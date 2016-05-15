@@ -9,6 +9,7 @@ import _debug from 'debug'
 import config from '../config'
 import webpackDevMiddleware from './middleware/webpack-dev'
 import webpackHMRMiddleware from './middleware/webpack-hmr'
+import bodyparser from 'koa-bodyparser'
 import sqlite3 from 'co-sqlite3'
 
 const debug = _debug('app:server')
@@ -20,6 +21,9 @@ app.use(async (ctx, next) => {
     ctx.db = await sqlite3('./database.sqlite3')
     await next()
 });
+
+app.use(bodyparser())
+
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {
   app.use(convert(proxy(config.proxy.options)))
