@@ -9,11 +9,17 @@ import _debug from 'debug'
 import config from '../config'
 import webpackDevMiddleware from './middleware/webpack-dev'
 import webpackHMRMiddleware from './middleware/webpack-hmr'
+import sqlite3 from 'co-sqlite3'
 
 const debug = _debug('app:server')
 const paths = config.utils_paths
 const app = new Koa()
 
+// make database available on koa context
+app.use(async (ctx, next) => {
+    ctx.db = await sqlite3('./database.sqlite3')
+    await next()
+});
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {
   app.use(convert(proxy(config.proxy.options)))
