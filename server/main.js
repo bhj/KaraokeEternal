@@ -11,6 +11,7 @@ import webpackDevMiddleware from './middleware/webpack-dev'
 import webpackHMRMiddleware from './middleware/webpack-hmr'
 import bodyparser from 'koa-bodyparser'
 import sqlite3 from 'co-sqlite3'
+import apiAccount from './api/account'
 
 const debug = _debug('app:server')
 const paths = config.utils_paths
@@ -24,6 +25,7 @@ app.use(async (ctx, next) => {
 
 app.use(bodyparser())
 
+app.use(apiAccount.routes())
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {
   app.use(convert(proxy(config.proxy.options)))
