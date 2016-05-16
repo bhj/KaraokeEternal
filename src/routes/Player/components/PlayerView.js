@@ -15,7 +15,7 @@ export const PlayerView = (props) => (
   </div>
 )
 
-Counter.propTypes = {
+PlayerView.propTypes = {
   // counter: React.PropTypes.number.isRequired,
   play: React.PropTypes.func.isRequired,
   pause: React.PropTypes.func.isRequired
