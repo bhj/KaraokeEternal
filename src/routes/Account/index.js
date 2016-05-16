@@ -1,9 +1,9 @@
-import AccountView from './components/AccountView'
+import AccountContainer from './containers/AccountContainer'
 
 // Sync route definition
 export default function(store){
   return {
     path: 'account',
-    component: AccountView
+    component: AccountContainer
   }
 }
