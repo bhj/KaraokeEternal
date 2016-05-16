@@ -44,9 +44,9 @@ export function loginUser(creds) {
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
-        localStorage.setItem('isAuthenticated', true)
-        localStorage.setItem('email', response.email)
-        localStorage.setItem('name', response.name)
+        localStorage.setItem('isAuthenticated', JSON.stringify(true))
+        localStorage.setItem('email', JSON.stringify(response.email))
+        localStorage.setItem('name', JSON.stringify(response.name))
         dispatch(receiveLogin(response))
       })
       .catch(err => {
@@ -91,9 +91,9 @@ export function logoutUser() {
     return fetch('/api/account/logout')
       .then(checkStatus)
       .then(response => {
-        localStorage.setItem('isAuthenticated', false)
-        localStorage.setItem('email', null)
-        localStorage.setItem('name', null)
+        localStorage.setItem('isAuthenticated', JSON.stringify(false))
+        localStorage.setItem('email', JSON.stringify(null))
+        localStorage.setItem('name', JSON.stringify(null))
         dispatch(receiveLogout())
       })
       .catch(err => {
@@ -230,9 +230,9 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   isFetching: false,
-  isAuthenticated: localStorage.getItem('isAuthenticated'),
-  email: localStorage.getItem('email'),
-  name: localStorage.getItem('name')
+  isAuthenticated: JSON.parse(localStorage.getItem('isAuthenticated')),
+  email: JSON.parse(localStorage.getItem('email')),
+  name: JSON.parse(localStorage.getItem('name'))
 }
 
 export default function userReducer (state = initialState, action) {
