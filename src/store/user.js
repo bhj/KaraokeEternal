@@ -222,7 +222,6 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-console.log('userReducer!')
 const initialState = {
   isFetching: false,
   isAuthenticated: false
