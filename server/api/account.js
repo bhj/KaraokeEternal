@@ -33,6 +33,12 @@ router.post('/api/account/login', async (ctx, next) => {
   }
 })
 
+// logout
+router.get('/api/account/logout', async (ctx, next) => {
+  ctx.cookies.set('id_token', '', {httpOnly: true})
+  ctx.status = 200
+})
+
 // create
 router.post('/api/account/create', async (ctx, next) => {
   let {name, email, newPassword, newPasswordConfirm} = ctx.request.body
