@@ -44,6 +44,9 @@ export function loginUser(creds) {
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
+        localStorage.setItem('isAuthenticated', true)
+        localStorage.setItem('email', response.email)
+        localStorage.setItem('name', response.name)
         dispatch(receiveLogin(response))
       })
       .catch(err => {
@@ -76,7 +79,7 @@ function receiveLogout() {
 function logoutError(message) {
   return {
     type: LOGOUT_FAIL,
-    payload: null
+    payload: message
   }
 }
 
@@ -88,6 +91,9 @@ export function logoutUser() {
     return fetch('/api/account/logout')
       .then(checkStatus)
       .then(response => {
+        localStorage.setItem('isAuthenticated', false)
+        localStorage.setItem('email', null)
+        localStorage.setItem('name', null)
         dispatch(receiveLogout())
       })
       .catch(err => {
@@ -224,7 +230,9 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   isFetching: false,
-  isAuthenticated: false
+  isAuthenticated: localStorage.getItem('isAuthenticated'),
+  email: localStorage.getItem('email'),
+  name: localStorage.getItem('name')
 }
 
 export default function userReducer (state = initialState, action) {
