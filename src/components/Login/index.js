@@ -3,11 +3,10 @@ import React, { Component, PropTypes } from 'react'
 export default class Login extends Component {
 
   render() {
-    const { onToggleNewClick, errorMessage } = this.props
+    const { errorMessage } = this.props
 
     return (
       <form>
-        <p>Sign in below or <a onClick={onToggleNewClick}>create a new account</a>.</p>
         <input type='text' ref='email' className="form-control" style={{ marginRight: '5px' }} placeholder='email' autoFocus/>
         <input type='password' ref='password' className="form-control" style={{ marginRight: '5px' }} placeholder='password'/>
         <button onClick={(event) => this.handleClick(event)} className="btn btn-primary">
@@ -32,6 +31,5 @@ export default class Login extends Component {
 
 Login.propTypes = {
   onLoginClick: PropTypes.func.isRequired,
-  onToggleNewClick: PropTypes.func.isRequired,
   errorMessage: PropTypes.string
 }

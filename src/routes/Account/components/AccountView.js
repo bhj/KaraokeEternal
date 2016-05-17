@@ -1,47 +1,59 @@
 import React, { PropTypes } from 'react'
 import Login from 'components/Login'
 import Logout from 'components/Logout'
-import Edit from '../components/Edit'
+import AccountForm from '../components/AccountForm'
 
 export class AccountView extends React.Component {
   static propTypes = {
-    // dispatch: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
     loginUser: PropTypes.func.isRequired,
     logoutUser: PropTypes.func.isRequired
   }
 
+  // initial state
   state = {
-    isNew: true // whether we're creating a new account
-  }
-
-  toggleNew () {
-    this.setState({isNew: !this.state.isNew})
+    viewMode: 'login'
   }
 
   render () {
     const {user, loginUser, logoutUser, createUser} = this.props
+    let viewMode = this.props.user.isAuthenticated ? 'edit' : this.state.viewMode
 
     return (
       <div className='container'>
         <h1>Account</h1>
-        {!user.isAuthenticated && !this.state.isNew &&
-          <Login
-            onLoginClick={ creds => loginUser(creds) }
-            onToggleNewClick={() => this.toggleNew()}
-            errorMessage={user.errorMessage}
-          />
+        {viewMode === 'login' &&
+          <div>
+            <p>Sign in below or <a onClick={() => this.setState({viewMode: 'create'})}>create a new account</a>.</p>
+            <Login
+              onLoginClick={ creds => loginUser(creds) }
+              errorMessage={user.errorMessage}
+            />
+          </div>
         }
 
-        {(user.isAuthenticated || this.state.isNew) &&
-          <Edit
-            isNew={this.state.isNew}
-            onToggleNewClick={() => this.toggleNew()}
-            onCreateClick={ user => createUser(user) }
-            name={this.state.isNew ? '' : user.name}
-            email={this.state.isNew ? '' : user.email}
-            errorMessage={user.errorMessage}
-          />
+        {viewMode === 'create' &&
+          <div>
+            <p>Create an account or <a onClick={() => this.setState({viewMode: 'login'})}>sign in with an existing one</a>.</p>
+            <AccountForm
+              onCreateClick={ user => createUser(user) }
+              errorMessage={user.errorMessage}
+              viewMode={viewMode}
+            />
+          </div>
+        }
+
+        {viewMode === 'edit' &&
+          <div>
+            <p>You may edit any account information here.</p>
+            <AccountForm
+              defaultName={user.name}
+              defaultEmail={user.email}
+              viewMode={viewMode}
+              onCreateClick={ user => createUser(user) }
+              errorMessage={user.errorMessage}
+            />
+          </div>
         }
 
         {user.isAuthenticated &&
