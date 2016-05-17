@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { loginUser, logoutUser, createUser } from 'store/user'
+import { loginUser, logoutUser, createUser, updateUser } from 'store/user'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -15,7 +15,8 @@ import AccountView from '../components/AccountView'
 const mapActionCreators = {
   loginUser,
   logoutUser,
-  createUser
+  createUser,
+  updateUser
 }
 
 const mapStateToProps = (state) => ({

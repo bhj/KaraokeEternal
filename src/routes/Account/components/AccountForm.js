@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react'
 export default class AccountForm extends Component {
 
   static propTypes = {
-    onCreateClick: PropTypes.func.isRequired,
+    onSubmitClick: PropTypes.func.isRequired,
     errorMessage: PropTypes.string
   }
 
@@ -18,8 +18,6 @@ export default class AccountForm extends Component {
   }
 
   render() {
-    const { errorMessage } = this.props
-
     return (
       <form>
         <input type='text' ref='name' value={this.state.name} onChange={this.handleChange('name')} className="form-control" placeholder='display name' autoFocus={this.props.viewMode === 'create'}/>
@@ -35,10 +33,6 @@ export default class AccountForm extends Component {
         <button onClick={(event) => this.handleClick(event)} className="btn btn-primary">
           {this.props.viewMode === 'create' ? 'Create Account' : 'Update Account'}
         </button>
-
-        {errorMessage &&
-          <p style={{color:'red'}}>{errorMessage}</p>
-        }
       </form>
     )
   }
@@ -49,20 +43,16 @@ export default class AccountForm extends Component {
     const email = this.refs.email
     const newPassword = this.refs.newPassword
     const newPasswordConfirm = this.refs.newPasswordConfirm
-    const curPassword = this.refs.curPassword || null
+    const curPassword = this.refs.curPassword
 
     const user = {
       name: name.value.trim(),
       email: email.value.trim(),
+      password: curPassword ? curPassword.value : null,
       newPassword: newPassword.value,
-      newPasswordConfirm: newPasswordConfirm.value,
+      newPasswordConfirm: newPasswordConfirm.value
      }
 
-    if (this.props.isNew) {
-      this.props.onCreateClick(user)
-    } else {
-      user.curPassword = curPassword.value
-//      this.props.onUpdateClick(user)
-    }
+    this.props.onSubmitClick(user)
   }
 }

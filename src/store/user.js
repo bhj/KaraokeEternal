@@ -1,5 +1,12 @@
 import 'whatwg-fetch'
 
+let fetchConfig = {
+  credentials: 'same-origin',
+  headers: new Headers({
+    'Content-Type': 'application/json'
+  })
+}
+
 // ------------------------------------
 // Login
 // ------------------------------------
@@ -31,24 +38,19 @@ function loginError(message) {
 // Calls the API to get a token and
 // dispatches actions along the way
 export function loginUser(creds) {
-  let config = {
-    method: 'POST',
-    headers: new Headers({
-      'Content-Type': 'application/json'
-    }),
-    body: JSON.stringify(creds)
-  }
-
   return dispatch => {
     dispatch(requestLogin(creds))
 
-    return fetch('/api/account/login', config)
+    return fetch('/api/account/login', {
+        ...fetchConfig,
+        method: 'POST',
+        body: JSON.stringify(creds)
+      })
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
-        localStorage.setItem('isAuthenticated', JSON.stringify(true))
-        localStorage.setItem('email', JSON.stringify(response.email))
-        localStorage.setItem('name', JSON.stringify(response.name))
+        localStorage.setItem('email', response.email)
+        localStorage.setItem('name', response.name)
         dispatch(receiveLogin(response))
       })
       .catch(err => {
@@ -90,12 +92,11 @@ export function logoutUser() {
   return dispatch => {
     dispatch(requestLogout())
 
-    return fetch('/api/account/logout')
+    return fetch('/api/account/logout', fetchConfig)
       .then(checkStatus)
       .then(response => {
-        localStorage.setItem('isAuthenticated', JSON.stringify(false))
-        localStorage.setItem('email', JSON.stringify(null))
-        localStorage.setItem('name', JSON.stringify(null))
+        localStorage.removeItem('email')
+        localStorage.removeItem('name')
         dispatch(receiveLogout())
       })
       .catch(err => {
@@ -133,18 +134,14 @@ function createError(message) {
 }
 
 export function createUser(user) {
-  let config = {
-    method: 'POST',
-    headers: new Headers({
-      'Content-Type': 'application/json'
-    }),
-    body: JSON.stringify(user)
-  }
-
   return dispatch => {
     dispatch(requestCreate(user))
 
-    return fetch('/api/account/create', config)
+    return fetch('/api/account/create', {
+        ...fetchConfig,
+        method: 'POST',
+        body: JSON.stringify(user)
+      })
       .then(checkStatus)
       .then(response => {
         dispatch(receiveCreate())
@@ -153,6 +150,56 @@ export function createUser(user) {
       })
       .catch(err => {
         dispatch(createError(err))
+      })
+  }
+}
+
+// ------------------------------------
+// Update account
+// ------------------------------------
+export const UPDATE = 'user/UPDATE'
+export const UPDATE_SUCCESS = 'user/UPDATE_SUCCESS'
+export const UPDATE_FAIL = 'user/UPDATE_FAIL'
+
+function requestUpdate(user) {
+  return {
+    type: UPDATE,
+    payload: user
+  }
+}
+
+function receiveUpdate(response) {
+  return {
+    type: UPDATE_SUCCESS,
+    payload: response
+  }
+}
+
+function updateError(message) {
+  return {
+    type: UPDATE_FAIL,
+    payload: message
+  }
+}
+
+export function updateUser(user) {
+  return dispatch => {
+    dispatch(requestUpdate(user))
+
+    return fetch('/api/account/update', {
+        ...fetchConfig,
+        method: 'POST',
+        body: JSON.stringify(user)
+      })
+      .then(checkStatus)
+      .then(response => response.json())
+      .then(response => {
+        localStorage.setItem('email', response.email)
+        localStorage.setItem('name', response.name)
+        dispatch(receiveUpdate(response))
+      })
+      .catch(err => {
+        dispatch(updateError(err))
       })
   }
 }
@@ -225,17 +272,35 @@ const ACTION_HANDLERS = {
     isFetching: false,
     errorMessage: payload.message
   }),
+  [UPDATE]: (state, {payload}) => ({
+    ...state,
+    isFetching: true,
+    errorMessage: null
+  }),
+  [UPDATE_SUCCESS]: (state, {payload}) => ({
+    ...state,
+    isFetching: false,
+    email: payload.email,
+    name: payload.name,
+    errorMessage: null
+  }),
+  [UPDATE_FAIL]: (state, {payload}) => ({
+    ...state,
+    isFetching: false,
+    errorMessage: payload.message
+  }),
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = {
+let initialState = {
   isFetching: false,
-  isAuthenticated: JSON.parse(localStorage.getItem('isAuthenticated')),
-  email: JSON.parse(localStorage.getItem('email')),
-  name: JSON.parse(localStorage.getItem('name'))
+  email: localStorage.getItem('email'),
+  name: localStorage.getItem('name')
 }
+
+initialState.isAuthenticated = (initialState.email !== null && initialState.name !== null)
 
 export default function userReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

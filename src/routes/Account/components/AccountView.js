@@ -7,17 +7,18 @@ export class AccountView extends React.Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
     loginUser: PropTypes.func.isRequired,
-    logoutUser: PropTypes.func.isRequired
+    logoutUser: PropTypes.func.isRequired,
+    createUser: PropTypes.func.isRequired,
+    updateUser: PropTypes.func.isRequired
   }
 
-  // initial state
   state = {
-    viewMode: 'login'
+    viewMode: 'login' // default
   }
 
   render () {
-    const {user, loginUser, logoutUser, createUser} = this.props
-    let viewMode = this.props.user.isAuthenticated ? 'edit' : this.state.viewMode
+    const {user, loginUser, logoutUser, createUser, updateUser} = this.props
+    let viewMode = user.isAuthenticated ? 'edit' : this.state.viewMode
 
     return (
       <div className='container'>
