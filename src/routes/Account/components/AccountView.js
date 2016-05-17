@@ -25,10 +25,7 @@ export class AccountView extends React.Component {
         {viewMode === 'login' &&
           <div>
             <p>Sign in below or <a onClick={() => this.setState({viewMode: 'create'})}>create a new account</a>.</p>
-            <Login
-              onLoginClick={ creds => loginUser(creds) }
-              errorMessage={user.errorMessage}
-            />
+            <Login onSubmitClick={ creds => loginUser(creds) } />
           </div>
         }
 
@@ -36,8 +33,7 @@ export class AccountView extends React.Component {
           <div>
             <p>Create an account or <a onClick={() => this.setState({viewMode: 'login'})}>sign in with an existing one</a>.</p>
             <AccountForm
-              onCreateClick={ user => createUser(user) }
-              errorMessage={user.errorMessage}
+              onSubmitClick={createUser}
               viewMode={viewMode}
             />
           </div>
@@ -50,10 +46,13 @@ export class AccountView extends React.Component {
               defaultName={user.name}
               defaultEmail={user.email}
               viewMode={viewMode}
-              onCreateClick={ user => createUser(user) }
-              errorMessage={user.errorMessage}
+              onSubmitClick={updateUser}
             />
           </div>
+        }
+
+        {user.errorMessage &&
+          <p style={{color:'red'}}>{user.errorMessage}</p>
         }
 
         {user.isAuthenticated &&
