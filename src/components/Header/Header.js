@@ -11,6 +11,9 @@ export const Header = () => (
         <IndexLinkContainer to='/' activeClassName={classes.activeRoute}>
           <NavItem>Home</NavItem>
         </IndexLinkContainer>
+        <LinkContainer to='/library' activeClassName={classes.activeRoute}>
+          <NavItem>Library</NavItem>
+        </LinkContainer>
         <LinkContainer to='/counter' activeClassName={classes.activeRoute}>
           <NavItem>Counter</NavItem>
         </LinkContainer>
