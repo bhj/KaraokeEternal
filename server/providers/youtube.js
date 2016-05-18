@@ -154,12 +154,12 @@ async function getPlaylistItems(username, key){
   let items = res.items
   log(' => %s of %s items', items.length, total)
 
-  // while(res.nextPageToken) {
-  //   let pageUrl = url + '&pageToken=' + res.nextPageToken
-  //   res = JSON.parse(await simpleGet(pageUrl))
-  //   items = items.concat(res.items)
-  //   log(' => %s of %s items (nextPageToken=%s)', items.length, total, res.nextPageToken)
-  // }
+  while(res.nextPageToken) {
+    let pageUrl = url + '&pageToken=' + res.nextPageToken
+    res = JSON.parse(await simpleGet(pageUrl))
+    items = items.concat(res.items)
+    log(' => %s of %s items (nextPageToken=%s)', items.length, total, res.nextPageToken)
+  }
 
   return items
 }
