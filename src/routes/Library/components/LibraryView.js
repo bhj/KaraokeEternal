@@ -9,7 +9,9 @@ class LibraryView extends React.Component {
   }
 
   componentWillMount() {
-    this.props.fetchArtists()
+    if (! this.props.library.artists) {
+      this.props.fetchArtists()
+    }
   }
 
   render () {
