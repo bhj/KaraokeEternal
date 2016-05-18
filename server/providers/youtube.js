@@ -78,7 +78,7 @@ async function process(item) {
 
   if (!artist) {
     log(' => new artist: %s', meta.artist)
-    let res = await db.run('INSERT INTO artists(artist) VALUES (?)', [meta.artist])
+    let res = await db.run('INSERT INTO artists(name) VALUES (?)', [meta.artist])
 
     if (!res) {
       error(' => Could not create artist: %s', meta.artist)
@@ -86,11 +86,11 @@ async function process(item) {
       return
     }
 
-    artist = {artist_id: res.lastID}
+    artist = {id: res.lastID}
   }
 
   let song = [
-    artist.artist_id,  // artistId
+    artist.id,  // artistId
     'youtube',  // provider
     meta.title, // title
     '',         // url
