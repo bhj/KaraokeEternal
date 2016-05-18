@@ -37,8 +37,6 @@ class LibraryView extends React.Component {
               key={artist.id}
               leftOptions={leftOptions}
               rightOptions={rightOptions}
-              // callActionWhenSwipingFarRight={item.callActionWhenSwipingFarRight}
-              // callActionWhenSwipingFarLeft={item.callActionWhenSwipingFarLeft}
             >
               {artist.name}
             </SwipeToRevealOptions>
