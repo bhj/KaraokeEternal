@@ -1,10 +1,11 @@
 import 'whatwg-fetch'
 
 let fetchConfig = {
-  credentials: 'same-origin',
   headers: new Headers({
     'Content-Type': 'application/json'
-  })
+  }),
+  // include the cookie that contains our JWT
+  credentials: 'same-origin'
 }
 
 // ------------------------------------
