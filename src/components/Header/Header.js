@@ -13,9 +13,6 @@ export const Header = () => (
       <LinkContainer to='/library'>
         <NavItem className={classes.noCollapse}>Library</NavItem>
       </LinkContainer>
-      <LinkContainer to='/counter'>
-        <NavItem className={classes.noCollapse}>Counter</NavItem>
-      </LinkContainer>
       <LinkContainer to='/player'>
         <NavItem className={classes.noCollapse}>Player</NavItem>
       </LinkContainer>
