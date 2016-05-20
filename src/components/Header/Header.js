@@ -1,31 +1,29 @@
 import React from 'react'
 import { Navbar, Nav, NavItem } from 'react-bootstrap'
 import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
-import classes from './Header.scss'
+// import classes from './Header.scss'
+import classes from './Header.css'
 
 export const Header = () => (
-  <div>
-    <h1>Karaoke Forever</h1>
-    <Navbar>
-      <Nav>
-        <IndexLinkContainer to='/' activeClassName={classes.activeRoute}>
-          <NavItem>Home</NavItem>
-        </IndexLinkContainer>
-        <LinkContainer to='/library' activeClassName={classes.activeRoute}>
-          <NavItem>Library</NavItem>
-        </LinkContainer>
-        <LinkContainer to='/counter' activeClassName={classes.activeRoute}>
-          <NavItem>Counter</NavItem>
-        </LinkContainer>
-        <LinkContainer to='/player' activeClassName={classes.activeRoute}>
-          <NavItem>Player</NavItem>
-        </LinkContainer>
-        <LinkContainer to='/account' activeClassName={classes.activeRoute}>
-          <NavItem>Account</NavItem>
-        </LinkContainer>
-      </Nav>
-    </Navbar>
-  </div>
+  <Navbar staticTop={true}>
+    <Nav>
+      <IndexLinkContainer to='/'>
+        <NavItem className={classes.noCollapse}>Home</NavItem>
+      </IndexLinkContainer>
+      <LinkContainer to='/library'>
+        <NavItem className={classes.noCollapse}>Library</NavItem>
+      </LinkContainer>
+      <LinkContainer to='/counter'>
+        <NavItem className={classes.noCollapse}>Counter</NavItem>
+      </LinkContainer>
+      <LinkContainer to='/player'>
+        <NavItem className={classes.noCollapse}>Player</NavItem>
+      </LinkContainer>
+      <LinkContainer to='/account'>
+        <NavItem className={classes.noCollapse}>Account</NavItem>
+      </LinkContainer>
+    </Nav>
+  </Navbar>
 )
 
 export default Header
