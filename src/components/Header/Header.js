@@ -5,7 +5,7 @@ import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import classes from './Header.css'
 
 export const Header = () => (
-  <Navbar staticTop={true}>
+  <Navbar fixedTop={true}>
     <Nav>
       <IndexLinkContainer to='/'>
         <NavItem className={classes.noCollapse}>Home</NavItem>

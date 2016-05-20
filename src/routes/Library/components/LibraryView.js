@@ -48,20 +48,18 @@ class LibraryView extends React.Component {
     if (!artists) return null
 
     return (
-      <div style={{height: 500, background: 'green'}}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <VirtualScroll
-              width={width}
-              height={height}
-              rowCount={artists.length}
-              rowHeight={65}
-              className={styles.VirtualScroll}
-              rowRenderer={(index) => this._rowRenderer(index)}
-            />
-          )}
-        </AutoSizer>
-      </div>
+      <AutoSizer>
+        {({ height, width }) => (
+          <VirtualScroll
+            width={width}
+            height={height}
+            rowCount={artists.length}
+            rowHeight={65}
+            className={styles.VirtualScroll}
+            rowRenderer={(index) => this._rowRenderer(index)}
+          />
+        )}
+      </AutoSizer>
     )
   }
 }
