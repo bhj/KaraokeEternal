@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
-import VirtualList from './VirtualList'
+import VirtualList from 'components/VirtualList'
+import SwipeableItem from 'components/SwipeableItem'
 import ArtistItem from './ArtistItem'
 
 class LibraryView extends React.Component {
@@ -20,16 +21,40 @@ class LibraryView extends React.Component {
 
     return (
       <VirtualList
-        items={artists}
-        rowComponent={ArtistItem}
         rowHeight={65}
-        onItemClick={this.handleClick.bind(this)}
+        rowCount={this.props.library.artists.length}
+        rowRenderer={(index) => this._rowRenderer(index)}
       />
     )
   }
 
-  handleClick(e){
-    console.log(e)
+  _rowRenderer ({ index }) {
+    let {id, name, count} = this.props.library.artists[index]
+    return (
+      <SwipeableItem
+        onItemClick={this.handleClick.bind(this, id)}
+        onSwipeReveal={this.handleSwipeReveal.bind(this)}
+      >
+        <ArtistItem
+          name={name}
+          count={count}
+          onSelectArtist={this.handleClick.bind(this, id, 'select')}
+        />
+      </SwipeableItem>
+    )
+  }
+
+  handleClick(id, action){
+    console.log(action, id)
+  }
+
+  handleSwipeReveal(ref) {
+    // close previous swipeable when another is revealed
+    if (this.lastOpenedRef){
+      this.lastOpenedRef.close()
+    }
+
+    this.lastOpenedRef = ref
   }
 }
 
