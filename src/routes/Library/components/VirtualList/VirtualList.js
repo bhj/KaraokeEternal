@@ -6,14 +6,15 @@ class VirtualList extends React.Component {
   static propTypes = {
     items: PropTypes.array.isRequired,
     rowHeight: PropTypes.number.isRequired,
-    rowComponent: PropTypes.func.isRequired
+    rowComponent: PropTypes.func.isRequired,
+    onItemClick: PropTypes.func.isRequired
   }
 
-  _rowRenderer ({ index }) {
-    let data = this.props.items[index]
-    // let data = {name}
-    return React.createElement(this.props.rowComponent, data)
-  }
+  // ItemClickHandler(i){
+  // 	this.list[i] = this.list[i] + 1;
+  //   console.log("force update of list item!");
+  //   this.refs.VirtualScroll.forceUpdate();
+  // },
 
   render () {
     let items = this.props.items
@@ -34,6 +35,12 @@ class VirtualList extends React.Component {
     )
   }
 
+  _rowRenderer ({ index }) {
+    let item = this.props.items[index]
+    item.onItemClick = this.props.onItemClick
+
+    return React.createElement(this.props.rowComponent, item)
+  }
 }
 
 export default VirtualList

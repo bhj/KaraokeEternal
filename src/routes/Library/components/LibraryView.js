@@ -23,8 +23,13 @@ class LibraryView extends React.Component {
         items={artists}
         rowComponent={ArtistItem}
         rowHeight={65}
+        onItemClick={this.handleClick.bind(this)}
       />
     )
+  }
+
+  handleClick(e){
+    console.log(e)
   }
 }
 
