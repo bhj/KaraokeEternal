@@ -5,8 +5,9 @@ import styles from './SwipeableItem.css'
 
 class SwipeableItem extends React.Component {
   static propTypes = {
-    onItemClick: PropTypes.func.isRequired,
-    onSwipeReveal: PropTypes.func.isRequired
+    onOptionsClick: PropTypes.func.isRequired,
+    onOptionsReveal: PropTypes.func.isRequired,
+    onOptionsClose:  PropTypes.func.isRequired,
   }
 
   render() {
@@ -29,11 +30,12 @@ class SwipeableItem extends React.Component {
      return (
        <SwipeToRevealOptions
          leftOptions={leftOptions}
-         onLeftClick={opt => this.props.onItemClick(opt.action)}
+         onLeftClick={opt => this.props.onOptionsClick(opt.action)}
          rightOptions={rightOptions}
-         onRightClick={opt => this.props.onItemClick(opt.action)}
+         onRightClick={opt => this.props.onOptionsClick(opt.action)}
          ref={(c) => this._ref = c}
-         onReveal={() => this.props.onSwipeReveal(this._ref)}
+         onReveal={() => this.props.onOptionsReveal(this._ref)}
+         onClose={() => this.props.onOptionsClose(this._ref)}
        >
          {this.props.children}
        </SwipeToRevealOptions>

@@ -32,29 +32,40 @@ class LibraryView extends React.Component {
     let {id, name, count} = this.props.library.artists[index]
     return (
       <SwipeableItem
-        onItemClick={this.handleClick.bind(this, id)}
-        onSwipeReveal={this.handleSwipeReveal.bind(this)}
+        onOptionsClick={this.handleOptionsClick.bind(this, id)}
+        onOptionsReveal={this.handleReveal.bind(this)}
+        onOptionsClose={this.handleClose.bind(this)}
       >
         <ArtistItem
           name={name}
           count={count}
-          onSelectArtist={this.handleClick.bind(this, id, 'select')}
+          onSelectArtist={this.handleArtistClick.bind(this, id)}
         />
       </SwipeableItem>
     )
   }
 
-  handleClick(id, action){
+  handleArtistClick(id){
+    // only if swipe options are not currently revealed
+    if (!this.lastRevealedRef){
+      console.log('select', id)
+    }
+  }
+
+  handleOptionsClick(id, action){
     console.log(action, id)
   }
 
-  handleSwipeReveal(ref) {
-    // close previous swipeable when another is revealed
-    if (this.lastOpenedRef){
-      this.lastOpenedRef.close()
+  handleClose(ref){
+    this.lastRevealedRef = null
+  }
+
+  handleReveal(ref) {
+    if (this.lastRevealedRef){
+      this.lastRevealedRef.close()
     }
 
-    this.lastOpenedRef = ref
+    this.lastRevealedRef = ref
   }
 }
 
