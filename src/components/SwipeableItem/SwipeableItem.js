@@ -7,7 +7,6 @@ class SwipeableItem extends React.Component {
   static propTypes = {
     onOptionsClick: PropTypes.func.isRequired,
     onOptionsReveal: PropTypes.func.isRequired,
-    onOptionsClose:  PropTypes.func.isRequired,
   }
 
   render() {
@@ -35,7 +34,6 @@ class SwipeableItem extends React.Component {
          onRightClick={opt => this.props.onOptionsClick(opt.action)}
          ref={(c) => this._ref = c}
          onReveal={() => this.props.onOptionsReveal(this._ref)}
-         onClose={() => this.props.onOptionsClose(this._ref)}
        >
          {this.props.children}
        </SwipeToRevealOptions>
