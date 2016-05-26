@@ -1,35 +1,40 @@
 import React, { PropTypes } from 'react'
 import VirtualList from 'components/VirtualList'
 import SwipeableItem from 'components/SwipeableItem'
-import ArtistItem from './ArtistItem'
+import ArtistItem from '../ArtistItem'
 
-class LibraryView extends React.Component {
+class ArtistList extends React.Component {
   static propTypes = {
     fetchArtists: PropTypes.func.isRequired,
-    library: PropTypes.object.isRequired
+    artists: PropTypes.object.isRequired
   }
 
   componentWillMount() {
-    if (! this.props.library.artists) {
-      this.props.fetchArtists()
-    }
+    this.props.fetchArtists()
+  }
+
+  componentWillUnmount() {
+    // get scrolltop
+    //
   }
 
   render () {
-    let artists = this.props.library.artists
+    // @todo - fix reducer structure
+    let artists = this.props.artists.artists
     if (!artists) return null
 
     return (
       <VirtualList
         rowHeight={65}
-        rowCount={this.props.library.artists.length}
+        rowCount={artists.length}
         rowRenderer={(index) => this._rowRenderer(index)}
       />
     )
   }
 
   _rowRenderer ({ index }) {
-    let {id, name, count} = this.props.library.artists[index]
+    // @todo - fix reducer structure
+    let {id, name, count} = this.props.artists.artists[index]
     return (
       <SwipeableItem
         onOptionsClick={this.handleOptionsClick.bind(this, id)}
@@ -66,4 +71,4 @@ class LibraryView extends React.Component {
   }
 }
 
-export default LibraryView
+export default ArtistList

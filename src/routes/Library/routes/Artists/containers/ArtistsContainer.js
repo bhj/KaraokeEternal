@@ -1,23 +1,23 @@
 import { connect } from 'react-redux'
-// import artist/song/search actions here?
+import { fetchArtists } from '../modules/artists'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
     wiring in the actions and state necessary to render a presentational
     component - in this case, the counter:   */
 
-import LibraryView from '../components/LibraryView'
+import ArtistList from '../components/ArtistList'
 
 /*  Object of action creators (can also be function that returns object).
     Keys will be passed as props to presentational components. Here we are
     implementing our wrapper around increment; the component doesn't care   */
 
 const mapActionCreators = {
-  // none currently... hmmmm
+  fetchArtists
 }
 
 const mapStateToProps = (state) => ({
-  library: state.library
+  artists: state.artists
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
@@ -34,4 +34,4 @@ const mapStateToProps = (state) => ({
     Selectors are composable. They can be used as input to other selectors.
     https://github.com/reactjs/reselect    */
 
-export default connect(mapStateToProps, mapActionCreators)(LibraryView)
+export default connect(mapStateToProps, mapActionCreators)(ArtistList)
