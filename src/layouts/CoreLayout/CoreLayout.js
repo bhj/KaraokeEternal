@@ -1,12 +1,12 @@
 import React from 'react'
 import Header from '../../components/Header'
-import classes from './CoreLayout.scss'
 import '../../styles/core.scss'
+import classes from './CoreLayout.css'
 
 export const CoreLayout = ({ children }) => (
-  <div className={classes.flexboxContainer}>
+  <div className={classes.flexContainer}>
     <Header />
-    <div className={classes.flexboxBody}>
+    <div className={classes.flexBody}>
       {children}
     </div>
   </div>
