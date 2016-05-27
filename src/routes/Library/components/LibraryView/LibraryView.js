@@ -1,9 +1,12 @@
 import React from 'react'
+import classes from './LibraryView.css'
 
 export const LibraryView = ({ children }) => (
-  <div style={{height: '100%'}}>
-    <p>Some search shit</p>
-    {children}
+  <div className={classes.flexContainer + ' ' + classes.flexItem}>
+    <p>Some search shit goes here</p>
+    <div className={classes.flexItem}>
+      {children}
+    </div>
   </div>
 )
 

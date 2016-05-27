@@ -4,9 +4,9 @@ import classes from './CoreLayout.css'
 import '../../styles/core.scss'
 
 export const CoreLayout = ({ children }) => (
-  <div className={classes.flexContainer}>
+  <div style={{height: '100%'}} className={classes.flexContainer}>
     <Header />
-    <div className={classes.flexContainer + ' ' + classes.flexGrow}>
+    <div className={classes.flexContainer + ' ' + classes.flexItem}>
       {children}
     </div>
     <Header />
