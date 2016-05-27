@@ -10,7 +10,7 @@ let isScanning
 // list all artists
 router.get('/api/artists', async (ctx, next) => {
   log('Artist list requested')
-  let artists = await ctx.db.all('SELECT artists.*, COUNT(songs.artist_id) AS count FROM artists JOIN songs ON artists.id = songs.artist_id GROUP BY artist_id')
+  let artists = await ctx.db.all('SELECT artists.*, COUNT(songs.artist_id) AS count FROM artists JOIN songs ON artists.id = songs.artist_id GROUP BY artist_id ORDER BY artists.name')
   log('Responding with %s artists', artists.length)
   ctx.body = artists
 })
