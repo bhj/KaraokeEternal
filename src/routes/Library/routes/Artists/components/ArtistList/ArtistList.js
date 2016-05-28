@@ -6,7 +6,7 @@ import ArtistItem from '../ArtistItem'
 class ArtistList extends React.Component {
   static propTypes = {
     fetchArtists: PropTypes.func.isRequired,
-    artists: PropTypes.object.isRequired
+    artists: PropTypes.array
   }
 
   componentWillMount() {
@@ -19,8 +19,7 @@ class ArtistList extends React.Component {
   }
 
   render () {
-    // @todo - fix reducer structure
-    let artists = this.props.artists.artists
+    let artists = this.props.artists
     if (!artists) return null
 
     return (
@@ -34,7 +33,7 @@ class ArtistList extends React.Component {
 
   _rowRenderer ({ index }) {
     // @todo - fix reducer structure
-    let {id, name, count} = this.props.artists.artists[index]
+    let {id, name, count} = this.props.artists[index]
     return (
       <SwipeableItem
         onOptionsClick={this.handleOptionsClick.bind(this, id)}

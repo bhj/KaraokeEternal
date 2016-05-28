@@ -1,11 +1,13 @@
 import { injectReducer } from '../../store/reducers'
 import { requireAuth } from 'components/requireAuth'
 import ArtistsRoute from './routes/Artists'
+import SongsRoute from './routes/Songs'
 
 export default (store) => ({
   path: 'library',
   childRoutes: [
-    ArtistsRoute(store)
+    ArtistsRoute(store),
+    SongsRoute(store)
   ],
   /*  Async getComponent is only invoked when route matches   */
   getComponent (nextState, cb) {
