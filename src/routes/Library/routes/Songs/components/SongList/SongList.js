@@ -17,6 +17,7 @@ class SongList extends React.Component {
           title={song.title}
           plays={song.plays}
           onSelectSong={this.handleSongClick.bind(this, song.uid)}
+          key={song.uid}
         />
       )
     })
