@@ -12,8 +12,12 @@ import ArtistList from '../components/ArtistList'
     Keys will be passed as props to presentational components. Here we are
     implementing our wrapper around increment; the component doesn't care   */
 
-const mapActionCreators = {
-  fetchArtists
+// include dispatch manually
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch,
+    fetchArtists: () => dispatch(fetchArtists())
+  };
 }
 
 const mapStateToProps = (state) => ({
@@ -34,4 +38,4 @@ const mapStateToProps = (state) => ({
     Selectors are composable. They can be used as input to other selectors.
     https://github.com/reactjs/reselect    */
 
-export default connect(mapStateToProps, mapActionCreators)(ArtistList)
+export default connect(mapStateToProps, mapDispatchToProps)(ArtistList)
