@@ -15,6 +15,14 @@ router.get('/api/artists', async (ctx, next) => {
   ctx.body = artists
 })
 
+// get songs for artistId
+router.get('/api/artists/:id', async (ctx, next) => {
+  let artistId = ctx.params.id
+  let songs = await ctx.db.all('SELECT songs.* FROM songs JOIN artists ON artists.id = songs.artist_id WHERE artist_id = ? ORDER BY songs.title', [artistId])
+  log('Returning %s songs for artistId=%s', songs.length, artistId)
+  ctx.body = songs
+})
+
 // scan for new songs
 router.get('/api/library/scan', async (ctx, next) => {
   if (isScanning) {
