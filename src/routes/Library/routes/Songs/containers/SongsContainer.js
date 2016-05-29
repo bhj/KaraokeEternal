@@ -17,7 +17,8 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
-  songs: state.library.songs
+  songs: state.library.songs,
+  isFetching: state.library.isFetching
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:

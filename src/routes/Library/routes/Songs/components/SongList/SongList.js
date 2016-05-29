@@ -4,11 +4,12 @@ import SongItem from '../SongItem'
 class SongList extends React.Component {
   static propTypes = {
     fetchSongs: PropTypes.func.isRequired,
-    songs: PropTypes.object
+    songs: PropTypes.object,
+    isFetching: PropTypes.bool.isRequired
   }
 
   render () {
-    if (!this.props.songs) return null
+    if (!this.props.songs || this.props.isFetching) return null
 
     let songs = this.props.songs.map(song => {
       return (
