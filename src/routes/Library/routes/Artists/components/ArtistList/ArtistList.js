@@ -32,7 +32,6 @@ class ArtistList extends React.Component {
   }
 
   _rowRenderer ({ index }) {
-    // @todo - fix reducer structure
     let {id, name, count} = this.props.artists[index]
     return (
       <SwipeableItem
