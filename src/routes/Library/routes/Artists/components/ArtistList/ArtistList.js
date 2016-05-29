@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import { push } from 'react-router-redux'
 import VirtualList from 'components/VirtualList'
 import SwipeableItem from 'components/SwipeableItem'
 import ArtistItem from '../ArtistItem'
@@ -53,7 +54,9 @@ class ArtistList extends React.Component {
       // skip; swipe options are currently revealed
       return
     }
-    console.log('select', id)
+
+    // @todo easiest way to get current URL dynamically?
+    this.props.dispatch(push('/library/artists/'+id))
   }
 
   handleOptionsClick(id, action){

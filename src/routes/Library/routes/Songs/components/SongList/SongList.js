@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
-import SwipeableItem from 'components/SwipeableItem'
-// import ArtistItem from '../ArtistItem'
+import SongItem from '../SongItem'
 
 class SongList extends React.Component {
   static propTypes = {
@@ -9,34 +8,28 @@ class SongList extends React.Component {
   }
 
   render () {
-    let songs = this.props.songs
-    if (!songs) return null
+    if (!this.props.songs) return null
+
+    let songs = this.props.songs.map(song => {
+      return (
+        <SongItem
+          title={song.title}
+          plays={song.plays}
+          onSelectSong={this.handleSongClick.bind(this, song.uid)}
+        />
+      )
+    })
 
     return (
-      <h1>Songs!</h1>
+      <div>
+        {songs}
+      </div>
     )
   }
 
-  // handleArtistClick(id){
-  //   let ref = this.lastRevealedRef
-  //   if (ref && (ref.state.showLeftButtons || ref.state.showRightButtons)){
-  //     // skip; swipe options are currently revealed
-  //     return
-  //   }
-  //   console.log('select', id)
-  // }
-  //
-  // handleOptionsClick(id, action){
-  //   console.log(action, id)
-  // }
-  //
-  // handleReveal(ref) {
-  //   if (this.lastRevealedRef){
-  //     this.lastRevealedRef.close()
-  //   }
-  //
-  //   this.lastRevealedRef = ref
-  // }
+  handleSongClick(uid){
+    console.log('select', uid)
+  }
 }
 
 export default SongList
