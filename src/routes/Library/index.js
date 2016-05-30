@@ -1,13 +1,13 @@
 import { injectReducer } from '../../store/reducers'
 import { requireAuth } from 'components/requireAuth'
 import { fetchArtists } from './modules/library'
-import ArtistsRoute from './routes/Artists'
+import ArtistsContainer from './routes/Artists/containers/ArtistsContainer'
 import SongsRoute from './routes/Songs'
 
 export default (store) => ({
   path: 'library',
+  indexRoute: {component: ArtistsContainer},
   childRoutes: [
-    ArtistsRoute(store),
     SongsRoute(store)
   ],
   getComponent (nextState, cb) {
