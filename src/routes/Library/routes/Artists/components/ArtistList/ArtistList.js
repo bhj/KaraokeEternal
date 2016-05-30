@@ -10,7 +10,6 @@ class ArtistList extends React.Component {
   }
 
   componentWillMount() {
-    this.props.fetchArtists()
   }
 
   componentWillUnmount() {
