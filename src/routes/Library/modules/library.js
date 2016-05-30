@@ -40,7 +40,7 @@ export function fetchArtists(id) {
   return dispatch => {
     dispatch(requestArtists())
 
-    return fetch('/api/artists', fetchConfig)
+    return fetch('/api/artist', fetchConfig)
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
@@ -84,7 +84,7 @@ export function fetchSongs(artistId) {
   return dispatch => {
     dispatch(requestSongs())
 
-    return fetch('/api/artists/'+artistId, fetchConfig)
+    return fetch('/api/artist/'+artistId, fetchConfig)
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {

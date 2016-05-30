@@ -8,7 +8,7 @@ var error = debug('app:library:error')
 let isScanning
 
 // list all artists
-router.get('/api/artists', async (ctx, next) => {
+router.get('/api/artist', async (ctx, next) => {
   log('Artist list requested')
   let artists = await ctx.db.all('SELECT artists.*, COUNT(songs.artist_id) AS count FROM artists JOIN songs ON artists.id = songs.artist_id GROUP BY artist_id ORDER BY artists.name')
   log('Responding with %s artists', artists.length)
@@ -16,7 +16,7 @@ router.get('/api/artists', async (ctx, next) => {
 })
 
 // get songs for artistId
-router.get('/api/artists/:id', async (ctx, next) => {
+router.get('/api/artist/:id', async (ctx, next) => {
   let artistId = ctx.params.id
   let songs = await ctx.db.all('SELECT songs.* FROM songs JOIN artists ON artists.id = songs.artist_id WHERE artist_id = ? ORDER BY songs.title', [artistId])
   log('Returning %s songs for artistId=%s', songs.length, artistId)
