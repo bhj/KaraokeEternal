@@ -1,15 +1,14 @@
 import React from 'react'
-import Header from '../../components/Header'
+import Navigation from '../../components/Navigation'
 import classes from './CoreLayout.css'
 import '../../styles/core.scss'
 
 export const CoreLayout = ({ children }) => (
   <div style={{height: '100%'}} className={classes.flexContainer}>
-    <Header />
     <div className={classes.flexContainer + ' ' + classes.flexItem}>
       {children}
     </div>
-    <Header />
+    <Navigation />
   </div>
 )
 
