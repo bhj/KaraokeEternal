@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import Header from 'components/Header'
 import Login from 'components/Login'
 import Logout from 'components/Logout'
 import AccountForm from '../components/AccountForm'
@@ -21,10 +22,10 @@ export class AccountView extends React.Component {
     let viewMode = user.isAuthenticated ? 'edit' : this.state.viewMode
 
     return (
-      <div className='container'>
-        <h1>Account</h1>
+      <div>
         {viewMode === 'login' &&
           <div>
+            <Header title="Sign in"/>
             <p>Sign in below or <a onClick={() => this.setState({viewMode: 'create'})}>create a new account</a>.</p>
             <Login onSubmitClick={ creds => loginUser(creds) } />
           </div>
@@ -32,6 +33,7 @@ export class AccountView extends React.Component {
 
         {viewMode === 'create' &&
           <div>
+            <Header title="Create Account"/>
             <p>Create an account or <a onClick={() => this.setState({viewMode: 'login'})}>sign in with an existing one</a>.</p>
             <AccountForm
               onSubmitClick={createUser}
@@ -42,6 +44,7 @@ export class AccountView extends React.Component {
 
         {viewMode === 'edit' &&
           <div>
+            <Header title={user.name} />
             <p>You may edit any account information here.</p>
             <AccountForm
               defaultName={user.name}
