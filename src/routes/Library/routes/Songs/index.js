@@ -2,7 +2,7 @@ import { fetchSongs } from '../../modules/library'
 import SongsContainer from './containers/SongsContainer'
 
 export default (store) => ({
-  path: 'artists/:artistId',
+  path: 'artist/:artistId',
   getComponent (nextState, cb) {
     require.ensure([], (require) => {
       const SongsContainer = require('./containers/SongsContainer').default

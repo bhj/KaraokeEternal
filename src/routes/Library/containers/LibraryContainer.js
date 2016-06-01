@@ -12,12 +12,16 @@ import LibraryView from '../components/LibraryView'
     Keys will be passed as props to presentational components. Here we are
     implementing our wrapper around increment; the component doesn't care   */
 
-const mapActionCreators = {
-  // none currently... hmmmm
+// include dispatch manually
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch,
+  };
 }
 
-const mapStateToProps = (state) => ({
-  library: state.library
+const mapStateToProps = (state, ownProps) => ({
+  library: state.library,
+  routerParams: ownProps.params
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
@@ -34,4 +38,4 @@ const mapStateToProps = (state) => ({
     Selectors are composable. They can be used as input to other selectors.
     https://github.com/reactjs/reselect    */
 
-export default connect(mapStateToProps, mapActionCreators)(LibraryView)
+export default connect(mapStateToProps, mapDispatchToProps)(LibraryView)

@@ -1,12 +1,10 @@
 import { injectReducer } from '../../store/reducers'
-import { requireAuth } from 'components/requireAuth'
+// import { requireAuth } from 'components/requireAuth'
 import { fetchArtists } from './modules/library'
-import ArtistsContainer from './routes/Artists/containers/ArtistsContainer'
 import SongsRoute from './routes/Songs'
 
 export default (store) => ({
   path: 'library',
-  indexRoute: {component: ArtistsContainer},
   childRoutes: [
     SongsRoute(store)
   ],
@@ -17,15 +15,17 @@ export default (store) => ({
       /*  Webpack - use require callback to define
           dependencies for bundling   */
       const Library = require('./containers/LibraryContainer').default
-      const reducer = require('./modules/library').default
 
-      /*  Add the reducer to the store on key 'library'  */
-      injectReducer(store, { key: 'library', reducer })
+      if (!store.getState().library) {
+        /*  Add the reducer to the store on key 'library'  */
+        const reducer = require('./modules/library').default
+        injectReducer(store, { key: 'library', reducer })
+        store.dispatch(fetchArtists())
+      }
 
-      store.dispatch(fetchArtists())
-
-      /*  Return getComponent   */
-      cb(null, requireAuth(Library))
+      // @todo: no requireAuth() because it forces everything to be
+      // re-mounted every time this route is hit... move it elsewhere
+      cb(null, Library)
 
     /* Webpack named bundle   */
   }, 'library')

@@ -1,20 +1,20 @@
 import React, { PropTypes } from 'react'
-import { push } from 'react-router-redux'
 import VirtualList from 'components/VirtualList'
 import ArtistItem from '../ArtistItem'
 
 class ArtistList extends React.Component {
   static propTypes = {
-    fetchArtists: PropTypes.func.isRequired,
-    artists: PropTypes.array
+    // fetchArtists: PropTypes.func.isRequired,
+    artists: PropTypes.array,
+    onArtistSelect: PropTypes.func.isRequired
   }
 
   componentWillMount() {
+    console.log('mounted!')
   }
 
   componentWillUnmount() {
-    // get scrolltop
-    //
+    console.log('UNmounted!')
   }
 
   render () {
@@ -36,19 +36,19 @@ class ArtistList extends React.Component {
       <ArtistItem
         name={name}
         count={count}
-        onSelectArtist={this.handleArtistClick.bind(this, id)}
+        onArtistSelect={this.props.onArtistSelect.bind(this, id)}
       />
     )
   }
 
-  handleArtistClick(id){
-    // @todo easiest way to get current URL dynamically?
-    this.props.dispatch(push('/library/artists/'+id))
-  }
+  // handleArtistClick(id){
+  //   // @todo easiest way to get current URL dynamically?
+  //   this.props.dispatch(push('/library/artists/'+id))
+  // }
 
-  handleOptionsClick(id, action){
-    console.log(action, id)
-  }
+  // handleOptionsClick(id, action){
+  //   console.log(action, id)
+  // }
 }
 
 export default ArtistList
