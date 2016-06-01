@@ -13,14 +13,18 @@ class LibraryView extends React.Component {
 
   render () {
     let params = this.props.routerParams
-    let display = params.artistId ? 0 : 1
 
     return (
       <div className={classes.flexContainer + ' ' + classes.flexItem}>
         <Header title="Artists"/>
         <p>Some search shit goes here</p>
-        <div className={classes.flexItem} style={{opacity: display}}>
+        <div className={classes.viewContainer}>
+          <div style={{display: params.artistId ? 'none' : 'block'}} className={classes.view}>
             <ArtistList artists={this.props.library.artists} onArtistSelect={this.handleArtistSelect.bind(this)}/>
+          </div>
+          <div style={{display: params.artistId ? 'block' : 'none'}} className={classes.view}>
+            {this.props.children}
+          </div>
         </div>
       </div>
     )
