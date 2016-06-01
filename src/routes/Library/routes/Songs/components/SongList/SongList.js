@@ -4,7 +4,7 @@ import SongItem from '../SongItem'
 class SongList extends React.Component {
   static propTypes = {
     fetchSongs: PropTypes.func.isRequired,
-    songs: PropTypes.object,
+    songs: PropTypes.array,
     isFetching: PropTypes.bool.isRequired
   }
 
