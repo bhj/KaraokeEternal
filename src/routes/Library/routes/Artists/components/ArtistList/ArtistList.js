@@ -4,17 +4,8 @@ import ArtistItem from '../ArtistItem'
 
 class ArtistList extends React.Component {
   static propTypes = {
-    // fetchArtists: PropTypes.func.isRequired,
     artists: PropTypes.array,
     onArtistSelect: PropTypes.func.isRequired
-  }
-
-  componentWillMount() {
-    console.log('mounted!')
-  }
-
-  componentWillUnmount() {
-    console.log('UNmounted!')
   }
 
   render () {
@@ -25,7 +16,7 @@ class ArtistList extends React.Component {
       <VirtualList
         rowHeight={65}
         rowCount={artists.length}
-        rowRenderer={(index) => this._rowRenderer(index)}
+        rowRenderer={this._rowRenderer.bind(this)}
       />
     )
   }
@@ -40,15 +31,6 @@ class ArtistList extends React.Component {
       />
     )
   }
-
-  // handleArtistClick(id){
-  //   // @todo easiest way to get current URL dynamically?
-  //   this.props.dispatch(push('/library/artists/'+id))
-  // }
-
-  // handleOptionsClick(id, action){
-  //   console.log(action, id)
-  // }
 }
 
 export default ArtistList
