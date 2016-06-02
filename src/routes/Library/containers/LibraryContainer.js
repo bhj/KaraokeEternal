@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-// import artist/song/search actions here?
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -20,7 +19,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  library: state.library,
+  artists: state.artists.entities,
   routerParams: ownProps.params
 })
 

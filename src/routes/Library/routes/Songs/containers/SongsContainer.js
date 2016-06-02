@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import { fetchSongs } from '../../../modules/library'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -12,13 +11,12 @@ import SongList from '../components/SongList'
     Keys will be passed as props to presentational components. Here we are
     implementing our wrapper around increment; the component doesn't care   */
 
-const mapActionCreators = {
-  fetchSongs
-}
+const mapActionCreators = {}
 
 const mapStateToProps = (state) => ({
-  songs: state.library.songs,
-  isFetching: state.library.isFetching
+  result: state.songs.result,
+  entities: state.songs.entities,
+  isFetching: state.songs.isFetching
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:

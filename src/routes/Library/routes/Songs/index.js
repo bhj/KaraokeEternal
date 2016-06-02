@@ -1,4 +1,4 @@
-import { fetchSongs } from '../../modules/library'
+import { fetchSongs } from './modules/songs'
 import SongsContainer from './containers/SongsContainer'
 
 export default (store) => ({

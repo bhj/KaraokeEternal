@@ -4,25 +4,25 @@ import ArtistItem from '../ArtistItem'
 
 class ArtistList extends React.Component {
   static propTypes = {
-    artists: PropTypes.array,
+    result: PropTypes.array,
+    entities: PropTypes.object,
     onArtistSelect: PropTypes.func.isRequired
   }
 
   render () {
-    let artists = this.props.artists
-    if (!artists) return null
+    if (!this.props.result.length) return null
 
     return (
       <VirtualList
         rowHeight={65}
-        rowCount={artists.length}
+        rowCount={this.props.result.length}
         rowRenderer={this._rowRenderer.bind(this)}
       />
     )
   }
 
   _rowRenderer ({ index }) {
-    let {id, name, count} = this.props.artists[index]
+    let {id, name, count} = this.props.entities[this.props.result[index]]
     return (
       <ArtistItem
         name={name}

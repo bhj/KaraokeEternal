@@ -1,6 +1,6 @@
 import { injectReducer } from '../../store/reducers'
 // import { requireAuth } from 'components/requireAuth'
-import { fetchArtists } from './modules/library'
+import { fetchArtists } from './routes/Artists/modules/artists'
 import SongsRoute from './routes/Songs'
 
 export default (store) => ({
@@ -16,10 +16,10 @@ export default (store) => ({
           dependencies for bundling   */
       const Library = require('./containers/LibraryContainer').default
 
-      if (!store.getState().library) {
-        /*  Add the reducer to the store on key 'library'  */
-        const reducer = require('./modules/library').default
-        injectReducer(store, { key: 'library', reducer })
+      // would prefer to let an Artists route dfn handle this initial
+      // load, but we're bypassing the router so LibraryView can always
+      // keep the artist list mounted regardless of subroute
+      if (!store.getState().artists.entities) {
         store.dispatch(fetchArtists())
       }
 

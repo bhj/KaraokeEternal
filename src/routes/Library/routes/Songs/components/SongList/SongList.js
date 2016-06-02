@@ -3,21 +3,22 @@ import SongItem from '../SongItem'
 
 class SongList extends React.Component {
   static propTypes = {
-    fetchSongs: PropTypes.func.isRequired,
-    songs: PropTypes.array,
+    result: PropTypes.array,
+    entities: PropTypes.object,
     isFetching: PropTypes.bool.isRequired
   }
 
   render () {
-    if (!this.props.songs || this.props.isFetching) return null
+    if (!this.props.result || this.props.isFetching) return null
 
-    let songs = this.props.songs.map(song => {
+    let songs = this.props.result.map(uid => {
+      let song = this.props.entities[uid]
       return (
         <SongItem
           title={song.title}
           plays={song.plays}
-          onSelectSong={this.handleSongClick.bind(this, song.uid)}
-          key={song.uid}
+          onSelectSong={this.handleSongClick.bind(this, uid)}
+          key={uid}
         />
       )
     })
