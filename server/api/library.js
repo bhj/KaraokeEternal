@@ -7,6 +7,32 @@ var error = debug('app:library:error')
 
 let isScanning
 
+// list library
+router.get('/api/library', async (ctx, next) => {
+  let rows
+  let artistIds = [] // artistIds ordered alphabetically
+  let artists = {} // indexed by artistId
+
+  // get artists
+  rows = await ctx.db.all('SELECT * FROM artists ORDER BY name')
+
+  rows.forEach(function(row){
+    artistIds.push(row.id)
+    artists[row.id] = row
+    artists[row.id].children = []
+  })
+
+  // assign songs to artists
+  rows = await ctx.db.all('SELECT * FROM songs ORDER BY title')
+
+  rows.forEach(function(row){
+    artists[row.artistId].children.push(row)
+  })
+
+  log('Responding with %s artists', artistIds.length)
+  ctx.body = {result: artistIds, entities: {artists}}
+})
+
 // list all artists
 router.get('/api/artist', async (ctx, next) => {
   log('Artist list requested')
