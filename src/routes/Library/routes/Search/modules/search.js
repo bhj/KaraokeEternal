@@ -9,45 +9,49 @@ let fetchConfig = {
 }
 
 // ------------------------------------
-// Get artists
+// Search library
 // ------------------------------------
-export const GET_ARTISTS = 'library/GET_ARTISTS'
-export const GET_ARTISTS_SUCCESS = 'library/GET_ARTISTS_SUCCESS'
-export const GET_ARTISTS_FAIL = 'library/GET_ARTISTS_FAIL'
+export const SEARCH_LIBRARY = 'library/SEARCH_LIBRARY'
+export const SEARCH_LIBRARY_SUCCESS = 'library/SEARCH_LIBRARY_SUCCESS'
+export const SEARCH_LIBRARY_FAIL = 'library/SEARCH_LIBRARY_FAIL'
 
-function requestArtists() {
+function requestSearch(query) {
   return {
-    type: GET_ARTISTS,
-    payload: null
+    type: SEARCH_LIBRARY,
+    payload: query
   }
 }
 
-function receiveArtists(response) {
+function receiveSearch(response) {
   return {
-    type: GET_ARTISTS_SUCCESS,
+    type: SEARCH_LIBRARY_SUCCESS,
     payload: response
   }
 }
 
-function artistError(message) {
+function searchError(message) {
   return {
-    type: GET_ARTISTS_FAIL,
+    type: SEARCH_LIBRARY_FAIL,
     payload: message
   }
 }
 
-export function fetchArtists(id) {
+export function doSearch(query) {
   return dispatch => {
-    dispatch(requestArtists())
+    dispatch(requestSearch(query))
 
-    return fetch('/api/artist', fetchConfig)
+    return fetch('/api/search', {
+        ...fetchConfig,
+        method: 'POST',
+        body: JSON.stringify({query})
+      })
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
-        dispatch(receiveArtists(response))
+        dispatch(receiveSearch(response))
       })
       .catch(err => {
-        dispatch(artistError(err))
+        dispatch(searchError(err))
       })
   }
 }
@@ -69,18 +73,20 @@ function checkStatus(response) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [GET_ARTISTS]: (state, {payload}) => ({
+
+  [SEARCH_LIBRARY]: (state, {payload}) => ({
     ...state,
     isFetching: true,
+    query: payload,
     errorMessage: null
   }),
-  [GET_ARTISTS_SUCCESS]: (state, {payload}) => ({
+  [SEARCH_LIBRARY_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     result: payload.result,
     entities: payload.entities
   }),
-  [GET_ARTISTS_FAIL]: (state, {payload}) => ({
+  [SEARCH_LIBRARY_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     errorMessage: payload.message
@@ -93,11 +99,12 @@ const ACTION_HANDLERS = {
 let initialState = {
   isFetching: false,
   errorMessage: null,
+  query: '',
   result: [],
   entities: null
 }
 
-export default function artistsReducer (state = initialState, action) {
+export default function searchReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

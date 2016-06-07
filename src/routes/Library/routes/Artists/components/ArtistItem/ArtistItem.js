@@ -3,6 +3,9 @@ import React from 'react'
 export const ArtistItem = (props) => (
   <div onClick={props.onArtistSelect}>
     {props.name} ({props.count})
+    <div>
+      {props.children}
+    </div>
   </div>
 )
 

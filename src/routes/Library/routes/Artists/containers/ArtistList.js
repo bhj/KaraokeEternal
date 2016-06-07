@@ -4,8 +4,8 @@ import ArtistList from '../components/ArtistList'
 const mapActionCreators = {}
 
 const mapStateToProps = (state) => ({
-  result: state.artists.result,
-  entities: state.artists.entities
+  ids: state.library.result,
+  artists: state.library.entities
 })
 
 export default connect(mapStateToProps, mapActionCreators)(ArtistList)

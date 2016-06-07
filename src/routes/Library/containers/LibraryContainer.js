@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { doSearch } from '../routes/Search/modules/search'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -11,16 +12,13 @@ import LibraryView from '../components/LibraryView'
     Keys will be passed as props to presentational components. Here we are
     implementing our wrapper around increment; the component doesn't care   */
 
-// include dispatch manually
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatch,
-  };
+const mapActionCreators = {
+  doSearch
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  artists: state.artists.entities,
-  routerParams: ownProps.params
+  routerParams: ownProps.params,
+  routerPath: ownProps.location.pathname
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
@@ -37,4 +35,4 @@ const mapStateToProps = (state, ownProps) => ({
     Selectors are composable. They can be used as input to other selectors.
     https://github.com/reactjs/reselect    */
 
-export default connect(mapStateToProps, mapDispatchToProps)(LibraryView)
+export default connect(mapStateToProps, mapActionCreators)(LibraryView)
