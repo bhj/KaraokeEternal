@@ -173,6 +173,7 @@ if (isUsingCSSModules) {
   webpackConfig.module.loaders.push({
     test: /\.scss$/,
     include: cssModulesRegex,
+    exclude: /src\/styles\/nomodule/,
     loaders: [
       'style',
       cssModulesLoader,
@@ -196,7 +197,8 @@ if (isUsingCSSModules) {
 const excludeCSSModules = isUsingCSSModules ? cssModulesRegex : false
 webpackConfig.module.loaders.push({
   test: /\.scss$/,
-  exclude: excludeCSSModules,
+  include: /src\/styles\/nomodule/,
+  // exclude: excludeCSSModules,
   loaders: [
     'style',
     BASE_CSS_LOADER,

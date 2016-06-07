@@ -2,6 +2,7 @@ import React from 'react'
 import Navigation from '../../components/Navigation'
 import classes from './CoreLayout.css'
 import '../../styles/core.scss'
+import '../../styles/nomodule/fa.scss';
 
 export const CoreLayout = ({ children }) => (
   <div style={{height: '100%'}} className={classes.flexContainer}>
