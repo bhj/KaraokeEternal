@@ -7,14 +7,14 @@ var error = debug('app:library:error')
 
 let isScanning
 
-// list library
+// all artists and songs (normalized)
 router.get('/api/library', async (ctx, next) => {
   let rows
-  let artistIds = [] // artistIds ordered alphabetically
+  let artistIds = [] // ordered alphabetically
   let artists = {} // indexed by artistId
 
   // get artists
-  rows = await ctx.db.all('SELECT * FROM artists ORDER BY name')
+  rows = await ctx.db.all('SELECT id, name FROM artists ORDER BY name')
 
   rows.forEach(function(row){
     artistIds.push(row.id)
