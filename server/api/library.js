@@ -1,17 +1,19 @@
 import Providers from '../providers/index'
 import KoaRouter from 'koa-router'
+
 let router = KoaRouter()
 let debug = require('debug')
-var log = debug('app:library')
-var error = debug('app:library:error')
-
+let log = debug('app:library')
+let error = debug('app:library:error')
 let isScanning
 
 // all artists and songs (normalized)
 router.get('/api/library', async (ctx, next) => {
-  let rows
+  let rows, songs
   let artistIds = [] // ordered alphabetically
   let artists = {} // indexed by artistId
+
+  log('Artist list requested')
 
   // get artists
   rows = await ctx.db.all('SELECT id, name FROM artists ORDER BY name')
@@ -23,56 +25,20 @@ router.get('/api/library', async (ctx, next) => {
   })
 
   // assign songs to artists
-  rows = await ctx.db.all('SELECT artistId, uid, title, plays FROM songs ORDER BY title')
+  songs = await ctx.db.all('SELECT artistId, uid, title, plays FROM songs ORDER BY title')
 
-  rows.forEach(function(row){
+  songs.forEach(function(row){
     artists[row.artistId].children.push(row)
   })
 
-  log('Responding with %s artists', artistIds.length)
+  log('Responding with %s songs by %s artists', songs.length, artistIds.length)
   ctx.body = {result: artistIds, entities: {artists}}
-})
-
-// list all artists
-router.get('/api/artist', async (ctx, next) => {
-  log('Artist list requested')
-  let rows = await ctx.db.all('SELECT artists.*, COUNT(songs.artist_id) AS count FROM artists JOIN songs ON artists.id = songs.artist_id GROUP BY artist_id ORDER BY artists.name')
-
-  // normalize
-  let result = []
-  let entities = {}
-
-  rows.forEach(function(row){
-    result.push(row.id) // artists.id
-    entities[row.id] = row
-  })
-
-  log('Responding with %s artists', result.length)
-  ctx.body = {result, entities}
-})
-
-// get songs for artistId
-router.get('/api/artist/:id', async (ctx, next) => {
-  let artistId = ctx.params.id
-  let rows = await ctx.db.all('SELECT songs.* FROM songs JOIN artists ON artists.id = songs.artist_id WHERE artist_id = ? ORDER BY songs.title', [artistId])
-
-  // normalize
-  let result = []
-  let entities = {}
-
-  rows.forEach(function(row){
-    result.push(row.uid) // songs.uid
-    entities[row.uid] = row
-  })
-
-  log('Returning %s songs for artistId=%s', result.length, artistId)
-  ctx.body = {result, entities}
 })
 
 // scan for new songs
 router.get('/api/library/scan', async (ctx, next) => {
   if (isScanning) {
-    error('Scan already in progress; aborting')
+    log('Scan already in progress; skipping request')
     return
   }
 
