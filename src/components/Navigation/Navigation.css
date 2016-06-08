@@ -1,7 +1,13 @@
-.noCollapse {
-  float: left;
+.flexContainer {
+  display: flex;
+  text-align: center;
 }
 
-.navBar {
-  margin-bottom: 0;
+.flexItem {
+  flex: 1;
+}
+
+.button {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
 }
