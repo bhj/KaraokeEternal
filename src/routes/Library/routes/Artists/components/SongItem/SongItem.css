@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  height: 48px;
+  margin-left: 48px;
+}
+
+.title {
+  flex: 1;
+  font-size: 24px;
+}
+
+.button {
+  flex: 0 0 none;
+}
+
+.plays {
+  flex: 0 0 20px;
+  height: 20px;
+  width: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 20px;
+  background: #4962c7;
+  margin: 0 10px;
+  color: white;
+  font-size: .75rem;
+}

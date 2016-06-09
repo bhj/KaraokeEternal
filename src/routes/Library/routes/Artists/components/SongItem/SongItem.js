@@ -1,8 +1,13 @@
 import React from 'react'
+import classes from './SongItem.css'
 
 export const SongItem = (props) => (
-  <div onClick={props.onSelectSong}>
-    {props.title} ({props.plays})
+  <div>
+    <div onClick={props.onSelectSong} className={classes.container}>
+      <div className={classes.title}>{props.title}</div>
+      <div className={classes.plays}>{props.plays}</div>
+    </div>
+    {props.children}
   </div>
 )
 
