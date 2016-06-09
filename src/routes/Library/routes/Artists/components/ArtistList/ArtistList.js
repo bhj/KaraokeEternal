@@ -14,6 +14,7 @@ class ArtistList extends React.Component {
 
   VirtualScroll = null
   expandedId = null
+  lastStartIndex = null
 
   render () {
     if (!this.props.ids.length) return null
@@ -28,6 +29,9 @@ class ArtistList extends React.Component {
             rowCount={this.props.ids.length}
             rowHeight={this.rowHeight.bind(this)}
             rowRenderer={this.rowRenderer.bind(this)}
+            onRowsRendered={this.handleRowsRendered.bind(this)}
+            scrollToIndex={this.lastStartIndex}
+            scrollToAlignment="start"
             overscanRowCount={10}
           />
         )}
@@ -49,6 +53,18 @@ class ArtistList extends React.Component {
 
     // this.VirtualScroll.recomputeRowHeights()
     // this.VirtualScroll.forceUpdate()
+  }
+
+  handleRowsRendered({startIndex}) {
+    this.lastStartIndex = startIndex
+  }
+
+  componentWillUnmount() {
+    localStorage.setItem('lastStartIndex', this.lastStartIndex)
+  }
+
+  componentWillMount() {
+    this.lastStartIndex = localStorage.getItem('lastStartIndex')
   }
 
   rowRenderer({index}) {
