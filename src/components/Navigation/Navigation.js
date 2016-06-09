@@ -5,13 +5,13 @@ import classes, {active} from './Navigation.css'
 export const Navigation = (props) => (
   <div className={classes.flexContainer}>
     <Link to='/library' className={classes.flexItem+' '+classes.button} activeClassName={active}>
-      <i className="fa fa-book fa-2x"></i>
+      <i className={'material-icons '+classes.icon}>library_music</i>
     </Link>
     <Link to='/player' className={classes.flexItem+' '+classes.button} activeClassName={active}>
-      <i className="fa fa-list-ol fa-2x"></i>
+      <i className={'material-icons '+classes.icon}>playlist_play</i>
     </Link>
     <Link to='/account' className={classes.flexItem+' '+classes.button} activeClassName={active}>
-      <i className="fa fa-user fa-2x"></i>
+      <i className={'material-icons '+classes.icon}>person</i>
     </Link>
   </div>
 )

@@ -15,6 +15,10 @@
   color: #a9a9a9;
 }
 
+.icon {
+  font-size: 36px !important;
+}
+
 .active {
   color: #4962c7;
 }
