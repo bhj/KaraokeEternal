@@ -1,26 +1,25 @@
 .container {
   display: flex;
-  height: 50px;
+  height: 48px;
 }
 
 .name {
   flex: 1;
   font-size: 24px;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  white-space: nowrap;
 }
 
-.button {
-  flex: 0 0 none;
-}
-
-.count {
-  flex: 0 0 20px;
-  height: 20px;
-  width: 20px;
-  line-height: 20px;
+.countIcon {
+  height: 24px;
+  width: 24px;
+  line-height: 24px;
   text-align: center;
-  border-radius: 20px;
+  border-radius: 4px;
   background: #4962c7;
-  margin: 0 10px;
+  margin-left: 12px;
+  margin-right: 12px;
   color: white;
-  font-size: .75rem;
+  font-size: 14px;
 }

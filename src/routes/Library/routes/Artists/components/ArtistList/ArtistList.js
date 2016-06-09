@@ -4,7 +4,7 @@ import styles from 'react-virtualized/styles.css'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 
-const ROW_HEIGHT = 50
+const ROW_HEIGHT = 48
 
 class ArtistList extends React.Component {
   static propTypes = {

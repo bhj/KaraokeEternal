@@ -2,12 +2,14 @@ import React, { PropTypes} from 'react'
 import classes from './ArtistItem.css'
 
 export const ArtistItem = (props) => (
-  <div onClick={props.onArtistSelect} className={classes.container}>
-    <i className={'material-icons '+classes.icon}>
-      {props.isExpanded ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}
-    </i>
-    <div className={classes.name}>{props.name}</div>
-    <div className={classes.count}>{props.count}</div>
+  <div>
+    <div onClick={props.onArtistSelect} className={classes.container}>
+      <div>
+        <div className={classes.countIcon}>{props.count}</div>
+      </div>
+      <div className={classes.name}>{props.name}</div>
+    </div>
+    {props.children}
   </div>
 )
 
