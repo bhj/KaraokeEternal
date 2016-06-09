@@ -90,6 +90,7 @@ class ArtistList extends React.Component {
         name={artist.name}
         count={artist.children.length}
         onArtistSelect={this.handleArtistClick.bind(this, artist.id)}
+        isExpanded={artist.id === this.expandedId}
       >
         {children}
       </ArtistItem>

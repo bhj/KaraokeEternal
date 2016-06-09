@@ -5,6 +5,7 @@
 
 .name {
   flex: 1;
+  font-size: 24px;
 }
 
 .button {
@@ -12,14 +13,14 @@
 }
 
 .count {
-  flex: 0 0 40px;
-  height: 40px;
-  width: 40px;
-  line-height: 40px;
+  flex: 0 0 20px;
+  height: 20px;
+  width: 20px;
+  line-height: 20px;
   text-align: center;
-  border-radius: 40px;
-  background: #efefef;
+  border-radius: 20px;
+  background: #4962c7;
   margin: 0 10px;
-  color: #555;
-  font-size: 1rem;
+  color: white;
+  font-size: .75rem;
 }
