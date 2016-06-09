@@ -64,11 +64,8 @@ router.get('/api/library/scan', async (ctx, next) => {
     // call each provider's scan method, passing config object and
     // koa context (from which we can access the db, and possibly
     // send progress updates down the wire?)
-    //
-    // these scans could eventually be asynchronous (by removing 'await')
-    // but doing it synchronously for now
     log('Provider \'%s\' starting scan', provider)
-    Providers[provider].scan(config, ctx)
+    await Providers[provider].scan(config, ctx)
     log('Provider \'%s\' finished', provider)
   }
 

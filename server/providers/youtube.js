@@ -1,4 +1,4 @@
-import simpleGet from '../lib/simple-get'
+import fetch from 'isomorphic-fetch'
 var debug = require('debug')
 var log = debug('app:provider:youtube')
 var error = debug('app:provider:youtube:error')
@@ -44,7 +44,7 @@ export async function scan(config, ctx) {
 
 async function process(item) {
   let videoId = item.snippet.resourceId.videoId
-  log(' => [%s] %s', videoId, item.snippet.title)
+  log('Process [%s]: %s', videoId, item.snippet.title)
 
   if (seenIds.indexOf(videoId) !== -1) {
     log(' => skipped (videoId already encountered this run)')
@@ -74,7 +74,7 @@ async function process(item) {
 
   // creating new song
   // does the artist already exist?
-  let artist = await db.get('SELECT * FROM artists WHERE artist = ?', [meta.artist])
+  let artist = await db.get('SELECT * FROM artists WHERE name = ?', [meta.artist])
 
   if (!artist) {
     log(' => new artist: %s', meta.artist)
@@ -135,30 +135,29 @@ function parseArtistTitle(str){
 
 
 async function getPlaylistItems(username, key){
-  // get channel/playlist info for youtube user
-  let url = `https://www.googleapis.com/youtube/v3/channels?forUsername=${username}&key=${key}&part=contentDetails`
-  let res
   log('Fetching items by username: %s', username)
 
-  res = JSON.parse(await simpleGet(url))
+  // get channel/playlist info for youtube user
+  let url = `https://www.googleapis.com/youtube/v3/channels?forUsername=${username}&key=${key}&part=contentDetails`
+  let data = await (await fetch(url)).json()
 
-  if (typeof res.items[0].contentDetails.relatedPlaylists.uploads !== 'string') {
+  if (typeof data.items[0].contentDetails.relatedPlaylists.uploads !== 'string') {
     throw new Error('Could not read upload playlist id')
   }
 
-  let playlist = res.items[0].contentDetails.relatedPlaylists.uploads
+  let playlist = data.items[0].contentDetails.relatedPlaylists.uploads
   url = `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=${playlist}&key=${key}&maxResults=50&part=snippet`
-  res = JSON.parse(await simpleGet(url))
+  data = await (await fetch(url)).json()
 
-  let total = res.pageInfo.totalResults
-  let items = res.items
+  let total = data.pageInfo.totalResults
+  let items = data.items
   log(' => %s of %s items', items.length, total)
 
-  while(res.nextPageToken) {
-    let pageUrl = url + '&pageToken=' + res.nextPageToken
-    res = JSON.parse(await simpleGet(pageUrl))
-    items = items.concat(res.items)
-    log(' => %s of %s items (nextPageToken=%s)', items.length, total, res.nextPageToken)
+  while(data.nextPageToken) {
+    let pageUrl = url + '&pageToken=' + data.nextPageToken
+    data = await (await fetch(pageUrl)).json()
+    items = items.concat(data.items)
+    log(' => %s of %s items (nextPageToken=%s)', items.length, total, data.nextPageToken)
   }
 
   return items
