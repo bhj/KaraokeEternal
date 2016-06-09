@@ -1,11 +1,12 @@
 import React from 'react'
+import classes from './ArtistItem.css'
 
 export const ArtistItem = (props) => (
-  <div onClick={props.onArtistSelect}>
-    {props.name} ({props.count})
-    <div>
-      {props.children}
+  <div onClick={props.onArtistSelect} className={classes.container}>
+    <div className={classes.count}>
+      {props.count}
     </div>
+    <div className={classes.name}>{props.name}</div>
   </div>
 )
 

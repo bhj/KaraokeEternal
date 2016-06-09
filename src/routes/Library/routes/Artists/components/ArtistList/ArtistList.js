@@ -4,7 +4,7 @@ import styles from 'react-virtualized/styles.css'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 
-const ROW_HEIGHT = 20
+const ROW_HEIGHT = 50
 
 class ArtistList extends React.Component {
   static propTypes = {
@@ -85,7 +85,12 @@ class ArtistList extends React.Component {
     }
 
     return (
-      <ArtistItem key={artist.id} name={artist.name} count={artist.children.length} onArtistSelect={this.handleArtistClick.bind(this, artist.id)}>
+      <ArtistItem
+        key={artist.id}
+        name={artist.name}
+        count={artist.children.length}
+        onArtistSelect={this.handleArtistClick.bind(this, artist.id)}
+      >
         {children}
       </ArtistItem>
     )

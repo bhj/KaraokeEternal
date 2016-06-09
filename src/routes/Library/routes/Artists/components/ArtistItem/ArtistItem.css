@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  height: 50px;
+}
+
+.name {
+  flex: 1;
+}
+
+.button {
+  flex: 0 0 none;
+}
+
+.count {
+  flex: 0 0 40px;
+  height: 40px;
+  width: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 40px;
+  background: #efefef;
+  margin: 0 10px;
+  color: #555;
+  font-size: 1rem;
+}
