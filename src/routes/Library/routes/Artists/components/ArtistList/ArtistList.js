@@ -16,6 +16,10 @@ class ArtistList extends React.Component {
   expandedId = null
   lastStartIndex = null
 
+  rowRenderer = this.rowRenderer.bind(this)
+  handleRowsRendered = this.handleRowsRendered.bind(this)
+  rowHeight = this.rowHeight.bind(this)
+
   render () {
     if (!this.props.ids.length) return null
 
@@ -27,9 +31,9 @@ class ArtistList extends React.Component {
             height={height}
             ref={(c) => {this.VirtualScroll = c}}
             rowCount={this.props.ids.length}
-            rowHeight={this.rowHeight.bind(this)}
-            rowRenderer={this.rowRenderer.bind(this)}
-            onRowsRendered={this.handleRowsRendered.bind(this)}
+            rowHeight={this.rowHeight}
+            rowRenderer={this.rowRenderer}
+            onRowsRendered={this.handleRowsRendered}
             scrollToIndex={this.lastStartIndex}
             scrollToAlignment="start"
             overscanRowCount={10}
