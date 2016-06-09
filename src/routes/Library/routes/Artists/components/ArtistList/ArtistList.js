@@ -43,18 +43,15 @@ class ArtistList extends React.Component {
     )
   }
 
-  handleArtistClick(artistId, event) {
-    event.stopPropagation()
+  handleArtistClick(artistId) {
     this.expandedId = (artistId === this.expandedId) ? null : artistId
 
     this.VirtualScroll.recomputeRowHeights()
     this.VirtualScroll.forceUpdate()
   }
 
-  handleSongClick(uid, event) {
+  handleSongClick(uid) {
     console.log(uid)
-    // event.stopPropagation()
-
     // this.VirtualScroll.recomputeRowHeights()
     // this.VirtualScroll.forceUpdate()
   }
@@ -82,7 +79,7 @@ class ArtistList extends React.Component {
             key={song.uid}
             title={song.title}
             plays={song.plays}
-            onSelectSong={this.handleSongClick.bind(this, song.uid)}
+            onSelectSong={() => this.handleSongClick(song.uid)}
           />
         )
       }, this)
@@ -93,7 +90,7 @@ class ArtistList extends React.Component {
         key={artist.id}
         name={artist.name}
         count={artist.children.length}
-        onArtistSelect={this.handleArtistClick.bind(this, artist.id)}
+        onArtistSelect={() => this.handleArtistClick(artist.id)}
         isExpanded={artist.id === this.expandedId}
       >
         {children}
