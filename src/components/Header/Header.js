@@ -2,8 +2,8 @@ import React from 'react'
 import classes from './Header.css'
 
 export const Header = (props) => (
-  <div className={classes.center}>
-    <h1>{props.title}</h1>
+  <div className={classes.container}>
+    <h1 className={classes.title}>{props.title}</h1>
   </div>
 )
 
