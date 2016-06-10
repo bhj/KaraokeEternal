@@ -1,5 +1,5 @@
 import { injectReducer } from '../../store/reducers'
-// import { requireAuth } from 'components/requireAuth'
+import { requireAuth } from 'components/requireAuth'
 import { fetchLibrary } from './modules/library'
 import SearchRoute from './routes/Search'
 
@@ -27,9 +27,7 @@ export default (store) => ({
         store.dispatch(fetchLibrary())
       }
 
-      // @todo: no requireAuth() because it forces everything to be
-      // re-mounted every time this route is hit... move it elsewhere
-      cb(null, Library)
+      cb(null, requireAuth(Library))
 
     /* Webpack named bundle   */
   }, 'library')
