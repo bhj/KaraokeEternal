@@ -13,8 +13,8 @@ class ArtistList extends React.Component {
   }
 
   VirtualScroll = null
-  expandedId = null
   lastStartIndex = null
+  expandedIds = []
 
   rowRenderer = this.rowRenderer.bind(this)
   handleRowsRendered = this.handleRowsRendered.bind(this)
@@ -44,7 +44,13 @@ class ArtistList extends React.Component {
   }
 
   handleArtistClick(artistId) {
-    this.expandedId = (artistId === this.expandedId) ? null : artistId
+    let i = this.expandedIds.indexOf(artistId)
+
+    if (i === -1) {
+      this.expandedIds.push(artistId)
+    } else {
+      this.expandedIds.splice(i, 1)
+    }
 
     this.VirtualScroll.recomputeRowHeights()
     this.VirtualScroll.forceUpdate()
@@ -62,17 +68,20 @@ class ArtistList extends React.Component {
 
   componentWillUnmount() {
     localStorage.setItem('lastStartIndex', this.lastStartIndex)
+    localStorage.setItem('expandedIds', JSON.stringify(this.expandedIds))
   }
 
   componentWillMount() {
     this.lastStartIndex = localStorage.getItem('lastStartIndex')
+    this.expandedIds = JSON.parse(localStorage.getItem('expandedIds')) || []
   }
 
   rowRenderer({index}) {
     let artist = this.props.artists[this.props.ids[index]]
+    let isExpanded = this.expandedIds.indexOf(artist.id) !== -1
     let children = []
 
-    if (this.expandedId === artist.id){
+    if (isExpanded){
       artist.children.forEach(function(song, i) {
         children.push(
           <SongItem
@@ -91,7 +100,7 @@ class ArtistList extends React.Component {
         name={artist.name}
         count={artist.children.length}
         onArtistSelect={() => this.handleArtistClick(artist.id)}
-        isExpanded={artist.id === this.expandedId}
+        isExpanded={isExpanded}
       >
         {children}
       </ArtistItem>
@@ -101,7 +110,7 @@ class ArtistList extends React.Component {
   rowHeight({index}) {
     let rows = 1
 
-    if (this.expandedId === this.props.artists[this.props.ids[index]].id) {
+    if (this.expandedIds.indexOf(this.props.artists[this.props.ids[index]].id) !== -1) {
       rows += this.props.artists[this.props.ids[index]].children.length
     }
 
