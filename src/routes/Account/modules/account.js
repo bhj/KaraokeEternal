@@ -10,9 +10,9 @@ let fetchConfig = {
 // ------------------------------------
 // Login
 // ------------------------------------
-export const LOGIN = 'user/LOGIN'
-export const LOGIN_SUCCESS = 'user/LOGIN_SUCCESS'
-export const LOGIN_FAIL = 'user/LOGIN_FAIL'
+export const LOGIN = 'account/LOGIN'
+export const LOGIN_SUCCESS = 'account/LOGIN_SUCCESS'
+export const LOGIN_FAIL = 'account/LOGIN_FAIL'
 
 function requestLogin(creds) {
   return {
@@ -49,8 +49,7 @@ export function loginUser(creds) {
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
-        localStorage.setItem('email', response.email)
-        localStorage.setItem('name', response.name)
+        localStorage.setItem('user', JSON.stringify(response))
         dispatch(receiveLogin(response))
       })
       .catch(err => {
@@ -62,9 +61,9 @@ export function loginUser(creds) {
 // ------------------------------------
 // Logout
 // ------------------------------------
-export const LOGOUT = 'user/LOGOUT'
-export const LOGOUT_SUCCESS = 'user/LOGOUT_SUCCESS'
-export const LOGOUT_FAIL = 'user/LOGOUT_FAIL'
+export const LOGOUT = 'account/LOGOUT'
+export const LOGOUT_SUCCESS = 'account/LOGOUT_SUCCESS'
+export const LOGOUT_FAIL = 'account/LOGOUT_FAIL'
 
 function requestLogout() {
   return {
@@ -108,9 +107,9 @@ export function logoutUser() {
 // ------------------------------------
 // Create account
 // ------------------------------------
-export const CREATE = 'user/CREATE'
-export const CREATE_SUCCESS = 'user/CREATE_SUCCESS'
-export const CREATE_FAIL = 'user/CREATE_FAIL'
+export const CREATE = 'account/CREATE'
+export const CREATE_SUCCESS = 'account/CREATE_SUCCESS'
+export const CREATE_FAIL = 'account/CREATE_FAIL'
 
 function requestCreate(user) {
   return {
@@ -157,9 +156,9 @@ export function createUser(user) {
 // ------------------------------------
 // Update account
 // ------------------------------------
-export const UPDATE = 'user/UPDATE'
-export const UPDATE_SUCCESS = 'user/UPDATE_SUCCESS'
-export const UPDATE_FAIL = 'user/UPDATE_FAIL'
+export const UPDATE = 'account/UPDATE'
+export const UPDATE_SUCCESS = 'account/UPDATE_SUCCESS'
+export const UPDATE_FAIL = 'account/UPDATE_FAIL'
 
 function requestUpdate(user) {
   return {
@@ -194,12 +193,55 @@ export function updateUser(user) {
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
-        localStorage.setItem('email', response.email)
-        localStorage.setItem('name', response.name)
+        localStorage.setItem('user', JSON.stringify(response))
         dispatch(receiveUpdate(response))
       })
       .catch(err => {
         dispatch(updateError(err))
+      })
+  }
+}
+
+// ------------------------------------
+// Available Rooms
+// ------------------------------------
+export const GET_ROOMS = 'account/GET_ROOMS'
+export const GET_ROOMS_SUCCESS = 'account/GET_ROOMS_SUCCESS'
+export const GET_ROOMS_FAIL = 'account/GET_ROOMS_FAIL'
+
+function requestRooms() {
+  return {
+    type: GET_ROOMS,
+    payload: null
+  }
+}
+
+function receiveRooms(response) {
+  return {
+    type: GET_ROOMS_SUCCESS,
+    payload: response
+  }
+}
+
+function roomsError(message) {
+  return {
+    type: GET_ROOMS_FAIL,
+    payload: message
+  }
+}
+
+export function fetchRooms() {
+  return dispatch => {
+    dispatch(requestRooms())
+
+    return fetch('/api/account/rooms', fetchConfig)
+      .then(checkStatus)
+      .then(response => response.json())
+      .then(response => {
+        dispatch(receiveRooms(response))
+      })
+      .catch(err => {
+        dispatch(roomsError(err))
       })
   }
 }
@@ -229,15 +271,12 @@ const ACTION_HANDLERS = {
   [LOGIN_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    isAuthenticated: true,
-    email: payload.email,
-    name: payload.name,
+    user: payload,
     errorMessage: null
   }),
   [LOGIN_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    isAuthenticated: false,
     errorMessage: payload.message
   }),
   [LOGOUT]: (state, {payload}) => ({
@@ -247,9 +286,7 @@ const ACTION_HANDLERS = {
   [LOGOUT_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    isAuthenticated: false,
-    email: null,
-    name: null,
+    user: null,
     errorMessage: null
   }),
   [LOGOUT_FAIL]: (state, {payload}) => ({
@@ -280,11 +317,26 @@ const ACTION_HANDLERS = {
   [UPDATE_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    email: payload.email,
-    name: payload.name,
+    user: payload,
     errorMessage: null
   }),
   [UPDATE_FAIL]: (state, {payload}) => ({
+    ...state,
+    isFetching: false,
+    errorMessage: payload.message
+  }),
+  [GET_ROOMS]: (state, {payload}) => ({
+    ...state,
+    isFetching: true,
+    errorMessage: null
+  }),
+  [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
+    ...state,
+    isFetching: false,
+    rooms: payload,
+    errorMessage: null
+  }),
+  [GET_ROOMS_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     errorMessage: payload.message
@@ -296,13 +348,11 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   isFetching: false,
-  email: localStorage.getItem('email'),
-  name: localStorage.getItem('name')
+  user: JSON.parse(localStorage.getItem('user')),
+  rooms: []
 }
 
-initialState.isAuthenticated = (initialState.email !== null && initialState.name !== null)
-
-export default function userReducer (state = initialState, action) {
+export default function accountReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

@@ -3,38 +3,55 @@ import { hash, compare } from '../lib/bcrypt-promise'
 import KoaRouter from 'koa-router'
 let router = KoaRouter()
 
+// list available rooms
+router.get('/api/account/rooms', async (ctx, next) => {
+  let rooms = await ctx.db.all('SELECT * FROM rooms WHERE status = ?', ['open'])
+  return ctx.body = rooms
+})
+
 // login
 router.post('/api/account/login', async (ctx, next) => {
-  let {email, password} = ctx.request.body
+  let {email, password, roomId} = ctx.request.body
 
   // check presence of all fields
-  if (!email || !password) {
+  if (!email || !password || !roomId) {
     ctx.status = 422
     return ctx.body = 'All fields are required'
   }
 
   email = email.trim().toLowerCase()
 
-
+  // validate email
   let user = await ctx.db.get('SELECT * FROM users WHERE email = ?', [email])
 
+  // validate password
   if (!user || !await compare(password, user.password)) {
     ctx.status = 401
     return
   }
 
-  // client will use this info in UI and
-  // cache it in localStorage to persist reloads
-  ctx.body = {
-    name: user.name,
-    email: user.email
+  // validate roomId
+  let room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', [roomId])
+
+  if (!room || room.status !== 'open') {
+    ctx.status = 401
+    return ctx.body = 'Invalid Room'
   }
 
-  // store user id in JWT in httpOnly cookie
+  // client will use this info in UI and cache
+  // it in localStorage to persist across reloads
+  ctx.body = {
+    name: user.name,
+    email: user.email,
+    roomId: roomId
+  }
+
+  // store JWT in httpOnly cookie
   let token = jwt.sign({
     id: user.id,
     name: user.name,
     email: user.email,
+    roomId: roomId
   }, 'shared-secret')
 
   ctx.cookies.set('id_token', token, {httpOnly: true})
@@ -42,7 +59,7 @@ router.post('/api/account/login', async (ctx, next) => {
 
 // logout
 router.get('/api/account/logout', async (ctx, next) => {
-  ctx.cookies.set('id_token', '', {httpOnly: true})
+  ctx.cookies.set('id_token', '.', {httpOnly: true})
   ctx.status = 200
 })
 

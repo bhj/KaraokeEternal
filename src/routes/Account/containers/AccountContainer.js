@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { loginUser, logoutUser, createUser, updateUser } from 'store/user'
+import { loginUser, logoutUser, createUser, updateUser } from '../modules/account'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -20,7 +20,9 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.user
+  user: state.account.user,
+  rooms: state.account.rooms,
+  errorMessage: state.account.errorMessage
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:

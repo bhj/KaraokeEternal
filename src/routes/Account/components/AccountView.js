@@ -6,7 +6,8 @@ import AccountForm from '../components/AccountForm'
 
 export class AccountView extends React.Component {
   static propTypes = {
-    user: PropTypes.object.isRequired,
+    user: PropTypes.object,
+    rooms: PropTypes.array.isRequired,
     loginUser: PropTypes.func.isRequired,
     logoutUser: PropTypes.func.isRequired,
     createUser: PropTypes.func.isRequired,
@@ -18,8 +19,8 @@ export class AccountView extends React.Component {
   }
 
   render () {
-    const {user, loginUser, logoutUser, createUser, updateUser} = this.props
-    let viewMode = user.isAuthenticated ? 'edit' : this.state.viewMode
+    const {user, loginUser, logoutUser, createUser, updateUser, errorMessage} = this.props
+    let viewMode = user ? 'edit' : this.state.viewMode
 
     return (
       <div>
@@ -27,7 +28,7 @@ export class AccountView extends React.Component {
           <div>
             <Header title="Sign in"/>
             <p>Sign in below or <a onClick={() => this.setState({viewMode: 'create'})}>create a new account</a>.</p>
-            <Login onSubmitClick={ creds => loginUser(creds) } />
+            <Login onSubmitClick={creds => loginUser(creds)} rooms={this.props.rooms}/>
           </div>
         }
 
@@ -55,11 +56,11 @@ export class AccountView extends React.Component {
           </div>
         }
 
-        {user.errorMessage &&
-          <p style={{color:'red'}}>{user.errorMessage}</p>
+        {errorMessage &&
+          <p style={{color:'red'}}>{errorMessage}</p>
         }
 
-        {user.isAuthenticated &&
+        {user &&
           <Logout
             onLogoutClick={ () => logoutUser() }
           />
