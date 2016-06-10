@@ -4,13 +4,20 @@ import Home from './Home'
 import AccountRoute from './Account'
 import PlayerRoute from './Player'
 import LibraryRoute from './Library'
+import { fetchLibrary } from './Library/modules/library'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
 
 export const createRoutes = (store) => ({
   path: '/',
-  component: CoreLayout,
+  getComponent (nextState, cb) {
+    if (!store.getState().library.result.length) {
+      store.dispatch(fetchLibrary())
+    }
+
+    cb(null, CoreLayout)
+  },
   indexRoute: Home,
   childRoutes: [
     AccountRoute(store),

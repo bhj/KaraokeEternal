@@ -1,55 +1,102 @@
 import React, { PropTypes } from 'react'
-import Header from 'components/Header'
-import { push } from 'react-router-redux'
-import ArtistList from '../../routes/Artists/containers/ArtistList'
-import classes from './LibraryView.css'
+import { AutoSizer, VirtualScroll } from 'react-virtualized'
+import styles from 'react-virtualized/styles.css'
+import ArtistItem from '../ArtistItem'
+import SongItem from '../SongItem'
+
+const ROW_HEIGHT = 48
 
 class LibraryView extends React.Component {
   static propTypes = {
-    routerParams: PropTypes.object,
-    routerPath: PropTypes.string,
-    doSearch: PropTypes.func.isRequired
+    ids: PropTypes.array.isRequired,
+    artists: PropTypes.object.isRequired
   }
 
-  state = {
-    search: ''
-  }
+  VirtualScroll = null
+  expandedIds = []
+
+  rowRenderer = this.rowRenderer.bind(this)
+  rowHeight = this.rowHeight.bind(this)
 
   render () {
-    let isAtRoot = this.props.routerPath === '/library'
-    let params = this.props.routerParams
-    let headerTitle = params.artistId ? this.props.artists[params.artistId].name : 'Artists'
+    if (!this.props.ids.length) return null
 
     return (
-      <div className={classes.flexContainer + ' ' + classes.flexItem}>
-        <Header title={headerTitle}/>
-        <div>
-          <input type='text' ref='search' onChange={this.handleSearch.bind(this)} className="form-control" placeholder='search' />
-        </div>
-        <div className={classes.viewContainer}>
-          <div style={{display: isAtRoot ? 'block' : 'none'}} className={classes.view}>
-            <ArtistList onArtistSelect={this.handleArtistSelect.bind(this)}/>
-          </div>
-          <div style={{display: isAtRoot ? 'none' : 'block'}} className={classes.view}>
-            {this.props.children}
-          </div>
-        </div>
-      </div>
+      <AutoSizer>
+        {({ height, width }) => (
+          <VirtualScroll
+            width={width}
+            height={height}
+            ref={(c) => {this.VirtualScroll = c}}
+            rowCount={this.props.ids.length}
+            rowHeight={this.rowHeight}
+            rowRenderer={this.rowRenderer}
+            overscanRowCount={10}
+          />
+        )}
+      </AutoSizer>
     )
   }
 
-  handleArtistSelect(id){
-    // this.props.dispatch(push('/library/artist/'+id))
-  }
+  handleArtistClick(artistId) {
+    let i = this.expandedIds.indexOf(artistId)
 
-  handleSearch(event) {
-    if (this.props.routerPath !== '/library/search') {
-      this.props.dispatch(push('/library/search'))
+    if (i === -1) {
+      this.expandedIds.push(artistId)
+    } else {
+      this.expandedIds.splice(i, 1)
     }
 
-    this.props.doSearch(event.target.value)
-    // this.setState({search: event.target.value})
-    // console.log(event.target.value)
-  }}
+    this.VirtualScroll.recomputeRowHeights()
+    this.VirtualScroll.forceUpdate()
+  }
+
+  handleSongClick(uid) {
+    console.log(uid)
+    // this.VirtualScroll.recomputeRowHeights()
+    // this.VirtualScroll.forceUpdate()
+  }
+
+  rowRenderer({index}) {
+    let artist = this.props.artists[this.props.ids[index]]
+    let isExpanded = this.expandedIds.indexOf(artist.id) !== -1
+    let children = []
+
+    if (isExpanded){
+      artist.children.forEach(function(song, i) {
+        children.push(
+          <SongItem
+            key={song.uid}
+            title={song.title}
+            plays={song.plays}
+            onSelectSong={() => this.handleSongClick(song.uid)}
+          />
+        )
+      }, this)
+    }
+
+    return (
+      <ArtistItem
+        key={artist.id}
+        name={artist.name}
+        count={artist.children.length}
+        onArtistSelect={() => this.handleArtistClick(artist.id)}
+        isExpanded={isExpanded}
+      >
+        {children}
+      </ArtistItem>
+    )
+  }
+
+  rowHeight({index}) {
+    let rows = 1
+
+    if (this.expandedIds.indexOf(this.props.artists[this.props.ids[index]].id) !== -1) {
+      rows += this.props.artists[this.props.ids[index]].children.length
+    }
+
+    return rows * ROW_HEIGHT
+  }
+}
 
 export default LibraryView
