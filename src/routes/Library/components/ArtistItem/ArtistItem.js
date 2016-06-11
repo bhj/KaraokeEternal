@@ -4,9 +4,7 @@ import classes from './ArtistItem.css'
 export const ArtistItem = (props) => (
   <div>
     <div onClick={props.onArtistSelect} className={classes.container}>
-      <div>
-        <div className={classes.countIcon}>{props.count}</div>
-      </div>
+      <div className={classes.countIcon}>{props.count}</div>
       <div className={classes.name}>{props.name}</div>
     </div>
     {props.children}
