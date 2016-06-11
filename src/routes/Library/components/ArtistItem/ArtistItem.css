@@ -1,6 +1,7 @@
 .container {
   display: flex;
   height: 48px;
+  align-items: center;
 }
 
 .name {
@@ -18,8 +19,7 @@
   text-align: center;
   border-radius: 4px;
   background: #4962c7;
-  margin-left: 12px;
-  margin-right: 12px;
+  margin: 12px;
   color: white;
   font-size: 14px;
 }
