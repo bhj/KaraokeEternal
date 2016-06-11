@@ -4,7 +4,7 @@ import classes from './SongItem.css'
 export const SongItem = (props) => (
   <div onClick={props.onSelectSong} className={classes.container}>
     <div className={classes.star}>
-      <i className='material-icons md-36 md-dark md-inactive'>
+      <i className='material-icons md-48 md-dark md-inactive'>
         {props.isStarred ? 'star' : 'star_border'}
       </i>
     </div>

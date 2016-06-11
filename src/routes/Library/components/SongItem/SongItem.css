@@ -1,7 +1,8 @@
 .container {
   display: flex;
-  height: 48px;
+  height: 44px;
   align-items: center;
+  margin-left: 10px;
 }
 
 .title {
@@ -13,13 +14,11 @@
 }
 
 .star {
-  width: 48px;
-  text-align: center;
 }
 
 .stats {
   display: flex;
   align-items: center;
-  margin-left: 12px;
-  margin-right: 12px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
