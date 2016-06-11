@@ -6,7 +6,7 @@
 
 .name {
   flex: 1;
-  font-size: 24px;
+  font-size: 20px;
   text-overflow: ellipsis;
   overflow:hidden;
   white-space: nowrap;

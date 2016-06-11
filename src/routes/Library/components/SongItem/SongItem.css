@@ -1,27 +1,25 @@
 .container {
   display: flex;
   height: 48px;
-  margin-left: 48px;
+  align-items: center;
 }
 
 .title {
   flex: 1;
-  font-size: 24px;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  white-space: nowrap;
 }
 
-.button {
-  flex: 0 0 none;
-}
-
-.plays {
-  flex: 0 0 20px;
-  height: 20px;
-  width: 20px;
-  line-height: 20px;
+.star {
+  width: 48px;
   text-align: center;
-  border-radius: 20px;
-  background: #4962c7;
-  margin: 0 10px;
-  color: white;
-  font-size: .75rem;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+  margin-right: 12px;
 }
