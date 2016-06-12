@@ -94,8 +94,7 @@ export function logoutUser() {
     return fetch('/api/account/logout', fetchConfig)
       .then(checkStatus)
       .then(response => {
-        localStorage.removeItem('email')
-        localStorage.removeItem('name')
+        localStorage.removeItem('user')
         dispatch(receiveLogout())
       })
       .catch(err => {
