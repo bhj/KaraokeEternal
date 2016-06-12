@@ -9,7 +9,8 @@ const ROW_HEIGHT = 44
 class LibraryView extends React.Component {
   static propTypes = {
     ids: PropTypes.array.isRequired,
-    artists: PropTypes.object.isRequired
+    artists: PropTypes.object.isRequired,
+    queueSong: PropTypes.func.isRequired
   }
 
   VirtualScroll = null
@@ -52,9 +53,7 @@ class LibraryView extends React.Component {
   }
 
   handleSongClick(uid) {
-    console.log(uid)
-    // this.VirtualScroll.recomputeRowHeights()
-    // this.VirtualScroll.forceUpdate()
+    this.props.queueSong(uid)
   }
 
   rowRenderer({index}) {

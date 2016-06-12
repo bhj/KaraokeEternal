@@ -14,6 +14,7 @@ import sqlite3 from 'co-sqlite3'
 import jwt from 'koa-jwt'
 import apiAccount from './api/account'
 import apiLibrary from './api/library'
+import apiQueue from './api/queue'
 
 const debug = _debug('app:server')
 const paths = config.utils_paths
@@ -33,6 +34,7 @@ app.use(convert(
 
 app.use(apiAccount.routes())
 app.use(apiLibrary.routes())
+app.use(apiQueue.routes())
 
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {
