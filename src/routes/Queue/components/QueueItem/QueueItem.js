@@ -9,9 +9,10 @@ export const QueueItem = (props) => (
       </i>
     </div>
 
-    <div className={classes.title}>{props.title}</div>
-    <div className={classes.artist}>{props.artist}</div>
-
+    <div className={classes.primary}>
+      <div className={classes.title}>{props.title}</div>
+      <div className={classes.artist}>{props.artist}</div>
+    </div>
   </div>
 )
 
