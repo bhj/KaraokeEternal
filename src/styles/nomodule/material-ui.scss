@@ -18,14 +18,12 @@
 .button {
   display: inline-block;
   position: relative;
-  padding: 12px;
-  // width: 120px;
-  // height: 32px;
-  // line-height: 32px;
+  padding: 16px;
   border-radius: 4px;
-  // font-size: 0.9em;
+  font-size: 16px;
   background-color: #fff;
   color: #646464;
+  border: none;
 }
 
 .button.wide {
