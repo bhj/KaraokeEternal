@@ -15,7 +15,7 @@ export default class Login extends Component {
         <input type='password' ref='password' className="form-control" style={{ marginRight: '5px' }} placeholder='password'/>
         Room: <select ref='room'>{roomOpts}</select>
 
-        <button onClick={(event) => this.handleClick(event)} className="btn btn-primary">
+        <button onClick={(event) => this.handleClick(event)} className="button wide green raised">
           Sign In
         </button>
       </form>

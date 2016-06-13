@@ -30,7 +30,7 @@ export default class AccountForm extends Component {
           <input type='password' ref='curPassword' className="form-control" placeholder='current password'/>
         }
 
-        <button onClick={(event) => this.handleClick(event)} className="btn btn-primary">
+        <button onClick={(event) => this.handleClick(event)} className="button wide green raised">
           {this.props.viewMode === 'create' ? 'Create Account' : 'Update Account'}
         </button>
       </form>
