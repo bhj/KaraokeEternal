@@ -1,4 +1,4 @@
-import AccountContainer from './containers/AccountContainer'
+import AccountView from './containers/AccountView'
 import { fetchRooms } from './modules/account'
 
 // route definition
@@ -7,7 +7,7 @@ export default function(store){
     path: 'account',
     getComponent (nextState, cb) {
       store.dispatch(fetchRooms())
-      cb(null, AccountContainer)
+      cb(null, AccountView)
     }
   }
 }

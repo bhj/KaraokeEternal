@@ -5,7 +5,7 @@ export default class Logout extends Component {
   render() {
     return (
       <button className='button wide grey raised' onClick={this.props.onLogoutClick}>
-        <i className='fa fa-sign-out'/>{' '}Sign Out
+        Sign Out
       </button>
     )
   }

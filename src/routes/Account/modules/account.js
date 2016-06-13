@@ -245,6 +245,18 @@ export function fetchRooms() {
   }
 }
 
+// ------------------------------------
+// Misc
+// ------------------------------------
+export const CHANGE_VIEW = 'account/CHANGE_VIEW'
+
+export function changeView(mode) {
+  return {
+    type: CHANGE_VIEW,
+    payload: mode
+  }
+}
+
 // helper for fetch response
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -340,6 +352,10 @@ const ACTION_HANDLERS = {
     isFetching: false,
     errorMessage: payload.message
   }),
+  [CHANGE_VIEW]: (state, {payload}) => ({
+    ...state,
+    viewMode: payload
+  }),
 }
 
 // ------------------------------------
@@ -348,7 +364,8 @@ const ACTION_HANDLERS = {
 let initialState = {
   isFetching: false,
   user: JSON.parse(localStorage.getItem('user')),
-  rooms: []
+  rooms: [],
+  viewMode: 'login'
 }
 
 export default function accountReducer (state = initialState, action) {
