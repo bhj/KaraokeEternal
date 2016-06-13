@@ -1,36 +1,50 @@
 import React, { PropTypes } from 'react'
 import Header from 'components/Header'
-import SongItem from '../../Library/components/SongItem'
+import QueueItem from './QueueItem'
+import styles from './QueueView.css'
 
 class QueueView extends React.Component {
   static propTypes = {
-    uids: PropTypes.array.isRequired,
+    queuedIds: PropTypes.array.isRequired,
+    queuedItems: PropTypes.object.isRequired,
+    errorMessage: PropTypes.string,
+    // library data
+    artistIds: PropTypes.array.isRequired,
+    artists: PropTypes.object.isRequired,
+    songUIDs: PropTypes.array.isRequired,
     songs: PropTypes.object.isRequired,
-    errorMessage: PropTypes.string
   }
 
   handleSongClick = this.handleSongClick.bind(this)
 
   render() {
-    let songs = this.props.uids.map(function(uid, i) {
-      let song = this.props.songs[uid]
+    if (!this.props.artistIds.length) return null;
+
+    let songs = this.props.queuedIds.map(function(qId, i) {
+      let qItem = this.props.queuedItems[qId]
+      let song = this.props.songs[qItem.songUID]
+
       return (
-        <SongItem
-          key={uid}
+        <QueueItem
+          key={qId}
+          artist={this.props.artists[song.artistId].name}
           title={song.title}
-          plays={song.plays}
           onSelectSong={this.handleSongClick}
         />
       )
     }, this)
 
     return (
-      <div>
+      <div className={styles.flexContainer}>
         <Header title="Queue"/>
+
         {this.props.errorMessage &&
           <p>{this.props.errorMessage}</p>
         }
-        {songs}
+
+        <div className={styles.scrollable}>
+          {songs}
+        </div>
       </div>
     )
   }

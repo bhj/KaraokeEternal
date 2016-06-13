@@ -8,8 +8,10 @@ const ROW_HEIGHT = 44
 
 class LibraryView extends React.Component {
   static propTypes = {
-    ids: PropTypes.array.isRequired,
+    artistIds: PropTypes.array.isRequired,
     artists: PropTypes.object.isRequired,
+    songUIDs: PropTypes.array.isRequired,
+    songs: PropTypes.object.isRequired,
     queueSong: PropTypes.func.isRequired
   }
 
@@ -20,7 +22,7 @@ class LibraryView extends React.Component {
   rowHeight = this.rowHeight.bind(this)
 
   render () {
-    if (!this.props.ids.length) return null
+    if (!this.props.artistIds.length) return null
 
     return (
       <AutoSizer>
@@ -29,7 +31,7 @@ class LibraryView extends React.Component {
             width={width}
             height={height}
             ref={(c) => {this.VirtualScroll = c}}
-            rowCount={this.props.ids.length}
+            rowCount={this.props.artistIds.length}
             rowHeight={this.rowHeight}
             rowRenderer={this.rowRenderer}
             overscanRowCount={10}
@@ -57,18 +59,18 @@ class LibraryView extends React.Component {
   }
 
   rowRenderer({index}) {
-    let artist = this.props.artists[this.props.ids[index]]
+    let artist = this.props.artists[this.props.artistIds[index]]
     let isExpanded = this.expandedIds.indexOf(artist.id) !== -1
     let children = []
 
     if (isExpanded){
-      artist.children.forEach(function(song, i) {
+      artist.songs.forEach(function(uid, i) {
         children.push(
           <SongItem
-            key={song.uid}
-            title={song.title}
-            plays={song.plays}
-            onSelectSong={() => this.handleSongClick(song.uid)}
+            key={uid}
+            title={this.props.songs[uid].title}
+            plays={this.props.songs[uid].plays}
+            onSelectSong={() => this.handleSongClick(uid)}
           />
         )
       }, this)
@@ -78,7 +80,7 @@ class LibraryView extends React.Component {
       <ArtistItem
         key={artist.id}
         name={artist.name}
-        count={artist.children.length}
+        count={artist.songs.length}
         onArtistSelect={() => this.handleArtistClick(artist.id)}
         isExpanded={isExpanded}
       >
@@ -90,8 +92,8 @@ class LibraryView extends React.Component {
   rowHeight({index}) {
     let rows = 1
 
-    if (this.expandedIds.indexOf(this.props.artists[this.props.ids[index]].id) !== -1) {
-      rows += this.props.artists[this.props.ids[index]].children.length
+    if (this.expandedIds.indexOf(this.props.artists[this.props.artistIds[index]].id) !== -1) {
+      rows += this.props.artists[this.props.artistIds[index]].songs.length
     }
 
     return rows * ROW_HEIGHT

@@ -9,9 +9,11 @@ let isScanning
 
 // all artists and songs (normalized)
 router.get('/api/library', async (ctx, next) => {
-  let rows, songs
-  let artistIds = [] // ordered alphabetically
-  let artists = {} // indexed by artistId
+  let rows
+  let artistIds = [] // results ordered alphabetically
+  let songUIDs = []  // results
+  let artists = {}   // indexed by artistId
+  let songs = {}     // indexed by UID
 
   log('Artist list requested')
 
@@ -20,19 +22,26 @@ router.get('/api/library', async (ctx, next) => {
 
   rows.forEach(function(row){
     artistIds.push(row.id)
+
     artists[row.id] = row
-    artists[row.id].children = []
+    artists[row.id].songs = []
   })
 
   // assign songs to artists
-  songs = await ctx.db.all('SELECT artistId, uid, title, plays FROM songs ORDER BY title')
+  rows = await ctx.db.all('SELECT artistId, uid, title, plays FROM songs ORDER BY title')
 
-  songs.forEach(function(row){
-    artists[row.artistId].children.push(row)
+  rows.forEach(function(row){
+    songUIDs.push(row.uid)
+
+    songs[row.uid] = row
+    artists[row.artistId].songs.push(row.uid)
   })
 
-  log('Responding with %s songs by %s artists', songs.length, artistIds.length)
-  ctx.body = {result: artistIds, entities: {artists}}
+  log('Responding with %s songs by %s artists', songUIDs.length, artistIds.length)
+  ctx.body = {
+    artists: {result: artistIds, entities: artists},
+    songs: {result: songUIDs, entities: songs}
+  }
 })
 
 // scan for new songs

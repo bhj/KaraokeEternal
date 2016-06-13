@@ -7,8 +7,10 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
-  ids: state.library.result,
-  artists: state.library.entities
+  artistIds: state.library.artists.result,
+  artists: state.library.artists.entities,
+  songUIDs: state.library.songs.result,
+  songs: state.library.songs.entities
 })
 
 export default connect(mapStateToProps, mapActionCreators)(LibraryView)

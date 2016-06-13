@@ -18,18 +18,18 @@ router.get('/api/queue', async (ctx, next) => {
     return ctx.body = 'Room is invalid or closed'
   }
 
-  let uids = []
-  let songs = {}
+  let queuedIds = []
+  let items = {}
 
   // get songs
-  let rows = await ctx.db.all('SELECT queues.*, songs.title FROM queues JOIN songs USING (uid) WHERE roomId = ? ORDER BY queues.date', [roomId])
+  let rows = await ctx.db.all('SELECT * FROM queue WHERE roomId = ? ORDER BY date', [roomId])
 
   rows.forEach(function(row){
-    uids.push(row.uid)
-    songs[row.uid] = row
+    queuedIds.push(row.id)
+    items[row.id] = row
   })
 
-  ctx.body = {result: uids, entities: {songs}}
+  ctx.body = {result: queuedIds, entities: items}
 })
 
 // queue song
@@ -58,9 +58,8 @@ router.put('/api/queue/:uid', async (ctx, next) => {
   }
 
   // add to queue
-  let now = new Date()
-  let res = await ctx.db.run('INSERT INTO queues (roomId, userId, uid, date) VALUES (?, ?, ?, ?)',
-    [roomId, ctx.state.user.id, ctx.params.uid, now])
+  let res = await ctx.db.run('INSERT INTO queue (roomId, userId, songUID, date) VALUES (?, ?, ?, ?)',
+    [roomId, ctx.state.user.id, ctx.params.uid, Date.now()])
 
   return ctx.status = (res.changes === 1) ? 200 : 500
 })

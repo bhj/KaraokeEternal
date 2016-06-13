@@ -1,0 +1,10 @@
+.flexContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable {
+  flex: 1;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}

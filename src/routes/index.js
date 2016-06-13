@@ -13,7 +13,7 @@ import { fetchLibrary } from './Library/modules/library'
 export const createRoutes = (store) => ({
   path: '/',
   getComponent (nextState, cb) {
-    if (!store.getState().library.result.length) {
+    if (!store.getState().library.artists.result.length) {
       store.dispatch(fetchLibrary())
     }
 

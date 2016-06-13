@@ -77,8 +77,8 @@ const ACTION_HANDLERS = {
   [GET_LIBRARY_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    result: payload.result,
-    entities: payload.entities.artists
+    artists: payload.artists,
+    songs: payload.songs
   }),
   [GET_LIBRARY_FAIL]: (state, {payload}) => ({
     ...state,
@@ -93,8 +93,8 @@ const ACTION_HANDLERS = {
 let initialState = {
   isFetching: false,
   errorMessage: null,
-  result: [],
-  entities: {}
+  artists: {result: [], entities:{}},
+  songs: {result: [], entities:{}}
 }
 
 export default function artistsReducer (state = initialState, action) {

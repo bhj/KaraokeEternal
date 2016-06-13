@@ -10,12 +10,12 @@ const CoreLayout = (props) => {
   let showLibrary = props.routerPath === '/library'
 
   return (
-    <div style={{height: '100%'}} className={classes.container}>
-      <div className={classes.viewContainer}>
-        <div style={{display: showLibrary ? 'block' : 'none'}} className={classes.view}>
+    <div style={{height: '100%'}} className={classes.flexContainer}>
+      <div className={classes.flexGrow}>
+        <div className={showLibrary ? classes.activeView : classes.inactiveView}>
           <LibraryView/>
         </div>
-        <div style={{display: showLibrary ? 'none' : 'block'}} className={classes.view}>
+        <div className={showLibrary ? classes.inactiveView : classes.activeView}>
           {props.children}
         </div>
       </div>

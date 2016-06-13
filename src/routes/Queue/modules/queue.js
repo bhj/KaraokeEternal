@@ -127,7 +127,7 @@ const ACTION_HANDLERS = {
     ...state,
     isFetching: true,
     result: payload.result,
-    entities: payload.entities.songs
+    entities: payload.entities
   }),
   [GET_QUEUE_FAIL]: (state, {payload}) => ({
     ...state,

@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.title {
+  /*flex: 1;*/
+  font-size: 18px;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  white-space: nowrap;
+}

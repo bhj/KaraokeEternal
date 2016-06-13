@@ -9,9 +9,14 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
-  uids: state.queue.result,
-  songs: state.queue.entities,
-  errorMessage: state.queue.errorMessage
+  queuedIds: state.queue.result,
+  queuedItems: state.queue.entities,
+  errorMessage: state.queue.errorMessage,
+  // library data
+  artistIds: state.library.artists.result,
+  artists: state.library.artists.entities,
+  songUIDs: state.library.songs.result,
+  songs: state.library.songs.entities,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(QueueView)

@@ -1,9 +1,9 @@
-.container {
+.flexContainer {
   display: flex;
   flex-direction: column;
 }
 
-.viewContainer {
+.flexGrow {
   flex: 1;
   position: relative;
 }
@@ -12,4 +12,14 @@
   width: 100%;
   height: 100%;
   position: absolute;
+}
+
+.activeView {
+  composes: view;
+  display: flex;
+}
+
+.inactiveView {
+  composes: view;
+  display: none;
 }
