@@ -16,7 +16,7 @@ router.post('/api/account/login', async (ctx, next) => {
   // check presence of all fields
   if (!email || !password || !roomId) {
     ctx.status = 422
-    return ctx.body = 'All fields are required'
+    return ctx.body = 'Email, password, and room are required'
   }
 
   email = email.trim().toLowerCase()
