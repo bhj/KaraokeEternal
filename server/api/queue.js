@@ -3,13 +3,12 @@ let router = KoaRouter()
 
 // get queue
 router.get('/api/queue', async (ctx, next) => {
-  // use roomId from their JWT
   if (!ctx.state.user) {
     ctx.status = 401
     return ctx.body = 'Invalid token (try signing in again)'
   }
 
-  // verify room
+  // use roomId from their JWT
   let roomId = ctx.state.user.roomId
   let room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', [roomId])
 
@@ -34,13 +33,12 @@ router.get('/api/queue', async (ctx, next) => {
 
 // queue song
 router.put('/api/queue/:uid', async (ctx, next) => {
-  // use roomId from their JWT
   if (!ctx.state.user) {
     ctx.status = 401
     return ctx.body = 'Invalid token (try signing in again)'
   }
 
-  // verify room
+  // use roomId from their JWT
   let roomId = ctx.state.user.roomId
   let room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', [roomId])
 
