@@ -13,6 +13,8 @@ class QueueView extends React.Component {
     artists: PropTypes.object.isRequired,
     songUIDs: PropTypes.array.isRequired,
     songs: PropTypes.object.isRequired,
+    // user data
+    user: PropTypes.object.isRequired,
   }
 
   handleSongClick = this.handleSongClick.bind(this)
@@ -30,6 +32,8 @@ class QueueView extends React.Component {
           artist={this.props.artists[song.artistId].name}
           title={song.title}
           onSelectSong={this.handleSongClick}
+          userName={qItem.userName}
+          canDelete={qItem.userId === this.props.user.id}
         />
       )
     }, this)
