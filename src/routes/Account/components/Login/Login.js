@@ -11,7 +11,7 @@ export default class Login extends Component {
 
     return (
       <form>
-        <input type='text' ref='email' placeholder="email" autoFocus={true}/>
+        <input type='email' ref='email' placeholder="email" autoFocus={true}/>
         <input type='password' ref='password' placeholder="password"/>
         <br/>
         <label>Room</label>

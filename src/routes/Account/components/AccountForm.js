@@ -47,7 +47,7 @@ export default class AccountForm extends Component {
         {(viewMode === 'create' || user) &&
           <form>
             <input type='text' ref='name' value={this.state.name} onChange={this.handleChange('name')} autoFocus={viewMode === 'create'} placeholder='display name'/>
-            <input type='text' ref='email' value={this.state.email} onChange={this.handleChange('email')} placeholder='email'/>
+            <input type='email' ref='email' value={this.state.email} onChange={this.handleChange('email')} placeholder='email'/>
 
             <input type='password' ref='newPassword' placeholder={viewMode === 'create' ? 'password' : 'new password'}/>
             <input type='password' ref='newPasswordConfirm' placeholder={viewMode === 'create' ? 'confirm password' : 'confirm new password'}/>
