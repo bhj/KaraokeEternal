@@ -6,6 +6,7 @@ export default class AccountForm extends Component {
   static propTypes = {
     user: PropTypes.object,
     rooms: PropTypes.array,
+    viewMode: PropTypes.string.isRequired,
     loginUser: PropTypes.func.isRequired,
     logoutUser: PropTypes.func.isRequired,
     createUser: PropTypes.func.isRequired,
