@@ -21,7 +21,7 @@ router.get('/api/queue', async (ctx, next) => {
   let items = {}
 
   // get songs
-  let rows = await ctx.db.all('SELECT * FROM queue WHERE roomId = ? ORDER BY date', [roomId])
+  let rows = await ctx.db.all('SELECT queue.*, users.name AS userName FROM queue LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
 
   rows.forEach(function(row){
     queuedIds.push(row.id)
