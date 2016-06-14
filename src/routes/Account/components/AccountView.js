@@ -18,12 +18,12 @@ class AccountView extends React.Component {
       <div className={classes.flexContainer}>
         <Header title={headerTitle}/>
 
-        {errorMessage &&
-          <p style={{color:'red'}}>{errorMessage}</p>
-        }
-
         <div className={classes.primary}>
           <AccountForm/>
+
+          {errorMessage &&
+            <p style={{color:'red'}}>{errorMessage}</p>
+          }
         </div>
       </div>
     )
