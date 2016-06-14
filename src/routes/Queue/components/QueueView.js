@@ -18,7 +18,7 @@ class QueueView extends React.Component {
   handleSongClick = this.handleSongClick.bind(this)
 
   render() {
-    if (!this.props.artistIds.length) return null;
+    if (!this.props.artistIds.length) return null
 
     let songs = this.props.queuedIds.map(function(qId, i) {
       let qItem = this.props.queuedItems[qId]
