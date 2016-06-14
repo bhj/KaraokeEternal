@@ -17,6 +17,8 @@ const mapStateToProps = (state) => ({
   artists: state.library.artists.entities,
   songUIDs: state.library.songs.result,
   songs: state.library.songs.entities,
+  // user data
+  user: state.account.user,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(QueueView)
