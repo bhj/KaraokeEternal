@@ -354,7 +354,8 @@ const ACTION_HANDLERS = {
   }),
   [CHANGE_VIEW]: (state, {payload}) => ({
     ...state,
-    viewMode: payload
+    viewMode: payload,
+    errorMessage: null
   }),
 }
 
