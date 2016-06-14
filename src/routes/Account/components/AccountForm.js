@@ -44,7 +44,7 @@ export default class AccountForm extends Component {
           <p>You may edit any account information here.</p>
         }
 
-        {(viewMode === 'create' || viewMode === 'edit') &&
+        {(viewMode === 'create' || user) &&
           <form>
             <input type='text' ref='name' value={this.state.name} onChange={this.handleChange('name')} autoFocus={viewMode === 'create'} placeholder='display name'/>
             <input type='text' ref='email' value={this.state.email} onChange={this.handleChange('email')} placeholder='email'/>
