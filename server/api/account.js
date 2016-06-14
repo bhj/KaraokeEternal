@@ -21,7 +21,7 @@ router.post('/api/account/login', async (ctx, next) => {
 
   email = email.trim().toLowerCase()
 
-  // validate email
+  // get user
   let user = await ctx.db.get('SELECT * FROM users WHERE email = ?', [email])
 
   // validate password
@@ -38,23 +38,15 @@ router.post('/api/account/login', async (ctx, next) => {
     return ctx.body = 'Invalid Room'
   }
 
-  // client will use this info in UI and cache
-  // it in localStorage to persist across reloads
-  ctx.body = {
-    name: user.name,
-    email: user.email,
-    roomId: roomId
-  }
+  delete user.password
+  user.roomId = roomId
 
-  // store JWT in httpOnly cookie
-  let token = jwt.sign({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    roomId: roomId
-  }, 'shared-secret')
-
+  // JWT for API calls is stored in httpOnly cookie
+  let token = jwt.sign(user, 'shared-secret')
   ctx.cookies.set('id_token', token, {httpOnly: true})
+
+  // client also persists this to localStorage
+  ctx.body = user
 })
 
 // logout
