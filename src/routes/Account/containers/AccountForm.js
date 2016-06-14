@@ -13,7 +13,6 @@ const mapActionCreators = {
 const mapStateToProps = (state) => ({
   user: state.account.user,
   rooms: state.account.rooms,
-  errorMessage: state.account.errorMessage,
   viewMode: state.account.viewMode
 })
 

@@ -10,7 +10,6 @@ export default class AccountForm extends Component {
     logoutUser: PropTypes.func.isRequired,
     createUser: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
     changeView: PropTypes.func.isRequired
   }
 
