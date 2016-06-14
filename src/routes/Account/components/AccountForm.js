@@ -64,8 +64,11 @@ export default class AccountForm extends Component {
           </form>
         }
 
-        {user &&
-          <Logout onLogoutClick={this.handleLogout} />
+        {this.props.user &&
+          <div>
+            <br/>
+            <Logout onLogoutClick={this.handleLogout} />
+          </div>
         }
       </div>
     )
