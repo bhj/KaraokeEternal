@@ -36,8 +36,15 @@
     -webkit-touch-callout: none;
   }
 
+  h2 {
+    font-size: 18px;
+    font-weight: lighter;
+    font-style: normal;
+  }
+
   input[type="text"],
   input[type="password"],
+  input[type="email"],
   select {
     display: block;
     margin: 0;
@@ -58,12 +65,14 @@
   }
   input[type="text"]:focus,
   input[type="password"]:focus,
+  input[type="email"]:focus,
   select:focus {
     outline: none;
   }
   // style-5
   input[type="text"],
   input[type="password"],
+  input[type="email"],
   select {
     padding: 10px;
     border: solid 1px #fff;
@@ -77,6 +86,7 @@
   }
   input[type="text"]:focus,
   input[type="password"]:focus,
+  input[type="email"]:focus,
   select:focus {
     -webkit-box-shadow: inset 1px 1px 2px 0 #c9c9c9;
     -moz-box-shadow: inset 1px 1px 2px 0 #c9c9c9;
