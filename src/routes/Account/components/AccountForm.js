@@ -57,6 +57,7 @@ export default class AccountForm extends Component {
               <input type='password' ref='curPassword' placeholder='current password'/>
             }
 
+            <br/>
             <button onClick={this.handleClick} className="button wide green raised">
               {viewMode === 'create' ? 'Create Account' : 'Update Account'}
             </button>

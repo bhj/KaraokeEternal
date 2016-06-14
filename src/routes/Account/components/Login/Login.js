@@ -11,9 +11,12 @@ export default class Login extends Component {
 
     return (
       <form>
-        <input type='text' ref='email' className="form-control" style={{ marginRight: '5px' }} placeholder='email' autoFocus/>
-        <input type='password' ref='password' className="form-control" style={{ marginRight: '5px' }} placeholder='password'/>
-        Room: <select ref='room'>{roomOpts}</select>
+        <input type='text' ref='email' placeholder="email" autoFocus={true}/>
+        <input type='password' ref='password' placeholder="password"/>
+        <br/>
+        <label>Room</label>
+        <select ref='room'>{roomOpts}</select>
+        <br/>
 
         <button onClick={(event) => this.handleClick(event)} className="button wide green raised">
           Sign In

@@ -12,7 +12,7 @@ class AccountView extends React.Component {
 
   render () {
     const { user, errorMessage } = this.props
-    const headerTitle = user ? user.name : (this.props.viewMode === 'login') ? 'Sign in' : 'Create Account'
+    const headerTitle = user ? user.name : (this.props.viewMode === 'login') ? 'Sign In' : 'Create Account'
 
     return (
       <div className={classes.flexContainer}>
