@@ -19,8 +19,8 @@ export default class AccountForm extends Component {
 
   // initial state
   state = {
-    name: this.props.defaultName,
-    email: this.props.defaultEmail
+    name: this.props.user ? this.props.user.name : '',
+    email: this.props.user ? this.props.user.email : ''
   }
 
   handleChange(inputName) {
@@ -28,11 +28,11 @@ export default class AccountForm extends Component {
   }
 
   render() {
-    const { user, viewMode } = this.props
+    const viewMode = this.props.user ? 'edit' : this.props.viewMode
 
     return (
       <div>
-        {!user && viewMode === 'login' &&
+        {viewMode === 'login' &&
           <div>
             <p>Sign in below or <a onClick={() => this.props.changeView('create')}>create a new account</a>.</p>
             <Login onSubmitClick={this.props.loginUser} rooms={this.props.rooms}/>
@@ -42,10 +42,10 @@ export default class AccountForm extends Component {
           <p>Create an account or <a onClick={() => this.props.changeView('login')}>sign in with an existing one</a>.</p>
         }
         {viewMode === 'edit' &&
-          <p>You may edit any account information here.</p>
+          <h2>Update Account</h2>
         }
 
-        {(viewMode === 'create' || user) &&
+        {viewMode !== 'login' &&
           <form>
             <input type='text' ref='name' value={this.state.name} onChange={this.handleChange('name')} autoFocus={viewMode === 'create'} placeholder='display name'/>
             <input type='email' ref='email' value={this.state.email} onChange={this.handleChange('email')} placeholder='email'/>
