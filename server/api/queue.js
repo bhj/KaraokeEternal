@@ -98,16 +98,16 @@ async function isRoomOpen(roomId) {
 }
 
 async function getQueue(roomId) {
-  let queuedIds = []
+  let queueIds = []
   let items = {}
 
   // get songs
   let rows = await this.db.all('SELECT queue.*, users.name AS userName FROM queue LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
 
   rows.forEach(function(row){
-    queuedIds.push(row.id)
+    queueIds.push(row.id)
     items[row.id] = row
   })
 
-  return {result: queuedIds, entities: items}
+  return {result: queueIds, entities: items}
 }

@@ -6,7 +6,7 @@ import styles from './QueueView.css'
 class QueueView extends React.Component {
   static propTypes = {
     // queue data
-    queuedIds: PropTypes.array.isRequired,
+    queueIds: PropTypes.array.isRequired,
     queuedItems: PropTypes.object.isRequired,
     errorMessage: PropTypes.string,
     // library data
@@ -21,7 +21,7 @@ class QueueView extends React.Component {
   render() {
     if (!this.props.artistIds.length) return null
 
-    let songs = this.props.queuedIds.map(function(qId, i) {
+    let songs = this.props.queueIds.map(function(qId, i) {
       let qItem = this.props.queuedItems[qId]
       let song = this.props.songs[qItem.songUID]
 
