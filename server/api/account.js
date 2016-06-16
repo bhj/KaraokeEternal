@@ -39,7 +39,7 @@ router.post('/api/account/login', async (ctx, next) => {
   }
 
   delete user.password
-  user.roomId = roomId
+  user.roomId = room.id
 
   // JWT for API calls is stored in httpOnly cookie
   let token = jwt.sign(user, 'shared-secret')
