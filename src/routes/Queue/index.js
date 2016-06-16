@@ -7,7 +7,7 @@ export default function(store){
   return {
     path: 'queue',
     getComponent (nextState, cb) {
-      if (store.getState().account.user) {
+      if (!store.getState().queue.result.length && store.getState().account.user) {
         store.dispatch(fetchQueue(store.getState().account.user.roomId))
       }
 
