@@ -32,7 +32,7 @@ class QueueView extends React.Component {
           title={song.title}
           userName={qItem.userName}
           canDelete={qItem.userId === this.props.user.id}
-          onDeleteClick={() => this.handleDeleteClick(qId)}
+          onDeleteClick={this.handleDeleteClick.bind(this, qId)}
         />
       )
     }, this)
