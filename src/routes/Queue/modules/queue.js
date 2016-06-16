@@ -55,27 +55,27 @@ export function fetchQueue() {
 // ------------------------------------
 // add to queue
 // ------------------------------------
-export const PUT_QUEUE = 'queue/PUT_QUEUE'
-export const PUT_QUEUE_SUCCESS = 'queue/PUT_QUEUE_SUCCESS'
-export const PUT_QUEUE_FAIL = 'queue/PUT_QUEUE_FAIL'
+export const QUEUE_PUT = 'queue/QUEUE_PUT'
+export const QUEUE_PUT_SUCCESS = 'queue/QUEUE_PUT_SUCCESS'
+export const QUEUE_PUT_FAIL = 'queue/QUEUE_PUT_FAIL'
 
 function requestPut(uid) {
   return {
-    type: PUT_QUEUE,
+    type: QUEUE_PUT,
     payload: uid
   }
 }
 
 function receivePut() {
   return {
-    type: PUT_QUEUE_SUCCESS,
+    type: QUEUE_PUT_SUCCESS,
     payload: null
   }
 }
 
 function putError(message) {
   return {
-    type: PUT_QUEUE_FAIL,
+    type: QUEUE_PUT_FAIL,
     payload: message
   }
 }
@@ -134,16 +134,16 @@ const ACTION_HANDLERS = {
     isFetching: false,
     errorMessage: payload.message
   }),
-  [PUT_QUEUE]: (state, {payload}) => ({
+  [QUEUE_PUT]: (state, {payload}) => ({
     ...state,
     isFetching: true,
     errorMessage: null
   }),
-  [PUT_QUEUE_SUCCESS]: (state, {payload}) => ({
+  [QUEUE_PUT_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
   }),
-  [PUT_QUEUE_FAIL]: (state, {payload}) => ({
+  [QUEUE_PUT_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     errorMessage: payload.message
