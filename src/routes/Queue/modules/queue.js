@@ -66,10 +66,10 @@ function requestPut(uid) {
   }
 }
 
-function receivePut() {
+function receivePut(queue) {
   return {
     type: QUEUE_PUT_SUCCESS,
-    payload: null
+    payload: queue
   }
 }
 
@@ -89,12 +89,59 @@ export function queueSong(uid) {
         method: 'PUT'
       })
       .then(checkStatus)
-      // .then(response => response.json())
-      .then(response => {
-        dispatch(receivePut())
+      .then(response => response.json())
+      .then(queue => {
+        dispatch(receivePut(queue))
       })
       .catch(err => {
         dispatch(putError(err))
+      })
+  }
+}
+
+// ------------------------------------
+// remove from queue
+// ------------------------------------
+export const QUEUE_DELETE = 'queue/QUEUE_DELETE'
+export const QUEUE_DELETE_SUCCESS = 'queue/QUEUE_DELETE_SUCCESS'
+export const QUEUE_DELETE_FAIL = 'queue/QUEUE_DELETE_FAIL'
+
+function requestDelete(uid) {
+  return {
+    type: QUEUE_DELETE,
+    payload: uid
+  }
+}
+
+function receiveDelete(queue) {
+  return {
+    type: QUEUE_DELETE_SUCCESS,
+    payload: queue
+  }
+}
+
+function deleteError(message) {
+  return {
+    type: QUEUE_DELETE_FAIL,
+    payload: message
+  }
+}
+
+export function deleteItem(id) {
+  return dispatch => {
+    dispatch(requestDelete(id))
+
+    return fetch('/api/queue/'+id, {
+        ...fetchConfig,
+        method: 'DELETE'
+      })
+      .then(checkStatus)
+      .then(response => response.json())
+      .then(queue => {
+        dispatch(receiveDelete(queue))
+      })
+      .catch(err => {
+        dispatch(deleteError(err))
       })
   }
 }
@@ -142,8 +189,26 @@ const ACTION_HANDLERS = {
   [QUEUE_PUT_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
+    result: payload.result,
+    entities: payload.entities
   }),
   [QUEUE_PUT_FAIL]: (state, {payload}) => ({
+    ...state,
+    isFetching: false,
+    errorMessage: payload.message
+  }),
+  [QUEUE_DELETE]: (state, {payload}) => ({
+    ...state,
+    isFetching: true,
+    errorMessage: null
+  }),
+  [QUEUE_DELETE_SUCCESS]: (state, {payload}) => ({
+    ...state,
+    isFetching: false,
+    result: payload.result,
+    entities: payload.entities
+  }),
+  [QUEUE_DELETE_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     errorMessage: payload.message

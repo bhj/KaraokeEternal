@@ -2,7 +2,7 @@ import React from 'react'
 import classes from './QueueItem.css'
 
 export const QueueItem = (props) => (
-  <div onClick={props.onSelectSong} className={classes.container}>
+  <div className={classes.container}>
     <div className={classes.star}>
       <i className='material-icons md-48 md-dark md-inactive'>
         {props.isStarred ? 'star' : 'star_border'}
@@ -16,8 +16,8 @@ export const QueueItem = (props) => (
     </div>
 
     {props.canDelete &&
-      <div>
-        <i className='material-icons md-36'>clear</i>
+      <div onClick={props.onDeleteClick}>
+        <i className={'material-icons '+classes.clear}>clear</i>
       </div>
     }
   </div>
@@ -28,7 +28,7 @@ QueueItem.propTypes = {
   artist: React.PropTypes.string.isRequired,
   userName: React.PropTypes.string.isRequired,
   canDelete: React.PropTypes.bool.isRequired,
-  onSelectSong: React.PropTypes.func.isRequired,
+  onDeleteClick: React.PropTypes.func.isRequired,
 }
 
 export default QueueItem

@@ -5,6 +5,7 @@ import styles from './QueueView.css'
 
 class QueueView extends React.Component {
   static propTypes = {
+    // queue data
     queuedIds: PropTypes.array.isRequired,
     queuedItems: PropTypes.object.isRequired,
     errorMessage: PropTypes.string,
@@ -16,8 +17,6 @@ class QueueView extends React.Component {
     // user data
     user: PropTypes.object.isRequired,
   }
-
-  handleSongClick = this.handleSongClick.bind(this)
 
   render() {
     if (!this.props.artistIds.length) return null
@@ -31,9 +30,9 @@ class QueueView extends React.Component {
           key={qId}
           artist={this.props.artists[song.artistId].name}
           title={song.title}
-          onSelectSong={this.handleSongClick}
           userName={qItem.userName}
           canDelete={qItem.userId === this.props.user.id}
+          onDeleteClick={() => this.handleDeleteClick(qId)}
         />
       )
     }, this)
@@ -53,8 +52,8 @@ class QueueView extends React.Component {
     )
   }
 
-  handleSongClick() {
-    console.log('click')
+  handleDeleteClick(id) {
+    this.props.deleteItem(id)
   }
 }
 
