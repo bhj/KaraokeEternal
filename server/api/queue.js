@@ -102,7 +102,7 @@ async function getQueue(roomId) {
   let items = {}
 
   // get songs
-  let rows = await this.db.all('SELECT queue.*, users.name AS userName FROM queue LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
+  let rows = await this.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.songUID = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
 
   rows.forEach(function(row){
     queueIds.push(row.id)
