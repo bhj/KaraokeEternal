@@ -1,6 +1,6 @@
-import readdir from '../lib/recursive-readdir'
-import multihash from '../lib/multihash'
-import fsStat from '../lib/fs-stat'
+import readdir from '../utilities/recursive-readdir'
+import multihash from '../utilities/multihash'
+import fsStat from '../utilities/fs-stat'
 import path from 'path'
 
 var debug = require('debug')

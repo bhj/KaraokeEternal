@@ -1,5 +1,5 @@
 import jwt from 'koa-jwt'
-import { hash, compare } from '../lib/bcrypt-promise'
+import { hash, compare } from './utilities/bcrypt-promise'
 import KoaRouter from 'koa-router'
 let router = KoaRouter()
 

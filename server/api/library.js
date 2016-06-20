@@ -1,4 +1,4 @@
-import Providers from '../providers/index'
+import Providers from './providers/index'
 import KoaRouter from 'koa-router'
 
 let router = KoaRouter()
