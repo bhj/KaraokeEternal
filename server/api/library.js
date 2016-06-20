@@ -28,7 +28,7 @@ router.get('/api/library', async (ctx, next) => {
   })
 
   // assign songs to artists
-  rows = await ctx.db.all('SELECT artistId, uid, title, plays FROM songs ORDER BY title')
+  rows = await ctx.db.all('SELECT artistId, plays, provider, title, uid FROM songs ORDER BY title')
 
   rows.forEach(function(row){
     songUIDs.push(row.uid)
