@@ -1,6 +1,7 @@
-import readdir from '../utilities/recursive-readdir'
-import multihash from '../utilities/multihash'
-import fsStat from '../utilities/fs-stat'
+import readdir from '../../utilities/recursive-readdir'
+import multihash from '../../utilities/multihash'
+import fs from 'fs'
+import fsStat from '../../utilities/fs-stat'
 import path from 'path'
 
 var debug = require('debug')
@@ -56,6 +57,46 @@ export async function scan(config, ctx) {
   }
 
   return Promise.resolve()
+}
+
+export async function resource(config, ctx) {
+  const { type, uid } = ctx.query
+  let song, file
+
+  if (! type || ! uid) {
+    ctx.status = 422
+    return ctx.body = "Missing 'type' or 'uid' query param"
+  }
+
+  song = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', [uid])
+
+  if (! song) {
+    ctx.status = 404
+    return ctx.body = `UID not found: ${uid}`
+  }
+
+  if (type === 'audio') {
+    file = song.url
+    ctx.type = 'audio/mpeg'
+  } else if (type === 'cdg') {
+    let info = path.parse(song.url)
+    file = song.url.substr(0, song.url.length-info.ext.length)+'.cdg'
+  }
+
+  // get file size (and does it exist?)
+  let stats
+  try {
+    stats = await fsStat(file)
+  } catch(err) {
+    ctx.status = 404
+    return ctx.body = `File not found: ${file}`
+  }
+
+  // stream it!
+  log('Streaming file: %s', file)
+
+  ctx.length = stats.size
+  ctx.body = fs.createReadStream(file)
 }
 
 async function process(file){

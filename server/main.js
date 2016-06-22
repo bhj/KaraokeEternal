@@ -15,6 +15,7 @@ import jwt from 'koa-jwt'
 import apiAccount from './api/account'
 import apiLibrary from './api/library'
 import apiQueue from './api/queue'
+import apiProvider from './api/provider'
 import KoaRange from 'koa-range'
 
 const debug = _debug('app:server')
@@ -38,6 +39,7 @@ app.use(convert(
 app.use(apiAccount.routes())
 app.use(apiLibrary.routes())
 app.use(apiQueue.routes())
+app.use(apiProvider.routes())
 
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {

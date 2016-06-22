@@ -1,58 +1,68 @@
+export const CHANGE_QUEUE_ITEM = 'player/CHANGE_QUEUE_ITEM'
+
+export function changeQueueItem(item) {
+  return {
+    type: CHANGE_QUEUE_ITEM,
+    payload: item
+  }
+}
+// ------------------------------------
+// dispatched mostly for informational purposes
+// by provider players
+// ------------------------------------
+export const GET_MEDIA = 'player/GET_MEDIA'
+export const GET_MEDIA_SUCCESS = 'player/GET_MEDIA_SUCCESS'
+export const GET_MEDIA_FAIL = 'player/GET_MEDIA_FAIL'
+
+export function getMedia(url) {
+  return {
+    type: GET_MEDIA,
+    payload: url
+  }
+}
+
+export function getMediaSuccess() {
+  return {
+    type: GET_MEDIA_SUCCESS,
+    payload: null
+  }
+}
+
+export function getMediaError(message) {
+  return {
+    type: GET_MEDIA_FAIL,
+    payload: message
+  }
+}
+
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const PLAY = 'player/PLAY';
-export const PAUSE = 'player/PAUSE';
-export const END = 'player/END';
-export const LOAD = 'player/LOAD';
-export const LOAD_SUCCESS = 'player/LOAD_SUCCESS';
-export const LOAD_FAIL = 'player/LOAD_FAIL';
+export const PLAY = 'player/PLAY'
+export const PAUSE = 'player/PAUSE'
+export const END = 'player/END'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 export const play = () => {
-  console.log('PLAYEEEEE')
   return {
     type: PLAY,
     payload: null
   }
 }
+
 export const pause = () => {
-  console.log('PAAAUUUUUUUUUSE')
   return {
     type: PAUSE,
     payload: null
   }
 }
+
 export const end = () => ({
   type: END,
   payload: null // current audio id?
-});
-
-export const load = (audioUrl, cdgUrl) => ({
-  type: LOAD,
-  payload: {audioUrl, cdgUrl}
-});
-
-export const loadSuccess = () => ({
-  type: LOAD_SUCCESS,
-  payload: null
-});
-
-export const loadFail = (error) => ({
-  type: LOAD_FAIL,
-  payload: error
-});
-
-export const actions = {
-  play,
-  pause,
-  end,
-  load,
-  loadSuccess,
-  loadFail
-};
+})
 
 // ------------------------------------
 // Action Handlers
@@ -70,30 +80,35 @@ const ACTION_HANDLERS = {
     ...state,
     isPlaying: false
   }),
-  [LOAD]: (state, {payload}) => ({
+  [GET_MEDIA]: (state, {payload}) => ({
     ...state,
-    isLoading: true,
-    audioUrl: payload.audioUrl,
-    cdgUrl: payload.cdgUrl
+    isFetching: true,
   }),
-  [LOAD_SUCCESS]: (state, {payload}) => ({
+  [GET_MEDIA_SUCCESS]: (state, {payload}) => ({
     ...state,
-    isLoading: false
+    isFetching: false,
+    isPlaying: true, // all media is loaded
   }),
-  [LOAD_FAIL]: (state, {payload}) => ({
+  [GET_MEDIA_FAIL]: (state, {payload}) => ({
     ...state,
-    isLoading: false,
-    errorMsg: payload.message
+    isFetching: false,
+    errorMessage: payload
+  }),
+  [CHANGE_QUEUE_ITEM]: (state, {payload}) => ({
+    ...state,
+    curItem: payload
   })
-};
+}
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 const initialState = {
-  isLoading: false,
-  isPlaying: false
-};
+  isFetching: false,
+  isPlaying: false,
+  curItem: null,
+  errorMessage: null
+}
 
 export default function playerReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type];

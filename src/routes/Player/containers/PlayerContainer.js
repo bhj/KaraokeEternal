@@ -1,11 +1,17 @@
 import { connect } from 'react-redux'
-import { play, pause } from '../modules/player'
+import { play, pause, changeQueueItem, getMedia, getMediaSuccess, getMediaError } from '../modules/player'
 import { fetchQueue } from '../../Queue/modules/queue'
 import PlayerView from '../components/PlayerView'
 
 const mapActionCreators = {
+  // player
   play,
   pause,
+  changeQueueItem,
+  getMedia,
+  getMediaSuccess,
+  getMediaError,
+  // queue
   fetchQueue
 }
 

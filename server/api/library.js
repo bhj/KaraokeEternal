@@ -1,5 +1,6 @@
-import Providers from './providers/index'
 import KoaRouter from 'koa-router'
+import Providers from './provider/index'
+import rows2obj from './utilities/rows2obj'
 
 let router = KoaRouter()
 let debug = require('debug')
@@ -82,28 +83,3 @@ router.get('/api/library/scan', async (ctx, next) => {
 })
 
 export default router
-
-// helper
-function rows2obj(rows) {
-  if (!rows) return false
-
-  let out = {}
-  rows.forEach(function(row){
-    let {key, val} = row
-
-    // simple transform for booleans
-    if (val === '0') val = false
-    if (val === '1') val = true
-
-    if (typeof out[key] !== 'undefined') {
-      if (Array.isArray(out[key])) {
-        return out[key].push(val)
-      } else {
-        return out[key] = [out[key], val]
-      }
-    }
-
-    out[key] = val
-  })
-  return out
-}
