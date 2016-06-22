@@ -111,6 +111,7 @@
     "koa-convert": "^1.2.0",
     "koa-jwt": "^1.2.0",
     "koa-proxy": "^0.6.0",
+    "koa-range": "^0.2.1",
     "koa-router": "^7.0.1",
     "koa-static": "^2.0.0",
     "material-design-icons": "^2.2.3",

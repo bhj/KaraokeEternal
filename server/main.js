@@ -15,6 +15,7 @@ import jwt from 'koa-jwt'
 import apiAccount from './api/account'
 import apiLibrary from './api/library'
 import apiQueue from './api/queue'
+import KoaRange from 'koa-range'
 
 const debug = _debug('app:server')
 const paths = config.utils_paths
@@ -25,6 +26,8 @@ app.use(async (ctx, next) => {
     ctx.db = await sqlite3('./database.sqlite3')
     await next()
 });
+
+app.use(convert(KoaRange))
 
 app.use(bodyparser())
 
