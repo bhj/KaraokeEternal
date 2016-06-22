@@ -8,7 +8,6 @@ class PlayerView extends React.Component {
     fetchQueue: React.PropTypes.func.isRequired,
     play: React.PropTypes.func.isRequired,
     pause: React.PropTypes.func.isRequired,
-    changeQueueItem: React.PropTypes.func.isRequired,
     getMedia: React.PropTypes.func.isRequired,
     getMediaSuccess: React.PropTypes.func.isRequired,
     getMediaError: React.PropTypes.func.isRequired,
@@ -46,28 +45,34 @@ class PlayerView extends React.Component {
     )
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   if (this.props.queue.result.length && nextProps.queue.result.length) {
-  //     // did the first item in the queue change?
-  //     return this.props.queue.entities[this.props.queue.result[0]] !== nextProps.queue.entities[nextProps.queue.result[0]]
-  //   }
-  //
-  //   if (!this.props.queue.result.length && !nextProps.queue.result.length) {
-  //     // still nothing in queue; don't bother
-  //     return false
-  //   }
-  //
-  //   return true
-  // }
+  // try to be conservative about triggering child component updates
+  shouldComponentUpdate(nextProps, nextState) {
+    const curItem = this.props.queue.entities[this.props.queue.result[0]]
+
+    // play status change?
+    if (this.props.isPlaying !== nextProps.isPlaying) {
+      return true
+    }
+
+    // first queue item is the same? skip update
+    if (this.props.queue.result.length &&
+      curItem.id === nextProps.queue.entities[nextProps.queue.result[0]].id)
+    {
+      return false
+    }
+
+    return true
+  }
 
   componentDidUpdate (prevProps) {
-    // dispatch action with the new queue item
-    this.props.changeQueueItem(this.props.queue.entities[this.props.queue.result[0]])
+    console.log('PlayerView: componentDidUpdate()')
+    // dispatch action with the new queue item for informational purposes
+    //   this.props.changeQueueItem(this.props.queue.entities[this.props.queue.result[0]].id)
   }
 
   componentDidMount () {
-    this.props.fetchQueue() // debug
-    // this.timeout = setInterval(this.props.fetchQueue, 2000)
+    // this.props.fetchQueue() // debug
+    this.timeout = setInterval(this.props.fetchQueue, 2000)
   }
 
   componentWillUnmount () {

@@ -1,11 +1,3 @@
-export const CHANGE_QUEUE_ITEM = 'player/CHANGE_QUEUE_ITEM'
-
-export function changeQueueItem(item) {
-  return {
-    type: CHANGE_QUEUE_ITEM,
-    payload: item
-  }
-}
 // ------------------------------------
 // dispatched mostly for informational purposes
 // by provider players
@@ -94,10 +86,6 @@ const ACTION_HANDLERS = {
     isFetching: false,
     errorMessage: payload
   }),
-  [CHANGE_QUEUE_ITEM]: (state, {payload}) => ({
-    ...state,
-    curItem: payload
-  })
 }
 
 // ------------------------------------
@@ -106,7 +94,6 @@ const ACTION_HANDLERS = {
 const initialState = {
   isFetching: false,
   isPlaying: false,
-  curItem: null,
   errorMessage: null
 }
 
