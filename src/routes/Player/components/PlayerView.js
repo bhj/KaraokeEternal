@@ -71,7 +71,6 @@ class PlayerView extends React.Component {
   }
 
   componentDidMount () {
-    // this.props.fetchQueue() // debug
     this.timeout = setInterval(this.props.fetchQueue, 2000)
   }
 

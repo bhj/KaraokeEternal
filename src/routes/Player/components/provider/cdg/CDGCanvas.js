@@ -18,7 +18,6 @@ export default class CDGCanvas extends React.Component {
     console.log('CDGCanvas: componentDidUpdate()')
 
     if (prevProps.cdgData !== this.props.cdgData) {
-      console.log('cdg data changed')
       this.player.load(this.props.cdgData)
     }
 
