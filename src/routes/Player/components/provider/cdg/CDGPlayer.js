@@ -36,6 +36,9 @@ class CDGPlayer extends React.Component {
   }
 
   render () {
+    // multiples of 300px
+    const canvasWidth = Math.floor(this.props.width / 300) * 300
+
     return (
       <div>
         <audio src={'/api/provider/cdg/resource?type=audio&uid='+this.props.item.songUID}
@@ -48,8 +51,8 @@ class CDGPlayer extends React.Component {
           controls
         />
         <CDGCanvas
-          width={this.props.width}
-          height={Math.floor(this.props.width * .72)}
+          width={canvasWidth}
+          height={canvasWidth * .72}
           isPlaying={this.props.isPlaying}
           audioPos={this.state.audioPos}
           cdgData={this.cdgData}
