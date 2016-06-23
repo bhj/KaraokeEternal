@@ -1,5 +1,5 @@
-import React, { PropTypes } from 'react';
-import CDGCore from './wcdg';
+import React, { PropTypes } from 'react'
+import CDGCore from './wcdg'
 
 export default class CDGCanvas extends React.Component {
   static propTypes = {
@@ -8,7 +8,7 @@ export default class CDGCanvas extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     audioPos: PropTypes.number.isRequired,
     cdgData: PropTypes.array.isRequired,
-  };
+  }
 
   componentDidMount () {
     this.player = new CDGCore(this.canvas)

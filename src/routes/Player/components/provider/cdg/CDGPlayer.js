@@ -1,6 +1,6 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes } from 'react'
 import fetch from 'isomorphic-fetch'
-import CDGCanvas from './CDGCanvas';
+import CDGCanvas from './CDGCanvas'
 
 class CDGPlayer extends React.Component {
   static propTypes = {

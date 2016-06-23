@@ -4,7 +4,7 @@ import Navigation from '../../components/Navigation'
 import LibraryView from '../../routes/Library/containers/LibraryContainer'
 import classes from './CoreLayout.css'
 import '../../styles/core.scss'
-import '../../styles/nomodule/material-ui.scss';
+import '../../styles/nomodule/material-ui.scss'
 
 const CoreLayout = (props) => {
   let showLibrary = props.routerPath === '/library'
