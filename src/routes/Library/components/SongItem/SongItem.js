@@ -9,7 +9,7 @@ export const SongItem = (props) => (
       </i>
     </div>
 
-    <div className={classes.title}>{props.title}</div>
+    <div className={classes.title}>{props.title} ({props.provider})</div>
 
     <div className={classes.stats}>
       <i className='material-icons md-18 md-dark md-inactive'>play_arrow</i>

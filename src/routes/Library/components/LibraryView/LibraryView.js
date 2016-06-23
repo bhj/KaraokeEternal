@@ -70,6 +70,7 @@ class LibraryView extends React.Component {
             key={uid}
             title={this.props.songs[uid].title}
             plays={this.props.songs[uid].plays}
+            provider={this.props.songs[uid].provider}
             onSelectSong={() => this.handleSongClick(uid)}
           />
         )
