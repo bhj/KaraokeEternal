@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import fetch from 'isomorphic-fetch'
 import CDGCanvas from './CDGCanvas'
+import classes from './CDGPlayer.css'
 
 class CDGPlayer extends React.Component {
   static propTypes = {
@@ -36,11 +37,23 @@ class CDGPlayer extends React.Component {
   }
 
   render () {
-    // multiples of 300px
-    const canvasWidth = Math.floor(this.props.width / 300) * 300
+    const { width, height } = this.props
+    let canvasScale = Math.floor(this.props.width / 300)
+
+    // make sure height would fit the viewport's
+    if (this.props.height < canvasScale * 300 * .72) {
+      canvasScale -= 1
+    }
 
     return (
-      <div>
+      <div style={{width, height}} className={classes.background}>
+        <CDGCanvas
+          width={canvasScale * 300}
+          height={canvasScale * 300 * .72}
+          isPlaying={this.props.isPlaying}
+          audioPos={this.state.audioPos}
+          cdgData={this.cdgData}
+        />
         <audio src={'/api/provider/cdg/resource?type=audio&uid='+this.props.item.songUID}
           preload='none'
           onCanPlayThrough={this.handleOnCanPlayThrough}
@@ -49,13 +62,6 @@ class CDGPlayer extends React.Component {
           onError={this.handleAudioError}
           ref={(c) => {this.audio = c}}
           controls
-        />
-        <CDGCanvas
-          width={canvasWidth}
-          height={canvasWidth * .72}
-          isPlaying={this.props.isPlaying}
-          audioPos={this.state.audioPos}
-          cdgData={this.cdgData}
         />
       </div>
     )
