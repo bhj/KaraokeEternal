@@ -49,7 +49,7 @@ class CDGPlayer extends React.Component {
         />
         <CDGCanvas
           width={this.props.width}
-          height={this.props.height}
+          height={Math.floor(this.props.width * .72)}
           isPlaying={this.props.isPlaying}
           audioPos={this.state.audioPos}
           cdgData={this.cdgData}
