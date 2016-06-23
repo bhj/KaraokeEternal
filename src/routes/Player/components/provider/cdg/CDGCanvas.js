@@ -15,19 +15,15 @@ export default class CDGCanvas extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    console.log('CDGCanvas: componentDidUpdate()')
-
     if (prevProps.cdgData !== this.props.cdgData) {
       this.player.load(this.props.cdgData)
-    }
-
-    if (prevProps.isPlaying !== this.props.isPlaying) {
-      this.updateIsPlaying()
     }
 
     if (prevProps.audioPos !== this.props.audioPos) {
       this.player.sync(this.props.audioPos)
     }
+
+    this.updateIsPlaying()
   }
 
   render () {
