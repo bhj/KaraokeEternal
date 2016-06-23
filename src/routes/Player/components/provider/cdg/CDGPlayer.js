@@ -26,6 +26,10 @@ class CDGPlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
+    if (prevProps.item.id !== this.props.item.id) {
+      this.updateSources()
+    }
+
     if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
     }
@@ -99,6 +103,7 @@ class CDGPlayer extends React.Component {
 
     if (this.isCDGLoaded) {
       this.props.getMediaSuccess()
+      this.updateIsPlaying()
     }
   }
 
@@ -121,6 +126,7 @@ class CDGPlayer extends React.Component {
 
     if (this.isAudioLoaded) {
       this.props.getMediaSuccess()
+      this.updateIsPlaying()
     }
   }
 }
