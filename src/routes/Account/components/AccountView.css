@@ -6,4 +6,8 @@
 
 .primary {
   padding: 1em;
+  /* scrollable */
+  flex: 1;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 }

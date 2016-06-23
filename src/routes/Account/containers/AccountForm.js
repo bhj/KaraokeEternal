@@ -1,10 +1,9 @@
 import { connect } from 'react-redux'
-import { loginUser, logoutUser, createUser, updateUser, changeView } from '../modules/account'
+import { loginUser, createUser, updateUser, changeView } from '../modules/account'
 import AccountForm from '../components/AccountForm'
 
 const mapActionCreators = {
   loginUser,
-  logoutUser,
   createUser,
   updateUser,
   changeView

@@ -8,14 +8,12 @@ export default class AccountForm extends Component {
     rooms: PropTypes.array,
     viewMode: PropTypes.string.isRequired,
     loginUser: PropTypes.func.isRequired,
-    logoutUser: PropTypes.func.isRequired,
     createUser: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
     changeView: PropTypes.func.isRequired
   }
 
   handleClick = this.handleClick.bind(this)
-  handleLogout = this.handleLogout.bind(this)
 
   // initial state
   state = {
@@ -63,13 +61,6 @@ export default class AccountForm extends Component {
             </button>
           </form>
         }
-
-        {this.props.user &&
-          <div>
-            <br/>
-            <Logout onLogoutClick={this.handleLogout} />
-          </div>
-        }
       </div>
     )
   }
@@ -95,9 +86,5 @@ export default class AccountForm extends Component {
      } else {
        this.props.createUser(user)
      }
-  }
-
-  handleLogout() {
-    this.props.logoutUser()
   }
 }

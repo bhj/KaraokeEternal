@@ -1,12 +1,14 @@
 import React, { PropTypes } from 'react'
 import Header from 'components/Header'
 import AccountForm from '../containers/AccountForm'
+import Logout from './Logout'
 import classes from './AccountView.css'
 
 class AccountView extends React.Component {
   static propTypes = {
     user: PropTypes.object,
     viewMode: PropTypes.string.isRequired,
+    logoutUser: PropTypes.func.isRequired,
     errorMessage: PropTypes.string
   }
 
@@ -23,6 +25,13 @@ class AccountView extends React.Component {
 
           {errorMessage &&
             <p style={{color:'red'}}>{errorMessage}</p>
+          }
+
+          {this.props.user &&
+            <div>
+              <br/>
+              <Logout onLogoutClick={this.props.logoutUser} />
+            </div>
           }
         </div>
       </div>
