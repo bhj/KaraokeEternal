@@ -20,11 +20,16 @@ class AccountView extends React.Component {
       <div className={classes.flexContainer}>
         <Header title={headerTitle}/>
 
-        <div className={classes.primary}>
+        <div className={classes.viewport}>
           <AccountForm/>
-
           {errorMessage &&
             <p style={{color:'red'}}>{errorMessage}</p>
+          }
+
+          {this.props.user && this.props.user.isAdmin &&
+            <button className='button wide blue raised' onClick={() => {this.props.push('/player')}}>
+              Start Player
+            </button>
           }
 
           {this.props.user &&

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
-import Login from './Login'
-import Logout from './Logout'
+import classes from './AccountForm.css'
+import Login from '../Login'
+import Logout from '../Logout'
 
 export default class AccountForm extends Component {
   static propTypes = {
@@ -29,7 +30,7 @@ export default class AccountForm extends Component {
     const viewMode = this.props.user ? 'edit' : this.props.viewMode
 
     return (
-      <div>
+      <div className={classes.section}>
         {viewMode === 'login' &&
           <div>
             <p>Sign in below or <a onClick={() => this.props.changeView('create')}>create a new account</a>.</p>

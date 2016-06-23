@@ -1,10 +1,12 @@
 import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 import { changeView, logoutUser } from '../modules/account'
 import AccountView from '../components/AccountView'
 
 const mapActionCreators = {
   changeView,
   logoutUser,
+  push
 }
 
 const mapStateToProps = (state) => ({

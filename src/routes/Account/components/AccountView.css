@@ -4,7 +4,7 @@
   width: 100%;
 }
 
-.primary {
+.viewport {
   padding: 1em;
   /* scrollable */
   flex: 1;
