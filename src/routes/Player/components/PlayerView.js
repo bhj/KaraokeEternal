@@ -45,36 +45,6 @@ class PlayerView extends React.Component {
     )
   }
 
-  // try to be conservative about triggering child component updates
-  shouldComponentUpdate(nextProps, nextState) {
-    const curItem = this.props.queue.entities[this.props.queue.result[0]]
-
-    // play status change?
-    if (this.props.isPlaying !== nextProps.isPlaying) {
-      return true
-    }
-
-    if (curItem) {
-      if (!nextProps.queue.result.length) {
-        // stopping; update
-        return true
-      }
-
-      if (curItem.id === nextProps.queue.entities[nextProps.queue.result[0]].id) {
-        // first queue item is the same; skip update
-        return false
-      }
-    }
-
-    return true
-  }
-
-  componentDidUpdate (prevProps) {
-    console.log('PlayerView: componentDidUpdate()')
-    // dispatch action with the new queue item for informational purposes
-    //   this.props.changeQueueItem(this.props.queue.entities[this.props.queue.result[0]].id)
-  }
-
   componentDidMount () {
     this.timeout = setInterval(this.props.fetchQueue, 2000)
   }
