@@ -54,9 +54,16 @@ class PlayerView extends React.Component {
       return true
     }
 
-    // first queue item is the same? skip update
-    if (curItem && curItem.id === nextProps.queue.entities[nextProps.queue.result[0]].id) {
-      return false
+    if (curItem) {
+      if (!nextProps.queue.result.length) {
+        // stopping; update
+        return true
+      }
+
+      if (curItem.id === nextProps.queue.entities[nextProps.queue.result[0]].id) {
+        // first queue item is the same; skip update
+        return false
+      }
     }
 
     return true
