@@ -50,7 +50,7 @@ class PlayerView extends React.Component {
   }
 
   componentWillUnmount () {
-    clearTimeout(this.timeout);
+    clearTimeout(this.timeout)
   }
 }
 

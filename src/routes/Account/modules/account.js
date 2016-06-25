@@ -384,7 +384,7 @@ let initialState = {
 //       console.log('client authenticated')
 //       //do other things
 //     })
-//     .emit('authenticate', {token: jwt}); //send the jwt
+//     .emit('authenticate', {token: jwt}) //send the jwt
 // })
 
 // (re)join socket room

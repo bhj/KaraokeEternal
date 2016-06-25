@@ -98,7 +98,7 @@ const initialState = {
 }
 
 export default function playerReducer (state = initialState, action) {
-  const handler = ACTION_HANDLERS[action.type];
+  const handler = ACTION_HANDLERS[action.type]
 
-  return handler ? handler(state, action) : state;
+  return handler ? handler(state, action) : state
 }

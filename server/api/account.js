@@ -177,13 +177,13 @@ export default router
 // email validation helper from
 // http://www.moreofless.co.uk/validate-email-address-without-regex/
 function validateEmail(email) {
-  var at = email.indexOf( "@" );
-  var dot = email.lastIndexOf( "\." );
+  var at = email.indexOf( "@" )
+  var dot = email.lastIndexOf( "\." )
   return email.length > 0 &&
          at > 0 &&
          dot > at + 1 &&
          dot < email.length &&
          email[at + 1] !== "." &&
          email.indexOf( " " ) === -1 &&
-         email.indexOf( ".." ) === -1;
+         email.indexOf( ".." ) === -1
 }
