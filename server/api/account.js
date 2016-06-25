@@ -168,7 +168,7 @@ router.post('/api/account/update', async (ctx, next) => {
   }, 'shared-secret')
 
   // store JWT in httpOnly cookie
-  ctx.cookies.set('id_token', token, {httpOnly: true})  //
+  ctx.cookies.set('id_token', token, {httpOnly: true})
   ctx.status = 200
 })
 
