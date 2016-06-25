@@ -62,8 +62,8 @@ app._io.on('connection', socket => {
   debug('client connected')
 
   socket.on('join', ({roomId}) => {
-    socket.join(roomId)
-    debug('client joined room %s', roomId)
+    socket.join(roomId) // key socket.io rooms by our roomId
+    debug('client joined room %s (%s in room)', roomId, socket.adapter.rooms[roomId].length)
   })
 
   // koa-socket middleware
