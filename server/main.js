@@ -17,12 +17,14 @@ import apiLibrary from './api/library'
 import apiQueue from './api/queue'
 import apiProvider from './api/provider'
 import KoaRange from 'koa-range'
+import KoaSocketIO from 'koa-socket'
 
 const debug = _debug('app:server')
 const paths = config.utils_paths
 const app = new Koa()
+const io = new KoaSocketIO()
 
-// make database available on koa context
+// make database available on koa ctx
 app.use(async (ctx, next) => {
     ctx.db = await sqlite3('./database.sqlite3')
     await next()
@@ -32,14 +34,44 @@ app.use(convert(KoaRange))
 
 app.use(bodyparser())
 
+// decode jwt and make available as ctx.user
 app.use(convert(
   jwt({secret: 'shared-secret', cookie: 'id_token', passthrough: true})
 ))
 
+// koa-router
 app.use(apiAccount.routes())
 app.use(apiLibrary.routes())
 app.use(apiQueue.routes())
 app.use(apiProvider.routes())
+
+// Attach socket to the application
+io.attach(app)
+
+// io.on('connection', socketioJwt.authorize({
+//     secret: 'shared-secret',
+//     timeout: 15000 // 15 seconds to send the authentication message
+//   })).on('authenticated', function(socket) {
+//     let user = socket.decoded_token
+//     //this socket is authenticated, we are good to handle more events from it.
+//     debug('authenticated user (id=%s, name=%s)', user.id, user.name)
+//   })
+// })
+
+app._io.on('connection', socket => {
+  debug('client connected')
+
+  socket.on('join', ({roomId}) => {
+    socket.join(roomId)
+    debug('client joined room %s', roomId)
+  })
+
+  // koa-socket middleware
+  // socket.on('connect', async (ctx, next) => {
+  //   // ...
+  //   await next()
+  // })
+})
 
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {

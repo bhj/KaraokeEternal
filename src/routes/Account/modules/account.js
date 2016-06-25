@@ -1,4 +1,6 @@
 import fetch from 'isomorphic-fetch'
+import io from 'socket.io-client'
+const socket = io('http://localhost:3000')
 
 let fetchConfig = {
   credentials: 'same-origin',
@@ -37,18 +39,22 @@ function loginError(message) {
 
 // Calls the API to get a token and
 // dispatches actions along the way
-export function loginUser(creds) {
+export function loginUser(user) {
   return dispatch => {
-    dispatch(requestLogin(creds))
+    dispatch(requestLogin(user))
 
     return fetch('/api/account/login', {
         ...fetchConfig,
         method: 'POST',
-        body: JSON.stringify(creds)
+        body: JSON.stringify(user)
       })
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
+        // join the room
+        socket.emit('join', {roomId: user.roomId})
+
+        // save for persistence
         localStorage.setItem('user', JSON.stringify(response))
         dispatch(receiveLogin(response))
       })
@@ -94,6 +100,9 @@ export function logoutUser() {
     return fetch('/api/account/logout', fetchConfig)
       .then(checkStatus)
       .then(response => {
+        // leave the room
+        socket.disconnect()
+
         localStorage.removeItem('user')
         dispatch(receiveLogout())
       })
@@ -367,6 +376,20 @@ let initialState = {
   user: JSON.parse(localStorage.getItem('user')),
   rooms: [],
   viewMode: 'login'
+}
+
+// socket.on('connect', function (socket) {
+//   socket
+//     .on('authenticated', function () {
+//       console.log('client authenticated')
+//       //do other things
+//     })
+//     .emit('authenticate', {token: jwt}); //send the jwt
+// })
+
+// (re)join socket room
+if (initialState.user && initialState.user.roomId) {
+  socket.emit('join', {roomId: initialState.user.roomId})
 }
 
 export default function accountReducer (state = initialState, action) {
