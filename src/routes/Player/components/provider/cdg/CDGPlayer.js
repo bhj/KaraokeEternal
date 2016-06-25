@@ -38,10 +38,10 @@ class CDGPlayer extends React.Component {
 
   render () {
     const { width, height } = this.props
-    let canvasScale = Math.floor(this.props.width / 300)
+    let canvasScale = Math.floor(width / 300)
 
     // make sure height would fit the viewport's
-    if (this.props.height < canvasScale * 300 * .72) {
+    while (height < canvasScale * 300 * .72) {
       canvasScale -= 1
     }
 
