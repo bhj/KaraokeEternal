@@ -1,6 +1,4 @@
 import fetch from 'isomorphic-fetch'
-import io from 'socket.io-client'
-const socket = io('http://localhost:3000')
 
 let fetchConfig = {
   credentials: 'same-origin',
@@ -51,8 +49,8 @@ export function loginUser(user) {
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
-        // join the room
-        socket.emit('join', {roomId: user.roomId})
+        // join the socket.io room
+        dispatch(joinRoom(user.roomId))
 
         // save for persistence
         localStorage.setItem('user', JSON.stringify(response))
@@ -94,16 +92,18 @@ function logoutError(message) {
 
 // Logs the user out
 export function logoutUser() {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(requestLogout())
 
     return fetch('/api/account/logout', fetchConfig)
       .then(checkStatus)
       .then(response => {
-        // leave the room
-        socket.disconnect()
+        // leave the socket.io room
+        dispatch(leaveRoom(getState().account.user.roomId))
 
+        // delete cached object
         localStorage.removeItem('user')
+
         dispatch(receiveLogout())
       })
       .catch(err => {
@@ -255,6 +255,27 @@ export function fetchRooms() {
 }
 
 // ------------------------------------
+// join/leave socket.io room
+// ------------------------------------
+export const JOIN_ROOM = 'server/JOIN_ROOM'
+export const LEAVE_ROOM = 'server/LEAVE_ROOM'
+
+export function joinRoom(roomId) {
+  return {
+    type: JOIN_ROOM,
+    payload: roomId
+  }
+}
+
+export function leaveRoom(roomId) {
+  return {
+    type: LEAVE_ROOM,
+    payload: roomId
+  }
+}
+
+
+// ------------------------------------
 // Misc
 // ------------------------------------
 export const CHANGE_VIEW = 'account/CHANGE_VIEW'
@@ -376,20 +397,6 @@ let initialState = {
   user: JSON.parse(localStorage.getItem('user')),
   rooms: [],
   viewMode: 'login'
-}
-
-// socket.on('connect', function (socket) {
-//   socket
-//     .on('authenticated', function () {
-//       console.log('client authenticated')
-//       //do other things
-//     })
-//     .emit('authenticate', {token: jwt}) //send the jwt
-// })
-
-// (re)join socket room
-if (initialState.user && initialState.user.roomId) {
-  socket.emit('join', {roomId: initialState.user.roomId})
 }
 
 export default function accountReducer (state = initialState, action) {

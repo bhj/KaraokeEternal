@@ -45,33 +45,44 @@ app.use(apiLibrary.routes())
 app.use(apiQueue.routes())
 app.use(apiProvider.routes())
 
-// Attach socket to the application
+// makes koa-socket available as app.io and
+// the "real" underlying instance as app._io
 io.attach(app)
-
-// io.on('connection', socketioJwt.authorize({
-//     secret: 'shared-secret',
-//     timeout: 15000 // 15 seconds to send the authentication message
-//   })).on('authenticated', function(socket) {
-//     let user = socket.decoded_token
-//     //this socket is authenticated, we are good to handle more events from it.
-//     debug('authenticated user (id=%s, name=%s)', user.id, user.name)
-//   })
-// })
 
 app._io.on('connection', socket => {
   debug('client connected')
 
-  socket.on('join', ({roomId}) => {
-    socket.join(roomId) // key socket.io rooms by our roomId
-    debug('client joined room %s (%s in room)', roomId, socket.adapter.rooms[roomId].length)
+  socket.on('action', (action) => {
+    switch(action.type) {
+      case 'server/JOIN_ROOM':
+        socket.join(action.payload)
+        debug('client joined room %s (%s in room)', action.payload, socket.adapter.rooms[action.payload].length)
+        break
+      case 'server/LEAVE_ROOM':
+        socket.leave(action.payload)
+        debug('client left room %s (%s in room)', action.payload, socket.adapter.rooms[action.payload] ? socket.adapter.rooms[action.payload].length : 0)
+        break
+      default : debug('unknown action from client')
+    }
   })
-
-  // koa-socket middleware
-  // socket.on('connect', async (ctx, next) => {
-  //   // ...
-  //   await next()
-  // })
 })
+
+// koa-socket middleware
+// io.on('action', async (ctx, next) => {
+//   const { type, payload } = ctx.data
+//   console.log(ctx.socket.socket.rooms)
+//
+//   switch(ctx.data.type) {
+//     case 'server/JOIN_ROOM':
+//       ctx.socket.join(payload)
+//       break
+//     case 'server/LEAVE_ROOM':
+//       ctx.socket.leave(payload)
+//       break
+//     default : debug('unknown action from client')
+//   }
+//   await next()
+// })
 
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {

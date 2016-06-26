@@ -6,6 +6,7 @@ import PlayerRoute from './Player'
 import LibraryRoute from './Library'
 import QueueRoute from './Queue'
 import { fetchLibrary } from './Library/modules/library'
+import { joinRoom } from './Account/modules/account'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -15,6 +16,13 @@ export const createRoutes = (store) => ({
   getComponent (nextState, cb) {
     if (!store.getState().library.artists.result.length) {
       store.dispatch(fetchLibrary())
+    }
+
+    // join socket.io room
+    const user = store.getState().account.user
+
+    if (user && user.roomId) {
+      store.dispatch(joinRoom(user.roomId))
     }
 
     cb(null, CoreLayout)

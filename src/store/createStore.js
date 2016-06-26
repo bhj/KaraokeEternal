@@ -1,13 +1,18 @@
 import { applyMiddleware, compose, createStore } from 'redux'
 import { routerMiddleware } from 'react-router-redux'
+import createSocketIoMiddleware from 'redux-socket.io'
+import io from 'socket.io-client'
 import thunk from 'redux-thunk'
 import makeRootReducer from './reducers'
+
+const socket = io()
+let socketIoMiddleware = createSocketIoMiddleware(socket, "server/")
 
 export default (initialState = {}, history) => {
   // ======================================================
   // Middleware Configuration
   // ======================================================
-  const middleware = [thunk, routerMiddleware(history)]
+  const middleware = [thunk, routerMiddleware(history), socketIoMiddleware]
 
   // ======================================================
   // Store Enhancers
