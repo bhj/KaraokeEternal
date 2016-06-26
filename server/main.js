@@ -12,10 +12,7 @@ import webpackHMRMiddleware from './middleware/webpack-hmr'
 import bodyparser from 'koa-bodyparser'
 import sqlite3 from 'co-sqlite3'
 import jwt from 'koa-jwt'
-import apiAccount from './api/account'
-import apiLibrary from './api/library'
-import apiQueue from './api/queue'
-import apiProvider from './api/provider'
+import apiRoutes from './api/routes'
 import KoaRange from 'koa-range'
 import KoaSocketIO from 'koa-socket'
 
@@ -39,11 +36,10 @@ app.use(convert(
   jwt({secret: 'shared-secret', cookie: 'id_token', passthrough: true})
 ))
 
-// koa-router
-app.use(apiAccount.routes())
-app.use(apiLibrary.routes())
-app.use(apiQueue.routes())
-app.use(apiProvider.routes())
+// initialize each module's koa-router route export
+for (let route in apiRoutes) {
+  app.use(apiRoutes[route].routes())
+}
 
 // makes koa-socket available as app.io and
 // the "real" underlying instance as app._io

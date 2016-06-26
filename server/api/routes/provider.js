@@ -1,6 +1,6 @@
 import KoaRouter from 'koa-router'
-import Providers from './provider/index'
-import rows2obj from './utilities/rows2obj'
+import Providers from '../provider/index'
+import rows2obj from '../utilities/rows2obj'
 
 let debug = require('debug')
 let log = debug('app:library')
