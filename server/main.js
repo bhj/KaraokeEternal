@@ -21,9 +21,17 @@ const paths = config.utils_paths
 const app = new Koa()
 const io = new KoaSocketIO()
 
+// initialize database
+let _dbInstance
+
+sqlite3(config.path_database).then((db)=>{
+  debug('SQLite3 database initialized at: %s', config.path_database)
+  _dbInstance = db
+})
+
 // make database available on koa ctx
 app.use(async (ctx, next) => {
-    ctx.db = await sqlite3('./database.sqlite3')
+    ctx.db = _dbInstance
     await next()
 });
 

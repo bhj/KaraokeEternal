@@ -30,6 +30,11 @@ const config = {
   server_port : process.env.PORT || 3000,
 
   // ----------------------------------
+  // SQLite3 Configuration
+  // ----------------------------------
+  path_database : './database.sqlite3',
+
+  // ----------------------------------
   // Compiler Configuration
   // ----------------------------------
   compiler_css_modules     : true,
