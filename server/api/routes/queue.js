@@ -11,7 +11,7 @@ router.get('/api/queue', async (ctx, next) => {
   // use roomId from their JWT
   await isRoomOpen.call(ctx, ctx.state.user.roomId)
 
-  ctx.body = await getQueue.call(ctx, ctx.state.user.roomId)
+  ctx.body = await getQueue(ctx, ctx.state.user.roomId)
 })
 
 // add to queue
@@ -97,12 +97,12 @@ async function isRoomOpen(roomId) {
   }
 }
 
-async function getQueue(roomId) {
+export async function getQueue(ctx, roomId) {
   let queueIds = []
   let items = {}
 
   // get songs
-  let rows = await this.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.songUID = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
+  let rows = await ctx.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.songUID = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
 
   rows.forEach(function(row){
     queueIds.push(row.id)

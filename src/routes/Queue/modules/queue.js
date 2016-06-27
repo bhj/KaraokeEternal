@@ -81,7 +81,7 @@ function putError(message) {
 }
 
 export function queueSong(uid) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(requestPut(uid))
 
     return fetch('/api/queue/'+uid, {
@@ -89,9 +89,9 @@ export function queueSong(uid) {
         method: 'PUT'
       })
       .then(checkStatus)
-      .then(response => response.json())
-      .then(queue => {
-        dispatch(receivePut(queue))
+      .then(() => {
+        const roomId = getState().account.user.roomId
+        dispatch(notifyQueueChange(roomId))
       })
       .catch(err => {
         dispatch(putError(err))
@@ -128,7 +128,7 @@ function deleteError(message) {
 }
 
 export function deleteItem(id) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(requestDelete(id))
 
     return fetch('/api/queue/'+id, {
@@ -136,15 +136,32 @@ export function deleteItem(id) {
         method: 'DELETE'
       })
       .then(checkStatus)
-      .then(response => response.json())
-      .then(queue => {
-        dispatch(receiveDelete(queue))
+      .then(() => {
+        const roomId = getState().account.user.roomId
+        dispatch(notifyQueueChange(roomId))
       })
       .catch(err => {
         dispatch(deleteError(err))
       })
   }
 }
+
+// ------------------------------------
+// sockets
+// ------------------------------------
+
+// dispatched to server
+export const NOTIFY_QUEUE_CHANGE = 'server/NOTIFY_QUEUE_CHANGE'
+
+export function notifyQueueChange(roomId) {
+  return {
+    type: NOTIFY_QUEUE_CHANGE,
+    payload: roomId
+  }
+}
+
+// emitted from server
+export const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 
 // ------------------------------------
 // Helper for fetch response
@@ -189,8 +206,6 @@ const ACTION_HANDLERS = {
   [QUEUE_PUT_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    result: payload.result,
-    entities: payload.entities
   }),
   [QUEUE_PUT_FAIL]: (state, {payload}) => ({
     ...state,
@@ -205,13 +220,16 @@ const ACTION_HANDLERS = {
   [QUEUE_DELETE_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    result: payload.result,
-    entities: payload.entities
   }),
   [QUEUE_DELETE_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     errorMessage: payload.message
+  }),
+  [QUEUE_CHANGE]: (state, {payload}) => ({
+    ...state,
+    result: payload.result,
+    entities: payload.entities
   }),
 }
 

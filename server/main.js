@@ -13,6 +13,7 @@ import bodyparser from 'koa-bodyparser'
 import sqlite3 from 'co-sqlite3'
 import jwt from 'koa-jwt'
 import apiRoutes from './api/routes'
+import apiSockets from './api/sockets'
 import KoaRange from 'koa-range'
 import KoaSocketIO from 'koa-socket'
 
@@ -66,27 +67,25 @@ app._io.on('connection', socket => {
         socket.leave(action.payload)
         debug('client left room %s (%s in room)', action.payload, socket.adapter.rooms[action.payload] ? socket.adapter.rooms[action.payload].length : 0)
         break
-      default : debug('unknown action from client')
     }
   })
 })
 
-// koa-socket middleware
-// io.on('action', async (ctx, next) => {
-//   const { type, payload } = ctx.data
-//   console.log(ctx.socket.socket.rooms)
-//
-//   switch(ctx.data.type) {
-//     case 'server/JOIN_ROOM':
-//       ctx.socket.join(payload)
-//       break
-//     case 'server/LEAVE_ROOM':
-//       ctx.socket.leave(payload)
-//       break
-//     default : debug('unknown action from client')
-//   }
-//   await next()
-// })
+// koa-socket middleware (note: this ctx is
+// not the same ctx as in koa middleware)
+io.use(async (ctx, next) => {
+  // make db and "raw" socket.io instance
+  // available to downstream middleware
+  ctx.db = _dbInstance
+  ctx.io = app._io
+
+  await next()
+})
+
+// apply koa-socket middlewares
+for (let handler in apiSockets) {
+  io.on('action', apiSockets[handler])
+}
 
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {
