@@ -41,7 +41,7 @@ router.put('/api/queue/:uid', async (ctx, next) => {
     return ctx.body = 'Could not queue item'
   }
 
-  ctx.body = await getQueue.call(ctx, ctx.state.user.roomId)
+  return ctx.status = 200
 })
 
 // remove from queue
@@ -82,7 +82,7 @@ router.del('/api/queue/:id', async (ctx, next) => {
     return ctx.body = 'Could not delete item'
   }
 
-  ctx.body = await getQueue.call(ctx, ctx.state.user.roomId)
+  return ctx.status = 200
 })
 
 export default router
