@@ -1,18 +1,13 @@
 import { connect } from 'react-redux'
-import { play, pause, changeQueueItem, getMedia, getMediaSuccess, getMediaError } from '../modules/player'
-import { fetchQueue } from '../../Queue/modules/queue'
+import { play, pause, getMedia, getMediaSuccess, getMediaError } from '../modules/player'
 import PlayerView from '../components/PlayerView'
 
 const mapActionCreators = {
-  // player
   play,
   pause,
-  changeQueueItem,
   getMedia,
   getMediaSuccess,
   getMediaError,
-  // queue
-  fetchQueue
 }
 
 const mapStateToProps = (state) => ({
