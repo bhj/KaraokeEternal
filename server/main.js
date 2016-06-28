@@ -57,8 +57,10 @@ io.attach(app)
 // koa-socket middleware (note: ctx is
 // not the same ctx as koa middleware)
 io.use(async (ctx, next) => {
-  // make db available to downstream middleware
+  // make db and socket.io instance
+  // available to downstream middleware
   ctx.db = _dbInstance
+  ctx.io = app._io
   await next()
 })
 
