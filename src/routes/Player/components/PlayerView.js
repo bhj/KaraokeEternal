@@ -5,7 +5,6 @@ import ProviderPlayers from './provider'
 class PlayerView extends React.Component {
   static propTypes = {
     // actions
-    fetchQueue: React.PropTypes.func.isRequired,
     play: React.PropTypes.func.isRequired,
     pause: React.PropTypes.func.isRequired,
     getMedia: React.PropTypes.func.isRequired,
@@ -43,14 +42,6 @@ class PlayerView extends React.Component {
         )}
       </AutoSizer>
     )
-  }
-
-  componentDidMount () {
-    this.timeout = setInterval(this.props.fetchQueue, 2000)
-  }
-
-  componentWillUnmount () {
-    clearTimeout(this.timeout)
   }
 }
 
