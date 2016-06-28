@@ -19,9 +19,9 @@ export const createRoutes = (store) => ({
     }
 
     // join socket.io room
-    const user = store.getState().account.user
+    const { user, hasJoinedRoom } = store.getState().account
 
-    if (user && user.roomId) {
+    if (user && user.roomId && !hasJoinedRoom) {
       store.dispatch(joinRoom(user.roomId))
     }
 

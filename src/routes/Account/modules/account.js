@@ -258,7 +258,9 @@ export function fetchRooms() {
 // join/leave socket.io room
 // ------------------------------------
 export const JOIN_ROOM = 'server/JOIN_ROOM'
+export const JOIN_ROOM_SUCCESS = 'server/JOIN_ROOM_SUCCESS'
 export const LEAVE_ROOM = 'server/LEAVE_ROOM'
+export const LEAVE_ROOM_SUCCESS = 'server/LEAVE_ROOM_SUCCESS'
 
 export function joinRoom(roomId) {
   return {
@@ -387,6 +389,14 @@ const ACTION_HANDLERS = {
     viewMode: payload,
     errorMessage: null
   }),
+  [JOIN_ROOM_SUCCESS]: (state, {payload}) => ({
+    ...state,
+    hasJoinedRoom: true,
+  }),
+  [LEAVE_ROOM_SUCCESS]: (state, {payload}) => ({
+    ...state,
+    hasJoinedRoom: false,
+  }),
 }
 
 // ------------------------------------
@@ -396,6 +406,7 @@ let initialState = {
   isFetching: false,
   user: JSON.parse(localStorage.getItem('user')),
   rooms: [],
+  hasJoinedRoom: false,
   viewMode: 'login'
 }
 

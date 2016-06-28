@@ -1,5 +1,7 @@
-import queue from './queue'
+import queueActions from './queue'
+import roomActions from './room'
 
 export default {
-  queue
+  queueActions,
+  roomActions
 }
