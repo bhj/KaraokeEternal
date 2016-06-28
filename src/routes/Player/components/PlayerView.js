@@ -1,19 +1,19 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import { AutoSizer } from 'react-virtualized'
 import ProviderPlayers from './provider'
 
 class PlayerView extends React.Component {
   static propTypes = {
     // actions
-    play: React.PropTypes.func.isRequired,
-    pause: React.PropTypes.func.isRequired,
-    getMedia: React.PropTypes.func.isRequired,
-    getMediaSuccess: React.PropTypes.func.isRequired,
-    getMediaError: React.PropTypes.func.isRequired,
+    play: PropTypes.func.isRequired,
+    pause: PropTypes.func.isRequired,
+    getMedia: PropTypes.func.isRequired,
+    getMediaSuccess: PropTypes.func.isRequired,
+    getMediaError: PropTypes.func.isRequired,
     // store state
-    queue: React.PropTypes.object.isRequired,
-    isPlaying: React.PropTypes.bool.isRequired,
-    isFetching: React.PropTypes.bool.isRequired,
+    queue: PropTypes.object.isRequired,
+    isPlaying: PropTypes.bool.isRequired,
+    isFetching: PropTypes.bool.isRequired,
   }
 
   render () {
