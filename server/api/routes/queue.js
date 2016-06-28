@@ -1,19 +1,6 @@
 import KoaRouter from 'koa-router'
 let router = KoaRouter()
 
-// get queue
-router.get('/api/queue', async (ctx, next) => {
-  if (!ctx.state.user) {
-    ctx.status = 401
-    return ctx.body = 'Invalid token (try signing in again)'
-  }
-
-  // use roomId from their JWT
-  await isRoomOpen.call(ctx, ctx.state.user.roomId)
-
-  ctx.body = await getQueue(ctx, ctx.state.user.roomId)
-})
-
 // add to queue
 router.put('/api/queue/:uid', async (ctx, next) => {
   if (!ctx.state.user) {
@@ -95,19 +82,4 @@ async function isRoomOpen(roomId) {
     this.status = 401
     return this.body = 'Room is invalid or closed'
   }
-}
-
-export async function getQueue(ctx, roomId) {
-  let queueIds = []
-  let items = {}
-
-  // get songs
-  let rows = await ctx.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.songUID = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
-
-  rows.forEach(function(row){
-    queueIds.push(row.id)
-    items[row.id] = row
-  })
-
-  return {result: queueIds, entities: items}
 }
