@@ -45,40 +45,20 @@ app.use(convert(
   jwt({secret: 'shared-secret', cookie: 'id_token', passthrough: true})
 ))
 
-// initialize each module's koa-router route export
+// initialize each module's koa-router routes
 for (let route in apiRoutes) {
   app.use(apiRoutes[route].routes())
 }
 
-// makes koa-socket available as app.io and
-// the "real" underlying instance as app._io
+// make koa-socket available as app.io
+// and the "real" socket.io instance as app._io
 io.attach(app)
 
-app._io.on('connection', socket => {
-  debug('client connected')
-
-  socket.on('action', (action) => {
-    switch(action.type) {
-      case 'server/JOIN_ROOM':
-        socket.join(action.payload)
-        debug('client joined room %s (%s in room)', action.payload, socket.adapter.rooms[action.payload].length)
-        break
-      case 'server/LEAVE_ROOM':
-        socket.leave(action.payload)
-        debug('client left room %s (%s in room)', action.payload, socket.adapter.rooms[action.payload] ? socket.adapter.rooms[action.payload].length : 0)
-        break
-    }
-  })
-})
-
-// koa-socket middleware (note: this ctx is
-// not the same ctx as in koa middleware)
+// koa-socket middleware (note: ctx is
+// not the same ctx as koa middleware)
 io.use(async (ctx, next) => {
-  // make db and "raw" socket.io instance
-  // available to downstream middleware
+  // make db available to downstream middleware
   ctx.db = _dbInstance
-  ctx.io = app._io
-
   await next()
 })
 
