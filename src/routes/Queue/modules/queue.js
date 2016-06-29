@@ -9,50 +9,6 @@ let fetchConfig = {
 }
 
 // ------------------------------------
-// Get queue
-// ------------------------------------
-export const GET_QUEUE = 'queue/GET_QUEUE'
-export const GET_QUEUE_SUCCESS = 'queue/GET_QUEUE_SUCCESS'
-export const GET_QUEUE_FAIL = 'queueGET_QUEUE_FAIL'
-
-function requestQueue() {
-  return {
-    type: GET_QUEUE,
-    payload: null
-  }
-}
-
-function receiveQueue(response) {
-  return {
-    type: GET_QUEUE_SUCCESS,
-    payload: response
-  }
-}
-
-function queueError(message) {
-  return {
-    type: GET_QUEUE_FAIL,
-    payload: message
-  }
-}
-
-export function fetchQueue() {
-  return dispatch => {
-    dispatch(requestQueue())
-
-    return fetch('/api/queue', fetchConfig)
-      .then(checkStatus)
-      .then(response => response.json())
-      .then(response => {
-        dispatch(receiveQueue(response))
-      })
-      .catch(err => {
-        dispatch(queueError(err))
-      })
-  }
-}
-
-// ------------------------------------
 // add to queue
 // ------------------------------------
 export const QUEUE_PUT = 'queue/QUEUE_PUT'
@@ -91,7 +47,7 @@ export function queueSong(uid) {
       .then(checkStatus)
       .then(() => {
         const roomId = getState().account.user.roomId
-        dispatch(notifyQueueChange(roomId))
+        dispatch(requestQueueUpdate(roomId))
       })
       .catch(err => {
         dispatch(putError(err))
@@ -138,7 +94,7 @@ export function deleteItem(id) {
       .then(checkStatus)
       .then(() => {
         const roomId = getState().account.user.roomId
-        dispatch(notifyQueueChange(roomId))
+        dispatch(requestQueueUpdate(roomId))
       })
       .catch(err => {
         dispatch(deleteError(err))
@@ -151,17 +107,17 @@ export function deleteItem(id) {
 // ------------------------------------
 
 // dispatched to server
-export const NOTIFY_QUEUE_CHANGE = 'server/NOTIFY_QUEUE_CHANGE'
+export const QUEUE_UPDATE = 'server/QUEUE_UPDATE'
 
-export function notifyQueueChange(roomId) {
+export function requestQueueUpdate(roomId) {
   return {
-    type: NOTIFY_QUEUE_CHANGE,
+    type: QUEUE_UPDATE,
     payload: roomId
   }
 }
 
 // emitted from server
-export const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
+export const QUEUE_UPDATE_SUCCESS = 'server/QUEUE_UPDATE_SUCCESS'
 
 // ------------------------------------
 // Helper for fetch response
@@ -182,22 +138,6 @@ function checkStatus(response) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [GET_QUEUE]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
-    errorMessage: null
-  }),
-  [GET_QUEUE_SUCCESS]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
-    result: payload.result,
-    entities: payload.entities
-  }),
-  [GET_QUEUE_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-    errorMessage: payload.message
-  }),
   [QUEUE_PUT]: (state, {payload}) => ({
     ...state,
     isFetching: true,
@@ -226,7 +166,7 @@ const ACTION_HANDLERS = {
     isFetching: false,
     errorMessage: payload.message
   }),
-  [QUEUE_CHANGE]: (state, {payload}) => ({
+  [QUEUE_UPDATE_SUCCESS]: (state, {payload}) => ({
     ...state,
     result: payload.result,
     entities: payload.entities

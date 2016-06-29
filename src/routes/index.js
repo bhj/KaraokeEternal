@@ -18,13 +18,6 @@ export const createRoutes = (store) => ({
       store.dispatch(fetchLibrary())
     }
 
-    // join socket.io room
-    const { user, hasJoinedRoom } = store.getState().account
-
-    if (user && user.roomId && !hasJoinedRoom) {
-      store.dispatch(joinRoom(user.roomId))
-    }
-
     cb(null, CoreLayout)
   },
   indexRoute: Home,

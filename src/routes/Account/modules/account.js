@@ -37,24 +37,24 @@ function loginError(message) {
 
 // Calls the API to get a token and
 // dispatches actions along the way
-export function loginUser(user) {
+export function loginUser(creds) {
   return dispatch => {
-    dispatch(requestLogin(user))
+    dispatch(requestLogin(creds))
 
     return fetch('/api/account/login', {
         ...fetchConfig,
         method: 'POST',
-        body: JSON.stringify(user)
+        body: JSON.stringify(creds)
       })
       .then(checkStatus)
       .then(response => response.json())
-      .then(response => {
+      .then(user => {
         // join the socket.io room
         dispatch(joinRoom(user.roomId))
 
         // save for persistence
-        localStorage.setItem('user', JSON.stringify(response))
-        dispatch(receiveLogin(response))
+        localStorage.setItem('user', JSON.stringify(user))
+        dispatch(receiveLogin(user))
       })
       .catch(err => {
         dispatch(loginError(err))
@@ -189,20 +189,20 @@ function updateError(message) {
   }
 }
 
-export function updateUser(user) {
+export function updateUser(data) {
   return dispatch => {
-    dispatch(requestUpdate(user))
+    dispatch(requestUpdate(data))
 
     return fetch('/api/account/update', {
         ...fetchConfig,
         method: 'POST',
-        body: JSON.stringify(user)
+        body: JSON.stringify(data)
       })
       .then(checkStatus)
       .then(response => response.json())
-      .then(response => {
-        localStorage.setItem('user', JSON.stringify(response))
-        dispatch(receiveUpdate(response))
+      .then(user => {
+        localStorage.setItem('user', JSON.stringify(user))
+        dispatch(receiveUpdate(user))
       })
       .catch(err => {
         dispatch(updateError(err))
@@ -257,10 +257,9 @@ export function fetchRooms() {
 // ------------------------------------
 // join/leave socket.io room
 // ------------------------------------
+// sent to server
 export const JOIN_ROOM = 'server/JOIN_ROOM'
-export const JOIN_ROOM_SUCCESS = 'server/JOIN_ROOM_SUCCESS'
 export const LEAVE_ROOM = 'server/LEAVE_ROOM'
-export const LEAVE_ROOM_SUCCESS = 'server/LEAVE_ROOM_SUCCESS'
 
 export function joinRoom(roomId) {
   return {
@@ -276,6 +275,19 @@ export function leaveRoom(roomId) {
   }
 }
 
+// emitted from server
+export const JOIN_ROOM_SUCCESS = 'server/JOIN_ROOM_SUCCESS'
+export const LEAVE_ROOM_SUCCESS = 'server/LEAVE_ROOM_SUCCESS'
+
+// socket.io client disconnect
+export const DISCONNECTED = 'server/DISCONNECTED'
+
+export function disconnected() {
+  return {
+    type: DISCONNECTED,
+    payload: null
+  }
+}
 
 // ------------------------------------
 // Misc
@@ -391,11 +403,15 @@ const ACTION_HANDLERS = {
   }),
   [JOIN_ROOM_SUCCESS]: (state, {payload}) => ({
     ...state,
-    hasJoinedRoom: true,
+    isInRoom: true,
   }),
   [LEAVE_ROOM_SUCCESS]: (state, {payload}) => ({
     ...state,
-    hasJoinedRoom: false,
+    isInRoom: false,
+  }),
+  [DISCONNECTED]: (state, {payload}) => ({
+    ...state,
+    isInRoom: false,
   }),
 }
 
@@ -406,7 +422,7 @@ let initialState = {
   isFetching: false,
   user: JSON.parse(localStorage.getItem('user')),
   rooms: [],
-  hasJoinedRoom: false,
+  isInRoom: false,
   viewMode: 'login'
 }
 

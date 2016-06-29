@@ -1,19 +1,15 @@
-import _debug from 'debug'
-const debug = _debug('app:socket:queue')
-
-export const NOTIFY_QUEUE_CHANGE = 'server/NOTIFY_QUEUE_CHANGE'
-export const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
+const QUEUE_UPDATE = 'server/QUEUE_UPDATE'
+export const QUEUE_UPDATE_SUCCESS = 'server/QUEUE_UPDATE_SUCCESS'
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [NOTIFY_QUEUE_CHANGE]: async (ctx, {payload}) => {
+  [QUEUE_UPDATE]: async (ctx, {payload}) => {
     let roomId = payload
 
-    ctx.io.in(roomId)
-    ctx.io.emit('action', {
-      type: QUEUE_CHANGE,
+    ctx.io.to(roomId).emit('action', {
+      type: QUEUE_UPDATE_SUCCESS,
       payload: await fetchQueue(ctx.db, roomId)
     })
   },

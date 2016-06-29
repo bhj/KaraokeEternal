@@ -1,4 +1,4 @@
-import { fetchQueue, QUEUE_CHANGE } from './queue'
+import { fetchQueue, QUEUE_UPDATE_SUCCESS } from './queue'
 import _debug from 'debug'
 const debug = _debug('app:socket:room')
 
@@ -17,19 +17,18 @@ const ACTION_HANDLERS = {
 
     ctx.socket.socket.join(roomId)
 
-    ctx.io.to(socketId)
-    ctx.io.emit('action', {
+    ctx.io.to(socketId).emit('action', {
       type: JOIN_ROOM_SUCCESS,
       payload: roomId
     })
 
-    ctx.io.in(roomId)
-    ctx.io.emit('action', {
-      type: QUEUE_CHANGE,
+    // to the newcomer only
+    ctx.io.to(socketId).emit('action', {
+      type: QUEUE_UPDATE_SUCCESS,
       payload: await fetchQueue(ctx.db, roomId)
     })
 
-    debug('client %s joined room %s (%s in room)', socketId, roomId, ctx.socket.socket.adapter.rooms[roomId].length)
+    debug('client %s joined room %s (%s in room)', socketId, roomId, ctx.socket.socket.adapter.rooms[roomId].length || 0)
   },
   [LEAVE_ROOM]: async (ctx, {payload}) => {
     let roomId = payload
@@ -37,13 +36,12 @@ const ACTION_HANDLERS = {
 
     ctx.socket.socket.leave(roomId)
 
-    ctx.io.to(socketId)
-    ctx.io.emit('action', {
+    ctx.io.to(socketId).emit('action', {
       type: LEAVE_ROOM_SUCCESS,
-      payload: roomId
+      payload: null
     })
 
-    debug('client %s left room %s (%s in room)', socketId, roomId, ctx.socket.socket.adapter.rooms[roomId].length)
+    debug('client %s left room %s (%s in room)', socketId, roomId, ctx.socket.socket.adapter.rooms[roomId].length || 0)
   },
 }
 

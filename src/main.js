@@ -5,6 +5,19 @@ import { useRouterHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
+import { joinRoom, disconnected } from './routes/Account/modules/account'
+import io from 'socket.io-client'
+const socket = io()
+
+socket.on('connect', function () {
+  if (store.getState().account.user) {
+    store.dispatch(joinRoom(store.getState().account.user.roomId))
+  }
+})
+
+socket.on('disconnect', function () {
+  store.dispatch(disconnected())
+})
 
 // ========================================================
 // Browser History Setup
@@ -21,7 +34,7 @@ const browserHistory = useRouterHistory(createBrowserHistory)({
 // so we need to provide a custom `selectLocationState` to inform
 // react-router-redux of its location.
 const initialState = window.___INITIAL_STATE__
-const store = createStore(initialState, browserHistory)
+const store = createStore(initialState, browserHistory, socket)
 const history = syncHistoryWithStore(browserHistory, store, {
   selectLocationState: (state) => state.router
 })
