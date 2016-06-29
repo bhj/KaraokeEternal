@@ -153,23 +153,20 @@ router.post('/api/account/update', async (ctx, next) => {
   let res = await ctx.db.run('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
     [name, email, password, ctx.state.user.id])
 
-  // client will use this info in UI and
-  // cache it in localStorage to persist reloads
-  ctx.body = {
-    name,
-    email,
-  }
+  // return user (shape should match /login)
+  user = await ctx.db.get('SELECT * FROM users WHERE email = ?', [email])
+
+  delete user.password
+  user.roomId = ctx.state.user.roomId
 
   // generate new JWT
-  let token = jwt.sign({
-    id: ctx.state.user.id,
-    name,
-    email
-  }, 'shared-secret')
+  let token = jwt.sign(user, 'shared-secret')
 
   // store JWT in httpOnly cookie
   ctx.cookies.set('id_token', token, {httpOnly: true})
-  ctx.status = 200
+
+  // client also persists this to localStorage
+  ctx.body = user
 })
 
 export default router
