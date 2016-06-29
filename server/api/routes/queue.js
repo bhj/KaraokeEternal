@@ -20,7 +20,7 @@ router.put('/api/queue/:uid', async (ctx, next) => {
   }
 
   // insert row
-  let res = await ctx.db.run('INSERT INTO queue (roomId, userId, songUID, date) VALUES (?, ?, ?, ?)',
+  let res = await ctx.db.run('INSERT INTO queue (roomId, userId, uid, date) VALUES (?, ?, ?, ?)',
     [ctx.state.user.roomId, ctx.state.user.id, ctx.params.uid, Date.now()])
 
   if (res.changes !== 1) {
@@ -39,7 +39,7 @@ router.del('/api/queue/:id', async (ctx, next) => {
   }
 
   // verify item exists
-  let item = await ctx.db.get('SELECT * FROM queue WHERE id = ?', [ctx.params.id])
+  let item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', [ctx.params.id])
 
   if (!item) {
     ctx.status = 404
@@ -62,7 +62,7 @@ router.del('/api/queue/:id', async (ctx, next) => {
   await isRoomOpen.call(ctx, ctx.state.user.roomId)
 
   // delete item
-  let res = await ctx.db.run('DELETE FROM queue WHERE id = ?', [item.id])
+  let res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', [item.queueId])
 
   if (res.changes !== 1) {
     ctx.status = 500

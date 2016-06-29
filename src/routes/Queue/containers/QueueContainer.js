@@ -10,8 +10,9 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
-  queueIds: state.queue.result,
-  queuedItems: state.queue.entities,
+  queueIds: state.queue.result.queueIds,
+  uids: state.queue.result.uids,
+  items: state.queue.entities,
   errorMessage: state.queue.errorMessage,
   // library data
   artistIds: state.library.artists.result,

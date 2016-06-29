@@ -23,3 +23,7 @@
   color: white;
   font-size: 14px;
 }
+
+.hasQueued {
+  background: yellow;
+}

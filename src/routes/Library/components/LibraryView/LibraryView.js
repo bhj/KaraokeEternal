@@ -12,6 +12,8 @@ class LibraryView extends React.Component {
     artists: PropTypes.object.isRequired,
     songUIDs: PropTypes.array.isRequired,
     songs: PropTypes.object.isRequired,
+    queue: PropTypes.object.isRequired,
+    // actions
     queueSong: PropTypes.func.isRequired
   }
 
@@ -20,6 +22,13 @@ class LibraryView extends React.Component {
 
   rowRenderer = this.rowRenderer.bind(this)
   rowHeight = this.rowHeight.bind(this)
+
+  componentDidUpdate () {
+    // queue may have changed; update rows
+    if (this.VirtualScroll) {
+      this.VirtualScroll.forceUpdate()
+    }
+  }
 
   render () {
     if (!this.props.artistIds.length) return null
@@ -59,12 +68,29 @@ class LibraryView extends React.Component {
   }
 
   rowRenderer({index}) {
-    let artist = this.props.artists[this.props.artistIds[index]]
-    let isExpanded = this.expandedIds.indexOf(artist.id) !== -1
-    let children = []
+    const artist = this.props.artists[this.props.artistIds[index]]
+    const isExpanded = this.expandedIds.indexOf(artist.id) !== -1
 
-    if (isExpanded){
-      artist.songs.forEach(function(uid, i) {
+    let children = []
+    let isChildQueued = false
+
+    for (let i=0; i < artist.songs.length; i++) {
+      const uid = artist.songs[i]
+      let isQueued = false
+
+      // search for uid
+      if (this.props.queue.result.uids.indexOf(uid) !== -1) {
+        isQueued = true
+        isChildQueued = true
+
+        if (!isExpanded) {
+          // since we aren't rendering children (songs) and
+          // we have enough info to render parent ArtistItem
+          break
+        }
+      }
+
+      if (isExpanded) {
         children.push(
           <SongItem
             key={uid}
@@ -72,9 +98,10 @@ class LibraryView extends React.Component {
             plays={this.props.songs[uid].plays}
             provider={this.props.songs[uid].provider}
             onSelectSong={() => this.handleSongClick(uid)}
+            isQueued={isQueued}
           />
         )
-      }, this)
+      }
     }
 
     return (
@@ -84,6 +111,7 @@ class LibraryView extends React.Component {
         count={artist.songs.length}
         onArtistSelect={() => this.handleArtistClick(artist.id)}
         isExpanded={isExpanded}
+        isChildQueued={isChildQueued}
       >
         {children}
       </ArtistItem>

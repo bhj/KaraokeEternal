@@ -7,7 +7,8 @@ class QueueView extends React.Component {
   static propTypes = {
     // queue data
     queueIds: PropTypes.array.isRequired,
-    queuedItems: PropTypes.object.isRequired,
+    uids: PropTypes.array.isRequired,
+    items: PropTypes.object.isRequired,
     errorMessage: PropTypes.string,
     // library data
     artistIds: PropTypes.array.isRequired,
@@ -21,18 +22,18 @@ class QueueView extends React.Component {
   render() {
     if (!this.props.artistIds.length) return null
 
-    let songs = this.props.queueIds.map(function(qId, i) {
-      let qItem = this.props.queuedItems[qId]
-      let song = this.props.songs[qItem.songUID]
+    let songs = this.props.queueIds.map(function(queueId, i) {
+      let item = this.props.items[queueId]
+      let song = this.props.songs[item.uid]
 
       return (
         <QueueItem
-          key={qId}
+          key={queueId}
           artist={this.props.artists[song.artistId].name}
           title={song.title}
-          userName={qItem.userName}
-          canDelete={qItem.userId === this.props.user.id}
-          onDeleteClick={this.handleDeleteClick.bind(this, qId)}
+          userName={item.userName}
+          canDelete={item.userId === this.props.user.id}
+          onDeleteClick={this.handleDeleteClick.bind(this, queueId)}
         />
       )
     }, this)

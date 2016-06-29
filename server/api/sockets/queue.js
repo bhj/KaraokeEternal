@@ -27,15 +27,18 @@ export default async function queueActions(ctx, next) {
 
 export async function fetchQueue(db, roomId) {
   let queueIds = []
+  let uids = []
   let items = {}
 
   // get songs
-  let rows = await db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.songUID = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
+  let rows = await db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.uid = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
 
   rows.forEach(function(row){
-    queueIds.push(row.id)
-    items[row.id] = row
+    queueIds.push(row.queueId)
+    items[row.queueId] = row
+    // used for quick lookup by Library
+    uids.push(row.uid)
   })
 
-  return {result: queueIds, entities: items}
+  return {result: {uids, queueIds}, entities: items}
 }

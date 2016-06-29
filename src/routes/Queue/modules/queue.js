@@ -179,7 +179,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   isFetching: false,
   errorMessage: null,
-  result: [],
+  result: {queueIds: [], uids: []},
   entities: {}
 }
 
