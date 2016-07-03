@@ -41,17 +41,15 @@ router.post('/api/account/login', async (ctx, next) => {
   delete user.password
   user.roomId = room.id
 
-  // JWT for API calls is stored in httpOnly cookie
   let token = jwt.sign(user, 'shared-secret')
-  ctx.cookies.set('id_token', token, {httpOnly: true})
 
   // client also persists this to localStorage
-  ctx.body = user
+  ctx.body = { user, token }
 })
 
 // logout
 router.get('/api/account/logout', async (ctx, next) => {
-  ctx.cookies.set('id_token', '.', {httpOnly: true})
+  // doesn't do much...
   ctx.status = 200
 })
 

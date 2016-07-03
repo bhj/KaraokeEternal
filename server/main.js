@@ -11,11 +11,12 @@ import webpackDevMiddleware from './middleware/webpack-dev'
 import webpackHMRMiddleware from './middleware/webpack-hmr'
 import bodyparser from 'koa-bodyparser'
 import sqlite3 from 'co-sqlite3'
-import jwt from 'koa-jwt'
+import KoaJwt from 'koa-jwt'
 import apiRoutes from './api/routes'
-import apiSockets from './api/sockets'
 import KoaRange from 'koa-range'
 import KoaSocketIO from 'koa-socket'
+import authActions from './api/sockets/auth'
+import queueActions from './api/sockets/queue'
 
 const debug = _debug('app:server')
 const paths = config.utils_paths
@@ -42,7 +43,7 @@ app.use(bodyparser())
 
 // decode jwt and make available as ctx.user
 app.use(convert(
-  jwt({secret: 'shared-secret', cookie: 'id_token', passthrough: true})
+  KoaJwt({secret: 'shared-secret', cookie: 'id_token', passthrough: true})
 ))
 
 // initialize each module's koa-router routes
@@ -54,20 +55,26 @@ for (let route in apiRoutes) {
 // and the "real" socket.io instance as app._io
 io.attach(app)
 
-// koa-socket middleware (note: ctx is
-// not the same ctx as koa middleware)
+// ---------------------
+// koa-socket middleware
+// ---------------------
+// note: ctx is not the same ctx as koa middleware
+
+// auth handler first so we have decoded_token downstream
+io.on('action', authActions)
+
+// make user, db and socket.io instance available downstream
 io.use(async (ctx, next) => {
-  // make db and socket.io instance
-  // available to downstream middleware
+  ctx.user = ctx.socket.socket.decoded_token
   ctx.db = _dbInstance
   ctx.io = app._io
+
   await next()
 })
 
-// apply koa-socket middlewares
-for (let handler in apiSockets) {
-  io.on('action', apiSockets[handler])
-}
+// further koa-socket middleware can access
+// everything on ctx (see above)
+io.on('action', queueActions)
 
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {

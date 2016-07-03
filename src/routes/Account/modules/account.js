@@ -21,10 +21,10 @@ function requestLogin(creds) {
   }
 }
 
-function receiveLogin(token) {
+function receiveLogin(response) {
   return {
     type: LOGIN_SUCCESS,
-    payload: token
+    payload: response
   }
 }
 
@@ -35,8 +35,8 @@ function loginError(message) {
   }
 }
 
-// Calls the API to get a token and
-// dispatches actions along the way
+// Calls the API to get a token (stored in httpOnly cookie)
+// and connects to the socket with said cookie
 export function loginUser(creds) {
   return dispatch => {
     dispatch(requestLogin(creds))
@@ -47,20 +47,43 @@ export function loginUser(creds) {
         body: JSON.stringify(creds)
       })
       .then(checkStatus)
-      .then(response => response.json())
-      .then(user => {
-        // join the socket.io room
-        dispatch(joinRoom(user.roomId))
+      .then(res => res.json())
+      .then(res => {
+        dispatch(receiveLogin(res))
+        dispatch(authenticateSocket(res.token))
 
-        // save for persistence
-        localStorage.setItem('user', JSON.stringify(user))
-        dispatch(receiveLogin(user))
+        localStorage.setItem('user', JSON.stringify(res.user))
+        localStorage.setItem('token', res.token)
       })
       .catch(err => {
         dispatch(loginError(err))
       })
   }
 }
+
+// ------------------------------------
+// socket.io authentication
+// ------------------------------------
+const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
+const SOCKET_AUTHENTICATE_SUCCESS = 'server/SOCKET_AUTHENTICATE_SUCCESS'
+const SOCKET_AUTHENTICATE_FAIL = 'server/._AUTHENTICATE_FAIL'
+
+export function authenticateSocket(token) {
+  return {
+    type: SOCKET_AUTHENTICATE,
+    payload: token,
+  }
+}
+
+const SOCKET_DEAUTHENTICATE = 'server/SOCKET_DEAUTHENTICATE'
+
+export function deauthenticateSocket() {
+  return {
+    type: SOCKET_DEAUTHENTICATE,
+    payload: null,
+  }
+}
+
 
 // ------------------------------------
 // Logout
@@ -98,13 +121,11 @@ export function logoutUser() {
     return fetch('/api/account/logout', fetchConfig)
       .then(checkStatus)
       .then(response => {
-        // leave the socket.io room
-        dispatch(leaveRoom(getState().account.user.roomId))
-
-        // delete cached object
-        localStorage.removeItem('user')
-
         dispatch(receiveLogout())
+        dispatch(deauthenticateSocket())
+
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
       })
       .catch(err => {
         dispatch(logoutError(err))
@@ -255,41 +276,6 @@ export function fetchRooms() {
 }
 
 // ------------------------------------
-// join/leave socket.io room
-// ------------------------------------
-// sent to server
-export const JOIN_ROOM = 'server/JOIN_ROOM'
-export const LEAVE_ROOM = 'server/LEAVE_ROOM'
-
-export function joinRoom(roomId) {
-  return {
-    type: JOIN_ROOM,
-    payload: roomId
-  }
-}
-
-export function leaveRoom(roomId) {
-  return {
-    type: LEAVE_ROOM,
-    payload: roomId
-  }
-}
-
-// emitted from server
-export const JOIN_ROOM_SUCCESS = 'server/JOIN_ROOM_SUCCESS'
-export const LEAVE_ROOM_SUCCESS = 'server/LEAVE_ROOM_SUCCESS'
-
-// socket.io client disconnect
-export const DISCONNECTED = 'server/DISCONNECTED'
-
-export function disconnected() {
-  return {
-    type: DISCONNECTED,
-    payload: null
-  }
-}
-
-// ------------------------------------
 // Misc
 // ------------------------------------
 export const CHANGE_VIEW = 'account/CHANGE_VIEW'
@@ -301,7 +287,7 @@ export function changeView(mode) {
   }
 }
 
-// helper for fetch response
+// helper for fetch response``
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response
@@ -326,7 +312,8 @@ const ACTION_HANDLERS = {
   [LOGIN_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    user: payload,
+    user: payload.user,
+    token: payload.token,
     errorMessage: null
   }),
   [LOGIN_FAIL]: (state, {payload}) => ({
@@ -342,6 +329,7 @@ const ACTION_HANDLERS = {
     ...state,
     isFetching: false,
     user: null,
+    token: null,
     errorMessage: null
   }),
   [LOGOUT_FAIL]: (state, {payload}) => ({
@@ -401,28 +389,31 @@ const ACTION_HANDLERS = {
     viewMode: payload,
     errorMessage: null
   }),
-  [JOIN_ROOM_SUCCESS]: (state, {payload}) => ({
+  [SOCKET_AUTHENTICATE_SUCCESS]: (state, {payload}) => ({
     ...state,
-    isInRoom: true,
+    user: payload,
+    isAuthenticated: true,
   }),
-  [LEAVE_ROOM_SUCCESS]: (state, {payload}) => ({
+  [SOCKET_AUTHENTICATE_FAIL]: (state, {payload}) => ({
     ...state,
-    isInRoom: false,
+    user: null,
+    errorMessage: payload.message
   }),
-  [DISCONNECTED]: (state, {payload}) => ({
+  [SOCKET_DEAUTHENTICATE]: (state, {payload}) => ({
     ...state,
-    isInRoom: false,
+    user: null,
+    token: null,
   }),
-}
+  }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 let initialState = {
-  isFetching: false,
+  token: localStorage.getItem('token'),
   user: JSON.parse(localStorage.getItem('user')),
+  isFetching: false,
   rooms: [],
-  isInRoom: false,
   viewMode: 'login'
 }
 

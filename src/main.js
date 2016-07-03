@@ -5,19 +5,33 @@ import { useRouterHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
-import { joinRoom, disconnected } from './routes/Account/modules/account'
+import { authenticateSocket, deauthenticateSocket } from './routes/Account/modules/account'
 import io from 'socket.io-client'
 const socket = io()
 
 socket.on('connect', function () {
-  if (store.getState().account.user) {
-    store.dispatch(joinRoom(store.getState().account.user.roomId))
+  const { token } = store.getState().account
+
+  if (token) {
+    // we think we were signed in; check with server
+    store.dispatch(authenticateSocket(token))
   }
 })
 
 socket.on('disconnect', function () {
-  store.dispatch(disconnected())
+  store.dispatch(deauthenticateSocket())
 })
+
+// @todo
+// possibly useful in the future
+// socket.on('connect_error', function() {
+//   console.log('Connection failed')
+// })
+//
+// socket.on('reconnect_failed', function() {
+//   console.log('Reconnection failed')
+// })
+
 
 // ========================================================
 // Browser History Setup
