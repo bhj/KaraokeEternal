@@ -14,7 +14,7 @@ class LibraryView extends React.Component {
     songs: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     // actions
-    queueSong: PropTypes.func.isRequired
+    addSong: PropTypes.func.isRequired
   }
 
   VirtualScroll = null
@@ -64,7 +64,7 @@ class LibraryView extends React.Component {
   }
 
   handleSongClick(uid) {
-    this.props.queueSong(uid)
+    this.props.addSong(uid)
   }
 
   rowRenderer({index}) {

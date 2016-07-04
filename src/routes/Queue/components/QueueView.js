@@ -17,6 +17,7 @@ class QueueView extends React.Component {
     songs: PropTypes.object.isRequired,
     // user data
     user: PropTypes.object.isRequired,
+    removeItem: PropTypes.func.isRequired,
   }
 
   render() {
@@ -33,7 +34,7 @@ class QueueView extends React.Component {
           title={song.title}
           userName={item.userName}
           canDelete={item.userId === this.props.user.id}
-          onDeleteClick={this.handleDeleteClick.bind(this, queueId)}
+          onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
         />
       )
     }, this)
@@ -53,8 +54,8 @@ class QueueView extends React.Component {
     )
   }
 
-  handleDeleteClick(id) {
-    this.props.deleteItem(id)
+  handleRemoveClick(id) {
+    this.props.removeItem(id)
   }
 }
 

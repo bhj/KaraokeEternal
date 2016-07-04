@@ -1,18 +1,19 @@
 import { connect } from 'react-redux'
-import { fetchQueue, queueSong, deleteItem } from '../modules/queue'
+import { queueSong, playNext, removeItem } from '../modules/queue'
 import QueueView from '../components/QueueView'
 
 //  Object of action creators (can also be function that returns object).
 const mapActionCreators = {
-  fetchQueue,
   queueSong,
-  deleteItem
+  removeItem,
+  playNext,
 }
 
 const mapStateToProps = (state) => ({
   queueIds: state.queue.result.queueIds,
   uids: state.queue.result.uids,
   items: state.queue.entities,
+  playingId: state.queue.playingId,
   errorMessage: state.queue.errorMessage,
   // library data
   artistIds: state.library.artists.result,

@@ -1,9 +1,9 @@
 import { connect } from 'react-redux'
 import LibraryView from '../components/LibraryView'
-import { queueSong } from '../../Queue/modules/queue'
+import { addSong } from '../../Queue/modules/queue'
 
 const mapActionCreators = {
-  queueSong
+  addSong
 }
 
 const mapStateToProps = (state) => ({

@@ -15,9 +15,9 @@ export const QueueItem = (props) => (
       <div className={classes.user}>{props.userName}</div>
     </div>
 
-    {props.canDelete &&
-      <div onClick={props.onDeleteClick}>
-        <i className={'material-icons '+classes.clear}>clear</i>
+    {!props.isPlaying && props.isOwner &&
+      <div onClick={props.onRemoveClick}>
+        <i className={'material-icons md-36'}>clear</i>
       </div>
     }
   </div>
@@ -27,8 +27,10 @@ QueueItem.propTypes = {
   title: React.PropTypes.string.isRequired,
   artist: React.PropTypes.string.isRequired,
   userName: React.PropTypes.string.isRequired,
-  canDelete: React.PropTypes.bool.isRequired,
-  onDeleteClick: React.PropTypes.func.isRequired,
+  isPlaying: React.PropTypes.bool.isRequired,
+  isOwner: React.PropTypes.bool.isRequired,
+  onRemoveClick: React.PropTypes.func.isRequired,
+  onSkipClick: React.PropTypes.func.isRequired,
 }
 
 export default QueueItem

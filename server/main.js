@@ -58,22 +58,21 @@ io.attach(app)
 // ---------------------
 // koa-socket middleware
 // ---------------------
-// note: ctx is not the same ctx as koa middleware
-
-// auth handler first so we have decoded_token downstream
-io.on('action', authActions)
 
 // make user, db and socket.io instance available downstream
+// note: ctx is not the same ctx as koa middleware
 io.use(async (ctx, next) => {
-  ctx.user = ctx.socket.socket.decoded_token
+  ctx.user = ctx.socket.socket.decoded_token || null
   ctx.db = _dbInstance
   ctx.io = app._io
 
   await next()
 })
 
-// further koa-socket middleware can access
-// everything on ctx (see above)
+// first so it can set decoded_token for next middleware
+io.on('action', authActions)
+
+// more koa-socket middleware
 io.on('action', queueActions)
 
 // Enable koa-proxy if it has been enabled in the config.
