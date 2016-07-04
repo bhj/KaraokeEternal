@@ -5,7 +5,7 @@ import { useRouterHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
-import { authenticateSocket, deauthenticateSocket } from './routes/Account/modules/account'
+import { authenticateSocket } from './routes/Account/modules/account'
 import io from 'socket.io-client'
 const socket = io()
 
@@ -16,10 +16,6 @@ socket.on('connect', function () {
     // we think we were signed in; check with server
     store.dispatch(authenticateSocket(token))
   }
-})
-
-socket.on('disconnect', function () {
-  store.dispatch(deauthenticateSocket())
 })
 
 // @todo
