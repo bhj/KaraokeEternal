@@ -1,175 +1,123 @@
-import fetch from 'isomorphic-fetch'
-
-let fetchConfig = {
-  headers: new Headers({
-    'Content-Type': 'application/json'
-  }),
-  // include the cookie that contains our JWT
-  credentials: 'same-origin'
-}
+// emitted from server
+const QUEUE_UPDATE = 'server/QUEUE_UPDATE'
+const QUEUE_ERROR = 'server/QUEUE_ERROR'
 
 // ------------------------------------
 // add to queue
 // ------------------------------------
-export const QUEUE_PUT = 'queue/QUEUE_PUT'
-export const QUEUE_PUT_SUCCESS = 'queue/QUEUE_PUT_SUCCESS'
-export const QUEUE_PUT_FAIL = 'queue/QUEUE_PUT_FAIL'
+const QUEUE_ADD = 'server/QUEUE_ADD'
 
-function requestPut(uid) {
+export function addSong(uid) {
   return {
-    type: QUEUE_PUT,
+    type: QUEUE_ADD,
     payload: uid
-  }
-}
-
-function receivePut(queue) {
-  return {
-    type: QUEUE_PUT_SUCCESS,
-    payload: queue
-  }
-}
-
-function putError(message) {
-  return {
-    type: QUEUE_PUT_FAIL,
-    payload: message
-  }
-}
-
-export function queueSong(uid) {
-  return (dispatch, getState) => {
-    dispatch(requestPut(uid))
-
-    return fetch('/api/queue/'+uid, {
-        ...fetchConfig,
-        method: 'PUT'
-      })
-      .then(checkStatus)
-      .then(() => {
-        const roomId = getState().account.user.roomId
-        dispatch(requestQueueUpdate(roomId))
-      })
-      .catch(err => {
-        dispatch(putError(err))
-      })
   }
 }
 
 // ------------------------------------
 // remove from queue
 // ------------------------------------
-export const QUEUE_DELETE = 'queue/QUEUE_DELETE'
-export const QUEUE_DELETE_SUCCESS = 'queue/QUEUE_DELETE_SUCCESS'
-export const QUEUE_DELETE_FAIL = 'queue/QUEUE_DELETE_FAIL'
+export const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
 
-function requestDelete(uid) {
+export function removeItem(id) {
   return {
-    type: QUEUE_DELETE,
-    payload: uid
+    type: QUEUE_REMOVE,
+    payload: id
   }
 }
 
-function receiveDelete(queue) {
-  return {
-    type: QUEUE_DELETE_SUCCESS,
-    payload: queue
-  }
-}
-
-function deleteError(message) {
-  return {
-    type: QUEUE_DELETE_FAIL,
-    payload: message
-  }
-}
-
-export function deleteItem(id) {
+// ------------------------------------
+// Next item in queue
+// ------------------------------------
+export function playNext() {
   return (dispatch, getState) => {
-    dispatch(requestDelete(id))
+    const { queue } = getState()
 
-    return fetch('/api/queue/'+id, {
-        ...fetchConfig,
-        method: 'DELETE'
-      })
-      .then(checkStatus)
-      .then(() => {
-        const roomId = getState().account.user.roomId
-        dispatch(requestQueueUpdate(roomId))
-      })
-      .catch(err => {
-        dispatch(deleteError(err))
-      })
+    // is the queue empty?
+    if (!queue.result.queueIds.length) {
+      console.log('empty')
+      dispatch(end())
+      return
+    }
+
+    // just starting?
+    if (queue.playingId === null) {
+      dispatch(play(queue.result.queueIds[0]))
+      return
+    }
+
+    let qIndex = queue.result.queueIds.indexOf(queue.playingId)
+
+    if (qIndex === -1) {
+      console.log('playNext(): queue id %s is not in queue', queue.playingId)
+      return
+      // @todo
+    }
+
+    if (qIndex === queue.result.queueIds.length-1) {
+      console.log('eol')
+      dispatch(end())
+      return
+    }
+
+    dispatch(play(queue.result.queueIds[qIndex+1]))
   }
 }
 
 // ------------------------------------
-// sockets
+// Playback controls
 // ------------------------------------
+export const PLAY = 'queue/PLAY'
+export const PAUSE = 'queue/PAUSE'
+export const END = 'queue/END'
 
-// dispatched to server
-export const QUEUE_UPDATE = 'server/QUEUE_UPDATE'
-
-export function requestQueueUpdate(roomId) {
+export function play(queueId) {
   return {
-    type: QUEUE_UPDATE,
-    payload: roomId
+    type: PLAY,
+    payload: queueId
+  }
+}
+export function pause() {
+  return {
+    type: PAUSE,
+    payload: null
   }
 }
 
-// emitted from server
-export const QUEUE_UPDATE_SUCCESS = 'server/QUEUE_UPDATE_SUCCESS'
-
-// ------------------------------------
-// Helper for fetch response
-// ------------------------------------
-function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  } else {
-    return response.text().then((txt) => {
-      var error = new Error(txt)
-      error.response = response
-      throw error
-    })
+export function end() {
+  return {
+    type: END,
+    payload: null
   }
 }
+
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_PUT]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
-    errorMessage: null
-  }),
-  [QUEUE_PUT_SUCCESS]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [QUEUE_PUT_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-    errorMessage: payload.message
-  }),
-  [QUEUE_DELETE]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
-    errorMessage: null
-  }),
-  [QUEUE_DELETE_SUCCESS]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [QUEUE_DELETE_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-    errorMessage: payload.message
-  }),
-  [QUEUE_UPDATE_SUCCESS]: (state, {payload}) => ({
+  [QUEUE_UPDATE]: (state, {payload}) => ({
     ...state,
     result: payload.result,
     entities: payload.entities
+  }),
+  [QUEUE_ERROR]: (state, {payload}) => ({
+    ...state,
+    errorMessage: payload.message
+  }),
+  // playback control
+  [PLAY]: (state, {payload}) => ({
+    ...state,
+    isPlaying: true,
+    playingId: payload
+  }),
+  [PAUSE]: (state, {payload}) => ({
+    ...state,
+    isPlaying: false
+  }),
+  [END]: (state, {payload}) => ({
+    ...state,
+    isPlaying: false
   }),
 }
 
@@ -177,6 +125,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  isPlaying: false,
+  playingId: null,
   isFetching: false,
   errorMessage: null,
   result: {queueIds: [], uids: []},
