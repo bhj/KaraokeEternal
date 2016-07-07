@@ -15,8 +15,7 @@ import KoaJwt from 'koa-jwt'
 import apiRoutes from './api/routes'
 import KoaRange from 'koa-range'
 import KoaSocketIO from 'koa-socket'
-import authActions from './api/sockets/auth'
-import queueActions from './api/sockets/queue'
+import socketActions from './api/sockets'
 
 const debug = _debug('app:server')
 const paths = config.utils_paths
@@ -55,13 +54,11 @@ for (let route in apiRoutes) {
 // and the "real" socket.io instance as app._io
 io.attach(app)
 
-// ---------------------
 // koa-socket middleware
-// ---------------------
-
-// make user, db and socket.io instance available downstream
 // note: ctx is not the same ctx as koa middleware
 io.use(async (ctx, next) => {
+  // make user, db and socket.io instance available
+  // to downstream middleware and event listeners
   ctx.user = ctx.socket.socket.decoded_token || null
   ctx.db = _dbInstance
   ctx.io = app._io
@@ -69,11 +66,8 @@ io.use(async (ctx, next) => {
   await next()
 })
 
-// first so it can set decoded_token for next middleware
-io.on('action', authActions)
-
-// more koa-socket middleware
-io.on('action', queueActions)
+// koa-socket event listener
+io.on('action', socketActions)
 
 // Enable koa-proxy if it has been enabled in the config.
 if (config.proxy && config.proxy.enabled) {

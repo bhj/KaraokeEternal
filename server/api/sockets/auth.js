@@ -1,11 +1,11 @@
 import { verify } from 'koa-jwt' // really from jsonwebtoken
-import { getQueue, QUEUE_UPDATE } from './queue'
+import { getQueue, QUEUE_CHANGE } from './queue'
 import _debug from 'debug'
 const debug = _debug('app:socket:auth')
 
-const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
-const SOCKET_AUTHENTICATE_SUCCESS = 'server/SOCKET_AUTHENTICATE_SUCCESS'
-const SOCKET_AUTHENTICATE_FAIL = 'server/SOCKET_AUTHENTICATE_FAIL'
+export const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
+export const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
+export const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
 
 // ------------------------------------
 // Action Handlers
@@ -17,7 +17,7 @@ const ACTION_HANDLERS = {
     let user
 
     try {
-      user = await verify(token, 'shared-secret')
+      user = verify(token, 'shared-secret')
     } catch (err) {
       ctx.io.to(socketId).emit('action', {
         type: SOCKET_AUTHENTICATE_FAIL,
@@ -39,21 +39,14 @@ const ACTION_HANDLERS = {
       ctx.socket.socket.join(user.roomId)
     }
 
-    debug('client %s joined room %s (%s in room)', socketId, user.roomId, ctx.socket.socket.adapter.rooms[user.roomId].length || 0)
+    debug('%s (%s) joined room %s (%s in room)', user.name, socketId, user.roomId, ctx.socket.socket.adapter.rooms[user.roomId].length || 0)
 
     // success! send status to newcomer only
     ctx.io.to(socketId).emit('action', {
-      type: QUEUE_UPDATE,
+      type: QUEUE_CHANGE,
       payload: await getQueue(ctx, user.roomId)
     })
   },
 }
 
-export default async function authActions(ctx, next) {
-  const action = ctx.data
-  const handler = ACTION_HANDLERS[action.type]
-
-  if (handler) await handler(ctx, action)
-
-  await next()
-}
+export default ACTION_HANDLERS

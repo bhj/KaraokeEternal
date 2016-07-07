@@ -1,10 +1,11 @@
-export const QUEUE_UPDATE = 'server/QUEUE_UPDATE'
+export const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
+const QUEUE_END = 'queue/QUEUE_END'
+const QUEUE_ERROR = 'queue/QUEUE_ERROR'
+
+// client actions
 const QUEUE_ADD = 'server/QUEUE_ADD'
 const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
-const QUEUE_ERROR = 'server/QUEUE_ERROR'
 
-// const PLAY_NEXT = 'server/PLAY_NEXT' // to server
-// const PLAY_NEXT_SUCCESS = 'server/PLAY_NEXT_SUCCESS' // from server
 
 // ------------------------------------
 // Action Handlers
@@ -14,14 +15,6 @@ const ACTION_HANDLERS = {
     const socketId = ctx.socket.socket.id
     const uid = payload
     let song, res
-
-    if (!ctx.user || !ctx.user.roomId) {
-      ctx.io.to(socketId).emit('action', {
-        type: QUEUE_ERROR,
-        payload: {message: 'Invalid token (try signing in again)'}
-      })
-      return
-    }
 
     if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
       ctx.io.to(socketId).emit('action', {
@@ -55,7 +48,7 @@ const ACTION_HANDLERS = {
 
     // success! tell room
     ctx.io.to(ctx.user.roomId).emit('action', {
-      type: QUEUE_UPDATE,
+      type: QUEUE_CHANGE,
       payload: await getQueue(ctx, ctx.user.roomId)
     })
   },
@@ -63,14 +56,6 @@ const ACTION_HANDLERS = {
     const socketId = ctx.socket.socket.id
     const queueId = payload
     let item, res
-
-    if (!ctx.user || !ctx.user.roomId) {
-      ctx.io.to(socketId).emit('action', {
-        type: QUEUE_ERROR,
-        payload: {message: 'Invalid token (try signing in again)'}
-      })
-      return
-    }
 
     if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
       ctx.io.to(socketId).emit('action', {
@@ -122,32 +107,13 @@ const ACTION_HANDLERS = {
 
     // success! tell room
     ctx.io.to(ctx.user.roomId).emit('action', {
-      type: QUEUE_UPDATE,
+      type: QUEUE_CHANGE,
       payload: await getQueue(ctx, ctx.user.roomId)
     })
   },
-  // [PLAY_NEXT]: async (ctx, {payload}) => {
-  //   const { curItemId, roomId } = payload
-  //
-  //   // get next highest id in the queue
-  //   let row =
-  //
-  //   ctx.io.to(roomId).emit('action', {
-  //     type: PLAY_NEXT_SUCCESS,
-  //     payload: await fetchQueue(ctx.db, roomId)
-  //   })
-  // },
 }
 
-export default async function queueActions(ctx, next) {
-  const action = ctx.data
-  const handler = ACTION_HANDLERS[action.type]
-
-  if (handler) await handler(ctx, action)
-
-  // next koa-socket middleware
-  await next()
-}
+export default ACTION_HANDLERS
 
 
 export async function getQueue(ctx, roomId) {

@@ -3,7 +3,7 @@ import { routerReducer as router } from 'react-router-redux'
 import account from 'routes/Account/modules/account'
 import library from 'routes/Library/modules/library'
 import queue from 'routes/Queue/modules/queue'
-import searchReducer from 'routes/Library/routes/Search/modules/search'
+import player from 'routes/Player/modules/player'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
@@ -12,7 +12,7 @@ export const makeRootReducer = (asyncReducers) => {
     account,
     library,
     queue,
-    search: searchReducer,
+    player,
     ...asyncReducers
   })
 }

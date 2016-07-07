@@ -65,8 +65,8 @@ export function loginUser(creds) {
 // socket.io authentication
 // ------------------------------------
 const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
-const SOCKET_AUTHENTICATE_SUCCESS = 'server/SOCKET_AUTHENTICATE_SUCCESS'
-const SOCKET_AUTHENTICATE_FAIL = 'server/._AUTHENTICATE_FAIL'
+const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
+const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
 
 export function authenticateSocket(token) {
   return {
@@ -397,6 +397,7 @@ const ACTION_HANDLERS = {
   [SOCKET_AUTHENTICATE_FAIL]: (state, {payload}) => ({
     ...state,
     user: null,
+    token: null,
     errorMessage: payload.message
   }),
   [SOCKET_DEAUTHENTICATE]: (state, {payload}) => ({

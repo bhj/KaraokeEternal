@@ -1,6 +1,6 @@
 // emitted from server
-const QUEUE_UPDATE = 'server/QUEUE_UPDATE'
-const QUEUE_ERROR = 'server/QUEUE_ERROR'
+const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
+const QUEUE_ERROR = 'queue/QUEUE_ERROR'
 
 // ------------------------------------
 // add to queue
@@ -27,76 +27,10 @@ export function removeItem(id) {
 }
 
 // ------------------------------------
-// Next item in queue
-// ------------------------------------
-export function playNext() {
-  return (dispatch, getState) => {
-    const { queue } = getState()
-
-    // is the queue empty?
-    if (!queue.result.queueIds.length) {
-      console.log('empty')
-      dispatch(end())
-      return
-    }
-
-    // just starting?
-    if (queue.playingId === null) {
-      dispatch(play(queue.result.queueIds[0]))
-      return
-    }
-
-    let qIndex = queue.result.queueIds.indexOf(queue.playingId)
-
-    if (qIndex === -1) {
-      console.log('playNext(): queue id %s is not in queue', queue.playingId)
-      return
-      // @todo
-    }
-
-    if (qIndex === queue.result.queueIds.length-1) {
-      console.log('eol')
-      dispatch(end())
-      return
-    }
-
-    dispatch(play(queue.result.queueIds[qIndex+1]))
-  }
-}
-
-// ------------------------------------
-// Playback controls
-// ------------------------------------
-export const PLAY = 'queue/PLAY'
-export const PAUSE = 'queue/PAUSE'
-export const END = 'queue/END'
-
-export function play(queueId) {
-  return {
-    type: PLAY,
-    payload: queueId
-  }
-}
-export function pause() {
-  return {
-    type: PAUSE,
-    payload: null
-  }
-}
-
-export function end() {
-  return {
-    type: END,
-    payload: null
-  }
-}
-
-
-// ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_UPDATE]: (state, {payload}) => ({
+  [QUEUE_CHANGE]: (state, {payload}) => ({
     ...state,
     result: payload.result,
     entities: payload.entities
@@ -105,29 +39,12 @@ const ACTION_HANDLERS = {
     ...state,
     errorMessage: payload.message
   }),
-  // playback control
-  [PLAY]: (state, {payload}) => ({
-    ...state,
-    isPlaying: true,
-    playingId: payload
-  }),
-  [PAUSE]: (state, {payload}) => ({
-    ...state,
-    isPlaying: false
-  }),
-  [END]: (state, {payload}) => ({
-    ...state,
-    isPlaying: false
-  }),
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 const initialState = {
-  isPlaying: false,
-  playingId: null,
-  isFetching: false,
   errorMessage: null,
   result: {queueIds: [], uids: []},
   entities: {}

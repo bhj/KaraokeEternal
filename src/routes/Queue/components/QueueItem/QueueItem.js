@@ -15,6 +15,11 @@ export const QueueItem = (props) => (
       <div className={classes.user}>{props.userName}</div>
     </div>
 
+    {props.isPlaying && props.isOwner &&
+      <div onClick={props.onSkipClick}>
+        <i className={'material-icons md-36'}>skip_next</i>
+      </div>
+    }
     {!props.isPlaying && props.isOwner &&
       <div onClick={props.onRemoveClick}>
         <i className={'material-icons md-36'}>clear</i>

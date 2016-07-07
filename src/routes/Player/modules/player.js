@@ -1,10 +1,58 @@
+// Request Play Next
+const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
+const PLAYER_NEXT = 'player/PLAYER_NEXT'
+
+export function requestPlayNext() {
+  return (dispatch, getState) => {
+    dispatch({
+      type: PLAYER_NEXT_REQUEST,
+      payload: getState().player.currentId
+    })
+  }
+}
+
+// Request Play
+const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
+const PLAYER_PLAY = 'player/PLAYER_PLAY'
+
+export function requestPlay() {
+  return {
+    type: PLAYER_PLAY_REQUEST,
+    payload: null
+  }
+}
+
+// Request Pause
+const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
+const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
+
+export function requestPause() {
+  return {
+    type: PLAYER_PAUSE_REQUEST,
+    payload: null
+  }
+}
+
+// Emit/receive player status
+const PLAYER_STATUS_REQUEST = 'server/PLAYER_STATUS'
+const PLAYER_STATUS = 'player/PLAYER_STATUS'
+
+export function status(s) {
+  return {
+    type: PLAYER_STATUS_REQUEST,
+    payload: s
+  }
+}
+
+// can be emitted after a PLAYER_NEXT_REQUEST
+const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
+
 // ------------------------------------
 // dispatched mostly for informational purposes
 // by provider players
 // ------------------------------------
 export const GET_MEDIA = 'player/GET_MEDIA'
 export const GET_MEDIA_SUCCESS = 'player/GET_MEDIA_SUCCESS'
-export const GET_MEDIA_FAIL = 'player/GET_MEDIA_FAIL'
 
 export function getMedia(url) {
   return {
@@ -20,57 +68,56 @@ export function getMediaSuccess() {
   }
 }
 
-export function getMediaError(message) {
-  return {
-    type: GET_MEDIA_FAIL,
-    payload: message
+// signals we should move to next song
+export const MEDIA_END = 'player/MEDIA_END'
+
+export function mediaEnd() {
+  return (dispatch, getState) => {
+    dispatch({
+      type: MEDIA_END,
+      payload: getState().player.currentId
+    })
+
+    dispatch(requestPlayNext())
   }
 }
 
-// ------------------------------------
-// Constants
-// ------------------------------------
-export const PLAY = 'player/PLAY'
-export const PAUSE = 'player/PAUSE'
-export const END = 'player/END'
+// general error; we should move to next song
+export const MEDIA_ERROR = 'player/MEDIA_ERROR'
 
-// ------------------------------------
-// Actions
-// ------------------------------------
-export const play = () => {
+export function mediaError(id, message) {
   return {
-    type: PLAY,
-    payload: null
+    type: MEDIA_ERROR,
+    payload: {id, message}
   }
 }
-
-export const pause = () => {
-  return {
-    type: PAUSE,
-    payload: null
-  }
-}
-
-export const end = () => ({
-  type: END,
-  payload: null // current audio id?
-})
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAY]: (state, {payload}) => ({
+  [PLAYER_NEXT]: (state, {payload}) => ({
     ...state,
-    isPlaying: true
+    currentId: payload,
   }),
-  [PAUSE]: (state, {payload}) => ({
+  // broadcast to room
+  [PLAYER_STATUS]: (state, {payload}) => ({
     ...state,
-    isPlaying: false
+    isPlaying: payload.isPlaying,
+    currentTime: payload.currentTime,
+    currentId: payload.currentId,
   }),
-  [END]: (state, {payload}) => ({
+  [PLAYER_PAUSE]: (state, {payload}) => ({
     ...state,
-    isPlaying: false
+    isPlaying: false,
+  }),
+  [PLAYER_PLAY]: (state, {payload}) => ({
+    ...state,
+    isPlaying: true,
+  }),
+  [PLAYER_QUEUE_END]: (state, {payload}) => ({
+    ...state,
+    isPlaying: false,
   }),
   [GET_MEDIA]: (state, {payload}) => ({
     ...state,
@@ -81,10 +128,10 @@ const ACTION_HANDLERS = {
     isFetching: false,
     isPlaying: true, // all media is loaded
   }),
-  [GET_MEDIA_FAIL]: (state, {payload}) => ({
+  [MEDIA_ERROR]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: payload
+    errorMessage: payload.message
   }),
 }
 
@@ -92,8 +139,10 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  isFetching: false,
+  currentId: null,
+  currentTime: 0,
   isPlaying: false,
+  isFetching: false,
   errorMessage: null
 }
 
