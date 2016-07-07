@@ -77,6 +77,7 @@ const ACTION_HANDLERS = {
   [GET_LIBRARY_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
+    hasLoaded: true,
     artists: payload.artists,
     songs: payload.songs
   }),
@@ -92,6 +93,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   isFetching: false,
+  hasLoaded: false,
   errorMessage: null,
   artists: {result: [], entities:{}},
   songs: {result: [], entities:{}}
