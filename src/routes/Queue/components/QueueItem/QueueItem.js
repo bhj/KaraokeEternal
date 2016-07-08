@@ -15,12 +15,12 @@ export const QueueItem = (props) => (
       <div className={classes.user}>{props.userName}</div>
     </div>
 
-    {props.isPlaying && props.isOwner &&
+    {props.canSkip &&
       <div onClick={props.onSkipClick}>
         <i className={'material-icons md-36'}>skip_next</i>
       </div>
     }
-    {!props.isPlaying && props.isOwner &&
+    {props.canRemove &&
       <div onClick={props.onRemoveClick}>
         <i className={'material-icons md-36'}>clear</i>
       </div>
@@ -33,7 +33,8 @@ QueueItem.propTypes = {
   artist: React.PropTypes.string.isRequired,
   userName: React.PropTypes.string.isRequired,
   isPlaying: React.PropTypes.bool.isRequired,
-  isOwner: React.PropTypes.bool.isRequired,
+  canSkip: React.PropTypes.bool.isRequired,
+  canRemove: React.PropTypes.bool.isRequired,
   onRemoveClick: React.PropTypes.func.isRequired,
   onSkipClick: React.PropTypes.func.isRequired,
 }

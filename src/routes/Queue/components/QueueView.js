@@ -34,6 +34,8 @@ class QueueView extends React.Component {
     let songs = this.props.queueIds.map(function(queueId, i) {
       const item = this.props.items[queueId]
       const song = this.props.songs[item.uid]
+      const isOwner = item.userId === this.props.user.id
+      const isPlaying = queueId === this.props.currentId
 
       return (
         <QueueItem
@@ -41,8 +43,9 @@ class QueueView extends React.Component {
           artist={this.props.artists[song.artistId].name}
           title={song.title}
           userName={item.userName}
-          isOwner={item.userId === this.props.user.id}
-          isPlaying={this.props.currentId === queueId}
+          canSkip={isOwner && isPlaying}
+          canRemove={isOwner && !isPlaying && queueId > this.props.currentId}
+          isPlaying={isPlaying}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
           onSkipClick={this.props.requestPlayNext}
         />
