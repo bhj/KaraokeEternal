@@ -27,6 +27,8 @@ const mapStateToProps = (state) => ({
   // player
   isPlaying: state.player.isPlaying,
   currentId: state.player.currentId,
+  currentTime: state.player.currentTime,
+  duration: state.player.duration,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(QueueView)

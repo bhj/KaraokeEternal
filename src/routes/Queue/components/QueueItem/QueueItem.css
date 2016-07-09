@@ -3,6 +3,8 @@
   height: 64px;
   align-items: center;
   margin-left: 10px;
+  background-image: linear-gradient(to right, #f3f3f3, #ddd);
+  background-repeat: no-repeat;
 }
 
 .primary {

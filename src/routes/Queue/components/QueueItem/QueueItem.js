@@ -2,7 +2,7 @@ import React from 'react'
 import classes from './QueueItem.css'
 
 export const QueueItem = (props) => (
-  <div className={classes.container}>
+  <div className={classes.container} style={{backgroundSize: props.pctPlayed+'% 100%'}}>
     <div className={classes.star}>
       <i className='material-icons md-48 md-dark md-inactive'>
         {props.isStarred ? 'star' : 'star_border'}
@@ -34,9 +34,9 @@ QueueItem.propTypes = {
   userName: React.PropTypes.string.isRequired,
   isPlaying: React.PropTypes.bool.isRequired,
   canSkip: React.PropTypes.bool.isRequired,
+  onSkipClick: React.PropTypes.func.isRequired,
   canRemove: React.PropTypes.bool.isRequired,
   onRemoveClick: React.PropTypes.func.isRequired,
-  onSkipClick: React.PropTypes.func.isRequired,
 }
 
 export default QueueItem

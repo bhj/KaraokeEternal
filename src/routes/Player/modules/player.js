@@ -104,8 +104,9 @@ const ACTION_HANDLERS = {
   [PLAYER_STATUS]: (state, {payload}) => ({
     ...state,
     isPlaying: payload.isPlaying,
-    currentTime: payload.currentTime,
     currentId: payload.currentId,
+    currentTime: payload.currentTime,
+    duration: payload.duration,
   }),
   [PLAYER_PAUSE]: (state, {payload}) => ({
     ...state,
@@ -141,6 +142,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   currentId: null,
   currentTime: 0,
+  duration: 0,
   isPlaying: false,
   isFetching: false,
   errorMessage: null
