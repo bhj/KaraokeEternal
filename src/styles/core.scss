@@ -13,6 +13,11 @@
     margin: 0;
     padding: 0;
     height: 100%;
+    /* Helvetica Neue Regular Font Stack */
+    font-family: "HelveticaNeue", "Helvetica Neue", "HelveticaNeueRoman", "HelveticaNeue-Roman", "Helvetica Neue Roman", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:400; font-stretch:normal;
+
+    /* Helvetica Neue Light Font Stack */
+    // font-family: "HelveticaNeueLight", "HelveticaNeue-Light", "Helvetica Neue Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:300; font-stretch:normal;
   }
 
   *,
@@ -49,7 +54,6 @@
     display: block;
     margin: 0;
     width: 100%;
-    font-family: "Open Sans", sans-serif;
     font-size: 18px;
     -webkit-appearance: none;
     -moz-appearance: none;
