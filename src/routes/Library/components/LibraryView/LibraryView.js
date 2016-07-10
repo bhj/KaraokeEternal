@@ -4,7 +4,7 @@ import styles from 'react-virtualized/styles.css'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 
-const ROW_HEIGHT = 44
+const ROW_HEIGHT = 40
 
 class LibraryView extends React.Component {
   static propTypes = {

@@ -1,19 +1,19 @@
 .container {
   display: flex;
-  height: 44px;
+  height: 40px;
   align-items: center;
-  margin-left: 10px;
 }
 
 .title {
   flex: 1;
-  font-size: 18px;
+  font-size: 20px;
   text-overflow: ellipsis;
   overflow:hidden;
   white-space: nowrap;
 }
 
 .star {
+  font-size: 48px;
 }
 
 .stats {
