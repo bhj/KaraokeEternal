@@ -1,10 +1,13 @@
 .container {
+  display: flex;
   text-align: center;
+  align-items: center;
   background: #ededed;
   border-bottom: 1px solid #ccc;
 }
 
 .title {
+  flex: 1;
   padding: .7rem;
   margin: 0;
   font-size: 1.75rem;

@@ -1,3 +1,4 @@
-import Header from './Header'
+import { Header } from './Header'
+import { HeaderTitle } from './Header'
 
-export default Header
+export { Header, HeaderTitle }

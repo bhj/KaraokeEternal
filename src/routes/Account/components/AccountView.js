@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import Header from 'components/Header'
+import { Header, HeaderTitle } from 'components/Header'
 import AccountForm from '../containers/AccountForm'
 import Logout from './Logout'
 import classes from './AccountView.css'
@@ -18,7 +18,9 @@ class AccountView extends React.Component {
 
     return (
       <div className={classes.flexContainer}>
-        <Header title={headerTitle}/>
+        <Header>
+          <HeaderTitle>{headerTitle}</HeaderTitle>
+        </Header>
 
         <div className={classes.viewport}>
           <AccountForm/>

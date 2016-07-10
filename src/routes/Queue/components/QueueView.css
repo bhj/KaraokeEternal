@@ -9,3 +9,9 @@
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Header */
+.button {
+  width: 75px;
+  flex: 1;
+}

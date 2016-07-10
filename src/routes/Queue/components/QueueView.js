@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import Header from 'components/Header'
+import { Header, HeaderTitle } from 'components/Header'
 import QueueItem from './QueueItem'
 import classes from './QueueView.css'
 
@@ -56,15 +56,19 @@ class QueueView extends React.Component {
 
     return (
       <div className={classes.flexContainer}>
-        <div className={classes.header}>
-          <h1>Queue</h1>
+        <Header>
+          <HeaderTitle>Queue</HeaderTitle>
           {!this.props.isPlaying &&
-            <button onClick={this.props.requestPlay}>Play</button>
+            <div className={classes.button} onClick={this.props.requestPlay}>
+              <i className={'material-icons md-36'}>play_arrow</i>
+            </div>
           }
           {this.props.isPlaying &&
-            <button onClick={this.props.requestPause}>Pause</button>
+            <div className={classes.button} onClick={this.props.requestPause}>
+              <i className={'material-icons md-36'}>pause</i>
+            </div>
           }
-        </div>
+        </Header>
 
         {this.props.errorMessage &&
           <p>{this.props.errorMessage}</p>

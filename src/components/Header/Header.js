@@ -3,8 +3,12 @@ import classes from './Header.css'
 
 export const Header = (props) => (
   <div className={classes.container}>
-    <h1 className={classes.title}>{props.title}</h1>
+    {props.children}
   </div>
 )
 
-export default Header
+export const HeaderTitle = (props) => (
+  <h1 className={classes.title}>
+    {props.children}
+  </h1>
+)
