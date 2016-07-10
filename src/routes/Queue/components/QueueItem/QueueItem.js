@@ -4,7 +4,7 @@ import classes from './QueueItem.css'
 export const QueueItem = (props) => (
   <div className={classes.container} style={{backgroundSize: props.pctPlayed+'% 100%'}}>
     <div className={classes.star}>
-      <i className='material-icons md-48 md-dark md-inactive'>
+      <i className={'material-icons md-dark md-inactive'}>
         {props.isStarred ? 'star' : 'star_border'}
       </i>
     </div>
@@ -16,13 +16,13 @@ export const QueueItem = (props) => (
     </div>
 
     {props.canSkip &&
-      <div onClick={props.onSkipClick}>
-        <i className={'material-icons md-36'}>skip_next</i>
+      <div onClick={props.onSkipClick} className={classes.skip}>
+        <i className='material-icons'>skip_next</i>
       </div>
     }
     {props.canRemove &&
-      <div onClick={props.onRemoveClick}>
-        <i className={'material-icons md-36'}>clear</i>
+      <div onClick={props.onRemoveClick} className={classes.remove}>
+        <i className='material-icons'>clear</i>
       </div>
     }
   </div>

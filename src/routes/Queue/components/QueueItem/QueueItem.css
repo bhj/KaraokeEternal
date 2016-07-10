@@ -2,13 +2,12 @@
   display: flex;
   height: 64px;
   align-items: center;
-  margin-left: 10px;
   background-image: linear-gradient(to right, #f3f3f3, #ddd);
   background-repeat: no-repeat;
 }
 
 .primary {
-  display: block;
+  flex: 1;
   overflow:hidden;
 }
 
@@ -26,4 +25,17 @@
 .title {
   composes: ellipsis;
   font-size: 18px;
+}
+
+/* Actions */
+.skip {
+  font-size: 48px;  
+}
+
+.remove {
+  font-size: 36px;
+}
+
+.star {
+  font-size: 48px;
 }
