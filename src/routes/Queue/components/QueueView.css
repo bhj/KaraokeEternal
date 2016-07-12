@@ -12,6 +12,5 @@
 
 /* Header */
 .button {
-  width: 75px;
-  flex: 1;
+  font-size: 36px;
 }

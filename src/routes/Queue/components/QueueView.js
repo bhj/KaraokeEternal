@@ -60,12 +60,12 @@ class QueueView extends React.Component {
           <HeaderTitle>Queue</HeaderTitle>
           {!this.props.isPlaying &&
             <div className={classes.button} onClick={this.props.requestPlay}>
-              <i className={'material-icons md-36'}>play_arrow</i>
+              <i className={'material-icons '+classes.button}>play_arrow</i>
             </div>
           }
           {this.props.isPlaying &&
             <div className={classes.button} onClick={this.props.requestPause}>
-              <i className={'material-icons md-36'}>pause</i>
+              <i className={'material-icons '+classes.button}>pause</i>
             </div>
           }
         </Header>
