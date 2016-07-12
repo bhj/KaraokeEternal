@@ -46,6 +46,7 @@ class QueueView extends React.Component {
           userName={item.userName}
           canSkip={isOwner && isPlaying}
           canRemove={isOwner && !isPlaying && queueId > this.props.currentId}
+          isLast={i === this.props.queueIds.length-1}
           isPlaying={isPlaying}
           pctPlayed={isPlaying ? this.props.currentTime / this.props.duration * 100 : 0}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
