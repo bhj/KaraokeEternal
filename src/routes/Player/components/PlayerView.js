@@ -5,9 +5,7 @@ import ProviderPlayers from './provider'
 class PlayerView extends React.Component {
   static propTypes = {
     // actions
-    requestPlay: PropTypes.func.isRequired,
     requestPlayNext: PropTypes.func.isRequired,
-    requestPause: PropTypes.func.isRequired,
     status: PropTypes.func.isRequired,
     getMedia: PropTypes.func.isRequired,
     getMediaSuccess: PropTypes.func.isRequired,
@@ -17,7 +15,6 @@ class PlayerView extends React.Component {
     queue: PropTypes.object.isRequired,
     libraryHasLoaded: PropTypes.bool.isRequired,
     currentId: PropTypes.number,
-    currentTime: PropTypes.number,
     isPlaying: PropTypes.bool.isRequired,
     isFetching: PropTypes.bool.isRequired,
   }
@@ -30,12 +27,15 @@ class PlayerView extends React.Component {
       currentId: null,
       currentTime: 0,
       isPlaying: false,
+      duration: 0,
     })
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.isPlaying && this.props.isPlaying !== prevProps.isPlaying) {
-      if (!this.props.currentId) {
+    const { isPlaying, currentId } = this.props
+
+    if (isPlaying && isPlaying !== prevProps.isPlaying) {
+      if (!currentId) {
         this.props.requestPlayNext()
       }
     }
@@ -49,7 +49,7 @@ class PlayerView extends React.Component {
     // can occur while loading, make sure this error
     // is for the current item before we take action
     if (id === this.props.currentId) {
-      this.props.requestPlayNext()
+      this.props.requestPlayNext(id)
     }
   }
 

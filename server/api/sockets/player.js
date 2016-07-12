@@ -7,7 +7,7 @@ const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
 
-const PLAYER_STATUS_REQUEST = 'server/PLAYER_STATUS'
+const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
 
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
@@ -37,7 +37,7 @@ const ACTION_HANDLERS = {
     })
   },
   // Broadcast player's status to room
-  [PLAYER_STATUS_REQUEST]: async (ctx, {payload}) => {
+  [PLAYER_EMIT_STATUS]: async (ctx, {payload}) => {
     // to everyone in room except broadcasting player
     ctx.socket.socket.broadcast.to(ctx.user.roomId).emit('action', {
       type: PLAYER_STATUS,

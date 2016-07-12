@@ -16,7 +16,7 @@ class QueueView extends React.Component {
     songs: PropTypes.object.isRequired,
     // user
     user: PropTypes.object.isRequired,
-    //player
+    // player status
     isPlaying: PropTypes.bool.isRequired,
     currentId: PropTypes.number,
     currentTime: PropTypes.number,
@@ -49,7 +49,7 @@ class QueueView extends React.Component {
           isPlaying={isPlaying}
           pctPlayed={isPlaying ? this.props.currentTime / this.props.duration * 100 : 0}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
-          onSkipClick={this.props.requestPlayNext}
+          onSkipClick={this.handleSkipClick}
         />
       )
     }, this)
@@ -86,7 +86,7 @@ class QueueView extends React.Component {
   }
 
   handleSkipClick() {
-    this.props.requestPlayNext()
+    this.props.requestPlayNext(this.props.currentId)
   }
 }
 

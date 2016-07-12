@@ -1,48 +1,9 @@
-// Request Play Next
-const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
+import { requestPlayNext } from '../../Queue/modules/queue'
+
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
-
-export function requestPlayNext() {
-  return (dispatch, getState) => {
-    dispatch({
-      type: PLAYER_NEXT_REQUEST,
-      payload: getState().player.currentId
-    })
-  }
-}
-
-// Request Play
-const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
-
-export function requestPlay() {
-  return {
-    type: PLAYER_PLAY_REQUEST,
-    payload: null
-  }
-}
-
-// Request Pause
-const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
-
-export function requestPause() {
-  return {
-    type: PLAYER_PAUSE_REQUEST,
-    payload: null
-  }
-}
-
-// Emit/receive player status
-const PLAYER_STATUS_REQUEST = 'server/PLAYER_STATUS'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
-
-export function status(s) {
-  return {
-    type: PLAYER_STATUS_REQUEST,
-    payload: s
-  }
-}
 
 // can be emitted after a PLAYER_NEXT_REQUEST
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
@@ -73,12 +34,14 @@ export const MEDIA_END = 'player/MEDIA_END'
 
 export function mediaEnd() {
   return (dispatch, getState) => {
+    const curId = getState().player.currentId
+
     dispatch({
       type: MEDIA_END,
-      payload: getState().player.currentId
+      payload: curId
     })
 
-    dispatch(requestPlayNext())
+    dispatch(requestPlayNext(curId))
   }
 }
 
@@ -92,21 +55,29 @@ export function mediaError(id, message) {
   }
 }
 
+// Tell server to emit player status to room
+const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
+export function status(s) {
+  return {
+    type: PLAYER_EMIT_STATUS,
+    payload: s
+  }
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_NEXT]: (state, {payload}) => ({
-    ...state,
-    currentId: payload,
-  }),
-  // broadcast to room
-  [PLAYER_STATUS]: (state, {payload}) => ({
+  [PLAYER_EMIT_STATUS]: (state, {payload}) => ({
     ...state,
     isPlaying: payload.isPlaying,
     currentId: payload.currentId,
     currentTime: payload.currentTime,
     duration: payload.duration,
+  }),
+  [PLAYER_NEXT]: (state, {payload}) => ({
+    ...state,
+    currentId: payload,
   }),
   [PLAYER_PAUSE]: (state, {payload}) => ({
     ...state,

@@ -1,6 +1,5 @@
 import { connect } from 'react-redux'
-import { queueSong, removeItem } from '../modules/queue'
-import { requestPlay, requestPlayNext, requestPause } from '../../Player/modules/player'
+import { queueSong, removeItem, requestPlay, requestPlayNext, requestPause } from '../modules/queue'
 import QueueView from '../components/QueueView'
 
 //  Object of action creators (can also be function that returns object).
@@ -25,10 +24,10 @@ const mapStateToProps = (state) => ({
   // user
   user: state.account.user,
   // player
-  isPlaying: state.player.isPlaying,
-  currentId: state.player.currentId,
-  currentTime: state.player.currentTime,
-  duration: state.player.duration,
+  isPlaying: state.queue.isPlaying,
+  currentId: state.queue.currentId,
+  currentTime: state.queue.currentTime,
+  duration: state.queue.duration,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(QueueView)
