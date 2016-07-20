@@ -25,7 +25,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify song exists
-    song = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', [uid])
+    song = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', uid)
 
     if (!song) {
       ctx.io.to(socketId).emit('action', {
@@ -37,7 +37,7 @@ const ACTION_HANDLERS = {
 
     // insert row
     res = await ctx.db.run('INSERT INTO queue (roomId, userId, uid, date) VALUES (?, ?, ?, ?)',
-      [ctx.user.roomId, ctx.user.id, uid, Date.now()])
+      ctx.user.roomId, ctx.user.id, uid, Date.now())
 
     if (res.changes !== 1) {
       ctx.io.to(socketId).emit('action', {
@@ -66,7 +66,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify item exists
-    item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', [queueId])
+    item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', queueId)
 
     if (!item) {
       ctx.io.to(socketId).emit('action', {
@@ -95,7 +95,7 @@ const ACTION_HANDLERS = {
     }
 
     // delete item
-    res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', [queueId])
+    res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', queueId)
 
     if (res.changes !== 1) {
       ctx.io.to(socketId).emit('action', {
@@ -122,7 +122,7 @@ export async function getQueue(ctx, roomId) {
   let items = {}
 
   // get songs
-  let rows = await ctx.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.uid = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', [roomId])
+  let rows = await ctx.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.uid = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', roomId)
 
   rows.forEach(function(row){
     queueIds.push(row.queueId)
@@ -136,6 +136,6 @@ export async function getQueue(ctx, roomId) {
 }
 
 async function _roomIsOpen(ctx, roomId) {
-  const room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', [roomId])
+  const room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', roomId)
   return (room || room.status === 'open')
 }

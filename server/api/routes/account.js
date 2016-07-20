@@ -5,7 +5,7 @@ let router = KoaRouter()
 
 // list available rooms
 router.get('/api/account/rooms', async (ctx, next) => {
-  let rooms = await ctx.db.all('SELECT * FROM rooms WHERE status = ?', ['open'])
+  let rooms = await ctx.db.all('SELECT * FROM rooms WHERE status = ?', 'open')
   return ctx.body = rooms
 })
 
@@ -22,7 +22,7 @@ router.post('/api/account/login', async (ctx, next) => {
   email = email.trim().toLowerCase()
 
   // get user
-  let user = await ctx.db.get('SELECT * FROM users WHERE email = ?', [email])
+  let user = await ctx.db.get('SELECT * FROM users WHERE email = ?', email)
 
   // validate password
   if (!user || !await compare(password, user.password)) {
@@ -31,7 +31,7 @@ router.post('/api/account/login', async (ctx, next) => {
   }
 
   // validate roomId
-  let room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', [roomId])
+  let room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', roomId)
 
   if (!room || room.status !== 'open') {
     ctx.status = 401
@@ -73,7 +73,7 @@ router.post('/api/account/create', async (ctx, next) => {
   }
 
   // check for duplicate email
-  if (await ctx.db.get('SELECT * FROM users WHERE email = ?', [email])) {
+  if (await ctx.db.get('SELECT * FROM users WHERE email = ?', email)) {
     ctx.status = 401
     return ctx.body = 'Email address is already registered'
   }
@@ -85,7 +85,7 @@ router.post('/api/account/create', async (ctx, next) => {
   }
 
   let hashedPwd = await hash(newPassword, 10)
-  let res = await ctx.db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', [email, hashedPwd, name])
+  let res = await ctx.db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', email, hashedPwd, name)
   console.log(res)
   ctx.status = 200
 })
@@ -98,7 +98,7 @@ router.post('/api/account/update', async (ctx, next) => {
     return ctx.body = 'Invalid token'
   }
 
-  let user = await ctx.db.get('SELECT * FROM users WHERE id = ?', [ctx.state.user.id])
+  let user = await ctx.db.get('SELECT * FROM users WHERE id = ?', ctx.state.user.id)
 
   if (!user) {
     ctx.status = 401
@@ -142,17 +142,17 @@ router.post('/api/account/update', async (ctx, next) => {
 
   // check for duplicate email
   if (await ctx.db.get('SELECT * FROM users WHERE id != ? AND email = ? COLLATE NOCASE ',
-      [ctx.state.user.id, email])) {
+      ctx.state.user.id, email)) {
     ctx.status = 401
     return ctx.body = 'Email address is already registered'
   }
 
   // do update
   let res = await ctx.db.run('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
-    [name, email, password, ctx.state.user.id])
+    name, email, password, ctx.state.user.id)
 
   // return user (shape should match /login)
-  user = await ctx.db.get('SELECT * FROM users WHERE email = ?', [email])
+  user = await ctx.db.get('SELECT * FROM users WHERE email = ?', email)
 
   delete user.password
   user.roomId = ctx.state.user.roomId

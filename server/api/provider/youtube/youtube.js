@@ -3,7 +3,7 @@ var debug = require('debug')
 var log = debug('app:provider:youtube')
 var error = debug('app:provider:youtube:error')
 
-let seenIds, stats, db
+let seenIds, stats
 
 export async function scan(config, ctx) {
   if (typeof config.channel === 'undefined') {
@@ -16,7 +16,6 @@ export async function scan(config, ctx) {
     return Promise.resolve()
   }
 
-  db = ctx.db
   seenIds = []
   stats = {new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0}
 
@@ -33,7 +32,7 @@ export async function scan(config, ctx) {
     }
 
     for (let item of items) {
-      await process(item)
+      await process(item, ctx)
     }
   }
 
@@ -42,7 +41,7 @@ export async function scan(config, ctx) {
 }
 
 
-async function process(item) {
+async function process(item, ctx) {
   let videoId = item.snippet.resourceId.videoId
   log('Process [%s]: %s', videoId, item.snippet.title)
 
@@ -55,7 +54,7 @@ async function process(item) {
   seenIds.push(videoId)
 
   // search for this file in the db
-  let row = await db.get('SELECT * FROM songs WHERE uid = ?', [videoId])
+  let row = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', videoId)
 
   if (row) {
     // we're done
@@ -74,11 +73,11 @@ async function process(item) {
 
   // creating new song
   // does the artist already exist?
-  let artist = await db.get('SELECT * FROM artists WHERE name = ?', [meta.artist])
+  let artist = await ctx.db.get('SELECT * FROM artists WHERE name = ?', meta.artist)
 
   if (!artist) {
     log(' => new artist: %s', meta.artist)
-    let res = await db.run('INSERT INTO artists(name) VALUES (?)', [meta.artist])
+    let res = await ctx.db.run('INSERT INTO artists(name) VALUES (?)', meta.artist)
 
     if (!res) {
       error(' => Could not create artist: %s', meta.artist)
@@ -98,7 +97,7 @@ async function process(item) {
     videoId     // uid
   ]
 
-  let res = await db.run('INSERT INTO songs VALUES (?,?,?,?,?,?)', song)
+  let res = await ctx.db.run('INSERT INTO songs VALUES (?,?,?,?,?,?)', song)
   stats.new++
   log(' => new song: %s - %s', meta.artist, meta.title)
   // console.log({videoId, desc:item.snippet.title, artist: meta.artist, title: meta.title})

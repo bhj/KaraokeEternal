@@ -58,7 +58,7 @@ router.get('/api/library/scan', async (ctx, next) => {
     log('Getting configuration for provider "%s"', provider)
 
     // get provider's full config
-    let rows = await ctx.db.all('SELECT * FROM config WHERE domain = ?', [provider])
+    let rows = await ctx.db.all('SELECT * FROM config WHERE domain = ?', provider)
     let config = rows2obj(rows)
 
     if (typeof config !== 'object') {

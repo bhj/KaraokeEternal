@@ -20,7 +20,7 @@ const ACTION_HANDLERS = {
     let curId = payload || -1
 
     // get next-highest queue item id
-    let item = await ctx.db.get('SELECT * FROM queue WHERE roomId = ? AND queueId > ? LIMIT 1', [ctx.user.roomId, curId])
+    let item = await ctx.db.get('SELECT * FROM queue WHERE roomId = ? AND queueId > ? LIMIT 1', ctx.user.roomId, curId)
 
     if (!item) {
       // we're already on the last queued item

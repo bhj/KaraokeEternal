@@ -13,7 +13,7 @@ let allowedAudio = ['.mp3', '.m4a', '.flac']
 let allowedVideo= ['.mp4', '.m4v']
 let allowedExt = allowedAudio.concat(allowedVideo)
 
-let seenHashes, stats, db
+let seenHashes, stats
 
 export async function scan(config, ctx) {
   if (typeof config.path === 'undefined') {
@@ -21,7 +21,6 @@ export async function scan(config, ctx) {
     return Promise.resolve()
   }
 
-  db = ctx.db
   seenHashes = []
   stats = {new: 0, moved: 0, ok: 0, removed: 0, error: 0}
 
@@ -47,7 +46,7 @@ export async function scan(config, ctx) {
 
     for (let file of files) {
       try {
-        await process(file)
+        await process(file, ctx)
       } catch(err) {
         error('   => %s', err)
       }
@@ -68,7 +67,7 @@ export async function resource(config, ctx) {
     return ctx.body = "Missing 'type' or 'uid' query param"
   }
 
-  song = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', [uid])
+  song = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', uid)
 
   if (! song) {
     ctx.status = 404
@@ -99,7 +98,7 @@ export async function resource(config, ctx) {
   ctx.body = fs.createReadStream(file)
 }
 
-async function process(file){
+async function process(file, ctx){
   let toHash = [file]
   let info = path.parse(file)
   let meta = parseNameMeta(info) // start with filename-based metadata
@@ -132,7 +131,7 @@ async function process(file){
   seenHashes.push(hash)
 
   // search for this file in the db
-  let row = await db.get('SELECT * FROM songs WHERE uid = ?', [hash])
+  let row = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', hash)
 
   if (row) {
     if (row.url === file) {
@@ -143,7 +142,7 @@ async function process(file){
     }
 
     // it moved! update the location
-    await db.run('UPDATE songs SET url = ? WHERE uid = ?', [file, hash])
+    await ctx.db.run('UPDATE songs SET url = ? WHERE uid = ?', file, hash)
 
     stats.moved++
     log(' => moved from: %s', row.url)
@@ -152,11 +151,11 @@ async function process(file){
 
   // creating new song
   // does the artist already exist?
-  let artist = await db.get('SELECT * FROM artists WHERE artist = ?', [meta.artist])
+  let artist = await ctx.db.get('SELECT * FROM artists WHERE artist = ?', meta.artist)
 
   if (!artist) {
     log(' => new artist: %s', meta.artist)
-    let res = await db.run('INSERT INTO artists(name) VALUES (?)', [meta.artist])
+    let res = await ctx.db.run('INSERT INTO artists(name) VALUES (?)', meta.artist)
 
     if (!res) {
       error(' => Could not create artist: %s', meta.artist)

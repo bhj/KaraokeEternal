@@ -10,7 +10,7 @@ import config from '../config'
 import webpackDevMiddleware from './middleware/webpack-dev'
 import webpackHMRMiddleware from './middleware/webpack-hmr'
 import bodyparser from 'koa-bodyparser'
-import sqlite3 from 'co-sqlite3'
+import db from 'sqlite'
 import KoaJwt from 'koa-jwt'
 import apiRoutes from './api/routes'
 import KoaRange from 'koa-range'
@@ -23,18 +23,19 @@ const app = new Koa()
 const io = new KoaSocketIO()
 
 // initialize database
-let _dbInstance
-
-sqlite3(config.path_database).then((db)=>{
-  debug('SQLite3 database initialized at: %s', config.path_database)
-  _dbInstance = db
-})
+Promise.resolve()
+  // @todo ensure this happens before listen()
+  .then(() => {
+    db.open(config.path_database, { Promise })
+    debug('SQLite3 database opened: %s', config.path_database)
+  })
+  .catch(err => debug(err.stack))
 
 // make database available on koa ctx
 app.use(async (ctx, next) => {
-    ctx.db = _dbInstance
+    ctx.db = db
     await next()
-});
+})
 
 app.use(convert(KoaRange))
 
@@ -60,7 +61,7 @@ io.use(async (ctx, next) => {
   // make user, db and socket.io instance available
   // to downstream middleware and event listeners
   ctx.user = ctx.socket.socket.decoded_token || null
-  ctx.db = _dbInstance
+  ctx.db = db
   ctx.io = app._io
 
   await next()

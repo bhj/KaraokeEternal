@@ -22,7 +22,7 @@ router.get('/api/provider/:provider/:method', async (ctx, next) => {
   }
 
   // get provider config
-  let rows = await ctx.db.all('SELECT * FROM config WHERE domain = ?', [provider])
+  let rows = await ctx.db.all('SELECT * FROM config WHERE domain = ?', provider)
   const config = rows2obj(rows)
 
   if (! config.enabled) {
