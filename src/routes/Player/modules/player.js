@@ -45,17 +45,18 @@ export function mediaEnd() {
   }
 }
 
-// general error; we should move to next song
-export const MEDIA_ERROR = 'player/MEDIA_ERROR'
+// have server emit player error to room
+// we should also move to next song
+const PLAYER_EMIT_ERROR = 'server/PLAYER_EMIT_ERROR'
 
 export function mediaError(id, message) {
   return {
-    type: MEDIA_ERROR,
+    type: PLAYER_EMIT_ERROR,
     payload: {id, message}
   }
 }
 
-// Tell server to emit player status to room
+// have server emit player status to room
 const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
 export function status(s) {
   return {
@@ -99,11 +100,6 @@ const ACTION_HANDLERS = {
     ...state,
     isFetching: false,
     isPlaying: true, // all media is loaded
-  }),
-  [MEDIA_ERROR]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-    errorMessage: payload.message
   }),
 }
 

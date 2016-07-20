@@ -9,6 +9,7 @@ class QueueView extends React.Component {
     uids: PropTypes.array.isRequired,
     items: PropTypes.object.isRequired,
     errorMessage: PropTypes.string,
+    errors: PropTypes.object.isRequired,
     // library
     artistIds: PropTypes.array.isRequired,
     artists: PropTypes.object.isRequired,
@@ -37,6 +38,7 @@ class QueueView extends React.Component {
       const song = this.props.songs[item.uid]
       const isOwner = item.userId === this.props.user.id
       const isPlaying = queueId === this.props.currentId
+      const isErrored = typeof this.props.errors[queueId] !== 'undefined'
 
       return (
         <QueueItem
@@ -44,13 +46,15 @@ class QueueView extends React.Component {
           artist={this.props.artists[song.artistId].name}
           title={song.title}
           userName={item.userName}
-          canSkip={isOwner && isPlaying}
-          canRemove={isOwner && !isPlaying && queueId > this.props.currentId}
+          canSkip={isOwner && isPlaying && !isErrored}
+          canRemove={isOwner && !isPlaying && !isErrored && queueId > this.props.currentId}
+          isErrored={isErrored}
           isLast={i === this.props.queueIds.length-1}
           isPlaying={isPlaying}
           pctPlayed={isPlaying ? this.props.currentTime / this.props.duration * 100 : 0}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
           onSkipClick={this.handleSkipClick}
+          onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}
         />
       )
     }, this)
@@ -82,8 +86,12 @@ class QueueView extends React.Component {
     )
   }
 
-  handleRemoveClick(id) {
-    this.props.removeItem(id)
+  handleRemoveClick(queueId) {
+    this.props.removeItem(queueId)
+  }
+
+  handleErrorInfoClick(queueId) {
+    alert(this.props.errors[queueId])
   }
 
   handleSkipClick() {

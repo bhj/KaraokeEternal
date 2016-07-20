@@ -29,6 +29,7 @@ export function requestPause() {
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 const QUEUE_ERROR = 'queue/QUEUE_ERROR'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
+const PLAYER_ERROR = 'player/PLAYER_ERROR'
 
 // ------------------------------------
 // add to queue
@@ -75,6 +76,13 @@ const ACTION_HANDLERS = {
     ...state,
     errorMessage: payload.message
   }),
+  [PLAYER_ERROR]: (state, {payload}) => ({
+    ...state,
+    errors: {
+      ...state.errors,
+      [payload.id]: payload.message
+    }
+  }),
 }
 
 // ------------------------------------
@@ -88,6 +96,7 @@ const initialState = {
   currentTime: 0,
   duration: 0,
   errorMessage: null,
+  errors: {}, // keyed on queueId
 }
 
 export default function queueReducer (state = initialState, action) {

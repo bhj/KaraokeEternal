@@ -25,6 +25,11 @@ export const QueueItem = (props) => (
         <i className='material-icons'>clear</i>
       </div>
     }
+    {props.isErrored &&
+      <div onClick={props.onErrorInfoClick} className={classes.errorInfo}>
+        <i className='material-icons'>info_outline</i>
+      </div>
+    }
   </div>
 )
 
@@ -33,10 +38,12 @@ QueueItem.propTypes = {
   artist: React.PropTypes.string.isRequired,
   userName: React.PropTypes.string.isRequired,
   isPlaying: React.PropTypes.bool.isRequired,
+  isErrored: React.PropTypes.bool.isRequired,
   canSkip: React.PropTypes.bool.isRequired,
   onSkipClick: React.PropTypes.func.isRequired,
   canRemove: React.PropTypes.bool.isRequired,
   onRemoveClick: React.PropTypes.func.isRequired,
+  onErrorInfoClick: React.PropTypes.func.isRequired,
 }
 
 export default QueueItem
