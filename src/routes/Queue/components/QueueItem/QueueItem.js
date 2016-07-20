@@ -4,7 +4,7 @@ import classes from './QueueItem.css'
 export const QueueItem = (props) => (
   <div className={classes.container} style={{backgroundSize: props.pctPlayed+'% 100%'}}>
     <div className={classes.star}>
-      <i className={'material-icons md-dark md-inactive'}>
+      <i className='material-icons'>
         {props.isStarred ? 'star' : 'star_border'}
       </i>
     </div>

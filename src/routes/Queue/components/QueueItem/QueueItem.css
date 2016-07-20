@@ -28,14 +28,11 @@
 }
 
 /* Actions */
-.skip {
-  font-size: 48px;  
-}
-
-.remove {
-  font-size: 36px;
-}
-
-.star {
+.button {
   font-size: 48px;
+  color: rgba(10, 10, 10, 0.5);
+}
+
+.skip, .remove, .star, .errorInfo {
+  composes: button;
 }
