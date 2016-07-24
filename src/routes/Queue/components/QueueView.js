@@ -91,7 +91,7 @@ class QueueView extends React.Component {
   }
 
   handleErrorInfoClick(queueId) {
-    alert(this.props.errors[queueId])
+    alert(this.props.errors[queueId].join("\n\n"))
   }
 
   handleSkipClick() {

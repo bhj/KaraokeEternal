@@ -67,6 +67,18 @@ const ACTION_HANDLERS = {
     currentTime: payload.currentTime,
     duration: payload.duration,
   }),
+  [PLAYER_ERROR]: (state, {payload}) => {
+    // can be multiple errors for a media item
+    const {id, message} = payload
+
+    return {
+      ...state,
+      errors: {
+        ...state.errors,
+        [id]: state.errors[id] ? state.errors[id].concat(message) : [message]
+      }
+    }
+  },
   [QUEUE_CHANGE]: (state, {payload}) => ({
     ...state,
     result: payload.result,
@@ -75,13 +87,6 @@ const ACTION_HANDLERS = {
   [QUEUE_ERROR]: (state, {payload}) => ({
     ...state,
     errorMessage: payload.message
-  }),
-  [PLAYER_ERROR]: (state, {payload}) => ({
-    ...state,
-    errors: {
-      ...state.errors,
-      [payload.id]: payload.message
-    }
   }),
 }
 
