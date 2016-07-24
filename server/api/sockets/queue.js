@@ -36,8 +36,8 @@ const ACTION_HANDLERS = {
     }
 
     // insert row
-    res = await ctx.db.run('INSERT INTO queue (roomId, userId, uid, date) VALUES (?, ?, ?, ?)',
-      ctx.user.roomId, ctx.user.id, uid, Date.now())
+    res = await ctx.db.run('INSERT INTO queue (roomId, userId, uid) VALUES (?, ?, ?)',
+      ctx.user.roomId, ctx.user.id, uid)
 
     if (res.changes !== 1) {
       ctx.io.to(socketId).emit('action', {
@@ -54,7 +54,6 @@ const ACTION_HANDLERS = {
   },
   [QUEUE_REMOVE]: async (ctx, {payload}) => {
     const socketId = ctx.socket.socket.id
-    const queueId = payload
     let item, res
 
     if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
@@ -66,7 +65,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify item exists
-    item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', queueId)
+    item = await ctx.db.get('SELECT * FROM queue WHERE id = ?', payload)
 
     if (!item) {
       ctx.io.to(socketId).emit('action', {
@@ -95,7 +94,7 @@ const ACTION_HANDLERS = {
     }
 
     // delete item
-    res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', queueId)
+    res = await ctx.db.run('DELETE FROM queue WHERE id = ?', payload)
 
     if (res.changes !== 1) {
       ctx.io.to(socketId).emit('action', {
@@ -117,22 +116,17 @@ export default ACTION_HANDLERS
 
 
 export async function getQueue(ctx, roomId) {
-  let queueIds = []
-  let uids = []
-  let items = {}
+  let result = []
+  let entities = {}
 
-  // get songs
-  let rows = await ctx.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.uid = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY date', roomId)
+  let rows = await ctx.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.uid = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY queue.id', roomId)
 
   rows.forEach(function(row){
-    queueIds.push(row.queueId)
-    items[row.queueId] = row
-
-    // used for quick lookup by Library
-    uids.push(row.uid)
+    result.push(row.id)
+    entities[row.id] = row
   })
 
-  return {result: {uids, queueIds}, entities: items}
+  return {result, entities}
 }
 
 async function _roomIsOpen(ctx, roomId) {

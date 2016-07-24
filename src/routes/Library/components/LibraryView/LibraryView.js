@@ -79,16 +79,16 @@ class LibraryView extends React.Component {
       let isQueued = false
 
       // search for uid
-      if (this.props.queue.result.uids.indexOf(uid) !== -1) {
-        isQueued = true
-        isChildQueued = true
-
-        if (!isExpanded) {
-          // since we aren't rendering children (songs) and
-          // we have enough info to render parent ArtistItem
-          break
-        }
-      }
+      // if (this.props.queue.result.uids.indexOf(uid) !== -1) {
+      //   isQueued = true
+      //   isChildQueued = true
+      //
+      //   if (!isExpanded) {
+      //     // since we aren't rendering children (songs) and
+      //     // we have enough info to render parent ArtistItem
+      //     break
+      //   }
+      // }
 
       if (isExpanded) {
         children.push(

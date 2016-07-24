@@ -12,67 +12,44 @@ class PlayerView extends React.Component {
     mediaError: PropTypes.func.isRequired,
     mediaEnd: React.PropTypes.func.isRequired,
     // store state
-    queue: PropTypes.object.isRequired,
-    libraryHasLoaded: PropTypes.bool.isRequired,
-    currentId: PropTypes.number,
+    item: PropTypes.object,
     isPlaying: PropTypes.bool.isRequired,
     isFetching: PropTypes.bool.isRequired,
+    libraryHasLoaded: PropTypes.bool.isRequired,
   }
-
-  handleMediaError = this.handleMediaError.bind(this)
 
   componentDidMount() {
     // emit initial state
     this.props.status({
-      currentId: null,
-      currentTime: 0,
       isPlaying: false,
+      id: null,
+      time: 0,
       duration: 0,
     })
   }
 
-  componentDidUpdate (prevProps) {
-    const { isPlaying, currentId } = this.props
+  componentDidUpdate(prevProps) {
+    if (this.props.item) {
+      let { id, provider } = this.props.item
 
-    if (isPlaying && isPlaying !== prevProps.isPlaying) {
-      if (!currentId) {
-        this.props.requestPlayNext()
+      if (prevProps.item && this.props.item && prevProps.item.id !== id && !ProviderPlayers[provider]) {
+        // missing/invalid provider; trigger next track
+        this.props.mediaError(id, 'No player provided for "'+provider+'"')
       }
     }
-  }
 
-  handleMediaError(id, message) {
-    // notification
-    this.props.mediaError(id, message)
-
-    // since multiple errors (e.g. audio and video)
-    // can occur while loading, make sure this error
-    // is for the current item before we take action
-    if (id === this.props.currentId) {
-      this.props.requestPlayNext(id)
+    if (this.props.isPlaying && this.props.isPlaying !== prevProps.isPlaying) {
+      // start at beginning of queue
+      this.props.requestPlayNext()
     }
   }
 
   render () {
-    const { queue, currentId, isPlaying } = this.props
-    const item = queue.entities[currentId]
-
-    if (!currentId) {
+    if (!this.props.item || !ProviderPlayers[this.props.item.provider]) {
       return null
     }
 
-    if (!item) {
-      console.log('no item with id: %s', currentId)
-      return null
-    }
-
-    const Player = ProviderPlayers[item.provider]
-
-    if (!Player) {
-      // no player component for this provider (todo: better error)
-      console.log('no player component for provider: %s', item.provider)
-      return null
-    }
+    const Player = ProviderPlayers[this.props.item.provider]
 
     return (
       <AutoSizer>
@@ -80,12 +57,12 @@ class PlayerView extends React.Component {
           <Player
             width={width}
             height={height}
-            item={item}
+            item={this.props.item}
             isPlaying={this.props.isPlaying}
             getMedia={this.props.getMedia}
             getMediaSuccess={this.props.getMediaSuccess}
             onStatus={this.props.status}
-            onMediaError={this.handleMediaError}
+            onMediaError={this.props.mediaError}
             onMediaEnd={this.props.mediaEnd}
           />
         )}

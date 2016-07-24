@@ -1,12 +1,3 @@
-// Request Play Next
-const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
-export function requestPlayNext(curId) {
-  return {
-    type: PLAYER_NEXT_REQUEST,
-    payload: curId
-  }
-}
-
 // Request Play
 const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 export function requestPlay() {
@@ -62,10 +53,7 @@ const ACTION_HANDLERS = {
   // broadcast to room
   [PLAYER_STATUS]: (state, {payload}) => ({
     ...state,
-    isPlaying: payload.isPlaying,
-    currentId: payload.currentId,
-    currentTime: payload.currentTime,
-    duration: payload.duration,
+    status: payload,
   }),
   [PLAYER_ERROR]: (state, {payload}) => {
     // can be multiple errors for a media item
@@ -94,14 +82,11 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  result: {queueIds: [], uids: []},
-  entities: {},
-  isPlaying: false,
-  currentId: null,
-  currentTime: 0,
-  duration: 0,
+  result: [],   // item ids
+  entities: {}, // keyed by item id
+  errors: {},   // object of arrays keyed by item id
+  status: {},   // player status
   errorMessage: null,
-  errors: {}, // keyed on queueId
 }
 
 export default function queueReducer (state = initialState, action) {

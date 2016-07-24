@@ -20,10 +20,8 @@ const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 // ------------------------------------
 const ACTION_HANDLERS = {
   [PLAYER_NEXT_REQUEST]: async (ctx, {payload}) => {
-    let curId = payload || -1
-
     // get next-highest queue item id
-    let item = await ctx.db.get('SELECT * FROM queue WHERE roomId = ? AND queueId > ? LIMIT 1', ctx.user.roomId, curId)
+    let item = await ctx.db.get('SELECT * FROM queue WHERE roomId = ? AND id > ? LIMIT 1', ctx.user.roomId, payload)
 
     if (!item) {
       // we're already on the last queued item
@@ -36,7 +34,7 @@ const ACTION_HANDLERS = {
 
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_NEXT,
-      payload: item.queueId
+      payload: item.id
     })
   },
   // Broadcast player's status to room

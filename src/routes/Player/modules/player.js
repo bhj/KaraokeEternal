@@ -1,5 +1,3 @@
-import { requestPlayNext } from '../../Queue/modules/queue'
-
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
@@ -7,6 +5,19 @@ const PLAYER_STATUS = 'player/PLAYER_STATUS'
 
 // can be emitted after a PLAYER_NEXT_REQUEST
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
+
+// Request Play Next
+const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
+export function requestPlayNext() {
+  return (dispatch, getState) => {
+    const curId = getState().player.id
+
+    dispatch({
+      type: PLAYER_NEXT_REQUEST,
+      payload: curId
+    })
+  }
+}
 
 // ------------------------------------
 // dispatched mostly for informational purposes
@@ -34,25 +45,29 @@ export const MEDIA_END = 'player/MEDIA_END'
 
 export function mediaEnd() {
   return (dispatch, getState) => {
-    const curId = getState().player.currentId
-
     dispatch({
       type: MEDIA_END,
-      payload: curId
+      payload: getState().player.id
     })
 
-    dispatch(requestPlayNext(curId))
+    dispatch(requestPlayNext())
   }
 }
 
-// have server emit player error to room
-// we should also move to next song
 const PLAYER_EMIT_ERROR = 'server/PLAYER_EMIT_ERROR'
-
 export function mediaError(id, message) {
-  return {
-    type: PLAYER_EMIT_ERROR,
-    payload: {id, message}
+  return (dispatch, getState) => {
+    // informational: have server emit player error to room
+    dispatch({
+      type: PLAYER_EMIT_ERROR,
+      payload: {id, message}
+    })
+
+    // move to next song if we haven't already
+    // if (!getState().player.errors[id]) {
+      dispatch(requestPlayNext())
+    // }
+
   }
 }
 
@@ -72,13 +87,13 @@ const ACTION_HANDLERS = {
   [PLAYER_EMIT_STATUS]: (state, {payload}) => ({
     ...state,
     isPlaying: payload.isPlaying,
-    currentId: payload.currentId,
+    // id: payload.id,
     currentTime: payload.currentTime,
     duration: payload.duration,
   }),
   [PLAYER_NEXT]: (state, {payload}) => ({
     ...state,
-    currentId: payload,
+    id: payload,
   }),
   [PLAYER_PAUSE]: (state, {payload}) => ({
     ...state,
@@ -107,12 +122,12 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  currentId: null,
+  id: -1,
   currentTime: 0,
   duration: 0,
   isPlaying: false,
   isFetching: false,
-  errorMessage: null
+  errorMessage: null,
 }
 
 export default function playerReducer (state = initialState, action) {
