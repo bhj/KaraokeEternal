@@ -1,6 +1,5 @@
 import KoaRouter from 'koa-router'
 import Providers from '../provider/index'
-import rows2obj from '../utilities/rows2obj'
 
 let router = KoaRouter()
 let debug = require('debug')
@@ -55,29 +54,31 @@ router.get('/api/library/scan', async (ctx, next) => {
 
   isScanning = true
 
-  for (let provider in Providers) {
-    log('Getting configuration for provider "%s"', provider)
+  // get provider configs
+  let cfg = {}
+  let rows = await ctx.db.all('SELECT * FROM config WHERE domain LIKE "%.provider"')
 
-    // get provider's full config
-    let rows = await ctx.db.all('SELECT * FROM config WHERE domain = ?', provider)
-    let config = rows2obj(rows)
+  rows.forEach(function(row){
+    const provider = row.domain.substr(0, row.domain.lastIndexOf('.provider'))
+    cfg[provider] = JSON.parse(row.data)
+  })
 
-    if (typeof config !== 'object') {
-      log('Error reading configuration')
+  for (let provider in cfg) {
+    if (!cfg[provider].enabled) {
+      log('Provider "%s" not enabled; skipping', provider)
       continue
     }
 
-    if (!config.enabled) {
-      log('Provider not enabled; skipping')
+    if (!Providers[provider]) {
+      error('Provider "%s" is enabled but not loaded', provider)
       continue
     }
-
     // call each provider's scan method, passing config object and
     // koa context (from which we can access the db, and possibly
     // send progress updates down the wire?)
-    log('Provider \'%s\' starting scan', provider)
-    await Providers[provider].scan(config, ctx)
-    log('Provider \'%s\' finished', provider)
+    log('Provider "%s" starting scan', provider)
+    await Providers[provider].scan(cfg[provider], ctx)
+    log('Provider "%s" finished scan', provider)
   }
 
   isScanning = false

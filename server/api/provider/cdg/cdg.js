@@ -15,8 +15,8 @@ let allowedExt = allowedAudio.concat(allowedVideo)
 
 let seenHashes, stats
 
-export async function scan(config, ctx) {
-  if (typeof config.path === 'undefined') {
+export async function scan(cfg, ctx) {
+  if (!Array.isArray(cfg.paths) || !cfg.paths.length) {
     error('No paths configured; aborting scan')
     return Promise.resolve()
   }
@@ -24,10 +24,7 @@ export async function scan(config, ctx) {
   seenHashes = []
   stats = {new: 0, moved: 0, ok: 0, removed: 0, error: 0}
 
-  // make sure we have array of paths
-  if (!Array.isArray(config.path)) config.path = [config.path]
-
-  for (let searchPath of config.path) {
+  for (let searchPath of cfg.paths) {
     let files
     log('Scanning path: %s', searchPath)
 
@@ -176,7 +173,6 @@ async function process(file, ctx){
   ]
 
   let res = await db.run('INSERT INTO songs VALUES (?,?,?,?,?,?)', song)
-  // console.log(res)
   stats.new++
   log(' => new song: %s - %s', meta.artist, meta.title)
 }
