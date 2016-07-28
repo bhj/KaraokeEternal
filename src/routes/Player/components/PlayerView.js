@@ -30,9 +30,9 @@ class PlayerView extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.item) {
-      let { id, provider } = this.props.item
+      let { queueId, provider } = this.props.item
 
-      if (prevProps.item && this.props.item && prevProps.item.id !== id && !ProviderPlayers[provider]) {
+      if (prevProps.item && this.props.item && prevProps.item.queueId !== queueId && !ProviderPlayers[provider]) {
         // missing/invalid provider; trigger next track
         this.props.mediaError(id, 'No player provided for "'+provider+'"')
       }

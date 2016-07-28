@@ -13,7 +13,6 @@ const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: async (ctx, {payload}) => {
     const socketId = ctx.socket.socket.id
-    const uid = payload
     let song, res
 
     if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
@@ -25,7 +24,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify song exists
-    song = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', uid)
+    song = await ctx.db.get('SELECT * FROM songs WHERE songId = ?', payload)
 
     if (!song) {
       ctx.io.to(socketId).emit('action', {
@@ -36,8 +35,8 @@ const ACTION_HANDLERS = {
     }
 
     // insert row
-    res = await ctx.db.run('INSERT INTO queue (roomId, userId, uid) VALUES (?, ?, ?)',
-      ctx.user.roomId, ctx.user.id, uid)
+    res = await ctx.db.run('INSERT INTO queue (roomId, songId, userId) VALUES (?, ?, ?)',
+       ctx.user.roomId, payload, ctx.user.userId)
 
     if (res.changes !== 1) {
       ctx.io.to(socketId).emit('action', {
@@ -65,7 +64,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify item exists
-    item = await ctx.db.get('SELECT * FROM queue WHERE id = ?', payload)
+    item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', payload)
 
     if (!item) {
       ctx.io.to(socketId).emit('action', {
@@ -85,7 +84,7 @@ const ACTION_HANDLERS = {
     }
 
     // is it the user's item?
-    if (item.userId !== ctx.user.id) {
+    if (item.userId !== ctx.user.userId) {
       ctx.io.to(socketId).emit('action', {
         type: QUEUE_ERROR,
         payload: {message: 'Item is NOT YOURS'}
@@ -94,12 +93,12 @@ const ACTION_HANDLERS = {
     }
 
     // delete item
-    res = await ctx.db.run('DELETE FROM queue WHERE id = ?', payload)
+    res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', payload)
 
     if (res.changes !== 1) {
       ctx.io.to(socketId).emit('action', {
         type: QUEUE_ERROR,
-        payload: {message: 'Could not delete item (db changes !== 1)'}
+        payload: {message: 'Could not delete item (db error)'}
       })
       return
     }
@@ -119,17 +118,17 @@ export async function getQueue(ctx, roomId) {
   let result = []
   let entities = {}
 
-  let rows = await ctx.db.all('SELECT queue.*, songs.provider, users.name AS userName FROM queue JOIN songs on queue.uid = songs.uid LEFT OUTER JOIN users ON queue.userId = users.id WHERE roomId = ? ORDER BY queue.id', roomId)
+  let rows = await ctx.db.all('SELECT queueId, songId, userId, users.name AS userName FROM queue JOIN songs USING(songId) LEFT OUTER JOIN users USING(userId) WHERE roomId = ? ORDER BY queueId', roomId)
 
   rows.forEach(function(row){
-    result.push(row.id)
-    entities[row.id] = row
+    result.push(row.queueId)
+    entities[row.queueId] = row
   })
 
   return {result, entities}
 }
 
 async function _roomIsOpen(ctx, roomId) {
-  const room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', roomId)
+  const room = await ctx.db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
   return (room || room.status === 'open')
 }

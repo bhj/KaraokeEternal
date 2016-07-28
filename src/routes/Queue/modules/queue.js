@@ -27,10 +27,10 @@ const PLAYER_ERROR = 'player/PLAYER_ERROR'
 // ------------------------------------
 const QUEUE_ADD = 'server/QUEUE_ADD'
 
-export function addSong(uid) {
+export function addSong(songId) {
   return {
     type: QUEUE_ADD,
-    payload: uid
+    payload: songId
   }
 }
 
@@ -39,10 +39,10 @@ export function addSong(uid) {
 // ------------------------------------
 export const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
 
-export function removeItem(id) {
+export function removeItem(queueId) {
   return {
     type: QUEUE_REMOVE,
-    payload: id
+    payload: queueId
   }
 }
 
@@ -57,13 +57,13 @@ const ACTION_HANDLERS = {
   }),
   [PLAYER_ERROR]: (state, {payload}) => {
     // can be multiple errors for a media item
-    const {id, message} = payload
+    const {queueId, message} = payload
 
     return {
       ...state,
       errors: {
         ...state.errors,
-        [id]: state.errors[id] ? state.errors[id].concat(message) : [message]
+        [queueId]: state.errors[queueId] ? state.errors[queueId].concat(message) : [message]
       }
     }
   },
@@ -83,8 +83,8 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   result: [],   // item ids
-  entities: {}, // keyed by item id
-  errors: {},   // object of arrays keyed by item id
+  entities: {}, // keyed by queueId
+  errors: {},   // object of arrays keyed by queueId
   status: {},   // player status
   errorMessage: null,
 }

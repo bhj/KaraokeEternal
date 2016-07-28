@@ -31,7 +31,7 @@ router.post('/api/account/login', async (ctx, next) => {
   }
 
   // validate roomId
-  let room = await ctx.db.get('SELECT * FROM rooms WHERE id = ?', roomId)
+  let room = await ctx.db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
 
   if (!room || room.status !== 'open') {
     ctx.status = 401
@@ -39,7 +39,7 @@ router.post('/api/account/login', async (ctx, next) => {
   }
 
   delete user.password
-  user.roomId = room.id
+  user.roomId = room.roomId
 
   let token = jwt.sign(user, 'shared-secret')
 
@@ -98,7 +98,7 @@ router.post('/api/account/update', async (ctx, next) => {
     return ctx.body = 'Invalid token'
   }
 
-  let user = await ctx.db.get('SELECT * FROM users WHERE id = ?', ctx.state.user.id)
+  let user = await ctx.db.get('SELECT * FROM users WHERE userId = ?', ctx.state.user.userId)
 
   if (!user) {
     ctx.status = 401
@@ -141,15 +141,15 @@ router.post('/api/account/update', async (ctx, next) => {
   }
 
   // check for duplicate email
-  if (await ctx.db.get('SELECT * FROM users WHERE id != ? AND email = ? COLLATE NOCASE ',
-      ctx.state.user.id, email)) {
+  if (await ctx.db.get('SELECT * FROM users WHERE userId != ? AND email = ? COLLATE NOCASE ',
+      ctx.state.user.userId, email)) {
     ctx.status = 401
     return ctx.body = 'Email address is already registered'
   }
 
   // do update
-  let res = await ctx.db.run('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
-    name, email, password, ctx.state.user.id)
+  let res = await ctx.db.run('UPDATE users SET name = ?, email = ?, password = ? WHERE userId = ?',
+    name, email, password, ctx.state.user.userId)
 
   // return user (shape should match /login)
   user = await ctx.db.get('SELECT * FROM users WHERE email = ?', email)

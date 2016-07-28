@@ -5,7 +5,7 @@ export default class Login extends Component {
   render() {
     let roomOpts = this.props.rooms.map(function(room, i) {
       return (
-        <option key={room.id} value={room.id}>{room.name}</option>
+        <option key={room.roomId} value={room.roomId}>{room.name}</option>
       )
     }, this)
 

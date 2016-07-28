@@ -5,7 +5,7 @@ let router = KoaRouter()
 router.get('/api/search', async (ctx, next) => {
   let query = ctx.params.query
 
-  let rows = await ctx.db.all('SELECT artists.*, COUNT(songs.artist_id) AS count FROM artists JOIN songs ON artists.id = songs.artist_id GROUP BY artist_id ORDER BY artists.name')
+  let rows = await ctx.db.all('SELECT artists.*, COUNT(songs.artistId) AS count FROM artists JOIN songs USING(artistId) GROUP BY artistId ORDER BY artists.name')
 
   // normalize
   let result = []

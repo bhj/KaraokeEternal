@@ -12,7 +12,7 @@ class QueueView extends React.Component {
     // library
     artistIds: PropTypes.array.isRequired,
     artists: PropTypes.object.isRequired,
-    songUIDs: PropTypes.array.isRequired,
+    songIds: PropTypes.array.isRequired,
     songs: PropTypes.object.isRequired,
     // user
     user: PropTypes.object.isRequired,
@@ -28,30 +28,30 @@ class QueueView extends React.Component {
       return null
     }
 
-    const curId = this.props.status ? this.props.status.id : -1
+    const curId = this.props.status.queueId || -1
 
-    let songs = this.props.result.map(function(id, i) {
-      const item = this.props.entities[id]
-      const song = this.props.songs[item.uid]
-      const isPlaying = item.id === curId
-      const isErrored = typeof this.props.errors[id] !== 'undefined'
-      const isOwner = item.userId === this.props.user.id
+    let songs = this.props.result.map(function(queueId, i) {
+      const item = this.props.entities[queueId]
+      const song = this.props.songs[item.songId]
+      const isPlaying = item.queueId === curId
+      const isErrored = typeof this.props.errors[queueId] !== 'undefined'
+      const isOwner = item.userId === this.props.user.userId
 
       return (
         <QueueItem
-          key={id}
+          key={queueId}
           artist={this.props.artists[song.artistId].name}
           title={song.title}
           userName={item.userName}
           canSkip={isOwner && isPlaying && !isErrored}
-          canRemove={isOwner && !isPlaying && !isErrored && id > curId}
+          canRemove={isOwner && !isPlaying && !isErrored && queueId > curId}
           isErrored={isErrored}
           isLast={i === this.props.result.length-1}
           isPlaying={isPlaying}
           pctPlayed={isPlaying ? this.props.currentTime / this.props.duration * 100 : 0}
-          onRemoveClick={this.handleRemoveClick.bind(this, id)}
+          onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
           onSkipClick={this.props.requestPlayNext}
-          onErrorInfoClick={this.handleErrorInfoClick.bind(this, id)}
+          onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}
         />
       )
     }, this)
@@ -83,12 +83,12 @@ class QueueView extends React.Component {
     )
   }
 
-  handleRemoveClick(id) {
-    this.props.removeItem(id)
+  handleRemoveClick(queueId) {
+    this.props.removeItem(queueId)
   }
 
-  handleErrorInfoClick(id) {
-    alert(this.props.errors[id].join("\n\n"))
+  handleErrorInfoClick(queueId) {
+    alert(this.props.errors[queueId].join("\n\n"))
   }
 }
 

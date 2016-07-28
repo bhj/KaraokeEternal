@@ -3,50 +3,53 @@ import Providers from '../provider/index'
 
 let router = KoaRouter()
 let debug = require('debug')
-let log = debug('app:library')
 let error = debug('app:library:error')
 let isScanning
 
-// all artists and songs (normalized)
+// get all artists and songs
 router.get('/api/library', async (ctx, next) => {
+  const log = debug('app:library:get')
+
   let res = {
-    artistIds: [], // results ordered alphabetically
-    songUIDs: [],  // results
-    artists: {},   // indexed by artistId
-    songs: {},     // indexed by UID
+    artistIds: [], // results
+    songIds: [],   // results
+    artists: {},   // entities
+    songs: {},     // entities
   }
 
   // get artists
-  let artists = await ctx.db.all('SELECT id, name FROM artists ORDER BY name')
+  let artists = await ctx.db.all('SELECT artistId, name FROM artists ORDER BY name')
 
   artists.forEach(function(row){
-    res.artistIds.push(row.id)
-    res.artists[row.id] = row
-    res.artists[row.id].songs = []
+    res.artistIds.push(row.artistId)
+    res.artists[row.artistId] = row
+    res.artists[row.artistId].songIds = []
   })
 
   // assign songs to artists
-  let songs = await ctx.db.all('SELECT artistId, plays, provider, title, uid FROM songs ORDER BY title')
+  let songs = await ctx.db.all('SELECT artistId, plays, provider, title, songId FROM songs ORDER BY title')
 
   songs.forEach(function(row){
     if (typeof res.artists[row.artistId] === 'undefined') {
-      log('Warning: Invalid song (uid: %s, artistId: %s)', row.uid, row.artistId)
+      log('Warning: Invalid song (songId: %s, artistId: %s)', row.songId, row.artistId)
       return
     }
 
-    res.songUIDs.push(row.uid)
-    res.songs[row.uid] = row
-    res.artists[row.artistId].songs.push(row.uid)
+    res.songIds.push(row.songId)
+    res.songs[row.songId] = row
+    res.artists[row.artistId].songIds.push(row.songId)
   })
 
   ctx.body = {
     artists: {result: res.artistIds, entities: res.artists},
-    songs: {result: res.songUIDs, entities: res.songs}
+    songs: {result: res.songIds, entities: res.songs}
   }
 })
 
 // scan for new songs
 router.get('/api/library/scan', async (ctx, next) => {
+  const log = debug('app:library:scan')
+
   if (isScanning) {
     log('Scan already in progress; skipping request')
     return
@@ -77,11 +80,16 @@ router.get('/api/library/scan', async (ctx, next) => {
     // koa context (from which we can access the db, and possibly
     // send progress updates down the wire?)
     log('Provider "%s" starting scan', provider)
-    await Providers[provider].scan(cfg[provider], ctx)
+    await Providers[provider].scan(ctx, cfg[provider])
     log('Provider "%s" finished scan', provider)
   }
 
+  // delete artists having no songs
+  let res = await ctx.db.run('DELETE FROM artists WHERE artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)')
+  log('cleanup: removed %s artists with no songs', res.changes)
+
   isScanning = false
+  log('Library scan complete')
 })
 
 export default router

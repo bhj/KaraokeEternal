@@ -10,7 +10,7 @@ const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 export function requestPlayNext() {
   return (dispatch, getState) => {
-    const curId = getState().player.id
+    const curId = getState().player.queueId
 
     dispatch({
       type: PLAYER_NEXT_REQUEST,
@@ -47,7 +47,7 @@ export function mediaEnd() {
   return (dispatch, getState) => {
     dispatch({
       type: MEDIA_END,
-      payload: getState().player.id
+      payload: getState().player.queueId
     })
 
     dispatch(requestPlayNext())
@@ -122,7 +122,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  id: -1,
+  queueId: -1,
   currentTime: 0,
   duration: 0,
   isPlaying: false,

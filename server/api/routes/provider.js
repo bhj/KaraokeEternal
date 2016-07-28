@@ -21,17 +21,31 @@ router.get('/api/provider/:provider/:method', async (ctx, next) => {
   }
 
   // get provider config
-  let rows = await ctx.db.all('SELECT * FROM config WHERE domain = ?', provider)
-  const config = rows2obj(rows)
+  let row = await ctx.db.get('SELECT data FROM config WHERE domain = ?', provider+'.provider')
+  let cfg = JSON.parse(row.data)
 
-  if (! config.enabled) {
+  if (! cfg.enabled) {
     ctx.status = 401
     return ctx.body = `Provider "${provider}" not enabled`
   }
 
   log(`Starting method "${method}" of provider "${provider}"`)
-  await Providers[provider][method](config, ctx)
+  await Providers[provider][method](ctx, cfg)
   log(`Finished method "${method}" of provider "${provider}"`)
+})
+
+// list providers and their configuration
+router.get('/api/provider', async (ctx, next) => {
+  let cfg = {}
+
+  // get provider config
+  let rows = await ctx.db.all('SELECT * FROM config WHERE domain LIKE "%.provider"')
+
+  rows.forEach(function(row){
+    cfg[row.domain] = JSON.parse(row.data)
+  })
+
+  return ctx.body = cfg
 })
 
 export default router

@@ -13,11 +13,10 @@ export const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
 const ACTION_HANDLERS = {
   [SOCKET_AUTHENTICATE]: async (ctx, {payload}) => {
     const socketId = ctx.socket.socket.id // raw socket.io instance
-    const token = payload
     let user
 
     try {
-      user = verify(token, 'shared-secret')
+      user = verify(payload, 'shared-secret')
     } catch (err) {
       ctx.io.to(socketId).emit('action', {
         type: SOCKET_AUTHENTICATE_FAIL,
