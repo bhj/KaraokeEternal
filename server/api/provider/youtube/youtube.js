@@ -141,7 +141,7 @@ async function getPlaylistItems(username, key){
   let data = await (await fetch(url)).json()
 
   if (typeof data.items[0].contentDetails.relatedPlaylists.uploads !== 'string') {
-    throw new Error('Could not read upload playlist id')
+    return Promise.reject('Could not read upload playlist id')
   }
 
   let playlist = data.items[0].contentDetails.relatedPlaylists.uploads
