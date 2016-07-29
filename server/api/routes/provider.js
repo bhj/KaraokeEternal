@@ -29,9 +29,8 @@ router.get('/api/provider/:provider/:method', async (ctx, next) => {
     return ctx.body = `Provider "${provider}" not enabled`
   }
 
-  log(`Starting method "${method}" of provider "${provider}"`)
+  log(`Calling "${method}" method of "${provider}" provider`)
   await Providers[provider][method](ctx, cfg)
-  log(`Finished method "${method}" of provider "${provider}"`)
 })
 
 // list providers and their configuration
