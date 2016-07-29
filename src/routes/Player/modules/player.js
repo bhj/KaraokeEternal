@@ -93,7 +93,7 @@ const ACTION_HANDLERS = {
   }),
   [PLAYER_NEXT]: (state, {payload}) => ({
     ...state,
-    id: payload,
+    queueId: payload,
   }),
   [PLAYER_PAUSE]: (state, {payload}) => ({
     ...state,
