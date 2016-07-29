@@ -59,19 +59,19 @@ export async function scan(ctx, cfg) {
 
 
 export async function resource(ctx, cfg) {
-  const { type, id } = ctx.query
+  const { type, songId } = ctx.query
   let song, file, stats
 
-  if (! type || ! id) {
+  if (! type || ! songId) {
     ctx.status = 422
-    return ctx.body = "Missing 'type' or 'id' query param"
+    return ctx.body = "Missing 'type' or 'songId' in url"
   }
 
-  song = await ctx.db.get('SELECT * FROM songs WHERE id = ?', id)
+  song = await ctx.db.get('SELECT * FROM songs JOIN songs_cdg USING(songId) WHERE songId = ?', songId)
 
   if (! song) {
     ctx.status = 404
-    return ctx.body = `ID not found: ${id}`
+    return ctx.body = `songId not found: ${songId}`
   }
 
   if (type === 'audio') {

@@ -55,12 +55,12 @@ export function mediaEnd() {
 }
 
 const PLAYER_EMIT_ERROR = 'server/PLAYER_EMIT_ERROR'
-export function mediaError(id, message) {
+export function mediaError(queueId, message) {
   return (dispatch, getState) => {
     // informational: have server emit player error to room
     dispatch({
       type: PLAYER_EMIT_ERROR,
-      payload: {id, message}
+      payload: {queueId, message}
     })
 
     // move to next song if we haven't already
