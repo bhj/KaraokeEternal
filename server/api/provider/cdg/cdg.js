@@ -79,7 +79,7 @@ export async function resource(ctx, cfg) {
     ctx.type = 'audio/mpeg'
   } else if (type === 'cdg') {
     let info = pathUtils.parse(song.path)
-    file = song.pathUtils.substr(0, song.pathUtils.length-info.ext.length)+'.cdg'
+    file = song.path.substr(0, song.path.length-info.ext.length)+'.cdg'
   }
 
   // get file size (and does it exist?)
