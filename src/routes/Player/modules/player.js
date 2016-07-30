@@ -1,4 +1,3 @@
-const PLAYER_NEXT = 'player/PLAYER_NEXT'
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
@@ -10,7 +9,7 @@ const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 export function requestPlayNext() {
   return (dispatch, getState) => {
-    const curId = getState().player.queueId
+    const curId = getState().queue.curId
 
     dispatch({
       type: PLAYER_NEXT_REQUEST,
@@ -73,10 +72,10 @@ export function mediaError(queueId, message) {
 
 // have server emit player status to room
 const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
-export function status(s) {
+export function status(payload) {
   return {
     type: PLAYER_EMIT_STATUS,
-    payload: s
+    payload
   }
 }
 
@@ -84,17 +83,6 @@ export function status(s) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_EMIT_STATUS]: (state, {payload}) => ({
-    ...state,
-    isPlaying: payload.isPlaying,
-    // id: payload.id,
-    currentTime: payload.currentTime,
-    duration: payload.duration,
-  }),
-  [PLAYER_NEXT]: (state, {payload}) => ({
-    ...state,
-    queueId: payload,
-  }),
   [PLAYER_PAUSE]: (state, {payload}) => ({
     ...state,
     isPlaying: false,
@@ -122,9 +110,6 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  queueId: -1,
-  currentTime: 0,
-  duration: 0,
   isPlaying: false,
   isFetching: false,
   errorMessage: null,

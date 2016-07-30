@@ -8,7 +8,9 @@ class QueueView extends React.Component {
     result: PropTypes.array.isRequired,
     entities: PropTypes.object.isRequired,
     errors: PropTypes.object,
-    status: PropTypes.object.isRequired,
+    curId: PropTypes.number,
+    curPos: PropTypes.number,
+    isPlaying: PropTypes.bool,
     // library
     artistIds: PropTypes.array.isRequired,
     artists: PropTypes.object.isRequired,
@@ -28,7 +30,7 @@ class QueueView extends React.Component {
       return null
     }
 
-    const curId = this.props.status.queueId || -1
+    const curId = this.props.curId || -1
 
     let songs = this.props.result.map(function(queueId, i) {
       const item = this.props.entities[queueId]
@@ -48,7 +50,7 @@ class QueueView extends React.Component {
           isErrored={isErrored}
           isLast={i === this.props.result.length-1}
           isPlaying={isPlaying}
-          pctPlayed={isPlaying ? this.props.currentTime / this.props.duration * 100 : 0}
+          pctPlayed={isPlaying ? this.props.curPos / song.duration * 100 : 0}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
           onSkipClick={this.props.requestPlayNext}
           onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}

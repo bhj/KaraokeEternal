@@ -12,7 +12,7 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
-  item: state.queue.entities[state.player.queueId],
+  item: state.queue.entities[state.queue.curId],
   errors: state.queue.errors,
   isPlaying: state.player.isPlaying,
   isFetching: state.player.isFetching,

@@ -21,6 +21,7 @@ const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 const QUEUE_ERROR = 'queue/QUEUE_ERROR'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
 const PLAYER_ERROR = 'player/PLAYER_ERROR'
+const PLAYER_NEXT = 'player/PLAYER_NEXT'
 
 // ------------------------------------
 // add to queue
@@ -53,7 +54,15 @@ const ACTION_HANDLERS = {
   // broadcast to room
   [PLAYER_STATUS]: (state, {payload}) => ({
     ...state,
-    status: payload,
+    curId: payload.curId,
+    curPos: payload.curPos,
+    isPlaying: payload.isPlaying,
+  }),
+  [PLAYER_NEXT]: (state, {payload}) => ({
+    ...state,
+    curId: payload,
+    curPos: 0,
+    isPlaying: true, // optimistic UI
   }),
   [PLAYER_ERROR]: (state, {payload}) => {
     // can be multiple errors for a media item
@@ -85,7 +94,9 @@ const initialState = {
   result: [],   // item ids
   entities: {}, // keyed by queueId
   errors: {},   // object of arrays keyed by queueId
-  status: {},   // player status
+  curId: -1,
+  curPos: 0,
+  isPlaying: false,
   errorMessage: null,
 }
 

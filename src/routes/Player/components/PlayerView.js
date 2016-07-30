@@ -21,10 +21,9 @@ class PlayerView extends React.Component {
   componentDidMount() {
     // emit initial state
     this.props.status({
+      curId: null,
+      curPos: 0,
       isPlaying: false,
-      id: null,
-      time: 0,
-      duration: 0,
     })
   }
 
