@@ -15,7 +15,7 @@ export const QueueItem = (props) => (
       <div className={classes.user}>{props.userName}</div>
     </div>
 
-    {props.canSkip && !props.isLast &&
+    {props.canSkip &&
       <div onClick={props.onSkipClick} className={classes.skip}>
         <i className='material-icons'>skip_next</i>
       </div>
