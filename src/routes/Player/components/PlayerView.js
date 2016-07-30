@@ -37,7 +37,8 @@ class PlayerView extends React.Component {
       }
     }
 
-    if (this.props.isPlaying && this.props.isPlaying !== prevProps.isPlaying) {
+    // detect playing for the first time
+    if (!this.props.item && this.props.isPlaying && this.props.isPlaying !== prevProps.isPlaying) {
       // start at beginning of queue
       this.props.requestPlayNext()
     }
