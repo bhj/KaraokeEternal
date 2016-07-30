@@ -9,11 +9,9 @@ const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 export function requestPlayNext() {
   return (dispatch, getState) => {
-    const curId = getState().queue.curId
-
     dispatch({
       type: PLAYER_NEXT_REQUEST,
-      payload: curId
+      payload: getState().queue.curId
     })
   }
 }
