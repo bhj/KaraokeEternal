@@ -37,20 +37,6 @@ export function getMediaSuccess() {
   }
 }
 
-// signals we should move to next song
-export const MEDIA_END = 'player/MEDIA_END'
-
-export function mediaEnd() {
-  return (dispatch, getState) => {
-    dispatch({
-      type: MEDIA_END,
-      payload: getState().player.queueId
-    })
-
-    dispatch(requestPlayNext())
-  }
-}
-
 const PLAYER_EMIT_ERROR = 'server/PLAYER_EMIT_ERROR'
 export function mediaError(queueId, message) {
   return (dispatch, getState) => {

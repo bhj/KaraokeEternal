@@ -10,7 +10,6 @@ class PlayerView extends React.Component {
     getMedia: PropTypes.func.isRequired,
     getMediaSuccess: PropTypes.func.isRequired,
     mediaError: PropTypes.func.isRequired,
-    mediaEnd: React.PropTypes.func.isRequired,
     // store state
     item: PropTypes.object,
     isPlaying: PropTypes.bool.isRequired,
@@ -63,7 +62,7 @@ class PlayerView extends React.Component {
             getMediaSuccess={this.props.getMediaSuccess}
             onStatus={this.props.status}
             onMediaError={this.props.mediaError}
-            onMediaEnd={this.props.mediaEnd}
+            onMediaEnd={this.props.requestPlayNext}
           />
         )}
       </AutoSizer>
