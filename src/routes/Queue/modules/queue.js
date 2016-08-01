@@ -22,6 +22,7 @@ const QUEUE_ERROR = 'queue/QUEUE_ERROR'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
 const PLAYER_ERROR = 'player/PLAYER_ERROR'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
+const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 
 // ------------------------------------
 // add to queue
@@ -52,17 +53,29 @@ export function removeItem(queueId) {
 // ------------------------------------
 const ACTION_HANDLERS = {
   // broadcast to room
-  [PLAYER_STATUS]: (state, {payload}) => ({
-    ...state,
-    curId: payload.curId,
-    curPos: payload.curPos,
-    isPlaying: payload.isPlaying,
-  }),
+  [PLAYER_STATUS]: (state, {payload}) => {
+     // ignore (old) updates for previous queueId
+    if (state.curId && payload.curId && state.curId > payload.curId) {
+      return state
+    }
+
+    return {
+      ...state,
+      curId: payload.curId,
+      curPos: payload.curPos,
+      isPlaying: payload.isPlaying,
+    }
+  },
   [PLAYER_NEXT]: (state, {payload}) => ({
     ...state,
     curId: payload,
     curPos: 0,
-    isPlaying: true, // optimistic UI
+    isFinished: false,
+  }),
+  [PLAYER_QUEUE_END]: (state, {payload}) => ({
+    ...state,
+    isPlaying: false,
+    isFinished: true,
   }),
   [PLAYER_ERROR]: (state, {payload}) => {
     // can be multiple errors for a media item
@@ -94,9 +107,10 @@ const initialState = {
   result: [],   // item ids
   entities: {}, // keyed by queueId
   errors: {},   // object of arrays keyed by queueId
-  curId: -1,
+  curId: null,
   curPos: 0,
   isPlaying: false,
+  isFinished: false,
   errorMessage: null,
 }
 

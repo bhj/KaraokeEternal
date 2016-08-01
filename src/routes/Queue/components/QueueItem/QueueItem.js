@@ -37,7 +37,6 @@ QueueItem.propTypes = {
   title: React.PropTypes.string.isRequired,
   artist: React.PropTypes.string.isRequired,
   userName: React.PropTypes.string.isRequired,
-  isPlaying: React.PropTypes.bool.isRequired,
   isErrored: React.PropTypes.bool.isRequired,
   canSkip: React.PropTypes.bool.isRequired,
   onSkipClick: React.PropTypes.func.isRequired,

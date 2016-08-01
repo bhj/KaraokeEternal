@@ -10,7 +10,8 @@ class QueueView extends React.Component {
     errors: PropTypes.object,
     curId: PropTypes.number,
     curPos: PropTypes.number,
-    isPlaying: PropTypes.bool,
+    isPlaying: PropTypes.bool.isRequired,
+    isFinished: PropTypes.bool.isRequired,
     // library
     artistIds: PropTypes.array.isRequired,
     artists: PropTypes.object.isRequired,
@@ -30,14 +31,15 @@ class QueueView extends React.Component {
       return null
     }
 
-    const curId = this.props.curId || -1
-
     let songs = this.props.result.map(function(queueId, i) {
       const item = this.props.entities[queueId]
       const song = this.props.songs[item.songId]
-      const isPlaying = item.queueId === curId
-      const isErrored = typeof this.props.errors[queueId] !== 'undefined'
+      const { curId, isFinished, errors } = this.props
+
+      const isErrored = typeof errors[queueId] !== 'undefined'
+      const isActive = (item.queueId === curId) && !isErrored && !isFinished
       const isOwner = item.userId === this.props.user.userId
+      // const isLastItem = i === this.props.result.length-1
 
       return (
         <QueueItem
@@ -45,11 +47,10 @@ class QueueView extends React.Component {
           artist={this.props.artists[song.artistId].name}
           title={song.title}
           userName={item.userName}
-          canSkip={isOwner && isPlaying && !isErrored}
-          canRemove={isOwner && !isPlaying && !isErrored && queueId > curId}
+          canSkip={isOwner && isActive}
+          canRemove={isOwner && !isActive && queueId > curId}
           isErrored={isErrored}
-          isPlaying={isPlaying}
-          pctPlayed={isPlaying ? this.props.curPos / song.duration * 100 : 0}
+          pctPlayed={isActive ? this.props.curPos / song.duration * 100 : 0}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
           onSkipClick={this.props.requestPlayNext}
           onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}

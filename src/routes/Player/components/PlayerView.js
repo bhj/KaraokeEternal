@@ -4,23 +4,25 @@ import ProviderPlayers from './provider'
 
 class PlayerView extends React.Component {
   static propTypes = {
+    // queue
+    curId: PropTypes.number,
+    item: PropTypes.object,
+    isPlaying: PropTypes.bool.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
-    status: PropTypes.func.isRequired,
+    emitStatus: PropTypes.func.isRequired,
     getMedia: PropTypes.func.isRequired,
     getMediaSuccess: PropTypes.func.isRequired,
     mediaError: PropTypes.func.isRequired,
-    // store state
-    item: PropTypes.object,
-    isPlaying: PropTypes.bool.isRequired,
+    // player misc
     isFetching: PropTypes.bool.isRequired,
     libraryHasLoaded: PropTypes.bool.isRequired,
   }
 
   componentDidMount() {
     // emit initial state
-    this.props.status({
-      curId: null,
+    this.props.emitStatus({
+      curId: this.props.curId,
       curPos: 0,
       isPlaying: false,
     })
@@ -60,7 +62,7 @@ class PlayerView extends React.Component {
             isPlaying={this.props.isPlaying}
             getMedia={this.props.getMedia}
             getMediaSuccess={this.props.getMediaSuccess}
-            onStatus={this.props.status}
+            onStatus={this.props.emitStatus}
             onMediaError={this.props.mediaError}
             onMediaEnd={this.props.requestPlayNext}
           />

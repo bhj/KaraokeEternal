@@ -1,19 +1,21 @@
 import PlayerView from '../components/PlayerView'
 import { connect } from 'react-redux'
-import { status, getMedia, getMediaSuccess, mediaError, requestPlayNext } from '../modules/player'
+import { emitStatus, getMedia, getMediaSuccess, mediaError, requestPlayNext } from '../modules/player'
 
 const mapActionCreators = {
   requestPlayNext,
-  status,
+  emitStatus,
   getMedia,
   getMediaSuccess,
   mediaError,
 }
 
 const mapStateToProps = (state) => ({
-  item: state.queue.entities[state.queue.curId],
+  curId: state.queue.curId,
+  item: state.queue.isFinished ? null : state.queue.entities[state.queue.curId],
   errors: state.queue.errors,
   isPlaying: state.player.isPlaying,
+  isFinished: state.queue.isFinished,
   isFetching: state.player.isFetching,
   libraryHasLoaded: state.library.hasLoaded,
 })
