@@ -8,6 +8,7 @@ class PlayerView extends React.Component {
     curId: PropTypes.number,
     item: PropTypes.object,
     isPlaying: PropTypes.bool.isRequired,
+    isFinished: PropTypes.bool.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
@@ -38,15 +39,16 @@ class PlayerView extends React.Component {
       }
     }
 
-    // detect playing for the first time
-    if (!this.props.item && this.props.isPlaying && this.props.isPlaying !== prevProps.isPlaying) {
+    // playing for the first time or after queue ended
+    if (this.props.isPlaying && !prevProps.isPlaying && (this.props.curId === null || this.props.isFinished)) {
       // start at beginning of queue
       this.props.requestPlayNext()
     }
   }
 
   render () {
-    if (!this.props.item || !ProviderPlayers[this.props.item.provider]) {
+    // @todo: show placeholder components on load/queue empty
+    if (!this.props.item || !ProviderPlayers[this.props.item.provider] || this.props.isFinished) {
       return null
     }
 

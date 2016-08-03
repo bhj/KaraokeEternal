@@ -25,7 +25,7 @@ export const QueueItem = (props) => (
         <i className='material-icons'>clear</i>
       </div>
     }
-    {props.isErrored &&
+    {props.hasErrors &&
       <div onClick={props.onErrorInfoClick} className={classes.errorInfo}>
         <i className='material-icons'>info_outline</i>
       </div>
