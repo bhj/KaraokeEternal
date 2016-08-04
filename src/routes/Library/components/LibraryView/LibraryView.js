@@ -90,10 +90,16 @@ class LibraryView extends React.Component {
       }
 
       if (isExpanded) {
+        // convert seconds to mm:ss
+        const duration = Math.round(this.props.songs[songId].duration)
+        const min = Math.floor(duration / 60)
+        const sec = duration - (min * 60)
+
         children.push(
           <SongItem
             key={songId}
             title={this.props.songs[songId].title}
+            duration={min + ':' + (sec < 10 ? '0' + sec : sec)}
             plays={this.props.songs[songId].plays}
             provider={this.props.songs[songId].provider}
             onSelectSong={() => this.handleSongClick(songId)}
