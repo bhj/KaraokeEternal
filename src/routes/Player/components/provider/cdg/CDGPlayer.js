@@ -56,6 +56,7 @@ class CDGPlayer extends React.Component {
           audioPos={this.state.audioPos}
           cdgData={this.cdgData}
         />
+        <br/>
         <audio src={'/api/provider/cdg/resource?type=audio&songId='+this.props.item.songId}
           preload='none'
           onCanPlayThrough={this.handleOnCanPlayThrough}
