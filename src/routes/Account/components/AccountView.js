@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import { Header, HeaderTitle } from 'components/Header'
+import Navigation from 'components/Navigation'
 import AccountForm from '../containers/AccountForm'
 import Logout from './Logout'
 import classes from './AccountView.css'
@@ -41,6 +42,8 @@ class AccountView extends React.Component {
             </div>
           }
         </div>
+
+        <Navigation />
       </div>
     )
   }

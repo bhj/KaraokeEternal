@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import { Header, HeaderTitle } from 'components/Header'
+import Navigation from 'components/Navigation'
 import QueueItem from './QueueItem'
 import classes from './QueueView.css'
 
@@ -80,6 +81,8 @@ class QueueView extends React.Component {
         <div className={classes.scrollable}>
           {songs}
         </div>
+
+        <Navigation />
       </div>
     )
   }

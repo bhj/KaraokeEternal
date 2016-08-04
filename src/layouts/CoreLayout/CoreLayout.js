@@ -19,7 +19,6 @@ const CoreLayout = (props) => {
           {props.children}
         </div>
       </div>
-      <Navigation />
     </div>
   )
 }

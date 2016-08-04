@@ -1,6 +1,9 @@
 import React, { PropTypes } from 'react'
 import { AutoSizer, VirtualScroll } from 'react-virtualized'
 import styles from 'react-virtualized/styles.css'
+import { Header, HeaderTitle } from 'components/Header'
+import Navigation from 'components/Navigation'
+import classes from './LibraryView.css'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 
@@ -34,19 +37,27 @@ class LibraryView extends React.Component {
     if (!this.props.artistIds.length) return null
 
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <VirtualScroll
-            width={width}
-            height={height}
-            ref={(c) => {this.VirtualScroll = c}}
-            rowCount={this.props.artistIds.length}
-            rowHeight={this.rowHeight}
-            rowRenderer={this.rowRenderer}
-            overscanRowCount={10}
-          />
-        )}
-      </AutoSizer>
+      <div className={classes.container}>
+        <Header>
+          <HeaderTitle>Library</HeaderTitle>
+        </Header>
+        <div style={{ flex: '1 1 auto' }}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <VirtualScroll
+                width={width}
+                height={height}
+                ref={(c) => {this.VirtualScroll = c}}
+                rowCount={this.props.artistIds.length}
+                rowHeight={this.rowHeight}
+                rowRenderer={this.rowRenderer}
+                overscanRowCount={10}
+              />
+            )}
+          </AutoSizer>
+        </div>
+        <Navigation />
+      </div>
     )
   }
 
