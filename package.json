@@ -13,6 +13,7 @@
     "lint": "eslint src tests server",
     "lint:fix": "npm run lint -- --fix",
     "start": "better-npm-run start",
+    "start:prod": "better-npm-run start:prod",
     "dev": "better-npm-run dev",
     "dev:no-debug": "npm run dev -- --no_debug",
     "test": "better-npm-run test",
@@ -59,6 +60,13 @@
     "start": {
       "command": "babel-node bin/server",
       "env": {
+        "DEBUG": "app:*"
+      }
+    },
+    "start:prod": {
+      "command": "babel-node bin/server",
+      "env": {
+        "NODE_ENV": "production",
         "DEBUG": "app:*"
       }
     },
