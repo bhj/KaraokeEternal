@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import { AutoSizer } from 'react-virtualized'
 import ProviderPlayers from './provider'
+import screenfull from 'screenfull'
 
 class PlayerView extends React.Component {
   static propTypes = {
@@ -19,6 +20,8 @@ class PlayerView extends React.Component {
     isFetching: PropTypes.bool.isRequired,
     libraryHasLoaded: PropTypes.bool.isRequired,
   }
+
+  toggleFullscreen = this.toggleFullscreen.bind(this)
 
   componentDidMount() {
     // emit initial state
@@ -47,30 +50,44 @@ class PlayerView extends React.Component {
   }
 
   render () {
-    // @todo: show placeholder components on load/queue empty
-    if (!this.props.item || !ProviderPlayers[this.props.item.provider] || this.props.isFinished) {
-      return null
+    let ActiveComp = 'div'
+    let customProps = {}
+
+    if (this.props.isFinished) {
+      // show 'add more songs' placeholder
+    } else if (!this.props.item) {
+      // show 'press play to begin' placeholder
+    } else if (!ProviderPlayers[this.props.item.provider]) {
+      // show 'provider error' placeholder
+    } else {
+      ActiveComp = ProviderPlayers[this.props.item.provider]
+      customProps = {
+          item: this.props.item,
+          isPlaying: this.props.isPlaying,
+          getMedia: this.props.getMedia,
+          getMediaSuccess: this.props.getMediaSuccess,
+          onStatus: this.props.emitStatus,
+          onMediaError: this.props.mediaError,
+          onMediaEnd: this.props.requestPlayNext
+      }
     }
 
-    const Player = ProviderPlayers[this.props.item.provider]
-
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <Player
-            width={width}
-            height={height}
-            item={this.props.item}
-            isPlaying={this.props.isPlaying}
-            getMedia={this.props.getMedia}
-            getMediaSuccess={this.props.getMediaSuccess}
-            onStatus={this.props.emitStatus}
-            onMediaError={this.props.mediaError}
-            onMediaEnd={this.props.requestPlayNext}
-          />
-        )}
-      </AutoSizer>
+      <div style={{flex: '1 1 auto', width: '100%' }}
+        ref={ref => {this.ref = ref}}
+        onClick={this.toggleFullscreen}
+      >
+        <AutoSizer>
+          {({width, height}) => (
+            <ActiveComp width={width} height={height} {...customProps}/>
+          )}
+        </AutoSizer>
+      </div>
     )
+  }
+
+  toggleFullscreen() {
+    screenfull.toggle(this.ref)
   }
 }
 
