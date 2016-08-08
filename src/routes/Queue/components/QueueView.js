@@ -36,10 +36,17 @@ class QueueView extends React.Component {
       const item = this.props.entities[queueId]
       const song = this.props.songs[item.songId]
       const { curId, isFinished, errors } = this.props
-
       const isActive = (item.queueId === curId) && !isFinished
       const isOwner = item.userId === this.props.user.userId
-      // const isLastItem = i === this.props.result.length-1
+      let timeLeft
+
+      if (isActive) {
+        const dur = Math.round(song.duration - this.props.curPos)
+        const min = Math.floor(dur / 60)
+        const sec = dur - (min * 60)
+        timeLeft = min + ':' + (sec < 10 ? '0' + sec : sec)
+        timeLeft = min || sec ? '-'+timeLeft : timeLeft
+      }
 
       return (
         <QueueItem
@@ -51,6 +58,7 @@ class QueueView extends React.Component {
           canRemove={isOwner && !isActive && queueId > curId}
           hasErrors={typeof errors[queueId] !== 'undefined'}
           pctPlayed={isActive ? this.props.curPos / song.duration * 100 : 0}
+          timeLeft={timeLeft || ''}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
           onSkipClick={this.props.requestPlayNext}
           onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}

@@ -15,6 +15,11 @@ export const QueueItem = (props) => (
       <div className={classes.user}>{props.userName}</div>
     </div>
 
+    {props.timeLeft &&
+      <div className={classes.timeLeft}>
+        {props.timeLeft}
+      </div>
+    }
     {props.canSkip &&
       <div onClick={props.onSkipClick} className={classes.skip}>
         <i className='material-icons'>skip_next</i>
@@ -38,6 +43,7 @@ QueueItem.propTypes = {
   artist: React.PropTypes.string.isRequired,
   userName: React.PropTypes.string.isRequired,
   hasErrors: React.PropTypes.bool.isRequired,
+  timeLeft: React.PropTypes.string,
   canSkip: React.PropTypes.bool.isRequired,
   onSkipClick: React.PropTypes.func.isRequired,
   canRemove: React.PropTypes.bool.isRequired,
