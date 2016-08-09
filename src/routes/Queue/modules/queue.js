@@ -54,11 +54,7 @@ export function removeItem(queueId) {
 const ACTION_HANDLERS = {
   // broadcast to room
   [PLAYER_STATUS]: (state, {payload}) => {
-     // ignore (old) updates for previous queueId
-    if (state.curId && payload.curId && state.curId > payload.curId) {
-      return state
-    }
-
+     // @todo: ignore (old) updates for previous queueId
     return {
       ...state,
       curId: payload.curId,
