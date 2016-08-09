@@ -6,7 +6,6 @@ import PlayerRoute from './Player'
 import LibraryRoute from './Library'
 import QueueRoute from './Queue'
 import { fetchLibrary } from './Library/modules/library'
-import { joinRoom } from './Account/modules/account'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
