@@ -75,7 +75,7 @@ class PlayerView extends React.Component {
     return (
       <div style={{flex: '1 1 auto', width: '100%' }}
         ref={ref => {this.ref = ref}}
-        onClick={this.toggleFullscreen}
+        onDoubleClick={this.toggleFullscreen}
       >
         <AutoSizer>
           {({width, height}) => (
