@@ -1,9 +1,10 @@
 import KoaRouter from 'koa-router'
 import Providers from '../provider/index'
 
-let router = KoaRouter()
-let debug = require('debug')
-let error = debug('app:library:error')
+const router = KoaRouter()
+const debug = require('debug')
+const error = debug('app:library:error')
+
 let isScanning
 
 // get all artists and songs

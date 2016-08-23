@@ -1,10 +1,10 @@
 import KoaRouter from 'koa-router'
 import Providers from '../provider/index'
 
-let debug = require('debug')
-let log = debug('app:library')
-let error = debug('app:library:error')
-let router = KoaRouter()
+const router = KoaRouter()
+const debug = require('debug')
+const log = debug('app:library')
+const error = debug('app:library:error')
 
 // call media provider for song
 router.get('/api/provider/:provider/:method', async (ctx, next) => {

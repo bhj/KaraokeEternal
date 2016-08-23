@@ -1,5 +1,6 @@
 import KoaRouter from 'koa-router'
-let router = KoaRouter()
+
+const router = KoaRouter()
 
 // list all artists
 router.get('/api/search', async (ctx, next) => {

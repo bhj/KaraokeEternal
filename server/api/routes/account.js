@@ -1,7 +1,7 @@
 import jwt from 'koa-jwt'
 import { hash, compare } from '../utilities/bcrypt-promise'
 import KoaRouter from 'koa-router'
-let router = KoaRouter()
+const router = KoaRouter()
 
 // list available rooms
 router.get('/api/account/rooms', async (ctx, next) => {
