@@ -1,13 +1,10 @@
 /* eslint key-spacing:0 spaced-comment:0 */
-import path from 'path'
-import _debug from 'debug'
-import { argv } from 'yargs'
-import ip from 'ip'
+const path = require('path')
+const debug = require('debug')('app:config')
+const argv = require('yargs').argv
+const ip = require('ip')
 
-const localip = ip.address()
-const debug = _debug('app:config')
 debug('Creating default configuration.')
-
 // ========================================================
 // Default Configuration
 // ========================================================
@@ -26,7 +23,7 @@ const config = {
   // ----------------------------------
   // Server Configuration
   // ----------------------------------
-  server_host : localip, // use string 'localhost' to prevent exposure on local network
+  server_host : ip.address(), // use string 'localhost' to prevent exposure on local network
   server_port : process.env.PORT || 3000,
 
   // ----------------------------------
@@ -37,7 +34,11 @@ const config = {
   // ----------------------------------
   // Compiler Configuration
   // ----------------------------------
-  compiler_css_modules     : true,
+  compiler_babel : {
+    cacheDirectory : true,
+    plugins        : ['transform-runtime'],
+    presets        : ['es2015', 'react', 'stage-0']
+  },
   compiler_devtool         : 'source-map',
   compiler_hash_type       : 'hash',
   compiler_fail_on_warning : false,
@@ -48,13 +49,10 @@ const config = {
     chunkModules : false,
     colors : true
   },
-  compiler_vendor : [
-    'babel-polyfill',
-    'history',
+  compiler_vendors : [
     'react',
     'react-redux',
     'react-router',
-    'react-router-redux',
     'redux'
   ],
 
@@ -88,7 +86,6 @@ config.globals = {
   '__DEV__'      : config.env === 'development',
   '__PROD__'     : config.env === 'production',
   '__TEST__'     : config.env === 'test',
-  '__DEBUG__'    : config.env === 'development' && !argv.no_debug,
   '__COVERAGE__' : !argv.watch && config.env === 'test',
   '__BASENAME__' : JSON.stringify(process.env.BASENAME || '')
 }
@@ -98,23 +95,24 @@ config.globals = {
 // ------------------------------------
 const pkg = require('../package.json')
 
-config.compiler_vendor = config.compiler_vendor
+config.compiler_vendors = config.compiler_vendors
   .filter((dep) => {
     if (pkg.dependencies[dep]) return true
 
     debug(
       `Package "${dep}" was not found as an npm dependency in package.json; ` +
       `it won't be included in the webpack vendor bundle.
-       Consider removing it from vendor_dependencies in ~/config/index.js`
+       Consider removing it from \`compiler_vendors\` in ~/config/index.js`
     )
   })
 
 // ------------------------------------
 // Utilities
 // ------------------------------------
-const resolve = path.resolve
-const base = (...args) =>
-  Reflect.apply(resolve, null, [config.path_base, ...args])
+function base () {
+  const args = [config.path_base].concat([].slice.call(arguments))
+  return path.resolve.apply(path, args)
+}
 
 config.utils_paths = {
   base   : base,
@@ -126,7 +124,7 @@ config.utils_paths = {
 // Environment Configuration
 // ========================================================
 debug(`Looking for environment overrides for NODE_ENV "${config.env}".`)
-const environments = require('./environments').default
+const environments = require('./environments')
 const overrides = environments[config.env]
 if (overrides) {
   debug('Found overrides, applying to default configuration.')
@@ -135,4 +133,4 @@ if (overrides) {
   debug('No environment overrides found, defaults will be used.')
 }
 
-export default config
+module.exports = config

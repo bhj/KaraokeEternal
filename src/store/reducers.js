@@ -1,13 +1,12 @@
 import { combineReducers } from 'redux'
-import { routerReducer as router } from 'react-router-redux'
+import locationReducer from './location'
 import account from 'routes/Account/modules/account'
 import library from 'routes/Library/modules/library'
 import queue from 'routes/Queue/modules/queue'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
-    // Add sync reducers here
-    router,
+    location: locationReducer,
     account,
     library,
     queue,
