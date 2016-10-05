@@ -1,5 +1,5 @@
-import KoaRouter from 'koa-router'
-import Providers from '../provider/index'
+const KoaRouter = require('koa-router')
+const Providers = require('../provider/index')
 
 const router = KoaRouter()
 const debug = require('debug')
@@ -47,4 +47,4 @@ router.get('/api/provider', async (ctx, next) => {
   return ctx.body = cfg
 })
 
-export default router
+module.exports = exports = router

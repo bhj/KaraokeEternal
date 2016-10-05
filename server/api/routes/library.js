@@ -1,5 +1,5 @@
-import KoaRouter from 'koa-router'
-import Providers from '../provider/index'
+const KoaRouter = require('koa-router')
+const Providers = require('../provider/index')
 
 const router = KoaRouter()
 const debug = require('debug')
@@ -93,4 +93,4 @@ router.get('/api/library/scan', async (ctx, next) => {
   log('Library scan complete')
 })
 
-export default router
+module.exports = exports = router

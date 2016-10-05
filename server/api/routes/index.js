@@ -1,8 +1,8 @@
-import account from './account'
-import library from './library'
-import provider from './provider'
+const account = require('./account')
+const library = require('./library')
+const provider = require('./provider')
 
-export default {
+module.exports = exports = {
   account,
   library,
   provider,

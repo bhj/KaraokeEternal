@@ -1,7 +1,7 @@
-import * as cdg from './cdg/cdg'
-import * as youtube from './youtube/youtube'
+const cdg = require('./cdg/cdg')
+const youtube = require('./youtube/youtube')
 
-export default {
+module.exports = exports = {
   cdg,
-  youtube
+  youtube,
 }

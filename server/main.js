@@ -1,9 +1,12 @@
 const koa = require('koa')
+const IO = require('koa-socket')
 const debug = require('debug')('app:server')
 const webpack = require('webpack')
 const webpackConfig = require('../build/webpack.config')
 const config = require('../config')
+const paths = config.utils_paths
 
+const convert = require('koa-convert')
 const serve  = require('koa-static')
 const bodyparser  = require('koa-bodyparser')
 const db = require('sqlite')
@@ -14,8 +17,8 @@ const koaSocketIO = require('koa-socket')
 const apiRoutes = require('./api/routes')
 const socketActions = require('./api/sockets')
 
-const app = koa()
-const paths = config.utils_paths
+const app = new koa()
+const io = new IO()
 
 // initialize database
 Promise.resolve()
@@ -27,17 +30,20 @@ Promise.resolve()
   .catch(err => debug(err.stack))
 
 // make database available on koa ctx
-app.use(function *(next) => {
-    this.db = db
-    yield next
+app.use(async (ctx, next) => {
+    ctx.db = db
+    await next()
 })
 
-app.use(koaRange)
-
-app.use(bodyparser())
+app.use(convert(koaRange))
+app.use(convert(bodyparser))
 
 // decode jwt and make available as ctx.user
-app.use(koaJwt({secret: 'shared-secret', cookie: 'id_token', passthrough: true}))
+app.use(convert(koaJwt({
+  secret: 'shared-secret',
+  cookie: 'id_token',
+  passthrough: true,
+})))
 
 // initialize each module's koa-router routes
 for (let route in apiRoutes) {
@@ -50,14 +56,14 @@ io.attach(app)
 
 // koa-socket middleware
 // note: ctx is not the same ctx as koa middleware
-io.use(function *(next) => {
+io.use(async (ctx, next) => {
   // make user, db and socket.io instance available
   // to downstream middleware and event listeners
-  this.user = this.socket.socket.decoded_token || null
-  this.db = db
-  this.io = app._io
+  ctx.user = ctx.socket.socket.decoded_token || null
+  ctx.db = db
+  ctx.io = app._io
 
-  yield next
+  await next()
 })
 
 // koa-socket event listener
@@ -106,4 +112,4 @@ if (config.env === 'development') {
   app.use(serve(paths.dist()))
 }
 
-module.exports = app
+module.exports = expots = app

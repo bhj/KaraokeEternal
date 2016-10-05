@@ -68,4 +68,4 @@ const ACTION_HANDLERS = {
   },
 }
 
-export default ACTION_HANDLERS
+module.exports = exports = {actions: ACTION_HANDLERS}

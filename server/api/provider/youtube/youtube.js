@@ -1,11 +1,11 @@
-import fetch from 'isomorphic-fetch'
+const fetch = require('isomorphic-fetch')
 var debug = require('debug')
 var log = debug('app:provider:youtube')
 var error = debug('app:provider:youtube:error')
 
 let seenIds, stats
 
-export async function scan(config, ctx) {
+async function scan(config, ctx) {
   if (typeof config.channel === 'undefined') {
     error('No channels configured; aborting scan')
     return Promise.resolve()
@@ -103,6 +103,7 @@ async function process(item, ctx) {
   // console.log({videoId, desc:item.snippet.title, artist: meta.artist, title: meta.title})
 }
 
+module.exports = exports = { scan, process }
 
 function parseArtistTitle(str){
   let title, artist

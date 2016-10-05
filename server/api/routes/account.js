@@ -1,6 +1,6 @@
-import jwt from 'koa-jwt'
-import { hash, compare } from '../utilities/bcrypt-promise'
-import KoaRouter from 'koa-router'
+const jwt = require('koa-jwt')
+const bcrypt = require('../utilities/bcrypt-promise')
+const KoaRouter = require('koa-router')
 const router = KoaRouter()
 
 // list available rooms
@@ -167,7 +167,7 @@ router.post('/api/account/update', async (ctx, next) => {
   ctx.body = user
 })
 
-export default router
+module.exports = exports = router
 
 // email validation helper from
 // http://www.moreofless.co.uk/validate-email-address-without-regex/

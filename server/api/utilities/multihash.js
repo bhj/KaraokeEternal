@@ -1,7 +1,7 @@
 let fs = require('fs')
 let crypto = require('crypto')
 
-export default function(files, method) {
+module.exports = exports = function(files, method) {
   return new Promise(async function(resolve, reject) {
     let hash = crypto.createHash(method).setEncoding('hex')
 

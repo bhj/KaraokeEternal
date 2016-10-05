@@ -1,11 +1,10 @@
-import { verify } from 'koa-jwt' // really from jsonwebtoken
-import { getQueue, QUEUE_CHANGE } from './queue'
-import _debug from 'debug'
-const debug = _debug('app:socket:auth')
+const KoaJwt = require('koa-jwt') // really from jsonwebtoken
+const Queue = require('./queue')
+const debug = require('debug')('app:socket:auth')
 
-export const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
-export const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
-export const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
+const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
+const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
+const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
 
 // ------------------------------------
 // Action Handlers
@@ -16,7 +15,7 @@ const ACTION_HANDLERS = {
     let user
 
     try {
-      user = verify(payload, 'shared-secret')
+      user = KoaJwt.verify(payload, 'shared-secret')
     } catch (err) {
       ctx.io.to(socketId).emit('action', {
         type: SOCKET_AUTHENTICATE_FAIL,
@@ -42,10 +41,10 @@ const ACTION_HANDLERS = {
 
     // success! send status to newcomer only
     ctx.io.to(socketId).emit('action', {
-      type: QUEUE_CHANGE,
-      payload: await getQueue(ctx, user.roomId)
+      type: Queue.QUEUE_CHANGE,
+      payload: await Queue.getQueue(ctx, user.roomId)
     })
   },
 }
 
-export default ACTION_HANDLERS
+module.exports = exports = {actions: ACTION_HANDLERS}

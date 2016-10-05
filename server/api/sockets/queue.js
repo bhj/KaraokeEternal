@@ -1,4 +1,4 @@
-export const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
+const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 const QUEUE_END = 'queue/QUEUE_END'
 const QUEUE_ERROR = 'queue/QUEUE_ERROR'
 
@@ -111,10 +111,7 @@ const ACTION_HANDLERS = {
   },
 }
 
-export default ACTION_HANDLERS
-
-
-export async function getQueue(ctx, roomId) {
+async function getQueue(ctx, roomId) {
   let result = []
   let entities = {}
 
@@ -132,3 +129,5 @@ async function _roomIsOpen(ctx, roomId) {
   const room = await ctx.db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
   return (room || room.status === 'open')
 }
+
+module.exports = exports = {actions: ACTION_HANDLERS}
