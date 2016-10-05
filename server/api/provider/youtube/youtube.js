@@ -54,11 +54,11 @@ async function process(item, ctx) {
   seenIds.push(videoId)
 
   // search for this file in the db
-  let row = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', videoId)
+  let row = await ctx.db.get('SELECT * FROM songs WHERE fingerprint = ?', videoId)
 
   if (row) {
-    // we're done
-    log(' => already in database')
+    // @todo: check mtime and title for updates
+    log(' => ok')
     stats.ok++
     return
   }
@@ -94,7 +94,7 @@ async function process(item, ctx) {
     meta.title, // title
     '',         // url
     0,          // plays
-    videoId     // uid
+    videoId     // fingerprint
   ]
 
   let res = await ctx.db.run('INSERT INTO songs VALUES (?,?,?,?,?,?)', song)
@@ -107,6 +107,17 @@ module.exports = exports = { scan, process }
 
 function parseArtistTitle(str){
   let title, artist
+  const phrases = [
+    'karaoke video version with lyrics',
+    'karaoke version with lyrics',
+    'karaoke video with lyrics',
+    'karaoke version with lyrics',
+    'karaoke video',
+    'karaoke version',
+    'with lyrics',
+    'no lead vocal',
+    'singalong',
+  ]
 
   // remove anything after last |
   if (str.lastIndexOf('|') !== -1){
