@@ -112,4 +112,4 @@ if (config.env === 'development') {
   app.use(serve(paths.dist()))
 }
 
-module.exports = expots = app
+module.exports = exports = app
