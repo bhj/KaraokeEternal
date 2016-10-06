@@ -41,7 +41,6 @@ app.use(convert(bodyparser()))
 // decode jwt and make available as ctx.user
 app.use(convert(koaJwt({
   secret: 'shared-secret',
-  cookie: 'id_token',
   passthrough: true,
 })))
 
