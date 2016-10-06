@@ -1,5 +1,5 @@
 import React from 'react'
-import './Header.scss'
+import classes from './Header.css'
 
 export const Header = (props) => (
   <div className={classes.container}>
