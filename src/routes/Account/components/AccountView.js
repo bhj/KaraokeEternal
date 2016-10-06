@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import { browserHistory } from 'react-router'
 import { Header, HeaderTitle } from 'components/Header'
 import Navigation from 'components/Navigation'
 import AccountForm from '../containers/AccountForm'
@@ -30,7 +31,7 @@ class AccountView extends React.Component {
           }
 
           {this.props.user && this.props.user.isAdmin &&
-            <button className='button wide blue raised' onClick={() => {this.props.push('/player')}}>
+            <button className='button wide blue raised' onClick={() => {browserHistory.push('/player')}}>
               Start Player
             </button>
           }
