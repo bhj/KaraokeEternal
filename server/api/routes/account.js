@@ -86,7 +86,6 @@ router.post('/api/account/create', async (ctx, next) => {
 
   let hashedPwd = await hash(newPassword, 10)
   let res = await ctx.db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', email, hashedPwd, name)
-  console.log(res)
   ctx.status = 200
 })
 
