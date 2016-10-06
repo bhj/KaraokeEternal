@@ -36,7 +36,7 @@ app.use(async (ctx, next) => {
 })
 
 app.use(convert(koaRange))
-app.use(convert(bodyparser))
+app.use(convert(bodyparser()))
 
 // decode jwt and make available as ctx.user
 app.use(convert(koaJwt({
@@ -72,7 +72,7 @@ io.on('action', socketActions)
 // This rewrites all routes requests to the root /index.html file
 // (ignoring file requests). If you want to implement universal
 // rendering, you'll want to remove this middleware.
-app.use(require('koa-connect-history-api-fallback')())
+app.use(convert(require('koa-connect-history-api-fallback')()))
 
 // ------------------------------------
 // Apply Webpack HMR Middleware
@@ -81,7 +81,7 @@ if (config.env === 'development') {
   const compiler = webpack(webpackConfig)
 
   debug('Enable webpack dev and HMR middleware')
-  app.use(require('webpack-dev-middleware')(compiler, {
+  app.use(convert(require("koa-webpack-dev-middleware")(compiler, {
     publicPath  : webpackConfig.output.publicPath,
     contentBase : paths.client(),
     hot         : true,
@@ -89,8 +89,8 @@ if (config.env === 'development') {
     noInfo      : config.compiler_quiet,
     lazy        : false,
     stats       : config.compiler_stats
-  }))
-  app.use(require('webpack-hot-middleware')(compiler))
+  })))
+  app.use(convert(require('koa-webpack-hot-middleware')(compiler)))
 
   // Serve static assets from ~/src/static since Webpack is unaware of
   // these files. This middleware doesn't need to be enabled outside
