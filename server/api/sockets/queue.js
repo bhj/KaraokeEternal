@@ -133,4 +133,5 @@ async function _roomIsOpen(ctx, roomId) {
 module.exports = {
   ACTION_HANDLERS,
   getQueue,
+  QUEUE_CHANGE,
 }
