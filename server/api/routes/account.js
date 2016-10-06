@@ -84,7 +84,7 @@ router.post('/api/account/create', async (ctx, next) => {
     return ctx.body = 'Passwords do not match'
   }
 
-  let hashedPwd = await hash(newPassword, 10)
+  let hashedPwd = await bcrypt.hash(newPassword, 10)
   let res = await ctx.db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', email, hashedPwd, name)
   ctx.status = 200
 })
@@ -116,7 +116,7 @@ router.post('/api/account/update', async (ctx, next) => {
   }
 
   // validate current password
-  if (!await compare(password, user.password)) {
+  if (!await bcrypt.compare(password, user.password)) {
     ctx.status = 401
     return ctx.body = 'Current password is incorrect'
   }
@@ -128,7 +128,7 @@ router.post('/api/account/update', async (ctx, next) => {
       return ctx.body = 'New passwords do not match'
     }
 
-    password = await hash(newPassword, 10)
+    password = await bcrypt.hash(newPassword, 10)
   } else {
     password = user.password
   }
