@@ -25,7 +25,7 @@ router.post('/api/account/login', async (ctx, next) => {
   let user = await ctx.db.get('SELECT * FROM users WHERE email = ?', email)
 
   // validate password
-  if (!user || !await compare(password, user.password)) {
+  if (!user || !await bcrypt.compare(password, user.password)) {
     ctx.status = 401
     return
   }
@@ -160,7 +160,7 @@ router.post('/api/account/update', async (ctx, next) => {
   let token = jwt.sign(user, 'shared-secret')
 
   // store JWT in httpOnly cookie
-  ctx.cookies.set('id_token', token, {httpOnly: true})
+  // ctx.cookies.set('id_token', token, {httpOnly: true})
 
   // client also persists this to localStorage
   ctx.body = user
