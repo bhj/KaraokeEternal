@@ -62,6 +62,7 @@ webpackConfig.plugins = [
 if (__DEV__) {
   debug('Enable plugins for live development (HMR, NoErrors).')
   webpackConfig.plugins.push(
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
   )
@@ -124,8 +125,8 @@ webpackConfig.module.loaders.push({
   test    : /\.css$/,
   exclude : null,
   loaders : [
-    'style',
-    BASE_CSS_LOADER,
+    'style?sourceMap',
+    'css?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]',
     'postcss'
   ]
 })
