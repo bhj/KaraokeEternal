@@ -36,7 +36,7 @@ app.use(async (ctx, next) => {
 })
 
 app.use(convert(koaRange))
-app.use(convert(bodyparser()))
+app.use(bodyparser())
 
 // decode jwt and make available as ctx.user
 app.use(convert(koaJwt({

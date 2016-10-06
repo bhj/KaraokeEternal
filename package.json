@@ -95,7 +95,7 @@
     "ip": "^1.1.2",
     "json-loader": "^0.5.4",
     "koa": "^2.0.0-alpha.7",
-    "koa-bodyparser": "^2.2.0",
+    "koa-bodyparser": "^3.2.0",
     "koa-connect-history-api-fallback": "^0.3.0",
     "koa-convert": "^1.2.0",
     "koa-jwt": "^1.2.0",
