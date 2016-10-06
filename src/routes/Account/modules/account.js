@@ -1,12 +1,5 @@
 import fetch from 'isomorphic-fetch'
 
-let fetchConfig = {
-  credentials: 'same-origin',
-  headers: new Headers({
-    'Content-Type': 'application/json'
-  })
-}
-
 // ------------------------------------
 // Login
 // ------------------------------------
@@ -37,14 +30,16 @@ function loginError(message) {
 
 // Calls the API to get a token (stored in httpOnly cookie)
 // and connects to the socket with said cookie
-export function loginUser(creds) {
+export function loginUser(data) {
   return dispatch => {
-    dispatch(requestLogin(creds))
+    dispatch(requestLogin(data))
 
     return fetch('/api/account/login', {
-        ...fetchConfig,
-        method: 'POST',
-        body: JSON.stringify(creds)
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(data)
       })
       .then(checkStatus)
       .then(res => res.json())
@@ -118,7 +113,11 @@ export function logoutUser() {
   return (dispatch, getState) => {
     dispatch(requestLogout())
 
-    return fetch('/api/account/logout', fetchConfig)
+    return fetch('/api/account/logout', {
+      headers: new Headers({
+        'Authorization': 'Bearer ' + getState().account.token,
+      }),
+    })
       .then(checkStatus)
       .then(response => {
         dispatch(receiveLogout())
@@ -166,8 +165,10 @@ export function createUser(user) {
     dispatch(requestCreate(user))
 
     return fetch('/api/account/create', {
-        ...fetchConfig,
         method: 'POST',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+        }),
         body: JSON.stringify(user)
       })
       .then(checkStatus)
@@ -211,12 +212,15 @@ function updateError(message) {
 }
 
 export function updateUser(data) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(requestUpdate(data))
 
     return fetch('/api/account/update', {
-        ...fetchConfig,
         method: 'POST',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getState().account.token,
+        }),
         body: JSON.stringify(data)
       })
       .then(checkStatus)
@@ -263,7 +267,7 @@ export function fetchRooms() {
   return dispatch => {
     dispatch(requestRooms())
 
-    return fetch('/api/account/rooms', fetchConfig)
+    return fetch('/api/account/rooms')
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
