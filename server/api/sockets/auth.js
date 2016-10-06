@@ -47,4 +47,7 @@ const ACTION_HANDLERS = {
   },
 }
 
-module.exports = exports = {actions: ACTION_HANDLERS}
+module.exports = {
+  ACTION_HANDLERS,
+  SOCKET_AUTHENTICATE,
+}

@@ -167,7 +167,7 @@ router.post('/api/account/update', async (ctx, next) => {
   ctx.body = user
 })
 
-module.exports = exports = router
+module.exports = router
 
 // email validation helper from
 // http://www.moreofless.co.uk/validate-email-address-without-regex/

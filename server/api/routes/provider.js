@@ -47,4 +47,4 @@ router.get('/api/provider', async (ctx, next) => {
   return ctx.body = cfg
 })
 
-module.exports = exports = router
+module.exports = router

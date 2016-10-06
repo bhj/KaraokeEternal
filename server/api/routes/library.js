@@ -93,4 +93,4 @@ router.get('/api/library/scan', async (ctx, next) => {
   log('Library scan complete')
 })
 
-module.exports = exports = router
+module.exports = router

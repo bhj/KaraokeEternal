@@ -7,21 +7,16 @@ const Player = require('./player')
 
 const debug = require('debug')('app:socket')
 
+let ACTION_HANDLERS = Object.assign({}, Auth.ACTION_HANDLERS, Queue.ACTION_HANDLERS, Player.ACTION_HANDLERS)
 
-let ACTION_HANDLERS = {}
-
-ACTION_HANDLERS = Object.assign(ACTION_HANDLERS, Auth.actions)
-ACTION_HANDLERS = Object.assign(ACTION_HANDLERS, Queue.actions)
-ACTION_HANDLERS = Object.assign(ACTION_HANDLERS, Player.actions)
-
-module.exports = exports = async function(ctx, next) {
+module.exports = async function(ctx, next) {
   const action = ctx.data
   const handler = ACTION_HANDLERS[action.type]
 
   // only one allowed action if not authenticated...
-  if (!ctx.user && action.type !== Auth.actions.SOCKET_AUTHENTICATE) {
+  if (!ctx.user && action.type !== Auth.SOCKET_AUTHENTICATE) {
     ctx.socket.socket.emit('action', {
-      type: Auth.actions.SOCKET_AUTHENTICATE_FAIL,
+      type: Auth.SOCKET_AUTHENTICATE_FAIL,
       payload: {message: 'Invalid token (try signing in again)'}
     })
     return

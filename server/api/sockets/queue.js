@@ -130,4 +130,7 @@ async function _roomIsOpen(ctx, roomId) {
   return (room || room.status === 'open')
 }
 
-module.exports = exports = {actions: ACTION_HANDLERS}
+module.exports = {
+  ACTION_HANDLERS,
+  getQueue,
+}
