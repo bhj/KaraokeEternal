@@ -9,7 +9,7 @@ const debug = require('debug')('app:socket')
 
 let ACTION_HANDLERS = Object.assign({}, Auth.ACTION_HANDLERS, Queue.ACTION_HANDLERS, Player.ACTION_HANDLERS)
 
-module.exports = async function(ctx, next) {
+module.exports = async function(ctx) {
   const action = ctx.data
   const handler = ACTION_HANDLERS[action.type]
 
@@ -32,6 +32,4 @@ module.exports = async function(ctx, next) {
   } catch (err) {
     debug('Error in handler %s: %s', action.type, err.message)
   }
-
-  await next()
 }
