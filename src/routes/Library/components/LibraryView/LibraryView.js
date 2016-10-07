@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
 import { AutoSizer, List } from 'react-virtualized'
-import 'react-virtualized/styles.css'
 import { Header, HeaderTitle } from 'components/Header'
 import Navigation from 'components/Navigation'
 import classes from './LibraryView.css'
@@ -78,7 +77,7 @@ class LibraryView extends React.Component {
     this.props.addSong(songId)
   }
 
-  rowRenderer({key, index, style}) {
+  rowRenderer({index, key, style}) {
     const artist = this.props.artists[this.props.artistIds[index]]
     const isExpanded = this.expandedIds.indexOf(artist.artistId) !== -1
 
