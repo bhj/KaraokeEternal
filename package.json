@@ -122,7 +122,7 @@
     "react-redux": "^4.0.0",
     "react-router": "^2.2.0",
     "react-router-redux": "^4.0.0",
-    "react-virtualized": "7.0.1",
+    "react-virtualized": "^8.0.12",
     "recursive-readdir": "^2.1.0",
     "redux": "^3.0.0",
     "redux-auth-wrapper": "^0.8.0",

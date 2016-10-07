@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
-import { AutoSizer, VirtualScroll } from 'react-virtualized'
-import styles from 'react-virtualized/styles.css'
+import { AutoSizer, List } from 'react-virtualized'
 import { Header, HeaderTitle } from 'components/Header'
 import Navigation from 'components/Navigation'
 import classes from './LibraryView.css'
@@ -44,7 +43,7 @@ class LibraryView extends React.Component {
         <div style={{ flex: '1 1 auto' }}>
           <AutoSizer>
             {({ height, width }) => (
-              <VirtualScroll
+              <List
                 width={width}
                 height={height}
                 ref={(c) => {this.VirtualScroll = c}}
@@ -78,7 +77,7 @@ class LibraryView extends React.Component {
     this.props.addSong(songId)
   }
 
-  rowRenderer({index}) {
+  rowRenderer({index, key, style}) {
     const artist = this.props.artists[this.props.artistIds[index]]
     const isExpanded = this.expandedIds.indexOf(artist.artistId) !== -1
 
@@ -122,7 +121,8 @@ class LibraryView extends React.Component {
 
     return (
       <ArtistItem
-        key={artist.artistId}
+        key={key}
+        style={style}
         name={artist.name}
         count={artist.songIds.length}
         onArtistSelect={() => this.handleArtistClick(artist.artistId)}
