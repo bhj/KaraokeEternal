@@ -1,22 +1,23 @@
 import { applyMiddleware, compose, createStore } from 'redux'
-import { routerMiddleware } from 'react-router-redux'
 import createSocketIoMiddleware from 'redux-socket.io'
 import thunk from 'redux-thunk'
+import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
+import { updateLocation } from './location'
 
-export default (initialState = {}, history, socket) => {
+export default (initialState = {}, socket) => {
   // ======================================================
   // Middleware Configuration
   // ======================================================
-  let socketIoMiddleware = createSocketIoMiddleware(socket, "server/")
+  const socketIoMiddleware = createSocketIoMiddleware(socket, "server/")
 
-  const middleware = [thunk, routerMiddleware(history), socketIoMiddleware]
+  const middleware = [thunk, socketIoMiddleware]
 
   // ======================================================
   // Store Enhancers
   // ======================================================
   const enhancers = []
-  if (__DEBUG__) {
+  if (__DEV__) {
     const devToolsExtension = window.devToolsExtension
     if (typeof devToolsExtension === 'function') {
       enhancers.push(devToolsExtension())
@@ -35,6 +36,9 @@ export default (initialState = {}, history, socket) => {
     )
   )
   store.asyncReducers = {}
+
+  // To unsubscribe, invoke `store.unsubscribeHistory()` anytime
+  store.unsubscribeHistory = browserHistory.listen(updateLocation(store))
 
   if (module.hot) {
     module.hot.accept('./reducers', () => {

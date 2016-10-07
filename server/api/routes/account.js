@@ -1,6 +1,6 @@
-import jwt from 'koa-jwt'
-import { hash, compare } from '../utilities/bcrypt-promise'
-import KoaRouter from 'koa-router'
+const jwt = require('koa-jwt')
+const bcrypt = require('../utilities/bcrypt-promise')
+const KoaRouter = require('koa-router')
 const router = KoaRouter()
 
 // list available rooms
@@ -25,7 +25,7 @@ router.post('/api/account/login', async (ctx, next) => {
   let user = await ctx.db.get('SELECT * FROM users WHERE email = ?', email)
 
   // validate password
-  if (!user || !await compare(password, user.password)) {
+  if (!user || !await bcrypt.compare(password, user.password)) {
     ctx.status = 401
     return
   }
@@ -84,9 +84,8 @@ router.post('/api/account/create', async (ctx, next) => {
     return ctx.body = 'Passwords do not match'
   }
 
-  let hashedPwd = await hash(newPassword, 10)
+  let hashedPwd = await bcrypt.hash(newPassword, 10)
   let res = await ctx.db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', email, hashedPwd, name)
-  console.log(res)
   ctx.status = 200
 })
 
@@ -117,7 +116,7 @@ router.post('/api/account/update', async (ctx, next) => {
   }
 
   // validate current password
-  if (!await compare(password, user.password)) {
+  if (!await bcrypt.compare(password, user.password)) {
     ctx.status = 401
     return ctx.body = 'Current password is incorrect'
   }
@@ -129,7 +128,7 @@ router.post('/api/account/update', async (ctx, next) => {
       return ctx.body = 'New passwords do not match'
     }
 
-    password = await hash(newPassword, 10)
+    password = await bcrypt.hash(newPassword, 10)
   } else {
     password = user.password
   }
@@ -161,13 +160,13 @@ router.post('/api/account/update', async (ctx, next) => {
   let token = jwt.sign(user, 'shared-secret')
 
   // store JWT in httpOnly cookie
-  ctx.cookies.set('id_token', token, {httpOnly: true})
+  // ctx.cookies.set('id_token', token, {httpOnly: true})
 
   // client also persists this to localStorage
   ctx.body = user
 })
 
-export default router
+module.exports = router
 
 // email validation helper from
 // http://www.moreofless.co.uk/validate-email-address-without-regex/

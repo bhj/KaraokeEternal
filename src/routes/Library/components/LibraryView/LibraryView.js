@@ -33,7 +33,7 @@ class LibraryView extends React.Component {
   }
 
   render () {
-    if (!this.props.artistIds.length) return null
+    // if (!this.props.artistIds.length) return null
 
     return (
       <div className={classes.container}>

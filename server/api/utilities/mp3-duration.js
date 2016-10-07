@@ -1,6 +1,6 @@
-import mp3Duration from 'mp3-duration'
+const mp3Duration = require('mp3-duration')
 
-export default function(file) {
+module.exports = exports = function(file) {
   return new Promise(function(resolve, reject) {
     mp3Duration(file, function(err, duration){
       if (err) { return reject(err) }

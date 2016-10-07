@@ -1,7 +1,6 @@
 // ---------------------------------------
 // Test Environment Setup
 // ---------------------------------------
-import 'babel-polyfill'
 import sinon from 'sinon'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
@@ -33,6 +32,6 @@ const testsToRun = testsContext.keys().filter(inManifest)
 
 // require all `src/**/*.js` except for `main.js` (for isparta coverage reporting)
 if (__COVERAGE__) {
-  const componentsContext = require.context('../src/', true, /^((?!main).)*\.js$/)
+  const componentsContext = require.context('../src/', true, /^((?!main|reducers).)*\.js$/)
   componentsContext.keys().forEach(componentsContext)
 }

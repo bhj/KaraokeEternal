@@ -27,12 +27,9 @@ class QueueView extends React.Component {
   }
 
   render() {
-    if (!this.props.artistIds.length) {
-      // library not loaded yet
-      return null
-    }
+    let songs = []
 
-    let songs = this.props.result.map(function(queueId, i) {
+    songs = this.props.result.map(function(queueId, i) {
       const item = this.props.entities[queueId]
       const song = this.props.songs[item.songId]
       const { curId, isFinished, errors } = this.props

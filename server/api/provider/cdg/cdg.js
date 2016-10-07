@@ -1,11 +1,11 @@
-import readdir from '../../utilities/recursive-readdir'
-import multihash from '../../utilities/multihash'
-import musicmetadata from '../../utilities/musicmetadata'
-import mp3Duration from '../../utilities/mp3-duration'
+const readdir = require('../../utilities/recursive-readdir')
+const multihash = require('../../utilities/multihash')
+const musicmetadata = require('../../utilities/musicmetadata')
+const mp3Duration = require('../../utilities/mp3-duration')
 
-import fs from 'fs'
-import fsStat from '../../utilities/fs-stat'
-import pathUtils from 'path'
+const fs = require('fs')
+const fsStat = require('../../utilities/fs-stat')
+const pathUtils = require('path')
 
 var debug = require('debug')
 var log = debug('app:library:cdg')
@@ -15,7 +15,7 @@ let allowedExts = ['.mp3', '.m4a']
 let counts
 // let seenHashes = []
 
-export async function scan(ctx, cfg) {
+async function scan(ctx, cfg) {
   if (!Array.isArray(cfg.paths) || !cfg.paths.length) {
     error('No paths configured; aborting scan')
     return Promise.resolve()
@@ -58,7 +58,7 @@ export async function scan(ctx, cfg) {
 }
 
 
-export async function resource(ctx, cfg) {
+async function resource(ctx, cfg) {
   const { type, songId } = ctx.query
   let song, file, stats
 
@@ -225,6 +225,7 @@ async function process(ctx, path){
   log('  => new song: %s - %s', meta.artist, meta.title)
 }
 
+module.exports = exports = {scan, process, resource}
 
 function parseMeta(path) {
   const info = pathUtils.parse(path)

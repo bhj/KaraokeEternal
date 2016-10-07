@@ -1,11 +1,11 @@
-import fetch from 'isomorphic-fetch'
+const fetch = require('isomorphic-fetch')
 var debug = require('debug')
 var log = debug('app:provider:youtube')
 var error = debug('app:provider:youtube:error')
 
 let seenIds, stats
 
-export async function scan(config, ctx) {
+async function scan(config, ctx) {
   if (typeof config.channel === 'undefined') {
     error('No channels configured; aborting scan')
     return Promise.resolve()
@@ -54,11 +54,11 @@ async function process(item, ctx) {
   seenIds.push(videoId)
 
   // search for this file in the db
-  let row = await ctx.db.get('SELECT * FROM songs WHERE uid = ?', videoId)
+  let row = await ctx.db.get('SELECT * FROM songs WHERE fingerprint = ?', videoId)
 
   if (row) {
-    // we're done
-    log(' => already in database')
+    // @todo: check mtime and title for updates
+    log(' => ok')
     stats.ok++
     return
   }
@@ -94,7 +94,7 @@ async function process(item, ctx) {
     meta.title, // title
     '',         // url
     0,          // plays
-    videoId     // uid
+    videoId     // fingerprint
   ]
 
   let res = await ctx.db.run('INSERT INTO songs VALUES (?,?,?,?,?,?)', song)
@@ -103,9 +103,21 @@ async function process(item, ctx) {
   // console.log({videoId, desc:item.snippet.title, artist: meta.artist, title: meta.title})
 }
 
+module.exports = exports = { scan, process }
 
 function parseArtistTitle(str){
   let title, artist
+  const phrases = [
+    'karaoke video version with lyrics',
+    'karaoke version with lyrics',
+    'karaoke video with lyrics',
+    'karaoke version with lyrics',
+    'karaoke video',
+    'karaoke version',
+    'with lyrics',
+    'no lead vocal',
+    'singalong',
+  ]
 
   // remove anything after last |
   if (str.lastIndexOf('|') !== -1){

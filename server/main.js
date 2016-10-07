@@ -1,26 +1,24 @@
-import Koa from 'koa'
-import convert from 'koa-convert'
-import webpack from 'webpack'
-import webpackConfig from '../build/webpack.config'
-import historyApiFallback from 'koa-connect-history-api-fallback'
-import serve from 'koa-static'
-import proxy from 'koa-proxy'
-import _debug from 'debug'
-import config from '../config'
-import webpackDevMiddleware from './middleware/webpack-dev'
-import webpackHMRMiddleware from './middleware/webpack-hmr'
-import bodyparser from 'koa-bodyparser'
-import db from 'sqlite'
-import KoaJwt from 'koa-jwt'
-import apiRoutes from './api/routes'
-import KoaRange from 'koa-range'
-import KoaSocketIO from 'koa-socket'
-import socketActions from './api/sockets'
-
-const debug = _debug('app:server')
+const koa = require('koa')
+const IO = require('koa-socket')
+const debug = require('debug')('app:server')
+const webpack = require('webpack')
+const webpackConfig = require('../build/webpack.config')
+const config = require('../config')
 const paths = config.utils_paths
-const app = new Koa()
-const io = new KoaSocketIO()
+
+const convert = require('koa-convert')
+const serve  = require('koa-static')
+const bodyparser  = require('koa-bodyparser')
+const db = require('sqlite')
+const koaJwt = require('koa-jwt')
+const koaRange = require('koa-range')
+const koaSocketIO = require('koa-socket')
+
+const apiRoutes = require('./api/routes')
+const socketActions = require('./api/sockets')
+
+const app = new koa()
+const io = new IO()
 
 // initialize database
 Promise.resolve()
@@ -37,14 +35,14 @@ app.use(async (ctx, next) => {
     await next()
 })
 
-app.use(convert(KoaRange))
-
+app.use(convert(koaRange))
 app.use(bodyparser())
 
 // decode jwt and make available as ctx.user
-app.use(convert(
-  KoaJwt({secret: 'shared-secret', cookie: 'id_token', passthrough: true})
-))
+app.use(convert(koaJwt({
+  secret: 'shared-secret',
+  passthrough: true,
+})))
 
 // initialize each module's koa-router routes
 for (let route in apiRoutes) {
@@ -70,17 +68,10 @@ io.use(async (ctx, next) => {
 // koa-socket event listener
 io.on('action', socketActions)
 
-// Enable koa-proxy if it has been enabled in the config.
-if (config.proxy && config.proxy.enabled) {
-  app.use(convert(proxy(config.proxy.options)))
-}
-
 // This rewrites all routes requests to the root /index.html file
-// (ignoring file requests). If you want to implement isomorphic
+// (ignoring file requests). If you want to implement universal
 // rendering, you'll want to remove this middleware.
-app.use(convert(historyApiFallback({
-  verbose: false
-})))
+app.use(convert(require('koa-connect-history-api-fallback')()))
 
 // ------------------------------------
 // Apply Webpack HMR Middleware
@@ -88,11 +79,17 @@ app.use(convert(historyApiFallback({
 if (config.env === 'development') {
   const compiler = webpack(webpackConfig)
 
-  // Enable webpack-dev and webpack-hot middleware
-  const { publicPath } = webpackConfig.output
-
-  app.use(webpackDevMiddleware(compiler, publicPath))
-  app.use(webpackHMRMiddleware(compiler))
+  debug('Enable webpack dev and HMR middleware')
+  app.use(convert(require("koa-webpack-dev-middleware")(compiler, {
+    publicPath  : webpackConfig.output.publicPath,
+    contentBase : paths.client(),
+    hot         : true,
+    quiet       : config.compiler_quiet,
+    noInfo      : config.compiler_quiet,
+    lazy        : false,
+    stats       : config.compiler_stats
+  })))
+  app.use(convert(require('koa-webpack-hot-middleware')(compiler)))
 
   // Serve static assets from ~/src/static since Webpack is unaware of
   // these files. This middleware doesn't need to be enabled outside
@@ -114,4 +111,4 @@ if (config.env === 'development') {
   app.use(serve(paths.dist()))
 }
 
-export default app
+module.exports = exports = app

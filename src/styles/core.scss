@@ -1,100 +1,101 @@
-:global {
-  @import 'base';
-  @import '~normalize.css/normalize';
+@import 'base';
+@import '~normalize.css/normalize';
 
-  // Some best-practice CSS that's useful for most apps
-  // Just remove them if they're not what you want
-  html {
-    box-sizing: border-box;
-  }
+// Some best-practice CSS that's useful for most apps
+// Just remove them if they're not what you want
+html {
+  box-sizing: border-box;
+}
 
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    /* Helvetica Neue Regular Font Stack */
-    font-family: "HelveticaNeue", "Helvetica Neue", "HelveticaNeueRoman", "HelveticaNeue-Roman", "Helvetica Neue Roman", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:400; font-stretch:normal;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
 
-    /* Helvetica Neue Light Font Stack */
-    // font-family: "HelveticaNeueLight", "HelveticaNeue-Light", "Helvetica Neue Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:300; font-stretch:normal;
-  }
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
 
-  *,
-  *:before,
-  *:after {
-    box-sizing: inherit;
-  }
+html,
+body {
+  /* Helvetica Neue Regular Font Stack */
+  font-family: "HelveticaNeue", "Helvetica Neue", "HelveticaNeueRoman", "HelveticaNeue-Roman", "Helvetica Neue Roman", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:400; font-stretch:normal;
 
-  a {
-    color: #4962c7;
-    font-weight: bold;
-  }
+  /* Helvetica Neue Light Font Stack */
+  // font-family: "HelveticaNeueLight", "HelveticaNeue-Light", "Helvetica Neue Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:300; font-stretch:normal;
+}
 
-  body {
-    background-color: #f9f9f9;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-  }
+a {
+  color: #4962c7;
+  font-weight: bold;
+}
 
-  h2 {
-    font-size: 18px;
-    font-weight: lighter;
-    font-style: normal;
-  }
+body {
+  background-color: #f9f9f9;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+}
 
-  input[type="text"],
-  input[type="password"],
-  input[type="email"],
-  select {
-    display: block;
-    margin: 0;
-    width: 100%;
-    font-size: 18px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    -webkit-border-radius: none;
-    -moz-border-radius: none;
-    -ms-border-radius: none;
-    -o-border-radius: none;
-    border-radius: none;
-  }
-  input[type="text"]:focus,
-  input[type="password"]:focus,
-  input[type="email"]:focus,
-  select:focus {
-    outline: none;
-  }
-  // style-5
-  input[type="text"],
-  input[type="password"],
-  input[type="email"],
-  select {
-    padding: 10px;
-    border: solid 1px #fff;
-    -webkit-box-shadow: inset 1px 1px 2px 0 #707070;
-    -moz-box-shadow: inset 1px 1px 2px 0 #707070;
-    box-shadow: inset 1px 1px 2px 0 #707070;
-    -webkit-transition: box-shadow 0.3s;
-    -moz-transition: box-shadow 0.3s;
-    -o-transition: box-shadow 0.3s;
-    transition: box-shadow 0.3s;
-  }
-  input[type="text"]:focus,
-  input[type="password"]:focus,
-  input[type="email"]:focus,
-  select:focus {
-    -webkit-box-shadow: inset 1px 1px 2px 0 #c9c9c9;
-    -moz-box-shadow: inset 1px 1px 2px 0 #c9c9c9;
-    box-shadow: inset 1px 1px 2px 0 #c9c9c9;
-  }
+h2 {
+  font-size: 18px;
+  font-weight: lighter;
+  font-style: normal;
+}
 
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
+  display: block;
+  margin: 0;
+  width: 100%;
+  font-size: 18px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: none;
+  -moz-border-radius: none;
+  -ms-border-radius: none;
+  -o-border-radius: none;
+  border-radius: none;
+}
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+select:focus {
+  outline: none;
+  }
+// style-5
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
+  padding: 10px;
+  border: solid 1px #fff;
+  -webkit-box-shadow: inset 1px 1px 2px 0 #707070;
+  -moz-box-shadow: inset 1px 1px 2px 0 #707070;
+  box-shadow: inset 1px 1px 2px 0 #707070;
+  -webkit-transition: box-shadow 0.3s;
+  -moz-transition: box-shadow 0.3s;
+  -o-transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s;
+}
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+select:focus {
+  -webkit-box-shadow: inset 1px 1px 2px 0 #c9c9c9;
+  -moz-box-shadow: inset 1px 1px 2px 0 #c9c9c9;
+  box-shadow: inset 1px 1px 2px 0 #c9c9c9;
 }

@@ -1,6 +1,6 @@
-import recursive from 'recursive-readdir'
+const recursive = require('recursive-readdir')
 
-export default function(path, ignore=[]) {
+module.exports = exports = function(path, ignore=[]) {
   return new Promise(function(resolve, reject) {
     recursive(path, ignore, function(err, files) {
       if (err) { return reject(err) }

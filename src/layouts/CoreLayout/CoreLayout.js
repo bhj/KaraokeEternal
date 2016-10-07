@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import Header from '../../components/Header'
 import Navigation from '../../components/Navigation'
 import LibraryView from '../../routes/Library/containers/LibraryContainer'
 import classes from './CoreLayout.css'

@@ -1,26 +1,22 @@
-import authActions, { SOCKET_AUTHENTICATE, SOCKET_AUTHENTICATE_FAIL } from './auth'
-import queueActions from './queue'
-import playerActions from './player'
+const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
+const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
 
-import _debug from 'debug'
-const debug = _debug('app:socket')
+const Auth = require('./auth')
+const Queue = require('./queue')
+const Player = require('./player')
 
-let ACTION_HANDLERS = {}
+const debug = require('debug')('app:socket')
 
-ACTION_HANDLERS = Object.assign(ACTION_HANDLERS, {
-  ...authActions,
-  ...queueActions,
-  ...playerActions,
-})
+let ACTION_HANDLERS = Object.assign({}, Auth.ACTION_HANDLERS, Queue.ACTION_HANDLERS, Player.ACTION_HANDLERS)
 
-export default async function(ctx, next) {
+module.exports = async function(ctx) {
   const action = ctx.data
   const handler = ACTION_HANDLERS[action.type]
 
   // only one allowed action if not authenticated...
-  if (!ctx.user && action.type !== SOCKET_AUTHENTICATE) {
+  if (!ctx.user && action.type !== Auth.SOCKET_AUTHENTICATE) {
     ctx.socket.socket.emit('action', {
-      type: SOCKET_AUTHENTICATE_FAIL,
+      type: Auth.SOCKET_AUTHENTICATE_FAIL,
       payload: {message: 'Invalid token (try signing in again)'}
     })
     return
@@ -36,6 +32,4 @@ export default async function(ctx, next) {
   } catch (err) {
     debug('Error in handler %s: %s', action.type, err.message)
   }
-
-  await next()
 }

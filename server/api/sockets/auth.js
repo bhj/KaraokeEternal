@@ -1,11 +1,14 @@
-import { verify } from 'koa-jwt' // really from jsonwebtoken
-import { getQueue, QUEUE_CHANGE } from './queue'
-import _debug from 'debug'
-const debug = _debug('app:socket:auth')
+const KoaJwt = require('koa-jwt') // really from jsonwebtoken
+const Queue = require('./queue')
+const debug = require('debug')('app:socket:auth')
 
-export const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
-export const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
-export const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
+const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
+const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
+const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
+
+const SOCKET_DEAUTHENTICATE = 'server/SOCKET_DEAUTHENTICATE'
+const SOCKET_DEAUTHENTICATE_SUCCESS = 'server/SOCKET_DEAUTHENTICATE_SUCCESS'
+const SOCKET_DEAUTHENTICATE_FAIL = 'server/SOCKET_DEAUTHENTICATE_FAIL'
 
 // ------------------------------------
 // Action Handlers
@@ -16,7 +19,7 @@ const ACTION_HANDLERS = {
     let user
 
     try {
-      user = verify(payload, 'shared-secret')
+      user = KoaJwt.verify(payload, 'shared-secret')
     } catch (err) {
       ctx.io.to(socketId).emit('action', {
         type: SOCKET_AUTHENTICATE_FAIL,
@@ -42,10 +45,21 @@ const ACTION_HANDLERS = {
 
     // success! send status to newcomer only
     ctx.io.to(socketId).emit('action', {
-      type: QUEUE_CHANGE,
-      payload: await getQueue(ctx, user.roomId)
+      type: Queue.QUEUE_CHANGE,
+      payload: await Queue.getQueue(ctx, user.roomId)
     })
+  },
+  [SOCKET_DEAUTHENTICATE]: async (ctx, {payload}) => {
+    const socketId = ctx.socket.socket.id // raw socket.io instance
+
+    if (ctx.user && ctx.user.roomId) {
+      debug('%s (%s) left room %s (%s in room)', ctx.user.name, socketId, ctx.user.roomId, ctx.socket.socket.adapter.rooms[ctx.user.roomId].length-1 || 0)
+      ctx.socket.socket.leave(ctx.user.roomId)
+    }
   },
 }
 
-export default ACTION_HANDLERS
+module.exports = {
+  ACTION_HANDLERS,
+  SOCKET_AUTHENTICATE,
+}
