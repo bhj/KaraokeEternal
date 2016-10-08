@@ -27,7 +27,7 @@ class LibraryView extends React.Component {
   componentDidUpdate () {
     // queue may have changed; update rows
     if (this.VirtualScroll) {
-      this.VirtualScroll.forceUpdate()
+      this.VirtualScroll.forceUpdateGrid()
     }
   }
 
