@@ -1,7 +1,5 @@
 import React, { PropTypes } from 'react'
 import { AutoSizer, List } from 'react-virtualized'
-import { Header, HeaderTitle } from 'components/Header'
-import Navigation from 'components/Navigation'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 
@@ -33,27 +31,19 @@ class LibraryView extends React.Component {
 
   render () {
     return (
-      <div style={{display: 'flex', flex: '1', flexDirection: 'column'}}>
-        <Header>
-          <HeaderTitle>Library</HeaderTitle>
-        </Header>
-        <div style={{ flex: '1 1 auto' }}>
-          <AutoSizer>
-            {({ height, width }) => (
-              <List
-                width={width}
-                height={height}
-                ref={(c) => {this.VirtualScroll = c}}
-                rowCount={this.props.artistIds.length}
-                rowHeight={this.rowHeight}
-                rowRenderer={this.rowRenderer}
-                overscanRowCount={10}
-              />
-            )}
-          </AutoSizer>
-        </div>
-        <Navigation />
-      </div>
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            width={width}
+            height={height}
+            ref={(c) => {this.VirtualScroll = c}}
+            rowCount={this.props.artistIds.length}
+            rowHeight={this.rowHeight}
+            rowRenderer={this.rowRenderer}
+            overscanRowCount={10}
+          />
+        )}
+      </AutoSizer>
     )
   }
 

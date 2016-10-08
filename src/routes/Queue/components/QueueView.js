@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react'
 import { Header, HeaderTitle } from 'components/Header'
 import Navigation from 'components/Navigation'
 import QueueItem from './QueueItem'
-import classes from './QueueView.css'
 
 class QueueView extends React.Component {
   static propTypes = {
@@ -64,30 +63,8 @@ class QueueView extends React.Component {
     }, this)
 
     return (
-      <div className={classes.flexContainer}>
-        <Header>
-          <HeaderTitle>Queue</HeaderTitle>
-          {!this.props.isPlaying &&
-            <div className={classes.button} onClick={this.props.requestPlay}>
-              <i className={'material-icons '+classes.button}>play_arrow</i>
-            </div>
-          }
-          {this.props.isPlaying &&
-            <div className={classes.button} onClick={this.props.requestPause}>
-              <i className={'material-icons '+classes.button}>pause</i>
-            </div>
-          }
-        </Header>
-
-        {this.props.errorMessage &&
-          <p>{this.props.errorMessage}</p>
-        }
-
-        <div className={classes.scrollable}>
-          {songs}
-        </div>
-
-        <Navigation />
+      <div style={{flex: '1'}}>
+        {songs}
       </div>
     )
   }
