@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react'
 import { AutoSizer, List } from 'react-virtualized'
 import { Header, HeaderTitle } from 'components/Header'
 import Navigation from 'components/Navigation'
-import classes from './LibraryView.css'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 
@@ -33,10 +32,8 @@ class LibraryView extends React.Component {
   }
 
   render () {
-    // if (!this.props.artistIds.length) return null
-
     return (
-      <div className={classes.container}>
+      <div style={{display: 'flex', flex: '1', flexDirection: 'column'}}>
         <Header>
           <HeaderTitle>Library</HeaderTitle>
         </Header>
