@@ -1,7 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Header from '../../components/Header'
-import Navigation from '../../components/Navigation'
 import LibraryView from '../../routes/Library/containers/LibraryContainer'
 import classes from './CoreLayout.css'
 import '../../styles/core.scss'
@@ -11,12 +9,12 @@ const CoreLayout = (props) => {
   let showLibrary = props.routerPath === '/library'
 
   return (
-    <div style={{height: '100%'}} className={classes.flexContainer}>
-      <div className={classes.flexGrow}>
-        <div className={showLibrary ? classes.activeView : classes.inactiveView}>
+    <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+      <div style={{flex: '1', position: 'relative'}}>
+        <div className={showLibrary ? classes.active : classes.inactive}>
           <LibraryView/>
         </div>
-        <div className={showLibrary ? classes.inactiveView : classes.activeView}>
+        <div className={showLibrary ? classes.inactive : classes.active}>
           {props.children}
         </div>
       </div>

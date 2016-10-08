@@ -1,25 +1,15 @@
-.flexContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-.flexGrow {
-  flex: 1;
-  position: relative;
-}
-
 .view {
   width: 100%;
   height: 100%;
   position: absolute;
 }
 
-.activeView {
+.active {
   composes: view;
   display: flex;
 }
 
-.inactiveView {
+.inactive {
   composes: view;
   display: none;
 }
