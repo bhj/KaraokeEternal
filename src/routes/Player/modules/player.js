@@ -44,11 +44,7 @@ export function mediaError(queueId, message) {
       payload: {queueId, message}
     })
 
-    // move to next song if we haven't already
-    // if (!getState().player.errors[id]) {
-      dispatch(requestPlayNext())
-    // }
-
+    dispatch(requestPlayNext())
   }
 }
 
