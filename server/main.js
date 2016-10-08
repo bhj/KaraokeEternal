@@ -1,18 +1,19 @@
-const koa = require('koa')
-const IO = require('koa-socket')
 const debug = require('debug')('app:server')
 const webpack = require('webpack')
 const webpackConfig = require('../build/webpack.config')
 const config = require('../config')
 const paths = config.utils_paths
 
+const koa = require('koa')
+const IO = require('koa-socket')
 const convert = require('koa-convert')
 const serve  = require('koa-static')
-const bodyparser  = require('koa-bodyparser')
-const db = require('sqlite')
+const koaBodyparser  = require('koa-bodyparser')
 const koaJwt = require('koa-jwt')
 const koaRange = require('koa-range')
 const koaSocketIO = require('koa-socket')
+const koaLogger = require('koa-logger')
+const db = require('sqlite')
 
 const apiRoutes = require('./api/routes')
 const socketActions = require('./api/sockets')
@@ -35,8 +36,9 @@ app.use(async (ctx, next) => {
     await next()
 })
 
+app.use(koaLogger())
 app.use(convert(koaRange))
-app.use(bodyparser())
+app.use(koaBodyparser())
 
 // decode jwt and make available as ctx.user
 app.use(convert(koaJwt({
