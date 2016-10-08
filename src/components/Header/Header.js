@@ -1,7 +1,7 @@
 import React from 'react'
 import classes from './Header.css'
 
-export const Header = (props) => (
+const Header = (props) => (
   <div className={classes.container}>
     <h1 className={classes.title}>{props.title}</h1>
     {!props.isPlaying &&
@@ -16,3 +16,5 @@ export const Header = (props) => (
     }
   </div>
 )
+
+export default Header
