@@ -13,7 +13,7 @@ const CoreLayout = (props) => {
 
   return (
     <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-      <Header title={title} isPlaying={true} />
+      <Header title={title} />
 
       <div style={{flex: '1', position: 'relative'}}>
         <div className={showLibrary ? classes.active : classes.inactive}>
