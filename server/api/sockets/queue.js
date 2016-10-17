@@ -16,10 +16,8 @@ const ACTION_HANDLERS = {
     let song, res
 
     if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
-      ctx.io.to(socketId).emit('action', {
-        type: QUEUE_ERROR,
-        payload: {message: 'Room is no longer open'}
-      })
+      // callback with error
+      ctx.acknowledge('Room is no longer open')
       return
     }
 
@@ -27,10 +25,8 @@ const ACTION_HANDLERS = {
     song = await ctx.db.get('SELECT * FROM songs WHERE songId = ?', payload)
 
     if (!song) {
-      ctx.io.to(socketId).emit('action', {
-        type: QUEUE_ERROR,
-        payload: {message: 'Song not found'}
-      })
+      // callback with error
+      ctx.acknowledge('Song not found')
       return
     }
 
@@ -39,13 +35,15 @@ const ACTION_HANDLERS = {
        ctx.user.roomId, payload, ctx.user.userId)
 
     if (res.changes !== 1) {
-      ctx.io.to(socketId).emit('action', {
-        type: QUEUE_ERROR,
-        payload: {message: 'Error adding song (db changes !== 1)'}
-      })
+      // callback with error
+      ctx.acknowledge('Could not add song to queue')
+      return
     }
 
-    // success! tell room
+    // success!
+    ctx.acknowledge()
+
+    // tell room
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: QUEUE_CHANGE,
       payload: await getQueue(ctx, ctx.user.roomId)

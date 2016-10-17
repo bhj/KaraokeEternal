@@ -12,15 +12,14 @@ let ACTION_HANDLERS = Object.assign({}, Auth.ACTION_HANDLERS, Queue.ACTION_HANDL
 module.exports = async function(ctx) {
   const action = ctx.data
   const handler = ACTION_HANDLERS[action.type]
-
   // only one allowed action if not authenticated...
-  if (!ctx.user && action.type !== Auth.SOCKET_AUTHENTICATE) {
-    ctx.socket.socket.emit('action', {
-      type: Auth.SOCKET_AUTHENTICATE_FAIL,
-      payload: {message: 'Invalid token (try signing in again)'}
-    })
-    return
-  }
+  // if (!ctx.user && action.type !== Auth.SOCKET_AUTHENTICATE) {
+  //   ctx.socket.socket.emit('action', {
+  //     type: Auth.SOCKET_AUTHENTICATE_FAIL,
+  //     payload: {message: 'Invalid token (try signing in again)'}
+  //   })
+  //   return
+  // }
 
   if (!handler) {
     debug('No handler for type: %s', action.type)

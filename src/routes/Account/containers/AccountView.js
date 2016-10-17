@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import {ensureState} from 'redux-optimistic-ui'
 import { changeView, logoutUser } from '../modules/account'
 import AccountView from '../components/AccountView'
 
@@ -7,11 +8,15 @@ const mapActionCreators = {
   logoutUser,
 }
 
-const mapStateToProps = (state) => ({
-  user: state.account.user,
-  viewMode: state.account.viewMode,
-  errorMessage: state.account.errorMessage
-})
+const mapStateToProps = (state) => {
+  state = ensureState(state)
+
+  return {
+    user: state.account.user,
+    viewMode: state.account.viewMode,
+    errorMessage: state.account.errorMessage
+  }
+}
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
 

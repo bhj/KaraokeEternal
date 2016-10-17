@@ -1,5 +1,5 @@
 import { applyMiddleware, compose, createStore } from 'redux'
-import createSocketIoMiddleware from 'redux-socket.io'
+import createOptimisticMiddleware from './optimisticMiddleware'
 import thunk from 'redux-thunk'
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
@@ -9,9 +9,9 @@ export default (initialState = {}, socket) => {
   // ======================================================
   // Middleware Configuration
   // ======================================================
-  const socketIoMiddleware = createSocketIoMiddleware(socket, "server/")
+  const optimisticMiddleware = createOptimisticMiddleware(socket, "server/")
 
-  const middleware = [thunk, socketIoMiddleware]
+  const middleware = [thunk, optimisticMiddleware]
 
   // ======================================================
   // Store Enhancers

@@ -44,7 +44,8 @@ export const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
 export function removeItem(queueId) {
   return {
     type: QUEUE_REMOVE,
-    payload: queueId
+    payload: queueId,
+    meta: {isOptimistic: true},
   }
 }
 
@@ -85,6 +86,10 @@ const ACTION_HANDLERS = {
       }
     }
   },
+  // [QUEUE_ADD]: (state, {payload}) => ({
+  //   ...state,
+  //   result: state.result.push()
+  // }),
   [QUEUE_CHANGE]: (state, {payload}) => ({
     ...state,
     result: payload.result,

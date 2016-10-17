@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import {ensureState} from 'redux-optimistic-ui'
 
 // ------------------------------------
 // Login
@@ -115,7 +116,7 @@ export function logoutUser() {
 
     return fetch('/api/account/logout', {
       headers: new Headers({
-        'Authorization': 'Bearer ' + getState().account.token,
+        'Authorization': 'Bearer ' + ensureState(getState()).account.token,
       }),
     })
       .then(checkStatus)
@@ -219,7 +220,7 @@ export function updateUser(data) {
         method: 'POST',
         headers: new Headers({
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getState().account.token,
+          'Authorization': 'Bearer ' + ensureState(getState()).account.token,
         }),
         body: JSON.stringify(data)
       })

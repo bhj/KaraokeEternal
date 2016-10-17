@@ -1,4 +1,5 @@
 // We only need to import the modules necessary for initial render
+import {ensureState} from 'redux-optimistic-ui'
 import CoreLayout from '../layouts/CoreLayout/CoreLayout'
 import Home from './Home'
 import AccountRoute from './Account'
@@ -13,7 +14,7 @@ import { fetchLibrary } from './Library/modules/library'
 export const createRoutes = (store) => ({
   path: '/',
   getComponent (nextState, cb) {
-    if (!store.getState().library.artists.result.length) {
+    if (!ensureState(store.getState()).library.artists.result.length) {
       store.dispatch(fetchLibrary())
     }
 

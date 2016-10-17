@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {ensureState} from 'redux-optimistic-ui'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
 import { authenticateSocket } from './routes/Account/modules/account'
@@ -7,7 +8,7 @@ import io from 'socket.io-client'
 const socket = io()
 
 socket.on('connect', function () {
-  const { token } = store.getState().account
+  const { token } = ensureState(store.getState()).account
 
   if (token) {
     // we think we were signed in; check with server
