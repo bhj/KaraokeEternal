@@ -126,7 +126,7 @@ webpackConfig.module.loaders.push({
   exclude : null,
   loaders : [
     'style',
-    'css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+    'css?modules&-minimize&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
     'postcss'
   ]
 })

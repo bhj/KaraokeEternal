@@ -22,13 +22,6 @@ class LibraryView extends React.Component {
   rowRenderer = this.rowRenderer.bind(this)
   rowHeight = this.rowHeight.bind(this)
 
-  componentDidUpdate () {
-    // queue may have changed; update rows
-    if (this.VirtualScroll) {
-      this.VirtualScroll.forceUpdateGrid()
-    }
-  }
-
   render () {
     return (
       <AutoSizer>
@@ -37,6 +30,7 @@ class LibraryView extends React.Component {
             width={width}
             height={height}
             ref={(c) => {this.VirtualScroll = c}}
+            queuedSongIds={this.props.queuedSongIds}
             rowCount={this.props.artistIds.length}
             rowHeight={this.rowHeight}
             rowRenderer={this.rowRenderer}
