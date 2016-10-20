@@ -18,7 +18,6 @@ class PlayerView extends React.Component {
     mediaError: PropTypes.func.isRequired,
     // player misc
     isFetching: PropTypes.bool.isRequired,
-    libraryHasLoaded: PropTypes.bool.isRequired,
   }
 
   toggleFullscreen = this.toggleFullscreen.bind(this)

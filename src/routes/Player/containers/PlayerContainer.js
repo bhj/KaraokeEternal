@@ -21,7 +21,6 @@ const mapStateToProps = (state) => {
     errors: state.queue.errors,
     isPlaying: state.player.isPlaying,
     isFetching: state.player.isFetching,
-    libraryHasLoaded: state.library.hasLoaded,
   }
 }
 
