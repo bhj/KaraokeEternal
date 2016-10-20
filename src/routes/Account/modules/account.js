@@ -62,7 +62,6 @@ export function loginUser(data) {
 // ------------------------------------
 const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
 const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
-const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
 
 export function authenticateSocket(token) {
   return {
@@ -398,12 +397,6 @@ const ACTION_HANDLERS = {
     ...state,
     user: payload,
     isAuthenticated: true,
-  }),
-  [SOCKET_AUTHENTICATE_FAIL]: (state, {payload}) => ({
-    ...state,
-    user: null,
-    token: null,
-    errorMessage: payload.message
   }),
   [SOCKET_DEAUTHENTICATE]: (state, {payload}) => ({
     ...state,

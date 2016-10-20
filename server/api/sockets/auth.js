@@ -7,8 +7,6 @@ const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
 const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
 
 const SOCKET_DEAUTHENTICATE = 'server/SOCKET_DEAUTHENTICATE'
-const SOCKET_DEAUTHENTICATE_SUCCESS = 'server/SOCKET_DEAUTHENTICATE_SUCCESS'
-const SOCKET_DEAUTHENTICATE_FAIL = 'server/SOCKET_DEAUTHENTICATE_FAIL'
 
 // ------------------------------------
 // Action Handlers
@@ -21,15 +19,14 @@ const ACTION_HANDLERS = {
     try {
       user = KoaJwt.verify(payload, 'shared-secret')
     } catch (err) {
-      ctx.io.to(socketId).emit('action', {
-        type: SOCKET_AUTHENTICATE_FAIL,
-        payload: {message: err.message}
-      })
+      // callback with truthy error msg
+      ctx.acknowledge(err.message)
       return
     }
 
     // successful authentication
     ctx.socket.socket.decoded_token = user
+    ctx.socket.socket.connectedAt = new Date()
 
     ctx.io.to(socketId).emit('action', {
       type: SOCKET_AUTHENTICATE_SUCCESS,
@@ -55,6 +52,7 @@ const ACTION_HANDLERS = {
     if (ctx.user && ctx.user.roomId) {
       debug('%s (%s) left room %s (%s in room)', ctx.user.name, socketId, ctx.user.roomId, ctx.socket.socket.adapter.rooms[ctx.user.roomId].length-1 || 0)
       ctx.socket.socket.leave(ctx.user.roomId)
+      delete ctx.socket.socket.decoded_token
     }
   },
 }
