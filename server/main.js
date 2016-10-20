@@ -21,15 +21,6 @@ const socketActions = require('./api/sockets')
 const app = new koa()
 const io = new IO()
 
-// initialize database
-Promise.resolve()
-  // @todo ensure this happens before listen()
-  .then(() => {
-    db.open(config.path_database, { Promise })
-    debug('SQLite3 database opened: %s', config.path_database)
-  })
-  .catch(err => debug(err.stack))
-
 // make database available on koa ctx
 app.use(async (ctx, next) => {
     ctx.db = db
