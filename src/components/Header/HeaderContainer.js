@@ -19,13 +19,7 @@ const mapStateToProps = (state) => {
     curPos: state.queue.curPos,
     isPlaying: state.queue.isPlaying,
     isFinished: state.queue.isFinished,
-    // library
-    artistIds: state.library.artists.result,
-    artists: state.library.artists.entities,
-    songIds: state.library.songs.result,
-    songs: state.library.songs.entities,
-    // user
-    user: state.account.user,
+    errorMessage: state.errorMessage,
   }
 }
 
