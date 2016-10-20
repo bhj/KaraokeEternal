@@ -17,16 +17,16 @@ export default function createOptimisticMiddleware(socket, prefix) {
         return next(action)
       }
 
-      // For actions that have a high probability of failing, I don't set the flag
-      // if (!meta || !meta.isOptimistic) return next(action)
-
-      // executing optimistic action
-      // console.log(action, type.indexOf(prefix))
+      if (!meta || !meta.isOptimistic) {
+        // emit without optimism
+        socket.emit('action', action)
+        return next(action)
+      }
 
       const transactionID = nextTransactionID++
       next(Object.assign({}, action, {meta: {optimistic: {type: BEGIN, id: transactionID}}}))
 
-      // the 3rd arg is a callback
+      // emit with optimistic flag and error callback (3rd arg)
       socket.emit('action', action, error => {
         next({
           type: type + (error ? _ERROR : _SUCCESS),
