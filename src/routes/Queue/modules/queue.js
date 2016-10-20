@@ -1,3 +1,4 @@
+
 // Request Play
 const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 export function requestPlay() {
@@ -18,7 +19,6 @@ export function requestPause() {
 
 // emitted from server
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
-const QUEUE_ERROR = 'queue/QUEUE_ERROR'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
 const PLAYER_ERROR = 'player/PLAYER_ERROR'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
@@ -32,7 +32,8 @@ const QUEUE_ADD = 'server/QUEUE_ADD'
 export function addSong(songId) {
   return {
     type: QUEUE_ADD,
-    payload: songId
+    payload: songId,
+    meta: {isOptimistic: true},
   }
 }
 
@@ -86,18 +87,31 @@ const ACTION_HANDLERS = {
       }
     }
   },
-  // [QUEUE_ADD]: (state, {payload}) => ({
-  //   ...state,
-  //   result: state.result.push()
-  // }),
+  [QUEUE_ADD]: (state, {payload}) => {
+    // optimistic
+    let songIds = state.songIds.slice()
+    songIds.push(payload)
+
+    return {
+      ...state,
+      songIds,
+    }
+  },
+  [QUEUE_REMOVE]: (state, {payload}) => {
+    // optimistic
+    let result = state.result.slice()
+    result.splice(result.indexOf(payload), 1)
+
+    return {
+      ...state,
+      result,
+    }
+  },
   [QUEUE_CHANGE]: (state, {payload}) => ({
     ...state,
     result: payload.result,
-    entities: payload.entities
-  }),
-  [QUEUE_ERROR]: (state, {payload}) => ({
-    ...state,
-    errorMessage: payload.message
+    entities: payload.entities,
+    songIds: payload.result.map(queueId => payload.entities[queueId].songId)
   }),
 }
 
@@ -108,11 +122,11 @@ const initialState = {
   result: [],   // item ids
   entities: {}, // keyed by queueId
   errors: {},   // object of arrays keyed by queueId
+  songIds: [], // optimistic index for Library lookup
   curId: null,
   curPos: 0,
   isPlaying: false,
   isFinished: false,
-  errorMessage: null,
 }
 
 export default function queueReducer (state = initialState, action) {
