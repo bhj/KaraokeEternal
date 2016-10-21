@@ -6,10 +6,11 @@ import screenfull from 'screenfull'
 class PlayerView extends React.Component {
   static propTypes = {
     // queue
-    curId: PropTypes.number,
-    item: PropTypes.object,
+    queueId: PropTypes.number,
+    song: PropTypes.object,
     isPlaying: PropTypes.bool.isRequired,
     isFinished: PropTypes.bool.isRequired,
+    isErrored:  PropTypes.bool.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
@@ -25,49 +26,45 @@ class PlayerView extends React.Component {
   componentDidMount() {
     // emit initial state
     this.props.emitStatus({
-      curId: this.props.curId,
+      queueId: this.props.queueId,
       curPos: 0,
       isPlaying: false,
     })
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.item) {
-      let { queueId, provider } = this.props.item
-
-      if (prevProps.item && this.props.item && prevProps.item.queueId !== queueId && !ProviderPlayers[provider]) {
-        // missing/invalid provider; trigger next track
-        this.props.mediaError(id, 'No player provided for "'+provider+'"')
+    if (this.props.isPlaying && !prevProps.isPlaying) {
+      // playing for first time, after queue end, or after error
+      if (this.props.queueId === null || this.props.isFinished || this.props.isErrored) {
+        this.props.requestPlayNext()
       }
-    }
-
-    // playing for the first time or after queue ended
-    if (this.props.isPlaying && !prevProps.isPlaying && (this.props.curId === null || this.props.isFinished)) {
-      // start at beginning of queue
-      this.props.requestPlayNext()
     }
   }
 
   render () {
+    const song = this.props.song
     let ActiveComp = 'div'
     let customProps = {}
 
     if (this.props.isFinished) {
       // show 'add more songs' placeholder
-    } else if (!this.props.item) {
+    } else if (!song) {
       // show 'press play to begin' placeholder
-    } else if (!ProviderPlayers[this.props.item.provider]) {
+    } else if (!ProviderPlayers[song.provider]) {
       // show 'provider error' placeholder
+      this.props.mediaError(this.props.queueId, 'No provider for type: "'+song.provider+'"')
     } else {
-      ActiveComp = ProviderPlayers[this.props.item.provider]
+
+      ActiveComp = ProviderPlayers[song.provider]
       customProps = {
-          item: this.props.item,
+          queueId: this.props.queueId,
+          item: song,
           isPlaying: this.props.isPlaying,
           getMedia: this.props.getMedia,
           getMediaSuccess: this.props.getMediaSuccess,
           onStatus: this.props.emitStatus,
           onMediaError: this.props.mediaError,
-          onMediaEnd: this.props.requestPlayNext
+          onMediaEnd: this.props.requestPlayNext,
       }
     }
 

@@ -4,6 +4,7 @@ import locationReducer from './location'
 import account from 'routes/Account/modules/account'
 import library from 'routes/Library/modules/library'
 import queue from 'routes/Queue/modules/queue'
+import player from 'routes/Player/modules/player'
 
 export const makeRootReducer = (asyncReducers) => {
   return optimistic(combineReducers({
@@ -12,6 +13,7 @@ export const makeRootReducer = (asyncReducers) => {
     account,
     library,
     queue,
+    player,
     ...asyncReducers
   }))
 }

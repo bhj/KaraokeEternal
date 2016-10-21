@@ -7,6 +7,7 @@ class CDGPlayer extends React.Component {
   static propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+    queueId: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     item: PropTypes.object.isRequired,
     getMedia: PropTypes.func.isRequired, // action
@@ -29,7 +30,7 @@ class CDGPlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.item.queueId !== this.props.item.queueId) {
+    if (prevProps.queueId !== this.props.queueId) {
       this.updateSources()
     }
 
@@ -91,7 +92,7 @@ class CDGPlayer extends React.Component {
         this.cdgData = Array.from(new Uint8Array(res))
       }).then(() => { this.handleOnCdgLoaded() })
       .catch((err) => {
-        this.props.onMediaError(this.props.item.queueId, err.message)
+        this.props.onMediaError(this.props.queueId, err.message)
       })
   }
 
@@ -121,14 +122,14 @@ class CDGPlayer extends React.Component {
     })
 
     this.props.onStatus({
-      curId: this.props.item.queueId,
+      curId: this.props.queueId,
       curPos: this.audio.currentTime,
       isPlaying: !this.audio.paused && !this.audio.ended,
     })
   }
 
   handleAudioError = (err) => {
-    this.props.onMediaError(this.props.item.queueId,
+    this.props.onMediaError(this.props.queueId,
       'The audio file could not be loaded (error code '+err.target.error.code+')'
     )
   }

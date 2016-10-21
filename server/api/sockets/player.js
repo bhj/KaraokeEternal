@@ -10,8 +10,8 @@ const PLAYER_NEXT = 'player/PLAYER_NEXT'
 const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
 
-const PLAYER_EMIT_ERROR = 'server/PLAYER_EMIT_ERROR'
-const PLAYER_ERROR = 'player/PLAYER_ERROR'
+const PLAYER_EMIT_MEDIA_ERROR = 'server/PLAYER_EMIT_MEDIA_ERROR'
+const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
 
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 
@@ -47,10 +47,9 @@ const ACTION_HANDLERS = {
       payload
     })
   },
-  [PLAYER_EMIT_ERROR]: async (ctx, {payload}) => {
-    // to everyone in room except broadcasting player
-    ctx.socket.socket.broadcast.to(ctx.user.roomId).emit('action', {
-      type: PLAYER_ERROR,
+  [PLAYER_EMIT_MEDIA_ERROR]: async (ctx, {payload}) => {
+    ctx.io.to(ctx.user.roomId).emit('action', {
+      type: PLAYER_MEDIA_ERROR,
       payload
     })
   },

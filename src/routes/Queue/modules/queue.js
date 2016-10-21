@@ -20,7 +20,7 @@ export function requestPause() {
 // emitted from server
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
-const PLAYER_ERROR = 'player/PLAYER_ERROR'
+const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 
@@ -75,7 +75,7 @@ const ACTION_HANDLERS = {
     isPlaying: false,
     isFinished: true,
   }),
-  [PLAYER_ERROR]: (state, {payload}) => {
+  [PLAYER_MEDIA_ERROR]: (state, {payload}) => {
     const {queueId, message} = payload
 
     return {

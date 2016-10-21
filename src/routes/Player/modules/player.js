@@ -1,3 +1,5 @@
+import { ensureState } from 'redux-optimistic-ui'
+
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
@@ -9,7 +11,7 @@ export function requestPlayNext() {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_NEXT_REQUEST,
-      payload: getState().queue.curId
+      payload: ensureState(getState()).queue.curId
     })
   }
 }
@@ -35,16 +37,11 @@ export function getMediaSuccess() {
   }
 }
 
-const PLAYER_EMIT_ERROR = 'server/PLAYER_EMIT_ERROR'
+const PLAYER_EMIT_MEDIA_ERROR = 'server/PLAYER_EMIT_MEDIA_ERROR'
 export function mediaError(queueId, message) {
-  return (dispatch, getState) => {
-    // informational: have server emit player error to room
-    dispatch({
-      type: PLAYER_EMIT_ERROR,
-      payload: {queueId, message}
-    })
-
-    dispatch(requestPlayNext())
+  return {
+    type: PLAYER_EMIT_MEDIA_ERROR,
+    payload: { queueId, message }
   }
 }
 
@@ -82,6 +79,11 @@ const ACTION_HANDLERS = {
     isFetching: false,
     isPlaying: true, // all media is loaded
   }),
+  [PLAYER_EMIT_MEDIA_ERROR]: (state, {payload}) => ({
+    ...state,
+    isPlaying: false,
+    isFetching: false,
+  }),
 }
 
 // ------------------------------------
@@ -90,7 +92,6 @@ const ACTION_HANDLERS = {
 const initialState = {
   isPlaying: false,
   isFetching: false,
-  errorMessage: null,
 }
 
 export default function playerReducer (state = initialState, action) {
