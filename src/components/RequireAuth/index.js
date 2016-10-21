@@ -5,7 +5,6 @@ import { browserHistory } from 'react-router'
 // Redirects to /login by default
 export const requireAuth = UserAuthWrapper({
   authSelector: state => { ensureState(state).account.user }, // how to get the user state
-  predicate: user => user !== null,
   failureRedirectPath: '/account',
   wrapperDisplayName: 'requireAuth', // a nice name for this auth check
   redirectAction: (newLoc) => (dispatch) => {
