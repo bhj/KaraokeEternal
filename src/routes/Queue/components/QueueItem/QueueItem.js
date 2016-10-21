@@ -20,6 +20,11 @@ export const QueueItem = (props) => (
         {props.timeLeft}
       </div>
     }
+    {props.hasErrors &&
+      <div onClick={props.onErrorInfoClick} className={classes.errorInfo}>
+        <i className='material-icons'>info_outline</i>
+      </div>
+    }
     {props.canSkip &&
       <div onClick={props.onSkipClick} className={classes.skip}>
         <i className='material-icons'>skip_next</i>
@@ -28,11 +33,6 @@ export const QueueItem = (props) => (
     {props.canRemove &&
       <div onClick={props.onRemoveClick} className={classes.remove}>
         <i className='material-icons'>clear</i>
-      </div>
-    }
-    {props.hasErrors &&
-      <div onClick={props.onErrorInfoClick} className={classes.errorInfo}>
-        <i className='material-icons'>info_outline</i>
       </div>
     }
   </div>

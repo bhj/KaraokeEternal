@@ -34,6 +34,8 @@ class QueueView extends React.Component {
       const { curId, isFinished, errors } = this.props
       const isActive = (item.queueId === curId) && !isFinished
       const isOwner = item.userId === this.props.user.userId
+      const isAdmin = this.props.user.isAdmin === 1
+
       let timeLeft
 
       if (isActive) {
@@ -50,7 +52,7 @@ class QueueView extends React.Component {
           artist={this.props.artists[song.artistId].name}
           title={song.title}
           userName={item.userName}
-          canSkip={isOwner && isActive}
+          canSkip={isActive && (isOwner || isAdmin)}
           canRemove={isOwner && !isActive && queueId > curId}
           hasErrors={typeof errors[queueId] !== 'undefined'}
           pctPlayed={isActive ? this.props.curPos / song.duration * 100 : 0}
