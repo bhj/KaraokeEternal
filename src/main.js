@@ -26,6 +26,16 @@ socket.on('connect', function () {
 //   console.log('Reconnection failed')
 // })
 
+// hack to disable double-tap zooming in iOS 10, see:
+// http://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
+let lastTouchEnd = 0
+document.documentElement.addEventListener('touchend', event => {
+  var now = (new Date()).getTime()
+  if (now - lastTouchEnd <= 300) {
+    event.preventDefault()
+  }
+  lastTouchEnd = now
+}, false)
 
 // ========================================================
 // Store Instantiation
