@@ -23,16 +23,23 @@ export const injectReducer = (store, { key, reducer }) => {
 
 export default makeRootReducer
 
-export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE'
+export const CLEAR_ERROR_MESSAGE = 'CLEAR_ERROR_MESSAGE'
 
 function errorMessage(state = null, action) {
   const { type, error } = action
 
-  if (type === RESET_ERROR_MESSAGE) {
+  if (type === CLEAR_ERROR_MESSAGE) {
     return null
   } else if (error) {
     return action.error
   }
 
   return state
+}
+
+export function clearErrorMessage() {
+  return {
+    type: CLEAR_ERROR_MESSAGE,
+    payload: null,
+  }
 }

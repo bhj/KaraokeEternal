@@ -25,7 +25,8 @@ function receiveLogin(response) {
 function loginError(message) {
   return {
     type: LOGIN_FAIL,
-    payload: message
+    payload: null,
+    error: message + ' (incorrect login)',
   }
 }
 
@@ -52,7 +53,7 @@ export function loginUser(data) {
         localStorage.setItem('token', res.token)
       })
       .catch(err => {
-        dispatch(loginError(err))
+        dispatch(loginError(err.message))
       })
   }
 }
@@ -104,7 +105,8 @@ function receiveLogout() {
 function logoutError(message) {
   return {
     type: LOGOUT_FAIL,
-    payload: message
+    payload: null,
+    error: message,
   }
 }
 
@@ -127,7 +129,7 @@ export function logoutUser() {
         localStorage.removeItem('token')
       })
       .catch(err => {
-        dispatch(logoutError(err))
+        dispatch(logoutError(err.message))
       })
   }
 }
@@ -156,7 +158,8 @@ function receiveCreate() {
 function createError(message) {
   return {
     type: CREATE_FAIL,
-    payload: message
+    payload: null,
+    error: message,
   }
 }
 
@@ -178,7 +181,7 @@ export function createUser(user) {
         // this.loginUser({email: user.email, password: user.password})
       })
       .catch(err => {
-        dispatch(createError(err))
+        dispatch(createError(err.message))
       })
   }
 }
@@ -207,7 +210,8 @@ function receiveUpdate(response) {
 function updateError(message) {
   return {
     type: UPDATE_FAIL,
-    payload: message
+    payload: null,
+    error: message,
   }
 }
 
@@ -230,7 +234,7 @@ export function updateUser(data) {
         dispatch(receiveUpdate(user))
       })
       .catch(err => {
-        dispatch(updateError(err))
+        dispatch(updateError(err.message))
       })
   }
 }
@@ -259,7 +263,8 @@ function receiveRooms(response) {
 function roomsError(message) {
   return {
     type: GET_ROOMS_FAIL,
-    payload: message
+    payload: null,
+    error: message,
   }
 }
 
@@ -274,7 +279,7 @@ export function fetchRooms() {
         dispatch(receiveRooms(response))
       })
       .catch(err => {
-        dispatch(roomsError(err))
+        dispatch(roomsError(err.message))
       })
   }
 }
@@ -311,19 +316,16 @@ const ACTION_HANDLERS = {
   [LOGIN]: (state, {payload}) => ({
     ...state,
     isFetching: true,
-    errorMessage: null
   }),
   [LOGIN_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     user: payload.user,
     token: payload.token,
-    errorMessage: null
   }),
   [LOGIN_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: payload.message
   }),
   [LOGOUT]: (state, {payload}) => ({
     ...state,
@@ -334,69 +336,56 @@ const ACTION_HANDLERS = {
     isFetching: false,
     user: null,
     token: null,
-    errorMessage: null
   }),
   [LOGOUT_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: payload.message
   }),
   [CREATE]: (state, {payload}) => ({
     ...state,
     isFetching: true,
-    errorMessage: null
   }),
   [CREATE_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: null
   }),
   [CREATE_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: payload.message
   }),
   [UPDATE]: (state, {payload}) => ({
     ...state,
     isFetching: true,
-    errorMessage: null
   }),
   [UPDATE_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     user: payload,
-    errorMessage: null
   }),
   [UPDATE_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: payload.message
   }),
   [GET_ROOMS]: (state, {payload}) => ({
     ...state,
     isFetching: true,
-    errorMessage: null
   }),
   [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
     rooms: payload,
-    errorMessage: null
   }),
   [GET_ROOMS_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: payload.message
   }),
   [CHANGE_VIEW]: (state, {payload}) => ({
     ...state,
     viewMode: payload,
-    errorMessage: null
   }),
   [SOCKET_AUTHENTICATE_SUCCESS]: (state, {payload}) => ({
     ...state,
     user: payload,
-    isAuthenticated: true,
   }),
   [SOCKET_DEAUTHENTICATE]: (state, {payload}) => ({
     ...state,

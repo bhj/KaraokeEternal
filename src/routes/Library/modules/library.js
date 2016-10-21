@@ -32,7 +32,8 @@ function receiveLibrary(response) {
 function libraryError(message) {
   return {
     type: GET_LIBRARY_FAIL,
-    payload: message
+    payload: null,
+    error: message,
   }
 }
 
@@ -47,7 +48,7 @@ export function fetchLibrary() {
         dispatch(receiveLibrary(response))
       })
       .catch(err => {
-        dispatch(libraryError(err))
+        dispatch(libraryError(err.message))
       })
   }
 }
@@ -72,7 +73,6 @@ const ACTION_HANDLERS = {
   [GET_LIBRARY]: (state, {payload}) => ({
     ...state,
     isFetching: true,
-    errorMessage: null
   }),
   [GET_LIBRARY_SUCCESS]: (state, {payload}) => ({
     ...state,
@@ -83,7 +83,6 @@ const ACTION_HANDLERS = {
   [GET_LIBRARY_FAIL]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    errorMessage: payload.message
   }),
 }
 
@@ -92,7 +91,6 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   isFetching: false,
-  errorMessage: null,
   artists: {result: [], entities:{}},
   songs: {result: [], entities:{}}
 }
