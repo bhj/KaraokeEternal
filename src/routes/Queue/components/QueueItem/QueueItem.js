@@ -3,16 +3,13 @@ import classes from './QueueItem.css'
 
 export const QueueItem = (props) => (
   <div className={classes.container} style={{backgroundSize: props.pctPlayed+'% 100%'}}>
-    <div className={classes.timeLeft}>
-      {props.userName}
-      <br/>
+    <div className={classes.wait}>
       {props.isActive ? 'now' : props.wait}
     </div>
 
     <div className={classes.primary}>
-      <div className={classes.title}>{props.title}</div>
-      <div className={classes.artist}>{props.artist}</div>
-      <div className={classes.user}></div>
+      <div className={classes.user}>{props.userName}</div>
+      <div className={classes.title}>{props.artist} - {props.title}</div>
     </div>
 
     {props.hasErrors &&

@@ -1,7 +1,6 @@
 .container {
   display: flex;
   height: 64px;
-  align-items: center;
   background-image: linear-gradient(to right, #f3f3f3, #ddd);
   background-repeat: no-repeat;
 }
@@ -19,14 +18,17 @@
 
 .artist {
   composes: ellipsis;
-  font-size: 14px;
+  /*font-size: 14px;*/
 }
 
 .title {
   composes: ellipsis;
-  font-size: 18px;
+  /*font-size: 18px;*/
 }
 
+.wait {
+  width: 15%;
+}
 /* Actions */
 .button {
   font-size: 48px;
