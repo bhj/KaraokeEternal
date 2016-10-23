@@ -27,7 +27,7 @@ class QueueView extends React.Component {
   render() {
     let songs = []
     let wait = 0
-    let nextWait
+    let nextWait = 0
 
     songs = this.props.result.map(function(queueId, i) {
       const { curId, curPos } = this.props
@@ -55,7 +55,7 @@ class QueueView extends React.Component {
           userName={item.userName}
           isActive={isActive}
           isUpcoming={isUpcoming}
-          wait={isUpcoming ? secToTime(wait) : ''}
+          wait={isUpcoming && wait ? secToTime(wait) : ''}
           canSkip={isActive && (isOwner || isAdmin)}
           canRemove={isUpcoming && (isOwner || isAdmin)}
           hasErrors={typeof this.props[queueId] !== 'undefined'}
