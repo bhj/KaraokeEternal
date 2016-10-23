@@ -26,7 +26,7 @@ class PlayerView extends React.Component {
   componentDidMount() {
     // emit initial state
     this.props.emitStatus({
-      queueId: this.props.queueId,
+      curId: this.props.queueId,
       curPos: 0,
       isPlaying: false,
     })
