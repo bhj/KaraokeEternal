@@ -89,7 +89,7 @@ function secToTime(sec) {
   if (sec >= 60) {
     return Math.round(sec/60) + ' min'
   } else {
-    return (Math.floor(sec/5)+1)*5 + ' sec'
+    return Math.floor(sec) + ' sec'
   }
 }
 
