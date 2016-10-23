@@ -3,28 +3,28 @@ import classes from './QueueItem.css'
 
 export const QueueItem = (props) => (
   <div className={classes.container} style={{backgroundSize: props.pctPlayed+'% 100%'}}>
-    <div className={classes.star}>
-      <i className='material-icons'>
-        {props.isStarred ? 'star' : 'star_border'}
-      </i>
+    <div className={classes.timeLeft}>
+      {props.userName}
+      <br/>
+      {props.isActive ? 'now' : props.wait}
     </div>
 
     <div className={classes.primary}>
       <div className={classes.title}>{props.title}</div>
       <div className={classes.artist}>{props.artist}</div>
-      <div className={classes.user}>{props.userName}</div>
+      <div className={classes.user}></div>
     </div>
 
-    {props.timeLeft &&
-      <div className={classes.timeLeft}>
-        {props.timeLeft}
-      </div>
-    }
     {props.hasErrors &&
       <div onClick={props.onErrorInfoClick} className={classes.errorInfo}>
         <i className='material-icons'>info_outline</i>
       </div>
     }
+    <div className={classes.star}>
+      <i className='material-icons'>
+        {props.isStarred ? 'star' : 'star_border'}
+      </i>
+    </div>
     {props.canSkip &&
       <div onClick={props.onSkipClick} className={classes.skip}>
         <i className='material-icons'>skip_next</i>
@@ -43,7 +43,6 @@ QueueItem.propTypes = {
   artist: React.PropTypes.string.isRequired,
   userName: React.PropTypes.string.isRequired,
   hasErrors: React.PropTypes.bool.isRequired,
-  timeLeft: React.PropTypes.string,
   canSkip: React.PropTypes.bool.isRequired,
   onSkipClick: React.PropTypes.func.isRequired,
   canRemove: React.PropTypes.bool.isRequired,
