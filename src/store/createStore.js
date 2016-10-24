@@ -1,6 +1,7 @@
 import { applyMiddleware, compose, createStore } from 'redux'
 import createOptimisticMiddleware from './optimisticMiddleware'
 import thunk from 'redux-thunk'
+import createThrottle from "redux-throttle"
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './location'
@@ -9,9 +10,14 @@ export default (initialState = {}, socket) => {
   // ======================================================
   // Middleware Configuration
   // ======================================================
+  const throttle = createThrottle(1000, {
+    // https://lodash.com/docs#throttle
+    leading: true,
+    trailing: true
+  })
   const optimisticMiddleware = createOptimisticMiddleware(socket, "server/")
 
-  const middleware = [thunk, optimisticMiddleware]
+  const middleware = [thunk, throttle, optimisticMiddleware]
 
   // ======================================================
   // Store Enhancers

@@ -50,7 +50,8 @@ const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
 export function emitStatus(payload) {
   return {
     type: PLAYER_EMIT_STATUS,
-    payload
+    payload,
+    meta: {throttle: true}
   }
 }
 
