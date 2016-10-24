@@ -43,8 +43,8 @@ class PlayerView extends React.Component {
 
   render () {
     const song = this.props.song
-    let ActiveComp = 'div'
-    let customProps = {}
+    let Component = 'div'
+    let Props
 
     if (this.props.isFinished) {
       // show 'add more songs' placeholder
@@ -54,9 +54,8 @@ class PlayerView extends React.Component {
       // show 'provider error' placeholder
       this.props.mediaError(this.props.queueId, 'No provider for type: "'+song.provider+'"')
     } else {
-
-      ActiveComp = ProviderPlayers[song.provider]
-      customProps = {
+      Component = ProviderPlayers[song.provider]
+      Props = {
           queueId: this.props.queueId,
           item: song,
           isPlaying: this.props.isPlaying,
@@ -75,7 +74,7 @@ class PlayerView extends React.Component {
       >
         <AutoSizer>
           {({width, height}) => (
-            <ActiveComp width={width} height={height} {...customProps}/>
+            <Component width={width} height={height} {...Props}/>
           )}
         </AutoSizer>
       </div>
