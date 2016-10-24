@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import { Header, HeaderTitle } from 'components/Header'
 import Navigation from 'components/Navigation'
 import QueueItem from './QueueItem'
 
