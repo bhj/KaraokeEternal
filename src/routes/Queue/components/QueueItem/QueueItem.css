@@ -18,17 +18,15 @@
 
 .artist {
   composes: ellipsis;
-  /*font-size: 14px;*/
 }
 
 .title {
   composes: ellipsis;
-  /*font-size: 18px;*/
 }
 
 .wait {
-  width: 15%;
 }
+
 /* Actions */
 .button {
   font-size: 48px;
