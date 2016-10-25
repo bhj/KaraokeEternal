@@ -67,7 +67,7 @@ class QueueView extends React.Component {
     }, this)
 
     return (
-      <div style={{overflow: 'auto'}}>
+      <div style={{width: '100%', overflow: 'auto'}}>
         {songs}
       </div>
     )
