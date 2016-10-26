@@ -1,32 +1,8 @@
 
-// Request Play
-const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
-export function requestPlay() {
-  return {
-    type: PLAYER_PLAY_REQUEST,
-    payload: null
-  }
-}
-
-// Request Pause
-const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
-export function requestPause() {
-  return {
-    type: PLAYER_PAUSE_REQUEST,
-    payload: null
-  }
-}
-
 // emitted from server
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
-const PLAYER_STATUS = 'player/PLAYER_STATUS'
-const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
-const PLAYER_NEXT = 'player/PLAYER_NEXT'
-const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 
-// ------------------------------------
 // add to queue
-// ------------------------------------
 const QUEUE_ADD = 'server/QUEUE_ADD'
 
 export function addSong(songId) {
@@ -37,9 +13,7 @@ export function addSong(songId) {
   }
 }
 
-// ------------------------------------
 // remove from queue
-// ------------------------------------
 export const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
 
 export function removeItem(queueId) {
@@ -54,39 +28,6 @@ export function removeItem(queueId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  // broadcast to room
-  [PLAYER_STATUS]: (state, {payload}) => {
-     // @todo: ignore (old) updates for previous queueId
-    return {
-      ...state,
-      curId: payload.curId,
-      curPos: payload.curPos,
-      isPlaying: payload.isPlaying,
-    }
-  },
-  [PLAYER_NEXT]: (state, {payload}) => ({
-    ...state,
-    curId: payload,
-    curPos: 0,
-    isFinished: false,
-  }),
-  [PLAYER_QUEUE_END]: (state, {payload}) => ({
-    ...state,
-    isPlaying: false,
-    isFinished: true,
-  }),
-  [PLAYER_MEDIA_ERROR]: (state, {payload}) => {
-    const {queueId, message} = payload
-
-    return {
-      ...state,
-      errors: {
-        ...state.errors,
-        // can be multiple errors for a media item
-        [queueId]: state.errors[queueId] ? state.errors[queueId].concat(message) : [message]
-      }
-    }
-  },
   [QUEUE_ADD]: (state, {payload}) => {
     // optimistic
     let songIds = state.songIds.slice()
@@ -121,12 +62,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   result: [],   // item ids
   entities: {}, // keyed by queueId
-  errors: {},   // object of arrays keyed by queueId
   songIds: [], // optimistic index for Library lookup
-  curId: null,
-  curPos: 0,
-  isPlaying: false,
-  isFinished: false,
 }
 
 export default function queueReducer (state = initialState, action) {

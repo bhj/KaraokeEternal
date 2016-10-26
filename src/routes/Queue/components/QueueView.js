@@ -57,7 +57,7 @@ class QueueView extends React.Component {
           wait={isUpcoming && wait ? secToTime(wait) : ''}
           canSkip={isActive && (isOwner || isAdmin)}
           canRemove={isUpcoming && (isOwner || isAdmin)}
-          hasErrors={typeof this.props[queueId] !== 'undefined'}
+          hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
           pctPlayed={isActive ? curPos / song.duration * 100 : 0}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
           onSkipClick={this.props.requestPlayNext}

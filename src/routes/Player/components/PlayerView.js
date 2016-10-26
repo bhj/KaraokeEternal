@@ -35,7 +35,7 @@ class PlayerView extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.isPlaying && !prevProps.isPlaying) {
       // playing for first time, after queue end, or after error
-      if (this.props.queueId === null || this.props.isFinished || this.props.isErrored) {
+      if (this.props.queueId === -1 || this.props.isFinished || this.props.isErrored) {
         this.props.requestPlayNext()
       }
     }
