@@ -12,22 +12,21 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
+  let songId, song
   state = ensureState(state)
 
-  let songId
-  let queueId = state.player.queueId
-
-  if (state.queue.entities[queueId]) {
-    songId = state.queue.entities[queueId].songId
+  if (state.queue.entities[state.player.queueId]) {
+    songId = state.queue.entities[state.player.queueId].songId
+    song = state.library.songs.entities[songId]
   }
 
   return {
     queueId: state.player.queueId,
-    song: state.library.songs.entities[songId],
+    song,
     isFinished: state.player.isFinished,
     isPlaying: state.player.isPlaying,
     isFetching: state.player.isFetching,
-    isErrored: typeof state.player.errors[queueId] !== 'undefined'
+    isErrored: typeof state.player.errors[state.player.queueId] !== 'undefined'
   }
 }
 

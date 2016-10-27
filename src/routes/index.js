@@ -7,6 +7,7 @@ import PlayerRoute from './Player'
 import LibraryRoute from './Library'
 import QueueRoute from './Queue'
 import { fetchLibrary } from './Library/modules/library'
+import { setActivePlayer } from './Player/modules/player'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -14,8 +15,16 @@ import { fetchLibrary } from './Library/modules/library'
 export const createRoutes = (store) => ({
   path: '/',
   getComponent (nextState, cb) {
-    if (!ensureState(store.getState()).library.artists.result.length) {
+    const state = ensureState(store.getState())
+    if (!state.library.artists.result.length) {
       store.dispatch(fetchLibrary())
+    }
+
+    // hacky way to determine if we're the actual/visible player
+    if (state.location.pathname === '/player') {
+      store.dispatch(setActivePlayer(true))
+    } else if (state.player.isActive) {
+      store.dispatch(setActivePlayer(false))
     }
 
     cb(null, CoreLayout)

@@ -1,18 +1,21 @@
 import { ensureState } from 'redux-optimistic-ui'
 
+const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
+const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
-const PLAYER_STATUS = 'player/PLAYER_STATUS'
+const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
+const PLAYER_SET_ACTIVE = 'player/PLAYER_SET_ACTIVE'
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
+const PLAYER_STATUS = 'player/PLAYER_STATUS'
+
 // for informational purposes from provider players
 export const GET_MEDIA = 'player/GET_MEDIA'
 export const GET_MEDIA_SUCCESS = 'player/GET_MEDIA_SUCCESS'
 
-
 // Request Play
-const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 export function requestPlay() {
   return {
     type: PLAYER_PLAY_REQUEST,
@@ -21,7 +24,6 @@ export function requestPlay() {
 }
 
 // Request Pause
-const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 export function requestPause() {
   return {
     type: PLAYER_PAUSE_REQUEST,
@@ -30,13 +32,20 @@ export function requestPause() {
 }
 
 // Request Play Next
-const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 export function requestPlayNext() {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_NEXT_REQUEST,
       payload: ensureState(getState()).player.queueId
     })
+  }
+}
+
+// whether we are the "active" player or not
+export function setActivePlayer(isActive) {
+  return {
+    type: PLAYER_SET_ACTIVE,
+    payload: isActive
   }
 }
 
@@ -84,12 +93,17 @@ const ACTION_HANDLERS = {
     ...state,
     isPlaying: true,
   }),
-  [PLAYER_NEXT]: (state, {payload}) => ({
-    ...state,
-    queueId: payload,
-    pos: 0,
-    isFinished: false,
-  }),
+  [PLAYER_NEXT]: (state, {payload}) => {
+    // don't listen if we're not the active/visible player
+    if (!state.isActive) return state
+
+    return {
+      ...state,
+      queueId: payload,
+      pos: 0,
+      isFinished: false,
+    }
+  },
   [PLAYER_QUEUE_END]: (state, {payload}) => ({
     ...state,
     isPlaying: false,
@@ -109,9 +123,12 @@ const ACTION_HANDLERS = {
     isPlaying: false,
     isFetching: false,
   }),
+  [PLAYER_SET_ACTIVE]: (state, {payload}) => ({
+    ...state,
+    isActive: payload,
+  }),
   // broadcast to room
   [PLAYER_STATUS]: (state, {payload}) => {
-     // @todo: ignore (old) updates for previous queueId
     return {
       ...state,
       queueId: payload.queueId,
@@ -140,6 +157,7 @@ const initialState = {
   isPlaying: false,
   isFetching: false,
   isFinished: false,
+  isActive: false, // whether the player is visible (hacky)
   queueId: -1,
   pos: 0,
   errors: {},   // object of arrays keyed by queueId
