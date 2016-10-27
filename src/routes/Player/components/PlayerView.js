@@ -17,6 +17,7 @@ class PlayerView extends React.Component {
     getMedia: PropTypes.func.isRequired,
     getMediaSuccess: PropTypes.func.isRequired,
     mediaError: PropTypes.func.isRequired,
+    cancelStatus: PropTypes.func.isRequired,
     // player misc
     isFetching: PropTypes.bool.isRequired,
   }
@@ -26,9 +27,9 @@ class PlayerView extends React.Component {
   componentDidMount() {
     // emit initial state
     this.props.emitStatus({
-      curId: this.props.queueId,
-      curPos: 0,
-      isPlaying: false,
+      queueId: this.props.queueId,
+      pos: 0,
+      isPlaying: this.props.isPlaying,
     })
   }
 
@@ -38,6 +39,20 @@ class PlayerView extends React.Component {
       if (this.props.queueId === -1 || this.props.isFinished || this.props.isErrored) {
         this.props.requestPlayNext()
       }
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (this.props.queueId !== nextProps.queueId) {
+      // cancel any throttled status updates for old id
+      this.props.cancelStatus()
+
+      // emit the new id now so "play next" feels more responsive
+      this.props.emitStatus({
+        queueId: nextProps.queueId,
+        pos: 0,
+        isPlaying: this.props.isPlaying,
+      })
     }
   }
 
