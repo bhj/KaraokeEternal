@@ -9,7 +9,7 @@ class QueueView extends React.Component {
     errors: PropTypes.object,
     curId: PropTypes.number,
     curPos: PropTypes.number,
-    isFinished: PropTypes.bool.isRequired,
+    isAtQueueEnd: PropTypes.bool.isRequired,
     // library
     artistIds: PropTypes.array.isRequired,
     artists: PropTypes.object.isRequired,
@@ -33,7 +33,7 @@ class QueueView extends React.Component {
 
       const item = this.props.entities[queueId]
       const song = this.props.songs[item.songId]
-      const isActive = (item.queueId === curId) && !this.props.isFinished
+      const isActive = (item.queueId === curId) && !this.props.isAtQueueEnd
       const isUpcoming = queueId > curId
       const isOwner = item.userId === this.props.user.userId
       const isAdmin = this.props.user.isAdmin === 1

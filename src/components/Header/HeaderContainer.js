@@ -19,7 +19,7 @@ const mapStateToProps = (state) => {
     queueId: state.player.queueId,
     pos: state.player.pos,
     isPlaying: state.player.isPlaying,
-    isFinished: state.player.isFinished,
+    isAtQueueEnd: state.player.isAtQueueEnd,
     errorMessage: state.errorMessage,
   }
 }

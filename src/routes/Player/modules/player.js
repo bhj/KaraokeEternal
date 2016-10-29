@@ -109,13 +109,13 @@ const ACTION_HANDLERS = {
       ...state,
       queueId: payload,
       pos: 0,
-      isFinished: false,
+      isAtQueueEnd: false,
     }
   },
   [PLAYER_QUEUE_END]: (state, {payload}) => ({
     ...state,
     isPlaying: false,
-    isFinished: true,
+    isAtQueueEnd: true,
   }),
   [GET_MEDIA]: (state, {payload}) => ({
     ...state,
@@ -164,7 +164,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   isPlaying: false,
   isFetching: false,
-  isFinished: false,
+  isAtQueueEnd: false,
   isActive: false, // whether the player is visible (hacky)
   queueId: -1,
   pos: 0,

@@ -24,7 +24,7 @@ const mapStateToProps = (state) => {
   return {
     queueId: state.player.queueId,
     song,
-    isFinished: state.player.isFinished,
+    isAtQueueEnd: state.player.isAtQueueEnd,
     isPlaying: state.player.isPlaying,
     isFetching: state.player.isFetching,
     isErrored: typeof state.player.errors[state.player.queueId] !== 'undefined'

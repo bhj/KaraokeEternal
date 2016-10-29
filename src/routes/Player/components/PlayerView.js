@@ -9,7 +9,7 @@ class PlayerView extends React.Component {
     queueId: PropTypes.number,
     song: PropTypes.object,
     isPlaying: PropTypes.bool.isRequired,
-    isFinished: PropTypes.bool.isRequired,
+    isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored:  PropTypes.bool.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
@@ -36,7 +36,7 @@ class PlayerView extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.isPlaying && !prevProps.isPlaying) {
       // playing for first time, after queue end, or after error
-      if (this.props.queueId === -1 || this.props.isFinished || this.props.isErrored) {
+      if (this.props.queueId === -1 || this.props.isAtQueueEnd || this.props.isErrored) {
         this.props.requestPlayNext()
       }
     }
@@ -61,7 +61,7 @@ class PlayerView extends React.Component {
     let Component = 'div'
     let componentProps
 
-    if (this.props.isFinished) {
+    if (this.props.isAtQueueEnd) {
       // show 'add more songs' placeholder
     } else if (!song) {
       // show 'press play to begin' placeholder
