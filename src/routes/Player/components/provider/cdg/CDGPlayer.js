@@ -124,7 +124,7 @@ class CDGPlayer extends React.Component {
     this.props.onStatus({
       queueId: this.props.queueId,
       pos: this.audio.currentTime,
-      isPlaying: !this.audio.paused && !this.audio.ended,
+      isPlaying: !this.audio.paused,
     })
   }
 
