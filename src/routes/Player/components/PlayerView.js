@@ -43,16 +43,14 @@ class PlayerView extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
+    // cancel any queued (throttled) updates for prev item
     if (this.props.queueId !== nextProps.queueId) {
-      // cancel any throttled status updates for old id
       this.props.cancelStatus()
+    }
 
-      // emit the new id now so "play next" feels more responsive
-      this.props.emitStatus({
-        queueId: nextProps.queueId,
-        pos: 0,
-        isPlaying: this.props.isPlaying,
-      })
+    // cancel queued updates that would have outdated isPlaying: true
+    if ((this.props.isAtQueueEnd !== nextProps.isAtQueueEnd) && nextProps.isAtQueueEnd) {
+      this.props.cancelStatus()
     }
   }
 

@@ -7,7 +7,6 @@ const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
-const PLAYER_SET_ACTIVE = 'player/PLAYER_SET_ACTIVE'
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
 const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
@@ -47,14 +46,6 @@ export function cancelStatus() {
   return {
     type: CANCEL,
     payload: {type: PLAYER_EMIT_STATUS}
-  }
-}
-
-// whether we are the "active" player or not
-export function setActivePlayer(isActive) {
-  return {
-    type: PLAYER_SET_ACTIVE,
-    payload: isActive
   }
 }
 
@@ -102,14 +93,12 @@ const ACTION_HANDLERS = {
     isPlaying: true,
   }),
   [PLAYER_NEXT]: (state, {payload}) => {
-    // don't listen if we're not the active/visible player
-    if (!state.isActive) return state
-
     return {
       ...state,
       queueId: payload,
       pos: 0,
       isAtQueueEnd: false,
+      prevQueueId: state.queueId,
     }
   },
   [PLAYER_QUEUE_END]: (state, {payload}) => ({
@@ -131,16 +120,21 @@ const ACTION_HANDLERS = {
     isPlaying: false,
     isFetching: false,
   }),
-  [PLAYER_SET_ACTIVE]: (state, {payload}) => ({
-    ...state,
-    isActive: payload,
-  }),
   [PLAYER_STATUS]: (state, {payload}) => {
+    if (state.prevQueueId === payload.queueId) {
+      // ignore this (old) status update once
+      return {
+        ...state,
+        prevQueueId: null,
+      }
+    }
+
     return {
       ...state,
       queueId: payload.queueId,
       pos: payload.pos,
       isPlaying: payload.isPlaying,
+      prevQueueId: null,
     }
   },
   [PLAYER_MEDIA_ERROR]: (state, {payload}) => {
@@ -161,12 +155,12 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  queueId: -1,
+  pos: 0,
   isPlaying: false,
   isFetching: false,
   isAtQueueEnd: false,
-  isActive: false, // whether the player is visible (hacky)
-  queueId: -1,
-  pos: 0,
+  prevQueueId: null,
   errors: {},   // object of arrays keyed by queueId
 }
 
