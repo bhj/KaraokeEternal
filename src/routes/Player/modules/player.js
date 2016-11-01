@@ -135,7 +135,6 @@ const ACTION_HANDLERS = {
     ...state,
     isActive: payload,
   }),
-  // broadcast to room
   [PLAYER_STATUS]: (state, {payload}) => {
     return {
       ...state,
