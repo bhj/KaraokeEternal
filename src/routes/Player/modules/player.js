@@ -10,6 +10,7 @@ const PLAYER_NEXT = 'player/PLAYER_NEXT'
 const PLAYER_SET_ACTIVE = 'player/PLAYER_SET_ACTIVE'
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
+const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
 const PLAYER_STATUS = 'player/PLAYER_STATUS'
 
 // for informational purposes from provider players
@@ -80,7 +81,6 @@ export function mediaError(queueId, message) {
 }
 
 // have server emit player status to room
-const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
 export function emitStatus(payload) {
   return {
     type: PLAYER_EMIT_STATUS,
