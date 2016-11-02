@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch'
 import {ensureState} from 'redux-optimistic-ui'
+import { browserHistory } from 'react-router'
 
 // ------------------------------------
 // Login
@@ -33,7 +34,7 @@ function loginError(message) {
 // Calls the API to get a token (stored in httpOnly cookie)
 // and connects to the socket with said cookie
 export function loginUser(data) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(requestLogin(data))
 
     return fetch('/api/account/login', {
@@ -51,11 +52,28 @@ export function loginUser(data) {
 
         localStorage.setItem('user', JSON.stringify(res.user))
         localStorage.setItem('token', res.token)
+
+        // check for redirect in query string
+        let query = parseQuery(ensureState(getState()).location.search)
+
+        if (query.redirect) {
+          browserHistory.push(query.redirect)
+        }
       })
       .catch(err => {
         dispatch(loginError(err.message))
       })
   }
+}
+
+function parseQuery(qstr) {
+  var query = {}
+  var a = qstr.substr(1).split('&')
+  for (var i = 0; i < a.length; i++) {
+      var b = a[i].split('=')
+      query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '')
+  }
+  return query
 }
 
 // ------------------------------------
