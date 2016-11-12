@@ -1,6 +1,6 @@
 // We only need to import the modules necessary for initial render
 import {ensureState} from 'redux-optimistic-ui'
-import CoreLayout from '../layouts/CoreLayout/CoreLayout'
+import CoreLayout from 'layouts/CoreLayout'
 import Home from './Home'
 import AccountRoute from './Account'
 import PlayerRoute from './Player'

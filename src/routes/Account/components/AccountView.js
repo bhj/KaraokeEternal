@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react'
 import { browserHistory } from 'react-router'
-import { Header, HeaderTitle } from 'components/Header'
-import Navigation from 'components/Navigation'
+import AppLayout from 'layouts/AppLayout'
 import AccountForm from '../containers/AccountForm'
 import Logout from './Logout'
 
@@ -18,7 +17,7 @@ class AccountView extends React.Component {
     const headerTitle = user ? user.name : (this.props.viewMode === 'login') ? 'Sign In' : 'Create Account'
 
     return (
-      <div style={{flex: '1', padding: '1em'}}>
+      <AppLayout title={headerTitle}>
         <AccountForm/>
         {errorMessage &&
           <p style={{color:'red'}}>{errorMessage}</p>
@@ -36,7 +35,7 @@ class AccountView extends React.Component {
             <Logout onLogoutClick={this.props.logoutUser} />
           </div>
         }
-      </div>
+      </AppLayout>
     )
   }
 }

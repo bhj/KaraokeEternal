@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import Navigation from 'components/Navigation'
+import AppLayout from 'layouts/AppLayout'
 import QueueItem from './QueueItem'
 
 class QueueView extends React.Component {
@@ -67,9 +67,9 @@ class QueueView extends React.Component {
     }, this)
 
     return (
-      <div style={{width: '100%', overflow: 'auto'}}>
+      <AppLayout title="Queue">
         {songs}
-      </div>
+      </AppLayout>
     )
   }
 

@@ -1,4 +1,3 @@
-import { Header } from './Header'
-import { HeaderTitle } from './Header'
+import HeaderContainer from './HeaderContainer'
 
-export { Header, HeaderTitle }
+export default HeaderContainer

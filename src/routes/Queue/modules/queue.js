@@ -5,7 +5,7 @@ const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 // add to queue
 const QUEUE_ADD = 'server/QUEUE_ADD'
 
-export function addSong(songId) {
+export function queueSong(songId) {
   return {
     type: QUEUE_ADD,
     payload: songId,
