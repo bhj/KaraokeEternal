@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import AppLayout from 'layouts/AppLayout'
 import { AutoSizer } from 'react-virtualized'
 import ProviderPlayers from './provider'
 import screenfull from 'screenfull'
@@ -81,16 +82,15 @@ class PlayerView extends React.Component {
     }
 
     return (
-      <div style={{flex: '1 1 auto', width: '100%' }}
-        ref={ref => {this.ref = ref}}
-        onDoubleClick={this.toggleFullscreen}
-      >
+      <AppLayout title="Player">
         <AutoSizer>
           {({width, height}) => (
-            <Component width={width} height={height} {...componentProps}/>
+            <div style={{width, height}} ref={ref => {this.ref = ref}} onDoubleClick={this.toggleFullscreen}>
+              <Component width={width} height={height}  {...componentProps}/>
+            </div>
           )}
         </AutoSizer>
-      </div>
+      </AppLayout>
     )
   }
 
