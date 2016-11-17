@@ -50,6 +50,7 @@ const ACTION_HANDLERS = {
   },
   [QUEUE_REMOVE]: async (ctx, {payload}) => {
     const socketId = ctx.socket.socket.id
+    const queueId = payload
     let item, res
 
     if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
@@ -59,7 +60,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify item exists
-    item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', payload)
+    item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', queueId)
 
     if (!item) {
       // callback with truthy error msg
@@ -82,7 +83,7 @@ const ACTION_HANDLERS = {
     }
 
     // delete item
-    res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', payload)
+    res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', queueId)
 
     if (res.changes !== 1) {
       // callback with truthy error msg
@@ -105,7 +106,7 @@ async function getQueue(ctx, roomId) {
   let result = []
   let entities = {}
 
-  let rows = await ctx.db.all('SELECT queue.*, users.name AS userName FROM queue JOIN users USING(userId) WHERE roomId = ? ORDER BY queueId', roomId)
+  let rows = await ctx.db.all('SELECT queueId, songId, userId, users.name FROM queue JOIN users USING(userId) WHERE roomId = ? ORDER BY queueId', roomId)
 
   rows.forEach(function(row){
     result.push(row.queueId)
