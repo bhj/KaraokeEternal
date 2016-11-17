@@ -51,7 +51,7 @@ class QueueView extends React.Component {
           key={queueId}
           artist={this.props.artists[song.artistId].name}
           title={song.title}
-          userName={item.userName}
+          name={item.name}
           isActive={isActive}
           isUpcoming={isUpcoming}
           wait={isUpcoming && wait ? secToTime(wait) : ''}
