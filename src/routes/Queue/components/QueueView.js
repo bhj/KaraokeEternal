@@ -48,7 +48,7 @@ class QueueView extends React.Component {
 
       return (
         <QueueItem
-          key={queueId}
+          key={queueId+'-'+item.userId}
           artist={this.props.artists[song.artistId].name}
           title={song.title}
           name={item.name}

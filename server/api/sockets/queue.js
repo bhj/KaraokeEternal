@@ -51,7 +51,7 @@ const ACTION_HANDLERS = {
   [QUEUE_REMOVE]: async (ctx, {payload}) => {
     const socketId = ctx.socket.socket.id
     const queueId = payload
-    let item, res
+    let item, nextItem, res
 
     if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
       // callback with truthy error msg
@@ -89,6 +89,13 @@ const ACTION_HANDLERS = {
       // callback with truthy error msg
       ctx.acknowledge('Could not remove queue item')
       return
+    }
+
+    // does user have another item we could try to replace it with?
+    nextItem = await ctx.db.get('SELECT queueId FROM queue WHERE queueId > ? AND userId = ? LIMIT 1', queueId, item.userId)
+
+    if (nextItem) {
+      res = await ctx.db.run('UPDATE queue SET queueId = ? WHERE queueId = ?', queueId, nextItem.queueId)
     }
 
     // success!
