@@ -7,19 +7,19 @@
 }
 
 .play {
-  font-size: 54px;
+  font-size: 52px;
 }
 
 .pause {
-  font-size: 54px;
+  font-size: 52px;
 }
 
 .next {
-  font-size: 60px;
+  font-size: 58px;
 }
 
 .volume {
-  margin: 0 2rem 0 1.55rem;
+  margin: 0 2rem 0 1.5rem;
 }
 
 .disabled {

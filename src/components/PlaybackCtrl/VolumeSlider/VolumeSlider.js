@@ -22,7 +22,7 @@ export default class VolumeSlider extends Component {
     position: 'absolute',
     transform: 'translate(-50%, -50%)',
     marginTop: '6px',
-    fontSize: '48px',
+    fontSize: '44px',
     opacity: .7,
     color: '#333'
   }
