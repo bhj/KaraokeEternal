@@ -41,7 +41,7 @@ export function requestVolume(vol) {
     payload: vol,
     meta: {
       throttle: {
-        wait: 250,
+        wait: 200,
         leading: false,
       }
     },
