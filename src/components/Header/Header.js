@@ -3,7 +3,7 @@ import classes from './Header.css'
 import { SkyLightStateless } from 'react-skylight'
 
 const Header = (props) => (
-  <div>
+  <div className={classes.container}>
     <h1 className={classes.title}>{props.title}</h1>
 
     <SkyLightStateless

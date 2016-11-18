@@ -1,5 +1,11 @@
+.container {
+  border-bottom: 1px solid #ccc;
+  padding: .5rem 0;
+  background: #efefef;
+}
+
 .title {
-  margin: .75rem 0 0 0;
+  margin: 0;
   font-size: 1.75rem;
   font-weight: lighter;
   color: #555;

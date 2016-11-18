@@ -1,7 +1,8 @@
-.flexContainer {
+.container {
   display: flex;
   text-align: center;
   border-top: 1px solid #ccc;
+  background: #efefef;
 }
 
 .flexItem {
@@ -10,7 +11,6 @@
 
 .button {
   padding: .25rem 0;
-  background: #ededed;
   color: #a9a9a9;
 }
 
