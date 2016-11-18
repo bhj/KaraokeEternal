@@ -1,13 +1,10 @@
 import React from 'react'
 import classes from './Header.css'
-import PlaybackCtrl from '../PlaybackCtrl'
 import { SkyLightStateless } from 'react-skylight'
 
 const Header = (props) => (
   <div>
     <h1 className={classes.title}>{props.title}</h1>
-
-    <PlaybackCtrl/>
 
     <SkyLightStateless
       isVisible={props.errorMessage !== null}
