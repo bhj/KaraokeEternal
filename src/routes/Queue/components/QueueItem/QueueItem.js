@@ -17,11 +17,6 @@ export const QueueItem = (props) => (
         <i className='material-icons'>info_outline</i>
       </div>
     }
-    <div className={classes.star}>
-      <i className='material-icons'>
-        {props.isStarred ? 'star' : 'star_border'}
-      </i>
-    </div>
     {props.canSkip &&
       <div onClick={props.onSkipClick} className={classes.skip}>
         <i className='material-icons'>skip_next</i>
