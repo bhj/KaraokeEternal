@@ -109,6 +109,7 @@
     "node-sass": "^3.7.0",
     "normalize.css": "^4.1.1",
     "postcss-loader": "^0.13.0",
+    "rc-slider": "^5.3.4",
     "react": "^15.0.0",
     "react-addons-shallow-compare": "^15.3.2",
     "react-dom": "^15.0.0",

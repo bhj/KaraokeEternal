@@ -5,6 +5,8 @@ const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
 const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
+const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
+const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
@@ -29,6 +31,20 @@ export function requestPause() {
   return {
     type: PLAYER_PAUSE_REQUEST,
     payload: null
+  }
+}
+
+// Request Pause
+export function requestVolume(vol) {
+  return {
+    type: PLAYER_VOLUME_REQUEST,
+    payload: vol,
+    meta: {
+      throttle: {
+        wait: 250,
+        leading: false,
+      }
+    },
   }
 }
 
@@ -92,11 +108,15 @@ const ACTION_HANDLERS = {
     ...state,
     isPlaying: true,
   }),
+  [PLAYER_VOLUME]: (state, {payload}) => ({
+    ...state,
+    volume: payload,
+  }),
   [PLAYER_NEXT]: (state, {payload}) => {
     return {
       ...state,
       queueId: payload,
-      pos: 0,
+      position: 0,
       isAtQueueEnd: false,
       prevQueueId: state.queueId,
     }
@@ -132,7 +152,8 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       queueId: payload.queueId,
-      pos: payload.pos,
+      position: payload.position,
+      volume: payload.volume,
       isPlaying: payload.isPlaying,
       prevQueueId: null,
     }
@@ -156,11 +177,12 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   queueId: -1,
-  pos: 0,
+  prevQueueId: null,
+  position: 0,
+  volume: 1,
   isPlaying: false,
   isFetching: false,
   isAtQueueEnd: false,
-  prevQueueId: null,
   errors: {},   // object of arrays keyed by queueId
 }
 

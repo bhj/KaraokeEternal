@@ -1,20 +1,7 @@
-.container {
-  display: flex;
-  text-align: center;
-  align-items: center;
-  background: #ededed;
-  border-bottom: 1px solid #ccc;
-}
-
 .title {
-  flex: 1;
-  padding: .7rem;
-  margin: 0;
+  margin: .75rem 0 0 0;
   font-size: 1.75rem;
   font-weight: lighter;
   color: #555;
-}
-
-.button {
-  font-size: 48px;
+  text-align: center;
 }

@@ -21,7 +21,7 @@ const mapStateToProps = (state) => {
     entities: state.queue.entities,
     errors: state.player.errors,
     curId: state.player.queueId,
-    curPos: state.player.pos,
+    curPos: state.player.position,
     isAtQueueEnd: state.player.isAtQueueEnd,
     // library
     artistIds: state.library.artists.result,

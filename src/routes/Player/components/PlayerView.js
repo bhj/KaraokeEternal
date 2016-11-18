@@ -7,7 +7,8 @@ import screenfull from 'screenfull'
 class PlayerView extends React.Component {
   static propTypes = {
     // queue
-    queueId: PropTypes.number,
+    queueId: PropTypes.number.isRequired,
+    volume: PropTypes.number.isRequired,
     song: PropTypes.object,
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
@@ -29,7 +30,8 @@ class PlayerView extends React.Component {
     // emit initial state
     this.props.emitStatus({
       queueId: this.props.queueId,
-      pos: 0,
+      position: 0,
+      volume: this.props.volume,
       isPlaying: this.props.isPlaying,
     })
   }
@@ -71,6 +73,7 @@ class PlayerView extends React.Component {
       Component = ProviderPlayers[song.provider]
       componentProps = {
         queueId: this.props.queueId,
+        volume: this.props.volume,
         item: song,
         isPlaying: this.props.isPlaying,
         getMedia: this.props.getMedia,
@@ -86,7 +89,7 @@ class PlayerView extends React.Component {
         <AutoSizer>
           {({width, height}) => (
             <div style={{width, height}} ref={ref => {this.ref = ref}} onDoubleClick={this.toggleFullscreen}>
-              <Component width={width} height={height}  {...componentProps}/>
+              <Component width={width} height={height} {...componentProps}/>
             </div>
           )}
         </AutoSizer>

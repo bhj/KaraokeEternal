@@ -1,20 +1,14 @@
 import React from 'react'
 import classes from './Header.css'
+import PlaybackCtrl from '../PlaybackCtrl'
 import { SkyLightStateless } from 'react-skylight'
 
 const Header = (props) => (
-  <div className={classes.container}>
+  <div>
     <h1 className={classes.title}>{props.title}</h1>
-    {!props.isPlaying &&
-      <div className={classes.button} onClick={props.requestPlay}>
-        <i className={'material-icons '+classes.button}>play_arrow</i>
-      </div>
-    }
-    {props.isPlaying &&
-      <div className={classes.button} onClick={props.requestPause}>
-        <i className={'material-icons '+classes.button}>pause</i>
-      </div>
-    }
+
+    <PlaybackCtrl/>
+
     <SkyLightStateless
       isVisible={props.errorMessage !== null}
       onCloseClicked={props.clearErrorMessage}

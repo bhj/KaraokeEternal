@@ -23,6 +23,7 @@ const mapStateToProps = (state) => {
 
   return {
     queueId: state.player.queueId,
+    volume: state.player.volume,
     song,
     isAtQueueEnd: state.player.isAtQueueEnd,
     isPlaying: state.player.isPlaying,

@@ -55,8 +55,8 @@ class QueueView extends React.Component {
           isActive={isActive}
           isUpcoming={isUpcoming}
           wait={isUpcoming && wait ? secToTime(wait) : ''}
-          canSkip={isActive && (isOwner || isAdmin)}
-          canRemove={isUpcoming && (isOwner || isAdmin)}
+          canSkip={isActive && isOwner}
+          canRemove={isUpcoming && isOwner}
           hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
           pctPlayed={isActive ? curPos / song.duration * 100 : 0}
           onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
@@ -86,9 +86,9 @@ export default QueueView
 
 function secToTime(sec) {
   if (sec >= 60) {
-    return Math.round(sec/60) + ' min'
+    return Math.round(sec/60) + 'm'
   } else {
-    return Math.floor(sec) + ' sec'
+    return Math.floor(sec) + 's'
   }
 }
 

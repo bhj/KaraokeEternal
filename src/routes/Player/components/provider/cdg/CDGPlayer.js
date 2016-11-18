@@ -8,6 +8,7 @@ class CDGPlayer extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     queueId: PropTypes.number.isRequired,
+    volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     item: PropTypes.object.isRequired,
     getMedia: PropTypes.func.isRequired, // action
@@ -36,6 +37,10 @@ class CDGPlayer extends React.Component {
 
     if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
+    }
+
+    if (prevProps.volume !== this.props.volume) {
+      this.setVolume(this.props.volume)
     }
   }
 
@@ -96,6 +101,10 @@ class CDGPlayer extends React.Component {
       })
   }
 
+  setVolume(vol) {
+    this.audio.volume = vol
+  }
+
 /**
  * <audio> event handlers
  */
@@ -123,8 +132,9 @@ class CDGPlayer extends React.Component {
 
     this.props.onStatus({
       queueId: this.props.queueId,
-      pos: this.audio.currentTime,
       isPlaying: !this.audio.paused,
+      position: this.audio.currentTime,
+      volume: this.audio.volume,
     })
   }
 

@@ -4,6 +4,9 @@ const PLAYER_PLAY = 'player/PLAYER_PLAY'
 const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 
+const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
+const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
+
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
 
@@ -62,6 +65,12 @@ const ACTION_HANDLERS = {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PAUSE,
       payload: null
+    })
+  },
+  [PLAYER_VOLUME_REQUEST]: async (ctx, {payload}) => {
+    ctx.io.to(ctx.user.roomId).emit('action', {
+      type: PLAYER_VOLUME,
+      payload
     })
   },
 }

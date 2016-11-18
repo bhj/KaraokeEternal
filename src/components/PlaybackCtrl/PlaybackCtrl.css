@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  line-height: 1;
+  align-items: center;
+  margin: 0 1rem;
+  color: #666;
+}
+
+.play {
+  font-size: 54px;
+}
+
+.pause {
+  font-size: 54px;
+}
+
+.next {
+  font-size: 60px;
+}
+
+.volume {
+  margin: 0 2rem 0 1.55rem;
+}
+
+.disabled {
+  color: #ccc;
+}
