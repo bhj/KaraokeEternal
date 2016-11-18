@@ -119,7 +119,7 @@
     "react-virtualized": "^8.0.12",
     "recursive-readdir": "^2.1.0",
     "redux": "^3.6.0",
-    "redux-auth-wrapper": "^0.8.0",
+    "redux-auth-wrapper": "^0.9.0",
     "redux-optimistic-ui": "^0.4.1",
     "redux-throttle": "^0.1.1",
     "redux-thunk": "^2.0.0",
