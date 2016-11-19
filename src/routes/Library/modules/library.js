@@ -58,7 +58,12 @@ export function scrollArtists(scrollTop) {
   return {
     type: SCROLL_ARTISTS,
     payload: scrollTop,
-    meta: {throttle: true},
+    meta: {
+      throttle: {
+        wait: 1000,
+        leading: false,
+      }
+    },
   }
 }
 
