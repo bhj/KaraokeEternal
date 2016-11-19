@@ -1,17 +1,32 @@
-.view {
-  width: 100%;
-  height: 100%;
+.container {
+
+}
+
+.seethrough {
   position: absolute;
+  width: 100%;
+  background-color: rgba(245,245,245,0.8);
+  -webkit-backdrop-filter: blur(10px) saturate(200%);
+  backdrop-filter: blur(10px) saturate(200%);
+  z-index: 1;
+}
+
+.header {
+  top: 0;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+  composes: seethrough;
+}
+
+.nav {
+  bottom: 0px;
+  height: 50px;
+  border-top: 1px solid #ddd;
+  composes: seethrough;
+}
+
+.viewport {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-}
 
-.active {
-  composes: view;
-  display: flex;
-}
-
-.inactive {
-  composes: view;
-  display: none;
 }

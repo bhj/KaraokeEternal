@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { AutoSizer, List } from 'react-virtualized'
+import { List } from 'react-virtualized'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 const ROW_HEIGHT = 40
@@ -11,6 +11,8 @@ class ArtistList extends React.Component {
     queuedSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
@@ -23,22 +25,18 @@ class ArtistList extends React.Component {
 
   render () {
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <List
-            width={width}
-            height={height}
-            ref={(c) => {this.ref = c}}
-            queuedSongs={this.props.queuedSongs}
-            rowCount={this.props.artists.result.length}
-            rowHeight={this.rowHeight}
-            rowRenderer={this.rowRenderer}
-            onScroll={this.handleScroll}
-            scrollTop={this.props.scrollTop}
-            overscanRowCount={10}
-          />
-        )}
-      </AutoSizer>
+      <List
+        width={this.props.width}
+        height={this.props.height}
+        ref={(c) => {this.ref = c}}
+        queuedSongs={this.props.queuedSongs}
+        rowCount={this.props.artists.result.length}
+        rowHeight={this.rowHeight}
+        rowRenderer={this.rowRenderer}
+        onScroll={this.handleScroll}
+        scrollTop={this.props.scrollTop}
+        overscanRowCount={10}
+      />
     )
   }
 

@@ -5,21 +5,20 @@ import PlaybackCtrl from 'components/PlaybackCtrl'
 import classes from './AppLayout.css'
 
 const AppLayout = (props) => (
-  <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-    <Header title={props.title}/>
+  <div className={classes.container}>
 
-    <PlaybackCtrl />
+    <div className={classes.header}>
+      <Header title={props.title}/>
+    </div>
 
-    <div style={{flex: '1', overflow: 'auto'}}>
+    <div className={classes.viewport}>
       {props.children}
     </div>
 
-    <Navigation/>
+    <div className={classes.nav}>
+      <Navigation/>
+    </div>
   </div>
 )
-
-AppLayout.propTypes = {
-  // children: React.PropTypes.element,
-}
 
 export default AppLayout

@@ -1,8 +1,6 @@
 .container {
   display: flex;
   text-align: center;
-  border-top: 1px solid #ccc;
-  background: #efefef;
 }
 
 .flexItem {

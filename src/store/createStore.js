@@ -5,6 +5,7 @@ import createThrottle from "redux-throttle"
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './location'
+import { responsiveStoreEnhancer } from 'redux-responsive'
 
 export default (initialState = {}, socket) => {
   // ======================================================
@@ -22,7 +23,10 @@ export default (initialState = {}, socket) => {
   // ======================================================
   // Store Enhancers
   // ======================================================
-  const enhancers = []
+  const enhancers = [
+    responsiveStoreEnhancer,
+  ]
+
   if (__DEV__) {
     const devToolsExtension = window.devToolsExtension
     if (typeof devToolsExtension === 'function') {
