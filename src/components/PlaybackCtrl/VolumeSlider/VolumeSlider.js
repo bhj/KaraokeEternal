@@ -29,23 +29,13 @@ export default class VolumeSlider extends Component {
 
   CustomGrabber = props => {
     const style = Object.assign({ left: `${props.offset}%` }, this.grabberStyle)
-    let icon
     const vol = this.state.isDragging || this.ignoreStatus ? this.state.vol : this.props.volume
-    const level = Math.round(vol * 10/3)
 
-    switch (level) {
-      case 0:
-        icon = "volume_off"
-        break;
-      case 1:
-        icon = "volume_mute"
-        break;
-      case 2:
-        icon = "volume_down"
-        break;
-      default:
-        icon = "volume_up"
-    }
+    let icon
+    if (vol === 0) icon = "volume_off"
+    else if (vol < .4) icon = "volume_mute"
+    else if (vol < .7) icon = "volume_down"
+    else icon = "volume_up"
 
     return (
       <div style={style}>
