@@ -5,7 +5,9 @@ import ArtistList from '../ArtistList'
 const LibraryView = (props) => {
   return (
     <AppLayout title="Library">
-      <ArtistList {...props}/>
+      {(style) => (
+        <ArtistList {...props} style={style}/>
+      )}
     </AppLayout>
   )
 }

@@ -13,28 +13,29 @@ class AccountView extends React.Component {
   }
 
   render () {
-    const { user, errorMessage } = this.props
+    const { user } = this.props
     const headerTitle = user ? user.name : (this.props.viewMode === 'login') ? 'Sign In' : 'Create Account'
 
     return (
       <AppLayout title={headerTitle}>
-        <AccountForm/>
-        {errorMessage &&
-          <p style={{color:'red'}}>{errorMessage}</p>
-        }
+        {(style) => (
+          <div style={style}>
+            <AccountForm/>
 
-        {this.props.user && this.props.user.isAdmin &&
-          <button className='button wide blue raised' onClick={() => {browserHistory.push('/player')}}>
-            Start Player
-          </button>
-        }
+            {this.props.user && this.props.user.isAdmin &&
+              <button className='button wide blue raised' onClick={() => {browserHistory.push('/player')}}>
+                Start Player
+              </button>
+            }
 
-        {this.props.user &&
-          <div>
-            <br/>
-            <Logout onLogoutClick={this.props.logoutUser} />
+            {this.props.user &&
+              <div>
+                <br/>
+                <Logout onLogoutClick={this.props.logoutUser} />
+              </div>
+            }
           </div>
-        }
+        )}
       </AppLayout>
     )
   }

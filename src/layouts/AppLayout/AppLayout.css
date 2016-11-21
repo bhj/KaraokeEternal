@@ -1,19 +1,15 @@
-.container {
-
-}
-
 .seethrough {
   position: absolute;
   width: 100%;
-  background-color: rgba(245,245,245,0.8);
-  -webkit-backdrop-filter: blur(10px) saturate(200%);
-  backdrop-filter: blur(10px) saturate(200%);
+  background-color: rgba(240,240,240,0.6);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   z-index: 1;
 }
 
 .header {
   top: 0;
-  height: 50px;
+  /*height: 100px;*/
   border-bottom: 1px solid #ddd;
   composes: seethrough;
 }
@@ -26,7 +22,4 @@
 }
 
 .viewport {
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-
 }

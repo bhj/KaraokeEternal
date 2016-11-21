@@ -30,7 +30,7 @@ class ArtistList extends React.Component {
         height={this.props.height}
         ref={(c) => {this.ref = c}}
         queuedSongs={this.props.queuedSongs}
-        rowCount={this.props.artists.result.length}
+        rowCount={this.props.artists.result.length + 2} // top & bottom spacer
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         onScroll={this.handleScroll}
@@ -56,6 +56,15 @@ class ArtistList extends React.Component {
   }
 
   rowRenderer({index, key, style}) {
+    // top & bottom spacer
+    if (index === 0 || index === this.props.artists.result.length+1) {
+      return (
+        <div key={key} style={style}/>
+      )
+    } else {
+      index--
+    }
+
     const { artists, songs } = this.props
     const artist = artists.entities[artists.result[index]]
     const isExpanded = this.props.expandedArtists.indexOf(artist.artistId) !== -1
@@ -114,6 +123,15 @@ class ArtistList extends React.Component {
   }
 
   rowHeight({index}) {
+    // top & bottom spacer
+    if (index === 0) {
+      return this.props.style.paddingTop
+    } else if (index === this.props.artists.result.length+1){
+      return this.props.style.paddingBottom
+    } else {
+      index--
+    }
+
     const artistId = this.props.artists.result[index]
     let rows = 1
 

@@ -2,23 +2,49 @@ import React from 'react'
 import Header from 'components/Header'
 import Navigation from 'components/Navigation'
 import PlaybackCtrl from 'components/PlaybackCtrl'
+import { SkyLightStateless } from 'react-skylight'
 import classes from './AppLayout.css'
 
-const AppLayout = (props) => (
-  <div className={classes.container}>
+const AppLayout = (props) => {
+  const style = {
+    paddingTop: props.isAdmin ? 118 : 54,
+    paddingBottom: 50
+  }
 
-    <div className={classes.header}>
-      <Header title={props.title}/>
-    </div>
+  return (
+    <div>
+      <div className={classes.header}>
+        <Header title={props.title}/>
+        {props.isAdmin === 1 &&
+          <PlaybackCtrl/>
+        }
+      </div>
 
-    <div className={classes.viewport}>
-      {props.children}
-    </div>
+      <div className={classes.viewport}>
+        {props.children(style)}
+      </div>
 
-    <div className={classes.nav}>
-      <Navigation/>
+      <div className={classes.nav}>
+        <Navigation/>
+      </div>
+
+      <SkyLightStateless
+        isVisible={props.errorMessage !== null}
+        onCloseClicked={props.clearErrorMessage}
+        onOverlayClicked={props.clearErrorMessage}
+        title="Oops"
+        dialogStyles={{
+          width: '80%',
+          height: 'auto',
+          left: '10%',
+          marginLeft: '0'}}
+      >
+        {props.errorMessage}
+        <br/><br/><br/>
+        <button className="button wide raised" onClick={props.clearErrorMessage}>Dismiss</button>
+      </SkyLightStateless>
     </div>
-  </div>
-)
+  )
+}
 
 export default AppLayout
