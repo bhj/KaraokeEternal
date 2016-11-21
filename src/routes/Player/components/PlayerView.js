@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
-import { AutoSizer } from 'react-virtualized'
 import ProviderPlayers from './provider'
 import screenfull from 'screenfull'
 
@@ -58,7 +57,7 @@ class PlayerView extends React.Component {
   }
 
   render () {
-    const song = this.props.song
+    const { song, width, height } = this.props
     let Component = 'div'
     let componentProps
 
@@ -86,13 +85,11 @@ class PlayerView extends React.Component {
 
     return (
       <AppLayout title="Player">
-        <AutoSizer>
-          {({width, height}) => (
-            <div style={{width, height}} ref={ref => {this.ref = ref}} onDoubleClick={this.toggleFullscreen}>
+        {(style) => (
+          <div style={{...style, width, height}} ref={ref => {this.ref = ref}} onDoubleClick={this.toggleFullscreen}>
               <Component width={width} height={height} {...componentProps}/>
-            </div>
-          )}
-        </AutoSizer>
+          </div>
+        )}
       </AppLayout>
     )
   }
