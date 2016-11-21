@@ -18,32 +18,6 @@ export default class VolumeSlider extends Component {
   handleChange = this.handleChange.bind(this)
   handleAfterChange = this.handleAfterChange.bind(this)
 
-  grabberStyle = {
-    position: 'absolute',
-    transform: 'translate(-50%, -50%)',
-    marginTop: '6px',
-    fontSize: '44px',
-    opacity: .7,
-    color: '#333'
-  }
-
-  CustomGrabber = props => {
-    const style = Object.assign({ left: `${props.offset}%` }, this.grabberStyle)
-    const vol = this.state.isDragging || this.ignoreStatus ? this.state.vol : this.props.volume
-
-    let icon
-    if (vol === 0) icon = "volume_off"
-    else if (vol < .4) icon = "volume_mute"
-    else if (vol < .7) icon = "volume_down"
-    else icon = "volume_up"
-
-    return (
-      <div style={style}>
-        <i className='material-icons'>{icon}</i>
-      </div>
-    )
-  }
-
   handleChange(vol) {
     this.setState({
       vol,
@@ -69,8 +43,6 @@ export default class VolumeSlider extends Component {
   }
 
   render() {
-    const CustomGrabber = this.CustomGrabber
-
     return (
       <Slider
         min={0}
@@ -82,6 +54,40 @@ export default class VolumeSlider extends Component {
         handle={<CustomGrabber />}
         className={this.props.className}
       />
+    )
+  }
+}
+
+// volume slider handle/grabber
+class CustomGrabber extends Component {
+  static propTypes = {
+    value: React.PropTypes.any,
+    offset: React.PropTypes.number,
+  }
+
+  baseStyle = {
+    position: 'absolute',
+    transform: 'translate(-50%, -50%)',
+    marginTop: '6px',
+    fontSize: '44px',
+    opacity: .7,
+    color: '#333'
+  }
+
+  render() {
+    const style = Object.assign({ left: `${this.props.offset}%` }, this.baseStyle)
+    const vol = this.props.value
+
+    let icon
+    if (vol === 0) icon = "volume_off"
+    else if (vol < .4) icon = "volume_mute"
+    else if (vol < .7) icon = "volume_down"
+    else icon = "volume_up"
+
+    return (
+      <div style={style}>
+        <i className='material-icons'>{icon}</i>
+      </div>
     )
   }
 }
