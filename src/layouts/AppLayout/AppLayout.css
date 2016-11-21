@@ -2,8 +2,8 @@
   position: absolute;
   width: 100%;
   background-color: rgba(240,240,240,0.6);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  backdrop-filter: blur(20px) saturate(200%);
   z-index: 1;
 }
 
