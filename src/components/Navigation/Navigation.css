@@ -1,14 +1,12 @@
 .container {
   display: flex;
-  text-align: center;
-}
-
-.flexItem {
-  flex: 1;
+  height: 100%;
+  align-items: center;
 }
 
 .button {
-  padding: .25rem 0;
+  flex: 1;
+  align-items: center;
   color: #a9a9a9;
 }
 

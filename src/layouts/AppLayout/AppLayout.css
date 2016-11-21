@@ -16,10 +16,11 @@
 
 .nav {
   bottom: 0px;
-  height: 50px;
+  height: 64px;
   border-top: 1px solid #ddd;
   composes: seethrough;
 }
 
 .viewport {
+  overflow-y: scroll;
 }

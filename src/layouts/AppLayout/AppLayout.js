@@ -20,7 +20,7 @@ const AppLayout = (props) => {
         }
       </div>
 
-      <div className={classes.viewport}>
+      <div className={classes.viewport} style={{width: props.width, height: props.height}}>
         {props.children(style)}
       </div>
 
