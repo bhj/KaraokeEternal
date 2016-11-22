@@ -12,6 +12,8 @@ class PlayerView extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored:  PropTypes.bool.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
