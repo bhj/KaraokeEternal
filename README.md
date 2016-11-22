@@ -91,7 +91,6 @@ The application structure presented in this boilerplate is **fractal**, where fu
 ```
 .
 ├── bin                      # Build/Start scripts
-├── blueprints               # Blueprint files for redux-cli
 ├── build                    # All build-related configuration
 │   └── webpack              # Environment-specific configuration files for webpack
 ├── config                   # Project configuration settings
@@ -103,14 +102,18 @@ The application structure presented in this boilerplate is **fractal**, where fu
 │   ├── components           # Global Reusable Presentational Components
 │   ├── containers           # Global Reusable Container Components
 │   ├── layouts              # Components that dictate major page structure
-│   ├── redux                # "Ducks" location...
-│   │   └── modules          # reducer, action, creators not part of a route
+│   │   └── CoreLayout.js    # CoreLayout which receives children for each route
+│   │   └── CoreLayout.scss  # Styles related to the CoreLayout
+│   │   └── index.js         # Main file for layout
 │   ├── routes               # Main route definitions and async split points
 │   │   ├── index.js         # Bootstrap main application routes with store
-│   │   └── Home             # Fractal route
-│   │       ├── index.js     # Route definitions and async split points
-│   │       ├── assets       # Assets required to render components
-│   │       ├── components   # Presentational React Components
+│   │   ├── Home             # Fractal route
+│   │   │   ├── index.js     # Route definitions and async split points
+│   │   │   ├── assets       # Assets required to render components
+│   │   │   ├── components   # Presentational React Components
+│   │   │   └── routes **    # Fractal sub-routes (** optional)
+│   │   └── Counter          # Fractal route
+│   │       ├── index.js     # Counter route definition
 │   │       ├── container    # Connect components to actions and store
 │   │       ├── modules      # Collections of reducers/constants/actions
 │   │       └── routes **    # Fractal sub-routes (** optional)
@@ -214,7 +217,7 @@ This project wouldn't be possible without help from the community, so I'd like t
 
 * [Justin Greenberg](https://github.com/justingreenberg) - For all of your PR's, getting us to Babel 6, and constant work improving our patterns.
 * [Roman Pearah](https://github.com/neverfox) - For your bug reports, help in triaging issues, and PR contributions.
-* [Spencer Dixin](https://github.com/SpencerCDixon) - For your creation of [redux-cli](https://github.com/SpencerCDixon/redux-cli).
+* [Spencer Dixon](https://github.com/SpencerCDixon) - For your creation of [redux-cli](https://github.com/SpencerCDixon/redux-cli).
 * [Jonas Matser](https://github.com/mtsr) - For your help in triaging issues and unending support in our Gitter channel.
 
 And to everyone else who has contributed, even if you are not listed here your work is appreciated.
