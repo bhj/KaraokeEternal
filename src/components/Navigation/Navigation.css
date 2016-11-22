@@ -1,16 +1,20 @@
 .container {
   display: flex;
   height: 100%;
-  align-items: center;
 }
 
 .button {
   flex: 1;
-  align-items: center;
+  display: flex;
+  height: 100%;
   color: #a9a9a9;
+  text-decoration: none;
+  text-align: center;
+  align-items: center;
 }
 
 .icon {
+  flex: 1;
   font-size: 40px;
 }
 

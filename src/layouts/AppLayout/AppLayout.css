@@ -1,22 +1,21 @@
 .seethrough {
   position: absolute;
   width: 100%;
-  background-color: rgba(240,240,240,0.6);
-  -webkit-backdrop-filter: blur(20px) saturate(200%);
-  backdrop-filter: blur(20px) saturate(200%);
+  background-color: rgba(244,244,244,0.6);
+  -webkit-backdrop-filter: blur(10px) saturate(200%);
+  backdrop-filter: blur(10px) saturate(200%);
   z-index: 1;
 }
 
 .header {
   top: 0;
-  /*height: 100px;*/
   border-bottom: 1px solid #ddd;
   composes: seethrough;
 }
 
 .nav {
   bottom: 0px;
-  height: 64px;
+  height: 54px;
   border-top: 1px solid #ddd;
   composes: seethrough;
 }

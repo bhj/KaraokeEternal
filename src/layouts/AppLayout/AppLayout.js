@@ -6,16 +6,17 @@ import { SkyLightStateless } from 'react-skylight'
 import classes from './AppLayout.css'
 
 const AppLayout = (props) => {
+  const isAdmin = (props.isAdmin === 1)
   const style = {
-    paddingTop: props.isAdmin ? 118 : 54,
-    paddingBottom: 50
+    paddingTop: isAdmin ? 94 : 54,
+    paddingBottom: 54
   }
 
   return (
     <div>
-      <div className={classes.header}>
+      <div className={classes.header} style={{height: isAdmin ? 90 : 50}}>
         <Header title={props.title}/>
-        {props.isAdmin === 1 &&
+        {isAdmin &&
           <PlaybackCtrl/>
         }
       </div>

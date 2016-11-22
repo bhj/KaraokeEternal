@@ -4,13 +4,13 @@ import classes, {active} from './Navigation.css'
 
 export const Navigation = (props) => (
   <div className={classes.container}>
-    <Link to='/library' className={classes.flexItem+' '+classes.button} activeClassName={active}>
+    <Link to='/library' className={classes.button} activeClassName={active}>
       <i className={'material-icons '+classes.icon}>library_music</i>
     </Link>
-    <Link to='/queue' className={classes.flexItem+' '+classes.button} activeClassName={active}>
+    <Link to='/queue' className={classes.button} activeClassName={active}>
       <i className={'material-icons '+classes.icon}>subscriptions</i>
     </Link>
-    <Link to='/account' className={classes.flexItem+' '+classes.button} activeClassName={active}>
+    <Link to='/account' className={classes.button} activeClassName={active}>
       <i className={'material-icons '+classes.icon}>mood</i>
     </Link>
   </div>
