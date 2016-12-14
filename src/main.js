@@ -57,15 +57,6 @@ let render = () => {
   )
 }
 
-// ========================================================
-// Developer Tools Setup
-// ========================================================
-// if (__DEV__) {
-//   if (window.devToolsExtension) {
-//     window.devToolsExtension.open()
-//   }
-// }
-
 // This code is excluded from production bundle
 if (__DEV__) {
   if (module.hot) {

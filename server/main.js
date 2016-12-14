@@ -1,8 +1,7 @@
 const debug = require('debug')('app:server')
 const webpack = require('webpack')
-const webpackConfig = require('../build/webpack.config')
-const config = require('../config')
-const paths = config.utils_paths
+const webpackConfig = require('../config/webpack.config')
+const project = require('../config/project.config')
 
 const koa = require('koa')
 const IO = require('koa-socket')
@@ -69,26 +68,26 @@ app.use(convert(require('koa-connect-history-api-fallback')()))
 // ------------------------------------
 // Apply Webpack HMR Middleware
 // ------------------------------------
-if (config.env === 'development') {
+if (project.env === 'development') {
   const compiler = webpack(webpackConfig)
 
-  debug('Enable webpack dev and HMR middleware')
+  debug('Enabling webpack dev and HMR middleware')
   app.use(convert(require("koa-webpack-dev-middleware")(compiler, {
     publicPath  : webpackConfig.output.publicPath,
-    contentBase : paths.client(),
+    contentBase : project.paths.client(),
     hot         : true,
-    quiet       : config.compiler_quiet,
-    noInfo      : config.compiler_quiet,
+    quiet       : project.compiler_quiet,
+    noInfo      : project.compiler_quiet,
     lazy        : false,
-    stats       : config.compiler_stats
+    stats       : project.compiler_stats
   })))
   app.use(convert(require('koa-webpack-hot-middleware')(compiler)))
 
-  // Serve static assets from ~/src/static since Webpack is unaware of
+  // Serve static assets from ~/public since Webpack is unaware of
   // these files. This middleware doesn't need to be enabled outside
   // of development since this directory will be copied into ~/dist
   // when the application is compiled.
-  app.use(serve(paths.client('static')))
+  app.use(serve(project.paths.public()))
 } else {
   debug(
     'Server is being run outside of live development mode, meaning it will ' +
@@ -101,7 +100,7 @@ if (config.env === 'development') {
   // Serving ~/dist by default. Ideally these files should be served by
   // the web server and not the app server, but this helps to demo the
   // server in production.
-  app.use(serve(paths.dist()))
+  app.use(serve(project.paths.dist()))
 }
 
-module.exports = exports = app
+module.exports = app
