@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-fetch'
-import {ensureState} from 'redux-optimistic-ui'
 import { browserHistory } from 'react-router'
 
 // ------------------------------------
@@ -54,7 +53,7 @@ export function loginUser(data) {
         localStorage.setItem('token', res.token)
 
         // check for redirect in query string
-        let query = parseQuery(ensureState(getState()).location.search)
+        let query = parseQuery(getState().location.search)
 
         if (query.redirect) {
           browserHistory.push(query.redirect)
@@ -135,7 +134,7 @@ export function logoutUser() {
 
     return fetch('/api/account/logout', {
       headers: new Headers({
-        'Authorization': 'Bearer ' + ensureState(getState()).account.token,
+        'Authorization': 'Bearer ' + getState().account.token,
       }),
     })
       .then(checkStatus)
@@ -241,7 +240,7 @@ export function updateUser(data) {
         method: 'POST',
         headers: new Headers({
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + ensureState(getState()).account.token,
+          'Authorization': 'Bearer ' + getState().account.token,
         }),
         body: JSON.stringify(data)
       })

@@ -1,4 +1,3 @@
-import { ensureState } from 'redux-optimistic-ui'
 import { CANCEL, FLUSH } from "redux-throttle"
 
 const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
@@ -53,7 +52,7 @@ export function requestPlayNext() {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_NEXT_REQUEST,
-      payload: ensureState(getState()).player.queueId
+      payload: getState().player.queueId
     })
   }
 }

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import {ensureState} from 'redux-optimistic-ui'
+import { ensureState } from 'redux-optimistic-ui'
 import QueueView from '../components/QueueView'
 import { queueSong, removeItem } from '../modules/queue'
 import { requestPlay, requestPause, requestPlayNext } from '../../Player/modules/player'
@@ -14,11 +14,9 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  state = ensureState(state)
-
   return {
-    result: state.queue.result,
-    entities: state.queue.entities,
+    result: ensureState(state.queue).result,
+    entities: ensureState(state.queue).entities,
     errors: state.player.errors,
     curId: state.player.queueId,
     curPos: state.player.position,

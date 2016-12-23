@@ -1,6 +1,4 @@
 import { connect } from 'react-redux'
-import {ensureState} from 'redux-optimistic-ui'
-
 import { loginUser, createUser, updateUser, changeView } from '../modules/account'
 import AccountForm from '../components/AccountForm'
 
@@ -12,8 +10,6 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  state = ensureState(state)
-
   return {
     user: state.account.user,
     rooms: state.account.rooms,

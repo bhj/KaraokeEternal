@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import { ensureState } from 'redux-optimistic-ui'
 import PlaybackCtrl from './PlaybackCtrl'
 import { requestPlay, requestPause, requestVolume, requestPlayNext } from 'routes/Player/modules/player'
 
@@ -12,8 +11,6 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  state = ensureState(state)
-
   return {
     queueId: state.player.queueId,
     position: state.player.position,

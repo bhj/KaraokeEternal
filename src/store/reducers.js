@@ -8,16 +8,16 @@ import queue from 'routes/Queue/modules/queue'
 import player from 'routes/Player/modules/player'
 
 export const makeRootReducer = (asyncReducers) => {
-  return optimistic(combineReducers({
+  return combineReducers({
     location: locationReducer,
     browser: responsiveStateReducer,
     errorMessage,
     account,
     library,
-    queue,
+    queue: optimistic(queue),
     player,
     ...asyncReducers
-  }))
+  })
 }
 
 export const injectReducer = (store, { key, reducer }) => {

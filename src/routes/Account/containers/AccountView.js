@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import {ensureState} from 'redux-optimistic-ui'
 import { changeView, logoutUser } from '../modules/account'
 import AccountView from '../components/AccountView'
 
@@ -9,8 +8,6 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  state = ensureState(state)
-
   return {
     user: state.account.user,
     viewMode: state.account.viewMode,

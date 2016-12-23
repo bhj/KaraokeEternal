@@ -1,6 +1,5 @@
 import PlayerView from '../components/PlayerView'
 import { connect } from 'react-redux'
-import {ensureState} from 'redux-optimistic-ui'
 import { emitStatus, cancelStatus, getMedia, getMediaSuccess, mediaError, requestPlayNext } from '../modules/player'
 
 const mapActionCreators = {
@@ -14,7 +13,6 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   let songId, song
-  state = ensureState(state)
 
   if (state.queue.entities[state.player.queueId]) {
     songId = state.queue.entities[state.player.queueId].songId
