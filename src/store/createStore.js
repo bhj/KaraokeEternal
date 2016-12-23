@@ -5,7 +5,7 @@ import createThrottle from "redux-throttle"
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './location'
-import { responsiveStoreEnhancer } from 'redux-responsive'
+import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
 
 export default (initialState = {}, socket) => {
   // ======================================================
@@ -26,6 +26,8 @@ export default (initialState = {}, socket) => {
   const enhancers = [
     responsiveStoreEnhancer,
   ]
+
+  window.addEventListener('resize', () => store.dispatch(calculateResponsiveState(window)))
 
   let composeEnhancers = compose
 

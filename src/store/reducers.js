@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { optimistic } from 'redux-optimistic-ui';
-import { responsiveStateReducer } from 'redux-responsive'
+import { createResponsiveStateReducer } from 'redux-responsive'
 import locationReducer from './location'
 import account from 'routes/Account/modules/account'
 import library from 'routes/Library/modules/library'
@@ -10,7 +10,12 @@ import player from 'routes/Player/modules/player'
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     location: locationReducer,
-    browser: responsiveStateReducer,
+    browser: createResponsiveStateReducer(null, {
+        extraFields: () => ({
+            width: window.innerWidth,
+            height: window.innerHeight,
+        }),
+    }),
     errorMessage,
     account,
     library,
