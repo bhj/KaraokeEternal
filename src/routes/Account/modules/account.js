@@ -53,10 +53,14 @@ export function loginUser(data) {
         localStorage.setItem('token', res.token)
 
         // check for redirect in query string
-        let query = parseQuery(getState().location.search)
+        let loc = getState().location
 
-        if (query.redirect) {
-          browserHistory.push(query.redirect)
+        if (loc && loc.search) {
+          let query = parseQuery(loc.search)
+
+          if (query.redirect) {
+            browserHistory.push(query.redirect)
+          }
         }
       })
       .catch(err => {
