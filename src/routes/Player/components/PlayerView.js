@@ -82,14 +82,20 @@ class PlayerView extends React.Component {
         onStatus: this.props.emitStatus,
         onMediaError: this.props.mediaError,
         onMediaEnd: this.props.requestPlayNext,
+        width: this.props.width,
+        height: this.props.height,
       }
     }
 
     return (
       <AppLayout title="Player">
         {(style) => (
-          <div style={{...style, width, height}} ref={ref => {this.ref = ref}} onDoubleClick={this.toggleFullscreen}>
-              <Component width={width} height={height} {...componentProps}/>
+          <div
+            ref={ref => {this.ref = ref}}
+            onDoubleClick={this.toggleFullscreen}
+            style={style}
+            >
+              <Component {...componentProps}/>
           </div>
         )}
       </AppLayout>
