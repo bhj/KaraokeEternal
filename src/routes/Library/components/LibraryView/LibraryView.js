@@ -6,7 +6,7 @@ const LibraryView = (props) => {
   return (
     <AppLayout title="Library">
       {(style) => (
-        <ArtistList {...props} style={style}/>
+        <ArtistList {...props} {...style}/>
       )}
     </AppLayout>
   )
@@ -18,8 +18,8 @@ LibraryView.propTypes = {
   queuedSongs: PropTypes.array.isRequired,
   expandedArtists: PropTypes.array.isRequired,
   scrollTop: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
+  browserWidth: PropTypes.number.isRequired,
+  browserHeight: PropTypes.number.isRequired,
   // actions
   queueSong: PropTypes.func.isRequired,
   scrollArtists: PropTypes.func.isRequired,

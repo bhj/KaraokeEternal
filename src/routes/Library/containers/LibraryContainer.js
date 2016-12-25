@@ -17,8 +17,8 @@ const mapStateToProps = (state) => {
     queuedSongs: ensureState(state.queue).songIds,
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
-    width: state.browser.width,
-    height: state.browser.height,
+    browserWidth: state.browser.width,
+    browserHeight: state.browser.height,
   }
 }
 

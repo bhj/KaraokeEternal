@@ -12,8 +12,8 @@ class PlayerView extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored:  PropTypes.bool.isRequired,
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    browserWidth: PropTypes.number.isRequired,
+    browserHeight: PropTypes.number.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
@@ -59,7 +59,7 @@ class PlayerView extends React.Component {
   }
 
   render () {
-    const { song, width, height } = this.props
+    const { song } = this.props
     let Component = 'div'
     let componentProps
 
@@ -82,8 +82,6 @@ class PlayerView extends React.Component {
         onStatus: this.props.emitStatus,
         onMediaError: this.props.mediaError,
         onMediaEnd: this.props.requestPlayNext,
-        width: this.props.width,
-        height: this.props.height,
       }
     }
 
@@ -95,7 +93,11 @@ class PlayerView extends React.Component {
             onDoubleClick={this.toggleFullscreen}
             style={style}
             >
-              <Component {...componentProps}/>
+              <Component
+                {...componentProps}
+                width={this.props.browserWidth}
+                height={this.props.browserHeight - (style.paddingTop + style.paddingBottom)}
+              />
           </div>
         )}
       </AppLayout>

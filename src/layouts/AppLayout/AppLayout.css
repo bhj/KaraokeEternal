@@ -15,7 +15,6 @@
 
 .nav {
   bottom: 0px;
-  height: 54px;
   border-top: 1px solid #ddd;
   composes: seethrough;
 }

@@ -1,51 +1,56 @@
 import React from 'react'
 import Header from 'components/Header'
 import Navigation from 'components/Navigation'
-import PlaybackCtrl from 'components/PlaybackCtrl'
 import { SkyLightStateless } from 'react-skylight'
 import classes from './AppLayout.css'
 
-const AppLayout = (props) => {
-  const isAdmin = (props.isAdmin === 1)
-  const style = {
-    paddingTop: isAdmin ? 94 : 54,
-    paddingBottom: 54
+class AppLayout extends React.Component {
+  state = {
+    paddingTop: 0,
+    paddingBottom: 0,
   }
 
-  return (
-    <div>
-      <div className={classes.header} style={{height: isAdmin ? 90 : 50}}>
-        <Header title={props.title}/>
-        {isAdmin &&
-          <PlaybackCtrl/>
-        }
-      </div>
+  handleHeight(type, { height }) {
+    this.setState({[type]: height})
+  }
 
-      <div className={classes.viewport} style={{width: props.width, height: props.height}}>
-        {props.children(style)}
-      </div>
+  render() {
+    return (
+      <div>
+        <div className={classes.header}>
+          <Header
+            title={this.props.title}
+            isAdmin={this.props.isAdmin}
+            onHeight={this.handleHeight.bind(this, 'paddingTop')}
+          />
+        </div>
 
-      <div className={classes.nav}>
-        <Navigation/>
-      </div>
+        <div className={classes.viewport} style={{width: this.props.browserWidth, height: this.props.browserHeight}}>
+          {this.props.children(this.state)}
+        </div>
 
-      <SkyLightStateless
-        isVisible={props.errorMessage !== null}
-        onCloseClicked={props.clearErrorMessage}
-        onOverlayClicked={props.clearErrorMessage}
-        title="Oops"
-        dialogStyles={{
-          width: '80%',
-          height: 'auto',
-          left: '10%',
-          marginLeft: '0'}}
-      >
-        {props.errorMessage}
-        <br/><br/><br/>
-        <button className="button wide raised" onClick={props.clearErrorMessage}>Dismiss</button>
-      </SkyLightStateless>
-    </div>
-  )
+        <div className={classes.nav}>
+          <Navigation onHeight={this.handleHeight.bind(this, 'paddingBottom')}/>
+        </div>
+
+        <SkyLightStateless
+          isVisible={this.props.errorMessage !== null}
+          onCloseClicked={this.props.clearErrorMessage}
+          onOverlayClicked={this.props.clearErrorMessage}
+          title="Oops"
+          dialogStyles={{
+            width: '80%',
+            height: 'auto',
+            left: '10%',
+            marginLeft: '0'}}
+        >
+          {this.props.errorMessage}
+          <br/><br/><br/>
+          <button className="button wide raised" onClick={this.props.clearErrorMessage}>Dismiss</button>
+        </SkyLightStateless>
+      </div>
+    )
+  }
 }
 
 export default AppLayout

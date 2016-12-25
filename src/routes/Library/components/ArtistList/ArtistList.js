@@ -11,8 +11,10 @@ class ArtistList extends React.Component {
     queuedSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    browserWidth: PropTypes.number.isRequired,
+    browserHeight: PropTypes.number.isRequired,
+    paddingTop: PropTypes.number.isRequired,
+    paddingBottom: PropTypes.number.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
@@ -24,10 +26,15 @@ class ArtistList extends React.Component {
   handleScroll = this.handleScroll.bind(this)
 
   render () {
+    if (!this.props.paddingTop || !this.props.paddingBottom) {
+      // we don't know header/footer height yet; skip render
+      return null
+    }
+
     return (
       <List
-        width={this.props.width}
-        height={this.props.height}
+        width={this.props.browserWidth}
+        height={this.props.browserHeight}
         ref={(c) => {this.ref = c}}
         queuedSongs={this.props.queuedSongs}
         rowCount={this.props.artists.result.length + 2} // top & bottom spacer
@@ -125,9 +132,9 @@ class ArtistList extends React.Component {
   rowHeight({index}) {
     // top & bottom spacer
     if (index === 0) {
-      return this.props.style.paddingTop
+      return this.props.paddingTop
     } else if (index === this.props.artists.result.length+1){
-      return this.props.style.paddingBottom
+      return this.props.paddingBottom
     } else {
       index--
     }

@@ -29,8 +29,8 @@ const mapStateToProps = (state) => {
     isPlaying: state.player.isPlaying,
     isFetching: state.player.isFetching,
     isErrored: typeof state.player.errors[state.player.queueId] !== 'undefined',
-    width: state.browser.width,
-    height: state.browser.height,
+    browserWidth: state.browser.width,
+    browserHeight: state.browser.height,
   }
 }
 
