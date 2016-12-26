@@ -1,6 +1,8 @@
 // ------------------------------------
 // Constants
 // ------------------------------------
+export const HEADER_HEIGHT_CHANGE = 'ui/HEADER_HEIGHT_CHANGE'
+export const FOOTER_HEIGHT_CHANGE = 'ui/FOOTER_HEIGHT_CHANGE'
 export const SHOW_ERROR_MESSAGE = 'ui/SHOW_ERROR_MESSAGE'
 export const CLEAR_ERROR_MESSAGE = 'ui/CLEAR_ERROR_MESSAGE'
 
@@ -14,10 +16,40 @@ export function clearErrorMessage() {
   }
 }
 
+export function setHeaderHeight({height}) {
+  return (dispatch, getState) => {
+    if (getState().ui.headerHeight === height) return
+
+    dispatch({
+      type: HEADER_HEIGHT_CHANGE,
+      payload: height,
+    })
+  }
+}
+
+export function setFooterHeight({height}) {
+  return (dispatch, getState) => {
+    if (getState().ui.footerHeight === height) return
+
+    dispatch({
+      type: FOOTER_HEIGHT_CHANGE,
+      payload: height,
+    })
+  }
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [HEADER_HEIGHT_CHANGE]: (state, {payload}) => ({
+    ...state,
+    headerHeight: payload,
+  }),
+  [FOOTER_HEIGHT_CHANGE]: (state, {payload}) => ({
+    ...state,
+    footerHeight: payload,
+  }),
   [SHOW_ERROR_MESSAGE]: (state, {error}) => ({
     ...state,
     errorMessage: error,
@@ -32,6 +64,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  headerHeight: 0,
+  footerHeight: 0,
   errorMessage: null,
 }
 
