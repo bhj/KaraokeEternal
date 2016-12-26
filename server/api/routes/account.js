@@ -40,6 +40,7 @@ router.post('/api/account/login', async (ctx, next) => {
 
   delete user.password
   user.roomId = room.roomId
+  user.isAdmin = (user.isAdmin === 1)
 
   let token = jwt.sign(user, 'shared-secret')
 
