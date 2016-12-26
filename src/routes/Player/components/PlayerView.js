@@ -91,7 +91,7 @@ class PlayerView extends React.Component {
           <div
             ref={ref => {this.ref = ref}}
             onDoubleClick={this.toggleFullscreen}
-            style={style}
+            style={screenfull.isFullscreen ? {} : style}
             >
               <Component
                 {...componentProps}
