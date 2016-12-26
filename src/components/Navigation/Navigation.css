@@ -1,6 +1,6 @@
 .container {
   display: flex;
-  height: 100%;
+  padding: 6px 0;
 }
 
 .button {
