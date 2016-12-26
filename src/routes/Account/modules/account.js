@@ -141,17 +141,19 @@ export function logoutUser() {
         'Authorization': 'Bearer ' + getState().account.token,
       }),
     })
-      .then(checkStatus)
-      .then(response => {
-        dispatch(receiveLogout())
-        dispatch(deauthenticateSocket())
-
-        localStorage.removeItem('user')
-        localStorage.removeItem('token')
-      })
-      .catch(err => {
-        dispatch(logoutError(err.message))
-      })
+    .then(checkStatus)
+    .then(response => {
+      dispatch(receiveLogout())
+    })
+    .catch(err => {
+      dispatch(logoutError(err.message))
+    })
+    .then(() => {
+      // regardless of the server response; we tried!
+      dispatch(deauthenticateSocket())
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+    })
   }
 }
 
@@ -317,7 +319,7 @@ export function changeView(mode) {
   }
 }
 
-// helper for fetch response``
+// helper for fetch response
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response
