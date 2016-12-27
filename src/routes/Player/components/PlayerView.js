@@ -96,7 +96,7 @@ class PlayerView extends React.Component {
               <Component
                 {...componentProps}
                 width={this.props.browserWidth}
-                height={this.props.browserHeight - (style.paddingTop + style.paddingBottom)}
+                height={this.props.browserHeight - (screenfull.isFullscreen ? 0 : (style.paddingTop + style.paddingBottom))}
               />
           </div>
         )}
