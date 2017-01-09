@@ -1,4 +1,5 @@
 const debug = require('debug')('app:server')
+const path = require('path')
 const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.config')
 const project = require('../config/project.config')
@@ -60,11 +61,6 @@ io.use(async (ctx, next) => {
 // koa-socket event listener
 io.on('action', socketActions)
 
-// This rewrites all routes requests to the root /index.html file
-// (ignoring file requests). If you want to implement universal
-// rendering, you'll want to remove this middleware.
-app.use(convert(require('koa-connect-history-api-fallback')()))
-
 // ------------------------------------
 // Apply Webpack HMR Middleware
 // ------------------------------------
@@ -81,13 +77,30 @@ if (project.env === 'development') {
     lazy        : false,
     stats       : project.compiler_stats
   })))
-  app.use(convert(require('koa-webpack-hot-middleware')(compiler)))
+  app.use(convert(require('koa-webpack-hot-middleware')(compiler, {
+    path: '/__webpack_hmr'
+  })))
 
   // Serve static assets from ~/public since Webpack is unaware of
   // these files. This middleware doesn't need to be enabled outside
   // of development since this directory will be copied into ~/dist
   // when the application is compiled.
   app.use(serve(project.paths.public()))
+
+  // This rewrites all routes requests to the root /index.html file
+  // (ignoring file requests). If you want to implement universal
+  // rendering, you'll want to remove this middleware.
+  app.use(async (ctx, next) => {
+    const filename = path.join(compiler.outputPath, 'index.html')
+    compiler.outputFileSystem.readFile(filename, (err, result) => {
+      if (err) {
+        return Promise.reject(err)
+      }
+      ctx.set('content-type', 'text/html')
+      ctx.body = result
+      ctx.status = 200
+    })
+  })
 } else {
   debug(
     'Server is being run outside of live development mode, meaning it will ' +

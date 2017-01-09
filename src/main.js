@@ -72,6 +72,7 @@ if (__DEV__) {
       try {
         renderApp()
       } catch (error) {
+        console.error(error)
         renderError(error)
       }
     }
