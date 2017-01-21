@@ -1,3 +1,4 @@
+const db = require('sqlite')
 const jwt = require('koa-jwt')
 const bcrypt = require('../utilities/bcrypt-promise')
 const KoaRouter = require('koa-router')
@@ -5,7 +6,7 @@ const router = KoaRouter()
 
 // list available rooms
 router.get('/api/account/rooms', async (ctx, next) => {
-  let rooms = await ctx.db.all('SELECT * FROM rooms WHERE status = ?', 'open')
+  let rooms = await db.all('SELECT * FROM rooms WHERE status = ?', 'open')
   return ctx.body = rooms
 })
 
@@ -22,7 +23,7 @@ router.post('/api/account/login', async (ctx, next) => {
   email = email.trim().toLowerCase()
 
   // get user
-  let user = await ctx.db.get('SELECT * FROM users WHERE email = ?', email)
+  let user = await db.get('SELECT * FROM users WHERE email = ?', email)
 
   // validate password
   if (!user || !await bcrypt.compare(password, user.password)) {
@@ -31,7 +32,7 @@ router.post('/api/account/login', async (ctx, next) => {
   }
 
   // validate roomId
-  let room = await ctx.db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
+  let room = await db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
 
   if (!room || room.status !== 'open') {
     ctx.status = 401
@@ -74,7 +75,7 @@ router.post('/api/account/create', async (ctx, next) => {
   }
 
   // check for duplicate email
-  if (await ctx.db.get('SELECT * FROM users WHERE email = ?', email)) {
+  if (await db.get('SELECT * FROM users WHERE email = ?', email)) {
     ctx.status = 401
     return ctx.body = 'Email address is already registered'
   }
@@ -86,7 +87,7 @@ router.post('/api/account/create', async (ctx, next) => {
   }
 
   let hashedPwd = await bcrypt.hash(newPassword, 10)
-  let res = await ctx.db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', email, hashedPwd, name)
+  let res = await db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', email, hashedPwd, name)
   ctx.status = 200
 })
 
@@ -98,7 +99,7 @@ router.post('/api/account/update', async (ctx, next) => {
     return ctx.body = 'Invalid token'
   }
 
-  let user = await ctx.db.get('SELECT * FROM users WHERE userId = ?', ctx.state.user.userId)
+  let user = await db.get('SELECT * FROM users WHERE userId = ?', ctx.state.user.userId)
 
   if (!user) {
     ctx.status = 401
@@ -141,18 +142,18 @@ router.post('/api/account/update', async (ctx, next) => {
   }
 
   // check for duplicate email
-  if (await ctx.db.get('SELECT * FROM users WHERE userId != ? AND email = ? COLLATE NOCASE ',
+  if (await db.get('SELECT * FROM users WHERE userId != ? AND email = ? COLLATE NOCASE ',
       ctx.state.user.userId, email)) {
     ctx.status = 401
     return ctx.body = 'Email address is already registered'
   }
 
   // do update
-  let res = await ctx.db.run('UPDATE users SET name = ?, email = ?, password = ? WHERE userId = ?',
+  let res = await db.run('UPDATE users SET name = ?, email = ?, password = ? WHERE userId = ?',
     name, email, password, ctx.state.user.userId)
 
   // return user (shape should match /login)
-  user = await ctx.db.get('SELECT * FROM users WHERE email = ?', email)
+  user = await db.get('SELECT * FROM users WHERE email = ?', email)
 
   delete user.password
   user.roomId = ctx.state.user.roomId

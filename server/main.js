@@ -21,12 +21,6 @@ const socketActions = require('./api/sockets')
 const app = new koa()
 const io = new IO()
 
-// make database available on koa ctx
-app.use(async (ctx, next) => {
-    ctx.db = db
-    await next()
-})
-
 app.use(koaLogger())
 app.use(convert(koaRange))
 app.use(koaBodyparser())

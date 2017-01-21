@@ -1,3 +1,4 @@
+const db = require('sqlite')
 const KoaRouter = require('koa-router')
 const Providers = require('../providers')
 
@@ -21,7 +22,7 @@ router.get('/api/provider/:provider/:method', async (ctx, next) => {
   }
 
   // get provider config
-  let row = await ctx.db.get('SELECT data FROM config WHERE domain = ?', provider+'.provider')
+  let row = await db.get('SELECT data FROM config WHERE domain = ?', provider+'.provider')
   let cfg = JSON.parse(row.data)
 
   if (! cfg.enabled) {
@@ -38,7 +39,7 @@ router.get('/api/provider', async (ctx, next) => {
   let cfg = {}
 
   // get provider config
-  let rows = await ctx.db.all('SELECT * FROM config WHERE domain LIKE "%.provider"')
+  let rows = await db.all('SELECT * FROM config WHERE domain LIKE "%.provider"')
 
   rows.forEach(function(row){
     cfg[row.domain] = JSON.parse(row.data)
