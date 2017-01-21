@@ -1,26 +1,27 @@
+const db = require('sqlite')
 const readdir = require('../../utilities/recursive-readdir')
 const multihash = require('../../utilities/multihash')
 const musicmetadata = require('../../utilities/musicmetadata')
 const mp3Duration = require('../../utilities/mp3-duration')
-
+const debug = require('debug')
 const fs = require('fs')
 const fsStat = require('../../utilities/fs-stat')
 const pathUtils = require('path')
 
-var debug = require('debug')
-var log = debug('app:library:cdg')
-var error = debug('app:library:cdg:error')
+const log = debug('app:provider:cdg')
+const addSong = require('../../library/addSong')
+const searchLibrary = require('../../library/search')
 
 let allowedExts = ['.mp3', '.m4a']
 let counts
-// let seenHashes = []
 
-async function scan(ctx, cfg) {
+async function scan( cfg) {
   if (!Array.isArray(cfg.paths) || !cfg.paths.length) {
-    error('No paths configured; aborting scan')
+    log('No paths configured; aborting scan')
     return Promise.resolve()
   }
 
+  let validIds = [] // songIds for cleanup
   counts = {ok: 0, new: 0, moved: 0, duplicate: 0, removed: 0, error: 0, skipped: 0}
 
   for (let searchPath of cfg.paths) {
@@ -29,32 +30,33 @@ async function scan(ctx, cfg) {
     try {
       log('Scanning path: %s', searchPath)
       files = await readdir(searchPath)
-      log('  => found %s total files', files.length)
+      log('  => %s total files', files.length)
     } catch (err) {
-      error('  => %s', err)
+      log('  => %s', err)
       continue
     }
 
-    // filter out files with invalid extensions
+    // filter files with invalid extensions
     files = files.filter(function(file){
       return allowedExts.some(ext => ext === pathUtils.extname(file))
     })
 
-    log('  => found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
+    log('  => %s files with valid extensions (%s)', files.length, allowedExts.join(','))
 
     for (let i=0; i < files.length; i++) {
       try {
-        log('[file %s/%s] %s', i+1, files.length, files[i])
-        await process(ctx, files[i])
+        log('[%s/%s] %s', i+1, files.length, files[i])
+        let songId = await process(files[i])
+        validIds.push(songId)
       } catch(err) {
-        error(err)
+        log(err.message)
       }
     }
 
     log(JSON.stringify(counts))
   }
 
-  return Promise.resolve()
+  return Promise.resolve(validIds)
 }
 
 
@@ -97,135 +99,95 @@ async function resource(ctx, cfg) {
   ctx.body = fs.createReadStream(file)
 }
 
+module.exports = { scan, process }
 
-async function process(ctx, path){
+
+async function process(path){
   const pathInfo = pathUtils.parse(path)
   const cdgPath = path.substr(0, path.length-pathInfo.ext.length)+'.cdg'
+  let stats, song, res
 
-  let stats, type, duration
-
-  // make sure file exists and get stats
+  // make sure audio file exists and get stats
   try {
     stats = await fsStat(path)
   } catch(err) {
-    error(err)
+    log(err)
     counts.error++
     return
   }
 
-  // does CDG file exist?
+  // CDG sidecar must exist too
   try {
     await fsStat(cdgPath)
   } catch(err) {
-    log('  => skipping: no CDG file found')
+    log('skipping: no CDG file found')
     counts.skipped++
     return
   }
 
-  // is it already in the database with the
-  // same path and same mtime?
-  let row = await ctx.db.get('SELECT * FROM songs_cdg WHERE path = ? AND mtime = ?', path, stats.mtime)
-
-  if (row) {
-    log('  => ok')
-    counts.ok++
-    return
+  // get artist and title
+  song = parseMeta(path)
+  song.meta = {
+    path,
+    mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
   }
 
-  // hash the files as one
-  let hash = await multihash([path, cdgPath], 'sha256')
-  let desc = [path, cdgPath].map(path => pathUtils.parse(path).ext.replace('.', '')).join('+')
-  log('  => sha256 (%s): %s', desc, hash)
+  // already in database with the same path and mtime?
+  res = await searchLibrary({meta: {path, mtime: song.meta.mtime}})
 
-  // search for the hash
-  row = await ctx.db.get('SELECT * FROM songs_cdg WHERE hash = ?', hash)
-
-  if (row) {
-    // it moved! update the path and mtime
-    // @todo handle multiple identical files/hashes better
-    await ctx.db.run('UPDATE songs_cdg SET path = ?, mtime = ? WHERE songId = ?',
-      [path, stats.mtime, row.songId])
-
-    counts.moved++
-    log('  => moved from: %s', row.path)
-    return
+  if (res.result.length) {
+    log('song is in library (same path+mtime)')
+    counts.ok++
+    return Promise.resolve(res.result[0])
   }
 
   // --------
   // new song
   // --------
 
+  // hash the file(s)
+  let exts = [path, cdgPath].map(path => pathUtils.parse(path).ext.replace('.', '')).join('+')
+  log('getting sha256 (%s)', exts)
+  song.meta.sha256 = await multihash([path, cdgPath], 'sha256')
+
   // get duration in one of two ways depending on type
-  if (pathInfo.ext === '.mp3') {
-    try {
-      duration = await mp3Duration(path)
-    } catch(err) {
-      error(err)
-      counts.error++
-      return
-    }
-  } else {
-    try {
+  try {
+    if (pathInfo.ext === '.mp3') {
+      log('getting duration (mp3Duration)')
+      song.duration = await mp3Duration(path)
+    } else {
+      log('getting duration (musicmetadata)')
       let musicmeta = await musicmetadata(path, {duration: true})
-      duration = musicmeta.duration
-    } catch(err) {
-      error(err.message)
-      counts.error++
-      return
-    }
-  }
-
-  if (!duration) {
-    log('  => skipping: unable to determine duration')
-    counts.skipped++
-    return
-  }
-
-  log('  => duration: %s', duration)
-
-  let meta = parseMeta(path)
-
-  // does the artist already exist?
-  let artist = await ctx.db.get('SELECT * FROM artists WHERE name = ?', meta.artist)
-
-  if (!artist) {
-    log('  => new artist: %s', meta.artist)
-    let res = await ctx.db.run('INSERT INTO artists(name) VALUES (?)', meta.artist)
-
-    if (!res) {
-      error('  => Could not create artist: %s', meta.artist)
-      counts.error++
-      return
+      song.duration = musicmeta.duration
     }
 
-    artist = {artistId: res.lastID}
+    if (!song.duration) {
+      throw new Error('unable to determine duration')
+    }
+  } catch(err) {
+    log(err.message)
+    counts.error++
+    return Promise.reject(err.message)
   }
 
-  // insert to main library table
-  let res = await ctx.db.run('INSERT INTO songs(artistId, provider, title, duration, plays) VALUES (?,?,?,?,?)',
-    [artist.artistId, 'cdg', meta.title, duration, 0])
+  song.duration = Math.round(song.duration)
+  song.provider = 'cdg'
+  let songId
 
-  if (!res) {
-    error('  => Could not add song to library (db error)')
+  try {
+    songId = await addSong(song)
+    if (!Number.isInteger(songId)) {
+      throw new Error('got invalid lastID')
+    }
+  } catch(err) {
     counts.error++
-    return
-  }
-
-  // insert to provider data table
-  res = await ctx.db.run('INSERT INTO songs_cdg(songId, path, mtime, hash) VALUES (?,?,?,?)',
-    [res.lastID, path, stats.mtime, hash])
-
-  if (!res) {
-    error('  => Could not add song data (db error)')
-    counts.error++
-    return
+    return Promise.reject(err.message)
   }
 
   counts.new++
-  log('  => new song: %s - %s', meta.artist, meta.title)
+  return Promise.resolve(songId)
 }
 
-module.exports = exports = {scan, process, resource}
 
 function parseMeta(path) {
   const info = pathUtils.parse(path)

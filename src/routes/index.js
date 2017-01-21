@@ -5,7 +5,6 @@ import AccountRoute from './Account'
 import PlayerRoute from './Player'
 import LibraryRoute from './Library'
 import QueueRoute from './Queue'
-import { fetchLibrary } from './Library/modules/library'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -13,11 +12,6 @@ import { fetchLibrary } from './Library/modules/library'
 export const createRoutes = (store) => ({
   path: '/',
   getComponent (nextState, cb) {
-    const state = store.getState()
-    if (!state.library.artists.result.length) {
-      store.dispatch(fetchLibrary())
-    }
-
     cb(null, CoreLayout)
   },
   indexRoute: Home,

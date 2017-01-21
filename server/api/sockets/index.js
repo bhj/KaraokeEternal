@@ -1,5 +1,3 @@
-const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
-
 const Auth = require('./auth')
 const Queue = require('./queue')
 const Player = require('./player')

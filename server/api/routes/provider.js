@@ -1,5 +1,5 @@
 const KoaRouter = require('koa-router')
-const Providers = require('../provider/index')
+const Providers = require('../providers')
 
 const router = KoaRouter()
 const debug = require('debug')

@@ -1,12 +1,15 @@
 const KoaJwt = require('koa-jwt') // really from jsonwebtoken
-const Queue = require('./queue')
 const debug = require('debug')('app:socket:auth')
+
+const Queue = require('./queue')
+const getLibrary = require('../library/get')
+const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
 
 const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
 const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
 const SOCKET_AUTHENTICATE_FAIL = 'account/SOCKET_AUTHENTICATE_FAIL'
-
 const SOCKET_DEAUTHENTICATE = 'server/SOCKET_DEAUTHENTICATE'
+
 
 // ------------------------------------
 // Action Handlers
@@ -40,7 +43,12 @@ const ACTION_HANDLERS = {
 
     debug('%s (%s) joined room %s (%s in room)', user.name, socketId, user.roomId, ctx.socket.socket.adapter.rooms[user.roomId].length || 0)
 
-    // success! send status to newcomer only
+    // success! send library/queue data
+    ctx.io.to(socketId).emit('action', {
+      type: LIBRARY_CHANGE,
+      payload: await getLibrary()
+    })
+
     ctx.io.to(socketId).emit('action', {
       type: Queue.QUEUE_CHANGE,
       payload: await Queue.getQueue(ctx, user.roomId)

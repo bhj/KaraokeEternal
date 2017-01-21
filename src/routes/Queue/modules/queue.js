@@ -1,4 +1,3 @@
-
 // emitted from server
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 
