@@ -14,7 +14,7 @@ async function searchLibrary(params = {}) {
     Object.keys(params.meta).map(key => {
       let val = params.meta[key]
       if (typeof val === 'string') val = "'"+val+"'" // ugh
-      where.push(`json_extract(meta, '$.${key}') = ${val}`)
+      where.push(`json_extract(provider_json, '$.${key}') = ${val}`)
     })
   }
 
