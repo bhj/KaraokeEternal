@@ -4,7 +4,7 @@ import thunk from 'redux-thunk'
 import createThrottle from "redux-throttle"
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
-import { updateLocation } from './location'
+import { updateLocation } from './reducers/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
 
 export default (initialState = {}, socket) => {
@@ -16,7 +16,7 @@ export default (initialState = {}, socket) => {
     leading: true,
     trailing: true
   })
-  const socketMiddleware = createOptimisticMiddleware(socket, "server/")
+  const socketMiddleware = createSocketMiddleware(socket, "server/")
 
   const middleware = [thunk, throttle, socketMiddleware]
 
