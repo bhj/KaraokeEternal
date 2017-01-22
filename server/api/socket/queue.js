@@ -1,10 +1,11 @@
+const db = require('sqlite')
+
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 const QUEUE_END = 'queue/QUEUE_END'
 
 // client actions
 const QUEUE_ADD = 'server/QUEUE_ADD'
 const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
-
 
 // ------------------------------------
 // Action Handlers
@@ -21,7 +22,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify song exists
-    song = await ctx.db.get('SELECT * FROM songs WHERE songId = ?', payload)
+    song = await db.get('SELECT * FROM songs WHERE songId = ?', payload)
 
     if (!song) {
       // callback with truthy error msg
@@ -30,7 +31,7 @@ const ACTION_HANDLERS = {
     }
 
     // insert row
-    res = await ctx.db.run('INSERT INTO queue (roomId, songId, userId) VALUES (?, ?, ?)',
+    res = await db.run('INSERT INTO queue (roomId, songId, userId) VALUES (?, ?, ?)',
        ctx.user.roomId, payload, ctx.user.userId)
 
     if (res.changes !== 1) {
@@ -60,7 +61,7 @@ const ACTION_HANDLERS = {
     }
 
     // verify item exists
-    item = await ctx.db.get('SELECT * FROM queue WHERE queueId = ?', queueId)
+    item = await db.get('SELECT * FROM queue WHERE queueId = ?', queueId)
 
     if (!item) {
       // callback with truthy error msg
@@ -83,7 +84,7 @@ const ACTION_HANDLERS = {
     }
 
     // delete item
-    res = await ctx.db.run('DELETE FROM queue WHERE queueId = ?', queueId)
+    res = await db.run('DELETE FROM queue WHERE queueId = ?', queueId)
 
     if (res.changes !== 1) {
       // callback with truthy error msg
@@ -92,10 +93,10 @@ const ACTION_HANDLERS = {
     }
 
     // does user have another item we could try to replace it with?
-    nextItem = await ctx.db.get('SELECT queueId FROM queue WHERE queueId > ? AND userId = ? LIMIT 1', queueId, item.userId)
+    nextItem = await db.get('SELECT queueId FROM queue WHERE queueId > ? AND userId = ? LIMIT 1', queueId, item.userId)
 
     if (nextItem) {
-      res = await ctx.db.run('UPDATE queue SET queueId = ? WHERE queueId = ?', queueId, nextItem.queueId)
+      res = await db.run('UPDATE queue SET queueId = ? WHERE queueId = ?', queueId, nextItem.queueId)
     }
 
     // success!
@@ -113,7 +114,7 @@ async function getQueue(ctx, roomId) {
   let result = []
   let entities = {}
 
-  let rows = await ctx.db.all('SELECT queueId, songId, userId, users.name FROM queue JOIN users USING(userId) WHERE roomId = ? ORDER BY queueId', roomId)
+  let rows = await db.all('SELECT queueId, songId, userId, users.name FROM queue JOIN users USING(userId) WHERE roomId = ? ORDER BY queueId', roomId)
 
   rows.forEach(function(row){
     result.push(row.queueId)
@@ -124,7 +125,7 @@ async function getQueue(ctx, roomId) {
 }
 
 async function _roomIsOpen(ctx, roomId) {
-  const room = await ctx.db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
+  const room = await db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
   return (room || room.status === 'open')
 }
 

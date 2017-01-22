@@ -69,7 +69,7 @@ async function resource(ctx, cfg) {
     return ctx.body = "Missing 'type' or 'songId' in url"
   }
 
-  song = await ctx.db.get('SELECT * FROM songs JOIN songs_cdg USING(songId) WHERE songId = ?', songId)
+  song = await db.get('SELECT * FROM songs JOIN songs_cdg USING(songId) WHERE songId = ?', songId)
 
   if (! song) {
     ctx.status = 404
