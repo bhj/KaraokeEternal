@@ -93,7 +93,7 @@
     "eslint-plugin-react": "^6.9.0",
     "extract-text-webpack-plugin": "^1.0.0",
     "file-loader": "^0.9.0",
-    "fs-extra": "^1.0.0",
+    "fs-extra": "^2.0.0",
     "html-webpack-plugin": "^2.26.0",
     "imports-loader": "^0.7.0",
     "ip": "^1.1.2",
@@ -140,7 +140,6 @@
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.6",
     "webpack": "^1.12.14",
-    "webpack-hot-middleware": "^2.15.0",
     "yargs": "^6.6.0"
   },
   "devDependencies": {
@@ -175,6 +174,7 @@
     "redbox-react": "^1.2.10",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0",
-    "webpack-hot-middleware": "^2.14.0"
+    "webpack-dev-middleware": "1.8.4",
+    "webpack-hot-middleware": "^2.15.0"
   }
 }
