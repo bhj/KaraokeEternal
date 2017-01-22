@@ -167,7 +167,7 @@ async function process(path){
   } catch(err) {
     log(err.message)
     counts.error++
-    return Promise.reject(err.message)
+    return Promise.reject(err)
   }
 
   song.duration = Math.round(song.duration)
@@ -181,7 +181,7 @@ async function process(path){
     }
   } catch(err) {
     counts.error++
-    return Promise.reject(err.message)
+    return Promise.reject(err)
   }
 
   counts.new++

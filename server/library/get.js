@@ -33,7 +33,7 @@ async function getLibrary() {
     res = await db.all('SELECT songId, artistId, title, duration, plays, provider FROM songs ORDER BY title')
   } catch(err) {
     console.log(err)
-    return Promise.reject(err.message)
+    return Promise.reject(err)
   }
 
   // normalize results
