@@ -1,11 +1,11 @@
 const db = require('sqlite')
-const readdir = require('../../thunks/recursive-readdir')
-const multihash = require('../../thunks/multihash')
+const readdir = require('../../thunks/readdir')
+const hashfiles = require('../../thunks/hashfiles')
 const musicmetadata = require('../../thunks/musicmetadata')
-const mp3Duration = require('../../thunks/mp3-duration')
+const mp3duration = require('../../thunks/mp3duration')
 const debug = require('debug')
 const fs = require('fs')
-const fsStat = require('../../thunks/fs-stat')
+const fsStat = require('../../thunks/fsstat')
 const pathUtils = require('path')
 
 const log = debug('app:provider:cdg')
@@ -148,13 +148,13 @@ async function process(path){
   // hash the file(s)
   let exts = [path, cdgPath].map(path => pathUtils.parse(path).ext.replace('.', '')).join('+')
   log('getting sha256 (%s)', exts)
-  song.meta.sha256 = await multihash([path, cdgPath], 'sha256')
+  song.meta.sha256 = await hashfiles([path, cdgPath], 'sha256')
 
   // get duration in one of two ways depending on type
   try {
     if (pathInfo.ext === '.mp3') {
-      log('getting duration (mp3Duration)')
-      song.duration = await mp3Duration(path)
+      log('getting duration (mp3duration)')
+      song.duration = await mp3duration(path)
     } else {
       log('getting duration (musicmetadata)')
       let musicmeta = await musicmetadata(path, {duration: true})

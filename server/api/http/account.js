@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const jwt = require('koa-jwt')
-const bcrypt = require('../../thunks/bcrypt-promise')
+const bcrypt = require('../../thunks/bcrypt')
 const KoaRouter = require('koa-router')
 const router = KoaRouter()
 
