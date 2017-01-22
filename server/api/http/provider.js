@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const KoaRouter = require('koa-router')
-const Providers = require('../providers')
+const Providers = require('../../providers')
 
 const router = KoaRouter()
 const debug = require('debug')

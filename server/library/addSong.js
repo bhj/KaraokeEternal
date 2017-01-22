@@ -2,6 +2,8 @@ const db = require('sqlite')
 const debug = require('debug')
 const log = debug('app:library:addSong')
 
+const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+
 async function addSong(song) {
   log('new song: %s', JSON.stringify(song))
 

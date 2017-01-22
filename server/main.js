@@ -15,8 +15,8 @@ const koaSocketIO = require('koa-socket')
 const koaLogger = require('koa-logger')
 const db = require('sqlite')
 
-const apiRoutes = require('./api/routes')
-const socketActions = require('./api/sockets')
+const apiRoutes = require('./api/http')
+const socketActions = require('./api/socket')
 
 const app = new koa()
 const io = new IO()

@@ -2,7 +2,7 @@ const KoaJwt = require('koa-jwt') // really from jsonwebtoken
 const debug = require('debug')('app:socket:auth')
 
 const Queue = require('./queue')
-const getLibrary = require('../library/get')
+const getLibrary = require('../../library/get')
 const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
 
 const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
@@ -24,6 +24,7 @@ const ACTION_HANDLERS = {
     } catch (err) {
       // callback with truthy error msg
       ctx.acknowledge(err.message)
+      // @todo send SOCKET_AUTHENTICATE_FAIL
       return
     }
 

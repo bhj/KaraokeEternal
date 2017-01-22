@@ -3,7 +3,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter()
 const debug = require('debug')
 
-const Providers = require('../providers')
+const Providers = require('../../providers')
 let isScanning
 
 // scan for new songs
