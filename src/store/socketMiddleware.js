@@ -4,7 +4,7 @@ const _SUCCESS = '_SUCCESS'
 const _ERROR = '_ERROR'
 let nextTransactionID = 0
 
-export default function createOptimisticMiddleware(socket, prefix) {
+export default function createSocketMiddleware(socket, prefix) {
   return ({ dispatch }) => {
     // Wire socket.io to dispatch actions sent by the server.
     socket.on('action', dispatch)

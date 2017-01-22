@@ -1,5 +1,5 @@
 import { applyMiddleware, compose, createStore } from 'redux'
-import createOptimisticMiddleware from './optimisticMiddleware'
+import createSocketMiddleware from './socketMiddleware'
 import thunk from 'redux-thunk'
 import createThrottle from "redux-throttle"
 import { browserHistory } from 'react-router'
@@ -16,9 +16,9 @@ export default (initialState = {}, socket) => {
     leading: true,
     trailing: true
   })
-  const optimisticMiddleware = createOptimisticMiddleware(socket, "server/")
+  const socketMiddleware = createOptimisticMiddleware(socket, "server/")
 
-  const middleware = [thunk, throttle, optimisticMiddleware]
+  const middleware = [thunk, throttle, socketMiddleware]
 
   // ======================================================
   // Store Enhancers
