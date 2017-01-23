@@ -8,7 +8,7 @@ const searchLibrary = require('../../library/search')
 
 let stats
 
-async function scan(cfg) {
+async function scan(ctx, cfg) {
   const { channels } = cfg
 
   if (typeof channels === 'undefined' || !Array.isArray(channels)) {

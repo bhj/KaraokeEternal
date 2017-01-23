@@ -2,8 +2,14 @@ const log = require('debug')('app:socket')
 const Auth = require('./auth')
 const Queue = require('./queue')
 const Player = require('./player')
+const Prefs = require('./prefs')
 
-let ACTION_HANDLERS = Object.assign({}, Auth.ACTION_HANDLERS, Queue.ACTION_HANDLERS, Player.ACTION_HANDLERS)
+let ACTION_HANDLERS = Object.assign({},
+  Auth.ACTION_HANDLERS,
+  Queue.ACTION_HANDLERS,
+  Player.ACTION_HANDLERS,
+  Prefs.ACTION_HANDLERS
+)
 
 module.exports = async function(ctx) {
   const action = ctx.data

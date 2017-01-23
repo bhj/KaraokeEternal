@@ -42,7 +42,7 @@ router.get('/api/library/scan', async (ctx, next) => {
     log('Provider "%s" starting scan', provider)
 
     // call each provider's scan method
-    let validIds = await Provider.scan(cfg[provider])
+    let validIds = await Provider.scan(ctx, cfg[provider])
     log('Provider "%s" finished scan; %s valid songs', provider, validIds.length)
 
     // delete songs not in our valid list

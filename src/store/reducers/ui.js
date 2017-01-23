@@ -6,6 +6,9 @@ export const FOOTER_HEIGHT_CHANGE = 'ui/FOOTER_HEIGHT_CHANGE'
 export const SHOW_ERROR_MESSAGE = 'ui/SHOW_ERROR_MESSAGE'
 export const CLEAR_ERROR_MESSAGE = 'ui/CLEAR_ERROR_MESSAGE'
 
+export const PREFS_CHANGE_REQUEST = 'server/PREFS_CHANGE'
+export const PREFS_CHANGE = 'ui/PREFS_CHANGE'
+
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -38,6 +41,13 @@ export function setFooterHeight({height}) {
   }
 }
 
+export function setPrefs(domain, data) {
+  return {
+    type: PREFS_CHANGE_REQUEST,
+    payload: { domain, data },
+  }
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -58,6 +68,10 @@ const ACTION_HANDLERS = {
     ...state,
     errorMessage: null,
   }),
+  [PREFS_CHANGE]: (state, {payload}) => ({
+    ...state,
+    prefs: payload,
+  }),
 }
 
 // ------------------------------------
@@ -67,6 +81,7 @@ const initialState = {
   headerHeight: 0,
   footerHeight: 0,
   errorMessage: null,
+  prefs: null,
 }
 
 export default function uiReducer (state = initialState, action) {

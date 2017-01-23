@@ -2,7 +2,7 @@ import { UserAuthWrapper } from 'redux-auth-wrapper'
 import { browserHistory } from 'react-router'
 
 // Redirects to /login by default
-export const requireAuth = UserAuthWrapper({
+const requireAuth = UserAuthWrapper({
   // how to get the user state
   authSelector: state => { return state.account.user },
   failureRedirectPath: '/account',
@@ -12,3 +12,5 @@ export const requireAuth = UserAuthWrapper({
      // dispatch(addNotification({ message: 'Sorry, you are not an administrator' }));
   },
 })
+
+export default requireAuth

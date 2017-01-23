@@ -2,8 +2,12 @@ const KoaJwt = require('koa-jwt') // really from jsonwebtoken
 const debug = require('debug')('app:socket:auth')
 
 const Queue = require('./queue')
+
 const getLibrary = require('../../library/get')
 const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+
+const getPrefs = require('./prefs').getPrefs
+const PREFS_CHANGE = 'ui/PREFS_CHANGE'
 
 const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
 const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
@@ -25,7 +29,7 @@ const ACTION_HANDLERS = {
       // callback with truthy error msg
       ctx.acknowledge(err.message)
       // @todo send SOCKET_AUTHENTICATE_FAIL
-      return
+      return Promise.reject(new Error('invalid token'))
     }
 
     // successful authentication
@@ -54,6 +58,14 @@ const ACTION_HANDLERS = {
       type: Queue.QUEUE_CHANGE,
       payload: await Queue.getQueue(ctx, user.roomId)
     })
+
+    // send app config if they're admin
+    if (user && user.isAdmin) {
+      ctx.io.to(socketId).emit('action', {
+        type: PREFS_CHANGE,
+        payload: await getPrefs(),
+      })
+    }
   },
   [SOCKET_DEAUTHENTICATE]: async (ctx, {payload}) => {
     const socketId = ctx.socket.socket.id // raw socket.io instance

@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router'
 import AppLayout from 'layouts/AppLayout'
 import AccountForm from '../containers/AccountForm'
 import Logout from './Logout'
+import Providers from 'components/providers'
 
 class AccountView extends React.Component {
   static propTypes = {
@@ -13,14 +14,24 @@ class AccountView extends React.Component {
   }
 
   render () {
-    const { user } = this.props
+    const { user, prefs } = this.props
     const headerTitle = user ? user.name : (this.props.viewMode === 'login') ? 'Sign In' : 'Create Account'
+    let prefComponents = []
+
+    for (let i in Providers) {
+      if (typeof Providers[i].prefComponent !== 'undefined') {
+        let PrefPane = Providers[i].prefComponent
+        prefComponents.push(<PrefPane key={i}/>)
+      }
+    }
 
     return (
       <AppLayout title={headerTitle}>
         {(style) => (
           <div style={style}>
             <AccountForm/>
+
+            {prefComponents}
 
             {this.props.user && this.props.user.isAdmin &&
               <button className='button wide blue raised' onClick={() => {browserHistory.push('/player')}}>

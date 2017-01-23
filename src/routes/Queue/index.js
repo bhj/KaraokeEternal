@@ -1,5 +1,5 @@
 import QueueContainer from './containers/QueueContainer'
-import { requireAuth } from 'components/requireAuth'
+import requireAuth from 'components/requireAuth'
 
 // route definition
 export default function(store){

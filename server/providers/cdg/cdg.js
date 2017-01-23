@@ -7,15 +7,19 @@ const debug = require('debug')
 const fs = require('fs')
 const fsStat = require('../../thunks/fsstat')
 const pathUtils = require('path')
-
 const log = debug('app:provider:cdg')
-const addSong = require('../../library/addSong')
+
+const getLibrary = require('../../library/get')
 const searchLibrary = require('../../library/search')
+const addSong = require('../../library/addSong')
+
+const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+const PREFS_CHANGE = 'account/PREFS_CHANGE'
 
 let allowedExts = ['.mp3', '.m4a']
 let counts
 
-async function scan( cfg) {
+async function scan(ctx, cfg) {
   if (!Array.isArray(cfg.paths) || !cfg.paths.length) {
     log('No paths configured; aborting scan')
     return Promise.resolve()
@@ -51,6 +55,18 @@ async function scan( cfg) {
       } catch(err) {
         log(err.message)
       }
+
+      // emit updated library
+      // ctx.io.emit('action', {
+      //   type: LIBRARY_CHANGE,
+      //   payload: await getLibrary(),
+      // })
+
+      // emit status
+      ctx.io.emit('action', {
+        type: PROVIDER_SCAN_STATUS,
+        payload: {provider: 'cdg', pct: (files.length/i) * 100},
+      })
     }
 
     log(JSON.stringify(counts))
