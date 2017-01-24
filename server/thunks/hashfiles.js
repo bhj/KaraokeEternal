@@ -19,12 +19,16 @@ module.exports = exports = function(files, method) {
 
 function doPipe(fd, hash){
   return new Promise(function(resolve, reject) {
-    fd.on('data', function(data){
-      hash.update(data)
-    })
-
     fd.on('end', function(){
       return resolve()
+    })
+
+    fd.on('error', function(err){
+      return reject(err)
+    })
+
+    fd.on('data', function(data){
+      hash.update(data)
     })
   })
 }
