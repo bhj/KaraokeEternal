@@ -36,7 +36,8 @@ class ArtistList extends React.Component {
         width={this.props.browserWidth}
         height={this.props.browserHeight}
         ref={(c) => {this.ref = c}}
-        queuedSongs={this.props.queuedSongs}
+        songs={this.props.songs.result} // changes will force List re-draw
+        queuedSongs={this.props.queuedSongs} // changes will force List re-draw        
         rowCount={this.props.artists.result.length + 2} // top & bottom spacer
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}

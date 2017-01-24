@@ -1,9 +1,10 @@
 import { connect } from 'react-redux'
 import Prefs from './Prefs'
-import { setPrefs } from 'store/reducers/ui'
+import { setPrefs, providerRefresh } from 'store/reducers/ui'
 
 const mapActionCreators = {
   setPrefs,
+  providerRefresh,
 }
 
 const mapStateToProps = (state) => {

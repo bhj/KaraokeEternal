@@ -9,6 +9,8 @@ export const CLEAR_ERROR_MESSAGE = 'ui/CLEAR_ERROR_MESSAGE'
 export const PREFS_CHANGE_REQUEST = 'server/PREFS_CHANGE'
 export const PREFS_CHANGE = 'ui/PREFS_CHANGE'
 
+export const PROVIDER_REFRESH_REQUEST = 'server/PROVIDER_REFRESH'
+
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -48,6 +50,12 @@ export function setPrefs(domain, data) {
   }
 }
 
+export function providerRefresh(provider) {
+  return {
+    type: PROVIDER_REFRESH_REQUEST,
+    payload: provider,
+  }
+}
 // ------------------------------------
 // Action Handlers
 // ------------------------------------

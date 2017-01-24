@@ -1,10 +1,10 @@
 const db = require('sqlite')
 const debug = require('debug')
 const Providers = require('../../providers')
+const getPrefs = require('./prefs').getPrefs
 
-// const LIBRARY_REFRESH = 'server/LIBRARY_REFRESH'
-// const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
-const PROVIDER_SCAN_STATUS = 'provider/PROVIDER_SCAN_STATUS'
+const PROVIDER_REFRESH_REQUEST = 'server/PROVIDER_REFRESH'
+const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
 
 let isScanning
 
@@ -12,48 +12,45 @@ let isScanning
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_REFRESH]: async (ctx, {payload}) => {
-    const log = debug('app:library:scan')
+  [PROVIDER_REFRESH_REQUEST]: async (ctx, {payload}) => {
+    const log = debug('app:provider:refresh')
+    let cfg
+
+    if (typeof Providers[payload] === 'undefined') {
+      return Promise.reject(new Error('provider not loaded: '+payload))
+    }
+
+    try {
+      cfg = await getPrefs('provider.'+payload)
+    } catch(err) {
+      return Promise.reject(err)
+    }
+
+    if (!cfg.enabled) {
+      log('Provider "%s" not enabled; skipping', payload)
+      return
+    }
 
     if (isScanning) {
       log('ignoring request: scan already in progress')
       return
     }
 
+    log('Provider "%s" starting scan', payload)
     isScanning = true
+    let validIds
 
-    // get provider configs
-    let cfg = {}
-    let rows = await db.all('SELECT * FROM config WHERE domain LIKE "%.provider"')
-
-    rows.forEach(function(row){
-      const provider = row.domain.substr(0, row.domain.lastIndexOf('.provider'))
-      cfg[provider] = JSON.parse(row.data)
-    })
-
-    for (let provider in cfg) {
-      if (!cfg[provider].enabled) {
-        log('Provider "%s" not enabled; skipping', provider)
-        continue
-      }
-
-      if (!Providers[provider]) {
-        log('Provider "%s" is enabled but not loaded', provider)
-        continue
-      }
-
-      const Provider = Providers[provider]
-      const scanner =  Providers[provider].getScanner
-      log('Provider "%s" starting scan', provider)
-
-      // call each provider's scan method
-      let validIds = await Provider.scan(ctx, cfg[provider])
-      log('Provider "%s" finished scan; %s valid songs', provider, validIds.length)
-
-      // delete songs not in our valid list
-      let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', provider)
-      log('cleanup: removed %s invalid songs', res.stmt.changes)
+    // call provider's scan method
+    try {
+      validIds = await Providers[payload].scan(ctx, cfg)
+      log('Provider "%s" finished scan; %s valid songs', payload, validIds.length)
+    } catch(err) {
+      return Promise.reject(err)
     }
+
+    // delete songs not in our valid list
+    let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
+    log('cleanup: removed %s invalid songs', res.stmt.changes)
 
     // delete artists having no songs
     res = await db.run('DELETE FROM artists WHERE artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)')
@@ -66,6 +63,4 @@ const ACTION_HANDLERS = {
 
 module.exports = {
   ACTION_HANDLERS,
-  getQueue,
-  QUEUE_CHANGE,
 }

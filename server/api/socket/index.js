@@ -3,12 +3,14 @@ const Auth = require('./auth')
 const Queue = require('./queue')
 const Player = require('./player')
 const Prefs = require('./prefs')
+const Provider = require('./provider')
 
 let ACTION_HANDLERS = Object.assign({},
   Auth.ACTION_HANDLERS,
   Queue.ACTION_HANDLERS,
   Player.ACTION_HANDLERS,
-  Prefs.ACTION_HANDLERS
+  Prefs.ACTION_HANDLERS,
+  Provider.ACTION_HANDLERS
 )
 
 module.exports = async function(ctx) {

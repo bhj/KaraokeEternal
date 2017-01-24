@@ -34,7 +34,7 @@ async function scan(ctx, cfg) {
     try {
       log('Scanning path: %s', searchPath)
       files = await readdir(searchPath)
-      log('  => %s total files', files.length)
+      log('  => %s files total', files.length)
     } catch (err) {
       log('  => %s', err)
       continue
@@ -48,25 +48,31 @@ async function scan(ctx, cfg) {
     log('  => %s files with valid extensions (%s)', files.length, allowedExts.join(','))
 
     for (let i=0; i < files.length; i++) {
+      let songId, newCount
+
       try {
         log('[%s/%s] %s', i+1, files.length, files[i])
-        let songId = await process(files[i])
-        validIds.push(songId)
+        songId = await process(files[i])
       } catch(err) {
         log(err.message)
       }
 
-      // emit updated library
-      // ctx.io.emit('action', {
-      //   type: LIBRARY_CHANGE,
-      //   payload: await getLibrary(),
-      // })
+      validIds.push(songId)
+
+      if (counts.new !== newCount) {
+        newCount = counts.new
+        // emit updated library
+        ctx.io.emit('action', {
+          type: LIBRARY_CHANGE,
+          payload: await getLibrary(),
+        })
+      }
 
       // emit status
-      ctx.io.emit('action', {
-        type: PROVIDER_SCAN_STATUS,
-        payload: {provider: 'cdg', pct: (files.length/i) * 100},
-      })
+      // ctx.io.emit('action', {
+      //   type: PROVIDER_SCAN_STATUS,
+      //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
+      // })
     }
 
     log(JSON.stringify(counts))
@@ -127,18 +133,18 @@ async function process(path){
   try {
     stats = await fsStat(path)
   } catch(err) {
-    log(err)
-    counts.error++
-    return
-  }
+    log('skipping: %s', err.message)
+    counts.skipped++
+    return Promise.reject(err)
+}
 
   // CDG sidecar must exist too
   try {
     await fsStat(cdgPath)
   } catch(err) {
-    log('skipping: no CDG file found')
+    log('skipping: %s', err.message)
     counts.skipped++
-    return
+    return Promise.reject(err)
   }
 
   // get artist and title
@@ -164,7 +170,14 @@ async function process(path){
   // hash the file(s)
   let exts = [path, cdgPath].map(path => pathUtils.parse(path).ext.replace('.', '')).join('+')
   log('getting sha256 (%s)', exts)
-  song.meta.sha256 = await hashfiles([path, cdgPath], 'sha256')
+
+  try {
+    song.meta.sha256 = await hashfiles([path, cdgPath], 'sha256')
+  } catch(err) {
+    log('skipping: %s', err.message)
+    counts.skipped++
+    return Promise.reject(err)
+  }
 
   // get duration in one of two ways depending on type
   try {
