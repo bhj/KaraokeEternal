@@ -26,7 +26,7 @@ async function scan(ctx, cfg) {
   }
 
   let validIds = [] // songIds for cleanup
-  counts = {ok: 0, new: 0, moved: 0, duplicate: 0, removed: 0, error: 0, skipped: 0}
+  counts = {new: 0, ok: 0, skipped: 0}
 
   for (let searchPath of cfg.paths) {
     let files
@@ -195,7 +195,7 @@ async function process(path){
     }
   } catch(err) {
     log(err.message)
-    counts.error++
+    counts.skipped++
     return Promise.reject(err)
   }
 
@@ -209,7 +209,7 @@ async function process(path){
       throw new Error('got invalid lastID')
     }
   } catch(err) {
-    counts.error++
+    counts.skipped++
     return Promise.reject(err)
   }
 
