@@ -16,7 +16,7 @@ const addSong = require('../../library/addSong')
 const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
 const PREFS_CHANGE = 'account/PREFS_CHANGE'
 
-let allowedExts = ['.mp3', '.m4a']
+const allowedExts = ['.mp3', '.m4a']
 let counts
 
 async function scan(ctx, cfg) {
@@ -27,58 +27,58 @@ async function scan(ctx, cfg) {
 
   let validIds = [] // songIds for cleanup
   counts = {new: 0, ok: 0, skipped: 0}
+  let files = []
 
   for (let searchPath of cfg.paths) {
-    let files
-
     try {
-      log('Scanning path: %s', searchPath)
-      files = await readdir(searchPath)
-      log('  => %s files total', files.length)
+      log('searching path: %s', searchPath)
+      let res = await readdir(searchPath, [ignoreFunc])
+      log('found %s files with valid extensions (%s)', res.length, allowedExts.join(','))
+      files = files.concat(res)
     } catch (err) {
-      log('  => %s', err)
+      log(err.message)
       continue
     }
+  }
 
-    // filter files with invalid extensions
-    files = files.filter(function(file){
-      return allowedExts.some(ext => ext === pathUtils.extname(file))
-    })
+  log('total files to scan: %s', files.length)
 
-    log('  => %s files with valid extensions (%s)', files.length, allowedExts.join(','))
+  for (let i=0; i < files.length; i++) {
+    log('[%s/%s] %s', i+1, files.length, files[i])
+    let songId, newCount
 
-    for (let i=0; i < files.length; i++) {
-      let songId, newCount
-
-      try {
-        log('[%s/%s] %s', i+1, files.length, files[i])
-        songId = await process(files[i])
-      } catch(err) {
-        log(err.message)
-      }
-
-      validIds.push(songId)
-
-      if (counts.new !== newCount) {
-        newCount = counts.new
-        // emit updated library
-        ctx.io.emit('action', {
-          type: LIBRARY_CHANGE,
-          payload: await getLibrary(),
-        })
-      }
-
-      // emit status
-      // ctx.io.emit('action', {
-      //   type: PROVIDER_SCAN_STATUS,
-      //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
-      // })
+    try {
+      songId = await process(files[i])
+    } catch(err) {
+      log(err.message)
     }
+
+    validIds.push(songId)
+
+    if (counts.new !== newCount) {
+      newCount = counts.new
+      // emit updated library
+      ctx.io.emit('action', {
+        type: LIBRARY_CHANGE,
+        payload: await getLibrary(),
+      })
+    }
+
+    // emit status
+    // ctx.io.emit('action', {
+    //   type: PROVIDER_SCAN_STATUS,
+    //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
+    // })
 
     log(JSON.stringify(counts))
   }
 
-  return Promise.resolve(validIds)
+  // // delete songs not in our valid list
+  // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
+  // log('cleanup: removed %s invalid songs', res.stmt.changes)
+  //
+
+  return Promise.resolve()
 }
 
 
@@ -257,4 +257,11 @@ function titleCase(str) {
   return str.replace(/\w\S*/g, function(tStr) {
     return tStr.charAt(0).toUpperCase() + tStr.substr(1).toLowerCase()
   })
+}
+
+function ignoreFunc(file, stats) {
+  // `file` is the absolute path to the file, and `stats` is an `fs.Stats`
+  // object returned from `fs.lstat()`.
+  const ext = pathUtils.extname(file).toLowerCase()
+  return allowedExts.indexOf(ext) === -1
 }
