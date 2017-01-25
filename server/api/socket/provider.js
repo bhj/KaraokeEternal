@@ -27,7 +27,7 @@ const ACTION_HANDLERS = {
     }
 
     if (!cfg.enabled) {
-      log('Provider "%s" not enabled; skipping', payload)
+      log('provider "%s" not enabled; skipping', payload)
       return
     }
 
@@ -36,28 +36,22 @@ const ACTION_HANDLERS = {
       return
     }
 
-    log('Provider "%s" starting scan', payload)
+    log('provider "%s" starting scan', payload)
     isScanning = true
-    let validIds
 
     // call provider's scan method
     try {
-      validIds = await Providers[payload].scan(ctx, cfg)
-      log('Provider "%s" finished scan; %s valid songs', payload, validIds.length)
+      await Providers[payload].scan(ctx, cfg)
     } catch(err) {
-      return Promise.reject(err)
+      log(err.message)
     }
 
-    // delete songs not in our valid list
-    let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
-    log('cleanup: removed %s invalid songs', res.stmt.changes)
+    isScanning = false
+    log('provider "%s" finished scan', payload)
 
     // delete artists having no songs
     res = await db.run('DELETE FROM artists WHERE artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)')
     log('cleanup: removed %s artists with no songs', res.stmt.changes)
-
-    isScanning = false
-    log('Library scan complete')
   },
 }
 
