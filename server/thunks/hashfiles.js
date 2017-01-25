@@ -9,7 +9,12 @@ module.exports = exports = function(files, method) {
 
     for (let file of files) {
       let fd = fs.createReadStream(file)
-      await doPipe(fd, hash)
+
+      try {
+        await doPipe(fd, hash)
+      } catch(err) {
+        return reject(err)
+      }
     }
 
     hash.end()
