@@ -23,6 +23,9 @@ export default class Prefs extends React.Component {
 
   render() {
     const { prefs } = this.props
+    if (!prefs) return null
+
+    const enabled = prefs.enabled === true
     let paths = prefs.paths || []
 
     paths = paths.map(path => (
@@ -32,7 +35,7 @@ export default class Prefs extends React.Component {
     return (
       <div>
         <label>
-          <input type='checkbox' checked={prefs.enabled} onClick={this.toggleEnabled}/>
+          <input type='checkbox' checked={enabled} onClick={this.toggleEnabled}/>
           <strong> CD+Graphics</strong>
         </label>
         <button onClick={this.handleRefresh}>Refresh</button>
