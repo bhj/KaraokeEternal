@@ -27,8 +27,8 @@ class AccountView extends React.Component {
 
     return (
       <AppLayout title={headerTitle}>
-        {(style) => (
-          <div style={style}>
+        {(ui) => (
+          <div style={{paddingTop: ui.headerHeight, paddingBottom: ui.footerHeight}}>
             <AccountForm/>
 
             {prefComponents}

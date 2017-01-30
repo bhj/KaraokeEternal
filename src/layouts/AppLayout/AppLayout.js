@@ -8,7 +8,7 @@ export const AppLayout = (props) => (
   <div>
     <div className={classes.header}>
       <Header
-        title={props.title}
+        viewComponent={props.header}
         isAdmin={props.isAdmin}
         onHeight={props.setHeaderHeight}
       />
@@ -16,9 +16,10 @@ export const AppLayout = (props) => (
 
     <div className={classes.viewport} style={{width: props.browserWidth, height: props.browserHeight}}>
       {props.children({
-        // ready to reheat-n-serve as style
-        paddingTop: props.headerHeight,
-        paddingBottom: props.footerHeight,
+        browserWidth: props.browserWidth,
+        browserHeight: props.browserHeight,
+        headerHeight: props.headerHeight,
+        footerHeight: props.footerHeight,
       })}
     </div>
 

@@ -11,8 +11,8 @@ class ArtistList extends React.Component {
     queuedSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
-    browserWidth: PropTypes.number.isRequired,
-    browserHeight: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
     paddingTop: PropTypes.number.isRequired,
     paddingBottom: PropTypes.number.isRequired,
     // actions
@@ -33,11 +33,11 @@ class ArtistList extends React.Component {
 
     return (
       <List
-        width={this.props.browserWidth}
-        height={this.props.browserHeight}
+        width={this.props.width}
+        height={this.props.height}
         ref={(c) => {this.ref = c}}
         songs={this.props.songs.result} // changes will force List re-draw
-        queuedSongs={this.props.queuedSongs} // changes will force List re-draw        
+        queuedSongs={this.props.queuedSongs} // changes will force List re-draw
         rowCount={this.props.artists.result.length + 2} // top & bottom spacer
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
@@ -46,6 +46,13 @@ class ArtistList extends React.Component {
         overscanRowCount={10}
       />
     )
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.paddingTop !== prevProps.paddingTop ||
+      this.props.paddingBottom !== prevProps.paddingBottom) {
+      this.ref.recomputeRowHeights()
+    }
   }
 
   handleArtistClick(artistId) {
