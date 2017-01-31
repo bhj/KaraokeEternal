@@ -24,15 +24,17 @@ class QueueView extends React.Component {
   }
 
   render() {
+    const { curId, curPos } = this.props
+
     let songs = []
     let wait = 0
     let nextWait = 0
 
-    songs = this.props.result.map(function(queueId, i) {
-      const { curId, curPos } = this.props
-
+    this.props.result.forEach(function(queueId, i) {
       const item = this.props.entities[queueId]
       const song = this.props.songs[item.songId]
+      if (typeof song === 'undefined') return
+
       const isActive = (item.queueId === curId) && !this.props.isAtQueueEnd
       const isUpcoming = queueId > curId
       const isOwner = item.userId === this.props.user.userId
@@ -46,7 +48,7 @@ class QueueView extends React.Component {
         nextWait = song.duration
       }
 
-      return (
+      songs.push(
         <QueueItem
           key={queueId+'-'+item.userId}
           artist={this.props.artists[song.artistId].name}
