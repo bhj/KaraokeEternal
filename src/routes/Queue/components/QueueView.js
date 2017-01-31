@@ -70,8 +70,8 @@ class QueueView extends React.Component {
 
     return (
       <AppLayout title="Queue">
-        {(style) => (
-          <div style={style}>
+        {(ui) => (
+          <div style={{paddingTop: ui.headerHeight, paddingBottom: ui.footerHeight}}>
             {songs}
           </div>
         )}
