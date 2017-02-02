@@ -1,4 +1,4 @@
-import React, { PropTypes} from 'react'
+import React, { PropTypes } from 'react'
 import classes from './ArtistItem.css'
 
 const ArtistItem = (props) => {
@@ -19,7 +19,7 @@ ArtistItem.propTypes = {
   isExpanded: PropTypes.bool.isRequired,
   isChildQueued: PropTypes.bool.isRequired,
   onArtistSelect: PropTypes.func.isRequired,
-  style: PropTypes.object.isRequired,
+  style: PropTypes.object,
 }
 
 export default ArtistItem

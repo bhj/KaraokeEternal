@@ -1,13 +1,15 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
 import ArtistList from '../ArtistList'
-import LibraryHeader from './LibraryHeader'
+import LibraryHeader from '../LibraryHeader'
+import SearchResults from '../SearchResults'
 
 const LibraryView = (props) => {
+  const View = props.isSearching ? SearchResults : ArtistList
   return (
     <AppLayout title="Library" header={LibraryHeader}>
       {(ui) => (
-        <ArtistList {...props}
+        <View {...props}
           width={ui.browserWidth}
           height={ui.browserHeight}
           paddingTop={ui.headerHeight}
@@ -24,6 +26,9 @@ LibraryView.propTypes = {
   queuedSongs: PropTypes.array.isRequired,
   expandedArtists: PropTypes.array.isRequired,
   scrollTop: PropTypes.number.isRequired,
+  isSearching: PropTypes.bool.isRequired,
+  artistResults: PropTypes.array.isRequired,
+  songResults: PropTypes.array.isRequired,
   // actions
   queueSong: PropTypes.func.isRequired,
   scrollArtists: PropTypes.func.isRequired,

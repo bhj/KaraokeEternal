@@ -22,6 +22,13 @@ export function toggleArtistExpanded(artistId) {
     payload: artistId,
   }
 }
+export const SEARCH_LIBRARY = 'library/SEARCH_LIBRARY'
+export function searchLibrary(term) {
+  return {
+    type: SEARCH_LIBRARY,
+    payload: term,
+  }
+}
 
 // ------------------------------------
 // Action Handlers
@@ -32,6 +39,38 @@ const ACTION_HANDLERS = {
     artists: payload.artists,
     songs: payload.songs,
   }),
+  [SEARCH_LIBRARY]: (state, {payload}) => {
+    let artistResults, songResults
+    let term = payload.trim()
+
+    if (term === '') {
+      return {
+        ...state,
+        isSearching: false,
+        artistResults: [],
+        songResults: [],
+      }
+    }
+
+    term = term.toLowerCase()
+
+    artistResults = state.artists.result.filter((artistId, i) => {
+      const str = state.artists.entities[artistId].name.toLowerCase()
+      return str.indexOf(term) !== -1
+    })
+
+    songResults = state.songs.result.filter((songId, i) => {
+      const str = state.songs.entities[songId].title.toLowerCase()
+      return str.indexOf(term) !== -1
+    })
+
+    return {
+      ...state,
+      isSearching: true,
+      artistResults,
+      songResults,
+    }
+  },
   [SCROLL_ARTISTS]: (state, {payload}) => ({
     ...state,
     scrollTop: payload,
@@ -59,6 +98,9 @@ const ACTION_HANDLERS = {
 let initialState = {
   artists: {result: [], entities:{}},
   songs: {result: [], entities:{}},
+  isSearching: false,
+  artistResults: [],
+  songResults: [],
   isFetching: false,
   scrollTop: 0,
   expandedArtists: [],
