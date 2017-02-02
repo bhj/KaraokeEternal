@@ -26,11 +26,6 @@ class ArtistList extends React.Component {
   handleScroll = this.handleScroll.bind(this)
 
   render () {
-    if (!this.props.paddingTop || !this.props.paddingBottom) {
-      // we don't know header/footer height yet; skip render
-      return null
-    }
-
     return (
       <List
         width={this.props.width}
