@@ -98,18 +98,11 @@ class ArtistList extends React.Component {
       }
 
       if (isExpanded) {
-        // convert seconds to mm:ss
-        const duration = Math.round(songs.entities[songId].duration)
-        const min = Math.floor(duration / 60)
-        const sec = duration - (min * 60)
-
+        const song = songs.entities[songId]
         children.push(
           <SongItem
+            {...song}
             key={songId}
-            title={songs.entities[songId].title}
-            duration={min + ':' + (sec < 10 ? '0' + sec : sec)}
-            plays={songs.entities[songId].plays}
-            provider={songs.entities[songId].provider}
             onSelectSong={() => this.handleSongClick(songId)}
             isQueued={isQueued}
           />

@@ -34,13 +34,9 @@ class SearchResults extends React.Component {
           const song = this.props.songs.entities[songId]
           return (
             <SongItem
+              {...song}
               key={songId}
-              title={song.title}
-              // duration={min + ':' + (sec < 10 ? '0' + sec : sec)}
-              plays={song.plays}
-              provider={song.provider}
-              // onSelectSong={() => this.handleSongClick(songId)}
-              isQueued={false}
+              // isQueued={false}
             />
           )
         })}
