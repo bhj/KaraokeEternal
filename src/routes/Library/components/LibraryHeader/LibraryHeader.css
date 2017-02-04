@@ -1,5 +1,9 @@
+.container {
+  display: flex;
+}
+
 .search {
+  flex: 1;
   padding: 5px;
-  width: 100%;
   font-size: 18px;
 }
