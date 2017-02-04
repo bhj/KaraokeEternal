@@ -3,6 +3,7 @@ const path = require('path')
 const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.config')
 const project = require('../config/project.config')
+const readFile = require('./thunks/readfile')
 
 const koa = require('koa')
 const IO = require('koa-socket')
@@ -86,14 +87,14 @@ if (project.env === 'development') {
   // rendering, you'll want to remove this middleware.
   app.use(async (ctx, next) => {
     const filename = path.join(compiler.outputPath, 'index.html')
-    compiler.outputFileSystem.readFile(filename, (err, result) => {
-      if (err) {
-        return Promise.reject(err)
-      }
+    try {
+      ctx.body = await readFile(compiler, filename)
       ctx.set('content-type', 'text/html')
-      ctx.body = result
       ctx.status = 200
-    })
+      return Promise.resolve()
+    } catch(err) {
+      return Promise.reject(err)
+    }
   })
 } else {
   debug(
