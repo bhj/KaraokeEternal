@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { List } from 'react-virtualized'
+import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 const ROW_HEIGHT = 40
@@ -24,30 +24,31 @@ class ArtistList extends React.Component {
   rowRenderer = this.rowRenderer.bind(this)
   rowHeight = this.rowHeight.bind(this)
   handleScroll = this.handleScroll.bind(this)
+  setRef = this.setRef.bind(this)
 
   render () {
+    if (this.props.artists.result.length === 0) return null
+
     return (
-      <List
+      <PaddedList
         width={this.props.width}
         height={this.props.height}
-        ref={(c) => {this.ref = c}}
-        songs={this.props.songs.result} // changes will force List re-draw
-        queuedSongs={this.props.queuedSongs} // changes will force List re-draw
-        rowCount={this.props.artists.result.length + 2} // top & bottom spacer
+        songs={this.props.songs.result} // pass-through forces List refresh
+        queuedSongs={this.props.queuedSongs} // pass-through forces List refresh
+        rowCount={this.props.artists.result.length}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         onScroll={this.handleScroll}
+        onRef={this.setRef}
         scrollTop={this.props.scrollTop}
-        overscanRowCount={10}
+        paddingTop={this.props.paddingTop}
+        paddingBottom={this.props.paddingBottom}
       />
     )
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.paddingTop !== prevProps.paddingTop ||
-      this.props.paddingBottom !== prevProps.paddingBottom) {
-      this.ref.recomputeRowHeights()
-    }
+  setRef(ref) {
+    this.ref = ref
   }
 
   handleArtistClick(artistId) {
@@ -66,15 +67,6 @@ class ArtistList extends React.Component {
   }
 
   rowRenderer({index, key, style}) {
-    // top & bottom spacer
-    if (index === 0 || index === this.props.artists.result.length+1) {
-      return (
-        <div key={key} style={style}/>
-      )
-    } else {
-      index--
-    }
-
     const { artists, songs } = this.props
     const artist = artists.entities[artists.result[index]]
     const isExpanded = this.props.expandedArtists.indexOf(artist.artistId) !== -1
@@ -126,15 +118,6 @@ class ArtistList extends React.Component {
   }
 
   rowHeight({index}) {
-    // top & bottom spacer
-    if (index === 0) {
-      return this.props.paddingTop
-    } else if (index === this.props.artists.result.length+1){
-      return this.props.paddingBottom
-    } else {
-      index--
-    }
-
     const artistId = this.props.artists.result[index]
     let rows = 1
 
