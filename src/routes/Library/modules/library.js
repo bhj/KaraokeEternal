@@ -101,7 +101,6 @@ let initialState = {
   isSearching: false,
   artistResults: [],
   songResults: [],
-  isFetching: false,
   scrollTop: 0,
   expandedArtists: [],
 }
