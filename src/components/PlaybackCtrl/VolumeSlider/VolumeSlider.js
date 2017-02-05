@@ -1,11 +1,10 @@
-import React, { Component, PropTypes } from 'react'
-import Slider from 'rc-slider'
+import React, { PropTypes } from 'react'
+import Slider, { Handle } from 'rc-slider'
 import './VolumeSlider.scss'
 
-export default class VolumeSlider extends Component {
+export default class VolumeSlider extends React.Component {
   static propTypes = {
     volume: PropTypes.number.isRequired,
-    offset: PropTypes.number,
     onVolumeChange: PropTypes.func.isRequired,
     className: PropTypes.string.isRequired,
   }
@@ -51,7 +50,7 @@ export default class VolumeSlider extends Component {
         value={this.state.isDragging || this.ignoreStatus ? this.state.vol : this.props.volume}
         onChange={this.handleChange}
         onAfterChange={this.handleAfterChange}
-        handle={<CustomGrabber />}
+        handle={handle}
         className={this.props.className}
       />
     )
@@ -59,35 +58,25 @@ export default class VolumeSlider extends Component {
 }
 
 // volume slider handle/grabber
-class CustomGrabber extends Component {
-  static propTypes = {
-    value: React.PropTypes.any,
-    offset: React.PropTypes.number,
-  }
-
-  baseStyle = {
+const handle = (props) => {
+  const style = Object.assign({left: `${props.offset}%`}, {
     position: 'absolute',
     transform: 'translate(-50%, -50%)',
     marginTop: '6px',
     fontSize: '40px',
     opacity: .7,
-    color: '#333'
-  }
+    color: '#333',
+  })
 
-  render() {
-    const style = Object.assign({ left: `${this.props.offset}%` }, this.baseStyle)
-    const vol = this.props.value
+  let icon = "volume_up"
+  if (props.value === 0) icon = "volume_off"
+  else if (props.value < .4) icon = "volume_mute"
+  else if (props.value < .7) icon = "volume_down"
 
-    let icon
-    if (vol === 0) icon = "volume_off"
-    else if (vol < .4) icon = "volume_mute"
-    else if (vol < .7) icon = "volume_down"
-    else icon = "volume_up"
-
-    return (
-      <div style={style}>
-        <i className='material-icons'>{icon}</i>
-      </div>
-    )
-  }
+  return (
+    <div style={style}>
+      <i className='material-icons'>{icon}</i>
+      <Handle {...props}/>
+    </div>
+  )
 }
