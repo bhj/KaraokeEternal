@@ -8,13 +8,8 @@ const LibraryView = (props) => {
   const View = props.isSearching ? SearchResults : ArtistList
   return (
     <AppLayout title="Library" header={LibraryHeader}>
-      {(ui) => (
-        <View {...props}
-          width={ui.browserWidth}
-          height={ui.browserHeight}
-          paddingTop={ui.headerHeight}
-          paddingBottom={ui.footerHeight}
-        />
+      {(style) => (
+        <View {...style} {...props}/>
       )}
     </AppLayout>
   )

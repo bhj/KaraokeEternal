@@ -33,6 +33,9 @@ class ArtistList extends React.Component {
       <PaddedList
         width={this.props.width}
         height={this.props.height}
+        scrollTop={this.props.scrollTop}
+        paddingTop={this.props.paddingTop}
+        paddingBottom={this.props.paddingBottom}
         songs={this.props.songs.result} // pass-through forces List refresh
         queuedSongs={this.props.queuedSongs} // pass-through forces List refresh
         rowCount={this.props.artists.result.length}
@@ -40,9 +43,6 @@ class ArtistList extends React.Component {
         rowRenderer={this.rowRenderer}
         onScroll={this.handleScroll}
         onRef={this.setRef}
-        scrollTop={this.props.scrollTop}
-        paddingTop={this.props.paddingTop}
-        paddingBottom={this.props.paddingBottom}
       />
     )
   }

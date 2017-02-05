@@ -16,10 +16,10 @@ export const AppLayout = (props) => (
 
     <div className={classes.viewport} style={{width: props.browserWidth, height: props.browserHeight}}>
       {props.children({
-        browserWidth: props.browserWidth,
-        browserHeight: props.browserHeight,
-        headerHeight: props.headerHeight,
-        footerHeight: props.footerHeight,
+        width: props.browserWidth,
+        height: props.browserHeight,
+        paddingTop: props.headerHeight,
+        paddingBottom: props.footerHeight,
       })}
     </div>
 

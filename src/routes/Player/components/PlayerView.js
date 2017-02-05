@@ -12,8 +12,6 @@ class PlayerView extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored:  PropTypes.bool.isRequired,
-    browserWidth: PropTypes.number.isRequired,
-    browserHeight: PropTypes.number.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
@@ -95,8 +93,8 @@ class PlayerView extends React.Component {
             >
               <Component
                 {...componentProps}
-                width={this.props.browserWidth}
-                height={this.props.browserHeight - (screenfull.isFullscreen ? 0 : (style.paddingTop + style.paddingBottom))}
+                width={style.width}
+                height={style.height - (screenfull.isFullscreen ? 0 : (style.paddingTop + style.paddingBottom))}
               />
           </div>
         )}
