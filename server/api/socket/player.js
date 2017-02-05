@@ -27,7 +27,7 @@ const ACTION_HANDLERS = {
   [PLAYER_NEXT_REQUEST]: async (ctx, {payload}) => {
     // get next-highest queue item id
     // @todo try/catch
-    let item = await db.get('SELECT * FROM queue WHERE roomId = ? AND queueId > ? LIMIT 1', ctx.user.roomId, payload)
+    let item = await db.get('SELECT * FROM queue JOIN songs USING(songId) WHERE roomId = ? AND queueId > ? LIMIT 1', ctx.user.roomId, payload)
 
     if (!item) {
       // we're already on the last queued item
