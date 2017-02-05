@@ -7,13 +7,12 @@ export default class Prefs extends React.Component {
     providerRefresh: React.PropTypes.func.isRequired,
   }
 
-  toggleEnabled = this.toggleEnabled.bind(this)
+  setEnabled = this.setEnabled.bind(this)
   handleRefresh = this.handleRefresh.bind(this)
 
-  toggleEnabled(e) {
-    e.preventDefault()
+  setEnabled(e) {
     let prefs = Object.assign({}, this.props.prefs)
-    prefs.enabled = !prefs.enabled
+    prefs.enabled = e.target.checked
     this.props.setPrefs('provider.cdg', prefs)
   }
 
@@ -35,7 +34,7 @@ export default class Prefs extends React.Component {
     return (
       <div>
         <label>
-          <input type='checkbox' checked={enabled} onClick={this.toggleEnabled}/>
+          <input type='checkbox' checked={enabled} onChange={this.setEnabled}/>
           <strong> CD+Graphics</strong>
         </label>
         <button onClick={this.handleRefresh}>Refresh</button>
