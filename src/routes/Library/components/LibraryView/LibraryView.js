@@ -18,7 +18,7 @@ const LibraryView = (props) => {
 LibraryView.propTypes = {
   artists: PropTypes.object.isRequired,
   songs: PropTypes.object.isRequired,
-  queuedSongs: PropTypes.array.isRequired,
+  queuedSongIds: PropTypes.array.isRequired,
   expandedArtists: PropTypes.array.isRequired,
   scrollTop: PropTypes.number.isRequired,
   isSearching: PropTypes.bool.isRequired,

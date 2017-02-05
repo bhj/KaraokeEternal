@@ -2,7 +2,7 @@ import React from 'react'
 import classes from './SongItem.css'
 
 export const SongItem = (props) => (
-  <div onClick={props.onSelectSong} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
+  <div onClick={props.onSongClick} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
     <div className={classes.stats}>
       {toMMSS(props.duration)}
     </div>
@@ -22,7 +22,7 @@ SongItem.propTypes = {
   duration: React.PropTypes.number.isRequired,
   plays: React.PropTypes.number.isRequired,
   provider: React.PropTypes.string.isRequired,
-  onSelectSong: React.PropTypes.func.isRequired,
+  onSongClick: React.PropTypes.func.isRequired,
 }
 
 export default SongItem

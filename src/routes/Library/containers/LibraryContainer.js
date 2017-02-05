@@ -14,7 +14,7 @@ const mapStateToProps = (state) => {
   return {
     artists: state.library.artists,
     songs: state.library.songs,
-    queuedSongs: ensureState(state.queue).songIds,
+    queuedSongIds: ensureState(state.queue).songIds,
     expandedArtists: state.library.expandedArtists,
     isSearching: state.library.isSearching,
     artistResults: state.library.artistResults,
