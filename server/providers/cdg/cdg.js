@@ -91,7 +91,7 @@ async function resource(ctx, cfg) {
     return ctx.body = "Missing 'type' or 'songId' in url"
   }
 
-  song = await db.get('SELECT * FROM songs JOIN songs_cdg USING(songId) WHERE songId = ?', songId)
+  song = await db.get("SELECT json_extract(provider_json, '$.path') AS path FROM songs WHERE songId = ?", songId)
 
   if (! song) {
     ctx.status = 404
@@ -121,7 +121,7 @@ async function resource(ctx, cfg) {
   ctx.body = fs.createReadStream(file)
 }
 
-module.exports = { scan, process }
+module.exports = { scan, resource }
 
 
 async function process(path){

@@ -1,6 +1,7 @@
 const db = require('sqlite')
 const KoaRouter = require('koa-router')
 const Providers = require('../../providers')
+const getPrefs = require('../socket/prefs').getPrefs
 
 const router = KoaRouter()
 const debug = require('debug')
@@ -10,6 +11,7 @@ const error = debug('app:library:error')
 // call media provider for song
 router.get('/api/provider/:provider/:method', async (ctx, next) => {
   const { provider, method } = ctx.params
+  let cfg
 
   if (! Providers[provider]) {
     ctx.status = 404
@@ -22,10 +24,13 @@ router.get('/api/provider/:provider/:method', async (ctx, next) => {
   }
 
   // get provider config
-  let row = await db.get('SELECT data FROM config WHERE domain = ?', provider+'.provider')
-  let cfg = JSON.parse(row.data)
+  try {
+    cfg = await getPrefs('provider.'+provider)
+  } catch(err) {
+    return Promise.reject(err)
+  }
 
-  if (! cfg.enabled) {
+  if (!cfg.enabled) {
     ctx.status = 401
     return ctx.body = `Provider "${provider}" not enabled`
   }

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
-import ProviderPlayers from './provider'
+import Providers from 'components/providers'
 import screenfull from 'screenfull'
 
 class PlayerView extends React.Component {
@@ -67,11 +67,11 @@ class PlayerView extends React.Component {
       // show 'add more songs' placeholder
     } else if (!song) {
       // show 'press play to begin' placeholder
-    } else if (!ProviderPlayers[song.provider]) {
+    } else if (typeof Providers[song.provider] === 'undefined') {
       // show 'provider error' placeholder
       this.props.mediaError(this.props.queueId, 'No provider for type: "'+song.provider+'"')
     } else {
-      Component = ProviderPlayers[song.provider]
+      Component = Providers[song.provider].playerComponent
       componentProps = {
         queueId: this.props.queueId,
         volume: this.props.volume,

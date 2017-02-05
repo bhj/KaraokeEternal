@@ -88,7 +88,7 @@ async function process(song) {
   }
 }
 
-module.exports = exports = { scan, process }
+module.exports = exports = { scan }
 
 function parseArtistTitle(str){
   let title, artist
