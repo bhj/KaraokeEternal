@@ -2,7 +2,7 @@ import React from 'react'
 import classes from './SongItem.css'
 
 export const SongItem = (props) => (
-  <div onClick={props.onSongClick} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
+  <div onClick={props.onSongClick} style={props.style} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
     <div className={classes.stats}>
       {toMMSS(props.duration)}
     </div>
