@@ -57,6 +57,7 @@ const ACTION_HANDLERS = {
         ...state,
         isSearching: false,
         artistResults: [],
+        expandedArtistResults: [],
         songResults: [],
       }
     }
