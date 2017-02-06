@@ -13,9 +13,9 @@ class CDGPlayer extends React.Component {
     item: PropTypes.object.isRequired,
     getMedia: PropTypes.func.isRequired, // action
     getMediaSuccess: PropTypes.func.isRequired, // action
-    onMediaError: React.PropTypes.func.isRequired, // action
-    onMediaEnd: React.PropTypes.func.isRequired, // action
-    onStatus: React.PropTypes.func.isRequired, // action
+    onMediaError: PropTypes.func.isRequired, // action
+    onMediaEnd: PropTypes.func.isRequired, // action
+    onStatus: PropTypes.func.isRequired, // action
   }
 
   state = {

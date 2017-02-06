@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import classes from './QueueItem.css'
 
 export const QueueItem = (props) => (
@@ -31,15 +31,15 @@ export const QueueItem = (props) => (
 )
 
 QueueItem.propTypes = {
-  title: React.PropTypes.string.isRequired,
-  artist: React.PropTypes.string.isRequired,
-  name: React.PropTypes.string.isRequired,
-  hasErrors: React.PropTypes.bool.isRequired,
-  canSkip: React.PropTypes.bool.isRequired,
-  onSkipClick: React.PropTypes.func.isRequired,
-  canRemove: React.PropTypes.bool.isRequired,
-  onRemoveClick: React.PropTypes.func.isRequired,
-  onErrorInfoClick: React.PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  artist: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  hasErrors: PropTypes.bool.isRequired,
+  canSkip: PropTypes.bool.isRequired,
+  onSkipClick: PropTypes.func.isRequired,
+  canRemove: PropTypes.bool.isRequired,
+  onRemoveClick: PropTypes.func.isRequired,
+  onErrorInfoClick: PropTypes.func.isRequired,
 }
 
 export default QueueItem

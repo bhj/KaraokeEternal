@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import Header from 'components/Header'
 import Navigation from 'components/Navigation'
 import { SkyLightStateless } from 'react-skylight'
@@ -46,16 +46,16 @@ export const AppLayout = (props) => (
 )
 
 AppLayout.propTypes = {
-  isAdmin: React.PropTypes.bool,
-  errorMessage: React.PropTypes.string,
-  browserWidth: React.PropTypes.number,
-  browserHeight: React.PropTypes.number,
-  headerHeight: React.PropTypes.number,
-  footerHeight: React.PropTypes.number,
+  isAdmin: PropTypes.bool,
+  errorMessage: PropTypes.string,
+  browserWidth: PropTypes.number,
+  browserHeight: PropTypes.number,
+  headerHeight: PropTypes.number,
+  footerHeight: PropTypes.number,
   // actions
-  setHeaderHeight: React.PropTypes.func,
-  setFooterHeight: React.PropTypes.func,
-  clearErrorMessage: React.PropTypes.func,
+  setHeaderHeight: PropTypes.func,
+  setFooterHeight: PropTypes.func,
+  clearErrorMessage: PropTypes.func,
 }
 
 export default AppLayout

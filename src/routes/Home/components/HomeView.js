@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import DuckImage from '../assets/Duck.jpg'
 import './HomeView.scss'
 

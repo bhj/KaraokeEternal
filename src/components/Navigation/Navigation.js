@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import Measure from 'react-measure'
 import { Link, IndexLink } from 'react-router'
 import classes, {active} from './Navigation.css'
@@ -21,7 +21,7 @@ export const Navigation = (props) => (
 )
 
 Navigation.PropTypes = {
-  onHeight: React.PropTypes.func,
+  onHeight: PropTypes.func,
 }
 
 export default Navigation

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import classes from './SongItem.css'
 
 export const SongItem = (props) => (
@@ -18,11 +18,12 @@ export const SongItem = (props) => (
 )
 
 SongItem.propTypes = {
-  title: React.PropTypes.string.isRequired,
-  duration: React.PropTypes.number.isRequired,
-  plays: React.PropTypes.number.isRequired,
-  provider: React.PropTypes.string.isRequired,
-  onSongClick: React.PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  duration: PropTypes.number.isRequired,
+  plays: PropTypes.number.isRequired,
+  provider: PropTypes.string.isRequired,
+  onSongClick: PropTypes.func.isRequired,
+  style: PropTypes.object,
 }
 
 export default SongItem

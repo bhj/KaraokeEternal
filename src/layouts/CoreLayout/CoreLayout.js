@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import './CoreLayout.scss'
 import 'styles/core.scss'
 import 'styles/material-ui.scss'

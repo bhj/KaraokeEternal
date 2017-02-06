@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 
 export default class Prefs extends React.Component {
   static propTypes = {
-    prefs: React.PropTypes.object.isRequired,
-    setPrefs: React.PropTypes.func.isRequired,
-    providerRefresh: React.PropTypes.func.isRequired,
+    prefs: PropTypes.object.isRequired,
+    setPrefs: PropTypes.func.isRequired,
+    providerRefresh: PropTypes.func.isRequired,
   }
 
   setEnabled = this.setEnabled.bind(this)

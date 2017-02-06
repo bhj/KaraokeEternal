@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import Measure from 'react-measure'
 import PlaybackCtrl from 'components/PlaybackCtrl'
 import classes from './Header.css'
@@ -19,8 +19,8 @@ const Header = (props) => {
 }
 
 Header.PropTypes = {
-  isAdmin: React.PropTypes.bool,
-  onHeight: React.PropTypes.func,
+  isAdmin: PropTypes.bool,
+  onHeight: PropTypes.func,
 }
 
 export default Header
