@@ -100,7 +100,8 @@ class SearchResults extends React.Component {
         {...song}
         key={key}
         style={style}
-        // isQueued={false}
+        onSongClick={() => this.handleSongClick(songId)}
+        isQueued={this.props.queuedSongIds.indexOf(songId) !== -1}
       />
     )
   }

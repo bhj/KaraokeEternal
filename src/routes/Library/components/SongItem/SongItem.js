@@ -22,8 +22,9 @@ SongItem.propTypes = {
   duration: PropTypes.number.isRequired,
   plays: PropTypes.number.isRequired,
   provider: PropTypes.string.isRequired,
-  onSongClick: PropTypes.func.isRequired,
   style: PropTypes.object,
+  onSongClick: PropTypes.func.isRequired,
+  isQueued: PropTypes.bool.isRequired,
 }
 
 export default SongItem
