@@ -22,6 +22,15 @@ export function toggleArtistExpanded(artistId) {
     payload: artistId,
   }
 }
+
+export const ARTIST_RESULT_EXPAND_TOGGLE = 'library/ARTIST_RESULT_EXPAND_TOGGLE'
+export function toggleArtistResultExpanded(artistId) {
+  return {
+    type: ARTIST_RESULT_EXPAND_TOGGLE,
+    payload: artistId,
+  }
+}
+
 export const SEARCH_LIBRARY = 'library/SEARCH_LIBRARY'
 export function searchLibrary(term) {
   return {
@@ -76,18 +85,33 @@ const ACTION_HANDLERS = {
     scrollTop: payload,
   }),
   [ARTIST_EXPAND_TOGGLE]: (state, {payload}) => {
-    let expandedArtists = state.expandedArtists.slice()
-    const i = expandedArtists.indexOf(payload)
+    let list = state.expandedArtists.slice()
+    const i = list.indexOf(payload)
 
     if (i === -1) {
-      expandedArtists.push(payload)
+      list.push(payload)
     } else {
-      expandedArtists.splice(i, 1)
+      list.splice(i, 1)
     }
 
     return {
       ...state,
-      expandedArtists,
+      expandedArtists: list,
+    }
+  },
+  [ARTIST_RESULT_EXPAND_TOGGLE]: (state, {payload}) => {
+    let list = state.expandedArtistResults.slice()
+    const i = list.indexOf(payload)
+
+    if (i === -1) {
+      list.push(payload)
+    } else {
+      list.splice(i, 1)
+    }
+
+    return {
+      ...state,
+      expandedArtistResults: list,
     }
   }
 }
@@ -98,11 +122,13 @@ const ACTION_HANDLERS = {
 let initialState = {
   artists: {result: [], entities:{}},
   songs: {result: [], entities:{}},
+  scrollTop: 0,
+  expandedArtists: [],
+  // search "view"
   isSearching: false,
   artistResults: [],
   songResults: [],
-  scrollTop: 0,
-  expandedArtists: [],
+  expandedArtistResults: [],
 }
 
 export default function libraryReducer (state = initialState, action) {

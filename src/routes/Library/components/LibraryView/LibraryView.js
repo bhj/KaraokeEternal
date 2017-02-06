@@ -20,6 +20,7 @@ LibraryView.propTypes = {
   songs: PropTypes.object.isRequired,
   queuedSongIds: PropTypes.array.isRequired,
   expandedArtists: PropTypes.array.isRequired,
+  expandedArtistResults: PropTypes.array.isRequired,
   scrollTop: PropTypes.number.isRequired,
   isSearching: PropTypes.bool.isRequired,
   artistResults: PropTypes.array.isRequired,

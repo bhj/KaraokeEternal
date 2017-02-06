@@ -10,8 +10,8 @@ class SearchResults extends React.Component {
     songs: PropTypes.object.isRequired,
     artistResults: PropTypes.array.isRequired,  // artistIds
     songResults: PropTypes.array.isRequired,  // songIds
+    expandedArtistResults: PropTypes.array.isRequired,
     queuedSongIds: PropTypes.array.isRequired,
-    expandedArtists: PropTypes.array.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     paddingTop: PropTypes.number.isRequired,
@@ -19,7 +19,7 @@ class SearchResults extends React.Component {
     // actions
     queueSong: PropTypes.func.isRequired,
     // scrollArtists: PropTypes.func.isRequired,
-    toggleArtistExpanded: PropTypes.func.isRequired,
+    toggleArtistResultExpanded: PropTypes.func.isRequired,
   }
 
   rowRenderer = this.rowRenderer.bind(this)
@@ -75,7 +75,7 @@ class SearchResults extends React.Component {
           songIds={artist.songIds} // "children"
           queuedSongIds={this.props.queuedSongIds}
           name={artist.name}
-          isExpanded={this.props.expandedArtists.indexOf(artistId) !== -1}
+          isExpanded={this.props.expandedArtistResults.indexOf(artistId) !== -1}
           onArtistClick={() => this.handleArtistClick(artistId)}
           onSongClick={this.handleSongClick}
           key={key}
@@ -112,7 +112,7 @@ class SearchResults extends React.Component {
     const artistId = this.props.artistResults[index-1]
     let rows = 1
 
-    if (this.props.expandedArtists.indexOf(artistId) !== -1) {
+    if (this.props.expandedArtistResults.indexOf(artistId) !== -1) {
       rows += this.props.artists.entities[artistId].songIds.length
     }
 
@@ -120,7 +120,7 @@ class SearchResults extends React.Component {
   }
 
   handleArtistClick(artistId) {
-    this.props.toggleArtistExpanded(artistId)
+    this.props.toggleArtistResultExpanded(artistId)
   }
 
   handleSongClick(songId) {
