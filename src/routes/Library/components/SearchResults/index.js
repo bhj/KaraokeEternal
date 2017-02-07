@@ -1,3 +1,3 @@
-import SearchResults from './SearchResults'
+import SearchResultsContainer from './SearchResultsContainer'
 
-export default SearchResults
+export default SearchResultsContainer

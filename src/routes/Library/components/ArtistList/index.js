@@ -1,3 +1,3 @@
-import ArtistList from './ArtistList'
+import ArtistListContainer from './ArtistListContainer'
 
-export default ArtistList
+export default ArtistListContainer

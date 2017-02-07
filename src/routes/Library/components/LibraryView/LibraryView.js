@@ -9,25 +9,14 @@ const LibraryView = (props) => {
   return (
     <AppLayout title="Library" header={LibraryHeader}>
       {(style) => (
-        <View {...style} {...props}/>
+        <View {...style}/>
       )}
     </AppLayout>
   )
 }
 
 LibraryView.propTypes = {
-  artists: PropTypes.object.isRequired,
-  songs: PropTypes.object.isRequired,
-  queuedSongIds: PropTypes.array.isRequired,
-  expandedArtists: PropTypes.array.isRequired,
-  scrollTop: PropTypes.number.isRequired,
   searchTerm: PropTypes.string.isRequired,
-  artistResults: PropTypes.array.isRequired,
-  songResults: PropTypes.array.isRequired,
-  expandedArtistResults: PropTypes.array.isRequired,
-  // actions
-  queueSong: PropTypes.func.isRequired,
-  scrollArtists: PropTypes.func.isRequired,
 }
 
 export default LibraryView
