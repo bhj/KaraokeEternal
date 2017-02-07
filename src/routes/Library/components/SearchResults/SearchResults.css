@@ -1,0 +1,7 @@
+.artistsHeading,
+.songsHeading {
+  text-align: center;
+  background: #eee;
+  font-size: 18px;
+  padding-top: .25em;
+}

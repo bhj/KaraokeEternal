@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
+import classes from './SearchResults.css'
 const ROW_HEIGHT = 40
 
 class SearchResults extends React.Component {
@@ -60,7 +61,9 @@ class SearchResults extends React.Component {
     // # artist results heading
     if (index === 0) {
       return (
-        <div key={key} style={style}>{artistResults.length} artists</div>
+        <div key={key} style={style} className={classes.artistsHeading}>
+          {artistResults.length} artists
+        </div>
       )
     }
 
@@ -87,7 +90,9 @@ class SearchResults extends React.Component {
     // # song results heading
     if (index === artistResults.length + 1) {
       return (
-        <div key={key} style={style}>{songResults.length} songs</div>
+        <div key={key} style={style} className={classes.songsHeading}>
+          {songResults.length} songs
+        </div>
       )
     }
 
