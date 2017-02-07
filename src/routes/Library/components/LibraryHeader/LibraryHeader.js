@@ -6,6 +6,7 @@ class LibraryHeader extends React.Component {
     searchTerm: PropTypes.string.isRequired,
     // actions
     searchLibrary: PropTypes.func.isRequired,
+    searchReset: PropTypes.func.isRequired,
   }
 
   state = {
@@ -22,7 +23,7 @@ class LibraryHeader extends React.Component {
 
   clearSearch() {
     this.setState({value: ''})
-    this.props.searchLibrary('')
+    this.props.searchReset()
   }
 
   render () {

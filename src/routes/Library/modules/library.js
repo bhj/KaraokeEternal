@@ -31,11 +31,25 @@ export function toggleArtistResultExpanded(artistId) {
   }
 }
 
-export const SEARCH_LIBRARY = 'library/SEARCH_LIBRARY'
+export const LIBRARY_SEARCH = 'library/SEARCH'
 export function searchLibrary(term) {
   return {
-    type: SEARCH_LIBRARY,
+    type: LIBRARY_SEARCH,
     payload: term,
+    meta: {
+      throttle: {
+        wait: 300,
+        leading: false,
+      }
+    },
+  }
+}
+
+export const LIBRARY_SEARCH_RESET = 'library/SEARCH_RESET'
+export function searchReset() {
+  return {
+    type: LIBRARY_SEARCH_RESET,
+    payload: null,
   }
 }
 
@@ -48,7 +62,7 @@ const ACTION_HANDLERS = {
     artists: payload.artists,
     songs: payload.songs,
   }),
-  [SEARCH_LIBRARY]: (state, {payload}) => {
+  [LIBRARY_SEARCH]: (state, {payload}) => {
     let artistResults, songResults
     let term = payload.trim()
 
@@ -81,6 +95,13 @@ const ACTION_HANDLERS = {
       songResults,
     }
   },
+  [LIBRARY_SEARCH_RESET]: (state, {payload}) => ({
+    ...state,
+    searchTerm: '',
+    artistResults: [],
+    expandedArtistResults: [],
+    songResults: [],
+  }),
   [SCROLL_ARTISTS]: (state, {payload}) => ({
     ...state,
     scrollTop: payload,

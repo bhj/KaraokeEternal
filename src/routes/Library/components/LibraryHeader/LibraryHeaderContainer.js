@@ -1,9 +1,10 @@
 import { connect } from 'react-redux'
 import LibraryHeader from './LibraryHeader'
-import { searchLibrary } from '../../modules/library'
+import { searchLibrary, searchReset } from '../../modules/library'
 
 const mapActionCreators = {
   searchLibrary,
+  searchReset,
 }
 
 const mapStateToProps = (state) => {
