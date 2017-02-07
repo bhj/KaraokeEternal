@@ -55,7 +55,7 @@ const ACTION_HANDLERS = {
     if (term === '') {
       return {
         ...state,
-        isSearching: false,
+        searchTerm: '',
         artistResults: [],
         expandedArtistResults: [],
         songResults: [],
@@ -76,7 +76,7 @@ const ACTION_HANDLERS = {
 
     return {
       ...state,
-      isSearching: true,
+      searchTerm: payload,
       artistResults,
       songResults,
     }
@@ -125,8 +125,7 @@ let initialState = {
   songs: {result: [], entities:{}},
   scrollTop: 0,
   expandedArtists: [],
-  // search "view"
-  isSearching: false,
+  searchTerm: '',
   artistResults: [],
   songResults: [],
   expandedArtistResults: [],

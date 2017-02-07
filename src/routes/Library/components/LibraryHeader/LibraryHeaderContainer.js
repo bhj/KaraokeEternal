@@ -8,7 +8,7 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    isSearching: state.library.isSearching,
+    searchTerm: state.library.searchTerm,
   }
 }
 

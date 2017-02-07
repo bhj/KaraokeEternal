@@ -3,13 +3,13 @@ import classes from './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
   static propTypes = {
-    isSearching: PropTypes.bool.isRequired,
+    searchTerm: PropTypes.string.isRequired,
     // actions
     searchLibrary: PropTypes.func.isRequired,
   }
 
   state = {
-    value: '',
+    value: this.props.searchTerm,
   }
 
   handleChange = this.handleChange.bind(this)
@@ -34,7 +34,7 @@ class LibraryHeader extends React.Component {
           value={this.state.value}
           onChange={this.handleChange}
         />
-        {this.props.isSearching &&
+        {this.props.searchTerm &&
           <div onClick={this.clearSearch} className={classes.clear}>
             <i className='material-icons'>clear</i>
           </div>

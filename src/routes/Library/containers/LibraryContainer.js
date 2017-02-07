@@ -19,7 +19,7 @@ const mapStateToProps = (state) => {
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
     // search view
-    isSearching: state.library.isSearching,
+    searchTerm: state.library.searchTerm,
     artistResults: state.library.artistResults,
     expandedArtistResults: state.library.expandedArtistResults,
     songResults: state.library.songResults,
