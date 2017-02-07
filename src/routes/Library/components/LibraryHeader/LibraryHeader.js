@@ -30,12 +30,14 @@ class LibraryHeader extends React.Component {
       <div className={classes.container}>
         <input type="search"
           className={classes.search}
-          placeholder="Search library"
+          placeholder="search library"
           value={this.state.value}
           onChange={this.handleChange}
         />
         {this.props.isSearching &&
-          <button onClick={this.clearSearch}>Clear</button>
+          <div onClick={this.clearSearch} className={classes.clear}>
+            <i className='material-icons'>clear</i>
+          </div>
         }
       </div>
     )
