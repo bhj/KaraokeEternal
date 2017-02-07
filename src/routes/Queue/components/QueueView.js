@@ -1,21 +1,17 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
+import PaddedList from 'components/PaddedList'
 import QueueItem from './QueueItem'
 
 class QueueView extends React.Component {
   static propTypes = {
-    result: PropTypes.array.isRequired,
-    entities: PropTypes.object.isRequired,
+    queue: PropTypes.object.isRequired,
+    artists: PropTypes.object.isRequired,
+    songs: PropTypes.object.isRequired,
     errors: PropTypes.object,
     curId: PropTypes.number,
     curPos: PropTypes.number,
     isAtQueueEnd: PropTypes.bool.isRequired,
-    // library
-    artistIds: PropTypes.array.isRequired,
-    artists: PropTypes.object.isRequired,
-    songIds: PropTypes.array.isRequired,
-    songs: PropTypes.object.isRequired,
-    // user
     user: PropTypes.object.isRequired,
     // actions
     requestPlay: PropTypes.func.isRequired,
@@ -23,60 +19,79 @@ class QueueView extends React.Component {
     requestPause: PropTypes.func.isRequired,
   }
 
+  rowRenderer = this.rowRenderer.bind(this)
+  rowHeight = this.rowHeight.bind(this)
+  setRef = this.setRef.bind(this)
+
+  componentDidUpdate(prevProps) {
+    // nuclear option
+    this.ref.recomputeRowHeights()
+    this.ref.forceUpdate()
+  }
+
   render() {
-    const { curId, curPos } = this.props
+    // let wait = 0
+    // let nextWait = 0
 
-    let songs = []
-    let wait = 0
-    let nextWait = 0
-
-    this.props.result.forEach(function(queueId, i) {
-      const item = this.props.entities[queueId]
-      const song = this.props.songs[item.songId]
-      if (typeof song === 'undefined') return
-
-      const isActive = (item.queueId === curId) && !this.props.isAtQueueEnd
-      const isUpcoming = queueId > curId
-      const isOwner = item.userId === this.props.user.userId
-      const isAdmin = this.props.user.isAdmin === 1
+      // if (typeof song === 'undefined') return
 
       // hand time-to-play to the next queue item
-      if (isActive) {
-        nextWait = Math.round(song.duration - curPos)
-      } else if (isUpcoming) {
-        wait += nextWait
-        nextWait = song.duration
-      }
-
-      songs.push(
-        <QueueItem
-          key={queueId+'-'+item.userId}
-          artist={this.props.artists[song.artistId].name}
-          title={song.title}
-          name={item.name}
-          isActive={isActive}
-          isUpcoming={isUpcoming}
-          wait={isUpcoming && wait ? secToTime(wait) : ''}
-          canSkip={isActive && isOwner}
-          canRemove={isUpcoming && isOwner}
-          hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
-          pctPlayed={isActive ? curPos / song.duration * 100 : 0}
-          onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
-          onSkipClick={this.props.requestPlayNext}
-          onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}
-        />
-      )
-    }, this)
+      // if (isActive) {
+      //   nextWait = Math.round(song.duration - curPos)
+      // } else if (isUpcoming) {
+      //   wait += nextWait
+      //   nextWait = song.duration
+      // }
 
     return (
       <AppLayout title="Queue">
         {(style) => (
-          <div style={style}>
-            {songs}
-          </div>
+          <PaddedList
+            {...style}
+            queuedSongIds={this.props.queuedSongIds} // pass-through forces List refresh
+            rowCount={this.props.queue.result.length}
+            rowHeight={this.rowHeight}
+            rowRenderer={this.rowRenderer}
+            onRef={this.setRef}
+          />
         )}
       </AppLayout>
     )
+  }
+
+  rowRenderer({index, key, style}) {
+    const item = this.props.queue.entities[this.props.queue.result[index]]
+    const song = this.props.songs.entities[item.songId]
+    const queueId = item.queueId
+
+    const isActive = (queueId === this.props.curId) && !this.props.isAtQueueEnd
+    const isUpcoming = queueId > this.props.curId
+    const isOwner = item.userId === this.props.user.userId
+    const isAdmin = this.props.user.isAdmin === 1
+
+    return (
+      <QueueItem
+        key={key}
+        style={style}
+        artist={this.props.artists.entities[song.artistId].name}
+        title={song.title}
+        name={item.name}
+        isActive={isActive}
+        isUpcoming={isUpcoming}
+        // wait={isUpcoming && wait ? secToTime(wait) : ''}
+        canSkip={isActive && isOwner}
+        canRemove={isUpcoming && isOwner}
+        hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
+        pctPlayed={isActive ? curPos / song.duration * 100 : 0}
+        onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
+        onSkipClick={this.props.requestPlayNext}
+        onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}
+      />
+    )
+  }
+
+  rowHeight({index}) {
+    return 64
   }
 
   handleRemoveClick(queueId) {
@@ -85,6 +100,10 @@ class QueueView extends React.Component {
 
   handleErrorInfoClick(queueId) {
     alert(this.props.errors[queueId].join("\n\n"))
+  }
+
+  setRef(ref) {
+    this.ref = ref
   }
 }
 
@@ -97,15 +116,3 @@ function secToTime(sec) {
     return Math.floor(sec) + 's'
   }
 }
-
-// function getTime(sec) {
-//   const date = new Date()
-//   if (sec) date.setSeconds(date.getSeconds() + sec)
-//   return date.toTimeString().split(' ')[0]
-// }
-
-// function toMinSec(sec) {
-//   const m = Math.floor(sec / 60)
-//   const s = sec - (m * 60)
-//   return (m + ':' + (s < 10 ? '0' + s : s))
-// }

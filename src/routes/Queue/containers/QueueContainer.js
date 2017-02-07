@@ -15,17 +15,13 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    result: ensureState(state.queue).result,
-    entities: ensureState(state.queue).entities,
+    queue: ensureState(state.queue),
     errors: state.player.errors,
     curId: state.player.queueId,
     curPos: state.player.position,
     isAtQueueEnd: state.player.isAtQueueEnd,
-    // library
-    artistIds: state.library.artists.result,
-    artists: state.library.artists.entities,
-    songIds: state.library.songs.result,
-    songs: state.library.songs.entities,
+    artists: state.library.artists,
+    songs: state.library.songs,
     // user
     user: state.account.user,
   }
