@@ -114,7 +114,7 @@ async function getQueue(ctx, roomId) {
   let result = []
   let entities = {}
 
-  let rows = await db.all('SELECT queueId, songId, userId, users.name FROM queue JOIN songs USING(songId) JOIN users USING(userId) WHERE roomId = ? ORDER BY queueId', roomId)
+  let rows = await db.all('SELECT queueId, songId, userId, songs.duration, users.name FROM queue JOIN songs USING(songId) JOIN users USING(userId) WHERE roomId = ? ORDER BY queueId', roomId)
 
   rows.forEach(function(row){
     result.push(row.queueId)
