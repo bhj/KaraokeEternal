@@ -61,8 +61,9 @@ class QueueView extends React.Component {
         artist={this.props.artists.entities[song.artistId].name}
         title={song.title}
         name={item.name}
+        wait={item.wait}
         isActive={isActive}
-        wait={isUpcoming && item.wait ? secToTime(item.wait) : ''}
+        isUpcoming={isUpcoming}
         canSkip={isActive && isOwner}
         canRemove={isUpcoming && isOwner}
         hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
@@ -94,11 +95,3 @@ class QueueView extends React.Component {
 }
 
 export default QueueView
-
-function secToTime(sec) {
-  if (sec >= 60) {
-    return Math.round(sec/60) + 'm'
-  } else {
-    return Math.floor(sec) + 's'
-  }
-}

@@ -5,7 +5,8 @@ export const QueueItem = (props) => (
   <div style={props.style}>
     <div className={classes.container} style={{backgroundSize: props.pctPlayed+'% 100%'}}>
       <div className={classes.wait}>
-        {props.isActive ? 'now' : props.wait}
+        {props.isActive && 'now'}
+        {props.isUpcoming && secToTime(props.wait)}
       </div>
 
       <div className={classes.primary}>
@@ -45,3 +46,11 @@ QueueItem.propTypes = {
 }
 
 export default QueueItem
+
+function secToTime(sec) {
+  if (sec >= 60) {
+    return Math.round(sec/60) + 'm'
+  } else {
+    return Math.floor(sec) + 's'
+  }
+}
