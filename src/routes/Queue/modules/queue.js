@@ -51,32 +51,17 @@ const ACTION_HANDLERS = {
   [QUEUE_CHANGE]: (state, {payload}) => ({
     ...state,
     result: payload.result,
-    entities: payload.entities,
+    entities: setWaits(payload.result, payload.entities, state.curId, state.curPos),
     songIds: payload.result.map(queueId => payload.entities[queueId].songId)
   }),
   [PLAYER_STATUS]: (state, {payload}) => {
     const { queueId, position } = payload
-    let newItems = Object.assign({}, state.entities)
-
-    let wait = 0
-    let nextWait = 0
-
-    state.result.forEach(i => {
-      const duration = state.entities[i].duration
-      if (i === queueId) {
-        // currently playing
-        nextWait = Math.round(duration - position)
-      } else if (i > queueId) {
-        wait += nextWait
-        nextWait = duration
-      }
-
-      newItems[i].wait = wait
-    })
 
     return {
       ...state,
-      entities: newItems,
+      curId: queueId,
+      curPos: position,
+      entities: setWaits(state.result, state.entities, queueId, position),
     }
   },
 }
@@ -88,10 +73,38 @@ const initialState = {
   result: [],   // item ids
   entities: {}, // keyed by queueId
   songIds: [], // optimistic index for Library lookup
+  // these are siphoned off of player status
+  // because we need to calculate wait times
+  curId: -1,
+  curPos: 0,
 }
 
 export default function queueReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state
+}
+
+// calculates and adds the wait (in sec) property
+// to each entity. @todo this is hacky
+function setWaits(result, entities, curId, curPos) {
+  let newItems = Object.assign({}, entities)
+
+  let wait = 0
+  let nextWait = 0
+
+  result.forEach(i => {
+    const duration = entities[i].duration
+    if (i === curId) {
+      // currently playing
+      nextWait = Math.round(duration - curPos)
+    } else if (i > curId) {
+      wait += nextWait
+      nextWait = duration
+    }
+
+    newItems[i].wait = wait
+  })
+
+  return newItems
 }
