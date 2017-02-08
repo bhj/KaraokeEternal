@@ -1,5 +1,6 @@
 // emitted from server
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
+const PLAYER_STATUS = 'player/PLAYER_STATUS'
 
 // add to queue
 const QUEUE_ADD = 'server/QUEUE_ADD'
@@ -53,6 +54,32 @@ const ACTION_HANDLERS = {
     entities: payload.entities,
     songIds: payload.result.map(queueId => payload.entities[queueId].songId)
   }),
+  // listen to player to get playing id
+  [PLAYER_STATUS]: (state, {payload}) => {
+    const { queueId, position } = payload
+    let newItems = Object.assign({}, state.entities)
+
+    let wait = 0
+    let nextWait = 0
+
+    state.result.forEach(i => {
+      const duration = state.entities[i].duration
+      if (i === queueId) {
+        // currently playing
+        nextWait = Math.round(duration - position)
+      } else if (i > queueId) {
+        wait += nextWait
+        nextWait = duration
+      }
+
+      newItems[i].wait = wait
+    })
+
+    return {
+      ...state,
+      entities: newItems,
+    }
+  },
 }
 
 // ------------------------------------

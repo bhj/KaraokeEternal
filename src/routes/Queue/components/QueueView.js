@@ -30,25 +30,12 @@ class QueueView extends React.Component {
   }
 
   render() {
-    // let wait = 0
-    // let nextWait = 0
-
-      // if (typeof song === 'undefined') return
-
-      // hand time-to-play to the next queue item
-      // if (isActive) {
-      //   nextWait = Math.round(song.duration - curPos)
-      // } else if (isUpcoming) {
-      //   wait += nextWait
-      //   nextWait = song.duration
-      // }
-
     return (
       <AppLayout title="Queue">
         {(style) => (
           <PaddedList
             {...style}
-            queuedSongIds={this.props.queuedSongIds} // pass-through forces List refresh
+            queuedSongIds={this.props.queue.result} // pass-through forces List refresh
             rowCount={this.props.queue.result.length}
             rowHeight={this.rowHeight}
             rowRenderer={this.rowRenderer}
@@ -71,21 +58,20 @@ class QueueView extends React.Component {
 
     return (
       <QueueItem
-        key={key}
-        style={style}
         artist={this.props.artists.entities[song.artistId].name}
         title={song.title}
         name={item.name}
         isActive={isActive}
-        isUpcoming={isUpcoming}
-        // wait={isUpcoming && wait ? secToTime(wait) : ''}
+        wait={isUpcoming && item.wait ? secToTime(item.wait) : ''}
         canSkip={isActive && isOwner}
         canRemove={isUpcoming && isOwner}
         hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
-        pctPlayed={isActive ? curPos / song.duration * 100 : 0}
+        pctPlayed={isActive ? this.props.curPos / song.duration * 100 : 0}
         onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
         onSkipClick={this.props.requestPlayNext}
         onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}
+        key={key}
+        style={style}
       />
     )
   }
