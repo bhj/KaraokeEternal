@@ -54,7 +54,6 @@ const ACTION_HANDLERS = {
     entities: payload.entities,
     songIds: payload.result.map(queueId => payload.entities[queueId].songId)
   }),
-  // listen to player to get playing id
   [PLAYER_STATUS]: (state, {payload}) => {
     const { queueId, position } = payload
     let newItems = Object.assign({}, state.entities)
