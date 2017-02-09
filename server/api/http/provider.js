@@ -39,18 +39,4 @@ router.get('/api/provider/:provider/:method', async (ctx, next) => {
   await Providers[provider][method](ctx, cfg)
 })
 
-// list providers and their configuration
-router.get('/api/provider', async (ctx, next) => {
-  let cfg = {}
-
-  // get provider config
-  let rows = await db.all('SELECT * FROM config WHERE domain LIKE "%.provider"')
-
-  rows.forEach(function(row){
-    cfg[row.domain] = JSON.parse(row.data)
-  })
-
-  return ctx.body = cfg
-})
-
 module.exports = router
