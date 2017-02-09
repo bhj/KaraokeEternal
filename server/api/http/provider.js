@@ -35,7 +35,6 @@ router.get('/api/provider/:provider/:method', async (ctx, next) => {
     return ctx.body = `Provider "${provider}" not enabled`
   }
 
-  log(`Calling "${method}" method of "${provider}" provider`)
   await Providers[provider][method](ctx, cfg)
 })
 
