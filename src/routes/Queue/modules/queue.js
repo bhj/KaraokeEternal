@@ -46,6 +46,7 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       result,
+      entities: setWaits(result, state.entities, state.curId, state.curPos),
     }
   },
   [QUEUE_CHANGE]: (state, {payload}) => ({
