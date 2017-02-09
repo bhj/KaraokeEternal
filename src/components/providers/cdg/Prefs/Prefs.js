@@ -35,7 +35,7 @@ export default class Prefs extends React.Component {
       <div>
         <label>
           <input type='checkbox' checked={enabled} onChange={this.setEnabled}/>
-          <strong> CD+Graphics</strong>
+          <strong> CD+Graphics (.cdg + audio)</strong>
         </label>
         <button onClick={this.handleRefresh}>Refresh</button>
         {paths}
