@@ -7,7 +7,7 @@ class PaddedList extends React.Component {
     rowCount: PropTypes.number.isRequired,
     rowHeight: PropTypes.func.isRequired,
     onScroll: PropTypes.func,
-    onRef: PropTypes.func.isRequired,
+    onRef: PropTypes.func,
     scrollTop: PropTypes.number,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -28,7 +28,7 @@ class PaddedList extends React.Component {
         overscanRowCount={10}
         onScroll={this.props.onScroll}
         scrollTop={this.props.scrollTop} // initial list pos
-        ref={r => {this.props.onRef(r); this.ref = r}}
+        ref={r => {this.ref = r; if (this.props.onRef) this.props.onRef(r)}}
         // facades
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}

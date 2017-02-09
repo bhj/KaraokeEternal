@@ -22,7 +22,6 @@ class QueueView extends React.Component {
 
   rowRenderer = this.rowRenderer.bind(this)
   rowHeight = this.rowHeight.bind(this)
-  setRef = this.setRef.bind(this)
 
   render() {
     return (
@@ -35,7 +34,6 @@ class QueueView extends React.Component {
             rowRenderer={this.rowRenderer}
             scrollToIndex={this.props.queue.result.indexOf(this.props.curId)}
             scrollToAlignment={'center'}
-            onRef={this.setRef}
             queuedSongIds={this.props.queue.result} // pass-through forces List refresh
             curId={this.props.curId} // pass-through forces List refresh
             curPos={this.props.curPos} // pass-through forces List refresh
