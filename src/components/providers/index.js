@@ -1,7 +1,7 @@
 import cdg from './cdg'
-// const youtube = require('./youtube')
+import youtube from './youtube'
 
 export default {
   cdg,
-  // youtube,
+  youtube,
 }
