@@ -21,6 +21,14 @@ export function clearErrorMessage() {
   }
 }
 
+export function showErrorMessage(msg) {
+  return {
+    type: SHOW_ERROR_MESSAGE,
+    payload: null,
+    error: msg,
+  }
+}
+
 export function setHeaderHeight({height}) {
   return (dispatch, getState) => {
     if (getState().ui.headerHeight === height) return

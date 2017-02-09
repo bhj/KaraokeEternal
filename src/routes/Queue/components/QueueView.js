@@ -17,6 +17,7 @@ class QueueView extends React.Component {
     requestPlay: PropTypes.func.isRequired,
     requestPlayNext: PropTypes.func.isRequired,
     requestPause: PropTypes.func.isRequired,
+    showErrorMessage: PropTypes.func.isRequired,
   }
 
   rowRenderer = this.rowRenderer.bind(this)
@@ -85,7 +86,7 @@ class QueueView extends React.Component {
   }
 
   handleErrorInfoClick(queueId) {
-    alert(this.props.errors[queueId].join("\n\n"))
+    this.props.showErrorMessage(this.props.errors[queueId].join("\n\n"))
   }
 
   setRef(ref) {

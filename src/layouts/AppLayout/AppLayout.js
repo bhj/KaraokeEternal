@@ -38,7 +38,7 @@ export const AppLayout = (props) => (
         left: '10%',
         marginLeft: '0'}}
     >
-      {props.errorMessage}
+      <p>{props.errorMessage}</p>
       <br/><br/><br/>
       <button className="button wide raised" onClick={props.clearErrorMessage}>Dismiss</button>
     </SkyLightStateless>
