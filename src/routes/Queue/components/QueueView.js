@@ -23,23 +23,20 @@ class QueueView extends React.Component {
   rowHeight = this.rowHeight.bind(this)
   setRef = this.setRef.bind(this)
 
-  componentDidUpdate(prevProps) {
-    // nuclear option
-    this.ref.recomputeRowHeights()
-    this.ref.forceUpdate()
-  }
-
   render() {
     return (
       <AppLayout title="Queue">
         {(style) => (
           <PaddedList
             {...style}
-            queuedSongIds={this.props.queue.result} // pass-through forces List refresh
             rowCount={this.props.queue.result.length}
             rowHeight={this.rowHeight}
             rowRenderer={this.rowRenderer}
             onRef={this.setRef}
+            queuedSongIds={this.props.queue.result} // pass-through forces List refresh
+            curId={this.props.curId} // pass-through forces List refresh
+            curPos={this.props.curPos} // pass-through forces List refresh
+            errors={this.props.errors} // pass-through forces List refresh
           />
         )}
       </AppLayout>
