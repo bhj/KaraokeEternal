@@ -1,8 +1,8 @@
-// import Player from './Player'
+import Player from './Player'
 import Prefs from './Prefs'
 
 export default {
   name: 'youtube',
-  // playerComponent: Player,
+  playerComponent: Player,
   prefComponent: Prefs,
 }
