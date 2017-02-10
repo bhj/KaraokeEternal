@@ -204,7 +204,7 @@ function getApi(key) {
   return async function(params) {
     const API = 'https://www.googleapis.com/youtube/v3/'
     const url = API + params + `&key=${key}`
-    log('calling api: %s', API + params)
+    log('request: %s', API + params.substr(0, params.indexOf('?')))
 
     try {
       let res = await fetch(url)
