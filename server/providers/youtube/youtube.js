@@ -181,7 +181,10 @@ async function getPlaylistItems(username, key){
       songs.push({
         title: item.snippet.title,
         duration: toSeconds(parse(details.items[i].contentDetails.duration)),
-        meta: {videoId: videoIds[i]},
+        meta: {
+          username,
+          videoId: videoIds[i],
+        },
       })
     })
 
