@@ -10,13 +10,18 @@ async function searchLibrary(params = {}) {
   }
   let where = []
 
-  if (typeof params.meta === 'object') {
-    Object.keys(params.meta).map(key => {
-      let val = params.meta[key]
-      if (typeof val === 'string') val = "'"+val+"'" // ugh
-      where.push(`json_extract(provider_json, '$.${key}') = ${val}`)
-    })
-  }
+  Object.keys(params).map(key => {
+    if (key === 'meta' && typeof params.meta === 'object') {
+      Object.keys(params.meta).map(i => {
+        let val = params.meta[i]
+        if (typeof val === 'string') val = "'"+val+"'" // ugh
+        where.push(`json_extract(provider_json, '$.${i}') = ${val}`)
+      })
+      return
+    }
+
+    where.push(`${key} = '${params[key]}'`)
+  })
 
   sql = 'SELECT * FROM songs'
   if (where.length) sql += ' WHERE ' + where.join(' AND ')
