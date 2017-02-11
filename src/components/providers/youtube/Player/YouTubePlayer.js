@@ -33,9 +33,9 @@ class YouTubePlayer extends React.Component {
       this.updateIsPlaying()
     }
 
-    // if (prevProps.volume !== this.props.volume) {
-    //   this.setVolume(this.props.volume)
-    // }
+    if (prevProps.volume !== this.props.volume) {
+      this.setVolume(this.props.volume)
+    }
   }
 
   updateSources = () => {
@@ -71,24 +71,35 @@ class YouTubePlayer extends React.Component {
         <YouTube
           videoId={this.state.videoId}
           opts={opts}
-          onReady={this.handleOnReady}
+          onReady={this.handleReady}
+          onStateChange={this.handleStateChange}
           onError={this.handleAudioError}
         />
       </div>
     )
   }
 
-  handleOnReady = (event) => {
+  handleReady = (event) => {
     this.player = event.target
   }
 
-//   setVolume(vol) {
-//     this.audio.volume = vol
-//   }
-//
-// /**
-//  * <audio> event handlers
-//  */
+  handleStateChange = (event) => {
+    const isPlaying = event.data === 1
+    console.log(event.data)
+
+    this.props.onStatus({
+      queueId: this.props.queueId,
+      isPlaying: isPlaying,
+      position: this.player.getCurrentTime(),
+      volume: this.player.getVolume()/100,
+    })
+  }
+
+  setVolume = (vol) => {
+    this.player.setVolume(vol*100)
+  }
+
+
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
       this.player.playVideo()
@@ -96,25 +107,6 @@ class YouTubePlayer extends React.Component {
       this.player.pauseVideo()
     }
   }
-//
-//   handleOnTimeUpdate = () => {
-//     this.setState({
-//       audioPos: this.audio.currentTime * 1000
-//     })
-//
-//     this.props.onStatus({
-//       queueId: this.props.queueId,
-//       isPlaying: !this.audio.paused,
-//       position: this.audio.currentTime,
-//       volume: this.audio.volume,
-//     })
-//   }
-//
-//   handleAudioError = (err) => {
-//     this.props.onMediaError(this.props.queueId,
-//       'The audio file could not be loaded (error code '+err.target.error.code+')'
-//     )
-//   }
 }
 
 export default YouTubePlayer
