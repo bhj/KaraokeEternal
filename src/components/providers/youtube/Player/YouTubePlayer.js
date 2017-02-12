@@ -24,6 +24,10 @@ class YouTubePlayer extends React.Component {
     this.updateSources()
   }
 
+  componentWillUnmount () {
+    clearInterval(this.statusTimer)
+  }
+
   componentDidUpdate (prevProps) {
     if (prevProps.queueId !== this.props.queueId) {
       this.updateSources()
@@ -72,7 +76,7 @@ class YouTubePlayer extends React.Component {
           videoId={this.state.videoId}
           opts={opts}
           onReady={this.handleReady}
-          onStateChange={this.handleStateChange}
+          onStateChange={this.handleStatus}
           onError={this.handleAudioError}
         />
       </div>
@@ -83,28 +87,32 @@ class YouTubePlayer extends React.Component {
     this.player = event.target
   }
 
-  handleStateChange = (event) => {
-    const isPlaying = event.data === 1
-    console.log(event.data)
-
-    this.props.onStatus({
-      queueId: this.props.queueId,
-      isPlaying: isPlaying,
-      position: this.player.getCurrentTime(),
-      volume: this.player.getVolume()/100,
-    })
-  }
-
   setVolume = (vol) => {
-    this.player.setVolume(vol*100)
+    this.player.setVolume(vol * 100)
   }
 
+  handleStatus = (state) => {
+    this.props.onStatus({
+      isPlaying: state === 1 || this.player.getPlayerState() === 1,
+      queueId: this.props.queueId,
+      position: this.player.getCurrentTime(),
+      volume: this.player.getVolume() / 100,
+    })
+
+    if (isPlaying) {
+      this.statusTimer = setInterval(this.handleStatus, 1000)
+    } else {
+      clearInterval(this.statusTimer)
+    }
+  }
 
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
       this.player.playVideo()
+      this.statusTimer = setInterval(this.handleStatus, 1000)
     } else {
       this.player.pauseVideo()
+      clearInterval(this.statusTimer)
     }
   }
 }
