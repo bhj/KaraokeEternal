@@ -4,7 +4,7 @@ import thunk from 'redux-thunk'
 import createThrottle from "redux-throttle"
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
-import { updateLocation } from './reducers/location'
+import { updateLocation } from './modules/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
 
 export default (initialState = {}, socket) => {

@@ -1,6 +1,6 @@
 import AppLayout from './AppLayout'
 import { connect } from 'react-redux'
-import { setHeaderHeight, setFooterHeight, clearErrorMessage } from 'store/reducers/ui'
+import { setHeaderHeight, setFooterHeight, clearErrorMessage } from 'store/modules/ui'
 
 //  Object of action creators (can also be function that returns object).
 const mapActionCreators = {

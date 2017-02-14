@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
 import QueueView from '../components/QueueView'
-import { showErrorMessage } from 'store/reducers/ui'
+import { showErrorMessage } from 'store/modules/ui'
 import { queueSong, removeItem } from '../modules/queue'
 import { requestPlay, requestPause, requestPlayNext } from '../../Player/modules/player'
 

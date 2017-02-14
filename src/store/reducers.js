@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux'
-import { optimistic } from 'redux-optimistic-ui';
+import { optimistic } from 'redux-optimistic-ui'
 import { createResponsiveStateReducer } from 'redux-responsive'
 
 // reducers
-import location from './location'
-import ui from './ui'
+import location from './modules/location'
+import ui from './modules/ui'
 import account from 'routes/Account/modules/account'
 import library from 'routes/Library/modules/library'
 import queue from 'routes/Queue/modules/queue'
