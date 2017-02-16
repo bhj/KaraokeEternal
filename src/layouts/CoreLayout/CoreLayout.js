@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import './CoreLayout.scss'
 import 'styles/core.scss'
-import 'styles/material-ui.scss'
+import 'styles/material-icons.scss'
 
 export const CoreLayout = ({ children }) => {
   return (
