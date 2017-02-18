@@ -57,10 +57,8 @@ const ACTION_HANDLERS = {
       payload
     })
   },
-  // Broadcast player's status to room
   [EMIT_STATUS]: async (ctx, {payload}) => {
-    // to everyone in room except broadcasting player
-    ctx.socket.socket.broadcast.to(ctx.user.roomId).emit('action', {
+    ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYBACK_STATUS,
       payload
     })

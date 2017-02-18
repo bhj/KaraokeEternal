@@ -23,18 +23,6 @@ const ACTION_HANDLERS = {
       isAtQueueEnd: payload.isAtQueueEnd,
     }
   },
-  // if we're acting as Player, listen to our own
-  // status since it won't be emitted back at us
-  [EMIT_STATUS]: (state, {payload}) => {
-    return {
-      ...state,
-      queueId: payload.queueId,
-      position: payload.position,
-      volume: payload.volume,
-      isPlaying: payload.isPlaying,
-      isAtQueueEnd: payload.isAtQueueEnd,
-    }
-  },
   [PLAYBACK_ERROR]: (state, {payload}) => {
     const {queueId, message} = payload
 
