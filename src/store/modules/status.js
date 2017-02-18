@@ -3,7 +3,6 @@
 // ------------------------------------
 const PLAYBACK_STATUS = 'status/PLAYBACK_STATUS'
 const PLAYBACK_ERROR = 'status/PLAYBACK_ERROR'
-const EMIT_STATUS = 'server/PLAYER_STATUS'
 
 // ------------------------------------
 // Actions
