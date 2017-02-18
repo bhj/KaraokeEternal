@@ -12,11 +12,8 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    queueId: state.status.queueId,
-    position: state.status.position,
-    volume: state.status.volume,
     isPlaying: state.status.isPlaying,
-    isAtQueueEnd: state.status.isAtQueueEnd,
+    volume: state.status.volume,
   }
 }
 
