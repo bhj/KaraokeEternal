@@ -29,6 +29,7 @@ const PlaybackCtrl = (props) => (
 
 PlaybackCtrl.PropTypes = {
   isPlaying: PropTypes.bool.isRequired,
+  volume: PropTypes.number.isRequired,
   // actions
   requestPlay: PropTypes.func.isRequired,
   requestPlayNext: PropTypes.func.isRequired,
