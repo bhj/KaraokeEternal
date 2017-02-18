@@ -1,9 +1,10 @@
 .container {
   display: flex;
-  height: 50px;
+  height: 48px;
   line-height: 1;
   align-items: center;
   margin: 0 1rem;
+  padding-top: 5px;
   color: #666;
 }
 
