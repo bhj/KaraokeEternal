@@ -14,9 +14,9 @@ class PlayerView extends React.Component {
     isErrored:  PropTypes.bool.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
-    emitStatus: PropTypes.func.isRequired,
     getMedia: PropTypes.func.isRequired,
     getMediaSuccess: PropTypes.func.isRequired,
+    emitStatus: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
   }
 
@@ -56,14 +56,13 @@ class PlayerView extends React.Component {
     } else {
       Component = Providers[song.provider].playerComponent
       componentProps = {
-        queueId: this.props.queueId,
+        song,
         volume: this.props.volume,
-        item: song,
         isPlaying: this.props.isPlaying,
         getMedia: this.props.getMedia,
         getMediaSuccess: this.props.getMediaSuccess,
-        onStatus: this.props.emitStatus,
-        onMediaError: this.props.emitError,
+        onStatus: this.getStatusEmitter(this.props.queueId),
+        onMediaError: this.getErrorEmitter(this.props.queueId),
         onMediaEnd: this.props.requestPlayNext,
       }
     }
@@ -89,6 +88,18 @@ class PlayerView extends React.Component {
 
   toggleFullscreen() {
     screenfull.toggle(this.ref)
+  }
+
+  getStatusEmitter = (queueId) => {
+    return (status) => {
+      this.props.emitStatus({queueId, ...status})
+    }
+  }
+
+  getErrorEmitter = (queueId) => {
+    return (err) => {
+      this.props.emitError(err)
+    }
   }
 }
 

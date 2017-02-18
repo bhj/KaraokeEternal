@@ -5,10 +5,9 @@ class YouTubePlayer extends React.Component {
   static propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    queueId: PropTypes.number.isRequired,
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
-    item: PropTypes.object.isRequired,
+    song: PropTypes.object.isRequired,
     getMedia: PropTypes.func.isRequired, // action
     getMediaSuccess: PropTypes.func.isRequired, // action
     onMediaError: PropTypes.func.isRequired, // action
@@ -29,7 +28,7 @@ class YouTubePlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.queueId !== this.props.queueId) {
+    if (prevProps.song !== this.props.song) {
       this.updateSources()
     }
 
@@ -45,7 +44,7 @@ class YouTubePlayer extends React.Component {
 
   updateSources = () => {
     // get videoId for song
-    const url = '/api/song/'+this.props.item.songId
+    const url = '/api/song/'+this.props.song.songId
 
     fetch(url, fetchConfig)
       .then(checkStatus)
@@ -54,7 +53,7 @@ class YouTubePlayer extends React.Component {
         this.setState({videoId: song.videoId})
       })
       .catch((err) => {
-        this.props.onMediaError(this.props.queueId, err.message)
+        this.props.onMediaError(err.message)
       })
   }
 
@@ -91,7 +90,7 @@ class YouTubePlayer extends React.Component {
   }
 
   handleError = (event) => {
-    this.props.onMediaError(this.props.queueId, 'Error '+event.data)
+    this.props.onMediaError('Error '+event.data)
   }
 
   setVolume = (vol) => {
@@ -99,11 +98,10 @@ class YouTubePlayer extends React.Component {
   }
 
   handleStatus = (event) => {
-    if (!event && !this.player) {console.log('skip');return}
+    if (!event && !this.player) return
     const player = event ? event.target : this.player
 
     this.props.onStatus({
-      queueId: this.props.queueId,
       isPlaying: player.getPlayerState() === 1,
       position: player.getCurrentTime(),
       volume: player.getVolume() / 100,
