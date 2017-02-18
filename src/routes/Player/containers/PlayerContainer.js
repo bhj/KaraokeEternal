@@ -1,14 +1,14 @@
 import PlayerView from '../components/PlayerView'
 import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
-import { emitStatus, emitError, getMedia, getMediaSuccess, requestPlayNext } from '../modules/player'
+import { emitStatus, emitError, requestPlayNext, getMedia, getMediaSuccess } from '../modules/player'
 
 const mapActionCreators = {
-  requestPlayNext,
   emitStatus,
+  emitError,
+  requestPlayNext,
   getMedia,
   getMediaSuccess,
-  emitError,
 }
 
 const mapStateToProps = (state) => {
