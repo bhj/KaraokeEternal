@@ -108,6 +108,7 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       queueId: payload,
+      isPlaying: true,
       isAtQueueEnd: false,
     }
   },
