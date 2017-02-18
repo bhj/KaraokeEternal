@@ -4,7 +4,6 @@
 const PLAYBACK_STATUS = 'status/PLAYBACK_STATUS'
 const PLAYBACK_ERROR = 'status/PLAYBACK_ERROR'
 const EMIT_STATUS = 'server/PLAYER_STATUS'
-const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 
 // ------------------------------------
 // Actions
@@ -21,6 +20,7 @@ const ACTION_HANDLERS = {
       position: payload.position,
       volume: payload.volume,
       isPlaying: payload.isPlaying,
+      isAtQueueEnd: payload.isAtQueueEnd,
     }
   },
   // if we're acting as Player, listen to our own
@@ -32,6 +32,7 @@ const ACTION_HANDLERS = {
       position: payload.position,
       volume: payload.volume,
       isPlaying: payload.isPlaying,
+      isAtQueueEnd: payload.isAtQueueEnd,
     }
   },
   [PLAYBACK_ERROR]: (state, {payload}) => {
@@ -46,10 +47,6 @@ const ACTION_HANDLERS = {
       }
     }
   },
-  [PLAYER_QUEUE_END]: (state, {payload}) => ({
-    ...state,
-    isAtQueueEnd: true,
-  }),
 }
 
 // ------------------------------------

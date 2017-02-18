@@ -24,11 +24,10 @@ class PlayerView extends React.Component {
 
   componentDidMount() {
     // emit initial state
-    this.props.emitStatus({
-      queueId: this.props.queueId,
+    this.handleStatus({
+      isPlaying: this.props.isPlaying,
       position: 0,
       volume: this.props.volume,
-      isPlaying: this.props.isPlaying,
     })
   }
 
@@ -38,6 +37,14 @@ class PlayerView extends React.Component {
       if (this.props.queueId === -1 || this.props.isAtQueueEnd || this.props.isErrored) {
         this.props.requestPlayNext()
       }
+    }
+
+    if (this.props.isAtQueueEnd !== prevProps.isAtQueueEnd) {
+      this.handleStatus({
+        isPlaying: this.props.isPlaying,
+        position: 0,
+        volume: this.props.volume,
+      })
     }
   }
 
@@ -61,8 +68,8 @@ class PlayerView extends React.Component {
         isPlaying: this.props.isPlaying,
         getMedia: this.props.getMedia,
         getMediaSuccess: this.props.getMediaSuccess,
-        onStatus: this.getStatusEmitter(this.props.queueId),
-        onMediaError: this.getErrorEmitter(this.props.queueId),
+        onStatus: this.handleStatus,
+        onMediaError: this.handleError,
         onMediaEnd: this.props.requestPlayNext,
       }
     }
@@ -90,16 +97,16 @@ class PlayerView extends React.Component {
     screenfull.toggle(this.ref)
   }
 
-  getStatusEmitter = (queueId) => {
-    return (status) => {
-      this.props.emitStatus({queueId, ...status})
-    }
+  handleStatus = (status) => {
+    this.props.emitStatus({
+      ...status,
+      queueId: this.props.queueId,
+      isAtQueueEnd: this.props.isAtQueueEnd,
+    })
   }
 
-  getErrorEmitter = (queueId) => {
-    return (err) => {
-      this.props.emitError(err)
-    }
+  handleError = (err) => {
+    this.props.emitError(this.props.queueId, err)
   }
 }
 

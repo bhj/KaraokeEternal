@@ -7,6 +7,7 @@ const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
 const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
+const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
 
 const EMIT_STATUS = 'server/PLAYER_STATUS'
 const EMIT_ERROR = 'server/PLAYER_ERROR'
@@ -107,8 +108,13 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       queueId: payload,
+      isAtQueueEnd: false,
     }
   },
+  [PLAYER_QUEUE_END]: (state, {payload}) => ({
+    ...state,
+    isAtQueueEnd: true,
+  }),
   [GET_MEDIA]: (state, {payload}) => ({
     ...state,
     isFetching: true,
@@ -133,6 +139,7 @@ const initialState = {
   volume: 1,
   isPlaying: false,
   isFetching: false,
+  isAtQueueEnd: false,
 }
 
 export default function playerReducer (state = initialState, action) {
