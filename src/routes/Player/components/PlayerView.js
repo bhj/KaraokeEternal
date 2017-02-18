@@ -18,6 +18,8 @@ class PlayerView extends React.Component {
     getMediaSuccess: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
+    // pass-thru to force re-render
+    queue: PropTypes.object.isRequired,
   }
 
   toggleFullscreen = this.toggleFullscreen.bind(this)
@@ -45,6 +47,12 @@ class PlayerView extends React.Component {
         position: 0,
         volume: this.props.volume,
       })
+    }
+
+    if (this.props.queue !== prevProps.queue) {
+      if (this.props.isAtQueueEnd && this.props.isPlaying) {
+        this.props.requestPlayNext()
+      }
     }
   }
 
