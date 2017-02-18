@@ -5,10 +5,10 @@ import { createResponsiveStateReducer } from 'redux-responsive'
 // reducers
 import location from './modules/location'
 import ui from './modules/ui'
+import status from './modules/status'
 import account from 'routes/Account/modules/account'
 import library from 'routes/Library/modules/library'
 import queue from 'routes/Queue/modules/queue'
-import player from 'routes/Player/modules/player'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
@@ -20,10 +20,10 @@ export const makeRootReducer = (asyncReducers) => {
     }),
     location,
     ui,
+    status,
     account,
     library,
     queue: optimistic(queue),
-    player,
     ...asyncReducers
   })
 }

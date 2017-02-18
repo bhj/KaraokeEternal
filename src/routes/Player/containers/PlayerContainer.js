@@ -1,15 +1,14 @@
 import PlayerView from '../components/PlayerView'
 import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
-import { emitStatus, cancelStatus, getMedia, getMediaSuccess, mediaError, requestPlayNext } from '../modules/player'
+import { emitStatus, emitError, getMedia, getMediaSuccess, requestPlayNext } from '../modules/player'
 
 const mapActionCreators = {
   requestPlayNext,
   emitStatus,
   getMedia,
   getMediaSuccess,
-  mediaError,
-  cancelStatus,
+  emitError,
 }
 
 const mapStateToProps = (state) => {
@@ -25,10 +24,10 @@ const mapStateToProps = (state) => {
     queueId: state.player.queueId,
     volume: state.player.volume,
     song,
-    isAtQueueEnd: state.player.isAtQueueEnd,
+    isAtQueueEnd: state.status.isAtQueueEnd,
     isPlaying: state.player.isPlaying,
     isFetching: state.player.isFetching,
-    isErrored: typeof state.player.errors[state.player.queueId] !== 'undefined',
+    isErrored: typeof state.status.errors[state.status.queueId] !== 'undefined',
   }
 }
 

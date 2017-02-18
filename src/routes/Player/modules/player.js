@@ -1,4 +1,5 @@
-import { CANCEL, FLUSH } from "redux-throttle"
+const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
+const PLAYER_NEXT = 'player/PLAYER_NEXT'
 
 const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
@@ -6,12 +7,10 @@ const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
 const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
-const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
-const PLAYER_NEXT = 'player/PLAYER_NEXT'
-const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
-const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
-const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
-const PLAYER_STATUS = 'player/PLAYER_STATUS'
+
+const EMIT_STATUS = 'server/PLAYER_STATUS'
+const EMIT_ERROR = 'server/PLAYER_ERROR'
+const PLAYBACK_ERROR = 'status/PLAYBACK_ERROR'
 
 // for informational purposes from provider players
 export const GET_MEDIA = 'player/GET_MEDIA'
@@ -52,15 +51,8 @@ export function requestPlayNext() {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_NEXT_REQUEST,
-      payload: getState().player.queueId
+      payload: getState().status.queueId
     })
-  }
-}
-
-export function cancelStatus() {
-  return {
-    type: CANCEL,
-    payload: {type: PLAYER_EMIT_STATUS}
   }
 }
 
@@ -78,20 +70,20 @@ export function getMediaSuccess() {
   }
 }
 
-const PLAYER_EMIT_MEDIA_ERROR = 'server/PLAYER_EMIT_MEDIA_ERROR'
-export function mediaError(queueId, message) {
-  return {
-    type: PLAYER_EMIT_MEDIA_ERROR,
-    payload: { queueId, message }
-  }
-}
-
 // have server emit player status to room
 export function emitStatus(payload) {
   return {
-    type: PLAYER_EMIT_STATUS,
+    type: EMIT_STATUS,
     payload,
     meta: {throttle: true}
+  }
+}
+
+// have server emit error to room
+export function emitError(queueId, message) {
+  return {
+    type: EMIT_ERROR,
+    payload: { queueId, message }
   }
 }
 
@@ -115,16 +107,8 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       queueId: payload,
-      position: 0,
-      isAtQueueEnd: false,
-      prevQueueId: state.queueId,
     }
   },
-  [PLAYER_QUEUE_END]: (state, {payload}) => ({
-    ...state,
-    isPlaying: false,
-    isAtQueueEnd: true,
-  }),
   [GET_MEDIA]: (state, {payload}) => ({
     ...state,
     isFetching: true,
@@ -134,41 +118,11 @@ const ACTION_HANDLERS = {
     isFetching: false,
     isPlaying: true, // all media is loaded
   }),
-  [PLAYER_EMIT_MEDIA_ERROR]: (state, {payload}) => ({
+  [EMIT_ERROR]: (state, {payload}) => ({
     ...state,
     isPlaying: false,
     isFetching: false,
   }),
-  [PLAYER_STATUS]: (state, {payload}) => {
-    if (state.prevQueueId === payload.queueId) {
-      // ignore this (old) status update once
-      return {
-        ...state,
-        prevQueueId: null,
-      }
-    }
-
-    return {
-      ...state,
-      queueId: payload.queueId,
-      position: payload.position,
-      volume: payload.volume,
-      isPlaying: payload.isPlaying,
-      prevQueueId: null,
-    }
-  },
-  [PLAYER_MEDIA_ERROR]: (state, {payload}) => {
-    const {queueId, message} = payload
-
-    return {
-      ...state,
-      errors: {
-        ...state.errors,
-        // can be multiple errors for a media item
-        [queueId]: state.errors[queueId] ? state.errors[queueId].concat(message) : [message]
-      }
-    }
-  },
 }
 
 // ------------------------------------
@@ -176,13 +130,9 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   queueId: -1,
-  prevQueueId: null,
-  position: 0,
   volume: 1,
   isPlaying: false,
   isFetching: false,
-  isAtQueueEnd: false,
-  errors: {},   // object of arrays keyed by queueId
 }
 
 export default function playerReducer (state = initialState, action) {

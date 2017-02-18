@@ -1,6 +1,6 @@
 // emitted from server
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
-const PLAYER_STATUS = 'player/PLAYER_STATUS'
+const PLAYBACK_STATUS = 'status/PLAYBACK_STATUS'
 
 // add to queue
 const QUEUE_ADD = 'server/QUEUE_ADD'
@@ -55,7 +55,7 @@ const ACTION_HANDLERS = {
     entities: setWaits(payload.result, payload.entities, state.curId, state.curPos),
     songIds: payload.result.map(queueId => payload.entities[queueId].songId)
   }),
-  [PLAYER_STATUS]: (state, {payload}) => {
+  [PLAYBACK_STATUS]: (state, {payload}) => {
     const { queueId, position } = payload
 
     return {

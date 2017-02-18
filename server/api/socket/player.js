@@ -1,24 +1,20 @@
 const db = require('sqlite')
 
+const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
+const PLAYER_NEXT = 'player/PLAYER_NEXT'
+const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
+
 const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
 const PLAYER_PLAY = 'player/PLAYER_PLAY'
-
 const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
 const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
-
 const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
 const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
 
-const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
-const PLAYER_NEXT = 'player/PLAYER_NEXT'
-
-const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
-const PLAYER_STATUS = 'player/PLAYER_STATUS'
-
-const PLAYER_EMIT_MEDIA_ERROR = 'server/PLAYER_EMIT_MEDIA_ERROR'
-const PLAYER_MEDIA_ERROR = 'player/PLAYER_MEDIA_ERROR'
-
-const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
+const EMIT_STATUS = 'server/PLAYER_STATUS'
+const EMIT_ERROR = 'server/PLAYER_ERROR'
+const PLAYBACK_STATUS = 'status/PLAYBACK_STATUS'
+const PLAYBACK_ERROR = 'status/PLAYBACK_ERROR'
 
 // ------------------------------------
 // Action Handlers
@@ -43,20 +39,6 @@ const ACTION_HANDLERS = {
       payload: item.queueId
     })
   },
-  // Broadcast player's status to room
-  [PLAYER_EMIT_STATUS]: async (ctx, {payload}) => {
-    // to everyone in room except broadcasting player
-    ctx.socket.socket.broadcast.to(ctx.user.roomId).emit('action', {
-      type: PLAYER_STATUS,
-      payload
-    })
-  },
-  [PLAYER_EMIT_MEDIA_ERROR]: async (ctx, {payload}) => {
-    ctx.io.to(ctx.user.roomId).emit('action', {
-      type: PLAYER_MEDIA_ERROR,
-      payload
-    })
-  },
   [PLAYER_PLAY_REQUEST]: async (ctx, {payload}) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PLAY,
@@ -72,6 +54,20 @@ const ACTION_HANDLERS = {
   [PLAYER_VOLUME_REQUEST]: async (ctx, {payload}) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_VOLUME,
+      payload
+    })
+  },
+  // Broadcast player's status to room
+  [EMIT_STATUS]: async (ctx, {payload}) => {
+    // to everyone in room except broadcasting player
+    ctx.socket.socket.broadcast.to(ctx.user.roomId).emit('action', {
+      type: PLAYBACK_STATUS,
+      payload
+    })
+  },
+  [EMIT_ERROR]: async (ctx, {payload}) => {
+    ctx.io.to(ctx.user.roomId).emit('action', {
+      type: PLAYBACK_ERROR,
       payload
     })
   },

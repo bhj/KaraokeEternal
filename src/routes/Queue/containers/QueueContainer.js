@@ -18,10 +18,10 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     queue: ensureState(state.queue),
-    errors: state.player.errors,
-    curId: state.player.queueId,
-    curPos: state.player.position,
-    isAtQueueEnd: state.player.isAtQueueEnd,
+    errors: state.status.errors,
+    curId: state.status.queueId,
+    curPos: state.status.position,
+    isAtQueueEnd: state.status.isAtQueueEnd,
     artists: state.library.artists,
     songs: state.library.songs,
     // user
