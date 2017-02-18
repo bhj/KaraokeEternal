@@ -64,13 +64,11 @@ async function scan(ctx, cfg) {
       })
     }
 
-    // emit status
+    // emit progress
     // ctx.io.emit('action', {
     //   type: PROVIDER_SCAN_STATUS,
     //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
     // })
-
-    log(JSON.stringify(counts))
   }
 
   // // delete songs not in our valid list
