@@ -67,6 +67,10 @@ class YouTubePlayer extends React.Component {
       // https://developers.google.com/youtube/player_parameters
       playerVars: {
         autoplay: 1,
+        // controls: 0,
+        disablekb: 1,
+        fs: 0,
+        rel: 0,
       }
     }
 
