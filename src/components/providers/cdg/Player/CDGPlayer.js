@@ -6,10 +6,9 @@ class CDGPlayer extends React.Component {
   static propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    queueId: PropTypes.number.isRequired,
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
-    item: PropTypes.object.isRequired,
+    song: PropTypes.object.isRequired,
     getMedia: PropTypes.func.isRequired, // action
     getMediaSuccess: PropTypes.func.isRequired, // action
     onMediaError: PropTypes.func.isRequired, // action
@@ -30,7 +29,7 @@ class CDGPlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.queueId !== this.props.queueId) {
+    if (prevProps.song !== this.props.song) {
       this.updateSources()
     }
 
@@ -62,7 +61,7 @@ class CDGPlayer extends React.Component {
           cdgData={this.cdgData}
         />
         <br/>
-        <audio src={'/api/provider/cdg/resource?type=audio&songId='+this.props.item.songId}
+        <audio src={'/api/provider/cdg/resource?type=audio&songId='+this.props.song.songId}
           preload='none'
           onCanPlayThrough={this.handleOnCanPlayThrough}
           onTimeUpdate={this.handleOnTimeUpdate}
@@ -83,7 +82,7 @@ class CDGPlayer extends React.Component {
     this.audio.load()
 
     // get cdgData
-    const url = '/api/provider/cdg/resource?type=cdg&songId='+this.props.item.songId
+    const url = '/api/provider/cdg/resource?type=cdg&songId='+this.props.song.songId
 
     // notification
     this.props.getMedia(this.url)
@@ -96,7 +95,7 @@ class CDGPlayer extends React.Component {
         this.cdgData = Array.from(new Uint8Array(res))
       }).then(() => { this.handleOnCdgLoaded() })
       .catch((err) => {
-        this.props.onMediaError(this.props.queueId, err.message)
+        this.props.onMediaError(err.message)
       })
   }
 
@@ -130,7 +129,6 @@ class CDGPlayer extends React.Component {
     })
 
     this.props.onStatus({
-      queueId: this.props.queueId,
       isPlaying: !this.audio.paused,
       position: this.audio.currentTime,
       volume: this.audio.volume,
@@ -138,9 +136,7 @@ class CDGPlayer extends React.Component {
   }
 
   handleAudioError = (err) => {
-    this.props.onMediaError(this.props.queueId,
-      'The audio file could not be loaded (error code '+err.target.error.code+')'
-    )
+    this.props.onMediaError('Could not load audio (error '+err.target.error.code+')')
   }
 
   /**
