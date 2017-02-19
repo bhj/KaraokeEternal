@@ -74,6 +74,9 @@ const handle = (props) => {
   else if (props.value < .4) icon = "volume_mute"
   else if (props.value < .7) icon = "volume_down"
 
+  // will cause 'unknown prop' warning if passed to Handle
+  delete props.dragging
+
   return (
     <div style={style}>
       <i className='material-icons'>{icon}</i>
