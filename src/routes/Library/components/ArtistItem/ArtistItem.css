@@ -8,22 +8,31 @@
   flex: 1;
   font-size: 20px;
   text-overflow: ellipsis;
-  overflow:hidden;
+  overflow: hidden;
   white-space: nowrap;
-}
-
-.countIcon {
-  height: 30px;
-  width: 30px;
-  line-height: 30px;
-  text-align: center;
-  border-radius: 4px;
-  background: #4962c7;
-  margin: 0 10px;
-  color: white;
-  font-size: 16px;
 }
 
 .hasQueued {
   background: yellow;
+}
+
+.folder {
+  height: 40px;
+  width: 40px;
+  margin-right: 2px;
+}
+
+.icon {
+  position: absolute;
+  font-size: 40px;
+  color: #aaa;
+}
+
+.count {
+  position: relative;
+  top: 14px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
 }

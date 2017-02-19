@@ -26,7 +26,10 @@ const ArtistItem = (props) => {
   return (
     <div style={props.style}>
       <div onClick={props.onArtistClick} className={classes.container + (isChildQueued ? ' ' + classes.hasQueued : '')}>
-        <div className={classes.countIcon}>{props.songIds.length}</div>
+        <div className={classes.folder}>
+          <i className={'material-icons '+classes.icon}>{props.isExpanded ? 'folder_open' : 'folder'}</i>
+          <div className={classes.count}>{props.songIds.length}</div>
+        </div>
         <div className={classes.name}>{props.name}</div>
       </div>
       {children}
