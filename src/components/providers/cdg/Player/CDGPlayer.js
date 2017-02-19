@@ -26,6 +26,7 @@ class CDGPlayer extends React.Component {
 
   componentDidMount () {
     this.updateSources()
+    this.setVolume(this.props.volume)
   }
 
   componentDidUpdate (prevProps) {
