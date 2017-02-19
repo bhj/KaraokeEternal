@@ -41,9 +41,9 @@ class PlayerView extends React.Component {
       }
     }
 
-    if (this.props.isAtQueueEnd !== prevProps.isAtQueueEnd) {
+    if (this.props.isAtQueueEnd && !prevProps.isAtQueueEnd) {
       this.handleStatus({
-        isPlaying: this.props.isPlaying,
+        isPlaying: false,
         position: 0,
         volume: this.props.volume,
       })
