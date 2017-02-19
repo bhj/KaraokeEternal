@@ -66,6 +66,7 @@ const handle = (props) => {
     fontSize: '40px',
     opacity: .7,
     color: '#333',
+    touchAction: 'pan-x',
   })
 
   let icon = "volume_up"
