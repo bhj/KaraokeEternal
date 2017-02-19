@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import fetch from 'isomorphic-fetch'
 import CDGCanvas from './CDGCanvas'
 import classes from './CDGPlayer.css'
 
