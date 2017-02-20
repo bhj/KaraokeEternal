@@ -15,9 +15,6 @@ class PaddedList extends React.Component {
     paddingBottom: PropTypes.number.isRequired,
   }
 
-  rowRenderer = this.rowRenderer.bind(this)
-  rowHeight = this.rowHeight.bind(this)
-
   render () {
     return (
       <List
@@ -43,7 +40,7 @@ class PaddedList extends React.Component {
     }
   }
 
-  rowRenderer({index, key, style}) {
+  rowRenderer = ({index, key, style}) => {
     // top & bottom spacer
     if (index === 0 || index === this.props.rowCount+1) {
       return (
@@ -56,7 +53,7 @@ class PaddedList extends React.Component {
     return this.props.rowRenderer({ index, key, style })
   }
 
-  rowHeight({ index }) {
+  rowHeight = ({ index }) => {
     // top & bottom spacer
     if (index === 0) {
       return this.props.paddingTop

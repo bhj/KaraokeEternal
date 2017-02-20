@@ -14,15 +14,12 @@ export default class AccountForm extends Component {
     changeView: PropTypes.func.isRequired
   }
 
-  handleClick = this.handleClick.bind(this)
-
-  // initial state
   state = {
     name: this.props.user ? this.props.user.name : '',
     email: this.props.user ? this.props.user.email : ''
   }
 
-  handleChange(inputName) {
+  handleChange = (inputName) => {
     return (event) => this.setState({[inputName]: event.target.value})
   }
 
@@ -66,7 +63,7 @@ export default class AccountForm extends Component {
     )
   }
 
-  handleClick(event) {
+  handleClick = (event) => {
     event.preventDefault()
     const name = this.refs.name
     const email = this.refs.email

@@ -7,16 +7,13 @@ export default class Prefs extends React.Component {
     providerRefresh: PropTypes.func.isRequired,
   }
 
-  setEnabled = this.setEnabled.bind(this)
-  handleRefresh = this.handleRefresh.bind(this)
-
-  setEnabled(e) {
+  setEnabled = (e) => {
     let prefs = Object.assign({}, this.props.prefs)
     prefs.enabled = e.target.checked
     this.props.setPrefs('provider.youtube', prefs)
   }
 
-  handleRefresh() {
+  handleRefresh = () => {
     this.props.providerRefresh('youtube')
   }
 

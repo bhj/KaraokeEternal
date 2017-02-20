@@ -14,10 +14,7 @@ export default class VolumeSlider extends React.Component {
     isDragging: false,
   }
 
-  handleChange = this.handleChange.bind(this)
-  handleAfterChange = this.handleAfterChange.bind(this)
-
-  handleChange(vol) {
+  handleChange = (vol) => {
     this.setState({
       vol,
       isDragging: true,
@@ -26,7 +23,7 @@ export default class VolumeSlider extends React.Component {
     this.ignoreStatus = 0
   }
 
-  handleAfterChange(vol) {
+  handleAfterChange = (vol) => {
     this.setState({
       vol,
       isDragging: false,

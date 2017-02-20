@@ -22,8 +22,6 @@ class PlayerView extends React.Component {
     queue: PropTypes.object.isRequired,
   }
 
-  toggleFullscreen = this.toggleFullscreen.bind(this)
-
   componentDidMount() {
     // emit initial state
     this.handleStatus({
@@ -101,7 +99,7 @@ class PlayerView extends React.Component {
     )
   }
 
-  toggleFullscreen() {
+  toggleFullscreen = () => {
     screenfull.toggle(this.ref)
   }
 

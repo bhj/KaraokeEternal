@@ -19,16 +19,8 @@ class SearchResults extends React.Component {
     paddingBottom: PropTypes.number.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
-    // scrollArtists: PropTypes.func.isRequired,
     toggleArtistResultExpanded: PropTypes.func.isRequired,
   }
-
-  rowRenderer = this.rowRenderer.bind(this)
-  rowHeight = this.rowHeight.bind(this)
-  handleArtistClick = this.handleArtistClick.bind(this)
-  handleSongClick = this.handleSongClick.bind(this)
-  // handleScroll = this.handleScroll.bind(this)
-  setRef = this.setRef.bind(this)
 
   componentDidUpdate(prevProps) {
     // nuclear option
@@ -45,17 +37,15 @@ class SearchResults extends React.Component {
         paddingBottom={this.props.paddingBottom}
         artistResults={this.props.artistResults} // pass-through forces List refresh
         songResults={this.props.songResults} // pass-through forces List refresh
-        // queuedSongIds={this.props.queuedSongIds} // pass-through forces List refresh
         rowCount={this.props.artistResults.length+this.props.songResults.length+2}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
-        // onScroll={this.handleScroll}
         onRef={this.setRef}
       />
     )
   }
 
-  rowRenderer({index, key, style}) {
+  rowRenderer = ({index, key, style}) => {
     const { artistResults, songResults } = this.props
 
     // # artist results heading
@@ -111,7 +101,7 @@ class SearchResults extends React.Component {
     )
   }
 
-  rowHeight({index}) {
+  rowHeight = ({index}) => {
     // header
     if (index === 0) return ROW_HEIGHT
 
@@ -125,19 +115,15 @@ class SearchResults extends React.Component {
     return rows * ROW_HEIGHT
   }
 
-  handleArtistClick(artistId) {
+  handleArtistClick = (artistId) => {
     this.props.toggleArtistResultExpanded(artistId)
   }
 
-  handleSongClick(songId) {
+  handleSongClick = (songId) => {
     this.props.queueSong(songId)
   }
 
-  // handleScroll({ scrollTop }) {
-  //   this.props.scrollArtists(scrollTop)
-  // }
-
-  setRef(ref) {
+  setRef = (ref) => {
     this.ref = ref
   }
 }

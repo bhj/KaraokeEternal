@@ -20,9 +20,6 @@ class QueueView extends React.Component {
     showErrorMessage: PropTypes.func.isRequired,
   }
 
-  rowRenderer = this.rowRenderer.bind(this)
-  rowHeight = this.rowHeight.bind(this)
-
   render() {
     return (
       <AppLayout title="Queue">
@@ -44,7 +41,7 @@ class QueueView extends React.Component {
     )
   }
 
-  rowRenderer({index, key, style}) {
+  rowRenderer = ({index, key, style}) => {
     const item = this.props.queue.entities[this.props.queue.result[index]]
     const song = this.props.songs.entities[item.songId]
     const queueId = item.queueId
@@ -66,28 +63,28 @@ class QueueView extends React.Component {
         canRemove={isUpcoming && isOwner}
         hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
         pctPlayed={isActive ? this.props.curPos / song.duration * 100 : 0}
-        onRemoveClick={this.handleRemoveClick.bind(this, queueId)}
+        onRemoveClick={() => this.handleRemoveClick(queueId)}
         onSkipClick={this.props.requestPlayNext}
-        onErrorInfoClick={this.handleErrorInfoClick.bind(this, queueId)}
+        onErrorInfoClick={() => this.handleErrorInfoClick(queueId)}
         key={key}
         style={style}
       />
     )
   }
 
-  rowHeight({index}) {
+  rowHeight = ({index}) => {
     return 64
   }
 
-  handleRemoveClick(queueId) {
+  handleRemoveClick = (queueId) => {
     this.props.removeItem(queueId)
   }
 
-  handleErrorInfoClick(queueId) {
+  handleErrorInfoClick = (queueId) => {
     this.props.showErrorMessage(this.props.errors[queueId].join("\n\n"))
   }
 
-  setRef(ref) {
+  setRef = (ref) => {
     this.ref = ref
   }
 }

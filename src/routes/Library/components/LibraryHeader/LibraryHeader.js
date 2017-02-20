@@ -13,15 +13,12 @@ class LibraryHeader extends React.Component {
     value: this.props.searchTerm,
   }
 
-  handleChange = this.handleChange.bind(this)
-  clearSearch = this.clearSearch.bind(this)
-
-  handleChange(event) {
+  handleChange = (event) => {
     this.setState({value: event.target.value})
     this.props.searchLibrary(event.target.value)
   }
 
-  clearSearch() {
+  clearSearch = () => {
     this.setState({value: ''})
     this.props.searchReset()
   }

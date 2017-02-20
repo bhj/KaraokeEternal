@@ -20,13 +20,6 @@ class ArtistList extends React.Component {
     toggleArtistExpanded: PropTypes.func.isRequired,
   }
 
-  rowRenderer = this.rowRenderer.bind(this)
-  rowHeight = this.rowHeight.bind(this)
-  handleArtistClick = this.handleArtistClick.bind(this)
-  handleSongClick = this.handleSongClick.bind(this)
-  handleScroll = this.handleScroll.bind(this)
-  setRef = this.setRef.bind(this)
-
   render () {
     if (this.props.artists.result.length === 0) return null
 
@@ -48,7 +41,7 @@ class ArtistList extends React.Component {
     )
   }
 
-  rowRenderer({index, key, style}) {
+  rowRenderer = ({index, key, style}) => {
     const { artists, songs, expandedArtists } = this.props
     const artist = artists.entities[artists.result[index]]
 
@@ -67,7 +60,7 @@ class ArtistList extends React.Component {
     )
   }
 
-  rowHeight({index}) {
+  rowHeight = ({index}) => {
     const artistId = this.props.artists.result[index]
     let rows = 1
 
@@ -78,22 +71,22 @@ class ArtistList extends React.Component {
     return rows * ROW_HEIGHT
   }
 
-  handleArtistClick(artistId) {
+  handleArtistClick = (artistId) => {
     this.props.toggleArtistExpanded(artistId)
 
     this.ref.recomputeRowHeights()
     this.ref.forceUpdate()
   }
 
-  handleSongClick(songId) {
+  handleSongClick = (songId) => {
     this.props.queueSong(songId)
   }
 
-  handleScroll({ scrollTop }) {
+  handleScroll = ({ scrollTop }) => {
     this.props.scrollArtists(scrollTop)
   }
 
-  setRef(ref) {
+  setRef = (ref) => {
     this.ref = ref
   }
 }
