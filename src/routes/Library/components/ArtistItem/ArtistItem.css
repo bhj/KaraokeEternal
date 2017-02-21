@@ -25,7 +25,7 @@
 .icon {
   position: absolute;
   font-size: 40px;
-  color: #aaa;
+  color: #999;
 }
 
 .count {
@@ -33,6 +33,13 @@
   top: 14px;
   text-align: center;
   font-size: 14px;
-  font-weight: bold;
-  color: white;
+  color: #efefef;
+}
+
+.arrowDown {
+  position: relative;
+  top: 10px;
+  text-align: center;
+  font-size: 24px;
+  color: #ccc;
 }
