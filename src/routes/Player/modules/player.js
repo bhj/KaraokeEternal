@@ -1,3 +1,5 @@
+import { CANCEL, FLUSH } from 'redux-throttle'
+
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
 const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
@@ -74,6 +76,16 @@ export function emitStatus(payload) {
     type: EMIT_STATUS,
     payload,
     meta: {throttle: true}
+  }
+}
+
+// cancel pending status emits
+export function cancelStatus() {
+  return {
+    type: CANCEL,
+    payload: {
+      type: EMIT_STATUS
+    }
   }
 }
 

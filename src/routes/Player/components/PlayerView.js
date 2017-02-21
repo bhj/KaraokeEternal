@@ -17,6 +17,7 @@ class PlayerView extends React.Component {
     getMedia: PropTypes.func.isRequired,
     getMediaSuccess: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
+    cancelStatus: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
     // pass-thru to force re-render
     queue: PropTypes.object.isRequired,
@@ -51,6 +52,11 @@ class PlayerView extends React.Component {
       if (this.props.isAtQueueEnd && this.props.isPlaying) {
         this.props.requestPlayNext()
       }
+    }
+
+    // cancel any pending status emits having an old queueId
+    if (this.props.queueId !== prevProps.queueId) {
+      this.props.cancelStatus()
     }
   }
 
