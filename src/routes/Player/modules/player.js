@@ -7,6 +7,7 @@ const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
 const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
 const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
 const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
+const EMIT_STATUS = 'server/PLAYER_STATUS'
 const EMIT_ERROR = 'server/PLAYER_ERROR'
 
 // for informational purposes from provider players
