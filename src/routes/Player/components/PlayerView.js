@@ -11,7 +11,7 @@ class PlayerView extends React.Component {
     song: PropTypes.object,
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
-    isErrored:  PropTypes.bool.isRequired,
+    isErrored: PropTypes.bool.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     getMedia: PropTypes.func.isRequired,
