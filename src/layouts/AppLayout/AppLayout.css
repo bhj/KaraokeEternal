@@ -1,24 +1,3 @@
-.seethrough {
-  position: absolute;
-  width: 100%;
-  background-color: rgba(244,244,244,0.6);
-  -webkit-backdrop-filter: blur(10px) saturate(200%);
-  backdrop-filter: blur(10px) saturate(200%);
-  z-index: 1;
-}
-
-.header {
-  top: 0;
-  border-bottom: 1px solid #ddd;
-  composes: seethrough;
-}
-
-.nav {
-  bottom: 0px;
-  border-top: 1px solid #ddd;
-  composes: seethrough;
-}
-
 .viewport {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;

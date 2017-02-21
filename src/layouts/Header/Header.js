@@ -4,15 +4,13 @@ import PlaybackCtrl from 'components/PlaybackCtrl'
 import classes from './Header.css'
 
 const Header = (props) => {
-  const ViewComponent = props.viewComponent || 'div'
   return (
-    <Measure onMeasure={props.onHeight} whitelist={['height']}>
-      <div>
+    <Measure onMeasure={props.setHeaderHeight} whitelist={['height']}>
+      <div className={classes.container}>
         {props.isAdmin &&
           <PlaybackCtrl/>
         }
-
-        <ViewComponent/>
+        {props.children}
       </div>
     </Measure>
   )
@@ -20,7 +18,7 @@ const Header = (props) => {
 
 Header.PropTypes = {
   isAdmin: PropTypes.bool,
-  onHeight: PropTypes.func,
+  setHeaderHeight: PropTypes.func,
 }
 
 export default Header

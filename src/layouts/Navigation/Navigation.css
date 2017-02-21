@@ -1,0 +1,25 @@
+.container {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  padding: 6px 0;
+  border-top: 1px solid #ddd;
+  text-decoration: none;
+  width: 100%;
+  background-color: rgba(244,244,244,0.6);
+  -webkit-backdrop-filter: blur(10px) saturate(200%);
+  backdrop-filter: blur(10px) saturate(200%);
+  z-index: 1;
+}
+
+.button {
+  flex: 1;
+  display: block;
+  text-align: center;
+  color: #a9a9a9;
+  font-size: 40px;
+}
+
+.active {
+  color: #4962c7;
+}

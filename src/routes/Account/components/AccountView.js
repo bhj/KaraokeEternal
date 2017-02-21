@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import { browserHistory } from 'react-router'
 import AppLayout from 'layouts/AppLayout'
+import Header from 'layouts/Header'
 import AccountForm from '../containers/AccountForm'
 import Logout from './Logout'
 import Providers from 'components/providers'
@@ -26,7 +27,7 @@ class AccountView extends React.Component {
     }
 
     return (
-      <AppLayout title={headerTitle}>
+      <AppLayout title={headerTitle} header={Header}>
         {(style) => (
           <div style={style}>
             <AccountForm/>

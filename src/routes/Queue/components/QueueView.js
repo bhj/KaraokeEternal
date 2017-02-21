@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
+import Header from 'layouts/Header'
+import Navigation from 'layouts/Navigation'
 import PaddedList from 'components/PaddedList'
 import QueueItem from './QueueItem'
 
@@ -22,7 +24,7 @@ class QueueView extends React.Component {
 
   render() {
     return (
-      <AppLayout title="Queue">
+      <AppLayout title="Queue" header={Header}>
         {(style) => (
           <PaddedList
             {...style}

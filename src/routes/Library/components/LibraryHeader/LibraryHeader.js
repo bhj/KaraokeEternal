@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import Header from 'layouts/Header'
 import classes from './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
@@ -25,19 +26,21 @@ class LibraryHeader extends React.Component {
 
   render () {
     return (
-      <div className={classes.container}>
-        <input type="search"
-          className={classes.search}
-          placeholder="search library"
-          value={this.state.value}
-          onChange={this.handleChange}
-        />
-        {this.props.searchTerm &&
-          <div onClick={this.clearSearch} className={classes.clear}>
-            <i className='material-icons'>clear</i>
-          </div>
-        }
-      </div>
+      <Header>
+        <div className={classes.container}>
+          <input type="search"
+            className={classes.search}
+            placeholder="search library"
+            value={this.state.value}
+            onChange={this.handleChange}
+          />
+          {this.props.searchTerm &&
+            <div onClick={this.clearSearch} className={classes.clear}>
+              <i className='material-icons'>clear</i>
+            </div>
+          }
+        </div>
+      </Header>
     )
   }
 }

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
-import ArtistList from '../ArtistList'
 import LibraryHeader from '../LibraryHeader'
+import ArtistList from '../ArtistList'
 import SearchResults from '../SearchResults'
 
 const LibraryView = (props) => {

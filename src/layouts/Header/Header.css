@@ -1,0 +1,10 @@
+.container {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  background-color: rgba(244,244,244,0.6);
+  border-bottom: 1px solid #ddd;
+  -webkit-backdrop-filter: blur(10px) saturate(200%);
+  backdrop-filter: blur(10px) saturate(200%);
+  z-index: 1;
+}
