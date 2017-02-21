@@ -75,7 +75,12 @@ export function emitStatus(payload) {
   return {
     type: EMIT_STATUS,
     payload,
-    meta: {throttle: true}
+    meta: {
+      throttle: {
+        wait: 1000,
+        leading: true,
+      }
+    }
   }
 }
 

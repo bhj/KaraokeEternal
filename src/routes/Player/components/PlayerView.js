@@ -53,9 +53,16 @@ class PlayerView extends React.Component {
         this.props.requestPlayNext()
       }
     }
+  }
 
+  componentWillUpdate(nextProps) {
     // cancel any pending status emits having an old queueId
-    if (this.props.queueId !== prevProps.queueId) {
+    if (this.props.queueId !== nextProps.queueId) {
+      this.props.cancelStatus()
+    }
+
+    // improve play/pause feedback lag
+    if (this.props.isPlaying !== nextProps.isPlaying) {
       this.props.cancelStatus()
     }
   }
