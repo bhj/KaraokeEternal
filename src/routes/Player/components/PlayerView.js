@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
 import PlayerHeader from './PlayerHeader'
 import Providers from 'components/providers'
+import classes from './PlayerView.css'
 import screenfull from 'screenfull'
 
 class PlayerView extends React.Component {
@@ -99,7 +100,15 @@ class PlayerView extends React.Component {
     return (
       <AppLayout title="Player" header={header}>
         {(style) => (
-          <div ref={r => {this.ref = r}} style={screenfull.isFullscreen ? {} : style}>
+          <div
+            ref={r => {this.ref = r}}
+            className={classes.container}
+            style={screenfull.isFullscreen ? {} : {
+              // no background behind header/nav
+              marginTop: style.paddingTop,
+              marginBottom: style.paddingBottom
+            }}
+          >
             <Component
               {...componentProps}
               width={style.width}
