@@ -91,6 +91,7 @@ class YouTubePlayer extends React.Component {
   handleReady = (event) => {
     this.player = event.target
     event.target.setVolume(this.props.volume * 100) // flakey using this.player?
+    clearInterval(this.statusTimer)
     this.statusTimer = setInterval(this.handleStatus, 1000)
   }
 
