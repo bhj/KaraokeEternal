@@ -2,7 +2,7 @@
   position: absolute;
   bottom: 0;
   display: flex;
-  padding: 6px 0;
+  padding-top: 6px;
   border-top: 1px solid #ddd;
   text-decoration: none;
   width: 100%;
