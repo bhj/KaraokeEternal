@@ -106,7 +106,7 @@ class PlayerView extends React.Component {
             style={screenfull.isFullscreen ? {} : {
               // no background behind header/nav
               marginTop: style.paddingTop,
-              marginBottom: style.paddingBottom
+              height: style.height - (style.paddingTop + style.paddingBottom)
             }}
           >
             <Component
