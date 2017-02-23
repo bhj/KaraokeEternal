@@ -30,7 +30,7 @@ class AccountView extends React.Component {
     return (
       <AppLayout title={headerTitle} header={header}>
         {(style) => (
-          <div style={style}>
+          <div style={{...style, overflowY: 'scroll'}}>
             <AccountForm/>
 
             {prefComponents}
