@@ -69,7 +69,6 @@ class CDGPlayer extends React.Component {
           onEnded={this.props.onMediaEnd}
           onError={this.handleAudioError}
           ref={(c) => {this.audio = c}}
-          controls
         />
       </div>
     )
