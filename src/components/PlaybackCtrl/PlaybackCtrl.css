@@ -4,6 +4,7 @@
   line-height: 1;
   align-items: center;
   color: #666;
+  padding: 0 12px;
 }
 
 .play {
@@ -15,11 +16,12 @@
 }
 
 .next {
+  margin-left: 4px;
   font-size: 54px;
 }
 
 .volume {
-  margin-right: 32px;
+  margin: 0 30px;
 }
 
 .disabled {
