@@ -415,7 +415,7 @@ const ACTION_HANDLERS = {
     user: null,
     token: null,
   }),
-  }
+}
 
 // ------------------------------------
 // Reducer
