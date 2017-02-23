@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
-import Header from 'layouts/Header'
+import PlayerHeader from './PlayerHeader'
 import Providers from 'components/providers'
 import screenfull from 'screenfull'
 
@@ -70,6 +70,8 @@ class PlayerView extends React.Component {
 
   render () {
     const { song } = this.props
+    const header = <PlayerHeader requestFullscreen={this.handleFullscreen}/>
+
     let Component = 'div'
     let componentProps
 
@@ -95,7 +97,7 @@ class PlayerView extends React.Component {
     }
 
     return (
-      <AppLayout title="Player" header={Header}>
+      <AppLayout title="Player" header={header}>
         {(style) => (
           <div ref={r => {this.ref = r}} style={screenfull.isFullscreen ? {} : style}>
             <Component
@@ -109,8 +111,10 @@ class PlayerView extends React.Component {
     )
   }
 
-  toggleFullscreen = () => {
-    screenfull.toggle(this.ref)
+  handleFullscreen = () => {
+    if (screenfull.enabled) {
+      screenfull.request(this.ref)
+    }
   }
 
   handleStatus = (status) => {

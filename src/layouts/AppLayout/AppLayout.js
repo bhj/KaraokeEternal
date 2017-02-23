@@ -4,11 +4,9 @@ import { SkyLightStateless } from 'react-skylight'
 import classes from './AppLayout.css'
 
 const AppLayout = (props) => {
-  const Header = props.header
-
   return (
     <div>
-      <Header/>
+      {props.header}
 
       <div className={classes.viewport} style={{
         width: props.browserWidth,

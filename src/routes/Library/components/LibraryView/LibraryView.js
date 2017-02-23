@@ -6,8 +6,9 @@ import SearchResults from '../SearchResults'
 
 const LibraryView = (props) => {
   const View = props.searchTerm ? SearchResults : ArtistList
+  const header = <LibraryHeader/>
   return (
-    <AppLayout title="Library" header={LibraryHeader}>
+    <AppLayout title="Library" header={header}>
       {(style) => (
         <View {...style}/>
       )}

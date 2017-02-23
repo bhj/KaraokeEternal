@@ -16,6 +16,7 @@ class AccountView extends React.Component {
 
   render () {
     const { user, prefs } = this.props
+    const header = <Header/>
     const headerTitle = user ? user.name : (this.props.viewMode === 'login') ? 'Sign In' : 'Create Account'
     let prefComponents = []
 
@@ -27,7 +28,7 @@ class AccountView extends React.Component {
     }
 
     return (
-      <AppLayout title={headerTitle} header={Header}>
+      <AppLayout title={headerTitle} header={header}>
         {(style) => (
           <div style={style}>
             <AccountForm/>

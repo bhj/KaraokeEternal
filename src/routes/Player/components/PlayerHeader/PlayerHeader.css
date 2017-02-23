@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  height: 48px;
+  font-size: 48px;
+  line-height: 1;
+  align-items: center;
+  flex-direction: row-reverse;
+  color: #666;
+  margin-right: 6px;
+}

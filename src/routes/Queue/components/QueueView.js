@@ -23,8 +23,9 @@ class QueueView extends React.Component {
   }
 
   render() {
+    const header = <Header/>
     return (
-      <AppLayout title="Queue" header={Header}>
+      <AppLayout title="Queue" header={header}>
         {(style) => (
           <PaddedList
             {...style}
