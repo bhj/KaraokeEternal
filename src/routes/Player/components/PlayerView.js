@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
 import PlayerHeader from './PlayerHeader'
 import Providers from 'components/providers'
+import ColorCycle from './ColorCycle'
 import classes from './PlayerView.css'
 import screenfull from 'screenfull'
 
@@ -74,12 +75,16 @@ class PlayerView extends React.Component {
     const header = <PlayerHeader requestFullscreen={this.handleFullscreen}/>
 
     let Component = 'div'
-    let componentProps
+    let componentProps = {}
 
-    if (this.props.isAtQueueEnd) {
+    if (this.props.isAtQueueEnd || this.props.queue.result.length === 0) {
       // show 'add more songs' placeholder
+      componentProps.title = "CAN HAZ MOAR SONGZ?"
+      Component = ColorCycle
     } else if (!song) {
       // show 'press play to begin' placeholder
+      componentProps.title = "PRESS PLAY TO BEGIN"
+      Component = ColorCycle
     } else if (typeof Providers[song.provider] === 'undefined') {
       // show 'provider error' placeholder
       this.props.emitError(this.props.queueId, 'No provider for type: "'+song.provider+'"')
