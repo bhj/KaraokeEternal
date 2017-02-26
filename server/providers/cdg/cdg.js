@@ -34,7 +34,7 @@ async function scan(ctx, cfg) {
     // get list of files
     try {
       log('searching path: %s', dir)
-      files = await getFiles(dir, file => allowedExts.includes(path.extname(file)))
+      files = await getFiles(dir, file => allowedExts.includes(path.extname(file).toLowerCase()))
       log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
     } catch (err) {
       // try next configured path
