@@ -273,15 +273,6 @@ function parsePath(p) {
   return { artist, title }
 }
 
-function clean(str) {
-  return str.trim()
-    // remove leading numbers
-    .replace(/^\d/, '')
-    // remove text in parantheses or brackets
-    .replace(/ *\([^)]*\) */g, '')
-    .trim()
-}
-
 function titleCase(str) {
   return str.replace(/\w\S*/g, function(tStr) {
     return tStr.charAt(0).toUpperCase() + tStr.substr(1).toLowerCase()
