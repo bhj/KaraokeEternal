@@ -128,7 +128,6 @@
     "react-skylight": "^0.4.1",
     "react-virtualized": "^9.0.3",
     "react-youtube": "^7.3.0",
-    "recursive-readdir": "^2.1.1",
     "redbox-react": "^1.3.4",
     "redux": "^3.6.0",
     "redux-auth-wrapper": "^1.0.0",

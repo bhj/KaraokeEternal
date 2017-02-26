@@ -1,12 +1,12 @@
 const db = require('sqlite')
-const readdir = require('../../thunks/readdir')
+const getFiles = require('../../thunks/getFiles')
 const hashfiles = require('../../thunks/hashfiles')
 const musicmetadata = require('../../thunks/musicmetadata')
 const mp3duration = require('../../thunks/mp3duration')
 const debug = require('debug')
 const fs = require('fs')
-const fsStat = require('../../thunks/fsstat')
-const pathUtils = require('path')
+const stat = require('../../thunks/stat')
+const path = require('path')
 const log = debug('app:provider:cdg')
 
 const getLibrary = require('../../library/get')
@@ -27,49 +27,50 @@ async function scan(ctx, cfg) {
 
   let validIds = [] // songIds for cleanup
   counts = {new: 0, ok: 0, skipped: 0}
-  let files = []
 
-  for (let searchPath of cfg.paths) {
+  for (const dir of cfg.paths) {
+    let files = []
+
+    // get list of files
     try {
-      log('searching path: %s', searchPath)
-      let res = await readdir(searchPath, [ignoreFunc])
-      log('found %s files with valid extensions (%s)', res.length, allowedExts.join(','))
-      files = files.concat(res)
+      log('searching path: %s', dir)
+      files = await getFiles(dir, file => allowedExts.includes(path.extname(file)))
+      log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
     } catch (err) {
-      log(err.message)
+      // log(err.message)
       continue
     }
+
+    for (let i=0; i < files.length; i++) {
+      log('[%s/%s] %s', i+1, files.length, files[i])
+      let songId, newCount
+
+      try {
+        songId = await process(files[i])
+      } catch(err) {
+        continue
+      }
+
+      validIds.push(songId)
+
+      if (counts.new !== newCount) {
+        newCount = counts.new
+        // emit updated library
+        ctx.io.emit('action', {
+          type: LIBRARY_CHANGE,
+          payload: await getLibrary(),
+        })
+      }
+
+      // emit progress
+      // ctx.io.emit('action', {
+      //   type: PROVIDER_SCAN_STATUS,
+      //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
+      // })
+    }
   }
 
-  log('total files to scan: %s', files.length)
 
-  for (let i=0; i < files.length; i++) {
-    log('[%s/%s] %s', i+1, files.length, files[i])
-    let songId, newCount
-
-    try {
-      songId = await process(files[i])
-    } catch(err) {
-      log(err.message)
-    }
-
-    validIds.push(songId)
-
-    if (counts.new !== newCount) {
-      newCount = counts.new
-      // emit updated library
-      ctx.io.emit('action', {
-        type: LIBRARY_CHANGE,
-        payload: await getLibrary(),
-      })
-    }
-
-    // emit progress
-    // ctx.io.emit('action', {
-    //   type: PROVIDER_SCAN_STATUS,
-    //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
-    // })
-  }
 
   // // delete songs not in our valid list
   // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
@@ -100,13 +101,13 @@ async function resource(ctx, cfg) {
     file = song.path
     ctx.type = 'audio/mpeg'
   } else if (type === 'cdg') {
-    let info = pathUtils.parse(song.path)
+    let info = path.parse(song.path)
     file = song.path.substr(0, song.path.length-info.ext.length)+'.cdg'
   }
 
   // get file size (and does it exist?)
   try {
-    stats = await fsStat(file)
+    stats = await stat(file)
   } catch(err) {
     ctx.status = 404
     return ctx.body = `File not found: ${file}`
@@ -122,38 +123,26 @@ async function resource(ctx, cfg) {
 module.exports = { scan, resource }
 
 
-async function process(path){
-  const pathInfo = pathUtils.parse(path)
-  const cdgPath = path.substr(0, path.length-pathInfo.ext.length)+'.cdg'
-  let stats, song, res
+async function process(file){
+  const pathInfo = path.parse(file)
+  let stats, sha256, duration
 
-  // make sure audio file exists and get stats
+  // does file exist?
   try {
-    stats = await fsStat(path)
+    stats = await stat(file)
   } catch(err) {
     log('skipping: %s', err.message)
     counts.skipped++
     return Promise.reject(err)
 }
 
-  // CDG sidecar must exist too
-  try {
-    await fsStat(cdgPath)
-  } catch(err) {
-    log('skipping: %s', err.message)
-    counts.skipped++
-    return Promise.reject(err)
-  }
-
-  // get artist and title
-  song = parseMeta(path)
-  song.meta = {
-    path,
-    mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
-  }
-
   // already in database with the same path and mtime?
-  res = await searchLibrary({meta: {path, mtime: song.meta.mtime}})
+  res = await searchLibrary({
+    meta: {
+      path: file,
+      mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
+    }
+  })
 
   if (res.result.length) {
     log('song is in library (same path+mtime)')
@@ -161,34 +150,44 @@ async function process(path){
     return Promise.resolve(res.result[0])
   }
 
-  // --------
-  // new song
-  // --------
-
-  // hash the file(s)
-  let exts = [path, cdgPath].map(path => pathUtils.parse(path).ext.replace('.', '')).join('+')
-  log('getting sha256 (%s)', exts)
+  // need to hash the file(s)
+  // (don't bother if CDG sidecar doesn't exist)
+  const cdgFile = file.substr(0, file.length-pathInfo.ext.length)+'.cdg'
 
   try {
-    song.meta.sha256 = await hashfiles([path, cdgPath], 'sha256')
+    await stat(cdgFile)
   } catch(err) {
     log('skipping: %s', err.message)
     counts.skipped++
     return Promise.reject(err)
   }
 
+  log('getting sha256 (%s)', pathInfo.ext+'+.cdg')
+
+  try {
+    sha256 = await hashfiles([file, cdgFile], 'sha256')
+  } catch(err) {
+    log('skipping: %s', err.message)
+    counts.skipped++
+    return Promise.reject(err)
+  }
+
+  // --------
+  // new song
+  // --------
+
   // get duration in one of two ways depending on type
   try {
     if (pathInfo.ext === '.mp3') {
       log('getting duration (mp3duration)')
-      song.duration = await mp3duration(path)
+      duration = await mp3duration(file)
     } else {
       log('getting duration (musicmetadata)')
-      let musicmeta = await musicmetadata(path, {duration: true})
-      song.duration = musicmeta.duration
+      let musicmeta = await musicmetadata(file, {duration: true})
+      duration = musicmeta.duration
     }
 
-    if (!song.duration) {
+    if (!duration) {
       throw new Error('unable to determine duration')
     }
   } catch(err) {
@@ -197,49 +196,81 @@ async function process(path){
     return Promise.reject(err)
   }
 
-  song.duration = Math.round(song.duration)
+  // get artist and title
+  song = parsePath(file)
+  song.duration = Math.round(duration)
   song.provider = 'cdg'
-  let songId
 
+  song.meta = {
+    path: file,
+    mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
+    sha256,
+  }
+
+  // add song
   try {
-    songId = await addSong(song)
+    const songId = await addSong(song)
     if (!Number.isInteger(songId)) {
       throw new Error('got invalid lastID')
     }
+
+    counts.new++
+    return Promise.resolve(songId)
   } catch(err) {
     counts.skipped++
     return Promise.reject(err)
   }
-
-  counts.new++
-  return Promise.resolve(songId)
 }
 
+cfg = {
+  // regex or strings
+  globalRemove: [
+    /^\d/, // remove leading numbers
+    / *\([^)]*\) */g, // remove text in parantheses or brackets
+  ],
+  delimitter: '-', // regex or string
+  artistFirst: true,
+  artist: '', // explicit override
+}
 
-function parseMeta(path) {
-  const info = pathUtils.parse(path)
-  let parts
+function parsePath(p) {
+  const pInfo = path.parse(p)
+  let data = pInfo.name
+  let artist, title
 
-  // are paths in the format "artist-title"?
-  parts = clean(info.name).split('-')
-    .map(str => clean(str))
-    .filter(str => str) // filter out non-truthy parts
+  // pre-processing clean
+  cfg.globalRemove.forEach(pattern => {
+    data = data.replace(pattern, '')
+  })
 
-  // right-most part
-  let title = titleCase(parts.pop())
+  // split at delimitter
+  let parts = data.split(cfg.delimitter)
+    // .filter(val => parseFloat(val) == val) // filter out numbers
+    // .filter(str => str) // filter out non-truthy parts
 
-  // look to parent directory for artist name if out of parts
-  if (!parts.length) {
-    let parent = info.dir.split(pathUtils.sep).pop()
+  // @todo this assumes delimiter won't appear in title
+  title = cfg.artistFirst ? parts.pop() : parts.shift()
 
-    parts = clean(parent).split('-')
-    .map(str => clean(str))
-    .filter(str => str) // filter out non-truthy parts
+  if (cfg.artist) {
+    artist = cfg.artist
+  } else if (parts.length) {
+    artist = parts.join(cfg.delimiter)
+  } else {
+    // look for artist in parent dir name
+    let dir = pInfo.dir.split(pInfo.sep).pop()
+
+    // pre-processing clean
+    cfg.globalRemove.forEach(pattern => {
+      dir = dir.replace(pattern, '')
+    })
+
+    artist = dir
   }
 
-  let artist = titleCase(parts.pop())
+  artist = titleCase(artist.trim(artist))
+  title = titleCase(title.trim(title))
 
-  return {artist, title}
+  return { artist, title }
 }
 
 function clean(str) {
@@ -260,6 +291,6 @@ function titleCase(str) {
 function ignoreFunc(file, stats) {
   // `file` is the absolute path to the file, and `stats` is an `fs.Stats`
   // object returned from `fs.lstat()`.
-  const ext = pathUtils.extname(file).toLowerCase()
+  const ext = path.extname(file).toLowerCase()
   return allowedExts.indexOf(ext) === -1
 }
