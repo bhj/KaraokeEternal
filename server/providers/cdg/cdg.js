@@ -37,7 +37,8 @@ async function scan(ctx, cfg) {
       files = await getFiles(dir, file => allowedExts.includes(path.extname(file)))
       log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
     } catch (err) {
-      // log(err.message)
+      // try next configured path
+      log(err)
       continue
     }
 
@@ -48,6 +49,7 @@ async function scan(ctx, cfg) {
       try {
         songId = await process(files[i])
       } catch(err) {
+        // try next file
         continue
       }
 
