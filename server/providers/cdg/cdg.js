@@ -230,7 +230,7 @@ cfg = {
     /^\d/, // remove leading numbers
     / *\([^)]*\) */g, // remove text in parantheses or brackets
   ],
-  delimitter: '-', // regex or string
+  delimiter: '-', // regex or string
   artistFirst: true,
   artist: '', // explicit override
 }
@@ -245,8 +245,8 @@ function parsePath(p) {
     data = data.replace(pattern, '')
   })
 
-  // split at delimitter
-  let parts = data.split(cfg.delimitter)
+  // split at delimiter
+  let parts = data.split(cfg.delimiter)
     // .filter(val => parseFloat(val) == val) // filter out numbers
     // .filter(str => str) // filter out non-truthy parts
 
