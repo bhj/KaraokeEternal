@@ -280,10 +280,3 @@ function titleCase(str) {
     return tStr.charAt(0).toUpperCase() + tStr.substr(1).toLowerCase()
   })
 }
-
-function ignoreFunc(file, stats) {
-  // `file` is the absolute path to the file, and `stats` is an `fs.Stats`
-  // object returned from `fs.lstat()`.
-  const ext = path.extname(file).toLowerCase()
-  return allowedExts.indexOf(ext) === -1
-}
