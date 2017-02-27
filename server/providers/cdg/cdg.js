@@ -247,8 +247,6 @@ function parsePath(p) {
 
   // split at delimiter
   let parts = data.split(cfg.delimiter)
-    // .filter(val => parseFloat(val) == val) // filter out numbers
-    // .filter(str => str) // filter out non-truthy parts
 
   // @todo this assumes delimiter won't appear in title
   title = cfg.artistFirst ? parts.pop() : parts.shift()
