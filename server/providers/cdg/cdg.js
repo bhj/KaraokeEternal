@@ -12,6 +12,7 @@ const log = debug('app:provider:cdg')
 const getLibrary = require('../../library/get')
 const searchLibrary = require('../../library/search')
 const addSong = require('../../library/addSong')
+const parseArtistTitle = require('../../library/parseArtistTitle')
 
 const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
 const PREFS_CHANGE = 'account/PREFS_CHANGE'
@@ -50,6 +51,7 @@ async function scan(ctx, cfg) {
         songId = await process(files[i])
       } catch(err) {
         // try next file
+        log(err)
         continue
       }
 
@@ -198,8 +200,21 @@ async function process(file){
     return Promise.reject(err)
   }
 
-  // get artist and title
-  song = parsePath(file)
+  // try getting artist and title from filename
+  song = parseArtistTitle(pathInfo.name)
+
+  if (typeof song !== 'object') {
+    log('couldn\'t parse artist/title from filename (%s); trying parent folder', song)
+
+    // try parent folder?
+    song = parseArtistTitle(pathInfo.dir.split(pathInfo.sep).pop())
+
+    if (typeof song !== 'object') {
+      log('couldn\'t parse artist/title from folder: %s', song)
+      return Promise.reject('couldn\'t parse artist/title')
+    }
+  }
+
   song.duration = Math.round(duration)
   song.provider = 'cdg'
 
@@ -222,59 +237,4 @@ async function process(file){
     counts.skipped++
     return Promise.reject(err)
   }
-}
-
-cfg = {
-  // regex or strings
-  globalRemove: [
-    /^\d/, // remove leading numbers
-    / *\([^)]*\) */g, // remove text in parantheses or brackets
-  ],
-  delimiter: '-', // regex or string
-  artistFirst: true,
-  artist: '', // explicit override
-}
-
-function parsePath(p) {
-  const pInfo = path.parse(p)
-  let data = pInfo.name
-  let artist, title
-
-  // pre-processing clean
-  cfg.globalRemove.forEach(pattern => {
-    data = data.replace(pattern, '')
-  })
-
-  // split at delimiter
-  let parts = data.split(cfg.delimiter)
-
-  // @todo this assumes delimiter won't appear in title
-  title = cfg.artistFirst ? parts.pop() : parts.shift()
-
-  if (cfg.artist) {
-    artist = cfg.artist
-  } else if (parts.length) {
-    artist = parts.join(cfg.delimiter)
-  } else {
-    // look for artist in parent dir name
-    let dir = pInfo.dir.split(pInfo.sep).pop()
-
-    // pre-processing clean
-    cfg.globalRemove.forEach(pattern => {
-      dir = dir.replace(pattern, '')
-    })
-
-    artist = dir
-  }
-
-  artist = titleCase(artist.trim(artist))
-  title = titleCase(title.trim(title))
-
-  return { artist, title }
-}
-
-function titleCase(str) {
-  return str.replace(/\w\S*/g, function(tStr) {
-    return tStr.charAt(0).toUpperCase() + tStr.substr(1).toLowerCase()
-  })
 }
