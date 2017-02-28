@@ -1,7 +1,7 @@
 // karaoke-forever string to artist/title parser defaults
 module.exports = {
-  // used to split into artist/song
-  delimiter: '-', // regex or string
+  // used to split into artist/song (regex or string)
+  delimiter: '-',
   // whether artist is on left side of delimiter (default=true)
   // @todo: invert for RTL languages
   artistFirst: true,
