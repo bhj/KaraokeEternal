@@ -23,6 +23,7 @@ class SearchResults extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    if (!this.ref) return
     // nuclear option
     this.ref.recomputeRowHeights()
     this.ref.forceUpdate()

@@ -30,8 +30,6 @@ class ArtistList extends React.Component {
         scrollTop={this.props.scrollTop}
         paddingTop={this.props.paddingTop}
         paddingBottom={this.props.paddingBottom}
-        songs={this.props.songs.result} // pass-through forces List refresh
-        queuedSongIds={this.props.queuedSongIds} // pass-through forces List refresh
         rowCount={this.props.artists.result.length}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
@@ -39,6 +37,13 @@ class ArtistList extends React.Component {
         onRef={this.setRef}
       />
     )
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!this.ref) return
+    // nuclear option
+    this.ref.recomputeRowHeights()
+    this.ref.forceUpdate()
   }
 
   rowRenderer = ({index, key, style}) => {
