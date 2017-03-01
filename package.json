@@ -141,6 +141,7 @@
     "screenfull": "^3.0.2",
     "sinon": "^1.17.7",
     "sqlite": "^2.3.0",
+    "squel": "^5.8.0",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.6",
     "webpack": "^1.12.14",
