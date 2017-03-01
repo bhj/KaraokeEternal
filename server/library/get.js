@@ -1,4 +1,5 @@
 const db = require('sqlite')
+const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:get')
 
@@ -11,39 +12,52 @@ async function getLibrary() {
     result: [],
     entities: {}
   }
-  let res
 
   // get all artists
   try {
-    res = await db.all('SELECT artistId, name FROM artists ORDER BY name')
+    const q = squel.select()
+      .from('artists')
+      .field('artistId, name')
+      .order('name')
+
+    // log(q.toString())
+    const { text, values } = q.toParam()
+    const rows = await db.all(text, values)
+
+    // normalize results
+    rows.forEach(function(row){
+      artists.result.push(row.artistId)
+      artists.entities[row.artistId] = row
+      artists.entities[row.artistId].songIds = []
+    })
   } catch(err) {
-    console.log(err)
+    log(err)
     return Promise.reject(err)
   }
-
-  // normalize results
-  res.forEach(function(row){
-    artists.result.push(row.artistId)
-    artists.entities[row.artistId] = row
-    artists.entities[row.artistId].songIds = []
-  })
 
   // get all songs
   try {
-    res = await db.all('SELECT songId, artistId, title, duration, plays, provider FROM songs ORDER BY title')
+    const q = squel.select()
+      .from('songs')
+      .field('songId, artistId, title, duration, plays, provider')
+      .order('title')
+
+    // log(q.toString())
+    const { text, values } = q.toParam()
+    const rows = await db.all(text, values)
+
+    // normalize results
+    rows.forEach(function(row){
+      songs.result.push(row.songId)
+      songs.entities[row.songId] = row
+
+      // used in library view as parent/child LUT
+      artists.entities[row.artistId].songIds.push(row.songId)
+    })
   } catch(err) {
-    console.log(err)
+    log(err)
     return Promise.reject(err)
   }
-
-  // normalize results
-  res.forEach(function(row){
-    songs.result.push(row.songId)
-    songs.entities[row.songId] = row
-
-    // used in library view as parent/child LUT
-    artists.entities[row.artistId].songIds.push(row.songId)
-  })
 
   return { artists, songs }
 }
