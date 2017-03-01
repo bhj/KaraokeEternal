@@ -4,7 +4,7 @@ const debug = require('debug')
 const log = debug('app:library:search')
 
 async function searchLibrary(params = {}) {
-  let songs = {
+  const songs = {
     result: [],
     entities: {}
   }
@@ -23,12 +23,12 @@ async function searchLibrary(params = {}) {
 
   // get songs
   try {
-    log(q.toString())
+    // log(q.toString())
     const { text, values } = q.toParam()
-    let res = await db.all(text, values)
+    const rows = await db.all(text, values)
 
     // normalize results
-    res.forEach(function(row){
+    rows.forEach(function(row){
       songs.result.push(row.songId)
       songs.entities[row.songId] = row
     })
