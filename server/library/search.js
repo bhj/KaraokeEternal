@@ -33,7 +33,7 @@ async function searchLibrary(params = {}) {
       songs.entities[row.songId] = row
     })
   } catch(err) {
-    log(err)
+    log(err.message)
     return Promise.reject(err)
   }
 

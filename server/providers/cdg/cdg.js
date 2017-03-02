@@ -39,7 +39,7 @@ async function scan(ctx, cfg) {
       log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
     } catch (err) {
       // try next configured path
-      log(err)
+      log(err.message)
       continue
     }
 
@@ -51,7 +51,7 @@ async function scan(ctx, cfg) {
         songId = await process(files[i])
       } catch(err) {
         // try next file
-        log(err)
+        log(err.message)
         continue
       }
 

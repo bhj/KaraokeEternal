@@ -22,7 +22,7 @@ router.get('/api/song/:songId', async (ctx, next) => {
       ctx.status = 404
     }
   } catch(err) {
-    log(err)
+    log(err.message)
     ctx.status = 500
     return ctx.body = err.message
   }

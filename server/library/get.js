@@ -31,7 +31,7 @@ async function getLibrary() {
       artists.entities[row.artistId].songIds = []
     })
   } catch(err) {
-    log(err)
+    log(err.message)
     return Promise.reject(err)
   }
 
@@ -55,7 +55,7 @@ async function getLibrary() {
       artists.entities[row.artistId].songIds.push(row.songId)
     })
   } catch(err) {
-    log(err)
+    log(err.message)
     return Promise.reject(err)
   }
 

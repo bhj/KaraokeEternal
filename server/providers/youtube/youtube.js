@@ -61,7 +61,7 @@ async function process(song) {
       return Promise.resolve(res.result[0])
     }
   } catch(err) {
-    log(err)
+    log(err.message)
     return Promise.reject(err)
   }
 
@@ -82,7 +82,7 @@ async function process(song) {
     stats.new++
     return Promise.resolve(songId)
   } catch(err) {
-    log(err)
+    log(err.message)
     stats.error++
     return Promise.reject(err)
   }
