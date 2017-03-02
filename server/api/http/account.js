@@ -1,5 +1,5 @@
 const db = require('sqlite')
-const jwt = require('koa-jwt')
+const jwtSign = require('jsonwebtoken').sign
 const bcrypt = require('../../thunks/bcrypt')
 const KoaRouter = require('koa-router')
 const router = KoaRouter()
@@ -43,7 +43,7 @@ router.post('/api/account/login', async (ctx, next) => {
   user.roomId = room.roomId
   user.isAdmin = (user.isAdmin === 1)
 
-  let token = jwt.sign(user, 'shared-secret')
+  const token = jwtSign(user, 'shared-secret')
 
   // client also persists this to localStorage
   ctx.body = { user, token }
@@ -159,7 +159,7 @@ router.post('/api/account/update', async (ctx, next) => {
   user.roomId = ctx.state.user.roomId
 
   // generate new JWT
-  let token = jwt.sign(user, 'shared-secret')
+  let token = jwtSign(user, 'shared-secret')
 
   // store JWT in httpOnly cookie
   // ctx.cookies.set('id_token', token, {httpOnly: true})

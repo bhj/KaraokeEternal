@@ -27,10 +27,10 @@ app.use(convert(koaRange))
 app.use(koaBodyparser())
 
 // decode jwt and make available as ctx.user
-app.use(convert(koaJwt({
+app.use(koaJwt({
   secret: 'shared-secret',
   passthrough: true,
-})))
+}))
 
 // initialize each module's koa-router routes
 for (let route in apiRoutes) {

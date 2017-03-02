@@ -1,4 +1,4 @@
-const KoaJwt = require('koa-jwt') // really from jsonwebtoken
+const jwtVerify = require('jsonwebtoken').verify
 const debug = require('debug')('app:socket:auth')
 
 const Queue = require('./queue')
@@ -24,7 +24,7 @@ const ACTION_HANDLERS = {
     let user
 
     try {
-      user = KoaJwt.verify(payload, 'shared-secret')
+      user = jwtVerify(payload, 'shared-secret')
     } catch (err) {
       // callback with truthy error msg
       ctx.acknowledge(err.message)
