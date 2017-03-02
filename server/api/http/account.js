@@ -1,18 +1,32 @@
 const db = require('sqlite')
+const squel = require('squel')
 const jwtSign = require('jsonwebtoken').sign
 const bcrypt = require('../../thunks/bcrypt')
 const KoaRouter = require('koa-router')
 const router = KoaRouter()
+const debug = require('debug')
+const log = debug('app:account')
 
 // list available rooms
 router.get('/api/account/rooms', async (ctx, next) => {
-  let rooms = await db.all('SELECT * FROM rooms WHERE status = ?', 'open')
-  return ctx.body = rooms
+  const q = squel.select()
+    .from('rooms')
+    .where('status = ?', 'open')
+
+  try {
+    const { text, values } = q.toParam()
+    ctx.body = await db.all(text, values)
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
+  }
 })
 
 // login
 router.post('/api/account/login', async (ctx, next) => {
-  let {email, password, roomId} = ctx.request.body
+  const { email, password, roomId } = ctx.request.body
+  let user
 
   // check presence of all fields
   if (!email || !password || !roomId) {
@@ -20,32 +34,51 @@ router.post('/api/account/login', async (ctx, next) => {
     return ctx.body = 'Email, password, and room are required'
   }
 
-  email = email.trim().toLowerCase()
-
   // get user
-  let user = await db.get('SELECT * FROM users WHERE email = ?', email)
+  try {
+    const q = squel.select()
+      .from('users')
+      .where('email = ?', email.trim().toLowerCase())
+
+    const { text, values } = q.toParam()
+    user = await db.get(text, values)
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
+  }
 
   // validate password
   if (!user || !await bcrypt.compare(password, user.password)) {
-    ctx.status = 401
-    return
+    return ctx.status = 401
   }
 
   // validate roomId
-  let room = await db.get('SELECT * FROM rooms WHERE roomId = ?', roomId)
+  try {
+    const q = squel.select()
+      .from('rooms')
+      .where('roomId = ?', roomId)
 
-  if (!room || room.status !== 'open') {
-    ctx.status = 401
-    return ctx.body = 'Invalid Room'
+    const { text, values } = q.toParam()
+    const row = await db.get(text, values)
+
+    if (!row || row.status !== 'open') {
+      ctx.status = 401
+      return ctx.body = 'Invalid Room'
+    }
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
   }
 
   delete user.password
-  user.roomId = room.roomId
+  user.roomId = roomId
   user.isAdmin = (user.isAdmin === 1)
 
   const token = jwtSign(user, 'shared-secret')
 
-  // client also persists this to localStorage
+  // client saves this to localStorage
   ctx.body = { user, token }
 })
 
@@ -75,9 +108,20 @@ router.post('/api/account/create', async (ctx, next) => {
   }
 
   // check for duplicate email
-  if (await db.get('SELECT * FROM users WHERE email = ?', email)) {
-    ctx.status = 401
-    return ctx.body = 'Email address is already registered'
+  try {
+    const q = squel.select()
+      .from('users')
+      .where('email = ?', email)
+
+    const { text, values } = q.toParam()
+
+    if (await db.get(text, values)) {
+      ctx.status = 401
+      return ctx.body = 'Email address is already registered'
+    }
+  } catch(err) {
+    log(err.message)
+    return Promise.reject(err)
   }
 
   // check that passwords match
@@ -86,27 +130,70 @@ router.post('/api/account/create', async (ctx, next) => {
     return ctx.body = 'Passwords do not match'
   }
 
-  let hashedPwd = await bcrypt.hash(newPassword, 10)
-  let res = await db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', email, hashedPwd, name)
+  // hash new password
+  let hashedPwd
+  try {
+    hashedPwd = await bcrypt.hash(newPassword, 10)
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
+  }
+
+  // insert user row
+  try {
+    const q = squel.insert()
+      .into('users')
+      .set('email', email)
+      .set('password', hashedPwd)
+      .set('name', name)
+
+    const { text, values } = q.toParam()
+    const res = await db.run(text, values)
+
+    if (res.changes !== 1) {
+      throw new Error('insert failed')
+    }
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
+  }
+
+  // @todo: send user creds (log in automatically)
   ctx.status = 200
 })
 
 // update
 router.post('/api/account/update', async (ctx, next) => {
+  let user
+
   // check jwt validity
   if (!ctx.state.user) {
     ctx.status = 401
     return ctx.body = 'Invalid token'
   }
 
-  let user = await db.get('SELECT * FROM users WHERE userId = ?', ctx.state.user.userId)
+  // find user by id (from token)
+  try {
+    const q = squel.select()
+      .from('users')
+      .where('userId = ?', ctx.state.user.userId)
+
+    const { text, values } = q.toParam()
+    user = await db.get(text, values)
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
+  }
 
   if (!user) {
     ctx.status = 401
     return ctx.body = 'Invalid user id'
   }
 
-  let {name, email, password, newPassword, newPasswordConfirm} = ctx.request.body
+  let { name, email, password, newPassword, newPasswordConfirm } = ctx.request.body
 
   name = name.trim()
   email = email.trim().toLowerCase()
@@ -130,7 +217,13 @@ router.post('/api/account/update', async (ctx, next) => {
       return ctx.body = 'New passwords do not match'
     }
 
-    password = await bcrypt.hash(newPassword, 10)
+    try {
+      password = await bcrypt.hash(newPassword, 10)
+    } catch(err) {
+      log(err.message)
+      ctx.status = 500
+      return Promise.reject(err)
+    }
   } else {
     password = user.password
   }
@@ -142,30 +235,65 @@ router.post('/api/account/update', async (ctx, next) => {
   }
 
   // check for duplicate email
-  if (await db.get('SELECT * FROM users WHERE userId != ? AND email = ? COLLATE NOCASE ',
-      ctx.state.user.userId, email)) {
-    ctx.status = 401
-    return ctx.body = 'Email address is already registered'
+  try {
+    const q = squel.select()
+      .from('users')
+      .where('userId != ?', ctx.state.user.userId)
+      .where('email = ? COLLATE NOCASE', email)
+
+    const { text, values } = q.toParam()
+
+    if (await db.get(text, values)) {
+      ctx.status = 401
+      return ctx.body = 'Email address is already registered'
+    }
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
   }
 
-  // do update
-  let res = await db.run('UPDATE users SET name = ?, email = ?, password = ? WHERE userId = ?',
-    name, email, password, ctx.state.user.userId)
+  // do update!
+  try {
+    const q = squel.update()
+      .table('users')
+      .where('userId = ?', ctx.state.user.userId)
+      .set('name', name)
+      .set('email', email)
+      .set('password', password)
+
+    const { text, values } = q.toParam()
+    await db.run(text, values)
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
+  }
 
   // return user (shape should match /login)
-  user = await db.get('SELECT * FROM users WHERE email = ?', email)
+  try {
+    const q = squel.select()
+      .from('users')
+      .where('email = ?', email)
+
+    const { text, values } = q.toParam()
+    user = await db.get(text, values)
+    if (!user) throw new Error('couldn\'t get updated user')
+  } catch(err) {
+    log(err.message)
+    ctx.status = 500
+    return Promise.reject(err)
+  }
 
   delete user.password
   user.roomId = ctx.state.user.roomId
+  user.isAdmin = (user.isAdmin === 1)
 
   // generate new JWT
-  let token = jwtSign(user, 'shared-secret')
+  const token = jwtSign(user, 'shared-secret')
 
-  // store JWT in httpOnly cookie
-  // ctx.cookies.set('id_token', token, {httpOnly: true})
-
-  // client also persists this to localStorage
-  ctx.body = user
+  // client saves this to localStorage
+  ctx.body = { user, token }
 })
 
 module.exports = router

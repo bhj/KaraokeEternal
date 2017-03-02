@@ -383,7 +383,8 @@ const ACTION_HANDLERS = {
   [UPDATE_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    user: payload,
+    user: payload.user,
+    token: payload.token,
   }),
   [UPDATE_FAIL]: (state, {payload}) => ({
     ...state,
