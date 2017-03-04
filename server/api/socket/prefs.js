@@ -59,4 +59,5 @@ async function getPrefs(domain) {
 module.exports = {
   ACTION_HANDLERS,
   getPrefs,
+  PREFS_CHANGE,
 }
