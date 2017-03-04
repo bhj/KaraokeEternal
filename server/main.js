@@ -72,7 +72,7 @@ app._io.on('connection', async (sock) => {
   // send queue
   app._io.to(sock.id).emit('action', {
     type: Queue.QUEUE_CHANGE,
-    payload: await Queue.getQueue(),
+    payload: await Queue.getQueue(user.roomId),
   })
 
   // send app config if they're admin

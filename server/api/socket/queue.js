@@ -46,7 +46,7 @@ const ACTION_HANDLERS = {
     // tell room
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: QUEUE_CHANGE,
-      payload: await getQueue(ctx, ctx.user.roomId)
+      payload: await getQueue(ctx.user.roomId)
     })
   },
   [QUEUE_REMOVE]: async (ctx, {payload}) => {
@@ -105,12 +105,12 @@ const ACTION_HANDLERS = {
     // tell room
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: QUEUE_CHANGE,
-      payload: await getQueue(ctx, ctx.user.roomId)
+      payload: await getQueue(ctx.user.roomId)
     })
   },
 }
 
-async function getQueue(ctx, roomId) {
+async function getQueue(roomId) {
   let result = []
   let entities = {}
 
