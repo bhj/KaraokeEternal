@@ -6,12 +6,11 @@ const project = require('../config/project.config')
 const readFile = require('./thunks/readfile')
 
 const koa = require('koa')
-const IO = require('koa-socket')
 const convert = require('koa-convert')
 const serve = require('koa-static')
 const koaBodyparser = require('koa-bodyparser')
 const koaRange = require('koa-range')
-const koaSocketIO = require('koa-socket')
+const koaSocket = require('koa-socket')
 const koaLogger = require('koa-logger')
 const db = require('sqlite')
 const jwtVerify = require('jsonwebtoken').verify
@@ -24,7 +23,7 @@ const getLibrary = require('./library/get')
 const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
 
 const app = new koa()
-const io = new IO()
+const io = new koaSocket()
 
 app.use(koaLogger())
 app.use(convert(koaRange))
