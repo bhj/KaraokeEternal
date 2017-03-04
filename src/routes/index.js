@@ -12,11 +12,6 @@ import QueueRoute from './Queue'
 export const createRoutes = (store) => ({
   path: '/',
   getComponent (nextState, cb) {
-    // attempt socket.io connection if it looks like we had a valid session
-    if (store.getState().account.user) {
-      window._socket.open()
-    }
-
     cb(null, CoreLayout)
   },
   indexRoute: Home,

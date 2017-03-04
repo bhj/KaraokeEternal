@@ -2,6 +2,9 @@ import React, { PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
+import io from 'socket.io-client'
+// global socket.io client
+window._socket = io({autoConnect: false})
 
 // hack to disable double-tap zooming in iOS 10, see:
 // http://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
@@ -19,6 +22,11 @@ document.documentElement.addEventListener('touchend', event => {
 // ========================================================
 const initialState = window.___INITIAL_STATE__
 const store = createStore(initialState)
+
+// attempt socket.io connection if it looks like we have a valid session
+if (store.getState().account.user) {
+  window._socket.open()
+}
 
 // ========================================================
 // Render Setup

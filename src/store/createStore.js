@@ -6,9 +6,6 @@ import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
-import io from 'socket.io-client'
-// global socket.io client
-window._socket = io({autoConnect: false})
 
 export default (initialState = {}) => {
   // ======================================================
