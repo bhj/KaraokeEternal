@@ -108,7 +108,6 @@
     "koa": "^2.0.1",
     "koa-bodyparser": "^4.1.0",
     "koa-convert": "^1.2.0",
-    "koa-jwt": "^2.2.0",
     "koa-logger": "^2.0.1",
     "koa-range": "^0.3.0",
     "koa-router": "^7.1.0",
