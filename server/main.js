@@ -21,6 +21,7 @@ const Queue = require('./api/socket/queue')
 const Prefs = require('./api/socket/prefs')
 const getLibrary = require('./library/get')
 const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+const SOCKET_AUTH_ERROR = 'user/SOCKET_AUTH_ERROR'
 
 const app = new koa()
 const io = new koaSocket()
@@ -46,7 +47,12 @@ app._io.on('connection', async (sock) => {
     sock.decoded_token = jwtVerify(id_token, 'shared-secret')
     user = sock.decoded_token
   } catch (err) {
-    debug(err.message)
+      app._io.to(sock.id).emit('action', {
+        type: SOCKET_AUTH_ERROR,
+        payload: null,
+        error: err.message + ` (try signing in again)`
+      })
+
     sock.decoded_token = null
     sock.disconnect()
     return
