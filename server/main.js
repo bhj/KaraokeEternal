@@ -62,9 +62,10 @@ app._io.on('connection', async (sock) => {
   // join socket room
   if (user.roomId) {
     sock.join(user.roomId)
+    const room = sock.adapter.rooms[user.roomId] || {}
 
     debug('%s (%s) joined room %s (%s in room)',
-      user.name, sock.id, user.roomId, sock.adapter.rooms[user.roomId].length || 0
+      user.name, sock.id, user.roomId, room.length || 0
     )
   }
 
@@ -102,6 +103,17 @@ io.use(async (ctx, next) => {
 
 // koa-socket event listener
 io.on('action', socketActions)
+
+// log disconnect/leave
+io.on('disconnect', (ctx, data) => {
+  const user = ctx.user
+  const sock = ctx.socket.socket
+  const room = sock.adapter.rooms[user.roomId] || {}
+
+  debug('%s (%s) left room %s (%s in room)',
+    user.name, sock.id, user.roomId, room.length || 0
+  )
+})
 
 // ------------------------------------
 // Apply Webpack HMR Middleware
