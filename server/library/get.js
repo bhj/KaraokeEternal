@@ -39,7 +39,7 @@ async function getLibrary() {
   try {
     const q = squel.select()
       .from('songs')
-      .field('songId, artistId, title, duration, plays, provider')
+      .field('songId, artistId, title, duration, provider')
       .order('title')
 
     // log(q.toString())

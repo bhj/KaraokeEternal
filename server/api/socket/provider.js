@@ -1,4 +1,5 @@
 const db = require('sqlite')
+const squel = require('squel')
 const debug = require('debug')
 const Providers = require('../../providers')
 const getPrefs = require('./prefs').getPrefs
@@ -49,9 +50,20 @@ const ACTION_HANDLERS = {
     isScanning = false
     log('provider "%s" finished scan', payload)
 
-    // delete artists having no songs
-    res = await db.run('DELETE FROM artists WHERE artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)')
-    log('cleanup: removed %s artists with no songs', res.stmt.changes)
+    // cleanup: delete artists having no songs
+    try {
+      const q = squel.delete()
+        .from('artists')
+        .where('artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId))')
+        .where('songs.artistId = ?', null)
+
+        const { text, values } = q.toParam()
+        const res = await db.run(text, values)
+
+        log('cleanup: removed %s artists with no songs', res.stmt.changes)
+    } catch(err) {
+      log(err.message)
+    }
   },
 }
 

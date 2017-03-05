@@ -1,4 +1,5 @@
 const db = require('sqlite')
+const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:addSong')
 
@@ -12,8 +13,17 @@ async function addSong(song) {
   log('new song: %s', JSON.stringify({artist: song.artist, title: song.title, duration: song.duration}))
 
   // does the artist already exist?
-  let artistId
-  let row = await db.get('SELECT * FROM artists WHERE name = ?', song.artist)
+  let row
+  try {
+    const q = squel.select()
+      .from('artists')
+      .where('name = ?', song.artist)
+
+      const { text, values } = q.toParam()
+      row = await db.get(text, values)
+    } catch(err) {
+    return Promise.reject(err)
+  }
 
   if (row) {
     log('matched artist: %s', row.name)
@@ -22,7 +32,17 @@ async function addSong(song) {
     log('new artist: %s', song.artist)
 
     try {
-      let res = await db.run('INSERT INTO artists(name) VALUES (?)', song.artist)
+      const q = squel.insert()
+        .into('artists')
+        .set('name', song.artist)
+
+      const { text, values } = q.toParam()
+      const res = await db.run(text, values)
+
+      if (!Number.isInteger(res.stmt.lastID)) {
+        throw new Error('invalid lastID after artist insert')
+      }
+
       song.artistId = res.stmt.lastID
     } catch(err) {
       return Promise.reject(err)
@@ -34,20 +54,23 @@ async function addSong(song) {
     artistId: song.artistId,
     title: song.title,
     duration: song.duration,
-    plays: 0,
     provider: song.provider,
     provider_json: typeof song.meta === 'object' ? JSON.stringify(song.meta) : {},
   }
 
   try {
-    const cols = Object.keys(data)
-    const vals = cols.map(i => data[i])
-    const placeholders = '?,'.repeat(cols.length-1) + '?'
+    const q = squel.insert()
+      .into('songs')
 
-    let res = await db.run(`INSERT INTO songs(${cols}) VALUES (${placeholders})`, vals)
+    Object.keys(data).forEach(key => {
+      q.set(key, data[key])
+    })
+
+    const { text, values } = q.toParam()
+    const res = await db.run(text, values)
 
     if (!Number.isInteger(res.stmt.lastID)) {
-      throw new Error('got invalid lastID')
+      throw new Error('got invalid lastID after song insert')
     }
 
     return Promise.resolve(res.stmt.lastID)

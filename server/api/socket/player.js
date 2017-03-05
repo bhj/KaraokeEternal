@@ -1,4 +1,6 @@
 const db = require('sqlite')
+const squel = require('squel')
+const log = require('debug')('app:socket:player')
 
 const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
 const PLAYER_NEXT = 'player/PLAYER_NEXT'
@@ -22,8 +24,22 @@ const PLAYBACK_ERROR = 'status/PLAYBACK_ERROR'
 const ACTION_HANDLERS = {
   [PLAYER_NEXT_REQUEST]: async (ctx, {payload}) => {
     // get next-highest queue item id
-    // @todo try/catch
-    let item = await db.get('SELECT * FROM queue JOIN songs USING(songId) WHERE roomId = ? AND queueId > ? LIMIT 1', ctx.user.roomId, payload)
+    let item
+
+    try {
+      const q = squel.select()
+        .from('queue')
+        .join('songs USING(songId)')
+        .where('roomId = ?', ctx.user.roomId)
+        .where('queueId > ?', payload)
+        .limit(1)
+
+      const { text, values } = q.toParam()
+      item = await db.get(text, values)
+    } catch(err) {
+      log(err.message)
+      return Promise.reject(err)
+    }
 
     if (!item) {
       // we're already on the last queued item

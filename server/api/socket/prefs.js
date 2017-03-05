@@ -1,4 +1,5 @@
 const db = require('sqlite')
+const squel = require('squel')
 const log = require('debug')('app:socket:prefs')
 
 const PREFS_CHANGE_REQUEST = 'server/PREFS_CHANGE'
@@ -11,9 +12,13 @@ const ACTION_HANDLERS = {
     }
 
     try {
-      let res = await db.run('UPDATE prefs SET data = ? WHERE domain = ?',
-        JSON.stringify(payload.data), payload.domain
-      )
+      const q = squel.update()
+        .table('prefs')
+        .set('data = ?', JSON.stringify(payload.data))
+        .where('domain = ?', payload.domain)
+
+      const { text, values } = q.toParam()
+      await db.run(text, values)
     } catch(err) {
       return Promise.reject(err)
     }
@@ -29,17 +34,20 @@ async function getPrefs(domain) {
   let res
 
   try {
+    const q = squel.select()
+      .from('prefs')
+
     if (domain) {
-      res = await db.all('SELECT * FROM prefs WHERE domain = ?', domain)
-    } else {
-      res = await db.all('SELECT * FROM prefs')
+      q.where('domain = ?', domain)
+    }
+    const { text, values } = q.toParam()
+    res = await db.all(text, values)
+
+    if (!res.length) {
+      throw new Error('no prefs for domain: '+domain)
     }
   } catch(err) {
     return Promise.reject(err)
-  }
-
-  if (!res.length) {
-    return Promise.reject(new Error('no prefs for domain: '+domain))
   }
 
   if (domain) {

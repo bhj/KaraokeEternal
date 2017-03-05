@@ -1,4 +1,3 @@
-const db = require('sqlite')
 const getFiles = require('../../thunks/getFiles')
 const hashfiles = require('../../thunks/hashfiles')
 const musicmetadata = require('../../thunks/musicmetadata')
@@ -87,26 +86,33 @@ async function scan(ctx, cfg) {
 
 async function resource(ctx, cfg) {
   const { type, songId } = ctx.query
-  let song, file, stats
+  let file, stats
 
   if (! type || ! songId) {
     ctx.status = 422
     return ctx.body = "Missing 'type' or 'songId' in url"
   }
 
-  song = await db.get("SELECT json_extract(provider_json, '$.path') AS path FROM songs WHERE songId = ?", songId)
+  // get song from db
+  try {
+    const res = await searchLibrary({ songId })
 
-  if (! song) {
-    ctx.status = 404
-    return ctx.body = `songId not found: ${songId}`
+    if (!res.result.length) {
+      ctx.status = 404
+      return ctx.body = `songId not found: ${songId}`
+    }
+
+    row = res.entities[res.result[0]]
+    // should be the audio file path
+    file = JSON.parse(row.provider_json).path
+  } catch(err) {
+    log(err.message)
+    return Promise.reject(err)
   }
 
-  if (type === 'audio') {
-    file = song.path
-    ctx.type = 'audio/mpeg'
-  } else if (type === 'cdg') {
-    let info = path.parse(song.path)
-    file = song.path.substr(0, song.path.length-info.ext.length)+'.cdg'
+  if (type === 'cdg') {
+    const info = path.parse(file)
+    file = file.substr(0, file.length - info.ext.length) + '.cdg'
   }
 
   // get file size (and does it exist?)
@@ -141,17 +147,23 @@ async function process(file){
 }
 
   // already in database with the same path and mtime?
-  res = await searchLibrary({
-    meta: {
-      path: file,
-      mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
-    }
-  })
+  try {
+    const res = await searchLibrary({
+      meta: {
+        path: file,
+        mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
+      }
+    })
 
-  if (res.result.length) {
-    log('song is in library (same path+mtime)')
-    counts.ok++
-    return Promise.resolve(res.result[0])
+    if (res.result.length) {
+      log('song is in library (same path/mtime)')
+      counts.ok++
+      return Promise.resolve(res.result[0])
+    }
+  } catch(err) {
+    log('skipping: %s', err.message)
+    counts.skipped++
+    return Promise.reject(err)
   }
 
   // need to hash the file(s)
