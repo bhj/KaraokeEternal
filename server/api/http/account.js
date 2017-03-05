@@ -76,15 +76,19 @@ router.post('/api/account/login', async (ctx, next) => {
   user.roomId = roomId
   user.isAdmin = (user.isAdmin === 1)
 
+  // set httpOnly cookie containing signed JWT
   const token = jwtSign(user, 'shared-secret')
+  ctx.cookies.set('id_token', token, {
+    httpOnly: true,
+  })
 
-  // client saves this to localStorage
-  ctx.body = { user, token }
+  // user JSON as response body
+  ctx.body = user
 })
 
 // logout
 router.get('/api/account/logout', async (ctx, next) => {
-  // doesn't do much...
+  ctx.cookies.set('id_token', '')
   ctx.status = 200
 })
 
@@ -140,7 +144,7 @@ router.post('/api/account/create', async (ctx, next) => {
     return Promise.reject(err)
   }
 
-  // insert user row
+  // insert user
   try {
     const q = squel.insert()
       .into('users')
@@ -293,7 +297,7 @@ router.post('/api/account/update', async (ctx, next) => {
   const token = jwtSign(user, 'shared-secret')
 
   // client saves this to localStorage
-  ctx.body = { user, token }
+  ctx.body = { user }
 })
 
 module.exports = router

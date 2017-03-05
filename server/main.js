@@ -6,31 +6,29 @@ const project = require('../config/project.config')
 const readFile = require('./thunks/readfile')
 
 const koa = require('koa')
-const IO = require('koa-socket')
 const convert = require('koa-convert')
-const serve  = require('koa-static')
-const koaBodyparser  = require('koa-bodyparser')
-const koaJwt = require('koa-jwt')
+const serve = require('koa-static')
+const koaBodyparser = require('koa-bodyparser')
 const koaRange = require('koa-range')
-const koaSocketIO = require('koa-socket')
+const koaSocket = require('koa-socket')
 const koaLogger = require('koa-logger')
 const db = require('sqlite')
+const jwtVerify = require('jsonwebtoken').verify
 
 const apiRoutes = require('./api/http')
 const socketActions = require('./api/socket')
+const Queue = require('./api/socket/queue')
+const Prefs = require('./api/socket/prefs')
+const getLibrary = require('./library/get')
+const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+const SOCKET_AUTH_ERROR = 'user/SOCKET_AUTH_ERROR'
 
 const app = new koa()
-const io = new IO()
+const io = new koaSocket()
 
 app.use(koaLogger())
 app.use(convert(koaRange))
 app.use(koaBodyparser())
-
-// decode jwt and make available as ctx.user
-app.use(koaJwt({
-  secret: 'shared-secret',
-  passthrough: true,
-}))
 
 // initialize each module's koa-router routes
 for (let route in apiRoutes) {
@@ -41,13 +39,63 @@ for (let route in apiRoutes) {
 // and the "real" socket.io instance as app._io
 io.attach(app)
 
+app._io.on('connection', async (sock) => {
+  const { id_token } = parseCookies(sock.handshake)
+  let user
+
+  try {
+    sock.decoded_token = jwtVerify(id_token, 'shared-secret')
+    user = sock.decoded_token
+  } catch (err) {
+      app._io.to(sock.id).emit('action', {
+        type: SOCKET_AUTH_ERROR,
+        payload: null,
+        error: err.message + ` (try signing in again)`
+      })
+
+    sock.decoded_token = null
+    sock.disconnect()
+    return
+  }
+
+  // authentication successful
+  // join socket room
+  if (user.roomId) {
+    sock.join(user.roomId)
+    const room = sock.adapter.rooms[user.roomId] || {}
+
+    debug('%s (%s) joined room %s (%s in room)',
+      user.name, sock.id, user.roomId, room.length || 0
+    )
+  }
+
+  // send library
+  app._io.to(sock.id).emit('action', {
+    type: LIBRARY_CHANGE,
+    payload: await getLibrary(),
+  })
+
+  // send queue
+  app._io.to(sock.id).emit('action', {
+    type: Queue.QUEUE_CHANGE,
+    payload: await Queue.getQueue(user.roomId),
+  })
+
+  // send app config if they're admin
+  if (user && user.isAdmin) {
+    app._io.to(sock.id).emit('action', {
+      type: Prefs.PREFS_CHANGE,
+      payload: await Prefs.getPrefs(),
+    })
+  }
+})
+
 // koa-socket middleware
+// makes user, db and socket.io instance available
+// to downstream middleware and event listeners
 // note: ctx is not the same ctx as koa middleware
 io.use(async (ctx, next) => {
-  // make user, db and socket.io instance available
-  // to downstream middleware and event listeners
   ctx.user = ctx.socket.socket.decoded_token || null
-  ctx.db = db
   ctx.io = app._io
 
   await next()
@@ -55,6 +103,17 @@ io.use(async (ctx, next) => {
 
 // koa-socket event listener
 io.on('action', socketActions)
+
+// log disconnect/leave
+io.on('disconnect', (ctx, data) => {
+  const user = ctx.user
+  const sock = ctx.socket.socket
+  const room = sock.adapter.rooms[user.roomId] || {}
+
+  debug('%s (%s) left room %s (%s in room)',
+    user.name, sock.id, user.roomId, room.length || 0
+  )
+})
 
 // ------------------------------------
 // Apply Webpack HMR Middleware
@@ -112,3 +171,17 @@ if (project.env === 'development') {
 }
 
 module.exports = app
+
+// cookie helper from
+// http://stackoverflow.com/questions/3393854/get-and-set-a-single-cookie-with-node-js-http-server
+function parseCookies(request) {
+  const list = {}
+  const rc = request.headers.cookie
+
+  rc && rc.split(';').forEach(cookie => {
+      const parts = cookie.split('=')
+      list[parts.shift().trim()] = decodeURI(parts.join('='))
+  })
+
+  return list
+}

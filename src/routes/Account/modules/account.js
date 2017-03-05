@@ -30,14 +30,15 @@ function loginError(message) {
   }
 }
 
-// Calls the API to get a token (stored in httpOnly cookie)
-// and connects to the socket with said cookie
+// calls api endpoint that should set our JWT in an httpOnly cookie;
+// we then establish the sockiet.io connection with said cookie
 export function loginUser(data) {
   return (dispatch, getState) => {
     dispatch(requestLogin(data))
 
     return fetch('/api/account/login', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
@@ -46,11 +47,12 @@ export function loginUser(data) {
       .then(checkStatus)
       .then(res => res.json())
       .then(res => {
+        // cache the user object as returned in the response body
         dispatch(receiveLogin(res))
-        dispatch(authenticateSocket(res.token))
+        localStorage.setItem('user', JSON.stringify(res))
 
-        localStorage.setItem('user', JSON.stringify(res.user))
-        localStorage.setItem('token', res.token)
+        // socket handshake should contain httpOnly cookie with JWT
+        window._socket.open()
 
         // check for redirect in query string
         let loc = getState().location
@@ -78,29 +80,6 @@ function parseQuery(qstr) {
   }
   return query
 }
-
-// ------------------------------------
-// socket.io authentication
-// ------------------------------------
-const SOCKET_AUTHENTICATE = 'server/SOCKET_AUTHENTICATE'
-const SOCKET_AUTHENTICATE_SUCCESS = 'account/SOCKET_AUTHENTICATE_SUCCESS'
-
-export function authenticateSocket(token) {
-  return {
-    type: SOCKET_AUTHENTICATE,
-    payload: token,
-  }
-}
-
-const SOCKET_DEAUTHENTICATE = 'server/SOCKET_DEAUTHENTICATE'
-
-export function deauthenticateSocket() {
-  return {
-    type: SOCKET_DEAUTHENTICATE,
-    payload: null,
-  }
-}
-
 
 // ------------------------------------
 // Logout
@@ -137,12 +116,11 @@ export function logoutUser() {
     dispatch(requestLogout())
 
     return fetch('/api/account/logout', {
-      headers: new Headers({
-        'Authorization': 'Bearer ' + getState().account.token,
-      }),
+      credentials: 'same-origin',
     })
     .then(checkStatus)
     .then(response => {
+      // should clear cookie field containing JWT
       dispatch(receiveLogout())
     })
     .catch(err => {
@@ -150,9 +128,10 @@ export function logoutUser() {
     })
     .then(() => {
       // regardless of the server response; we tried!
-      dispatch(deauthenticateSocket())
       localStorage.removeItem('user')
-      localStorage.removeItem('token')
+
+      // disconnect socket
+      window._socket.close()
     })
   }
 }
@@ -343,8 +322,7 @@ const ACTION_HANDLERS = {
   [LOGIN_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    user: payload.user,
-    token: payload.token,
+    user: payload,
   }),
   [LOGIN_FAIL]: (state, {payload}) => ({
     ...state,
@@ -358,7 +336,6 @@ const ACTION_HANDLERS = {
     ...state,
     isFetching: false,
     user: null,
-    token: null,
   }),
   [LOGOUT_FAIL]: (state, {payload}) => ({
     ...state,
@@ -383,8 +360,7 @@ const ACTION_HANDLERS = {
   [UPDATE_SUCCESS]: (state, {payload}) => ({
     ...state,
     isFetching: false,
-    user: payload.user,
-    token: payload.token,
+    user: payload,
   }),
   [UPDATE_FAIL]: (state, {payload}) => ({
     ...state,
@@ -407,22 +383,12 @@ const ACTION_HANDLERS = {
     ...state,
     viewMode: payload,
   }),
-  [SOCKET_AUTHENTICATE_SUCCESS]: (state, {payload}) => ({
-    ...state,
-    user: payload,
-  }),
-  [SOCKET_DEAUTHENTICATE]: (state, {payload}) => ({
-    ...state,
-    user: null,
-    token: null,
-  }),
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 let initialState = {
-  token: localStorage.getItem('token'),
   user: JSON.parse(localStorage.getItem('user')),
   isFetching: false,
   rooms: [],

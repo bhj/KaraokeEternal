@@ -30,7 +30,7 @@ export default class Login extends Component {
     const creds = {
       email: this.refs.email.value,
       password: this.refs.password.value,
-      roomId: this.refs.room.value
+      roomId: parseInt(this.refs.room.value, 10),
     }
 
     this.props.onSubmitClick(creds)

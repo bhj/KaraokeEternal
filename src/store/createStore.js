@@ -7,7 +7,7 @@ import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
 
-export default (initialState = {}, socket) => {
+export default (initialState = {}) => {
   // ======================================================
   // Middleware Configuration
   // ======================================================
@@ -16,7 +16,8 @@ export default (initialState = {}, socket) => {
     leading: true,
     trailing: true
   })
-  const socketMiddleware = createSocketMiddleware(socket, "server/")
+
+  const socketMiddleware = createSocketMiddleware(window._socket, "server/")
 
   const middleware = [thunk, throttle, socketMiddleware]
 
