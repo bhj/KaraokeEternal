@@ -30,6 +30,19 @@ app.use(koaLogger())
 app.use(convert(koaRange))
 app.use(koaBodyparser())
 
+// make JWT data available on koa context
+app.use(async (ctx, next) => {
+  const { id_token } = parseCookie(ctx.request.header.cookie)
+
+  try {
+    ctx.user = jwtVerify(id_token, 'shared-secret')
+  } catch(err) {
+    ctx.user = null
+  }
+
+  await next()
+})
+
 // initialize each module's koa-router routes
 for (let route in apiRoutes) {
   app.use(apiRoutes[route].routes())
@@ -40,7 +53,7 @@ for (let route in apiRoutes) {
 io.attach(app)
 
 app._io.on('connection', async (sock) => {
-  const { id_token } = parseCookies(sock.handshake)
+  const { id_token } = parseCookie(sock.handshake.headers.cookie)
   let user
 
   try {
@@ -172,14 +185,13 @@ if (project.env === 'development') {
 
 module.exports = app
 
-// cookie helper from
+// cookie helper based on
 // http://stackoverflow.com/questions/3393854/get-and-set-a-single-cookie-with-node-js-http-server
-function parseCookies(request) {
+function parseCookie(cookie) {
   const list = {}
-  const rc = request.headers.cookie
 
-  rc && rc.split(';').forEach(cookie => {
-      const parts = cookie.split('=')
+  cookie && cookie.split(';').forEach(c => {
+      const parts = c.split('=')
       list[parts.shift().trim()] = decodeURI(parts.join('='))
   })
 
