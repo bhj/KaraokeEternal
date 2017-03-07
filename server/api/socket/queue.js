@@ -1,5 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
+const log = require('debug')('app:socket:queue')
 
 const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
 const QUEUE_END = 'queue/QUEUE_END'
@@ -16,22 +17,16 @@ const ACTION_HANDLERS = {
     const socketId = ctx.socket.socket.id
 
     // is room open?
-    let room
     try {
-      const q = squel.select()
-        .from('rooms')
-        .where('roomId = ?', ctx.user.roomId)
-
-      const { text, values } = q.toParam()
-      room = await db.get(text, values)
+      if (!await _isRoomOpen(ctx.user.roomId)) {
+        // callback with truthy error msg
+        ctx.acknowledge('Room is no longer open')
+        return
+      }
     } catch(err) {
-      return Promise.reject(err)
-    }
-
-    if (!room || room.status !== 'open') {
       // callback with truthy error msg
-      ctx.acknowledge('Room is no longer open')
-      return
+      ctx.acknowledge(err.message)
+      return Promise.reject(err)
     }
 
     // verify song exists
@@ -89,10 +84,17 @@ const ACTION_HANDLERS = {
     const queueId = payload
     let item, nextItem
 
-    if (!await _roomIsOpen(ctx, ctx.user.roomId)) {
+    // is room open?
+    try {
+      if (!await _isRoomOpen(ctx.user.roomId)) {
+        // callback with truthy error msg
+        ctx.acknowledge('Room is no longer open')
+        return
+      }
+    } catch(err) {
       // callback with truthy error msg
-      ctx.acknowledge('Room is no longer open')
-      return
+      ctx.acknowledge(err.message)
+      return Promise.reject(err)
     }
 
     // verify item exists
@@ -221,6 +223,22 @@ async function getQueue(roomId) {
   })
 
   return { result, entities }
+}
+
+async function _isRoomOpen(roomId) {
+  try {
+    const q = squel.select()
+      .from('rooms')
+      .where('roomId = ?', roomId)
+
+    const { text, values } = q.toParam()
+    const room = await db.get(text, values)
+
+    return (room && room.status === 'open')
+  } catch(err) {
+    log(err)
+    return Promise.reject(err)
+  }
 }
 
 module.exports = {
