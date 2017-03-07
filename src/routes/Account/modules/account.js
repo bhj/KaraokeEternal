@@ -223,9 +223,9 @@ export function updateUser(data) {
 
     return fetch('/api/account/update', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: new Headers({
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getState().account.token,
         }),
         body: JSON.stringify(data)
       })
