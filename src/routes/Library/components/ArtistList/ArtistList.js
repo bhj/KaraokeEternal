@@ -58,7 +58,7 @@ class ArtistList extends React.Component {
         name={artist.name}
         isExpanded={expandedArtists.indexOf(artist.artistId) !== -1}
         onArtistClick={() => this.handleArtistClick(artist.artistId)}
-        onSongClick={this.handleSongClick}
+        onSongClick={this.props.queueSong}
         key={key}
         style={style}
       />
@@ -81,10 +81,6 @@ class ArtistList extends React.Component {
 
     this.ref.recomputeRowHeights()
     this.ref.forceUpdate()
-  }
-
-  handleSongClick = (songId) => {
-    this.props.queueSong(songId)
   }
 
   handleScroll = ({ scrollTop }) => {
