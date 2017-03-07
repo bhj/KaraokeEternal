@@ -26,64 +26,14 @@ router.get('/api/account/rooms', async (ctx, next) => {
 // login
 router.post('/api/account/login', async (ctx, next) => {
   const { email, password, roomId } = ctx.request.body
-  let user
 
-  // check presence of all fields
-  if (!email || !password || !roomId) {
-    ctx.status = 422
-    return ctx.body = 'Email, password, and room are required'
-  }
-
-  // get user
   try {
-    const q = squel.select()
-      .from('users')
-      .where('email = ?', email.trim().toLowerCase())
-
-    const { text, values } = q.toParam()
-    user = await db.get(text, values)
+    await _login(ctx, ctx.request.body)
   } catch(err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
   }
-
-  // validate password
-  if (!user || !await bcrypt.compare(password, user.password)) {
-    return ctx.status = 401
-  }
-
-  // validate roomId
-  try {
-    const q = squel.select()
-      .from('rooms')
-      .where('roomId = ?', roomId)
-
-    const { text, values } = q.toParam()
-    const row = await db.get(text, values)
-
-    if (!row || row.status !== 'open') {
-      ctx.status = 401
-      return ctx.body = 'Invalid Room'
-    }
-  } catch(err) {
-    log(err.message)
-    ctx.status = 500
-    return Promise.reject(err)
-  }
-
-  delete user.password
-  user.roomId = roomId
-  user.isAdmin = (user.isAdmin === 1)
-
-  // set httpOnly cookie containing signed JWT
-  const token = jwtSign(user, 'shared-secret')
-  ctx.cookies.set('id_token', token, {
-    httpOnly: true,
-  })
-
-  // user JSON as response body
-  ctx.body = user
 })
 
 // logout
@@ -94,13 +44,13 @@ router.get('/api/account/logout', async (ctx, next) => {
 
 // create
 router.post('/api/account/create', async (ctx, next) => {
-  let {name, email, newPassword, newPasswordConfirm} = ctx.request.body
+  let {name, email, password, passwordConfirm} = ctx.request.body
 
   name = name.trim()
   email = email.trim().toLowerCase()
 
   // check presence of all fields
-  if (!name || !email || !newPassword || !newPasswordConfirm) {
+  if (!name || !email || !password || !passwordConfirm) {
     ctx.status = 422
     return ctx.body = 'All fields are required'
   }
@@ -129,7 +79,7 @@ router.post('/api/account/create', async (ctx, next) => {
   }
 
   // check that passwords match
-  if (newPassword !== newPasswordConfirm) {
+  if (password !== passwordConfirm) {
     ctx.status = 422
     return ctx.body = 'Passwords do not match'
   }
@@ -137,7 +87,7 @@ router.post('/api/account/create', async (ctx, next) => {
   // hash new password
   let hashedPwd
   try {
-    hashedPwd = await bcrypt.hash(newPassword, 10)
+    hashedPwd = await bcrypt.hash(password, 10)
   } catch(err) {
     log(err.message)
     ctx.status = 500
@@ -164,7 +114,6 @@ router.post('/api/account/create', async (ctx, next) => {
     return Promise.reject(err)
   }
 
-  // @todo: send user creds (log in automatically)
   ctx.status = 200
 })
 
@@ -173,7 +122,7 @@ router.post('/api/account/update', async (ctx, next) => {
   let user
 
   // check jwt validity
-  if (!ctx.state.user) {
+  if (!ctx.user) {
     ctx.status = 401
     return ctx.body = 'Invalid token'
   }
@@ -182,7 +131,7 @@ router.post('/api/account/update', async (ctx, next) => {
   try {
     const q = squel.select()
       .from('users')
-      .where('userId = ?', ctx.state.user.userId)
+      .where('userId = ?', ctx.user.userId)
 
     const { text, values } = q.toParam()
     user = await db.get(text, values)
@@ -242,7 +191,7 @@ router.post('/api/account/update', async (ctx, next) => {
   try {
     const q = squel.select()
       .from('users')
-      .where('userId != ?', ctx.state.user.userId)
+      .where('userId != ?', ctx.user.userId)
       .where('email = ? COLLATE NOCASE', email)
 
     const { text, values } = q.toParam()
@@ -261,7 +210,7 @@ router.post('/api/account/update', async (ctx, next) => {
   try {
     const q = squel.update()
       .table('users')
-      .where('userId = ?', ctx.state.user.userId)
+      .where('userId = ?', ctx.user.userId)
       .set('name', name)
       .set('email', email)
       .set('password', password)
@@ -290,7 +239,7 @@ router.post('/api/account/update', async (ctx, next) => {
   }
 
   delete user.password
-  user.roomId = ctx.state.user.roomId
+  user.roomId = ctx.user.roomId
   user.isAdmin = (user.isAdmin === 1)
 
   // generate new JWT
@@ -301,6 +250,74 @@ router.post('/api/account/update', async (ctx, next) => {
 })
 
 module.exports = router
+
+
+async function _login(ctx, creds) {
+  const { email, password, roomId } = creds
+
+  // check presence of all fields
+  if (!email || !password || !roomId) {
+    ctx.status = 422
+    return ctx.body = 'Email, password, and room are required'
+  }
+
+  // get user
+  let user
+  try {
+    const q = squel.select()
+      .from('users')
+      .where('email = ?', email.trim().toLowerCase())
+
+    const { text, values } = q.toParam()
+    user = await db.get(text, values)
+
+    if (!user) {
+      ctx.status = 401
+      return
+    }
+  } catch(err) {
+    return Promise.reject(err)
+  }
+
+  // validate password
+  if (!await bcrypt.compare(password, user.password)) {
+    ctx.status = 401
+    return
+  }
+
+  // validate roomId
+  try {
+    const q = squel.select()
+      .from('rooms')
+      .where('roomId = ?', roomId)
+
+    const { text, values } = q.toParam()
+    const row = await db.get(text, values)
+
+    if (!row || row.status !== 'open') {
+      ctx.status = 401
+      return ctx.body = 'Invalid Room'
+    }
+  } catch(err) {
+    return Promise.reject(err)
+  }
+
+  delete user.password
+  user.roomId = roomId
+  user.isAdmin = (user.isAdmin === 1)
+
+  // encrypt JWT
+  const token = jwtSign(user, 'shared-secret')
+
+  // set httpOnly cookie containing JWT
+  ctx.cookies.set('id_token', token, {
+    httpOnly: true,
+  })
+
+  // user JSON as response body
+  ctx.body = user
+  return Promise.resolve()
+}
 
 // email validation helper from
 // http://www.moreofless.co.uk/validate-email-address-without-regex/
