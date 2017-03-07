@@ -38,8 +38,11 @@ async function getLibrary() {
   // get all songs
   try {
     const q = squel.select()
-      .from('songs')
       .field('songId, artistId, title, duration, provider')
+      .field('COUNT(stars.userId) AS stars')
+      .from('songs')
+      .left_join('stars USING(songId)')
+      .group('songId')
       .order('title')
 
     // log(q.toString())
