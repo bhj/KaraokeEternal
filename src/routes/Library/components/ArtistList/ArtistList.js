@@ -78,9 +78,6 @@ class ArtistList extends React.Component {
 
   handleArtistClick = (artistId) => {
     this.props.toggleArtistExpanded(artistId)
-
-    this.ref.recomputeRowHeights()
-    this.ref.forceUpdate()
   }
 
   handleScroll = ({ scrollTop }) => {
