@@ -1,5 +1,5 @@
 import AccountView from './containers/AccountView'
-import { fetchRooms } from './modules/account'
+import { fetchRooms } from 'store/modules/user'
 
 // route definition
 export default function(store){

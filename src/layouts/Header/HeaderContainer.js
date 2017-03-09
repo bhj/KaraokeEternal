@@ -8,7 +8,7 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    isAdmin: state.account.user && state.account.user.isAdmin,
+    isAdmin: state.user.user && state.user.user.isAdmin,
   }
 }
 

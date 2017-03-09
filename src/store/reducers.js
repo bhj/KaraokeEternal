@@ -6,7 +6,7 @@ import { createResponsiveStateReducer } from 'redux-responsive'
 import location from './modules/location'
 import ui from './modules/ui'
 import status from './modules/status'
-import account from 'routes/Account/modules/account'
+import user from './modules/user'
 import library from 'routes/Library/modules/library'
 import queue from 'routes/Queue/modules/queue'
 
@@ -21,8 +21,8 @@ export const makeRootReducer = (asyncReducers) => {
     location,
     ui,
     status,
-    account,
     library,
+    user,
     queue: optimistic(queue),
     ...asyncReducers
   })

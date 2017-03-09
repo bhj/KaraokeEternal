@@ -49,7 +49,8 @@ export function loginUser(data) {
       .then(res => {
         // cache the user object as returned in the response body
         dispatch(receiveLogin(res))
-        localStorage.setItem('user', JSON.stringify(res))
+        localStorage.setItem('user', JSON.stringify(res.user))
+        localStorage.setItem('starredSongs', JSON.stringify(res.starredSongs))
 
         // socket handshake should contain httpOnly cookie with JWT
         window._socket.open()
@@ -298,6 +299,19 @@ export function changeView(mode) {
   }
 }
 
+// ------------------------------------
+// Star/Unstar song
+// ------------------------------------
+const TOGGLE_SONG_STARRED = 'server/TOGGLE_SONG_STARRED'
+
+export function toggleSongStarred(songId) {
+  return {
+    type: TOGGLE_SONG_STARRED,
+    payload: songId,
+    // meta: {isOptimistic: true},
+  }
+}
+
 // helper for fetch response
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -315,74 +329,45 @@ function checkStatus(response) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LOGIN]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
-  }),
   [LOGIN_SUCCESS]: (state, {payload}) => ({
     ...state,
-    isFetching: false,
-    user: payload,
-  }),
-  [LOGIN_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [LOGOUT]: (state, {payload}) => ({
-    ...state,
-    isFetching: true
+    user: payload.user,
+    starredSongs: payload.starredSongs,
   }),
   [LOGOUT_SUCCESS]: (state, {payload}) => ({
     ...state,
-    isFetching: false,
     user: null,
-  }),
-  [LOGOUT_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [CREATE]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
-  }),
-  [CREATE_SUCCESS]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [CREATE_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [UPDATE]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
   }),
   [UPDATE_SUCCESS]: (state, {payload}) => ({
     ...state,
-    isFetching: false,
-    user: payload,
-  }),
-  [UPDATE_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [GET_ROOMS]: (state, {payload}) => ({
-    ...state,
-    isFetching: true,
+    user: payload.user,
+    starredSongs: payload.starredSongs,
   }),
   [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
     ...state,
-    isFetching: false,
     rooms: payload,
-  }),
-  [GET_ROOMS_FAIL]: (state, {payload}) => ({
-    ...state,
-    isFetching: false,
   }),
   [CHANGE_VIEW]: (state, {payload}) => ({
     ...state,
     viewMode: payload,
   }),
+  [TOGGLE_SONG_STARRED]: (state, {payload}) => {
+    // make a copy
+    const starredSongs = state.starredSongs.slice()
+
+    if (starredSongs.includes(payload)) {
+      // remove star
+      starredSongs.splice(starredSongs.indexOf(payload), 1)
+    } else {
+      // add star
+      starredSongs.push(payload)
+    }
+
+    return {
+      ...state,
+      starredSongs,
+    }
+  },
 }
 
 // ------------------------------------
@@ -390,7 +375,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   user: JSON.parse(localStorage.getItem('user')),
-  isFetching: false,
+  starredSongs: JSON.parse(localStorage.getItem('starredSongs')),
   rooms: [],
   viewMode: 'login'
 }

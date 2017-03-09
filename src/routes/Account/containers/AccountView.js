@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { changeView, logoutUser } from '../modules/account'
+import { changeView, logoutUser } from 'store/modules/user'
 import AccountView from '../components/AccountView'
 
 const mapActionCreators = {
@@ -9,9 +9,9 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.account.user,
-    viewMode: state.account.viewMode,
-    errorMessage: state.account.errorMessage
+    user: state.user.user,
+    viewMode: state.user.viewMode,
+    errorMessage: state.user.errorMessage
   }
 }
 
