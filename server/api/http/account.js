@@ -243,6 +243,7 @@ router.post('/api/account/update', async (ctx, next) => {
   user.isAdmin = (user.isAdmin === 1)
 
   // generate new JWT
+  // @todo use async version
   const token = jwtSign(user, 'shared-secret')
 
   // client saves this to localStorage
@@ -259,6 +260,24 @@ async function _login(ctx, creds) {
   if (!email || !password || !roomId) {
     ctx.status = 422
     return ctx.body = 'Email, password, and room are required'
+  }
+
+  // validate roomId
+  try {
+    const q = squel.select()
+      .from('rooms')
+      .where('roomId = ?', roomId)
+
+    const { text, values } = q.toParam()
+    const row = await db.get(text, values)
+
+    if (!row || row.status !== 'open') {
+      ctx.status = 401
+      ctx.body = 'Invalid Room'
+      return
+    }
+  } catch(err) {
+    return Promise.reject(err)
   }
 
   // get user
@@ -280,24 +299,29 @@ async function _login(ctx, creds) {
   }
 
   // validate password
-  if (!await bcrypt.compare(password, user.password)) {
-    ctx.status = 401
-    return
+  try {
+    if (!await bcrypt.compare(password, user.password)) {
+      ctx.status = 401
+      return
+    }
+  } catch(err) {
+    return Promise.reject(err)
   }
 
-  // validate roomId
+  // get starred songs
+  const starredSongs = []
   try {
     const q = squel.select()
-      .from('rooms')
-      .where('roomId = ?', roomId)
+      .from('stars')
+      .field('songId')
+      .where('userId = ?', user.userId)
 
     const { text, values } = q.toParam()
-    const row = await db.get(text, values)
+    const rows = await db.all(text, values)
 
-    if (!row || row.status !== 'open') {
-      ctx.status = 401
-      return ctx.body = 'Invalid Room'
-    }
+    rows.forEach(row => {
+      starredSongs.push(row.songId)
+    })
   } catch(err) {
     return Promise.reject(err)
   }
@@ -306,7 +330,8 @@ async function _login(ctx, creds) {
   user.roomId = roomId
   user.isAdmin = (user.isAdmin === 1)
 
-  // encrypt JWT
+  // encrypt user JWT
+  // @todo use async version
   const token = jwtSign(user, 'shared-secret')
 
   // set httpOnly cookie containing JWT
@@ -314,9 +339,11 @@ async function _login(ctx, creds) {
     httpOnly: true,
   })
 
-  // user JSON as response body
-  ctx.body = user
-  return Promise.resolve()
+  // send bootstrap info in response body
+  ctx.body = {
+    user,
+    starredSongs,
+  }
 }
 
 // email validation helper from
