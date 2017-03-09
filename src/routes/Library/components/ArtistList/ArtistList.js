@@ -8,6 +8,7 @@ class ArtistList extends React.Component {
     artists: PropTypes.object.isRequired,
     songs: PropTypes.object.isRequired,
     queuedSongIds: PropTypes.array.isRequired,
+    starredSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
@@ -16,6 +17,7 @@ class ArtistList extends React.Component {
     paddingBottom: PropTypes.number.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
+    toggleSongStarred: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
     toggleArtistExpanded: PropTypes.func.isRequired,
   }
@@ -55,9 +57,11 @@ class ArtistList extends React.Component {
         songs={songs}
         songIds={artist.songIds} // "children"
         queuedSongIds={this.props.queuedSongIds}
+        starredSongs={this.props.starredSongs}
         name={artist.name}
         isExpanded={expandedArtists.indexOf(artist.artistId) !== -1}
         onArtistClick={() => this.handleArtistClick(artist.artistId)}
+        onSongStarClick={this.props.toggleSongStarred}
         onSongClick={this.props.queueSong}
         key={key}
         style={style}

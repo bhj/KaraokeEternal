@@ -2,14 +2,16 @@ import React, { PropTypes } from 'react'
 import classes from './SongItem.css'
 
 export const SongItem = (props) => (
-  <div onClick={props.onSongClick} style={props.style} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
+  <div style={props.style} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
     <div className={classes.stats}>
       {toMMSS(props.duration)}
     </div>
 
-    <div className={classes.title}>{props.title}</div>
+    <div onClick={props.onSongClick}  className={classes.title}>
+      {props.title}
+    </div>
 
-    <div className={classes.star}>
+    <div onClick={props.onSongStarClick} className={classes.star}>
       <i className='material-icons'>
         {props.isStarred ? 'star' : 'star_border'}
       </i>
@@ -20,10 +22,11 @@ export const SongItem = (props) => (
 SongItem.propTypes = {
   title: PropTypes.string.isRequired,
   duration: PropTypes.number.isRequired,
-  plays: PropTypes.number.isRequired,
+  stars: PropTypes.number.isRequired,
   provider: PropTypes.string.isRequired,
   style: PropTypes.object,
   onSongClick: PropTypes.func.isRequired,
+  onSongStarClick: PropTypes.func.isRequired,
   isQueued: PropTypes.bool.isRequired,
 }
 

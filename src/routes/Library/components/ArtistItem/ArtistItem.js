@@ -16,7 +16,9 @@ const ArtistItem = (props) => {
         <SongItem
           {...props.songs.entities[songId]}
           onSongClick={() => props.onSongClick(songId)}
-          isQueued={props.queuedSongIds.indexOf(songId) !== -1}
+          onSongStarClick={() => props.onSongStarClick(songId)}
+          isQueued={props.queuedSongIds.includes(songId)}
+          isStarred={props.starredSongs.includes(songId)}
           key={songId}
         />
       )
@@ -46,10 +48,12 @@ ArtistItem.propTypes = {
   songs: PropTypes.object.isRequired,
   songIds: PropTypes.array.isRequired,
   queuedSongIds: PropTypes.array.isRequired,
+  starredSongs: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
   isExpanded: PropTypes.bool.isRequired,
   onArtistClick: PropTypes.func.isRequired,
   onSongClick: PropTypes.func.isRequired,
+  onSongStarClick: PropTypes.func.isRequired,
   style: PropTypes.object,
 }
 
