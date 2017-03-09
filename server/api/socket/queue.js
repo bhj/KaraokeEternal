@@ -61,7 +61,7 @@ const ACTION_HANDLERS = {
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
 
-      if (res.changes !== 1) {
+      if (res.stmt.changes !== 1) {
         throw new Error('Could not add song to queue')
       }
     } catch(err) {
@@ -139,7 +139,7 @@ const ACTION_HANDLERS = {
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
 
-      if (res.changes !== 1) {
+      if (res.stmt.changes !== 1) {
         throw new Error('Could not remove queue item')
       }
     } catch(err) {
@@ -174,7 +174,7 @@ const ACTION_HANDLERS = {
         const { text, values } = q.toParam()
         const res = await db.run(text, values)
 
-        if (res.changes !== 1) {
+        if (res.stmt.changes !== 1) {
           throw new Error('Could not update queue item id')
         }
       } catch(err) {

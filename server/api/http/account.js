@@ -105,7 +105,7 @@ router.post('/api/account/create', async (ctx, next) => {
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
 
-    if (res.changes !== 1) {
+    if (res.stmt.changes !== 1) {
       throw new Error('insert failed')
     }
   } catch(err) {
