@@ -2,14 +2,18 @@ import React, { PropTypes } from 'react'
 import { browserHistory } from 'react-router'
 import AppLayout from 'layouts/AppLayout'
 import Header from 'layouts/Header'
-import AccountForm from '../containers/AccountForm'
+import AccountForm from './AccountForm'
 import Logout from './Logout'
 import Providers from 'components/providers'
 
 class AccountView extends React.Component {
   static propTypes = {
     user: PropTypes.object,
+    // actions
+    loginUser: PropTypes.func.isRequired,
     logoutUser: PropTypes.func.isRequired,
+    createUser: PropTypes.func.isRequired,
+    updateUser: PropTypes.func.isRequired,
   }
 
   render () {
@@ -28,7 +32,7 @@ class AccountView extends React.Component {
       <AppLayout header={header}>
         {(style) => (
           <div style={{...style, overflowY: 'scroll'}}>
-            <AccountForm/>
+            <AccountForm {...this.props}/>
 
             {prefComponents}
 

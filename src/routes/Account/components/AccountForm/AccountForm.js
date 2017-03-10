@@ -1,12 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 import classes from './AccountForm.css'
 import Login from '../Login'
-import Logout from '../Logout'
 
 export default class AccountForm extends Component {
   static propTypes = {
     user: PropTypes.object,
-    rooms: PropTypes.array,
     loginUser: PropTypes.func.isRequired,
     createUser: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
@@ -30,7 +28,7 @@ export default class AccountForm extends Component {
         {view === 'login' &&
           <div>
             <p>Sign in below or <a onClick={() => this.props.changeView('create')}>create a new account</a>.</p>
-            <Login onSubmitClick={this.props.loginUser} rooms={this.props.rooms}/>
+            <Login onSubmitClick={this.props.loginUser} rooms={this.props.user.rooms}/>
           </div>
         }
         {view === 'create' &&

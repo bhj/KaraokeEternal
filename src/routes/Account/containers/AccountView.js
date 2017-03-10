@@ -1,10 +1,12 @@
 import { connect } from 'react-redux'
-import { changeView, logoutUser } from 'store/modules/user'
+import { loginUser, logoutUser, createUser, updateUser } from 'store/modules/user'
 import AccountView from '../components/AccountView'
 
 const mapActionCreators = {
-  changeView,
+  loginUser,
   logoutUser,
+  createUser,
+  updateUser,
 }
 
 const mapStateToProps = (state) => {
