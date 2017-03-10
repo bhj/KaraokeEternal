@@ -25,7 +25,7 @@ const mapStateToProps = (state) => {
     artists: state.library.artists,
     songs: state.library.songs,
     // user
-    user: state.user.user,
+    user: state.user,
   }
 }
 

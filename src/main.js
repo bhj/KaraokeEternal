@@ -24,7 +24,7 @@ const initialState = window.___INITIAL_STATE__
 const store = createStore(initialState)
 
 // attempt socket.io connection if it looks like we have a valid session
-if (store.getState().user.user) {
+if (store.getState().user.userId !== null) {
   window._socket.open()
 }
 

@@ -9,15 +9,12 @@ import Providers from 'components/providers'
 class AccountView extends React.Component {
   static propTypes = {
     user: PropTypes.object,
-    viewMode: PropTypes.string.isRequired,
     logoutUser: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string
   }
 
   render () {
     const { user, prefs } = this.props
     const header = <Header/>
-    const headerTitle = user ? user.name : (this.props.viewMode === 'login') ? 'Sign In' : 'Create Account'
     let prefComponents = []
 
     for (let i in Providers) {
@@ -28,7 +25,7 @@ class AccountView extends React.Component {
     }
 
     return (
-      <AppLayout title={headerTitle} header={header}>
+      <AppLayout header={header}>
         {(style) => (
           <div style={{...style, overflowY: 'scroll'}}>
             <AccountForm/>

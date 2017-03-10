@@ -246,8 +246,7 @@ router.post('/api/account/update', async (ctx, next) => {
   // @todo use async version
   const token = jwtSign(user, 'shared-secret')
 
-  // client saves this to localStorage
-  ctx.body = { user }
+  ctx.body = user
 })
 
 module.exports = router
@@ -329,21 +328,22 @@ async function _login(ctx, creds) {
   delete user.password
   user.roomId = roomId
   user.isAdmin = (user.isAdmin === 1)
+  user.starredSongs = starredSongs
 
-  // encrypt user JWT
+  // encrypt JWT based on subset of user object
   // @todo use async version
-  const token = jwtSign(user, 'shared-secret')
+  const token = jwtSign({
+    userId: user.userId,
+    name: user.name,
+    roomId: user.roomId,
+  }, 'shared-secret')
 
   // set httpOnly cookie containing JWT
   ctx.cookies.set('id_token', token, {
     httpOnly: true,
   })
 
-  // send bootstrap info in response body
-  ctx.body = {
-    user,
-    starredSongs,
-  }
+  ctx.body = user
 }
 
 // email validation helper from

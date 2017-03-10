@@ -49,8 +49,8 @@ export function loginUser(data) {
       .then(res => {
         // cache the user object as returned in the response body
         dispatch(receiveLogin(res))
-        localStorage.setItem('user', JSON.stringify(res.user))
-        localStorage.setItem('starredSongs', JSON.stringify(res.starredSongs))
+
+        // @todo - persist data
 
         // socket handshake should contain httpOnly cookie with JWT
         window._socket.open()
@@ -129,7 +129,7 @@ export function logoutUser() {
     })
     .then(() => {
       // regardless of the server response; we tried!
-      localStorage.removeItem('user')
+      // @todo - purge persisted data
 
       // disconnect socket
       window._socket.close()
@@ -331,25 +331,25 @@ function checkStatus(response) {
 const ACTION_HANDLERS = {
   [LOGIN_SUCCESS]: (state, {payload}) => ({
     ...state,
-    user: payload.user,
-    starredSongs: payload.starredSongs,
-  }),
-  [LOGOUT_SUCCESS]: (state, {payload}) => ({
-    ...state,
-    user: null,
+    ...payload,
   }),
   [UPDATE_SUCCESS]: (state, {payload}) => ({
     ...state,
-    user: payload.user,
-    starredSongs: payload.starredSongs,
+    ...payload,
+  }),
+  [LOGOUT_SUCCESS]: (state, {payload}) => ({
+    ...state,
+    userId: null,
+    email: null,
+    name: null,
+    isAdmin: false,
+    roomId: null,
+    starredSongs: [],
+    rooms: [],
   }),
   [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
     ...state,
     rooms: payload,
-  }),
-  [CHANGE_VIEW]: (state, {payload}) => ({
-    ...state,
-    viewMode: payload,
   }),
   [TOGGLE_SONG_STARRED]: (state, {payload}) => {
     // make a copy
@@ -374,10 +374,13 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 let initialState = {
-  user: JSON.parse(localStorage.getItem('user')),
-  starredSongs: JSON.parse(localStorage.getItem('starredSongs')),
+  userId: null,
+  email: null,
+  name: null,
+  isAdmin: false,
+  roomId: null,
+  starredSongs: [],
   rooms: [],
-  viewMode: 'login'
 }
 
 export default function accountReducer (state = initialState, action) {

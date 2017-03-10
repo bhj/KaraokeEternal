@@ -9,9 +9,7 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user.user,
-    viewMode: state.user.viewMode,
-    errorMessage: state.user.errorMessage
+    user: state.user,
   }
 }
 
