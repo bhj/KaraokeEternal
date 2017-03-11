@@ -299,19 +299,6 @@ export function changeView(mode) {
   }
 }
 
-// ------------------------------------
-// Star/Unstar song
-// ------------------------------------
-const TOGGLE_SONG_STARRED = 'server/TOGGLE_SONG_STARRED'
-
-export function toggleSongStarred(songId) {
-  return {
-    type: TOGGLE_SONG_STARRED,
-    payload: songId,
-    // meta: {isOptimistic: true},
-  }
-}
-
 // helper for fetch response
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -344,30 +331,12 @@ const ACTION_HANDLERS = {
     name: null,
     isAdmin: false,
     roomId: null,
-    starredSongs: [],
     rooms: [],
   }),
   [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
     ...state,
     rooms: payload,
   }),
-  [TOGGLE_SONG_STARRED]: (state, {payload}) => {
-    // make a copy
-    const starredSongs = state.starredSongs.slice()
-
-    if (starredSongs.includes(payload)) {
-      // remove star
-      starredSongs.splice(starredSongs.indexOf(payload), 1)
-    } else {
-      // add star
-      starredSongs.push(payload)
-    }
-
-    return {
-      ...state,
-      starredSongs,
-    }
-  },
 }
 
 // ------------------------------------
@@ -379,11 +348,11 @@ let initialState = {
   name: null,
   isAdmin: false,
   roomId: null,
-  starredSongs: [],
   rooms: [],
+  starredSongs: [],
 }
 
-export default function accountReducer (state = initialState, action) {
+export default function userReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state
