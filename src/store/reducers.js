@@ -18,12 +18,12 @@ export const makeRootReducer = (asyncReducers) => {
             height: window.innerHeight,
         }),
     }),
-    location,
-    ui,
-    status,
     library,
-    user,
+    location,
     queue: optimistic(queue),
+    status,
+    ui,
+    user,
     ...asyncReducers
   })
 }
