@@ -19,13 +19,14 @@ const ACTION_HANDLERS = {
     // is room open?
     try {
       if (!await _isRoomOpen(ctx.user.roomId)) {
-        // callback with truthy error msg
-        ctx.acknowledge('Room is no longer open')
-        return
+        return ctx.acknowledge({
+          type: QUEUE_ADD+'_ERROR',
+          meta: {
+            error: 'Room is no longer open'
+          }
+        })
       }
     } catch(err) {
-      // callback with truthy error msg
-      ctx.acknowledge(err.message)
       return Promise.reject(err)
     }
 
@@ -39,15 +40,16 @@ const ACTION_HANDLERS = {
       const { text, values } = q.toParam()
       song = await db.get(text, values)
     } catch(err) {
-      // callback with truthy error msg
-      ctx.acknowledge(err.message)
       return Promise.reject(err)
     }
 
     if (!song) {
-      // callback with truthy error msg
-      ctx.acknowledge('Song not found')
-      return
+      return ctx.acknowledge({
+        type: QUEUE_ADD+'_ERROR',
+        meta: {
+          error: 'songId not found: '+payload
+        }
+      })
     }
 
     // insert row
@@ -65,15 +67,15 @@ const ACTION_HANDLERS = {
         throw new Error('Could not add song to queue')
       }
     } catch(err) {
-      // callback with truthy error msg
-      ctx.acknowledge(err.message)
       return Promise.reject(err)
     }
 
     // success!
-    ctx.acknowledge()
+    ctx.acknowledge({
+      type: QUEUE_ADD+'_SUCCESS',
+    })
 
-    // tell room
+    // to all in room
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: QUEUE_CHANGE,
       payload: await getQueue(ctx.user.roomId)
@@ -87,13 +89,14 @@ const ACTION_HANDLERS = {
     // is room open?
     try {
       if (!await _isRoomOpen(ctx.user.roomId)) {
-        // callback with truthy error msg
-        ctx.acknowledge('Room is no longer open')
-        return
+        return ctx.acknowledge({
+          type: QUEUE_REMOVE+'_ERROR',
+          meta: {
+            error: 'Room is no longer open'
+          }
+        })
       }
     } catch(err) {
-      // callback with truthy error msg
-      ctx.acknowledge(err.message)
       return Promise.reject(err)
     }
 
@@ -106,28 +109,36 @@ const ACTION_HANDLERS = {
       const { text, values } = q.toParam()
       item = await db.get(text, values)
     } catch(err) {
-      // callback with truthy error msg
-      ctx.acknowledge(err.message)
       return Promise.reject(err)
     }
 
     if (!item) {
-      // callback with truthy error msg
-      ctx.acknowledge('Queue item not found')
+      return ctx.acknowledge({
+        type: QUEUE_REMOVE+'_ERROR',
+        meta: {
+          error: 'queueId not found: '+queueId
+        }
+      })
     }
 
     // is it in the user's room?
     if (item.roomId !== ctx.user.roomId) {
-      // callback with truthy error msg
-      ctx.acknowledge('Item is not in your room')
-      return
+      return ctx.acknowledge({
+        type: QUEUE_REMOVE+'_ERROR',
+        meta: {
+          error: 'queueId is not in your room: '+queueId
+        }
+      })
     }
 
     // is it the user's item?
     if (item.userId !== ctx.user.userId) {
-      // callback with truthy error msg
-      ctx.acknowledge('Item is NOT YOURS')
-      return
+      return ctx.acknowledge({
+        type: QUEUE_REMOVE+'_ERROR',
+        meta: {
+          error: 'Item is NOT YOURS: '+queueId
+        }
+      })
     }
 
     // delete item
@@ -143,7 +154,6 @@ const ACTION_HANDLERS = {
         throw new Error('Could not remove queue item')
       }
     } catch(err) {
-      ctx.acknowledge(err.message)
       return Promise.reject(err)
     }
 
@@ -159,8 +169,6 @@ const ACTION_HANDLERS = {
       const { text, values } = q.toParam()
       nextItem = await db.get(text, values)
     } catch(err) {
-      // callback with truthy error msg
-      ctx.acknowledge(err.message)
       return Promise.reject(err)
     }
 
@@ -183,7 +191,9 @@ const ACTION_HANDLERS = {
     }
 
     // success!
-    ctx.acknowledge()
+    ctx.acknowledge({
+      type: QUEUE_REMOVE+'_SUCCESS',
+    })
 
     // tell room
     ctx.io.to(ctx.user.roomId).emit('action', {

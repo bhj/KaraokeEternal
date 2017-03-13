@@ -33,7 +33,31 @@ const ACTION_HANDLERS = {
       return Promise.reject(err)
     }
 
-    // send library
+    // success; send back new starred list
+    try {
+      const q = squel.select()
+        .from('stars')
+        .field('songId')
+        .where('userId = ?', ctx.user.userId)
+
+      const { text, values } = q.toParam()
+      const rows = await db.all(text, values)
+
+      const starredSongs = []
+      rows.forEach(row => {
+        starredSongs.push(row.songId)
+      })
+
+      ctx.acknowledge({
+        type: TOGGLE_SONG_STARRED+'_SUCCESS',
+        payload: starredSongs,
+      })
+    } catch(err) {
+      return Promise.reject(err)
+    }
+
+    // emit updated star counts to room
+    // @todo incremental updates
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: LIBRARY_CHANGE,
       payload: await getLibrary(),

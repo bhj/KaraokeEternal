@@ -288,18 +288,19 @@ export function fetchRooms() {
 }
 
 // ------------------------------------
-// Misc
+// Starred songs
 // ------------------------------------
-export const CHANGE_VIEW = 'account/CHANGE_VIEW'
-
-export function changeView(mode) {
+const TOGGLE_SONG_STARRED = "server/TOGGLE_SONG_STARRED"
+export function toggleSongStarred(songId) {
   return {
-    type: CHANGE_VIEW,
-    payload: mode
+    type: TOGGLE_SONG_STARRED,
+    payload: songId,
   }
 }
 
+// ------------------------------------
 // helper for fetch response
+// ------------------------------------
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response
@@ -332,10 +333,15 @@ const ACTION_HANDLERS = {
     isAdmin: false,
     roomId: null,
     rooms: [],
+    starredSongs: [],
   }),
   [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
     ...state,
     rooms: payload,
+  }),
+  [TOGGLE_SONG_STARRED+'_SUCCESS']: (state, {payload}) => ({
+    ...state,
+    starredSongs: payload,
   }),
 }
 

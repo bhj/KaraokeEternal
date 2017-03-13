@@ -62,8 +62,9 @@ app._io.on('connection', async (sock) => {
   } catch (err) {
       app._io.to(sock.id).emit('action', {
         type: SOCKET_AUTH_ERROR,
-        payload: null,
-        error: err.message + ` (try signing in again)`
+        meta: {
+          error: `${err.message} (try signing in again)`
+        }
       })
 
     sock.decoded_token = null

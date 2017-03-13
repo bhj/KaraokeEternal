@@ -1,9 +1,7 @@
-import { BEGIN, COMMIT, REVERT } from 'redux-optimistic-ui'
-
 const _SUCCESS = '_SUCCESS'
 const _ERROR = '_ERROR'
-const pendingIds = {} // transactionIDs to timeoutIDs
-let nextTransactionID = 0
+const pendingIds = {} // requestIDs to timeoutIDs
+let nextRequestID = 0
 
 export default function createSocketMiddleware(socket, prefix) {
   return ({ dispatch }) => {
@@ -18,53 +16,28 @@ export default function createSocketMiddleware(socket, prefix) {
         return next(action)
       }
 
-      if (!meta || !meta.isOptimistic) {
-        // emit without optimism
-        socket.emit('action', action)
-        return next(action)
-      }
+      const requestID = nextRequestID++
 
-      const transactionID = nextTransactionID++
-      next(Object.assign({}, action, {
-        meta: {
-          optimistic: {
-            type: BEGIN,
-            id: transactionID
-          }
-        }}))
+      // fire request action
+      next(action)
 
-      // in case socket.io callback never fires due to conn error
-      const timeoutID = setTimeout(() => {
+      // error action if socket.io callback timeout
+      pendingIds[requestID] = setTimeout(() => {
         next({
           type: type + _ERROR,
-          error: 'Socket timeout; reverting optimistic action: ' + type,
+          error: 'No response from server (check network connection)',
           payload,
-          meta: {
-            optimistic: {
-              type: REVERT,
-              id: transactionID
-            },
-          },
         })
       }, 2000)
 
-      // store reference to timer this transaction is for
-      pendingIds[transactionID] = timeoutID
-
-      // emit with optimistic flag and callback (3rd arg)
-      socket.emit('action', action, error => {
+      // emit with callback method (3rd arg) that is
+      // called using ctx.acknowledge(action) on the server
+      socket.emit('action', action, responseAction => {
         // cancel dead man's timer
-        clearTimeout(pendingIds[transactionID])
+        clearTimeout(pendingIds[requestID])
 
-        next({
-          type: type + (error ? _ERROR : _SUCCESS),
-          error,
-          payload,
-          meta: {
-            // Here's the magic: if there was an error, revert the state, otherwise, commit it
-            optimistic: error ? {type: REVERT, id: transactionID} : {type: COMMIT, id: transactionID}
-          }
-        })
+        // action should typically have type *_SUCCESS or *_ERROR
+        return next(responseAction)
       })
     }
   }

@@ -18,9 +18,12 @@ module.exports = async function(ctx) {
   const handler = ACTION_HANDLERS[action.type]
 
   if (!ctx.user) {
-    // callback with truthy error msg
-    ctx.acknowledge('Invalid token (try signing in again)')
-    return
+    return ctx.acknowledge({
+      type: 'SOCKET_AUTH_ERROR',
+      meta: {
+        error: 'Invalid token (try signing in again)'
+      }
+    })
   }
 
   if (!handler) {

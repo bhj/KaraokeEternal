@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import { ensureState } from 'redux-optimistic-ui'
 import QueueView from '../components/QueueView'
 import { showErrorMessage } from 'store/modules/ui'
 import { queueSong, removeItem } from '../modules/queue'
@@ -17,7 +16,7 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    queue: ensureState(state.queue),
+    queue: state.queue,
     errors: state.status.errors,
     curId: state.status.queueId,
     curPos: state.status.position,

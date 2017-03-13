@@ -76,9 +76,9 @@ const ACTION_HANDLERS = {
     ...state,
     footerHeight: payload,
   }),
-  [SHOW_ERROR_MESSAGE]: (state, {error}) => ({
+  [SHOW_ERROR_MESSAGE]: (state, action) => ({
     ...state,
-    errorMessage: error,
+    errorMessage: action.meta.error,
   }),
   [CLEAR_ERROR_MESSAGE]: (state, {payload}) => ({
     ...state,
@@ -101,7 +101,7 @@ const initialState = {
 }
 
 export default function uiReducer (state = initialState, action) {
-  const handler = action.error ?
+  const handler = action.meta && action.meta.error ?
     ACTION_HANDLERS[SHOW_ERROR_MESSAGE] : ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux'
-import { optimistic } from 'redux-optimistic-ui'
 import { createResponsiveStateReducer } from 'redux-responsive'
 
 // reducers
@@ -20,7 +19,7 @@ export const makeRootReducer = (asyncReducers) => {
     }),
     library,
     location,
-    queue: optimistic(queue),
+    queue,
     status,
     ui,
     user,

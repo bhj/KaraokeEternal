@@ -9,7 +9,6 @@ export function queueSong(songId) {
   return {
     type: QUEUE_ADD,
     payload: songId,
-    meta: {isOptimistic: true},
   }
 }
 
@@ -20,7 +19,6 @@ export function removeItem(queueId) {
   return {
     type: QUEUE_REMOVE,
     payload: queueId,
-    meta: {isOptimistic: true},
   }
 }
 
@@ -28,27 +26,6 @@ export function removeItem(queueId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_ADD]: (state, {payload}) => {
-    // optimistic
-    let songIds = state.songIds.slice()
-    songIds.push(payload)
-
-    return {
-      ...state,
-      songIds,
-    }
-  },
-  [QUEUE_REMOVE]: (state, {payload}) => {
-    // optimistic
-    let result = state.result.slice()
-    result.splice(result.indexOf(payload), 1)
-
-    return {
-      ...state,
-      result,
-      entities: setWaits(result, state.entities, state.curId, state.curPos),
-    }
-  },
   [QUEUE_CHANGE]: (state, {payload}) => ({
     ...state,
     result: payload.result,
