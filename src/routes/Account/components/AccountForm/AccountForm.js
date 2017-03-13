@@ -40,8 +40,8 @@ export default class AccountForm extends Component {
 
         {view !== 'login' &&
           <form>
-            <input type='text' ref='name' value={this.state.name} onChange={this.handleChange('name')} autoFocus={view === 'create'} placeholder='display name'/>
-            <input type='email' ref='email' value={this.state.email} onChange={this.handleChange('email')} placeholder='email'/>
+            <input type='text' ref='name' value={this.state.name || ''} onChange={this.handleChange('name')} autoFocus={view === 'create'} placeholder='display name'/>
+            <input type='email' ref='email' value={this.state.email || ''} onChange={this.handleChange('email')} placeholder='email'/>
 
             <input type='password' ref='newPassword' placeholder={view === 'create' ? 'password' : 'new password'}/>
             <input type='password' ref='newPasswordConfirm' placeholder={view === 'create' ? 'confirm password' : 'confirm new password'}/>
