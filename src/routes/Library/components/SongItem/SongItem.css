@@ -4,26 +4,44 @@
   align-items: center;
 }
 
+.duration {
+  margin: 0 10px;
+}
+
 .title {
   flex: 1;
   font-size: 20px;
   text-overflow: ellipsis;
-  overflow:hidden;
+  overflow: hidden;
   white-space: nowrap;
 }
 
 .star {
-  font-size: 40px;
-  margin: 0 5px;
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #efefef;
+  margin: 0 10px;
 }
 
-.stats {
-  display: flex;
-  align-items: center;
-  margin-left: 10px;
-  margin-right: 10px;
+.starStarred {
+  composes: star;
+  color: #999;
+}
+
+.starredCount {
+  position: relative;
+  font-size: 12px;
+  top: 18px;
+  text-align: center;
+  color: #ccc;
+}
+
+.starredCountStarred {
+  composes: starredCount;
+  color: white;
 }
 
 .isQueued {
-  background: yellow;
+  background: #fefefe;
 }

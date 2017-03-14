@@ -3,7 +3,7 @@ import classes from './SongItem.css'
 
 export const SongItem = (props) => (
   <div style={props.style} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
-    <div className={classes.stats}>
+    <div className={classes.duration}>
       {toMMSS(props.duration)}
     </div>
 
@@ -11,10 +11,9 @@ export const SongItem = (props) => (
       {props.title}
     </div>
 
-    <div onClick={props.onSongStarClick} className={classes.star}>
-      <i className='material-icons'>
-        {props.isStarred ? 'star' : 'star_border'}
-      </i>
+    <div onClick={props.onSongStarClick} className={props.isStarred ? classes.starStarred : classes.star}>
+      <i className='material-icons' style={{position: 'absolute'}}>{props.isStarred ? 'star' : 'star_border'}</i>
+      <div className={props.isStarred ? classes.starredCountStarred : classes.starredCount}>{props.stars}</div>
     </div>
   </div>
 )
@@ -28,6 +27,7 @@ SongItem.propTypes = {
   onSongClick: PropTypes.func.isRequired,
   onSongStarClick: PropTypes.func.isRequired,
   isQueued: PropTypes.bool.isRequired,
+  isStarred: PropTypes.bool.isRequired,
 }
 
 export default SongItem
