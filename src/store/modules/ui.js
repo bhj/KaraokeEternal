@@ -17,15 +17,15 @@ export const PROVIDER_REFRESH_REQUEST = 'server/PROVIDER_REFRESH'
 export function clearErrorMessage() {
   return {
     type: CLEAR_ERROR_MESSAGE,
-    payload: null,
   }
 }
 
-export function showErrorMessage(msg) {
+export function showErrorMessage(error) {
   return {
     type: SHOW_ERROR_MESSAGE,
-    payload: null,
-    error: msg,
+    meta: {
+      error,
+    }
   }
 }
 
@@ -64,6 +64,7 @@ export function providerRefresh(provider) {
     payload: provider,
   }
 }
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------

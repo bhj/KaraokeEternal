@@ -25,8 +25,9 @@ export default function createSocketMiddleware(socket, prefix) {
       pendingIds[requestID] = setTimeout(() => {
         next({
           type: type + _ERROR,
-          error: 'No response from server (check network connection)',
-          payload,
+          meta: {
+            error: `No response from server; check network connection (on action ${type})`,
+          }
         })
       }, 2000)
 

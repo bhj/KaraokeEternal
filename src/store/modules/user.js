@@ -25,8 +25,9 @@ function receiveLogin(response) {
 function loginError(message) {
   return {
     type: LOGIN_FAIL,
-    payload: null,
-    error: message + ' (incorrect login)',
+    meta: {
+      error: message + ' (incorrect login)',
+    }
   }
 }
 
@@ -106,8 +107,9 @@ function receiveLogout() {
 function logoutError(message) {
   return {
     type: LOGOUT_FAIL,
-    payload: null,
-    error: message,
+    meta: {
+      error: message,
+    }
   }
 }
 
@@ -161,8 +163,9 @@ function receiveCreate() {
 function createError(message) {
   return {
     type: CREATE_FAIL,
-    payload: null,
-    error: message,
+    meta: {
+      error: message,
+    }
   }
 }
 
@@ -213,8 +216,9 @@ function receiveUpdate(response) {
 function updateError(message) {
   return {
     type: UPDATE_FAIL,
-    payload: null,
-    error: message,
+    meta: {
+      error: message,
+    }
   }
 }
 
@@ -266,8 +270,9 @@ function receiveRooms(response) {
 function roomsError(message) {
   return {
     type: GET_ROOMS_FAIL,
-    payload: null,
-    error: message,
+    meta: {
+      error: message,      
+    }
   }
 }
 
