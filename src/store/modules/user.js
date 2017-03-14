@@ -51,8 +51,6 @@ export function loginUser(data) {
         // cache the user object as returned in the response body
         dispatch(receiveLogin(res))
 
-        // @todo - persist data
-
         // socket handshake should contain httpOnly cookie with JWT
         window._socket.open()
 
@@ -237,7 +235,6 @@ export function updateUser(data) {
       .then(checkStatus)
       .then(response => response.json())
       .then(user => {
-        localStorage.setItem('user', JSON.stringify(user))
         dispatch(receiveUpdate(user))
       })
       .catch(err => {

@@ -6,8 +6,16 @@ import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
+import { persistStore, autoRehydrate } from 'redux-persist'
+import io from 'socket.io-client'
 
 export default (initialState = {}) => {
+  // the "socket" side of the api requires authentication, so
+  // we only want to attempt socket connection if we think we
+  // have (or just received) a JWT set via http cookie on login.
+  // socket.io handshake will then contain the JWT
+  window._socket = io({autoConnect: false})
+
   // ======================================================
   // Middleware Configuration
   // ======================================================
@@ -26,6 +34,7 @@ export default (initialState = {}) => {
   // ======================================================
   const enhancers = [
     responsiveStoreEnhancer,
+    autoRehydrate(),
   ]
 
   window.addEventListener('resize', () => store.dispatch(calculateResponsiveState(window)))
@@ -61,6 +70,15 @@ export default (initialState = {}) => {
       store.replaceReducer(reducers(store.asyncReducers))
     })
   }
+
+  // begin periodically persisting the store
+  persistStore(store, {whitelist: ['user']}, () => {
+    // on rehydrate, attempt socket.io connection
+    // if it looks like we have a valid session
+    if (store.getState().user.userId !== null) {
+      window._socket.open()
+    }
+  })
 
   return store
 }
