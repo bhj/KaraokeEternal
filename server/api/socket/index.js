@@ -1,12 +1,12 @@
 const log = require('debug')('app:socket')
-const User = require('./user')
+const Library = require('./library')
 const Queue = require('./queue')
 const Player = require('./player')
 const Prefs = require('./prefs')
 const Provider = require('./provider')
 
 let ACTION_HANDLERS = Object.assign({},
-  User.ACTION_HANDLERS,
+  Library.ACTION_HANDLERS,
   Queue.ACTION_HANDLERS,
   Player.ACTION_HANDLERS,
   Prefs.ACTION_HANDLERS,

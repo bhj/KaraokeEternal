@@ -3,12 +3,12 @@ const squel = require('squel')
 const jwtSign = require('jsonwebtoken').sign
 const bcrypt = require('../../thunks/bcrypt')
 const KoaRouter = require('koa-router')
-const router = KoaRouter()
+const router = KoaRouter({prefix: '/api'})
 const debug = require('debug')
 const log = debug('app:account')
 
 // list available rooms
-router.get('/api/account/rooms', async (ctx, next) => {
+router.get('/rooms', async (ctx, next) => {
   const q = squel.select()
     .from('rooms')
     .where('status = ?', 'open')
@@ -24,7 +24,7 @@ router.get('/api/account/rooms', async (ctx, next) => {
 })
 
 // login
-router.post('/api/account/login', async (ctx, next) => {
+router.post('/login', async (ctx, next) => {
   const { email, password, roomId } = ctx.request.body
 
   try {
@@ -37,13 +37,13 @@ router.post('/api/account/login', async (ctx, next) => {
 })
 
 // logout
-router.get('/api/account/logout', async (ctx, next) => {
+router.get('/logout', async (ctx, next) => {
   ctx.cookies.set('id_token', '')
   ctx.status = 200
 })
 
 // create
-router.post('/api/account/create', async (ctx, next) => {
+router.post('/account/create', async (ctx, next) => {
   let {name, email, password, passwordConfirm} = ctx.request.body
 
   name = name.trim()
@@ -118,7 +118,7 @@ router.post('/api/account/create', async (ctx, next) => {
 })
 
 // update
-router.post('/api/account/update', async (ctx, next) => {
+router.post('/account/update', async (ctx, next) => {
   let user
 
   // check jwt validity

@@ -1,15 +1,14 @@
 const db = require('sqlite')
-const KoaRouter = require('koa-router')
 const Providers = require('../../providers')
 const getPrefs = require('../socket/prefs').getPrefs
-
-const router = KoaRouter()
+const KoaRouter = require('koa-router')
+const router = KoaRouter({prefix: '/api'})
 const debug = require('debug')
 const log = debug('app:library')
 const error = debug('app:library:error')
 
 // call media provider for song
-router.get('/api/provider/:provider/:method', async (ctx, next) => {
+router.get('/provider/:provider/:method', async (ctx, next) => {
   const { provider, method } = ctx.params
   let cfg
 

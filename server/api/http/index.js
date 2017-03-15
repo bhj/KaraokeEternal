@@ -1,9 +1,9 @@
-const account = require('./account')
+const user = require('./user')
 const provider = require('./provider')
 const song = require('./song')
 
 module.exports = {
-  account,
+  user,
   provider,
   song,
 }

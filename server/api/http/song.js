@@ -1,11 +1,11 @@
 const db = require('sqlite')
 const KoaRouter = require('koa-router')
-const router = KoaRouter()
+const router = KoaRouter({prefix: '/api'})
 const debug = require('debug')
 const log = debug('app:api:song')
 const searchLibrary = require('../../library/search')
 
-router.get('/api/song/:songId', async (ctx, next) => {
+router.get('/song/:songId', async (ctx, next) => {
   const { songId } = ctx.params
 
   try {

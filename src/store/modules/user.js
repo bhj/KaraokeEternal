@@ -37,7 +37,7 @@ export function loginUser(data) {
   return (dispatch, getState) => {
     dispatch(requestLogin(data))
 
-    return fetch('/api/account/login', {
+    return fetch('/api/login', {
       method: 'POST',
       credentials: 'same-origin',
       headers: new Headers({
@@ -116,7 +116,7 @@ export function logoutUser() {
   return (dispatch, getState) => {
     dispatch(requestLogout())
 
-    return fetch('/api/account/logout', {
+    return fetch('/api/logout', {
       credentials: 'same-origin',
     })
     .then(checkStatus)
@@ -268,7 +268,7 @@ function roomsError(message) {
   return {
     type: GET_ROOMS_FAIL,
     meta: {
-      error: message,      
+      error: message,
     }
   }
 }
@@ -277,7 +277,7 @@ export function fetchRooms() {
   return dispatch => {
     dispatch(requestRooms())
 
-    return fetch('/api/account/rooms')
+    return fetch('/api/rooms')
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
