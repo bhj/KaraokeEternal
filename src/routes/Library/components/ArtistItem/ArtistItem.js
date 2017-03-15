@@ -7,7 +7,7 @@ const ArtistItem = (props) => {
   let isChildQueued = false
 
   props.songIds.forEach(songId => {
-    if (props.queuedSongIds.indexOf(songId) !== -1) {
+    if (props.queuedSongs.includes(songId)) {
       isChildQueued = true
     }
 
@@ -17,7 +17,7 @@ const ArtistItem = (props) => {
           {...props.songs.entities[songId]}
           onSongClick={() => props.onSongClick(songId)}
           onSongStarClick={() => props.onSongStarClick(songId)}
-          isQueued={props.queuedSongIds.includes(songId)}
+          isQueued={props.queuedSongs.includes(songId)}
           isStarred={props.starredSongs.includes(songId)}
           key={songId}
         />
@@ -47,7 +47,7 @@ const ArtistItem = (props) => {
 ArtistItem.propTypes = {
   songs: PropTypes.object.isRequired,
   songIds: PropTypes.array.isRequired,
-  queuedSongIds: PropTypes.array.isRequired,
+  queuedSongs: PropTypes.array.isRequired,
   starredSongs: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
   isExpanded: PropTypes.bool.isRequired,

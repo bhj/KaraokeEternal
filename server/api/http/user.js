@@ -356,6 +356,6 @@ function validateEmail(email) {
          dot > at + 1 &&
          dot < email.length &&
          email[at + 1] !== "." &&
-         email.indexOf( " " ) === -1 &&
-         email.indexOf( ".." ) === -1
+         email.contains(" ") &&
+         !email.contains("..")
 }

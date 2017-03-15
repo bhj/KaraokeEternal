@@ -7,19 +7,19 @@ class ArtistList extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
     songs: PropTypes.object.isRequired,
-    queuedSongIds: PropTypes.array.isRequired,
-    starredSongs: PropTypes.array.isRequired,
-    expandedArtists: PropTypes.array.isRequired,
-    scrollTop: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     paddingTop: PropTypes.number.isRequired,
     paddingBottom: PropTypes.number.isRequired,
+    queuedSongs: PropTypes.array.isRequired,
+    starredSongs: PropTypes.array.isRequired,
+    expandedArtists: PropTypes.array.isRequired,
+    scrollTop: PropTypes.number.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
     toggleSongStarred: PropTypes.func.isRequired,
-    scrollArtists: PropTypes.func.isRequired,
     toggleArtistExpanded: PropTypes.func.isRequired,
+    scrollArtists: PropTypes.func.isRequired,
   }
 
   render () {
@@ -56,10 +56,10 @@ class ArtistList extends React.Component {
       <ArtistItem
         songs={songs}
         songIds={artist.songIds} // "children"
-        queuedSongIds={this.props.queuedSongIds}
+        queuedSongs={this.props.queuedSongs}
         starredSongs={this.props.starredSongs}
         name={artist.name}
-        isExpanded={expandedArtists.indexOf(artist.artistId) !== -1}
+        isExpanded={expandedArtists.includes(artist.artistId)}
         onArtistClick={() => this.handleArtistClick(artist.artistId)}
         onSongStarClick={this.props.toggleSongStarred}
         onSongClick={this.props.queueSong}
@@ -73,7 +73,7 @@ class ArtistList extends React.Component {
     const artistId = this.props.artists.result[index]
     let rows = 1
 
-    if (this.props.expandedArtists.indexOf(artistId) !== -1) {
+    if (this.props.expandedArtists.includes(artistId)) {
       rows += this.props.artists.entities[artistId].songIds.length
     }
 

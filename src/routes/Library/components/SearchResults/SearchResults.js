@@ -12,13 +12,14 @@ class SearchResults extends React.Component {
     artistResults: PropTypes.array.isRequired,  // artistIds
     songResults: PropTypes.array.isRequired,  // songIds
     expandedArtistResults: PropTypes.array.isRequired,
-    queuedSongIds: PropTypes.array.isRequired,
+    queuedSongs: PropTypes.array.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     paddingTop: PropTypes.number.isRequired,
     paddingBottom: PropTypes.number.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
+    toggleSongStarred: PropTypes.func.isRequired,
     toggleArtistResultExpanded: PropTypes.func.isRequired,
   }
 
@@ -36,8 +37,6 @@ class SearchResults extends React.Component {
         height={this.props.height}
         paddingTop={this.props.paddingTop}
         paddingBottom={this.props.paddingBottom}
-        artistResults={this.props.artistResults} // pass-through forces List refresh
-        songResults={this.props.songResults} // pass-through forces List refresh
         rowCount={this.props.artistResults.length+this.props.songResults.length+2}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
@@ -67,11 +66,13 @@ class SearchResults extends React.Component {
         <ArtistItem
           songs={this.props.songs}
           songIds={artist.songIds} // "children"
-          queuedSongIds={this.props.queuedSongIds}
+          queuedSongs={this.props.queuedSongs}
+          starredSongs={this.props.starredSongs}
           name={artist.name}
-          isExpanded={this.props.expandedArtistResults.indexOf(artistId) !== -1}
+          isExpanded={this.props.expandedArtistResults.includes(artistId)}
           onArtistClick={() => this.handleArtistClick(artistId)}
-          onSongClick={this.handleSongClick}
+          onSongClick={this.props.queueSong}
+          onSongStarClick={this.props.toggleSongStarred}
           key={key}
           style={style}
         />
@@ -97,7 +98,9 @@ class SearchResults extends React.Component {
         key={key}
         style={style}
         onSongClick={() => this.handleSongClick(songId)}
-        isQueued={this.props.queuedSongIds.indexOf(songId) !== -1}
+        onSongStarClick={() => this.handleSongStarClick(songId)}
+        isQueued={this.props.queuedSongs.includes(songId)}
+        isStarred={this.props.starredSongs.includes(songId)}
       />
     )
   }
@@ -109,7 +112,7 @@ class SearchResults extends React.Component {
     const artistId = this.props.artistResults[index-1]
     let rows = 1
 
-    if (this.props.expandedArtistResults.indexOf(artistId) !== -1) {
+    if (this.props.expandedArtistResults.includes(artistId)) {
       rows += this.props.artists.entities[artistId].songIds.length
     }
 
@@ -122,6 +125,10 @@ class SearchResults extends React.Component {
 
   handleSongClick = (songId) => {
     this.props.queueSong(songId)
+  }
+
+  handleSongStarClick = (songId) => {
+    this.props.toggleSongStarred(songId)
   }
 
   setRef = (ref) => {
