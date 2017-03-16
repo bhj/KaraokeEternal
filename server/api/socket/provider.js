@@ -54,8 +54,7 @@ const ACTION_HANDLERS = {
     try {
       const q = squel.delete()
         .from('artists')
-        .where('artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId))')
-        .where('songs.artistId = ?', null)
+        .where('artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)')
 
         const { text, values } = q.toParam()
         const res = await db.run(text, values)
