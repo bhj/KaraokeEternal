@@ -18,7 +18,7 @@ const ACTION_HANDLERS = {
     let cfg
 
     if (typeof Providers[payload] === 'undefined') {
-      return Promise.reject(new Error('provider not loaded: '+payload))
+      return Promise.reject(err)
     }
 
     try {
@@ -28,14 +28,33 @@ const ACTION_HANDLERS = {
     }
 
     if (!cfg.enabled) {
-      log('provider "%s" not enabled; skipping', payload)
-      return
+      const msg = `Provider '${payload}' not enabled`
+      log(msg)
+
+      return ctx.acknowledge({
+        type: PROVIDER_REFRESH_REQUEST+'_ERROR',
+        meta: {
+          error: msg
+        }
+      })
     }
 
     if (isScanning) {
-      log('ignoring request: scan already in progress')
-      return
+      const msg = `Scan already in progress`
+      log(msg)
+
+      return ctx.acknowledge({
+        type: PROVIDER_REFRESH_REQUEST+'_ERROR',
+        meta: {
+          error: msg
+        }
+      })
     }
+
+    // ack request
+    ctx.acknowledge({
+      type: PROVIDER_REFRESH_REQUEST+'_SUCCESS',
+    })
 
     log('provider "%s" starting scan', payload)
     isScanning = true
