@@ -43,7 +43,7 @@ app.use(async (ctx, next) => {
   await next()
 })
 
-// initialize each module's koa-router routes
+// koa-router (http) api endpoints
 for (let route in apiRoutes) {
   app.use(apiRoutes[route].routes())
 }
@@ -115,7 +115,7 @@ io.use(async (ctx, next) => {
   await next()
 })
 
-// koa-socket event listener
+// koa-socket (socket.io) api actions
 io.on('action', socketActions)
 
 // log disconnect/leave
