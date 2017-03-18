@@ -22,14 +22,16 @@ export default function createSocketMiddleware(socket, prefix) {
       next(action)
 
       // error action if socket.io callback timeout
-      pendingIds[requestID] = setTimeout(() => {
-        next({
-          type: type + _ERROR,
-          meta: {
-            error: `No response from server; check network connection (on action ${type})`,
-          }
-        })
-      }, 2000)
+      if (meta && meta.requireAck !== false) {
+        pendingIds[requestID] = setTimeout(() => {
+          next({
+            type: type + _ERROR,
+            meta: {
+              error: `No response from server; check network connection (on action ${type})`,
+            }
+          })
+        }, 2000)        
+      }
 
       // emit with callback method (3rd arg) that is
       // called using ctx.acknowledge(action) on the server

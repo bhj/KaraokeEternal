@@ -20,7 +20,6 @@ export const GET_MEDIA_SUCCESS = 'player/GET_MEDIA_SUCCESS'
 export function requestPlay() {
   return {
     type: PLAYER_PLAY_REQUEST,
-    payload: null
   }
 }
 
@@ -28,16 +27,16 @@ export function requestPlay() {
 export function requestPause() {
   return {
     type: PLAYER_PAUSE_REQUEST,
-    payload: null
   }
 }
 
-// Request Pause
+// Request volume
 export function requestVolume(vol) {
   return {
     type: PLAYER_VOLUME_REQUEST,
     payload: vol,
     meta: {
+      requireAck: false,
       throttle: {
         wait: 200,
         leading: false,
@@ -66,7 +65,6 @@ export function getMedia(url) {
 export function getMediaSuccess() {
   return {
     type: GET_MEDIA_SUCCESS,
-    payload: null
   }
 }
 
@@ -76,6 +74,7 @@ export function emitStatus(payload) {
     type: EMIT_STATUS,
     payload,
     meta: {
+      requireAck: false,
       throttle: {
         wait: 1000,
         leading: true,
@@ -98,7 +97,10 @@ export function cancelStatus() {
 export function emitError(queueId, message) {
   return {
     type: EMIT_ERROR,
-    payload: { queueId, message }
+    payload: { queueId, message },
+    meta: {
+      requireAck: false,
+    }
   }
 }
 

@@ -41,6 +41,11 @@ const ACTION_HANDLERS = {
       return Promise.reject(err)
     }
 
+    // ack (@todo: wait until player response)
+    ctx.acknowledge({
+      type: PLAYER_NEXT_REQUEST+'_SUCCESS',
+    })
+
     if (!item) {
       // we're already on the last queued item
       ctx.io.to(ctx.user.roomId).emit('action', {
@@ -56,12 +61,22 @@ const ACTION_HANDLERS = {
     })
   },
   [PLAYER_PLAY_REQUEST]: async (ctx, {payload}) => {
+    // ack (@todo: wait until player response)
+    ctx.acknowledge({
+      type: PLAYER_PLAY_REQUEST+'_SUCCESS',
+    })
+
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PLAY,
       payload: null
     })
   },
   [PLAYER_PAUSE_REQUEST]: async (ctx, {payload}) => {
+    // ack (@todo: wait until player response)
+    ctx.acknowledge({
+      type: PLAYER_PAUSE_REQUEST+'_SUCCESS',
+    })
+
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PAUSE,
       payload: null
