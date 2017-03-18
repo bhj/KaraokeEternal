@@ -22,8 +22,6 @@ class PlayerView extends React.Component {
     emitStatus: PropTypes.func.isRequired,
     cancelStatus: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
-    // pass-thru to force re-render
-    queue: PropTypes.object.isRequired,
   }
 
   componentDidMount() {
@@ -77,7 +75,7 @@ class PlayerView extends React.Component {
     let Component = 'div'
     let componentProps = {}
 
-    if (this.props.isAtQueueEnd || this.props.queue.result.length === 0) {
+    if (this.props.isAtQueueEnd) {
       // show 'add more songs' placeholder
       componentProps.title = "CAN HAZ MOAR SONGZ?"
       Component = ColorCycle
