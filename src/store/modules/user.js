@@ -31,8 +31,8 @@ function loginError(message) {
   }
 }
 
-// calls api endpoint that should set our JWT in an httpOnly cookie;
-// we then establish the sockiet.io connection with said cookie
+// calls api endpoint that should set an httpOnly cookie with
+// our JWT, then establish the sockiet.io connection
 export function loginUser(data) {
   return (dispatch, getState) => {
     dispatch(requestLogin(data))
@@ -48,10 +48,11 @@ export function loginUser(data) {
       .then(checkStatus)
       .then(res => res.json())
       .then(res => {
-        // cache the user object as returned in the response body
+        // user object in response body
         dispatch(receiveLogin(res))
 
-        // socket handshake should contain httpOnly cookie with JWT
+        // socket.io handshake happens over http so
+        // our JWT will be sent in the cookie
         window._socket.open()
 
         // check for redirect in query string
