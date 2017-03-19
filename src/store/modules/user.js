@@ -334,7 +334,6 @@ const ACTION_HANDLERS = {
     name: null,
     isAdmin: false,
     roomId: null,
-    rooms: [],
     starredSongs: [],
   }),
   [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
