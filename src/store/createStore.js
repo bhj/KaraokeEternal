@@ -33,8 +33,8 @@ export default (initialState = {}) => {
   // Store Enhancers
   // ======================================================
   const enhancers = [
-    responsiveStoreEnhancer,
     autoRehydrate(),
+    responsiveStoreEnhancer,
   ]
 
   window.addEventListener('resize', () => store.dispatch(calculateResponsiveState(window)))
@@ -72,7 +72,7 @@ export default (initialState = {}) => {
   }
 
   // begin periodically persisting the store
-  persistStore(store, {whitelist: ['user']}, () => {
+  window._persistor = persistStore(store, {whitelist: ['user']}, () => {
     // on rehydrate, attempt socket.io connection
     // if it looks like we have a valid session
     if (store.getState().user.userId !== null) {

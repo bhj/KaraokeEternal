@@ -128,8 +128,8 @@ export function logoutUser() {
       dispatch(logoutError(err.message))
     })
     .then(() => {
-      // regardless of the server response; we tried!
-      // @todo - purge persisted data
+      // regardless of server response; we tried!
+      window._persistor.purge()
 
       // disconnect socket
       window._socket.close()
