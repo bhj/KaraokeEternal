@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import Prefs from './Prefs'
-import { setPrefs, providerRefresh } from 'store/modules/ui'
+import { setPrefs, providerRefresh } from 'store/modules/user'
 
 const mapActionCreators = {
   setPrefs,
@@ -8,7 +8,7 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  const prefs = state.ui.prefs
+  const { prefs } = state.user
 
   if (prefs && prefs.provider && prefs.provider.cdg) {
     return {prefs: prefs.provider.cdg}

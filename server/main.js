@@ -95,13 +95,11 @@ app._io.on('connection', async (sock) => {
     payload: await Queue.getQueue(user.roomId),
   })
 
-  // send app config if they're admin
-  if (user && user.isAdmin) {
-    app._io.to(sock.id).emit('action', {
-      type: Prefs.PREFS_CHANGE,
-      payload: await Prefs.getPrefs(),
-    })
-  }
+  // send prefs
+  app._io.to(sock.id).emit('action', {
+    type: Prefs.PREFS_CHANGE,
+    payload: await Prefs.getPrefs(),
+  })
 })
 
 // koa-socket middleware

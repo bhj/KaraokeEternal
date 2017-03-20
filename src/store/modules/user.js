@@ -1,6 +1,10 @@
 import fetch from 'isomorphic-fetch'
 import { browserHistory } from 'react-router'
 
+export const PREFS_CHANGE_REQUEST = 'server/PREFS_CHANGE'
+export const PREFS_CHANGE = 'ui/PREFS_CHANGE'
+export const PROVIDER_REFRESH_REQUEST = 'server/PROVIDER_REFRESH'
+
 // ------------------------------------
 // Login
 // ------------------------------------
@@ -291,7 +295,7 @@ export function fetchRooms() {
 }
 
 // ------------------------------------
-// Starred songs
+// Star songs
 // ------------------------------------
 const TOGGLE_SONG_STARRED = "server/TOGGLE_SONG_STARRED"
 export function toggleSongStarred(songId) {
@@ -302,8 +306,28 @@ export function toggleSongStarred(songId) {
 }
 
 // ------------------------------------
-// helper for fetch response
+// Set prefs
 // ------------------------------------
+export function setPrefs(domain, data) {
+  return {
+    type: PREFS_CHANGE_REQUEST,
+    payload: { domain, data },
+  }
+}
+
+// ------------------------------------
+// Provider re-scan
+// ------------------------------------
+export function providerRefresh(provider) {
+  return {
+    type: PROVIDER_REFRESH_REQUEST,
+    payload: provider,
+  }
+}
+
+
+
+// helper for fetch response
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response
@@ -345,6 +369,10 @@ const ACTION_HANDLERS = {
     ...state,
     starredSongs: payload,
   }),
+  [PREFS_CHANGE]: (state, {payload}) => ({
+    ...state,
+    prefs: payload,
+  }),
 }
 
 // ------------------------------------
@@ -355,6 +383,7 @@ let initialState = {
   email: null,
   name: null,
   isAdmin: false,
+  prefs: null,
   roomId: null,
   rooms: [],
   starredSongs: [],
