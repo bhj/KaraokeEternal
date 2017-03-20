@@ -358,6 +358,7 @@ const ACTION_HANDLERS = {
     email: null,
     name: null,
     isAdmin: false,
+    prefs: null,
     roomId: null,
     starredSongs: [],
   }),
