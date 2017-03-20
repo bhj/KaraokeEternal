@@ -3,9 +3,9 @@ const squel = require('squel')
 const log = require('debug')('app:socket:library')
 
 const TOGGLE_SONG_STARRED = 'server/TOGGLE_SONG_STARRED'
-
+const searchLibrary = require('../../library/search')
 const getLibrary = require('../../library/get')
-const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+const SONG_UPDATE = 'library/SONG_UPDATE'
 
 const ACTION_HANDLERS = {
   [TOGGLE_SONG_STARRED]: async (ctx, {payload}) => {
@@ -56,12 +56,23 @@ const ACTION_HANDLERS = {
       return Promise.reject(err)
     }
 
-    // emit updated star counts to room
-    // @todo incremental updates
-    ctx.io.to(ctx.user.roomId).emit('action', {
-      type: LIBRARY_CHANGE,
-      payload: await getLibrary(),
-    })
+    // emit updated star count to room
+    try {
+      const res = await searchLibrary({
+        songId: payload,
+      })
+
+      if (res.result.length !== 1) {
+        throw new Error(res.result.length+' results (expected 1)')
+      }
+
+      ctx.io.to(ctx.user.roomId).emit('action', {
+        type: SONG_UPDATE,
+        payload: res.entities[res.result[0]],
+      })
+    } catch(err) {
+      return Promise.reject(err)
+    }
   },
 }
 

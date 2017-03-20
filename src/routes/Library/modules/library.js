@@ -1,5 +1,6 @@
 // emitted from server
 const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+const SONG_UPDATE = 'library/SONG_UPDATE'
 
 export const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
 export function scrollArtists(scrollTop) {
@@ -135,7 +136,21 @@ const ACTION_HANDLERS = {
       ...state,
       expandedArtistResults: list,
     }
-  }
+  },
+  [SONG_UPDATE]: (state, {payload}) => {
+    const { songId } = payload
+
+    return {
+      ...state,
+      songs: {
+        ...state.songs,
+        entities: {
+          ...state.songs.entities,
+          [songId]: payload,
+        }
+      }
+    }
+  },
 }
 
 // ------------------------------------
