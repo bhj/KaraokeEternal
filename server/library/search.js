@@ -9,7 +9,9 @@ async function searchLibrary(params = {}) {
     entities: {}
   }
 
-  const q = squel.select().from('songs')
+  const q = squel.select()
+    .field('songs.*')
+    .from('songs')
 
   Object.keys(params).map(key => {
     if (key === 'meta' && typeof params.meta === 'object') {
@@ -20,6 +22,11 @@ async function searchLibrary(params = {}) {
       q.where(`${key} = ?`, params[key])
     }
   })
+
+  // starred count
+  q.field('COUNT(stars.userId) AS stars')
+    .left_join('stars USING(songId)')
+    .group('songId')
 
   // get songs
   try {
