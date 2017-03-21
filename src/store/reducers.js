@@ -11,18 +11,18 @@ import queue from 'routes/Queue/modules/queue'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
-    browser: createResponsiveStateReducer(null, {
-        extraFields: () => ({
-            width: window.innerWidth,
-            height: window.innerHeight,
-        }),
-    }),
     library,
     location,
     queue,
     status,
     ui,
     user,
+    viewport: createResponsiveStateReducer(null, {
+        extraFields: () => ({
+            width: window.innerWidth,
+            height: window.innerHeight,
+        }),
+    }),
     ...asyncReducers
   })
 }

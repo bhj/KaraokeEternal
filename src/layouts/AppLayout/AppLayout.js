@@ -9,12 +9,12 @@ const AppLayout = (props) => {
       {props.header}
 
       <div className={classes.viewport} style={{
-        width: props.browserWidth,
-        height: props.browserHeight,
+        width: props.viewportWidth,
+        height: props.viewportHeight,
       }}>
         {props.children({
-          width: props.browserWidth,
-          height: props.browserHeight,
+          width: props.viewportWidth,
+          height: props.viewportHeight,
           paddingTop: props.headerHeight,
           paddingBottom: props.footerHeight,
         })}
