@@ -137,20 +137,16 @@ const ACTION_HANDLERS = {
       expandedArtistResults: list,
     }
   },
-  [SONG_UPDATE]: (state, {payload}) => {
-    const { songId } = payload
-
-    return {
-      ...state,
-      songs: {
-        ...state.songs,
-        entities: {
-          ...state.songs.entities,
-          [songId]: payload,
-        }
+  [SONG_UPDATE]: (state, {payload}) => ({
+    ...state,
+    songs: {
+      ...state.songs,
+      entities: {
+        ...state.songs.entities,
+        [payload.songId]: payload,
       }
     }
-  },
+  })
 }
 
 // ------------------------------------
