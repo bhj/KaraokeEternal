@@ -1,5 +1,4 @@
-const _SUCCESS = '_SUCCESS'
-const _ERROR = '_ERROR'
+import { _SUCCESS, _ERROR } from 'constants'
 const pendingIds = {} // requestIDs to timeoutIDs
 let nextRequestID = 0
 
@@ -30,7 +29,7 @@ export default function createSocketMiddleware(socket, prefix) {
               error: `No response from server; check network connection (on action ${type})`,
             }
           })
-        }, 2000)        
+        }, 2000)
       }
 
       // emit with callback method (3rd arg) that is
