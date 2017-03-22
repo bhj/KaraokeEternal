@@ -2,13 +2,13 @@ const db = require('sqlite')
 const squel = require('squel')
 const log = require('debug')('app:socket:library')
 
-const searchLibrary = require('../../library/search')
-const getLibrary = require('../../library/get')
+const searchLibrary = require('../../lib/search')
+const getLibrary = require('../../lib/get')
 
 const {
   SONG_UPDATE,
   TOGGLE_SONG_STARRED
-} = require('../../constants')
+} = require('../constants')
 
 const ACTION_HANDLERS = {
   [TOGGLE_SONG_STARRED]: async (ctx, {payload}) => {

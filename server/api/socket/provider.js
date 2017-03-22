@@ -7,7 +7,7 @@ const getPrefs = require('./prefs').getPrefs
 const {
   PROVIDER_REFRESH_REQUEST,
   LIBRARY_UPDATE
-} = require('../../constants')
+} = require('../constants')
 
 let isScanning
 

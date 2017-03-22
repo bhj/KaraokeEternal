@@ -3,7 +3,7 @@ const path = require('path')
 const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.config')
 const project = require('../config/project.config')
-const readFile = require('./thunks/readfile')
+const readFile = require('./lib/thunks/readfile')
 
 const koa = require('koa')
 const convert = require('koa-convert')
@@ -19,11 +19,11 @@ const apiRoutes = require('./api/http')
 const socketActions = require('./api/socket')
 const Queue = require('./api/socket/queue')
 const Prefs = require('./api/socket/prefs')
-const getLibrary = require('./library/get')
+const getLibrary = require('./lib/get')
 const {
   LIBRARY_UPDATE,
   AUTH_ERROR,
-} = require('./constants')
+} = require('./api/constants')
 
 const app = new koa()
 const io = new koaSocket()

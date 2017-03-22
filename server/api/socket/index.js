@@ -8,7 +8,7 @@ const Provider = require('./provider')
 const {
   AUTH_ERROR,
   ACTION_ERROR,
-} = require('../../constants')
+} = require('../constants')
 
 let ACTION_HANDLERS = Object.assign({},
   Library.ACTION_HANDLERS,

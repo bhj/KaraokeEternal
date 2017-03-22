@@ -16,7 +16,7 @@ const {
   EMIT_ERROR,
   PLAYBACK_STATUS,
   PLAYBACK_ERROR,
-} = require('../../constants')
+} = require('../constants')
 
 // ------------------------------------
 // Action Handlers

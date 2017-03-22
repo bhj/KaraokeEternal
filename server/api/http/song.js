@@ -3,7 +3,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({prefix: '/api'})
 const debug = require('debug')
 const log = debug('app:api:song')
-const searchLibrary = require('../../library/search')
+const searchLibrary = require('../../lib/search')
 
 router.get('/song/:songId', async (ctx, next) => {
   const { songId } = ctx.params

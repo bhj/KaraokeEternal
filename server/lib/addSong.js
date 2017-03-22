@@ -3,7 +3,7 @@ const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:addSong')
 
-const { LIBRARY_UPDATE } = require('../constants')
+const { LIBRARY_UPDATE } = require('../api/constants')
 
 async function addSong(song) {
   if (!song || !song.artist || !song.title || !song.duration) {

@@ -1,22 +1,23 @@
-const getFiles = require('../../thunks/getFiles')
-const hashfiles = require('../../thunks/hashfiles')
-const musicmetadata = require('../../thunks/musicmetadata')
-const mp3duration = require('../../thunks/mp3duration')
-const debug = require('debug')
 const fs = require('fs')
-const stat = require('../../thunks/stat')
 const path = require('path')
+const debug = require('debug')
 const log = debug('app:provider:cdg')
 
-const getLibrary = require('../../library/get')
-const searchLibrary = require('../../library/search')
-const addSong = require('../../library/addSong')
-const parseArtistTitle = require('../../library/parseArtistTitle')
+const getFiles = require('../../lib/thunks/getFiles')
+const hashfiles = require('../../lib/thunks/hashfiles')
+const musicmetadata = require('../../lib/thunks/musicmetadata')
+const mp3duration = require('../../lib/thunks/mp3duration')
+const stat = require('../../lib/thunks/stat')
+
+const getLibrary = require('../../lib/get')
+const searchLibrary = require('../../lib/search')
+const addSong = require('../../lib/addSong')
+const parseArtistTitle = require('../../lib/parseArtistTitle')
 
 const {
   LIBRARY_UPDATE,
   PREFS_CHANGE
-} = require('../../constants')
+} = require('../../api/constants')
 
 const allowedExts = ['.mp3', '.m4a']
 let counts

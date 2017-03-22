@@ -7,7 +7,7 @@ const {
   QUEUE_REMOVE,
   QUEUE_UPDATE,
   QUEUE_END,
-} = require('../../constants')
+} = require('../constants')
 
 // ------------------------------------
 // Action Handlers

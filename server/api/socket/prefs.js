@@ -5,7 +5,7 @@ const log = require('debug')('app:socket:prefs')
 const {
   PREFS_CHANGE_REQUEST,
   PREFS_CHANGE
-} = require('../../constants')
+} = require('../constants')
 
 const ACTION_HANDLERS = {
   [PREFS_CHANGE_REQUEST]: async (ctx, {payload}) => {

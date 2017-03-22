@@ -3,8 +3,8 @@ const fetch = require('isomorphic-fetch')
 var log = require('debug')('app:provider:youtube')
 const { parse, toSeconds, pattern } = require('iso8601-duration')
 
-const addSong = require('../../library/addSong')
-const searchLibrary = require('../../library/search')
+const addSong = require('../../lib/addSong')
+const searchLibrary = require('../../lib/search')
 
 let stats
 
