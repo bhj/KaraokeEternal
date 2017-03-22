@@ -25,9 +25,7 @@ LibraryView.propTypes = {
   expandedArtists: PropTypes.array.isRequired,
   // search
   searchTerm: PropTypes.string.isRequired,
-  artistResults: PropTypes.array.isRequired,
   expandedArtistResults: PropTypes.array.isRequired,
-  songResults: PropTypes.array.isRequired,
   // actions
   queueSong: PropTypes.func.isRequired,
   toggleSongStarred: PropTypes.func.isRequired,
