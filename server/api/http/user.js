@@ -1,7 +1,7 @@
 const db = require('sqlite')
 const squel = require('squel')
 const jwtSign = require('jsonwebtoken').sign
-const bcrypt = require('./thunks/bcrypt')
+const bcrypt = require('../../lib/thunks/bcrypt')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({prefix: '/api'})
 const debug = require('debug')
