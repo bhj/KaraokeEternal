@@ -12,7 +12,7 @@ export default function createSocketMiddleware(socket, prefix) {
       const { type, meta, payload } = action
 
       // only apply to socket.io requests
-      if (type.indexOf(prefix) !== 0) {
+      if (!type || type.indexOf(prefix) !== 0) {
         return next(action)
       }
 
