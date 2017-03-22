@@ -22,9 +22,9 @@ const mapStateToProps = (state) => {
     scrollTop: state.library.scrollTop,
     // search
     searchTerm: state.library.searchTerm,
-    artistResults: state.library.artistResults,
+    artistResults: state.artists.searchResult,
+    songResults: state.songs.searchResult,
     expandedArtistResults: state.library.expandedArtistResults,
-    songResults: state.library.songResults,
   }
 }
 

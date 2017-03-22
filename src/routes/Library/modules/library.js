@@ -1,3 +1,8 @@
+import {
+  LIBRARY_SEARCH,
+  LIBRARY_SEARCH_RESET,
+} from 'constants'
+
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
 export function scrollArtists(scrollTop) {
   return {
@@ -22,7 +27,6 @@ export function toggleArtistResultExpanded(artistId) {
   }
 }
 
-const LIBRARY_SEARCH = 'library/SEARCH'
 export function searchLibrary(term) {
   return {
     type: LIBRARY_SEARCH,
@@ -36,7 +40,6 @@ export function searchLibrary(term) {
   }
 }
 
-const LIBRARY_SEARCH_RESET = 'library/SEARCH_RESET'
 export function searchReset() {
   return {
     type: LIBRARY_SEARCH_RESET,
@@ -48,45 +51,13 @@ export function searchReset() {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_SEARCH]: (state, {payload}) => {
-    let artistResults, songResults
-    let term = payload.trim()
-
-    if (term === '') {
-      return {
-        ...state,
-        searchTerm: '',
-        artistResults: [],
-        expandedArtistResults: [],
-        songResults: [],
-      }
-    }
-
-    term = term.toLowerCase()
-
-    artistResults = state.artists.result.filter((artistId, i) => {
-      const str = state.artists.entities[artistId].name.toLowerCase()
-      return str.indexOf(term) !== -1
-    })
-
-    songResults = state.songs.result.filter((songId, i) => {
-      const str = state.songs.entities[songId].title.toLowerCase()
-      return str.indexOf(term) !== -1
-    })
-
-    return {
-      ...state,
-      searchTerm: payload,
-      artistResults,
-      songResults,
-    }
-  },
+  [LIBRARY_SEARCH]: (state, {payload}) => ({
+    ...state,
+    searchTerm: payload,
+  }),
   [LIBRARY_SEARCH_RESET]: (state, {payload}) => ({
     ...state,
     searchTerm: '',
-    artistResults: [],
-    expandedArtistResults: [],
-    songResults: [],
   }),
   [SCROLL_ARTISTS]: (state, {payload}) => ({
     ...state,
