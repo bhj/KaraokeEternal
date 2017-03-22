@@ -1,16 +1,18 @@
 import { CANCEL, FLUSH } from 'redux-throttle'
 
-const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
-const PLAYER_NEXT = 'player/PLAYER_NEXT'
-const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
-const PLAYER_PLAY = 'player/PLAYER_PLAY'
-const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
-const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
-const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
-const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
-const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
-const EMIT_STATUS = 'server/PLAYER_STATUS'
-const EMIT_ERROR = 'server/PLAYER_ERROR'
+import {
+  PLAYER_NEXT_REQUEST,
+  PLAYER_NEXT,
+  PLAYER_PLAY_REQUEST,
+  PLAYER_PLAY,
+  PLAYER_PAUSE_REQUEST,
+  PLAYER_PAUSE,
+  PLAYER_VOLUME_REQUEST,
+  PLAYER_VOLUME,
+  PLAYER_QUEUE_END ,
+  EMIT_STATUS,
+  EMIT_ERROR
+} from 'constants'
 
 // for informational purposes from provider players
 export const GET_MEDIA = 'player/GET_MEDIA'

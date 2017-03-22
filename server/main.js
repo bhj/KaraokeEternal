@@ -20,8 +20,10 @@ const socketActions = require('./api/socket')
 const Queue = require('./api/socket/queue')
 const Prefs = require('./api/socket/prefs')
 const getLibrary = require('./library/get')
-const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
-const SOCKET_AUTH_ERROR = 'user/SOCKET_AUTH_ERROR'
+const {
+  LIBRARY_UPDATE,
+  AUTH_ERROR,
+} = require('./constants')
 
 const app = new koa()
 const io = new koaSocket()
@@ -85,13 +87,13 @@ app._io.on('connection', async (sock) => {
 
   // send library
   app._io.to(sock.id).emit('action', {
-    type: LIBRARY_CHANGE,
+    type: LIBRARY_UPDATE,
     payload: await getLibrary(),
   })
 
   // send queue
   app._io.to(sock.id).emit('action', {
-    type: Queue.QUEUE_CHANGE,
+    type: Queue.QUEUE_UPDATE,
     payload: await Queue.getQueue(user.roomId),
   })
 

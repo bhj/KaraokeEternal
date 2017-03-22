@@ -4,8 +4,10 @@ const debug = require('debug')
 const Providers = require('../../providers')
 const getPrefs = require('./prefs').getPrefs
 
-const PROVIDER_REFRESH_REQUEST = 'server/PROVIDER_REFRESH'
-const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
+const {
+  PROVIDER_REFRESH_REQUEST,
+  LIBRARY_UPDATE
+} = require('../../constants')
 
 let isScanning
 

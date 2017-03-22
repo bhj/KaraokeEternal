@@ -1,17 +1,23 @@
 import fetch from 'isomorphic-fetch'
 import { browserHistory } from 'react-router'
 
-export const PREFS_CHANGE_REQUEST = 'server/PREFS_CHANGE'
-export const PREFS_CHANGE = 'ui/PREFS_CHANGE'
-export const PROVIDER_REFRESH_REQUEST = 'server/PROVIDER_REFRESH'
+import {
+  PREFS_CHANGE_REQUEST,
+  PREFS_CHANGE,
+  PROVIDER_REFRESH_REQUEST,
+  TOGGLE_SONG_STARRED,
+  LOGIN,
+  LOGOUT,
+  CREATE,
+  UPDATE,
+  GET_ROOMS,
+  _SUCCESS,
+  _ERROR,
+} from 'constants'
 
 // ------------------------------------
 // Login
 // ------------------------------------
-export const LOGIN = 'account/LOGIN'
-export const LOGIN_SUCCESS = 'account/LOGIN_SUCCESS'
-export const LOGIN_FAIL = 'account/LOGIN_FAIL'
-
 function requestLogin(creds) {
   return {
     type: LOGIN,
@@ -21,14 +27,14 @@ function requestLogin(creds) {
 
 function receiveLogin(response) {
   return {
-    type: LOGIN_SUCCESS,
+    type: LOGIN+_SUCCESS,
     payload: response
   }
 }
 
 function loginError(message) {
   return {
-    type: LOGIN_FAIL,
+    type: LOGIN+_ERROR,
     meta: {
       error: message + ' (incorrect login)',
     }
@@ -89,10 +95,6 @@ function parseQuery(qstr) {
 // ------------------------------------
 // Logout
 // ------------------------------------
-export const LOGOUT = 'account/LOGOUT'
-export const LOGOUT_SUCCESS = 'account/LOGOUT_SUCCESS'
-export const LOGOUT_FAIL = 'account/LOGOUT_FAIL'
-
 function requestLogout() {
   return {
     type: LOGOUT,
@@ -102,14 +104,14 @@ function requestLogout() {
 
 function receiveLogout() {
   return {
-    type: LOGOUT_SUCCESS,
+    type: LOGOUT+_SUCCESS,
     payload: null
   }
 }
 
 function logoutError(message) {
   return {
-    type: LOGOUT_FAIL,
+    type: LOGOUT+_ERROR,
     meta: {
       error: message,
     }
@@ -145,10 +147,6 @@ export function logoutUser() {
 // ------------------------------------
 // Create account
 // ------------------------------------
-export const CREATE = 'account/CREATE'
-export const CREATE_SUCCESS = 'account/CREATE_SUCCESS'
-export const CREATE_FAIL = 'account/CREATE_FAIL'
-
 function requestCreate(user) {
   return {
     type: CREATE,
@@ -158,14 +156,14 @@ function requestCreate(user) {
 
 function receiveCreate() {
   return {
-    type: CREATE_SUCCESS,
+    type: CREATE+_SUCCESS,
     payload: null
   }
 }
 
 function createError(message) {
   return {
-    type: CREATE_FAIL,
+    type: CREATE+_ERROR,
     meta: {
       error: message,
     }
@@ -198,10 +196,6 @@ export function createUser(user) {
 // ------------------------------------
 // Update account
 // ------------------------------------
-export const UPDATE = 'account/UPDATE'
-export const UPDATE_SUCCESS = 'account/UPDATE_SUCCESS'
-export const UPDATE_FAIL = 'account/UPDATE_FAIL'
-
 function requestUpdate(user) {
   return {
     type: UPDATE,
@@ -211,14 +205,14 @@ function requestUpdate(user) {
 
 function receiveUpdate(response) {
   return {
-    type: UPDATE_SUCCESS,
+    type: UPDATE+_SUCCESS,
     payload: response
   }
 }
 
 function updateError(message) {
   return {
-    type: UPDATE_FAIL,
+    type: UPDATE+_ERROR,
     meta: {
       error: message,
     }
@@ -251,10 +245,6 @@ export function updateUser(data) {
 // ------------------------------------
 // Available Rooms
 // ------------------------------------
-export const GET_ROOMS = 'account/GET_ROOMS'
-export const GET_ROOMS_SUCCESS = 'account/GET_ROOMS_SUCCESS'
-export const GET_ROOMS_FAIL = 'account/GET_ROOMS_FAIL'
-
 function requestRooms() {
   return {
     type: GET_ROOMS,
@@ -264,14 +254,14 @@ function requestRooms() {
 
 function receiveRooms(response) {
   return {
-    type: GET_ROOMS_SUCCESS,
+    type: GET_ROOMS+_SUCCESS,
     payload: response
   }
 }
 
 function roomsError(message) {
   return {
-    type: GET_ROOMS_FAIL,
+    type: GET_ROOMS+_ERROR,
     meta: {
       error: message,
     }
@@ -297,7 +287,6 @@ export function fetchRooms() {
 // ------------------------------------
 // Star songs
 // ------------------------------------
-const TOGGLE_SONG_STARRED = "server/TOGGLE_SONG_STARRED"
 export function toggleSongStarred(songId) {
   return {
     type: TOGGLE_SONG_STARRED,
@@ -325,8 +314,6 @@ export function providerRefresh(provider) {
   }
 }
 
-
-
 // helper for fetch response
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -344,15 +331,15 @@ function checkStatus(response) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LOGIN_SUCCESS]: (state, {payload}) => ({
+  [LOGIN+_SUCCESS]: (state, {payload}) => ({
     ...state,
     ...payload,
   }),
-  [UPDATE_SUCCESS]: (state, {payload}) => ({
+  [UPDATE+_SUCCESS]: (state, {payload}) => ({
     ...state,
     ...payload,
   }),
-  [LOGOUT_SUCCESS]: (state, {payload}) => ({
+  [LOGOUT+_SUCCESS]: (state, {payload}) => ({
     ...state,
     userId: null,
     email: null,
@@ -362,11 +349,11 @@ const ACTION_HANDLERS = {
     roomId: null,
     starredSongs: [],
   }),
-  [GET_ROOMS_SUCCESS]: (state, {payload}) => ({
+  [GET_ROOMS+_SUCCESS]: (state, {payload}) => ({
     ...state,
     rooms: payload,
   }),
-  [TOGGLE_SONG_STARRED+'_SUCCESS']: (state, {payload}) => ({
+  [TOGGLE_SONG_STARRED+_SUCCESS]: (state, {payload}) => ({
     ...state,
     starredSongs: payload,
   }),

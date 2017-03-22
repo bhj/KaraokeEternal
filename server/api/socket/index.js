@@ -5,6 +5,11 @@ const Player = require('./player')
 const Prefs = require('./prefs')
 const Provider = require('./provider')
 
+const {
+  AUTH_ERROR,
+  ACTION_ERROR,
+} = require('../../constants')
+
 let ACTION_HANDLERS = Object.assign({},
   Library.ACTION_HANDLERS,
   Queue.ACTION_HANDLERS,
@@ -19,7 +24,7 @@ module.exports = async function(ctx) {
 
   if (!ctx.user) {
     return ctx.acknowledge({
-      type: 'SOCKET_AUTH_ERROR',
+      type: AUTH_ERROR,
       meta: {
         error: 'Invalid token (try signing in again)'
       }
@@ -37,7 +42,7 @@ module.exports = async function(ctx) {
     const msg = `Error handling ${action.type}: ${err.message}`
 
     return ctx.acknowledge({
-      type: 'SOCKET_ACTION_ERROR',
+      type: ACTION_ERROR,
       meta: {
         error: msg
       }

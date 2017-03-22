@@ -13,8 +13,10 @@ const searchLibrary = require('../../library/search')
 const addSong = require('../../library/addSong')
 const parseArtistTitle = require('../../library/parseArtistTitle')
 
-const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
-const PREFS_CHANGE = 'account/PREFS_CHANGE'
+const {
+  LIBRARY_UPDATE,
+  PREFS_CHANGE
+} = require('../../constants')
 
 const allowedExts = ['.mp3', '.m4a']
 let counts
@@ -60,7 +62,7 @@ async function scan(ctx, cfg) {
         newCount = counts.new
         // emit updated library
         ctx.io.emit('action', {
-          type: LIBRARY_CHANGE,
+          type: LIBRARY_UPDATE,
           payload: await getLibrary(),
         })
       }

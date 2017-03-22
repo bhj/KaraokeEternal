@@ -2,12 +2,12 @@ const db = require('sqlite')
 const squel = require('squel')
 const log = require('debug')('app:socket:queue')
 
-const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
-const QUEUE_END = 'queue/QUEUE_END'
-
-// client actions
-const QUEUE_ADD = 'server/QUEUE_ADD'
-const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
+const {
+  QUEUE_ADD,
+  QUEUE_REMOVE,
+  QUEUE_UPDATE,
+  QUEUE_END,
+} = require('../../constants')
 
 // ------------------------------------
 // Action Handlers
@@ -77,7 +77,7 @@ const ACTION_HANDLERS = {
 
     // to all in room
     ctx.io.to(ctx.user.roomId).emit('action', {
-      type: QUEUE_CHANGE,
+      type: QUEUE_UPDATE,
       payload: await getQueue(ctx.user.roomId)
     })
   },
@@ -197,7 +197,7 @@ const ACTION_HANDLERS = {
 
     // tell room
     ctx.io.to(ctx.user.roomId).emit('action', {
-      type: QUEUE_CHANGE,
+      type: QUEUE_UPDATE,
       payload: await getQueue(ctx.user.roomId)
     })
   },
@@ -254,5 +254,5 @@ async function _isRoomOpen(roomId) {
 module.exports = {
   ACTION_HANDLERS,
   getQueue,
-  QUEUE_CHANGE,
+  QUEUE_UPDATE,
 }

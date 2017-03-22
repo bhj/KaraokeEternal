@@ -14,8 +14,8 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    artists: state.library.artists,
-    songs: state.library.songs,
+    artists: state.artists,
+    songs: state.songs,
     queuedSongs: state.queue.songIds,
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,

@@ -2,21 +2,21 @@ const db = require('sqlite')
 const squel = require('squel')
 const log = require('debug')('app:socket:player')
 
-const PLAYER_NEXT_REQUEST = 'server/PLAYER_NEXT'
-const PLAYER_NEXT = 'player/PLAYER_NEXT'
-const PLAYER_QUEUE_END = 'player/PLAYER_QUEUE_END'
-
-const PLAYER_PLAY_REQUEST = 'server/PLAYER_PLAY'
-const PLAYER_PLAY = 'player/PLAYER_PLAY'
-const PLAYER_PAUSE_REQUEST = 'server/PLAYER_PAUSE'
-const PLAYER_PAUSE = 'player/PLAYER_PAUSE'
-const PLAYER_VOLUME_REQUEST = 'server/PLAYER_VOLUME'
-const PLAYER_VOLUME = 'player/PLAYER_VOLUME'
-
-const EMIT_STATUS = 'server/PLAYER_STATUS'
-const EMIT_ERROR = 'server/PLAYER_ERROR'
-const PLAYBACK_STATUS = 'status/PLAYBACK_STATUS'
-const PLAYBACK_ERROR = 'status/PLAYBACK_ERROR'
+const {
+  PLAYER_NEXT_REQUEST,
+  PLAYER_NEXT,
+  PLAYER_QUEUE_END,
+  PLAYER_PLAY_REQUEST,
+  PLAYER_PLAY,
+  PLAYER_PAUSE_REQUEST,
+  PLAYER_PAUSE,
+  PLAYER_VOLUME_REQUEST,
+  PLAYER_VOLUME,
+  EMIT_STATUS,
+  EMIT_ERROR,
+  PLAYBACK_STATUS,
+  PLAYBACK_ERROR,
+} = require('../../constants')
 
 // ------------------------------------
 // Action Handlers

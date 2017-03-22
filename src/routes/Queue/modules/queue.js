@@ -1,10 +1,11 @@
-// emitted from server
-const QUEUE_CHANGE = 'queue/QUEUE_CHANGE'
-const PLAYBACK_STATUS = 'status/PLAYBACK_STATUS'
+import {
+  QUEUE_ADD,
+  QUEUE_UPDATE,
+  QUEUE_REMOVE,
+  PLAYBACK_STATUS,
+} from 'constants'
 
 // add to queue
-const QUEUE_ADD = 'server/QUEUE_ADD'
-
 export function queueSong(songId) {
   return {
     type: QUEUE_ADD,
@@ -13,8 +14,6 @@ export function queueSong(songId) {
 }
 
 // remove from queue
-export const QUEUE_REMOVE = 'server/QUEUE_REMOVE'
-
 export function removeItem(queueId) {
   return {
     type: QUEUE_REMOVE,
@@ -26,7 +25,7 @@ export function removeItem(queueId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_CHANGE]: (state, {payload}) => ({
+  [QUEUE_UPDATE]: (state, {payload}) => ({
     ...state,
     result: payload.result,
     entities: setWaits(payload.result, payload.entities, state.curId, state.curPos),

@@ -12,12 +12,12 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  const { queue, library, player } = state
+  const { queue, player } = state
   let songId, song
 
   if (queue.entities[player.queueId]) {
     songId = queue.entities[player.queueId].songId
-    song = library.songs.entities[songId]
+    song = state.songs.entities[songId]
   }
 
   return {

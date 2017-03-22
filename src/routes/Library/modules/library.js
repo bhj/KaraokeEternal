@@ -1,8 +1,4 @@
-// emitted from server
-const LIBRARY_CHANGE = 'library/LIBRARY_CHANGE'
-const SONG_UPDATE = 'library/SONG_UPDATE'
-
-export const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
+const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
 export function scrollArtists(scrollTop) {
   return {
     type: SCROLL_ARTISTS,
@@ -16,7 +12,7 @@ export function scrollArtists(scrollTop) {
   }
 }
 
-export const ARTIST_EXPAND_TOGGLE = 'library/ARTIST_EXPAND_TOGGLE'
+const ARTIST_EXPAND_TOGGLE = 'library/ARTIST_EXPAND_TOGGLE'
 export function toggleArtistExpanded(artistId) {
   return {
     type: ARTIST_EXPAND_TOGGLE,
@@ -24,7 +20,7 @@ export function toggleArtistExpanded(artistId) {
   }
 }
 
-export const ARTIST_RESULT_EXPAND_TOGGLE = 'library/ARTIST_RESULT_EXPAND_TOGGLE'
+const ARTIST_RESULT_EXPAND_TOGGLE = 'library/ARTIST_RESULT_EXPAND_TOGGLE'
 export function toggleArtistResultExpanded(artistId) {
   return {
     type: ARTIST_RESULT_EXPAND_TOGGLE,
@@ -32,7 +28,7 @@ export function toggleArtistResultExpanded(artistId) {
   }
 }
 
-export const LIBRARY_SEARCH = 'library/SEARCH'
+const LIBRARY_SEARCH = 'library/SEARCH'
 export function searchLibrary(term) {
   return {
     type: LIBRARY_SEARCH,
@@ -46,7 +42,7 @@ export function searchLibrary(term) {
   }
 }
 
-export const LIBRARY_SEARCH_RESET = 'library/SEARCH_RESET'
+const LIBRARY_SEARCH_RESET = 'library/SEARCH_RESET'
 export function searchReset() {
   return {
     type: LIBRARY_SEARCH_RESET,
@@ -58,11 +54,6 @@ export function searchReset() {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_CHANGE]: (state, {payload}) => ({
-    ...state,
-    artists: payload.artists,
-    songs: payload.songs,
-  }),
   [LIBRARY_SEARCH]: (state, {payload}) => {
     let artistResults, songResults
     let term = payload.trim()
@@ -137,24 +128,12 @@ const ACTION_HANDLERS = {
       expandedArtistResults: list,
     }
   },
-  [SONG_UPDATE]: (state, {payload}) => ({
-    ...state,
-    songs: {
-      ...state.songs,
-      entities: {
-        ...state.songs.entities,
-        [payload.songId]: payload,
-      }
-    }
-  })
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 let initialState = {
-  artists: {result: [], entities:{}},
-  songs: {result: [], entities:{}},
   scrollTop: 0,
   expandedArtists: [],
   searchTerm: '',
