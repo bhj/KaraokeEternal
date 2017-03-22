@@ -14,7 +14,7 @@ export default (store) => ({
       const PlayerContainer = require('./containers/PlayerContainer').default
       const reducer = require('./modules/player').default
 
-      /*  Add the reducer to the store on key 'counter'  */
+      /*  Add the reducer to the store on key 'player'  */
       injectReducer(store, { key: 'player', reducer })
 
       /*  Return getComponent   */
