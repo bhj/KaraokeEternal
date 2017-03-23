@@ -19,7 +19,7 @@ const apiRoutes = require('./api/http')
 const socketActions = require('./api/socket')
 const Queue = require('./api/socket/queue')
 const Prefs = require('./api/socket/prefs')
-const getLibrary = require('./lib/get')
+const getLibrary = require('./lib/getLibrary')
 const {
   LIBRARY_UPDATE,
   AUTH_ERROR,

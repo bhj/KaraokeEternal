@@ -3,13 +3,13 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({prefix: '/api'})
 const debug = require('debug')
 const log = debug('app:api:song')
-const searchLibrary = require('../../lib/search')
+const getSongs = require('../../lib/getSongs')
 
 router.get('/song/:songId', async (ctx, next) => {
   const { songId } = ctx.params
 
   try {
-    let res = await searchLibrary({ songId })
+    let res = await getSongs({ songId })
 
     if (res.result.length === 1) {
       const row = res.entities[res.result[0]]

@@ -4,7 +4,7 @@ var log = require('debug')('app:provider:youtube')
 const { parse, toSeconds, pattern } = require('iso8601-duration')
 
 const addSong = require('../../lib/addSong')
-const searchLibrary = require('../../lib/search')
+const getSongs = require('../../lib/getSongs')
 
 let stats
 
@@ -53,7 +53,7 @@ async function process(song) {
 
   // search for this file in the db
   try {
-    let res = await searchLibrary({meta: { videoId: song.meta.videoId }})
+    let res = await getSongs({meta: { videoId: song.meta.videoId }})
     // @todo: check mtime and title for updates
     if (res.result.length) {
       log('song is in library (same videoId)')

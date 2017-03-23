@@ -2,8 +2,8 @@ const db = require('sqlite')
 const squel = require('squel')
 const log = require('debug')('app:socket:library')
 
-const searchLibrary = require('../../lib/search')
-const getLibrary = require('../../lib/get')
+const getSongs = require('../../lib/getSongs')
+const getLibrary = require('../../lib/getLibrary')
 
 const {
   SONG_UPDATE,
@@ -61,7 +61,7 @@ const ACTION_HANDLERS = {
 
     // emit updated star count to room
     try {
-      const res = await searchLibrary({
+      const res = await getSongs({
         songId: payload,
       })
 

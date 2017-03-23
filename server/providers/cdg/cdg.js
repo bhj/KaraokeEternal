@@ -9,8 +9,8 @@ const musicmetadata = require('../../lib/thunks/musicmetadata')
 const mp3duration = require('../../lib/thunks/mp3duration')
 const stat = require('../../lib/thunks/stat')
 
-const getLibrary = require('../../lib/get')
-const searchLibrary = require('../../lib/search')
+const getLibrary = require('../../lib/getLibrary')
+const getSongs = require('../../lib/getSongs')
 const addSong = require('../../lib/addSong')
 const parseArtistTitle = require('../../lib/parseArtistTitle')
 
@@ -98,7 +98,7 @@ async function resource(ctx, cfg) {
 
   // get song from db
   try {
-    const res = await searchLibrary({ songId })
+    const res = await getSongs({ songId })
 
     if (!res.result.length) {
       ctx.status = 404
@@ -151,7 +151,7 @@ async function process(file){
 
   // already in database with the same path and mtime?
   try {
-    const res = await searchLibrary({
+    const res = await getSongs({
       meta: {
         path: file,
         mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)

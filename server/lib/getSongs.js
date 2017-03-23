@@ -3,7 +3,7 @@ const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:search')
 
-async function searchLibrary(params = {}) {
+async function getSongs(params = {}) {
   const songs = {
     result: [],
     entities: {}
@@ -48,4 +48,4 @@ async function searchLibrary(params = {}) {
   return songs
 }
 
-module.exports = searchLibrary
+module.exports = getSongs
