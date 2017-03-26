@@ -21,7 +21,7 @@ export default function createSocketMiddleware(socket, prefix) {
       next(action)
 
       // error action if socket.io callback timeout
-      if (meta && meta.requireAck !== false) {
+      if (!(meta && meta.requireAck === false)) {
         pendingIds[requestID] = setTimeout(() => {
           next({
             type: type + _ERROR,
