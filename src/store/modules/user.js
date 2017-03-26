@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch'
 import { browserHistory } from 'react-router'
 
 import {
-  PREFS_CHANGE_REQUEST,
+  SET_PREFS,
   PREFS_CHANGE,
   PROVIDER_REFRESH_REQUEST,
   TOGGLE_SONG_STARRED,
@@ -299,7 +299,7 @@ export function toggleSongStarred(songId) {
 // ------------------------------------
 export function setPrefs(domain, data) {
   return {
-    type: PREFS_CHANGE_REQUEST,
+    type: SET_PREFS,
     payload: { domain, data },
   }
 }

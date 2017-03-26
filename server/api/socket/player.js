@@ -16,6 +16,8 @@ const {
   EMIT_ERROR,
   PLAYBACK_STATUS,
   PLAYBACK_ERROR,
+  _SUCCESS,
+  _ERROR,
 } = require('../constants')
 
 // ------------------------------------
@@ -43,7 +45,7 @@ const ACTION_HANDLERS = {
 
     // ack (@todo: wait until player response)
     ctx.acknowledge({
-      type: PLAYER_NEXT_REQUEST+'_SUCCESS',
+      type: PLAYER_NEXT_REQUEST+_SUCCESS,
     })
 
     if (!item) {
@@ -63,7 +65,7 @@ const ACTION_HANDLERS = {
   [PLAYER_PLAY_REQUEST]: async (ctx, {payload}) => {
     // ack (@todo: wait until player response)
     ctx.acknowledge({
-      type: PLAYER_PLAY_REQUEST+'_SUCCESS',
+      type: PLAYER_PLAY_REQUEST+_SUCCESS,
     })
 
     ctx.io.to(ctx.user.roomId).emit('action', {
@@ -74,7 +76,7 @@ const ACTION_HANDLERS = {
   [PLAYER_PAUSE_REQUEST]: async (ctx, {payload}) => {
     // ack (@todo: wait until player response)
     ctx.acknowledge({
-      type: PLAYER_PAUSE_REQUEST+'_SUCCESS',
+      type: PLAYER_PAUSE_REQUEST+_SUCCESS,
     })
 
     ctx.io.to(ctx.user.roomId).emit('action', {
