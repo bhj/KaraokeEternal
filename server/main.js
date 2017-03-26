@@ -22,7 +22,7 @@ const Prefs = require('./api/socket/prefs')
 const getLibrary = require('./lib/getLibrary')
 const {
   LIBRARY_UPDATE,
-  AUTH_ERROR,
+  SOCKET_AUTH_ERROR,
 } = require('./api/constants')
 
 const app = new koa()

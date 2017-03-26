@@ -6,7 +6,7 @@ const Prefs = require('./prefs')
 const Provider = require('./provider')
 
 const {
-  AUTH_ERROR,
+  SOCKET_AUTH_ERROR,
   ACTION_ERROR,
 } = require('../constants')
 
@@ -24,7 +24,7 @@ module.exports = async function(ctx) {
 
   if (!ctx.user) {
     return ctx.acknowledge({
-      type: AUTH_ERROR,
+      type: SOCKET_AUTH_ERROR,
       meta: {
         error: 'Invalid token (try signing in again)'
       }
