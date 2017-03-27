@@ -57,6 +57,7 @@ const ACTION_HANDLERS = {
       return
     }
 
+    // emits to room, but only player should be listening
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_NEXT,
       payload: item.queueId
