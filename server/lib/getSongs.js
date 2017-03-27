@@ -44,7 +44,7 @@ async function getSongs(params = {}) {
     return Promise.reject(err)
   }
 
-  log('%s result' + (songs.result.length === 1 ? '' : 's'), songs.result.length)
+  // log('%s result' + (songs.result.length === 1 ? '' : 's'), songs.result.length)
   return songs
 }
 
