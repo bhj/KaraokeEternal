@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import { browserHistory } from 'react-router'
 import AppLayout from 'layouts/AppLayout'
-import Header from 'layouts/Header'
+import Header from 'components/Header'
 import AccountForm from './AccountForm'
 import Logout from './Logout'
 import Providers from 'components/providers'

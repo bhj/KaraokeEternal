@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import Header from 'layouts/Header'
+import Header from 'components/Header'
 import classes from './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {

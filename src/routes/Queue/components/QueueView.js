@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
-import Header from 'layouts/Header'
+import Header from 'components/Header'
 import Navigation from 'layouts/Navigation'
 import PaddedList from 'components/PaddedList'
 import QueueItem from './QueueItem'
