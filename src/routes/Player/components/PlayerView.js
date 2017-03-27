@@ -26,7 +26,7 @@ class PlayerView extends React.Component {
 
   componentDidMount() {
     // emit initial state
-    this.handleStatus({
+    this.props.emitStatus({
       isPlaying: this.props.isPlaying,
       position: 0,
       volume: this.props.volume,
@@ -42,7 +42,7 @@ class PlayerView extends React.Component {
     }
 
     if (this.props.isAtQueueEnd && !prevProps.isAtQueueEnd) {
-      this.handleStatus({
+      this.props.emitStatus({
         isPlaying: false,
         position: 0,
         volume: this.props.volume,
@@ -94,7 +94,7 @@ class PlayerView extends React.Component {
         isPlaying: this.props.isPlaying,
         getMedia: this.props.getMedia,
         getMediaSuccess: this.props.getMediaSuccess,
-        onStatus: this.handleStatus,
+        onStatus: this.props.emitStatus,
         onMediaError: this.handleError,
         onMediaEnd: this.props.requestPlayNext,
       }
@@ -127,14 +127,6 @@ class PlayerView extends React.Component {
     if (screenfull.enabled) {
       screenfull.request(this.ref)
     }
-  }
-
-  handleStatus = (status) => {
-    this.props.emitStatus({
-      ...status,
-      queueId: this.props.queueId,
-      isAtQueueEnd: this.props.isAtQueueEnd,
-    })
   }
 
   handleError = (err) => {

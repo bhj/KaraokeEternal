@@ -71,17 +71,25 @@ export function getMediaSuccess() {
 }
 
 // have server emit player status to room
-export function emitStatus(payload) {
-  return {
-    type: EMIT_STATUS,
-    payload,
-    meta: {
-      requireAck: false,
-      throttle: {
-        wait: 1000,
-        leading: true,
+export function emitStatus(status) {
+  return (dispatch, getState) => {
+    const { queueId, isAtQueueEnd } = getState().player
+    
+    dispatch({
+      type: EMIT_STATUS,
+      payload: {
+        ...status,
+        queueId,
+        isAtQueueEnd,
+      },
+      meta: {
+        requireAck: false,
+        throttle: {
+          wait: 1000,
+          leading: true,
+        }
       }
-    }
+    })
   }
 }
 
