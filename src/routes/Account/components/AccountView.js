@@ -18,7 +18,6 @@ class AccountView extends React.Component {
 
   render () {
     const { user, prefs } = this.props
-    const header = <Header/>
     let prefComponents = []
 
     for (let i in Providers) {
@@ -29,9 +28,11 @@ class AccountView extends React.Component {
     }
 
     return (
-      <AppLayout header={header}>
-        {(style) => (
-          <div style={{...style, overflowY: 'scroll'}}>
+      <AppLayout>
+        {viewportStyle => (
+          <div style={{...viewportStyle}}>
+            <Header/>
+
             <AccountForm {...this.props}/>
 
             {prefComponents}

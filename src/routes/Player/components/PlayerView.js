@@ -70,8 +70,6 @@ class PlayerView extends React.Component {
 
   render () {
     const { song } = this.props
-    const header = <PlayerHeader requestFullscreen={this.handleFullscreen}/>
-
     let Component = 'div'
     let componentProps = {}
 
@@ -101,22 +99,24 @@ class PlayerView extends React.Component {
     }
 
     return (
-      <AppLayout title="Player" header={header}>
+      <AppLayout>
         {(style) => (
-          <div
-            ref={r => {this.ref = r}}
-            className={classes.container}
-            style={screenfull.isFullscreen ? {} : {
-              // no background behind header/nav
-              marginTop: style.paddingTop,
-              height: style.height - (style.paddingTop + style.paddingBottom)
-            }}
-          >
-            <Component
-              {...componentProps}
-              width={style.width}
-              height={style.height - (screenfull.isFullscreen ? 0 : (style.paddingTop + style.paddingBottom))}
-            />
+          <div style={{overflow: 'hidden'}}>
+            <PlayerHeader requestFullscreen={this.handleFullscreen}/>
+            <div
+              ref={r => {this.ref = r}}
+              className={classes.container}
+              style={screenfull.isFullscreen ? {} : {
+                marginTop: style.paddingTop,
+                height: style.height - style.paddingTop - style.paddingBottom,
+              }}
+            >
+              <Component
+                {...componentProps}
+                width={style.width}
+                height={style.height - (screenfull.isFullscreen ? 0 : (style.paddingTop + style.paddingBottom))}
+              />
+            </div>
           </div>
         )}
       </AppLayout>

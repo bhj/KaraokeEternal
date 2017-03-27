@@ -4,21 +4,17 @@ import { SkyLightStateless } from 'react-skylight'
 import classes from './AppLayout.css'
 
 const AppLayout = (props) => {
+  const viewportStyle = {
+    width: props.viewportWidth,
+    height: props.viewportHeight,
+    paddingTop: props.headerHeight,
+    paddingBottom: props.footerHeight,
+    overflowY: 'scroll',
+  }
+
   return (
     <div>
-      {props.header}
-
-      <div className={classes.viewport} style={{
-        width: props.viewportWidth,
-        height: props.viewportHeight,
-      }}>
-        {props.children({
-          width: props.viewportWidth,
-          height: props.viewportHeight,
-          paddingTop: props.headerHeight,
-          paddingBottom: props.footerHeight,
-        })}
-      </div>
+      {props.children(viewportStyle)}
 
       <Navigation/>
 
@@ -41,7 +37,11 @@ const AppLayout = (props) => {
   )
 }
 AppLayout.propTypes = {
-  errorMessage: PropTypes.string,
+  viewportWidth: PropTypes.number.isRequired,
+  viewportHeight: PropTypes.number.isRequired,
+  headerHeight: PropTypes.number.isRequired,
+  footerHeight: PropTypes.number.isRequired,
+  errorMessage: PropTypes.any,
   // actions
   clearErrorMessage: PropTypes.func,
 }

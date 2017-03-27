@@ -23,22 +23,24 @@ class QueueView extends React.Component {
   }
 
   render() {
-    const header = <Header/>
     return (
-      <AppLayout title="Queue" header={header}>
-        {(style) => (
-          <PaddedList
-            {...style}
-            rowCount={this.props.queue.result.length}
-            rowHeight={this.rowHeight}
-            rowRenderer={this.rowRenderer}
-            scrollToIndex={this.props.queue.result.indexOf(this.props.curId)}
-            scrollToAlignment={'center'}
-            queuedSongs={this.props.queue.result} // pass-through forces List refresh
-            curId={this.props.curId} // pass-through forces List refresh
-            curPos={this.props.curPos} // pass-through forces List refresh
-            errors={this.props.errors} // pass-through forces List refresh
-          />
+      <AppLayout>
+        {viewportStyle => (
+          <div>
+            <Header/>
+            <PaddedList
+              {...viewportStyle}
+              rowCount={this.props.queue.result.length}
+              rowHeight={this.rowHeight}
+              rowRenderer={this.rowRenderer}
+              scrollToIndex={this.props.queue.result.indexOf(this.props.curId)}
+              scrollToAlignment={'center'}
+              queuedSongs={this.props.queue.result} // pass-through forces List refresh
+              curId={this.props.curId} // pass-through forces List refresh
+              curPos={this.props.curPos} // pass-through forces List refresh
+              errors={this.props.errors} // pass-through forces List refresh
+            />
+          </div>
         )}
       </AppLayout>
     )
