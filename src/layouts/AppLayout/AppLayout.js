@@ -36,6 +36,7 @@ const AppLayout = (props) => {
     </div>
   )
 }
+
 AppLayout.propTypes = {
   viewportWidth: PropTypes.number.isRequired,
   viewportHeight: PropTypes.number.isRequired,
