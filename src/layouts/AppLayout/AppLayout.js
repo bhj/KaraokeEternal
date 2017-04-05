@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import Navigation from 'layouts/Navigation'
+import Navigation from 'components/Navigation'
 import { SkyLightStateless } from 'react-skylight'
 import classes from './AppLayout.css'
 
