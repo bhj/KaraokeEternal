@@ -18,14 +18,14 @@ export default class Login extends Component {
         <select ref='room'>{roomOpts}</select>
         <br/>
 
-        <button onClick={(event) => this.handleClick(event)} className="button wide green raised">
+        <button onClick={this.handleClick} className="button wide green raised">
           Sign In
         </button>
       </form>
     )
   }
 
-  handleClick(event) {
+  handleClick = (event) => {
     event.preventDefault()
     const creds = {
       email: this.refs.email.value,
