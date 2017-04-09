@@ -11,10 +11,10 @@ const mapStateToProps = (state) => {
   const { prefs } = state.user
 
   if (prefs && prefs.provider && prefs.provider.youtube) {
-    return {prefs: prefs.provider.youtube}
+    return { prefs: prefs.provider.youtube }
   }
 
-  return {prefs: {}}
+  return { prefs: {} }
 }
 
 export default connect(mapStateToProps, mapActionCreators)(Prefs)

@@ -25,7 +25,7 @@ class PaddedList extends React.Component {
         overscanRowCount={10}
         onScroll={this.props.onScroll}
         scrollTop={this.props.scrollTop} // initial list pos
-        ref={r => {this.ref = r; if (this.props.onRef) this.props.onRef(r)}}
+        ref={r => { this.ref = r; if (this.props.onRef) this.props.onRef(r) }}
         // facades
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
@@ -33,18 +33,18 @@ class PaddedList extends React.Component {
     )
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     if (this.props.paddingTop !== prevProps.paddingTop ||
       this.props.paddingBottom !== prevProps.paddingBottom) {
       this.ref.recomputeRowHeights()
     }
   }
 
-  rowRenderer = ({index, key, style}) => {
+  rowRenderer = ({ index, key, style }) => {
     // top & bottom spacer
-    if (index === 0 || index === this.props.rowCount+1) {
+    if (index === 0 || index === this.props.rowCount + 1) {
       return (
-        <div key={key} style={style}/>
+        <div key={key} style={style} />
       )
     } else {
       index--
@@ -57,7 +57,7 @@ class PaddedList extends React.Component {
     // top & bottom spacer
     if (index === 0) {
       return this.props.paddingTop
-    } else if (index === this.props.rowCount+1){
+    } else if (index === this.props.rowCount + 1) {
       return this.props.paddingBottom
     } else {
       index--

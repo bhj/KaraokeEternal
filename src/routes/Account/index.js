@@ -2,7 +2,7 @@ import AccountView from './containers/AccountView'
 import { fetchRooms } from 'store/modules/user'
 
 // route definition
-export default function(store){
+export default function (store) {
   return {
     path: 'account',
     getComponent (nextState, cb) {

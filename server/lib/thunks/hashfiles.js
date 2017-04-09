@@ -1,8 +1,8 @@
 let fs = require('fs')
 let crypto = require('crypto')
 
-module.exports = exports = function(files, method) {
-  return new Promise(async function(resolve, reject) {
+module.exports = exports = function (files, method) {
+  return new Promise(async function (resolve, reject) {
     let hash = crypto.createHash(method).setEncoding('hex')
 
     if (!Array.isArray(files)) files = [files]
@@ -12,7 +12,7 @@ module.exports = exports = function(files, method) {
 
       try {
         await doPipe(fd, hash)
-      } catch(err) {
+      } catch (err) {
         return reject(err)
       }
     }
@@ -22,17 +22,17 @@ module.exports = exports = function(files, method) {
   })
 }
 
-function doPipe(fd, hash){
-  return new Promise(function(resolve, reject) {
-    fd.on('end', function(){
+function doPipe (fd, hash) {
+  return new Promise(function (resolve, reject) {
+    fd.on('end', function () {
       return resolve()
     })
 
-    fd.on('error', function(err){
+    fd.on('error', function (err) {
       return reject(err)
     })
 
-    fd.on('data', function(data){
+    fd.on('data', function (data) {
       hash.update(data)
     })
   })

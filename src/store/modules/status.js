@@ -8,7 +8,7 @@ import { PLAYBACK_STATUS, PLAYBACK_ERROR } from 'constants'
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYBACK_STATUS]: (state, {payload}) => {
+  [PLAYBACK_STATUS]: (state, { payload }) => {
     return {
       ...state,
       queueId: payload.queueId,
@@ -18,8 +18,8 @@ const ACTION_HANDLERS = {
       isAtQueueEnd: payload.isAtQueueEnd,
     }
   },
-  [PLAYBACK_ERROR]: (state, {payload}) => {
-    const {queueId, message} = payload
+  [PLAYBACK_ERROR]: (state, { payload }) => {
+    const { queueId, message } = payload
 
     return {
       ...state,

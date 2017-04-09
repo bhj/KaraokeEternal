@@ -24,7 +24,7 @@ class PlayerView extends React.Component {
     emitError: PropTypes.func.isRequired,
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // emit initial state
     this.props.emitStatus({
       isPlaying: this.props.isPlaying,
@@ -33,7 +33,7 @@ class PlayerView extends React.Component {
     })
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     if (this.props.isPlaying && !prevProps.isPlaying) {
       // playing for first time, after queue end, or after error
       if (this.props.queueId === -1 || this.props.isAtQueueEnd || this.props.isErrored) {
@@ -56,7 +56,7 @@ class PlayerView extends React.Component {
     }
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUpdate (nextProps) {
     // cancel any pending status emits having an old queueId
     if (this.props.queueId !== nextProps.queueId) {
       this.props.cancelStatus()
@@ -75,15 +75,15 @@ class PlayerView extends React.Component {
 
     if (this.props.isAtQueueEnd) {
       // show 'add more songs' placeholder
-      componentProps.title = "CAN HAZ MOAR SONGZ?"
+      componentProps.title = 'CAN HAZ MOAR SONGZ?'
       Component = ColorCycle
     } else if (!song) {
       // show 'press play to begin' placeholder
-      componentProps.title = "PRESS PLAY TO BEGIN"
+      componentProps.title = 'PRESS PLAY TO BEGIN'
       Component = ColorCycle
     } else if (typeof Providers[song.provider] === 'undefined') {
       // show 'provider error' placeholder
-      this.props.emitError(this.props.queueId, 'No provider for type: "'+song.provider+'"')
+      this.props.emitError(this.props.queueId, 'No provider for type: "' + song.provider + '"')
     } else {
       Component = Providers[song.provider].playerComponent
       componentProps = {
@@ -101,10 +101,10 @@ class PlayerView extends React.Component {
     return (
       <AppLayout>
         {(style) => (
-          <div style={{overflow: 'hidden'}}>
-            <PlayerHeader requestFullscreen={this.handleFullscreen}/>
+          <div style={{ overflow: 'hidden' }}>
+            <PlayerHeader requestFullscreen={this.handleFullscreen} />
             <div
-              ref={r => {this.ref = r}}
+              ref={r => { this.ref = r }}
               className={classes.container}
               style={screenfull.isFullscreen ? {} : {
                 marginTop: style.paddingTop,

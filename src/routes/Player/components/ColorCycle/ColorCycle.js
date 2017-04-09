@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import chroma from 'chroma-js'
 import classes from './ColorCycle.css'
 
-const colorNames = ['red','purple','blue','green', 'yellow','orange','red']
+const colorNames = ['red', 'purple', 'blue', 'green', 'yellow', 'orange', 'red']
 const cycleSpeed = 50 // ms
 
 class ColorCycle extends React.Component {
@@ -16,7 +16,7 @@ class ColorCycle extends React.Component {
 
   chars = []
 
-  render() {
+  render () {
     const text = this.chars.map((char, i) => {
       i += this.state.offset
 
@@ -25,7 +25,7 @@ class ColorCycle extends React.Component {
       }
 
       return (
-        <span key={char+i} style={{color: this.colors[i]}}>
+        <span key={char + i} style={{ color: this.colors[i] }}>
           {char}
         </span>
       )
@@ -38,13 +38,13 @@ class ColorCycle extends React.Component {
     )
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     if (prevProps.title !== this.props.title) {
       this.updateTitle()
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.updateTitle()
 
     this.timer = setInterval(() => {
@@ -54,7 +54,7 @@ class ColorCycle extends React.Component {
     }, cycleSpeed)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     clearInterval(this.timer)
   }
 

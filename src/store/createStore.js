@@ -1,7 +1,7 @@
 import { applyMiddleware, compose, createStore } from 'redux'
 import createSocketMiddleware from './socketMiddleware'
 import thunk from 'redux-thunk'
-import createThrottle from "redux-throttle"
+import createThrottle from 'redux-throttle'
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
@@ -14,7 +14,7 @@ export default (initialState = {}) => {
   // we only want to attempt socket connection if we think we
   // have (or just received) a JWT set via http cookie on login.
   // socket.io handshake will then contain the JWT
-  window._socket = io({autoConnect: false})
+  window._socket = io({ autoConnect: false })
 
   // ======================================================
   // Middleware Configuration
@@ -25,7 +25,7 @@ export default (initialState = {}) => {
     trailing: true
   })
 
-  const socketMiddleware = createSocketMiddleware(window._socket, "server/")
+  const socketMiddleware = createSocketMiddleware(window._socket, 'server/')
 
   const middleware = [thunk, throttle, socketMiddleware]
 
@@ -72,7 +72,7 @@ export default (initialState = {}) => {
   }
 
   // begin periodically persisting the store
-  window._persistor = persistStore(store, {whitelist: ['user']}, () => {
+  window._persistor = persistStore(store, { whitelist: ['user'] }, () => {
     // on rehydrate, attempt socket.io connection
     // if it looks like we have a valid session
     if (store.getState().user.userId !== null) {

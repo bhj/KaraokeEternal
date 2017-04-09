@@ -24,7 +24,7 @@ const {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_NEXT_REQUEST]: async (ctx, {payload}) => {
+  [PLAYER_NEXT_REQUEST]: async (ctx, { payload }) => {
     // get next-highest queue item id
     let item
 
@@ -38,14 +38,14 @@ const ACTION_HANDLERS = {
 
       const { text, values } = q.toParam()
       item = await db.get(text, values)
-    } catch(err) {
+    } catch (err) {
       log(err.message)
       return Promise.reject(err)
     }
 
     // ack (@todo: wait until player response)
     ctx.acknowledge({
-      type: PLAYER_NEXT_REQUEST+_SUCCESS,
+      type: PLAYER_NEXT_REQUEST + _SUCCESS,
     })
 
     if (!item) {
@@ -63,10 +63,10 @@ const ACTION_HANDLERS = {
       payload: item.queueId
     })
   },
-  [PLAYER_PLAY_REQUEST]: async (ctx, {payload}) => {
+  [PLAYER_PLAY_REQUEST]: async (ctx, { payload }) => {
     // ack (@todo: wait until player response)
     ctx.acknowledge({
-      type: PLAYER_PLAY_REQUEST+_SUCCESS,
+      type: PLAYER_PLAY_REQUEST + _SUCCESS,
     })
 
     ctx.io.to(ctx.user.roomId).emit('action', {
@@ -74,10 +74,10 @@ const ACTION_HANDLERS = {
       payload: null
     })
   },
-  [PLAYER_PAUSE_REQUEST]: async (ctx, {payload}) => {
+  [PLAYER_PAUSE_REQUEST]: async (ctx, { payload }) => {
     // ack (@todo: wait until player response)
     ctx.acknowledge({
-      type: PLAYER_PAUSE_REQUEST+_SUCCESS,
+      type: PLAYER_PAUSE_REQUEST + _SUCCESS,
     })
 
     ctx.io.to(ctx.user.roomId).emit('action', {
@@ -85,19 +85,19 @@ const ACTION_HANDLERS = {
       payload: null
     })
   },
-  [PLAYER_VOLUME_REQUEST]: async (ctx, {payload}) => {
+  [PLAYER_VOLUME_REQUEST]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_VOLUME,
       payload
     })
   },
-  [EMIT_STATUS]: async (ctx, {payload}) => {
+  [EMIT_STATUS]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYBACK_STATUS,
       payload
     })
   },
-  [EMIT_ERROR]: async (ctx, {payload}) => {
+  [EMIT_ERROR]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYBACK_ERROR,
       payload

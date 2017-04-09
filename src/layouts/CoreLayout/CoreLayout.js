@@ -5,7 +5,7 @@ import 'styles/material-icons.scss'
 
 export const CoreLayout = ({ children }) => {
   return (
-    <div style={{height: '100%'}}>
+    <div style={{ height: '100%' }}>
       {children}
     </div>
   )

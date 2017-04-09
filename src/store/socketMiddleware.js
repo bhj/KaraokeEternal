@@ -2,7 +2,7 @@ import { _SUCCESS, _ERROR } from 'constants'
 const pendingIds = {} // requestIDs to timeoutIDs
 let nextRequestID = 0
 
-export default function createSocketMiddleware(socket, prefix) {
+export default function createSocketMiddleware (socket, prefix) {
   return ({ dispatch }) => {
     // Wire socket.io to dispatch actions sent by the server.
     socket.on('action', dispatch)

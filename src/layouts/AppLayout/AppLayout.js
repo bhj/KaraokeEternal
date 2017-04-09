@@ -16,22 +16,22 @@ const AppLayout = (props) => {
     <div>
       {props.children(viewportStyle)}
 
-      <Navigation/>
+      <Navigation />
 
       <SkyLightStateless
         isVisible={props.errorMessage !== null}
         onCloseClicked={props.clearErrorMessage}
         onOverlayClicked={props.clearErrorMessage}
-        title="Oops"
+        title='Oops'
         dialogStyles={{
           width: '80%',
           height: 'auto',
           left: '10%',
-          marginLeft: '0'}}
+          marginLeft: '0' }}
       >
         <p>{props.errorMessage}</p>
-        <br/><br/><br/>
-        <button className="button wide raised" onClick={props.clearErrorMessage}>Dismiss</button>
+        <br /><br /><br />
+        <button className='button wide raised' onClick={props.clearErrorMessage}>Dismiss</button>
       </SkyLightStateless>
     </div>
   )

@@ -9,7 +9,7 @@ import {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_SEARCH]: (state, {payload}) => {
+  [LIBRARY_SEARCH]: (state, { payload }) => {
     let artistResults
     let term = payload.trim()
 
@@ -32,14 +32,14 @@ const ACTION_HANDLERS = {
       searchResult: artistResults,
     }
   },
-  [LIBRARY_SEARCH_RESET]: (state, {payload}) => ({
+  [LIBRARY_SEARCH_RESET]: (state, { payload }) => ({
     ...state,
     searchResult: [],
   }),
-  [LIBRARY_UPDATE]: (state, {payload}) => ({
+  [LIBRARY_UPDATE]: (state, { payload }) => ({
     ...payload.artists,
   }),
-  [ARTIST_UPDATE]: (state, {payload}) => ({
+  [ARTIST_UPDATE]: (state, { payload }) => ({
     ...state,
     entities: {
       ...state.entities,

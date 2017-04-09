@@ -9,7 +9,7 @@ import {
   PLAYER_PAUSE,
   PLAYER_VOLUME_REQUEST,
   PLAYER_VOLUME,
-  PLAYER_QUEUE_END ,
+  PLAYER_QUEUE_END,
   EMIT_STATUS,
   EMIT_ERROR
 } from 'constants'
@@ -19,21 +19,21 @@ export const GET_MEDIA = 'player/GET_MEDIA'
 export const GET_MEDIA_SUCCESS = 'player/GET_MEDIA_SUCCESS'
 
 // Request Play
-export function requestPlay() {
+export function requestPlay () {
   return {
     type: PLAYER_PLAY_REQUEST,
   }
 }
 
 // Request Pause
-export function requestPause() {
+export function requestPause () {
   return {
     type: PLAYER_PAUSE_REQUEST,
   }
 }
 
 // Request volume
-export function requestVolume(vol) {
+export function requestVolume (vol) {
   return {
     type: PLAYER_VOLUME_REQUEST,
     payload: vol,
@@ -48,7 +48,7 @@ export function requestVolume(vol) {
 }
 
 // Request Play Next
-export function requestPlayNext() {
+export function requestPlayNext () {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_NEXT_REQUEST,
@@ -57,24 +57,24 @@ export function requestPlayNext() {
   }
 }
 
-export function getMedia(url) {
+export function getMedia (url) {
   return {
     type: GET_MEDIA,
     payload: url
   }
 }
 
-export function getMediaSuccess() {
+export function getMediaSuccess () {
   return {
     type: GET_MEDIA_SUCCESS,
   }
 }
 
 // have server emit player status to room
-export function emitStatus(status) {
+export function emitStatus (status) {
   return (dispatch, getState) => {
     const { queueId, isAtQueueEnd } = getState().player
-    
+
     dispatch({
       type: EMIT_STATUS,
       payload: {
@@ -94,7 +94,7 @@ export function emitStatus(status) {
 }
 
 // cancel pending status emits
-export function cancelStatus() {
+export function cancelStatus () {
   return {
     type: CANCEL,
     payload: {
@@ -104,7 +104,7 @@ export function cancelStatus() {
 }
 
 // have server emit error to room
-export function emitError(queueId, message) {
+export function emitError (queueId, message) {
   return {
     type: EMIT_ERROR,
     payload: { queueId, message },
@@ -118,19 +118,19 @@ export function emitError(queueId, message) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_PAUSE]: (state, {payload}) => ({
+  [PLAYER_PAUSE]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
   }),
-  [PLAYER_PLAY]: (state, {payload}) => ({
+  [PLAYER_PLAY]: (state, { payload }) => ({
     ...state,
     isPlaying: true,
   }),
-  [PLAYER_VOLUME]: (state, {payload}) => ({
+  [PLAYER_VOLUME]: (state, { payload }) => ({
     ...state,
     volume: payload,
   }),
-  [PLAYER_NEXT]: (state, {payload}) => {
+  [PLAYER_NEXT]: (state, { payload }) => {
     return {
       ...state,
       queueId: payload,
@@ -138,20 +138,20 @@ const ACTION_HANDLERS = {
       isAtQueueEnd: false,
     }
   },
-  [PLAYER_QUEUE_END]: (state, {payload}) => ({
+  [PLAYER_QUEUE_END]: (state, { payload }) => ({
     ...state,
     isAtQueueEnd: true,
   }),
-  [GET_MEDIA]: (state, {payload}) => ({
+  [GET_MEDIA]: (state, { payload }) => ({
     ...state,
     isFetching: true,
   }),
-  [GET_MEDIA_SUCCESS]: (state, {payload}) => ({
+  [GET_MEDIA_SUCCESS]: (state, { payload }) => ({
     ...state,
     isFetching: false,
     isPlaying: true, // all media is loaded
   }),
-  [EMIT_ERROR]: (state, {payload}) => ({
+  [EMIT_ERROR]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
     isFetching: false,

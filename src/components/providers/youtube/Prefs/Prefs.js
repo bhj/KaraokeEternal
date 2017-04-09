@@ -17,7 +17,7 @@ export default class Prefs extends React.Component {
     this.props.providerRefresh('youtube')
   }
 
-  render() {
+  render () {
     const { prefs } = this.props
     if (!prefs) return null
 
@@ -31,7 +31,7 @@ export default class Prefs extends React.Component {
     return (
       <div>
         <label>
-          <input type='checkbox' checked={enabled} onChange={this.setEnabled}/>
+          <input type='checkbox' checked={enabled} onChange={this.setEnabled} />
           <strong> YouTube Channels</strong>
         </label>
         <button onClick={this.handleRefresh}>Refresh</button>

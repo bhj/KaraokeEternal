@@ -11,7 +11,7 @@ const LibraryView = (props) => {
     <AppLayout>
       {viewportStyle => (
         <div>
-          <LibraryHeader/>
+          <LibraryHeader />
 
           <View
             {...props}

@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const KoaRouter = require('koa-router')
-const router = KoaRouter({prefix: '/api'})
+const router = KoaRouter({ prefix: '/api' })
 const debug = require('debug')
 const log = debug('app:api:song')
 const getSongs = require('../../lib/getSongs')
@@ -21,7 +21,7 @@ router.get('/song/:songId', async (ctx, next) => {
     } else {
       ctx.status = 404
     }
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return ctx.body = err.message

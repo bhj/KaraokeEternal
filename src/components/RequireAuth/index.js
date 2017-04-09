@@ -9,7 +9,7 @@ const requireAuth = UserAuthWrapper({
   failureRedirectPath: '/account',
   wrapperDisplayName: 'requireAuth', // a nice name for this auth check
   redirectAction: (newLoc) => (dispatch) => {
-     browserHistory.push(newLoc)
+    browserHistory.push(newLoc)
      // dispatch(addNotification({ message: 'Sorry, you are not an administrator' }));
   },
 })

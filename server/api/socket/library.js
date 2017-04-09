@@ -11,7 +11,7 @@ const {
 } = require('../constants')
 
 const ACTION_HANDLERS = {
-  [TOGGLE_SONG_STARRED]: async (ctx, {payload}) => {
+  [TOGGLE_SONG_STARRED]: async (ctx, { payload }) => {
     // already starred?
     try {
       const q = squel.delete()
@@ -32,7 +32,7 @@ const ACTION_HANDLERS = {
         const { text, values } = q.toParam()
         await db.run(text, values)
       }
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
@@ -52,10 +52,10 @@ const ACTION_HANDLERS = {
       })
 
       ctx.acknowledge({
-        type: TOGGLE_SONG_STARRED+'_SUCCESS',
+        type: TOGGLE_SONG_STARRED + '_SUCCESS',
         payload: starredSongs,
       })
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
@@ -66,14 +66,14 @@ const ACTION_HANDLERS = {
       })
 
       if (res.result.length !== 1) {
-        throw new Error(res.result.length+' results (expected 1)')
+        throw new Error(res.result.length + ' results (expected 1)')
       }
 
       ctx.io.to(ctx.user.roomId).emit('action', {
         type: SONG_UPDATE,
         payload: res.entities[res.result[0]],
       })
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
   },

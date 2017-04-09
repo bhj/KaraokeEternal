@@ -13,20 +13,20 @@ const {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_ADD]: async (ctx, {payload}) => {
+  [QUEUE_ADD]: async (ctx, { payload }) => {
     const socketId = ctx.socket.socket.id
 
     // is room open?
     try {
       if (!await _isRoomOpen(ctx.user.roomId)) {
         return ctx.acknowledge({
-          type: QUEUE_ADD+'_ERROR',
+          type: QUEUE_ADD + '_ERROR',
           meta: {
             error: 'Room is no longer open'
           }
         })
       }
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
@@ -39,15 +39,15 @@ const ACTION_HANDLERS = {
 
       const { text, values } = q.toParam()
       song = await db.get(text, values)
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
     if (!song) {
       return ctx.acknowledge({
-        type: QUEUE_ADD+'_ERROR',
+        type: QUEUE_ADD + '_ERROR',
         meta: {
-          error: 'songId not found: '+payload
+          error: 'songId not found: ' + payload
         }
       })
     }
@@ -66,13 +66,13 @@ const ACTION_HANDLERS = {
       if (res.stmt.changes !== 1) {
         throw new Error('Could not add song to queue')
       }
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
     // success!
     ctx.acknowledge({
-      type: QUEUE_ADD+'_SUCCESS',
+      type: QUEUE_ADD + '_SUCCESS',
     })
 
     // to all in room
@@ -81,7 +81,7 @@ const ACTION_HANDLERS = {
       payload: await getQueue(ctx.user.roomId)
     })
   },
-  [QUEUE_REMOVE]: async (ctx, {payload}) => {
+  [QUEUE_REMOVE]: async (ctx, { payload }) => {
     const socketId = ctx.socket.socket.id
     const queueId = payload
     let item, nextItem
@@ -90,13 +90,13 @@ const ACTION_HANDLERS = {
     try {
       if (!await _isRoomOpen(ctx.user.roomId)) {
         return ctx.acknowledge({
-          type: QUEUE_REMOVE+'_ERROR',
+          type: QUEUE_REMOVE + '_ERROR',
           meta: {
             error: 'Room is no longer open'
           }
         })
       }
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
@@ -108,15 +108,15 @@ const ACTION_HANDLERS = {
 
       const { text, values } = q.toParam()
       item = await db.get(text, values)
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
     if (!item) {
       return ctx.acknowledge({
-        type: QUEUE_REMOVE+'_ERROR',
+        type: QUEUE_REMOVE + '_ERROR',
         meta: {
-          error: 'queueId not found: '+queueId
+          error: 'queueId not found: ' + queueId
         }
       })
     }
@@ -124,9 +124,9 @@ const ACTION_HANDLERS = {
     // is it in the user's room?
     if (item.roomId !== ctx.user.roomId) {
       return ctx.acknowledge({
-        type: QUEUE_REMOVE+'_ERROR',
+        type: QUEUE_REMOVE + '_ERROR',
         meta: {
-          error: 'queueId is not in your room: '+queueId
+          error: 'queueId is not in your room: ' + queueId
         }
       })
     }
@@ -134,9 +134,9 @@ const ACTION_HANDLERS = {
     // is it the user's item?
     if (item.userId !== ctx.user.userId) {
       return ctx.acknowledge({
-        type: QUEUE_REMOVE+'_ERROR',
+        type: QUEUE_REMOVE + '_ERROR',
         meta: {
-          error: 'Item is NOT YOURS: '+queueId
+          error: 'Item is NOT YOURS: ' + queueId
         }
       })
     }
@@ -153,7 +153,7 @@ const ACTION_HANDLERS = {
       if (res.stmt.changes !== 1) {
         throw new Error('Could not remove queue item')
       }
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
@@ -168,7 +168,7 @@ const ACTION_HANDLERS = {
 
       const { text, values } = q.toParam()
       nextItem = await db.get(text, values)
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
@@ -185,14 +185,14 @@ const ACTION_HANDLERS = {
         if (res.stmt.changes !== 1) {
           throw new Error('Could not update queue item id')
         }
-      } catch(err) {
+      } catch (err) {
         // well, we tryed...
       }
     }
 
     // success!
     ctx.acknowledge({
-      type: QUEUE_REMOVE+'_SUCCESS',
+      type: QUEUE_REMOVE + '_SUCCESS',
     })
 
     // tell room
@@ -203,7 +203,7 @@ const ACTION_HANDLERS = {
   },
 }
 
-async function getQueue(roomId) {
+async function getQueue (roomId) {
   let result = []
   let entities = {}
   let rows
@@ -223,11 +223,11 @@ async function getQueue(roomId) {
 
     const { text, values } = q.toParam()
     rows = await db.all(text, values)
-  } catch(err) {
+  } catch (err) {
     return Promise.reject(err)
   }
 
-  rows.forEach(function(row){
+  rows.forEach(function (row) {
     result.push(row.queueId)
     entities[row.queueId] = row
   })
@@ -235,7 +235,7 @@ async function getQueue(roomId) {
   return { result, entities }
 }
 
-async function _isRoomOpen(roomId) {
+async function _isRoomOpen (roomId) {
   try {
     const q = squel.select()
       .from('rooms')
@@ -245,7 +245,7 @@ async function _isRoomOpen(roomId) {
     const room = await db.get(text, values)
 
     return (room && room.status === 'open')
-  } catch(err) {
+  } catch (err) {
     log(err)
     return Promise.reject(err)
   }

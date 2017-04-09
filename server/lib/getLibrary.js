@@ -3,7 +3,7 @@ const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:get')
 
-async function getLibrary() {
+async function getLibrary () {
   let artists = {
     result: [],
     entities: {}
@@ -25,12 +25,12 @@ async function getLibrary() {
     const rows = await db.all(text, values)
 
     // normalize results
-    rows.forEach(function(row){
+    rows.forEach(function (row) {
       artists.result.push(row.artistId)
       artists.entities[row.artistId] = row
       artists.entities[row.artistId].songIds = []
     })
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     return Promise.reject(err)
   }
@@ -50,14 +50,14 @@ async function getLibrary() {
     const rows = await db.all(text, values)
 
     // normalize results
-    rows.forEach(function(row){
+    rows.forEach(function (row) {
       songs.result.push(row.songId)
       songs.entities[row.songId] = row
 
       // used in library view as parent/child LUT
       artists.entities[row.artistId].songIds.push(row.songId)
     })
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     return Promise.reject(err)
   }

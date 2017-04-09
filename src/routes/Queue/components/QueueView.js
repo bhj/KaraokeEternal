@@ -22,12 +22,12 @@ class QueueView extends React.Component {
     showErrorMessage: PropTypes.func.isRequired,
   }
 
-  render() {
+  render () {
     return (
       <AppLayout>
         {viewportStyle => (
           <div>
-            <Header/>
+            <Header />
             <PaddedList
               {...viewportStyle}
               rowCount={this.props.queue.result.length}
@@ -46,7 +46,7 @@ class QueueView extends React.Component {
     )
   }
 
-  rowRenderer = ({index, key, style}) => {
+  rowRenderer = ({ index, key, style }) => {
     const item = this.props.queue.entities[this.props.queue.result[index]]
     const song = this.props.songs.entities[item.songId]
     const queueId = item.queueId
@@ -77,7 +77,7 @@ class QueueView extends React.Component {
     )
   }
 
-  rowHeight = ({index}) => {
+  rowHeight = ({ index }) => {
     return 64
   }
 
@@ -86,7 +86,7 @@ class QueueView extends React.Component {
   }
 
   handleErrorInfoClick = (queueId) => {
-    this.props.showErrorMessage(this.props.errors[queueId].join("\n\n"))
+    this.props.showErrorMessage(this.props.errors[queueId].join('\n\n'))
   }
 
   setRef = (ref) => {

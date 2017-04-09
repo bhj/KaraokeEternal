@@ -8,7 +8,7 @@ const getSongs = require('../../lib/getSongs')
 
 let stats
 
-async function scan(ctx, cfg) {
+async function scan (ctx, cfg) {
   const { channels } = cfg
 
   if (typeof channels === 'undefined' || !Array.isArray(channels)) {
@@ -22,14 +22,14 @@ async function scan(ctx, cfg) {
   }
 
   let validIds = [] // songIds for cleanup
-  stats = {new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0}
+  stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
 
   for (let channel of channels) {
     let items
 
     try {
       songs = await getPlaylistItems(channel, cfg.apiKey)
-    } catch(err) {
+    } catch (err) {
       log('  => %s', err)
     }
 
@@ -37,7 +37,7 @@ async function scan(ctx, cfg) {
       try {
         let songId = await process(song)
         validIds.push(songId)
-      } catch(err) {
+      } catch (err) {
         log(err.message)
       }
     }
@@ -47,20 +47,19 @@ async function scan(ctx, cfg) {
   return Promise.resolve(validIds)
 }
 
-
-async function process(song) {
+async function process (song) {
   log('processing song: %s', JSON.stringify(song))
 
   // search for this file in the db
   try {
-    let res = await getSongs({meta: { videoId: song.meta.videoId }})
+    let res = await getSongs({ meta: { videoId: song.meta.videoId } })
     // @todo: check mtime and title for updates
     if (res.result.length) {
       log('song is in library (same videoId)')
       stats.ok++
       return Promise.resolve(res.result[0])
     }
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     return Promise.reject(err)
   }
@@ -81,7 +80,7 @@ async function process(song) {
     let songId = await addSong(song)
     stats.new++
     return Promise.resolve(songId)
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     stats.error++
     return Promise.reject(err)
@@ -90,7 +89,7 @@ async function process(song) {
 
 module.exports = exports = { scan }
 
-function parseArtistTitle(str){
+function parseArtistTitle (str) {
   let title, artist
   const phrases = [
     'karaoke video version with lyrics',
@@ -105,7 +104,7 @@ function parseArtistTitle(str){
   ]
 
   // remove anything after last |
-  if (str.lastIndexOf('|') !== -1){
+  if (str.lastIndexOf('|') !== -1) {
     str = str.substring(0, str.lastIndexOf('|'))
   }
 
@@ -115,22 +114,21 @@ function parseArtistTitle(str){
   // de-"in the style of"
   let delim = str.toLowerCase().indexOf('in the style of')
   if (delim !== -1) {
-    let parts = str.split(str.substring(delim, delim+15))
+    let parts = str.split(str.substring(delim, delim + 15))
     str = parts[1] + '-' + parts[0]
   }
 
   // split into song title and artist
   let parts = str.split('-')
 
-  if (parts.length < 2){
+  if (parts.length < 2) {
     return false
   }
 
   return { artist : parts[0].trim(), title : parts[1].trim() }
 }
 
-
-async function getPlaylistItems(username, key){
+async function getPlaylistItems (username, key) {
   let api = getApi(key)
   let playlistId, playlist
   let songs = []
@@ -145,7 +143,7 @@ async function getPlaylistItems(username, key){
     if (typeof playlistId !== 'string') {
       throw new Error('invalid playlist id')
     }
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     return Promise.reject(err)
   }
@@ -155,12 +153,12 @@ async function getPlaylistItems(username, key){
     let url = `playlistItems?playlistId=${playlistId}&maxResults=50&part=snippet`
 
     if (playlist && playlist.nextPageToken) {
-      url += '&pageToken='+playlist.nextPageToken
+      url += '&pageToken=' + playlist.nextPageToken
     }
 
     try {
       playlist = await api(url)
-    } catch(err) {
+    } catch (err) {
       log(err.message)
       return Promise.reject(err)
     }
@@ -170,8 +168,8 @@ async function getPlaylistItems(username, key){
     let details
 
     try {
-      details = await api(`videos?part=contentDetails&id=`+videoIds.join(','))
-    } catch(err) {
+      details = await api(`videos?part=contentDetails&id=` + videoIds.join(','))
+    } catch (err) {
       log(err.message)
       return Promise.reject(err)
     }
@@ -194,14 +192,14 @@ async function getPlaylistItems(username, key){
   return songs
 }
 
-function titleCase(str) {
-  return str.replace(/\w\S*/g, function(tStr) {
+function titleCase (str) {
+  return str.replace(/\w\S*/g, function (tStr) {
     return tStr.charAt(0).toUpperCase() + tStr.substr(1).toLowerCase()
   })
 }
 
-function getApi(key) {
-  return async function(params) {
+function getApi (key) {
+  return async function (params) {
     const API = 'https://www.googleapis.com/youtube/v3/'
     const url = API + params + `&key=${key}`
     log('request: %s', API + params.substr(0, params.indexOf('?')))

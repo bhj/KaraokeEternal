@@ -4,7 +4,7 @@ import {
 } from 'constants'
 
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
-export function scrollArtists(scrollTop) {
+export function scrollArtists (scrollTop) {
   return {
     type: SCROLL_ARTISTS,
     payload: scrollTop,
@@ -12,7 +12,7 @@ export function scrollArtists(scrollTop) {
 }
 
 const ARTIST_EXPAND_TOGGLE = 'library/ARTIST_EXPAND_TOGGLE'
-export function toggleArtistExpanded(artistId) {
+export function toggleArtistExpanded (artistId) {
   return {
     type: ARTIST_EXPAND_TOGGLE,
     payload: artistId,
@@ -20,14 +20,14 @@ export function toggleArtistExpanded(artistId) {
 }
 
 const ARTIST_RESULT_EXPAND_TOGGLE = 'library/ARTIST_RESULT_EXPAND_TOGGLE'
-export function toggleArtistResultExpanded(artistId) {
+export function toggleArtistResultExpanded (artistId) {
   return {
     type: ARTIST_RESULT_EXPAND_TOGGLE,
     payload: artistId,
   }
 }
 
-export function searchLibrary(term) {
+export function searchLibrary (term) {
   return {
     type: LIBRARY_SEARCH,
     payload: term,
@@ -40,7 +40,7 @@ export function searchLibrary(term) {
   }
 }
 
-export function searchReset() {
+export function searchReset () {
   return {
     type: LIBRARY_SEARCH_RESET,
     payload: null,
@@ -51,19 +51,19 @@ export function searchReset() {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_SEARCH]: (state, {payload}) => ({
+  [LIBRARY_SEARCH]: (state, { payload }) => ({
     ...state,
     searchTerm: payload,
   }),
-  [LIBRARY_SEARCH_RESET]: (state, {payload}) => ({
+  [LIBRARY_SEARCH_RESET]: (state, { payload }) => ({
     ...state,
     searchTerm: '',
   }),
-  [SCROLL_ARTISTS]: (state, {payload}) => ({
+  [SCROLL_ARTISTS]: (state, { payload }) => ({
     ...state,
     scrollTop: payload,
   }),
-  [ARTIST_EXPAND_TOGGLE]: (state, {payload}) => {
+  [ARTIST_EXPAND_TOGGLE]: (state, { payload }) => {
     let list = state.expandedArtists.slice()
     const i = list.indexOf(payload)
 
@@ -78,7 +78,7 @@ const ACTION_HANDLERS = {
       expandedArtists: list,
     }
   },
-  [ARTIST_RESULT_EXPAND_TOGGLE]: (state, {payload}) => {
+  [ARTIST_RESULT_EXPAND_TOGGLE]: (state, { payload }) => {
     let list = state.expandedArtistResults.slice()
     const i = list.indexOf(payload)
 

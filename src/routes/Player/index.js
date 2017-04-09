@@ -21,6 +21,6 @@ export default (store) => ({
       cb(null, PlayerContainer)
 
     /* Webpack named bundle   */
-  }, 'player')
+    }, 'player')
   }
 })

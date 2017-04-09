@@ -15,7 +15,7 @@ let isScanning
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PROVIDER_REFRESH_REQUEST]: async (ctx, {payload}) => {
+  [PROVIDER_REFRESH_REQUEST]: async (ctx, { payload }) => {
     const log = debug('app:provider:refresh')
     let cfg
 
@@ -24,8 +24,8 @@ const ACTION_HANDLERS = {
     }
 
     try {
-      cfg = await getPrefs('provider.'+payload)
-    } catch(err) {
+      cfg = await getPrefs('provider.' + payload)
+    } catch (err) {
       return Promise.reject(err)
     }
 
@@ -34,7 +34,7 @@ const ACTION_HANDLERS = {
       log(msg)
 
       return ctx.acknowledge({
-        type: PROVIDER_REFRESH_REQUEST+'_ERROR',
+        type: PROVIDER_REFRESH_REQUEST + '_ERROR',
         meta: {
           error: msg
         }
@@ -46,7 +46,7 @@ const ACTION_HANDLERS = {
       log(msg)
 
       return ctx.acknowledge({
-        type: PROVIDER_REFRESH_REQUEST+'_ERROR',
+        type: PROVIDER_REFRESH_REQUEST + '_ERROR',
         meta: {
           error: msg
         }
@@ -55,7 +55,7 @@ const ACTION_HANDLERS = {
 
     // ack request
     ctx.acknowledge({
-      type: PROVIDER_REFRESH_REQUEST+'_SUCCESS',
+      type: PROVIDER_REFRESH_REQUEST + '_SUCCESS',
     })
 
     log('provider "%s" starting scan', payload)
@@ -64,7 +64,7 @@ const ACTION_HANDLERS = {
     // call provider's scan method
     try {
       await Providers[payload].scan(ctx, cfg)
-    } catch(err) {
+    } catch (err) {
       log(err.message)
     }
 
@@ -77,11 +77,11 @@ const ACTION_HANDLERS = {
         .from('artists')
         .where('artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)')
 
-        const { text, values } = q.toParam()
-        const res = await db.run(text, values)
+      const { text, values } = q.toParam()
+      const res = await db.run(text, values)
 
-        log('cleanup: removed %s artists with no songs', res.stmt.changes)
-    } catch(err) {
+      log('cleanup: removed %s artists with no songs', res.stmt.changes)
+    } catch (err) {
       log(err.message)
     }
   },

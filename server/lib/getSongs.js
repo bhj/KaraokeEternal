@@ -3,7 +3,7 @@ const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:search')
 
-async function getSongs(params = {}) {
+async function getSongs (params = {}) {
   const songs = {
     result: [],
     entities: {}
@@ -35,11 +35,11 @@ async function getSongs(params = {}) {
     const rows = await db.all(text, values)
 
     // normalize results
-    rows.forEach(function(row){
+    rows.forEach(function (row) {
       songs.result.push(row.songId)
       songs.entities[row.songId] = row
     })
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     return Promise.reject(err)
   }

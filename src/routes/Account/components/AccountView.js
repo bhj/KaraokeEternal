@@ -23,29 +23,29 @@ class AccountView extends React.Component {
     for (let i in Providers) {
       if (typeof Providers[i].prefComponent !== 'undefined') {
         let PrefPane = Providers[i].prefComponent
-        prefComponents.push(<PrefPane key={i}/>)
+        prefComponents.push(<PrefPane key={i} />)
       }
     }
 
     return (
       <AppLayout>
         {viewportStyle => (
-          <div style={{...viewportStyle}}>
-            <Header/>
+          <div style={{ ...viewportStyle }}>
+            <Header />
 
-            <AccountForm {...this.props}/>
+            <AccountForm {...this.props} />
 
             {prefComponents}
 
             {this.props.user && this.props.user.isAdmin &&
-              <button className='button wide blue raised' onClick={() => {browserHistory.push('/player')}}>
+              <button className='button wide blue raised' onClick={() => { browserHistory.push('/player') }}>
                 Start Player
               </button>
             }
 
             {this.props.user &&
               <div>
-                <br/>
+                <br />
                 <Logout onLogoutClick={this.props.logoutUser} />
               </div>
             }

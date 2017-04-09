@@ -6,7 +6,7 @@ import {
 } from 'constants'
 
 // add to queue
-export function queueSong(songId) {
+export function queueSong (songId) {
   return {
     type: QUEUE_ADD,
     payload: songId,
@@ -14,7 +14,7 @@ export function queueSong(songId) {
 }
 
 // remove from queue
-export function removeItem(queueId) {
+export function removeItem (queueId) {
   return {
     type: QUEUE_REMOVE,
     payload: queueId,
@@ -25,13 +25,13 @@ export function removeItem(queueId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_UPDATE]: (state, {payload}) => ({
+  [QUEUE_UPDATE]: (state, { payload }) => ({
     ...state,
     result: payload.result,
     entities: setWaits(payload.result, payload.entities, state.curId, state.curPos),
     songIds: payload.result.map(queueId => payload.entities[queueId].songId)
   }),
-  [PLAYBACK_STATUS]: (state, {payload}) => {
+  [PLAYBACK_STATUS]: (state, { payload }) => {
     const { queueId, position } = payload
 
     return {
@@ -64,7 +64,7 @@ export default function queueReducer (state = initialState, action) {
 
 // calculates and adds the wait (in sec) property
 // to each entity. @todo this is hacky
-function setWaits(result, entities, curId, curPos) {
+function setWaits (result, entities, curId, curPos) {
   let newItems = Object.assign({}, entities)
 
   let wait = 0

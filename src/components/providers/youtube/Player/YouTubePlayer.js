@@ -44,13 +44,13 @@ class YouTubePlayer extends React.Component {
 
   updateSources = () => {
     // get videoId for song
-    const url = '/api/song/'+this.props.song.songId
+    const url = '/api/song/' + this.props.song.songId
 
     fetch(url, fetchConfig)
       .then(checkStatus)
       .then(res => res.json())
       .then(song => {
-        this.setState({videoId: song.videoId})
+        this.setState({ videoId: song.videoId })
       })
       .catch((err) => {
         this.props.onMediaError(err.message)
@@ -75,7 +75,7 @@ class YouTubePlayer extends React.Component {
     }
 
     return (
-      <div style={{width, height}}>
+      <div style={{ width, height }}>
         <YouTube
           videoId={this.state.videoId}
           opts={opts}
@@ -96,7 +96,7 @@ class YouTubePlayer extends React.Component {
   }
 
   handleError = (event) => {
-    this.props.onMediaError('Error '+event.data)
+    this.props.onMediaError('Error ' + event.data)
   }
 
   setVolume = (vol) => {
@@ -136,7 +136,7 @@ const fetchConfig = {
   credentials: 'same-origin'
 }
 
-function checkStatus(response) {
+function checkStatus (response) {
   if (response.status >= 200 && response.status < 300) {
     return response
   } else {

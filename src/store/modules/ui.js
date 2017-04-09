@@ -6,17 +6,16 @@ export const FOOTER_HEIGHT_CHANGE = 'ui/FOOTER_HEIGHT_CHANGE'
 export const SHOW_ERROR_MESSAGE = 'ui/SHOW_ERROR_MESSAGE'
 export const CLEAR_ERROR_MESSAGE = 'ui/CLEAR_ERROR_MESSAGE'
 
-
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function clearErrorMessage() {
+export function clearErrorMessage () {
   return {
     type: CLEAR_ERROR_MESSAGE,
   }
 }
 
-export function showErrorMessage(error) {
+export function showErrorMessage (error) {
   return {
     type: SHOW_ERROR_MESSAGE,
     meta: {
@@ -25,7 +24,7 @@ export function showErrorMessage(error) {
   }
 }
 
-export function setHeaderHeight({height}) {
+export function setHeaderHeight ({ height }) {
   return (dispatch, getState) => {
     if (getState().ui.headerHeight === height) return
 
@@ -36,7 +35,7 @@ export function setHeaderHeight({height}) {
   }
 }
 
-export function setFooterHeight({height}) {
+export function setFooterHeight ({ height }) {
   return (dispatch, getState) => {
     if (getState().ui.footerHeight === height) return
 
@@ -47,16 +46,15 @@ export function setFooterHeight({height}) {
   }
 }
 
-
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [HEADER_HEIGHT_CHANGE]: (state, {payload}) => ({
+  [HEADER_HEIGHT_CHANGE]: (state, { payload }) => ({
     ...state,
     headerHeight: payload,
   }),
-  [FOOTER_HEIGHT_CHANGE]: (state, {payload}) => ({
+  [FOOTER_HEIGHT_CHANGE]: (state, { payload }) => ({
     ...state,
     footerHeight: payload,
   }),
@@ -64,7 +62,7 @@ const ACTION_HANDLERS = {
     ...state,
     errorMessage: action.meta.error,
   }),
-  [CLEAR_ERROR_MESSAGE]: (state, {payload}) => ({
+  [CLEAR_ERROR_MESSAGE]: (state, { payload }) => ({
     ...state,
     errorMessage: null,
   }),
@@ -80,8 +78,8 @@ const initialState = {
 }
 
 export default function uiReducer (state = initialState, action) {
-  const handler = action.meta && action.meta.error ?
-    ACTION_HANDLERS[SHOW_ERROR_MESSAGE] : ACTION_HANDLERS[action.type]
+  const handler = action.meta && action.meta.error
+    ? ACTION_HANDLERS[SHOW_ERROR_MESSAGE] : ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state
 }

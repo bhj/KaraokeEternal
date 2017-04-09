@@ -8,7 +8,7 @@ const Header = (props) => {
     <Measure onMeasure={props.setHeaderHeight} whitelist={['height']}>
       <div className={classes.container}>
         {props.isAdmin &&
-          <PlaybackCtrl/>
+          <PlaybackCtrl />
         }
         {props.children}
       </div>

@@ -18,23 +18,23 @@ import {
 // ------------------------------------
 // Login
 // ------------------------------------
-function requestLogin(creds) {
+function requestLogin (creds) {
   return {
     type: LOGIN,
     payload: creds
   }
 }
 
-function receiveLogin(response) {
+function receiveLogin (response) {
   return {
-    type: LOGIN+_SUCCESS,
+    type: LOGIN + _SUCCESS,
     payload: response
   }
 }
 
-function loginError(message) {
+function loginError (message) {
   return {
-    type: LOGIN+_ERROR,
+    type: LOGIN + _ERROR,
     meta: {
       error: message + ' (incorrect login)',
     }
@@ -43,7 +43,7 @@ function loginError(message) {
 
 // calls api endpoint that should set an httpOnly cookie with
 // our JWT, then establish the sockiet.io connection
-export function loginUser(data) {
+export function loginUser (data) {
   return (dispatch, getState) => {
     dispatch(requestLogin(data))
 
@@ -54,7 +54,7 @@ export function loginUser(data) {
         'Content-Type': 'application/json',
       }),
       body: JSON.stringify(data)
-      })
+    })
       .then(checkStatus)
       .then(res => res.json())
       .then(res => {
@@ -82,12 +82,12 @@ export function loginUser(data) {
   }
 }
 
-function parseQuery(qstr) {
+function parseQuery (qstr) {
   var query = {}
   var a = qstr.substr(1).split('&')
   for (var i = 0; i < a.length; i++) {
-      var b = a[i].split('=')
-      query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '')
+    var b = a[i].split('=')
+    query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '')
   }
   return query
 }
@@ -95,23 +95,23 @@ function parseQuery(qstr) {
 // ------------------------------------
 // Logout
 // ------------------------------------
-function requestLogout() {
+function requestLogout () {
   return {
     type: LOGOUT,
     payload: null
   }
 }
 
-function receiveLogout() {
+function receiveLogout () {
   return {
-    type: LOGOUT+_SUCCESS,
+    type: LOGOUT + _SUCCESS,
     payload: null
   }
 }
 
-function logoutError(message) {
+function logoutError (message) {
   return {
-    type: LOGOUT+_ERROR,
+    type: LOGOUT + _ERROR,
     meta: {
       error: message,
     }
@@ -119,7 +119,7 @@ function logoutError(message) {
 }
 
 // Logs the user out
-export function logoutUser() {
+export function logoutUser () {
   return (dispatch, getState) => {
     dispatch(requestLogout())
 
@@ -147,40 +147,40 @@ export function logoutUser() {
 // ------------------------------------
 // Create account
 // ------------------------------------
-function requestCreate(user) {
+function requestCreate (user) {
   return {
     type: CREATE,
     payload: user
   }
 }
 
-function receiveCreate() {
+function receiveCreate () {
   return {
-    type: CREATE+_SUCCESS,
+    type: CREATE + _SUCCESS,
     payload: null
   }
 }
 
-function createError(message) {
+function createError (message) {
   return {
-    type: CREATE+_ERROR,
+    type: CREATE + _ERROR,
     meta: {
       error: message,
     }
   }
 }
 
-export function createUser(user) {
+export function createUser (user) {
   return dispatch => {
     dispatch(requestCreate(user))
 
     return fetch('/api/account/create', {
-        method: 'POST',
-        headers: new Headers({
-          'Content-Type': 'application/json',
-        }),
-        body: JSON.stringify(user)
-      })
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(user)
+    })
       .then(checkStatus)
       .then(response => {
         dispatch(receiveCreate())
@@ -196,41 +196,41 @@ export function createUser(user) {
 // ------------------------------------
 // Update account
 // ------------------------------------
-function requestUpdate(user) {
+function requestUpdate (user) {
   return {
     type: UPDATE,
     payload: user
   }
 }
 
-function receiveUpdate(response) {
+function receiveUpdate (response) {
   return {
-    type: UPDATE+_SUCCESS,
+    type: UPDATE + _SUCCESS,
     payload: response
   }
 }
 
-function updateError(message) {
+function updateError (message) {
   return {
-    type: UPDATE+_ERROR,
+    type: UPDATE + _ERROR,
     meta: {
       error: message,
     }
   }
 }
 
-export function updateUser(data) {
+export function updateUser (data) {
   return (dispatch, getState) => {
     dispatch(requestUpdate(data))
 
     return fetch('/api/account/update', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: new Headers({
-          'Content-Type': 'application/json',
-        }),
-        body: JSON.stringify(data)
-      })
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(data)
+    })
       .then(checkStatus)
       .then(response => response.json())
       .then(user => {
@@ -245,30 +245,30 @@ export function updateUser(data) {
 // ------------------------------------
 // Available Rooms
 // ------------------------------------
-function requestRooms() {
+function requestRooms () {
   return {
     type: GET_ROOMS,
     payload: null
   }
 }
 
-function receiveRooms(response) {
+function receiveRooms (response) {
   return {
-    type: GET_ROOMS+_SUCCESS,
+    type: GET_ROOMS + _SUCCESS,
     payload: response
   }
 }
 
-function roomsError(message) {
+function roomsError (message) {
   return {
-    type: GET_ROOMS+_ERROR,
+    type: GET_ROOMS + _ERROR,
     meta: {
       error: message,
     }
   }
 }
 
-export function fetchRooms() {
+export function fetchRooms () {
   return dispatch => {
     dispatch(requestRooms())
 
@@ -287,7 +287,7 @@ export function fetchRooms() {
 // ------------------------------------
 // Star songs
 // ------------------------------------
-export function toggleSongStarred(songId) {
+export function toggleSongStarred (songId) {
   return {
     type: TOGGLE_SONG_STARRED,
     payload: songId,
@@ -297,7 +297,7 @@ export function toggleSongStarred(songId) {
 // ------------------------------------
 // Set prefs
 // ------------------------------------
-export function setPrefs(domain, data) {
+export function setPrefs (domain, data) {
   return {
     type: SET_PREFS,
     payload: { domain, data },
@@ -307,7 +307,7 @@ export function setPrefs(domain, data) {
 // ------------------------------------
 // Provider re-scan
 // ------------------------------------
-export function providerRefresh(provider) {
+export function providerRefresh (provider) {
   return {
     type: PROVIDER_REFRESH_REQUEST,
     payload: provider,
@@ -315,7 +315,7 @@ export function providerRefresh(provider) {
 }
 
 // helper for fetch response
-function checkStatus(response) {
+function checkStatus (response) {
   if (response.status >= 200 && response.status < 300) {
     return response
   } else {
@@ -331,15 +331,15 @@ function checkStatus(response) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LOGIN+_SUCCESS]: (state, {payload}) => ({
+  [LOGIN + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),
-  [UPDATE+_SUCCESS]: (state, {payload}) => ({
+  [UPDATE + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),
-  [LOGOUT+_SUCCESS]: (state, {payload}) => ({
+  [LOGOUT + _SUCCESS]: (state, { payload }) => ({
     ...state,
     userId: null,
     email: null,
@@ -349,15 +349,15 @@ const ACTION_HANDLERS = {
     roomId: null,
     starredSongs: [],
   }),
-  [GET_ROOMS+_SUCCESS]: (state, {payload}) => ({
+  [GET_ROOMS + _SUCCESS]: (state, { payload }) => ({
     ...state,
     rooms: payload,
   }),
-  [TOGGLE_SONG_STARRED+_SUCCESS]: (state, {payload}) => ({
+  [TOGGLE_SONG_STARRED + _SUCCESS]: (state, { payload }) => ({
     ...state,
     starredSongs: payload,
   }),
-  [PREFS_CHANGE]: (state, {payload}) => ({
+  [PREFS_CHANGE]: (state, { payload }) => ({
     ...state,
     prefs: payload,
   }),

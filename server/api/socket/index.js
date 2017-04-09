@@ -18,7 +18,7 @@ let ACTION_HANDLERS = Object.assign({},
   Provider.ACTION_HANDLERS
 )
 
-module.exports = async function(ctx) {
+module.exports = async function (ctx) {
   const action = ctx.data
   const handler = ACTION_HANDLERS[action.type]
 

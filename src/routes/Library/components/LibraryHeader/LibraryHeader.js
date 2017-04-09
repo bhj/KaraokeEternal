@@ -15,12 +15,12 @@ class LibraryHeader extends React.Component {
   }
 
   handleChange = (event) => {
-    this.setState({value: event.target.value})
+    this.setState({ value: event.target.value })
     this.props.searchLibrary(event.target.value)
   }
 
   clearSearch = () => {
-    this.setState({value: ''})
+    this.setState({ value: '' })
     this.props.searchReset()
   }
 
@@ -28,9 +28,9 @@ class LibraryHeader extends React.Component {
     return (
       <Header>
         <div className={classes.container}>
-          <input type="search"
+          <input type='search'
             className={classes.search}
-            placeholder="search library"
+            placeholder='search library'
             value={this.state.value}
             onChange={this.handleChange}
           />

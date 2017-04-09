@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react'
 
 export default class Login extends Component {
 
-  render() {
-    let roomOpts = this.props.rooms.map(function(room, i) {
+  render () {
+    let roomOpts = this.props.rooms.map(function (room, i) {
       return (
         <option key={room.roomId} value={room.roomId}>{room.name}</option>
       )
@@ -11,14 +11,14 @@ export default class Login extends Component {
 
     return (
       <form>
-        <input type='email' ref='email' placeholder="email" autoFocus={true}/>
-        <input type='password' ref='password' placeholder="password"/>
-        <br/>
+        <input type='email' ref='email' placeholder='email' autoFocus />
+        <input type='password' ref='password' placeholder='password' />
+        <br />
         <label>Room</label>
         <select ref='room'>{roomOpts}</select>
-        <br/>
+        <br />
 
-        <button onClick={this.handleClick} className="button wide green raised">
+        <button onClick={this.handleClick} className='button wide green raised'>
           Sign In
         </button>
       </form>

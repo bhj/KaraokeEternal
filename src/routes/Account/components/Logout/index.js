@@ -1,3 +1,3 @@
 import Logout from './Logout'
 
-export default Logout 
+export default Logout

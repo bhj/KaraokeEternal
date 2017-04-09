@@ -22,10 +22,10 @@ export const makeRootReducer = (asyncReducers) => {
     ui,
     user,
     viewport: createResponsiveStateReducer(null, {
-        extraFields: () => ({
-            width: window.innerWidth,
-            height: window.innerHeight,
-        }),
+      extraFields: () => ({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }),
     }),
     ...asyncReducers
   })

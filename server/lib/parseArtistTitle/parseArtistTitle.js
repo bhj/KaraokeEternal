@@ -1,6 +1,6 @@
 const parserDefaults = require('./kfconfig-default.js')
 
-function parseArtistTitle(str, cfg) {
+function parseArtistTitle (str, cfg) {
   cfg = cfg || parserDefaults
   let artist, title
 
@@ -37,14 +37,13 @@ function parseArtistTitle(str, cfg) {
 
 module.exports = parseArtistTitle
 
-
-function titleCase(str) {
-  return str.replace(/\w\S*/g, function(tStr) {
+function titleCase (str) {
+  return str.replace(/\w\S*/g, function (tStr) {
     return tStr.charAt(0).toUpperCase() + tStr.substr(1).toLowerCase()
   })
 }
 
-function replaceMulti(str, repl) {
+function replaceMulti (str, repl) {
   repl.forEach(r => {
     const find = Array.isArray(r) ? r[0] : r
     const repl = Array.isArray(r) ? r[1] : ''

@@ -32,13 +32,13 @@ export default class VolumeSlider extends React.Component {
     this.ignoreStatus = 2
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     if (this.ignoreStatus && prevProps.volume !== this.props.volume) {
       this.ignoreStatus--
     }
   }
 
-  render() {
+  render () {
     return (
       <Slider
         min={0}
@@ -56,20 +56,20 @@ export default class VolumeSlider extends React.Component {
 
 // volume slider handle/grabber
 const handle = (props) => {
-  const style = Object.assign({left: `${props.offset}%`}, {
+  const style = Object.assign({ left: `${props.offset}%` }, {
     position: 'absolute',
     transform: 'translate(-50%, -50%)',
     marginTop: '6px',
     fontSize: '40px',
-    opacity: .7,
+    opacity: 0.7,
     color: '#333',
     touchAction: 'pan-x',
   })
 
-  let icon = "volume_up"
-  if (props.value === 0) icon = "volume_off"
-  else if (props.value < .4) icon = "volume_mute"
-  else if (props.value < .7) icon = "volume_down"
+  let icon = 'volume_up'
+  if (props.value === 0) icon = 'volume_off'
+  else if (props.value < 0.4) icon = 'volume_mute'
+  else if (props.value < 0.7) icon = 'volume_down'
 
   // will cause 'unknown prop' warning if passed to Handle
   delete props.dragging
@@ -77,7 +77,7 @@ const handle = (props) => {
   return (
     <div style={style}>
       <i className='material-icons'>{icon}</i>
-      <Handle {...props}/>
+      <Handle {...props} />
     </div>
   )
 }

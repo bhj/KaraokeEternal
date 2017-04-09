@@ -22,14 +22,14 @@ const {
 const allowedExts = ['.mp3', '.m4a']
 let counts
 
-async function scan(ctx, cfg) {
+async function scan (ctx, cfg) {
   if (!Array.isArray(cfg.paths) || !cfg.paths.length) {
     log('No paths configured; aborting scan')
     return Promise.resolve()
   }
 
   let validIds = [] // songIds for cleanup
-  counts = {new: 0, ok: 0, skipped: 0}
+  counts = { new: 0, ok: 0, skipped: 0 }
 
   for (const dir of cfg.paths) {
     let files = []
@@ -45,13 +45,13 @@ async function scan(ctx, cfg) {
       continue
     }
 
-    for (let i=0; i < files.length; i++) {
-      log('[%s/%s] %s', i+1, files.length, files[i])
+    for (let i = 0; i < files.length; i++) {
+      log('[%s/%s] %s', i + 1, files.length, files[i])
       let songId, newCount
 
       try {
         songId = await process(files[i])
-      } catch(err) {
+      } catch (err) {
         // try next file
         log(err.message)
         continue
@@ -76,8 +76,6 @@ async function scan(ctx, cfg) {
     }
   }
 
-
-
   // // delete songs not in our valid list
   // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
   // log('cleanup: removed %s invalid songs', res.stmt.changes)
@@ -86,12 +84,11 @@ async function scan(ctx, cfg) {
   return Promise.resolve()
 }
 
-
-async function resource(ctx, cfg) {
+async function resource (ctx, cfg) {
   const { type, songId } = ctx.query
   let file, stats
 
-  if (! type || ! songId) {
+  if (!type || !songId) {
     ctx.status = 422
     return ctx.body = "Missing 'type' or 'songId' in url"
   }
@@ -108,7 +105,7 @@ async function resource(ctx, cfg) {
     row = res.entities[res.result[0]]
     // should be the audio file path
     file = JSON.parse(row.provider_json).path
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     return Promise.reject(err)
   }
@@ -121,7 +118,7 @@ async function resource(ctx, cfg) {
   // get file size (and does it exist?)
   try {
     stats = await stat(file)
-  } catch(err) {
+  } catch (err) {
     ctx.status = 404
     return ctx.body = `File not found: ${file}`
   }
@@ -135,19 +132,18 @@ async function resource(ctx, cfg) {
 
 module.exports = { scan, resource }
 
-
-async function process(file){
+async function process (file) {
   const pathInfo = path.parse(file)
   let stats, sha256, duration
 
   // does file exist?
   try {
     stats = await stat(file)
-  } catch(err) {
+  } catch (err) {
     log('skipping: %s', err.message)
     counts.skipped++
     return Promise.reject(err)
-}
+  }
 
   // already in database with the same path and mtime?
   try {
@@ -163,7 +159,7 @@ async function process(file){
       counts.ok++
       return Promise.resolve(res.result[0])
     }
-  } catch(err) {
+  } catch (err) {
     log('skipping: %s', err.message)
     counts.skipped++
     return Promise.reject(err)
@@ -171,21 +167,21 @@ async function process(file){
 
   // need to hash the file(s)
   // (don't bother if CDG sidecar doesn't exist)
-  const cdgFile = file.substr(0, file.length-pathInfo.ext.length)+'.cdg'
+  const cdgFile = file.substr(0, file.length - pathInfo.ext.length) + '.cdg'
 
   try {
     await stat(cdgFile)
-  } catch(err) {
+  } catch (err) {
     log('skipping: %s', err.message)
     counts.skipped++
     return Promise.reject(err)
   }
 
-  log('getting sha256 (%s)', pathInfo.ext+'+.cdg')
+  log('getting sha256 (%s)', pathInfo.ext + '+.cdg')
 
   try {
     sha256 = await hashfiles([file, cdgFile], 'sha256')
-  } catch(err) {
+  } catch (err) {
     log('skipping: %s', err.message)
     counts.skipped++
     return Promise.reject(err)
@@ -202,14 +198,14 @@ async function process(file){
       duration = await mp3duration(file)
     } else {
       log('getting duration (musicmetadata)')
-      let musicmeta = await musicmetadata(file, {duration: true})
+      let musicmeta = await musicmetadata(file, { duration: true })
       duration = musicmeta.duration
     }
 
     if (!duration) {
       throw new Error('unable to determine duration')
     }
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     counts.skipped++
     return Promise.reject(err)
@@ -248,7 +244,7 @@ async function process(file){
 
     counts.new++
     return Promise.resolve(songId)
-  } catch(err) {
+  } catch (err) {
     counts.skipped++
     return Promise.reject(err)
   }

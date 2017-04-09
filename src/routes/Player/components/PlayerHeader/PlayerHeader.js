@@ -6,7 +6,7 @@ const PlayerHeader = (props) => (
   <Header>
     <div className={classes.container}>
       <div onClick={props.requestFullscreen} className={classes.fullscreen}>
-        <i className="material-icons">fullscreen</i>
+        <i className='material-icons'>fullscreen</i>
       </div>
     </div>
   </Header>

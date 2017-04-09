@@ -17,10 +17,10 @@ export default class AccountForm extends Component {
   }
 
   handleChange = (inputName) => {
-    return (event) => this.setState({[inputName]: event.target.value})
+    return (event) => this.setState({ [inputName]: event.target.value })
   }
 
-  render() {
+  render () {
     const view = this.props.user.userId !== null ? 'edit' : this.state.view
 
     return (
@@ -28,7 +28,7 @@ export default class AccountForm extends Component {
         {view === 'login' &&
           <div>
             <p>Sign in below or <a onClick={() => this.props.changeView('create')}>create a new account</a>.</p>
-            <Login onSubmitClick={this.props.loginUser} rooms={this.props.user.rooms}/>
+            <Login onSubmitClick={this.props.loginUser} rooms={this.props.user.rooms} />
           </div>
         }
         {view === 'create' &&
@@ -40,18 +40,18 @@ export default class AccountForm extends Component {
 
         {view !== 'login' &&
           <form>
-            <input type='text' ref='name' value={this.state.name || ''} onChange={this.handleChange('name')} autoFocus={view === 'create'} placeholder='display name'/>
-            <input type='email' ref='email' value={this.state.email || ''} onChange={this.handleChange('email')} placeholder='email'/>
+            <input type='text' ref='name' value={this.state.name || ''} onChange={this.handleChange('name')} autoFocus={view === 'create'} placeholder='display name' />
+            <input type='email' ref='email' value={this.state.email || ''} onChange={this.handleChange('email')} placeholder='email' />
 
-            <input type='password' ref='newPassword' placeholder={view === 'create' ? 'password' : 'new password'}/>
-            <input type='password' ref='newPasswordConfirm' placeholder={view === 'create' ? 'confirm password' : 'confirm new password'}/>
+            <input type='password' ref='newPassword' placeholder={view === 'create' ? 'password' : 'new password'} />
+            <input type='password' ref='newPasswordConfirm' placeholder={view === 'create' ? 'confirm password' : 'confirm new password'} />
 
             {view === 'edit' &&
-              <input type='password' ref='curPassword' placeholder='current password'/>
+              <input type='password' ref='curPassword' placeholder='current password' />
             }
 
-            <br/>
-            <button onClick={this.handleClick} className="button wide green raised">
+            <br />
+            <button onClick={this.handleClick} className='button wide green raised'>
               {view === 'create' ? 'Create Account' : 'Update Account'}
             </button>
           </form>
@@ -74,12 +74,12 @@ export default class AccountForm extends Component {
       password: curPassword ? curPassword.value : null,
       newPassword: newPassword.value,
       newPasswordConfirm: newPasswordConfirm.value
-     }
+    }
 
-     if (this.props.user) {
-       this.props.updateUser(user)
-     } else {
-       this.props.createUser(user)
-     }
+    if (this.props.user) {
+      this.props.updateUser(user)
+    } else {
+      this.props.createUser(user)
+    }
   }
 }

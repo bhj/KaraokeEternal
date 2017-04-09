@@ -23,7 +23,7 @@ class SearchResults extends React.Component {
     toggleArtistResultExpanded: PropTypes.func.isRequired,
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     if (!this.ref) return
     // nuclear option
     this.ref.recomputeRowHeights()
@@ -37,7 +37,7 @@ class SearchResults extends React.Component {
         height={this.props.height}
         paddingTop={this.props.paddingTop}
         paddingBottom={this.props.paddingBottom}
-        rowCount={this.props.artistResults.length+this.props.songResults.length+2}
+        rowCount={this.props.artistResults.length + this.props.songResults.length + 2}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         onRef={this.setRef}
@@ -45,7 +45,7 @@ class SearchResults extends React.Component {
     )
   }
 
-  rowRenderer = ({index, key, style}) => {
+  rowRenderer = ({ index, key, style }) => {
     const { artistResults, songResults } = this.props
 
     // # artist results heading
@@ -58,8 +58,8 @@ class SearchResults extends React.Component {
     }
 
     // artist results
-    if (index > 0 && index < artistResults.length+1) {
-      const artistId = artistResults[index-1]
+    if (index > 0 && index < artistResults.length + 1) {
+      const artistId = artistResults[index - 1]
       const artist = this.props.artists.entities[artistId]
 
       return (
@@ -105,11 +105,11 @@ class SearchResults extends React.Component {
     )
   }
 
-  rowHeight = ({index}) => {
+  rowHeight = ({ index }) => {
     // header
     if (index === 0) return ROW_HEIGHT
 
-    const artistId = this.props.artistResults[index-1]
+    const artistId = this.props.artistResults[index - 1]
     let rows = 1
 
     if (this.props.expandedArtistResults.includes(artistId)) {

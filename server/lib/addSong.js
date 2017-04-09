@@ -5,12 +5,12 @@ const log = debug('app:library:addSong')
 
 const { LIBRARY_UPDATE } = require('../api/constants')
 
-async function addSong(song) {
+async function addSong (song) {
   if (!song || !song.artist || !song.title || !song.duration) {
     return Promise.reject(new Error('invalid song data'))
   }
 
-  log('new song: %s', JSON.stringify({artist: song.artist, title: song.title, duration: song.duration}))
+  log('new song: %s', JSON.stringify({ artist: song.artist, title: song.title, duration: song.duration }))
 
   // does the artist already exist?
   let row
@@ -19,9 +19,9 @@ async function addSong(song) {
       .from('artists')
       .where('name = ?', song.artist)
 
-      const { text, values } = q.toParam()
-      row = await db.get(text, values)
-    } catch(err) {
+    const { text, values } = q.toParam()
+    row = await db.get(text, values)
+  } catch (err) {
     return Promise.reject(err)
   }
 
@@ -44,7 +44,7 @@ async function addSong(song) {
       }
 
       song.artistId = res.stmt.lastID
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
   }
@@ -74,7 +74,7 @@ async function addSong(song) {
     }
 
     return Promise.resolve(res.stmt.lastID)
-  } catch(err) {
+  } catch (err) {
     return Promise.reject(err)
   }
 }

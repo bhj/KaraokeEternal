@@ -3,7 +3,7 @@ const squel = require('squel')
 const jwtSign = require('jsonwebtoken').sign
 const bcrypt = require('../../lib/thunks/bcrypt')
 const KoaRouter = require('koa-router')
-const router = KoaRouter({prefix: '/api'})
+const router = KoaRouter({ prefix: '/api' })
 const debug = require('debug')
 const log = debug('app:account')
 
@@ -16,7 +16,7 @@ router.get('/rooms', async (ctx, next) => {
   try {
     const { text, values } = q.toParam()
     ctx.body = await db.all(text, values)
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -29,7 +29,7 @@ router.post('/login', async (ctx, next) => {
 
   try {
     await _login(ctx, ctx.request.body)
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -44,7 +44,7 @@ router.get('/logout', async (ctx, next) => {
 
 // create
 router.post('/account/create', async (ctx, next) => {
-  let {name, email, password, passwordConfirm} = ctx.request.body
+  let { name, email, password, passwordConfirm } = ctx.request.body
 
   name = name.trim()
   email = email.trim().toLowerCase()
@@ -73,7 +73,7 @@ router.post('/account/create', async (ctx, next) => {
       ctx.status = 401
       return ctx.body = 'Email address is already registered'
     }
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     return Promise.reject(err)
   }
@@ -88,7 +88,7 @@ router.post('/account/create', async (ctx, next) => {
   let hashedPwd
   try {
     hashedPwd = await bcrypt.hash(password, 10)
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -108,7 +108,7 @@ router.post('/account/create', async (ctx, next) => {
     if (res.stmt.changes !== 1) {
       throw new Error('insert failed')
     }
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -135,7 +135,7 @@ router.post('/account/update', async (ctx, next) => {
 
     const { text, values } = q.toParam()
     user = await db.get(text, values)
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -172,7 +172,7 @@ router.post('/account/update', async (ctx, next) => {
 
     try {
       password = await bcrypt.hash(newPassword, 10)
-    } catch(err) {
+    } catch (err) {
       log(err.message)
       ctx.status = 500
       return Promise.reject(err)
@@ -200,7 +200,7 @@ router.post('/account/update', async (ctx, next) => {
       ctx.status = 401
       return ctx.body = 'Email address is already registered'
     }
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -217,7 +217,7 @@ router.post('/account/update', async (ctx, next) => {
 
     const { text, values } = q.toParam()
     await db.run(text, values)
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -232,7 +232,7 @@ router.post('/account/update', async (ctx, next) => {
     const { text, values } = q.toParam()
     user = await db.get(text, values)
     if (!user) throw new Error('couldn\'t get updated user')
-  } catch(err) {
+  } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
@@ -251,8 +251,7 @@ router.post('/account/update', async (ctx, next) => {
 
 module.exports = router
 
-
-async function _login(ctx, creds) {
+async function _login (ctx, creds) {
   const { email, password, roomId } = creds
 
   // check presence of all fields
@@ -275,7 +274,7 @@ async function _login(ctx, creds) {
       ctx.body = 'Invalid Room'
       return
     }
-  } catch(err) {
+  } catch (err) {
     return Promise.reject(err)
   }
 
@@ -293,7 +292,7 @@ async function _login(ctx, creds) {
       ctx.status = 401
       return
     }
-  } catch(err) {
+  } catch (err) {
     return Promise.reject(err)
   }
 
@@ -303,7 +302,7 @@ async function _login(ctx, creds) {
       ctx.status = 401
       return
     }
-  } catch(err) {
+  } catch (err) {
     return Promise.reject(err)
   }
 
@@ -321,7 +320,7 @@ async function _login(ctx, creds) {
     rows.forEach(row => {
       starredSongs.push(row.songId)
     })
-  } catch(err) {
+  } catch (err) {
     return Promise.reject(err)
   }
 
@@ -348,14 +347,14 @@ async function _login(ctx, creds) {
 
 // email validation helper from
 // http://www.moreofless.co.uk/validate-email-address-without-regex/
-function validateEmail(email) {
-  var at = email.indexOf( "@" )
-  var dot = email.lastIndexOf( "\." )
+function validateEmail (email) {
+  var at = email.indexOf('@')
+  var dot = email.lastIndexOf('\.')
   return email.length > 0 &&
          at > 0 &&
          dot > at + 1 &&
          dot < email.length &&
-         email[at + 1] !== "." &&
-         email.contains(" ") &&
-         !email.contains("..")
+         email[at + 1] !== '.' &&
+         email.contains(' ') &&
+         !email.contains('..')
 }

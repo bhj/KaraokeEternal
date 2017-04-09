@@ -6,17 +6,17 @@ const PlaybackCtrl = (props) => (
   <div className={classes.container}>
     {!props.isPlaying &&
       <div onClick={props.requestPlay} className={classes.play}>
-        <i className="material-icons">play_arrow</i>
+        <i className='material-icons'>play_arrow</i>
       </div>
     }
     {props.isPlaying &&
       <div onClick={props.requestPause} className={classes.pause}>
-        <i className="material-icons">pause</i>
+        <i className='material-icons'>pause</i>
       </div>
     }
 
-    <div onClick={props.requestPlayNext} className={classes.next + (props.isPlaying ? '' : ' '+classes.disabled)}>
-      <i className="material-icons">skip_next</i>
+    <div onClick={props.requestPlayNext} className={classes.next + (props.isPlaying ? '' : ' ' + classes.disabled)}>
+      <i className='material-icons'>skip_next</i>
     </div>
 
     <VolumeSlider

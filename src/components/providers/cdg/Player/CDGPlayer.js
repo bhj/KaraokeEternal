@@ -48,27 +48,27 @@ class CDGPlayer extends React.Component {
     let canvasScale = Math.floor(width / 300)
 
     // make sure height would fit the viewport's
-    while (height < canvasScale * 300 * .72) {
+    while (height < canvasScale * 300 * 0.72) {
       canvasScale -= 1
     }
 
     return (
-      <div style={{width, height}} className={classes.background}>
+      <div style={{ width, height }} className={classes.background}>
         <CDGCanvas
           width={canvasScale * 300}
-          height={canvasScale * 300 * .72}
+          height={canvasScale * 300 * 0.72}
           isPlaying={this.props.isPlaying}
           audioPos={this.state.audioPos}
           cdgData={this.cdgData}
         />
-        <br/>
-        <audio src={'/api/provider/cdg/resource?type=audio&songId='+this.props.song.songId}
+        <br />
+        <audio src={'/api/provider/cdg/resource?type=audio&songId=' + this.props.song.songId}
           preload='none'
           onCanPlayThrough={this.handleOnCanPlayThrough}
           onTimeUpdate={this.handleOnTimeUpdate}
           onEnded={this.props.onMediaEnd}
           onError={this.handleAudioError}
-          ref={(c) => {this.audio = c}}
+          ref={(c) => { this.audio = c }}
         />
       </div>
     )
@@ -82,7 +82,7 @@ class CDGPlayer extends React.Component {
     this.audio.load()
 
     // get cdgData
-    const url = '/api/provider/cdg/resource?type=cdg&songId='+this.props.song.songId
+    const url = '/api/provider/cdg/resource?type=cdg&songId=' + this.props.song.songId
 
     // notification
     this.props.getMedia(this.url)
@@ -99,7 +99,7 @@ class CDGPlayer extends React.Component {
       })
   }
 
-  setVolume(vol) {
+  setVolume (vol) {
     this.audio.volume = vol
   }
 
@@ -136,7 +136,7 @@ class CDGPlayer extends React.Component {
   }
 
   handleAudioError = (err) => {
-    this.props.onMediaError('Could not load audio (error '+err.target.error.code+')')
+    this.props.onMediaError('Could not load audio (error ' + err.target.error.code + ')')
   }
 
   /**
@@ -154,7 +154,6 @@ class CDGPlayer extends React.Component {
 
 export default CDGPlayer
 
-
 // helpers for fetch response
 const fetchConfig = {
   headers: new Headers({
@@ -164,7 +163,7 @@ const fetchConfig = {
   credentials: 'same-origin'
 }
 
-function checkStatus(response) {
+function checkStatus (response) {
   if (response.status >= 200 && response.status < 300) {
     return response
   } else {

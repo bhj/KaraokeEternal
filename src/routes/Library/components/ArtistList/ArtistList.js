@@ -41,18 +41,18 @@ class ArtistList extends React.Component {
     )
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     if (!this.ref) return
     // nuclear option
     this.ref.recomputeRowHeights()
     this.ref.forceUpdate()
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     this.props.scrollArtists(this.lastScrollPos)
   }
 
-  rowRenderer = ({index, key, style}) => {
+  rowRenderer = ({ index, key, style }) => {
     const { artists, songs, expandedArtists } = this.props
     const artist = artists.entities[artists.result[index]]
 
@@ -73,7 +73,7 @@ class ArtistList extends React.Component {
     )
   }
 
-  rowHeight = ({index}) => {
+  rowHeight = ({ index }) => {
     const artistId = this.props.artists.result[index]
     let rows = 1
 

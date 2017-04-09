@@ -38,7 +38,7 @@ app.use(async (ctx, next) => {
 
   try {
     ctx.user = jwtVerify(id_token, 'shared-secret')
-  } catch(err) {
+  } catch (err) {
     ctx.user = null
   }
 
@@ -62,12 +62,12 @@ app._io.on('connection', async (sock) => {
     sock.decoded_token = jwtVerify(id_token, 'shared-secret')
     user = sock.decoded_token
   } catch (err) {
-      app._io.to(sock.id).emit('action', {
-        type: SOCKET_AUTH_ERROR,
-        meta: {
-          error: `${err.message} (try signing in again)`
-        }
-      })
+    app._io.to(sock.id).emit('action', {
+      type: SOCKET_AUTH_ERROR,
+      meta: {
+        error: `${err.message} (try signing in again)`
+      }
+    })
 
     sock.decoded_token = null
     sock.disconnect()
@@ -136,7 +136,7 @@ if (project.env === 'development') {
   const compiler = webpack(webpackConfig)
 
   debug('Enabling webpack dev and HMR middleware')
-  app.use(convert(require("koa-webpack-dev-middleware")(compiler, {
+  app.use(convert(require('koa-webpack-dev-middleware')(compiler, {
     publicPath  : webpackConfig.output.publicPath,
     contentBase : project.paths.client(),
     hot         : true,
@@ -165,7 +165,7 @@ if (project.env === 'development') {
       ctx.set('content-type', 'text/html')
       ctx.status = 200
       return Promise.resolve()
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
   })
@@ -188,12 +188,12 @@ module.exports = app
 
 // cookie helper based on
 // http://stackoverflow.com/questions/3393854/get-and-set-a-single-cookie-with-node-js-http-server
-function parseCookie(cookie) {
+function parseCookie (cookie) {
   const list = {}
 
   cookie && cookie.split(';').forEach(c => {
-      const parts = c.split('=')
-      list[parts.shift().trim()] = decodeURI(parts.join('='))
+    const parts = c.split('=')
+    list[parts.shift().trim()] = decodeURI(parts.join('='))
   })
 
   return list

@@ -1,3 +1,3 @@
 import PrefsContainer from './PrefsContainer'
 
-export default PrefsContainer 
+export default PrefsContainer

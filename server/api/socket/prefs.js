@@ -9,7 +9,7 @@ const {
 } = require('../constants')
 
 const ACTION_HANDLERS = {
-  [SET_PREFS]: async (ctx, {payload}) => {
+  [SET_PREFS]: async (ctx, { payload }) => {
     if (!payload.domain || !payload.data) {
       return Promise.reject(new Error('invalid pref data'))
     }
@@ -23,12 +23,12 @@ const ACTION_HANDLERS = {
 
       const { text, values } = q.toParam()
       await db.run(text, values)
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
 
     ctx.acknowledge({
-      type: SET_PREFS+_SUCCESS,
+      type: SET_PREFS + _SUCCESS,
     })
 
     // send updated prefs
@@ -37,13 +37,13 @@ const ACTION_HANDLERS = {
         type: PREFS_CHANGE,
         payload: await getPrefs()
       })
-    } catch(err) {
+    } catch (err) {
       return Promise.reject(err)
     }
   },
 }
 
-async function getPrefs(domain) {
+async function getPrefs (domain) {
   let res
 
   try {
@@ -57,9 +57,9 @@ async function getPrefs(domain) {
     res = await db.all(text, values)
 
     if (!res.length) {
-      throw new Error('no prefs for domain: '+domain)
+      throw new Error('no prefs for domain: ' + domain)
     }
-  } catch(err) {
+  } catch (err) {
     return Promise.reject(err)
   }
 
@@ -68,7 +68,7 @@ async function getPrefs(domain) {
   }
 
   let cfg = {}
-  res.forEach(function(row){
+  res.forEach(function (row) {
     let parts = row.domain.split('.')
     if (typeof cfg[parts[0]] === 'undefined') cfg[parts[0]] = {}
     cfg[parts[0]][parts[1]] = JSON.parse(row.data)

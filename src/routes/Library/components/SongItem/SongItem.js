@@ -7,12 +7,12 @@ export const SongItem = (props) => (
       {toMMSS(props.duration)}
     </div>
 
-    <div onClick={props.onSongClick}  className={classes.title}>
+    <div onClick={props.onSongClick} className={classes.title}>
       {props.title}
     </div>
 
     <div onClick={props.onSongStarClick} className={props.isStarred ? classes.starStarred : classes.star}>
-      <i className='material-icons' style={{position: 'absolute'}}>{props.isStarred ? 'star' : 'star_border'}</i>
+      <i className='material-icons' style={{ position: 'absolute' }}>{props.isStarred ? 'star' : 'star_border'}</i>
       <div className={props.isStarred ? classes.starredCountStarred : classes.starredCount}>{props.stars}</div>
     </div>
   </div>
@@ -33,7 +33,7 @@ SongItem.propTypes = {
 export default SongItem
 
 // convert seconds to mm:ss
-function toMMSS(duration) {
+function toMMSS (duration) {
   const min = Math.floor(duration / 60)
   const sec = duration - (min * 60)
   return min + ':' + (sec < 10 ? '0' + sec : sec)
