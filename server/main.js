@@ -29,7 +29,7 @@ const app = new koa()
 const io = new koaSocket()
 
 app.use(koaLogger())
-app.use(convert(koaRange))
+app.use(koaRange)
 app.use(koaBodyparser())
 
 // make JWT data available on koa context
