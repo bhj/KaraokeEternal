@@ -24,7 +24,7 @@ class QueueView extends React.Component {
     return (
       <AppLayout>
         {viewportStyle => (
-          <div>
+          <div style={{ ...viewportStyle }}>
             <Header />
             <PaddedList
               {...viewportStyle}
