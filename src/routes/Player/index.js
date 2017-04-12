@@ -18,7 +18,7 @@ export default (store) => ({
       injectReducer(store, { key: 'player', reducer })
 
       /*  Return getComponent   */
-      cb(null, PlayerContainer)
+      cb(null, requireAuth(PlayerContainer))
 
     /* Webpack named bundle   */
     }, 'player')
