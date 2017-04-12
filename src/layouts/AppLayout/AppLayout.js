@@ -38,7 +38,7 @@ const AppLayout = (props) => {
 }
 
 AppLayout.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.any,
   viewportWidth: PropTypes.number.isRequired,
   viewportHeight: PropTypes.number.isRequired,
   headerHeight: PropTypes.number.isRequired,

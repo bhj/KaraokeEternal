@@ -57,13 +57,13 @@ export default class VolumeSlider extends React.Component {
 
 // volume slider handle/grabber
 const handle = (props) => {
-  const { value, ...restProps } = props
+  const { value, dragging, ...restProps } = props
 
   const style = Object.assign({ left: `${props.offset}%` }, {
     position: 'absolute',
     transform: 'translate(-50%, -50%)',
     marginTop: '6px',
-    fontSize: '40px',
+    fontSize: dragging ? '50px' : '40px',
     opacity: 0.7,
     color: '#333',
     touchAction: 'pan-x',
@@ -73,9 +73,6 @@ const handle = (props) => {
   if (value === 0) icon = 'volume_off'
   else if (value < 0.4) icon = 'volume_mute'
   else if (value < 0.7) icon = 'volume_down'
-
-  // will cause 'unknown prop' warning if passed to Handle
-  delete props.dragging
 
   return (
     <div style={style}>
