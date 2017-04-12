@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { PropTypes } from 'react'
 import Slider, { Handle } from 'rc-slider'
 import './VolumeSlider.scss'
@@ -56,6 +57,8 @@ export default class VolumeSlider extends React.Component {
 
 // volume slider handle/grabber
 const handle = (props) => {
+  const { value, ...restProps } = props
+
   const style = Object.assign({ left: `${props.offset}%` }, {
     position: 'absolute',
     transform: 'translate(-50%, -50%)',
@@ -67,9 +70,9 @@ const handle = (props) => {
   })
 
   let icon = 'volume_up'
-  if (props.value === 0) icon = 'volume_off'
-  else if (props.value < 0.4) icon = 'volume_mute'
-  else if (props.value < 0.7) icon = 'volume_down'
+  if (value === 0) icon = 'volume_off'
+  else if (value < 0.4) icon = 'volume_mute'
+  else if (value < 0.7) icon = 'volume_down'
 
   // will cause 'unknown prop' warning if passed to Handle
   delete props.dragging
@@ -77,7 +80,7 @@ const handle = (props) => {
   return (
     <div style={style}>
       <i className='material-icons'>{icon}</i>
-      <Handle {...props} />
+      <Handle {...restProps} />
     </div>
   )
 }

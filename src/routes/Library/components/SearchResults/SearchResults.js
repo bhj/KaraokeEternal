@@ -11,6 +11,7 @@ class SearchResults extends React.Component {
     songs: PropTypes.object.isRequired,
     artistResults: PropTypes.array.isRequired,  // artistIds
     songResults: PropTypes.array.isRequired,  // songIds
+    starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
     queuedSongs: PropTypes.array.isRequired,
     width: PropTypes.number.isRequired,

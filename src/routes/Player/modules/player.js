@@ -1,4 +1,4 @@
-import { CANCEL, FLUSH } from 'redux-throttle'
+import { CANCEL } from 'redux-throttle'
 
 import {
   PLAYER_NEXT_REQUEST,

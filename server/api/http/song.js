@@ -1,4 +1,3 @@
-const db = require('sqlite')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const debug = require('debug')
@@ -13,8 +12,8 @@ router.get('/song/:songId', async (ctx, next) => {
 
     if (res.result.length === 1) {
       const row = res.entities[res.result[0]]
-      const provider_data = JSON.parse(row.provider_json)
-      const song = Object.assign({}, row, provider_data)
+      const providerData = JSON.parse(row.provider_json)
+      const song = Object.assign({}, row, providerData)
       delete song.provider_json
 
       ctx.body = song
@@ -24,7 +23,8 @@ router.get('/song/:songId', async (ctx, next) => {
   } catch (err) {
     log(err.message)
     ctx.status = 500
-    return ctx.body = err.message
+    ctx.body = err.message
+    return
   }
 })
 

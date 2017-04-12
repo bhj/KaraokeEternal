@@ -6,7 +6,6 @@ const {
   QUEUE_ADD,
   QUEUE_REMOVE,
   QUEUE_UPDATE,
-  QUEUE_END,
 } = require('../constants')
 
 // ------------------------------------
@@ -14,8 +13,6 @@ const {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: async (ctx, { payload }) => {
-    const socketId = ctx.socket.socket.id
-
     // is room open?
     try {
       if (!await _isRoomOpen(ctx.user.roomId)) {
@@ -82,7 +79,6 @@ const ACTION_HANDLERS = {
     })
   },
   [QUEUE_REMOVE]: async (ctx, { payload }) => {
-    const socketId = ctx.socket.socket.id
     const queueId = payload
     let item, nextItem
 

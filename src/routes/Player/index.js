@@ -1,6 +1,5 @@
 import { injectReducer } from '../../store/reducers'
 import requireAuth from 'components/requireAuth'
-import PlayerContainer from './containers/PlayerContainer'
 
 export default (store) => ({
   path : 'player',

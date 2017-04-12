@@ -10,14 +10,10 @@ class AccountView extends React.Component {
   static propTypes = {
     user: PropTypes.object,
     // actions
-    loginUser: PropTypes.func.isRequired,
     logoutUser: PropTypes.func.isRequired,
-    createUser: PropTypes.func.isRequired,
-    updateUser: PropTypes.func.isRequired,
   }
 
   render () {
-    const { user, prefs } = this.props
     let prefComponents = []
 
     for (let i in Providers) {

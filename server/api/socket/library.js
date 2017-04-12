@@ -1,7 +1,5 @@
 const db = require('sqlite')
 const squel = require('squel')
-const log = require('debug')('app:socket:library')
-
 const getSongs = require('../../lib/getSongs')
 const getLibrary = require('../../lib/getLibrary')
 

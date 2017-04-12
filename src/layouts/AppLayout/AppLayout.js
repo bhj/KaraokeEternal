@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react'
 import Navigation from 'components/Navigation'
 import { SkyLightStateless } from 'react-skylight'
-import classes from './AppLayout.css'
 
 const AppLayout = (props) => {
   const viewportStyle = {
@@ -10,6 +9,7 @@ const AppLayout = (props) => {
     paddingTop: props.headerHeight,
     paddingBottom: props.footerHeight,
     overflowY: 'scroll',
+    WebkitOverflowScrolling: 'touch',
   }
 
   return (
@@ -38,6 +38,7 @@ const AppLayout = (props) => {
 }
 
 AppLayout.propTypes = {
+  children: PropTypes.node,
   viewportWidth: PropTypes.number.isRequired,
   viewportHeight: PropTypes.number.isRequired,
   headerHeight: PropTypes.number.isRequired,

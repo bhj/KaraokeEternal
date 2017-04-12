@@ -8,8 +8,6 @@ class YouTubePlayer extends React.Component {
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     song: PropTypes.object.isRequired,
-    getMedia: PropTypes.func.isRequired, // action
-    getMediaSuccess: PropTypes.func.isRequired, // action
     onMediaError: PropTypes.func.isRequired, // action
     onMediaEnd: PropTypes.func.isRequired, // action
     onStatus: PropTypes.func.isRequired, // action

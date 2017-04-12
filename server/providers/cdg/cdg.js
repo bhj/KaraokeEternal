@@ -16,7 +16,6 @@ const parseArtistTitle = require('../../lib/parseArtistTitle')
 
 const {
   LIBRARY_UPDATE,
-  PREFS_CHANGE
 } = require('../../api/constants')
 
 const allowedExts = ['.mp3', '.m4a']
@@ -90,7 +89,8 @@ async function resource (ctx, cfg) {
 
   if (!type || !songId) {
     ctx.status = 422
-    return ctx.body = "Missing 'type' or 'songId' in url"
+    ctx.body = "Missing 'type' or 'songId' in url"
+    return
   }
 
   // get song from db
@@ -99,10 +99,11 @@ async function resource (ctx, cfg) {
 
     if (!res.result.length) {
       ctx.status = 404
-      return ctx.body = `songId not found: ${songId}`
+      ctx.body = `songId not found: ${songId}`
+      return
     }
 
-    row = res.entities[res.result[0]]
+    const row = res.entities[res.result[0]]
     // should be the audio file path
     file = JSON.parse(row.provider_json).path
   } catch (err) {
@@ -120,7 +121,8 @@ async function resource (ctx, cfg) {
     stats = await stat(file)
   } catch (err) {
     ctx.status = 404
-    return ctx.body = `File not found: ${file}`
+    ctx.body = `File not found: ${file}`
+    return
   }
 
   // stream it!
@@ -191,6 +193,21 @@ async function process (file) {
   // new song
   // --------
 
+  // try getting artist and title from filename
+  let song = parseArtistTitle(pathInfo.name)
+
+  if (typeof song !== 'object') {
+    log('couldn\'t parse artist/title from filename (%s); trying parent folder', song)
+
+    // try parent folder?
+    song = parseArtistTitle(pathInfo.dir.split(pathInfo.sep).pop())
+
+    if (typeof song !== 'object') {
+      log('couldn\'t parse artist/title from folder: %s', song)
+      return Promise.reject('couldn\'t parse artist/title')
+    }
+  }
+
   // get duration in one of two ways depending on type
   try {
     if (pathInfo.ext === '.mp3') {
@@ -209,21 +226,6 @@ async function process (file) {
     log(err.message)
     counts.skipped++
     return Promise.reject(err)
-  }
-
-  // try getting artist and title from filename
-  song = parseArtistTitle(pathInfo.name)
-
-  if (typeof song !== 'object') {
-    log('couldn\'t parse artist/title from filename (%s); trying parent folder', song)
-
-    // try parent folder?
-    song = parseArtistTitle(pathInfo.dir.split(pathInfo.sep).pop())
-
-    if (typeof song !== 'object') {
-      log('couldn\'t parse artist/title from folder: %s', song)
-      return Promise.reject('couldn\'t parse artist/title')
-    }
   }
 
   song.duration = Math.round(duration)

@@ -18,7 +18,7 @@ module.exports = {
       // remove digits between non-word characters
       /\W*\d+\W*/i,
       // remove text between (), [], or {}
-      /[\(\[\{].*[\)\]\}]/ig,
+      /[([{].*[)\]}]/ig,
     ],
     // applied to both Artist and Title after split
     postSplit: [

@@ -16,23 +16,30 @@ export default class AccountForm extends Component {
     view: 'login',
   }
 
-  handleChange = (inputName) => {
-    return (event) => this.setState({ [inputName]: event.target.value })
+  handleChange = (inputName, event) => {
+    this.setState({ [inputName]: event.target.value })
   }
 
+  handleNameChange = this.handleChange.bind(this, 'name')
+  handleEmailChange = this.handleChange.bind(this, 'email')
+
+  viewLogin = () => this.setState({ view: 'login' })
+  viewCreate = () => this.setState({ view: 'create' })
+
   render () {
+    const { user } = this.props
     const view = this.props.user.userId !== null ? 'edit' : this.state.view
 
     return (
       <div className={classes.section}>
         {view === 'login' &&
           <div>
-            <p>Sign in below or <a onClick={() => this.props.changeView('create')}>create a new account</a>.</p>
-            <Login onSubmitClick={this.props.loginUser} rooms={this.props.user.rooms} />
+            <p>Sign in below or <a onClick={this.viewCreate}>create a new account</a>.</p>
+            <Login onSubmitClick={this.props.loginUser} rooms={user.rooms} />
           </div>
         }
         {view === 'create' &&
-          <p>Create an account or <a onClick={() => this.props.changeView('login')}>sign in with an existing one</a>.</p>
+          <p>Create an account or <a onClick={this.viewLogin}>sign in with an existing one</a>.</p>
         }
         {view === 'edit' &&
           <h2>Update Account</h2>
@@ -40,11 +47,23 @@ export default class AccountForm extends Component {
 
         {view !== 'login' &&
           <form>
-            <input type='text' ref='name' value={this.state.name || ''} onChange={this.handleChange('name')} autoFocus={view === 'create'} placeholder='display name' />
-            <input type='email' ref='email' value={this.state.email || ''} onChange={this.handleChange('email')} placeholder='email' />
+            <input type='text' ref='name' placeholder='display name'
+              value={this.state.name || ''}
+              onChange={this.handleNameChange}
+              autoFocus={view === 'create'}
+            />
+            <input type='email' ref='email' placeholder='email'
+              value={this.state.email || ''}
+              onChange={this.handleEmailChange}
+              autoFocus={view === 'login'}
+            />
 
-            <input type='password' ref='newPassword' placeholder={view === 'create' ? 'password' : 'new password'} />
-            <input type='password' ref='newPasswordConfirm' placeholder={view === 'create' ? 'confirm password' : 'confirm new password'} />
+            <input type='password' ref='newPassword'
+              placeholder={view === 'create' ? 'password' : 'new password'}
+            />
+            <input type='password' ref='newPasswordConfirm'
+              placeholder={view === 'create' ? 'confirm password' : 'confirm new password'}
+            />
 
             {view === 'edit' &&
               <input type='password' ref='curPassword' placeholder='current password' />
@@ -62,12 +81,7 @@ export default class AccountForm extends Component {
 
   handleClick = (event) => {
     event.preventDefault()
-    const name = this.refs.name
-    const email = this.refs.email
-    const newPassword = this.refs.newPassword
-    const newPasswordConfirm = this.refs.newPasswordConfirm
-    const curPassword = this.refs.curPassword
-
+    const { name, email, newPassword, newPasswordConfirm, curPassword } = this.refs
     const user = {
       name: name.value.trim(),
       email: email.value.trim(),

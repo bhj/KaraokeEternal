@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react'
 import AppLayout from 'layouts/AppLayout'
 import Header from 'components/Header'
-import Navigation from 'components/Navigation'
 import PaddedList from 'components/PaddedList'
 import QueueItem from './QueueItem'
 
@@ -16,9 +15,8 @@ class QueueView extends React.Component {
     isAtQueueEnd: PropTypes.bool.isRequired,
     user: PropTypes.object.isRequired,
     // actions
-    requestPlay: PropTypes.func.isRequired,
     requestPlayNext: PropTypes.func.isRequired,
-    requestPause: PropTypes.func.isRequired,
+    removeItem: PropTypes.func.isRequired,
     showErrorMessage: PropTypes.func.isRequired,
   }
 
@@ -54,7 +52,6 @@ class QueueView extends React.Component {
     const isActive = (queueId === this.props.curId) && !this.props.isAtQueueEnd
     const isUpcoming = queueId > this.props.curId
     const isOwner = item.userId === this.props.user.userId
-    const isAdmin = this.props.user.isAdmin === 1
 
     return (
       <QueueItem

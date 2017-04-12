@@ -1,4 +1,4 @@
-import { _SUCCESS, _ERROR } from 'constants'
+import { _ERROR } from 'constants'
 const pendingIds = {} // requestIDs to timeoutIDs
 let nextRequestID = 0
 
@@ -8,7 +8,7 @@ export default function createSocketMiddleware (socket, prefix) {
     socket.on('action', dispatch)
 
     return next => action => {
-      const { type, meta, payload } = action
+      const { type, meta } = action
 
       // only apply to socket.io requests
       if (!type || type.indexOf(prefix) !== 0) {

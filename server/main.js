@@ -5,14 +5,13 @@ const webpackConfig = require('../config/webpack.config')
 const project = require('../config/project.config')
 const readFile = require('./lib/thunks/readfile')
 
-const koa = require('koa')
+const Koa = require('koa')
 const convert = require('koa-convert')
 const serve = require('koa-static')
 const koaBodyparser = require('koa-bodyparser')
 const koaRange = require('koa-range')
-const koaSocket = require('koa-socket')
+const KoaSocket = require('koa-socket')
 const koaLogger = require('koa-logger')
-const db = require('sqlite')
 const jwtVerify = require('jsonwebtoken').verify
 
 const apiRoutes = require('./api/http')
@@ -25,8 +24,8 @@ const {
   SOCKET_AUTH_ERROR,
 } = require('./api/constants')
 
-const app = new koa()
-const io = new koaSocket()
+const app = new Koa()
+const io = new KoaSocket()
 
 app.use(koaLogger())
 app.use(koaRange)

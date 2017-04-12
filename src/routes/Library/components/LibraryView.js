@@ -24,18 +24,7 @@ const LibraryView = (props) => {
 }
 
 LibraryView.propTypes = {
-  artists: PropTypes.object.isRequired,
-  songs: PropTypes.object.isRequired,
-  queuedSongs: PropTypes.array.isRequired,
-  starredSongs: PropTypes.array.isRequired,
-  expandedArtists: PropTypes.array.isRequired,
-  // search
   searchTerm: PropTypes.string.isRequired,
-  expandedArtistResults: PropTypes.array.isRequired,
-  // actions
-  queueSong: PropTypes.func.isRequired,
-  toggleSongStarred: PropTypes.func.isRequired,
-  toggleArtistExpanded: PropTypes.func.isRequired,
 }
 
 export default LibraryView

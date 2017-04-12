@@ -49,11 +49,11 @@ class PlayerView extends React.Component {
       })
     }
 
-    if (this.props.queue !== prevProps.queue) {
-      if (this.props.isAtQueueEnd && this.props.isPlaying) {
-        this.props.requestPlayNext()
-      }
-    }
+    // if (this.props.queue !== prevProps.queue) {
+    //   if (this.props.isAtQueueEnd && this.props.isPlaying) {
+    //     this.props.requestPlayNext()
+    //   }
+    // }
   }
 
   componentWillUpdate (nextProps) {

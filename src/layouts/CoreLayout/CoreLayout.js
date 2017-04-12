@@ -12,3 +12,7 @@ export const CoreLayout = ({ children }) => {
 }
 
 export default CoreLayout
+
+CoreLayout.propTypes = {
+  children: PropTypes.node,
+}

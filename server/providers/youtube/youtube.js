@@ -1,11 +1,9 @@
-const db = require('sqlite')
 const fetch = require('isomorphic-fetch')
-var log = require('debug')('app:provider:youtube')
-const { parse, toSeconds, pattern } = require('iso8601-duration')
-
+const log = require('debug')('app:provider:youtube')
+const { parse, toSeconds } = require('iso8601-duration')
+const parseArtistTitle = require('../../lib/parseArtistTitle')
 const addSong = require('../../lib/addSong')
 const getSongs = require('../../lib/getSongs')
-
 let stats
 
 async function scan (ctx, cfg) {
@@ -25,7 +23,7 @@ async function scan (ctx, cfg) {
   stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
 
   for (let channel of channels) {
-    let items
+    let songs
 
     try {
       songs = await getPlaylistItems(channel, cfg.apiKey)
@@ -47,12 +45,12 @@ async function scan (ctx, cfg) {
   return Promise.resolve(validIds)
 }
 
-async function process (song) {
-  log('processing song: %s', JSON.stringify(song))
+async function process (item) {
+  log('processing: %s', JSON.stringify(item))
 
   // search for this file in the db
   try {
-    let res = await getSongs({ meta: { videoId: song.meta.videoId } })
+    let res = await getSongs({ meta: { videoId: item.meta.videoId } })
     // @todo: check mtime and title for updates
     if (res.result.length) {
       log('song is in library (same videoId)')
@@ -65,15 +63,14 @@ async function process (song) {
   }
 
   // new song
-  let meta = parseArtistTitle(song.title)
+  let song = parseArtistTitle(item.title)
 
-  if (meta === false) {
+  if (typeof song !== 'object') {
+    log('couldn\'t parse artist/title from video: %s', item.title)
     stats.skipped++
-    return Promise.reject(new Error('could not parse artist/title'))
+    return Promise.reject('couldn\'t parse artist/title')
   }
 
-  song.artist = meta.artist
-  song.title = meta.title
   song.provider = 'youtube'
 
   try {
@@ -89,44 +86,44 @@ async function process (song) {
 
 module.exports = exports = { scan }
 
-function parseArtistTitle (str) {
-  let title, artist
-  const phrases = [
-    'karaoke video version with lyrics',
-    'karaoke version with lyrics',
-    'karaoke video with lyrics',
-    'karaoke version with lyrics',
-    'karaoke video',
-    'karaoke version',
-    'with lyrics',
-    'no lead vocal',
-    'singalong',
-  ]
-
-  // remove anything after last |
-  if (str.lastIndexOf('|') !== -1) {
-    str = str.substring(0, str.lastIndexOf('|'))
-  }
-
-  // remove anything in parantheses
-  str = str.replace(/ *\([^)]*\) */g, '')
-
-  // de-"in the style of"
-  let delim = str.toLowerCase().indexOf('in the style of')
-  if (delim !== -1) {
-    let parts = str.split(str.substring(delim, delim + 15))
-    str = parts[1] + '-' + parts[0]
-  }
-
-  // split into song title and artist
-  let parts = str.split('-')
-
-  if (parts.length < 2) {
-    return false
-  }
-
-  return { artist : parts[0].trim(), title : parts[1].trim() }
-}
+// function parseArtistTitle (str) {
+//   let title, artist
+//   const phrases = [
+//     'karaoke video version with lyrics',
+//     'karaoke version with lyrics',
+//     'karaoke video with lyrics',
+//     'karaoke version with lyrics',
+//     'karaoke video',
+//     'karaoke version',
+//     'with lyrics',
+//     'no lead vocal',
+//     'singalong',
+//   ]
+//
+//   // remove anything after last |
+//   if (str.lastIndexOf('|') !== -1) {
+//     str = str.substring(0, str.lastIndexOf('|'))
+//   }
+//
+//   // remove anything in parantheses
+//   str = str.replace(/ *\([^)]*\) */g, '')
+//
+//   // de-"in the style of"
+//   let delim = str.toLowerCase().indexOf('in the style of')
+//   if (delim !== -1) {
+//     let parts = str.split(str.substring(delim, delim + 15))
+//     str = parts[1] + '-' + parts[0]
+//   }
+//
+//   // split into song title and artist
+//   let parts = str.split('-')
+//
+//   if (parts.length < 2) {
+//     return false
+//   }
+//
+//   return { artist : parts[0].trim(), title : parts[1].trim() }
+// }
 
 async function getPlaylistItems (username, key) {
   let api = getApi(key)
@@ -190,12 +187,6 @@ async function getPlaylistItems (username, key) {
   } while (playlist.nextPageToken)
 
   return songs
-}
-
-function titleCase (str) {
-  return str.replace(/\w\S*/g, function (tStr) {
-    return tStr.charAt(0).toUpperCase() + tStr.substr(1).toLowerCase()
-  })
 }
 
 function getApi (key) {

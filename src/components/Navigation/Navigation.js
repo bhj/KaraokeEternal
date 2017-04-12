@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import Measure from 'react-measure'
-import { Link, IndexLink } from 'react-router'
+import { Link } from 'react-router'
 import classes, { active } from './Navigation.css'
 
 export const Navigation = (props) => (
@@ -19,7 +19,7 @@ export const Navigation = (props) => (
   </Measure>
 )
 
-Navigation.PropTypes = {
+Navigation.propTypes = {
   setFooterHeight: PropTypes.func,
 }
 

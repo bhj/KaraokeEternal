@@ -6,7 +6,6 @@ const getPrefs = require('./prefs').getPrefs
 
 const {
   PROVIDER_REFRESH_REQUEST,
-  LIBRARY_UPDATE
 } = require('../constants')
 
 let isScanning
@@ -20,7 +19,7 @@ const ACTION_HANDLERS = {
     let cfg
 
     if (typeof Providers[payload] === 'undefined') {
-      return Promise.reject(err)
+      return Promise.reject(`Provider "${payload}" not found`)
     }
 
     try {
@@ -75,7 +74,9 @@ const ACTION_HANDLERS = {
     try {
       const q = squel.delete()
         .from('artists')
-        .where('artistId IN (SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)')
+        .where(`artistId IN (
+          SELECT artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.artistId IS NULL)
+        `)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)

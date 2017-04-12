@@ -16,9 +16,10 @@ const Header = (props) => {
   )
 }
 
-Header.PropTypes = {
-  isAdmin: PropTypes.bool,
-  setHeaderHeight: PropTypes.func,
+Header.propTypes = {
+  children: PropTypes.node,
+  isAdmin: PropTypes.bool.isRequired,
+  setHeaderHeight: PropTypes.func.isRequired,
 }
 
 export default Header

@@ -22,7 +22,6 @@ SongItem.propTypes = {
   title: PropTypes.string.isRequired,
   duration: PropTypes.number.isRequired,
   stars: PropTypes.number.isRequired,
-  provider: PropTypes.string.isRequired,
   style: PropTypes.object,
   onSongClick: PropTypes.func.isRequired,
   onSongStarClick: PropTypes.func.isRequired,

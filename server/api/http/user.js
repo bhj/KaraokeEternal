@@ -25,8 +25,6 @@ router.get('/rooms', async (ctx, next) => {
 
 // login
 router.post('/login', async (ctx, next) => {
-  const { email, password, roomId } = ctx.request.body
-
   try {
     await _login(ctx, ctx.request.body)
   } catch (err) {
@@ -52,13 +50,15 @@ router.post('/account/create', async (ctx, next) => {
   // check presence of all fields
   if (!name || !email || !password || !passwordConfirm) {
     ctx.status = 422
-    return ctx.body = 'All fields are required'
+    ctx.body = 'All fields are required'
+    return
   }
 
   // validate email
   if (!validateEmail(email)) {
     ctx.status = 422
-    return ctx.body = 'Invalid email address'
+    ctx.body = 'Invalid email address'
+    return
   }
 
   // check for duplicate email
@@ -71,7 +71,8 @@ router.post('/account/create', async (ctx, next) => {
 
     if (await db.get(text, values)) {
       ctx.status = 401
-      return ctx.body = 'Email address is already registered'
+      ctx.body = 'Email address is already registered'
+      return
     }
   } catch (err) {
     log(err.message)
@@ -81,7 +82,8 @@ router.post('/account/create', async (ctx, next) => {
   // check that passwords match
   if (password !== passwordConfirm) {
     ctx.status = 422
-    return ctx.body = 'Passwords do not match'
+    ctx.body = 'Passwords do not match'
+    return
   }
 
   // hash new password
@@ -124,7 +126,8 @@ router.post('/account/update', async (ctx, next) => {
   // check jwt validity
   if (!ctx.user) {
     ctx.status = 401
-    return ctx.body = 'Invalid token'
+    ctx.body = 'Invalid token'
+    return
   }
 
   // find user by id (from token)
@@ -143,7 +146,8 @@ router.post('/account/update', async (ctx, next) => {
 
   if (!user) {
     ctx.status = 401
-    return ctx.body = 'Invalid user id'
+    ctx.body = 'Invalid user id'
+    return
   }
 
   let { name, email, password, newPassword, newPasswordConfirm } = ctx.request.body
@@ -154,20 +158,23 @@ router.post('/account/update', async (ctx, next) => {
   // check presence of required fields
   if (!name || !email || !password) {
     ctx.status = 422
-    return ctx.body = 'Name, email and current password are required'
+    ctx.body = 'Name, email and current password are required'
+    return
   }
 
   // validate current password
   if (!await bcrypt.compare(password, user.password)) {
     ctx.status = 401
-    return ctx.body = 'Current password is incorrect'
+    ctx.body = 'Current password is incorrect'
+    return
   }
 
   // changing password?
   if (newPassword && newPasswordConfirm) {
     if (newPassword !== newPasswordConfirm) {
       ctx.status = 422
-      return ctx.body = 'New passwords do not match'
+      ctx.body = 'New passwords do not match'
+      return
     }
 
     try {
@@ -184,7 +191,8 @@ router.post('/account/update', async (ctx, next) => {
   // validate email
   if (!validateEmail(email)) {
     ctx.status = 422
-    return ctx.body = 'Invalid email address'
+    ctx.body = 'Invalid email address'
+    return
   }
 
   // check for duplicate email
@@ -198,7 +206,8 @@ router.post('/account/update', async (ctx, next) => {
 
     if (await db.get(text, values)) {
       ctx.status = 401
-      return ctx.body = 'Email address is already registered'
+      ctx.body = 'Email address is already registered'
+      return
     }
   } catch (err) {
     log(err.message)
@@ -223,30 +232,14 @@ router.post('/account/update', async (ctx, next) => {
     return Promise.reject(err)
   }
 
-  // return user (shape should match /login)
+  // attempt re-login
   try {
-    const q = squel.select()
-      .from('users')
-      .where('email = ?', email)
-
-    const { text, values } = q.toParam()
-    user = await db.get(text, values)
-    if (!user) throw new Error('couldn\'t get updated user')
+    await _login(ctx, { email, password, roomId: ctx.user.roomId })
   } catch (err) {
     log(err.message)
     ctx.status = 500
     return Promise.reject(err)
   }
-
-  delete user.password
-  user.roomId = ctx.user.roomId
-  user.isAdmin = (user.isAdmin === 1)
-
-  // generate new JWT
-  // @todo use async version
-  const token = jwtSign(user, 'shared-secret')
-
-  ctx.body = user
 })
 
 module.exports = router
@@ -257,25 +250,8 @@ async function _login (ctx, creds) {
   // check presence of all fields
   if (!email || !password || !roomId) {
     ctx.status = 422
-    return ctx.body = 'Email, password, and room are required'
-  }
-
-  // validate roomId
-  try {
-    const q = squel.select()
-      .from('rooms')
-      .where('roomId = ?', roomId)
-
-    const { text, values } = q.toParam()
-    const row = await db.get(text, values)
-
-    if (!row || row.status !== 'open') {
-      ctx.status = 401
-      ctx.body = 'Invalid Room'
-      return
-    }
-  } catch (err) {
-    return Promise.reject(err)
+    ctx.body = 'Email, password, and room are required'
+    return
   }
 
   // get user
@@ -290,6 +266,24 @@ async function _login (ctx, creds) {
 
     if (!user) {
       ctx.status = 401
+      return
+    }
+  } catch (err) {
+    return Promise.reject(err)
+  }
+
+  // validate roomId
+  try {
+    const q = squel.select()
+      .from('rooms')
+      .where('roomId = ?', roomId)
+
+    const { text, values } = q.toParam()
+    const row = await db.get(text, values)
+
+    if (!row || row.status !== 'open') {
+      ctx.status = 401
+      ctx.body = 'Invalid Room'
       return
     }
   } catch (err) {
@@ -349,7 +343,7 @@ async function _login (ctx, creds) {
 // http://www.moreofless.co.uk/validate-email-address-without-regex/
 function validateEmail (email) {
   var at = email.indexOf('@')
-  var dot = email.lastIndexOf('\.')
+  var dot = email.lastIndexOf('.')
   return email.length > 0 &&
          at > 0 &&
          dot > at + 1 &&

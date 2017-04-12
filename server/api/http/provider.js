@@ -1,40 +1,47 @@
-const db = require('sqlite')
 const Providers = require('../../providers')
 const getPrefs = require('../socket/prefs').getPrefs
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
-const debug = require('debug')
-const log = debug('app:library')
-const error = debug('app:library:error')
 
-// call media provider for song
+// calls a provider method
 router.get('/provider/:provider/:method', async (ctx, next) => {
   const { provider, method } = ctx.params
   let cfg
 
   if (!Providers[provider]) {
     ctx.status = 404
-    return ctx.body = `Provider "${provider}" not found`
+    ctx.body = `Provider "${provider}" not found`
+    return
   }
 
   if (!Providers[provider][method]) {
     ctx.status = 404
-    return ctx.body = `Method "${method}" not found in provider "${provider}"`
+    ctx.body = `Method "${method}" not found in provider "${provider}"`
   }
 
   // get provider config
   try {
     cfg = await getPrefs('provider.' + provider)
   } catch (err) {
-    return Promise.reject(err)
+    ctx.status = 500
+    ctx.body = err.message
+    return
   }
 
   if (!cfg.enabled) {
     ctx.status = 401
-    return ctx.body = `Provider "${provider}" not enabled`
+    ctx.body = `Provider "${provider}" not enabled`
+    return
   }
 
-  await Providers[provider][method](ctx, cfg)
+  // call it
+  try {
+    await Providers[provider][method](ctx, cfg)
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = err.message
+    return
+  }
 })
 
 module.exports = router

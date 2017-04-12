@@ -1,6 +1,5 @@
 const db = require('sqlite')
 const squel = require('squel')
-const log = require('debug')('app:socket:prefs')
 
 const {
   SET_PREFS,

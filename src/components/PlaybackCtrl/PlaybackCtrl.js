@@ -27,7 +27,7 @@ const PlaybackCtrl = (props) => (
   </div>
 )
 
-PlaybackCtrl.PropTypes = {
+PlaybackCtrl.propTypes = {
   isPlaying: PropTypes.bool.isRequired,
   volume: PropTypes.number.isRequired,
   // actions

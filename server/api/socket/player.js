@@ -17,7 +17,6 @@ const {
   PLAYBACK_STATUS,
   PLAYBACK_ERROR,
   _SUCCESS,
-  _ERROR,
 } = require('../constants')
 
 // ------------------------------------

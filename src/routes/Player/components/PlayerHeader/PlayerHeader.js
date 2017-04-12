@@ -12,7 +12,7 @@ const PlayerHeader = (props) => (
   </Header>
 )
 
-PlayerHeader.PropTypes = {
+PlayerHeader.propTypes = {
   // actions
   requestFullscreen: PropTypes.func.isRequired,
 }
