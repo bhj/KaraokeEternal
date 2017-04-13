@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 import AppLayout from 'layouts/AppLayout'
 import LibraryHeader from './LibraryHeader'
 import ArtistList from './ArtistList'

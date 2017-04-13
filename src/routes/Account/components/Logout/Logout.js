@@ -1,11 +1,12 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
-export default function Logout(props) {
+export default function Logout (props) {
   return (
     <button className='button wide grey raised' onClick={props.onLogoutClick}>
       Sign Out
     </button>
-  );
+  )
 }
 
 Logout.propTypes = {

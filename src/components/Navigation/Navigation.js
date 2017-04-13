@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 import Measure from 'react-measure'
 import { Link } from 'react-router'
 import classes, { active } from './Navigation.css'

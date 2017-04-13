@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 import { browserHistory } from 'react-router'
 import AppLayout from 'layouts/AppLayout'
 import Header from 'components/Header'
@@ -6,7 +7,7 @@ import AccountForm from './AccountForm'
 import Logout from './Logout'
 import Providers from 'components/providers'
 
-function AccountView(props) {
+function AccountView (props) {
   let prefComponents = []
 
   for (let i in Providers) {
@@ -41,13 +42,13 @@ function AccountView(props) {
         </div>
       )}
     </AppLayout>
-  );
+  )
 }
 
 AccountView.propTypes = {
   user: PropTypes.object,
   // actions
   logoutUser: PropTypes.func.isRequired,
-};
+}
 
 export default AccountView

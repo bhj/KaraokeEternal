@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types'
 /* eslint react/no-unused-prop-types: 0 */
-import React, { PropTypes } from 'react'
+import React from 'react'
 import SongItem from '../SongItem'
 import classes from './ArtistItem.css'
 

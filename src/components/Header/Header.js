@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 import Measure from 'react-measure'
 import PlaybackCtrl from 'components/PlaybackCtrl'
 import classes from './Header.css'
