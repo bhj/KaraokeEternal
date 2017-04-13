@@ -12,9 +12,9 @@ router.get('/song/:songId', async (ctx, next) => {
 
     if (res.result.length === 1) {
       const row = res.entities[res.result[0]]
-      const providerData = JSON.parse(row.provider_json)
+      const providerData = JSON.parse(row.providerData)
       const song = Object.assign({}, row, providerData)
-      delete song.provider_json
+      delete song.providerData
 
       ctx.body = song
     } else {

@@ -105,7 +105,7 @@ async function resource (ctx, cfg) {
 
     const row = res.entities[res.result[0]]
     // should be the audio file path
-    file = JSON.parse(row.provider_json).path
+    file = JSON.parse(row.providerData).path
   } catch (err) {
     log(err.message)
     return Promise.reject(err)
