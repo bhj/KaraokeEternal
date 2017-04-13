@@ -6,50 +6,48 @@ import AccountForm from './AccountForm'
 import Logout from './Logout'
 import Providers from 'components/providers'
 
-class AccountView extends React.Component {
-  static propTypes = {
-    user: PropTypes.object,
-    // actions
-    logoutUser: PropTypes.func.isRequired,
-  }
+function AccountView(props) {
+  let prefComponents = []
 
-  render () {
-    let prefComponents = []
-
-    for (let i in Providers) {
-      if (typeof Providers[i].prefComponent !== 'undefined') {
-        let PrefPane = Providers[i].prefComponent
-        prefComponents.push(<PrefPane key={i} />)
-      }
+  for (let i in Providers) {
+    if (typeof Providers[i].prefComponent !== 'undefined') {
+      let PrefPane = Providers[i].prefComponent
+      prefComponents.push(<PrefPane key={i} />)
     }
-
-    return (
-      <AppLayout>
-        {viewportStyle => (
-          <div style={{ ...viewportStyle }}>
-            <Header />
-
-            <AccountForm {...this.props} />
-
-            {prefComponents}
-
-            {this.props.user && this.props.user.isAdmin &&
-              <button className='button wide blue raised' onClick={() => { browserHistory.push('/player') }}>
-                Start Player
-              </button>
-            }
-
-            {this.props.user &&
-              <div>
-                <br />
-                <Logout onLogoutClick={this.props.logoutUser} />
-              </div>
-            }
-          </div>
-        )}
-      </AppLayout>
-    )
   }
+
+  return (
+    <AppLayout>
+      {viewportStyle => (
+        <div style={{ ...viewportStyle }}>
+          <Header />
+
+          <AccountForm {...props} />
+
+          {prefComponents}
+
+          {props.user && props.user.isAdmin &&
+            <button className='button wide blue raised' onClick={() => { browserHistory.push('/player') }}>
+              Start Player
+            </button>
+          }
+
+          {props.user &&
+            <div>
+              <br />
+              <Logout onLogoutClick={props.logoutUser} />
+            </div>
+          }
+        </div>
+      )}
+    </AppLayout>
+  );
 }
+
+AccountView.propTypes = {
+  user: PropTypes.object,
+  // actions
+  logoutUser: PropTypes.func.isRequired,
+};
 
 export default AccountView

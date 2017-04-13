@@ -1,14 +1,11 @@
-import React, { Component, PropTypes } from 'react'
+import React, { PropTypes } from 'react'
 
-export default class Logout extends Component {
-
-  render () {
-    return (
-      <button className='button wide grey raised' onClick={this.props.onLogoutClick}>
-        Sign Out
-      </button>
-    )
-  }
+export default function Logout(props) {
+  return (
+    <button className='button wide grey raised' onClick={props.onLogoutClick}>
+      Sign Out
+    </button>
+  );
 }
 
 Logout.propTypes = {
