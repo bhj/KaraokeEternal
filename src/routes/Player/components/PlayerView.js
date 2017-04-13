@@ -97,6 +97,8 @@ class PlayerView extends React.Component {
         onStatus: this.props.emitStatus,
         onMediaError: this.handleError,
         onMediaEnd: this.props.requestPlayNext,
+        width,
+        height: height - (screenfull.isFullscreen ? 0 : paddingTop + paddingBottom),
       }
     }
 
@@ -111,11 +113,7 @@ class PlayerView extends React.Component {
             height: height - paddingTop - paddingBottom,
           }}
         >
-          <Component
-            {...componentProps}
-            width={width}
-            height={height - (screenfull.isFullscreen ? 0 : paddingTop + paddingBottom)}
-          />
+          <Component {...componentProps} />
         </div>
       </div>
     )
