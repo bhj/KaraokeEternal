@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import AppLayout from 'layouts/AppLayout'
 import Header from 'components/Header'
 import PaddedList from 'components/PaddedList'
 import QueueItem from './QueueItem'
@@ -15,6 +14,7 @@ class QueueView extends React.Component {
     curPos: PropTypes.number,
     isAtQueueEnd: PropTypes.bool.isRequired,
     user: PropTypes.object.isRequired,
+    viewportStyle: PropTypes.object.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
@@ -22,26 +22,23 @@ class QueueView extends React.Component {
   }
 
   render () {
+    const props = this.props
     return (
-      <AppLayout>
-        {viewportStyle => (
-          <div style={{ ...viewportStyle }}>
-            <Header />
-            <PaddedList
-              {...viewportStyle}
-              rowCount={this.props.queue.result.length}
-              rowHeight={this.rowHeight}
-              rowRenderer={this.rowRenderer}
-              scrollToIndex={this.props.queue.result.indexOf(this.props.curId)}
-              scrollToAlignment={'center'}
-              queuedSongs={this.props.queue.result} // pass-through forces List refresh
-              curId={this.props.curId} // pass-through forces List refresh
-              curPos={this.props.curPos} // pass-through forces List refresh
-              errors={this.props.errors} // pass-through forces List refresh
-            />
-          </div>
-        )}
-      </AppLayout>
+      <div>
+        <Header />
+        <PaddedList
+          {...props.viewportStyle}
+          rowCount={props.queue.result.length}
+          rowHeight={this.rowHeight}
+          rowRenderer={this.rowRenderer}
+          scrollToIndex={props.queue.result.indexOf(props.curId)}
+          scrollToAlignment={'center'}
+          queuedSongs={props.queue.result} // pass-through forces List refresh
+          curId={props.curId} // pass-through forces List refresh
+          curPos={props.curPos} // pass-through forces List refresh
+          errors={props.errors} // pass-through forces List refresh
+        />
+      </div>
     )
   }
 

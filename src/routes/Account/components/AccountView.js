@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { browserHistory } from 'react-router'
-import AppLayout from 'layouts/AppLayout'
 import Header from 'components/Header'
 import AccountForm from './AccountForm'
 import Logout from './Logout'
 import Providers from 'components/providers'
 
 function AccountView (props) {
+  const { viewportStyle, ...restProps } = props
   let prefComponents = []
 
   for (let i in Providers) {
@@ -18,35 +18,32 @@ function AccountView (props) {
   }
 
   return (
-    <AppLayout>
-      {viewportStyle => (
-        <div style={{ ...viewportStyle }}>
-          <Header />
+    <div style={{ ...viewportStyle }}>
+      <Header />
 
-          <AccountForm {...props} />
+      <AccountForm {...restProps} />
 
-          {prefComponents}
+      {prefComponents}
 
-          {props.user && props.user.isAdmin &&
-            <button className='button wide blue raised' onClick={() => { browserHistory.push('/player') }}>
-              Start Player
-            </button>
-          }
+      {props.user && props.user.isAdmin &&
+        <button className='button wide blue raised' onClick={() => { browserHistory.push('/player') }}>
+          Start Player
+        </button>
+      }
 
-          {props.user &&
-            <div>
-              <br />
-              <Logout onLogoutClick={props.logoutUser} />
-            </div>
-          }
+      {props.user &&
+        <div>
+          <br />
+          <Logout onLogoutClick={props.logoutUser} />
         </div>
-      )}
-    </AppLayout>
+      }
+    </div>
   )
 }
 
 AccountView.propTypes = {
   user: PropTypes.object,
+  viewportStyle: PropTypes.object.isRequired,
   // actions
   logoutUser: PropTypes.func.isRequired,
 }

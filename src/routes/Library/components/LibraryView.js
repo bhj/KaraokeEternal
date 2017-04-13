@@ -1,30 +1,24 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import AppLayout from 'layouts/AppLayout'
 import LibraryHeader from './LibraryHeader'
 import ArtistList from './ArtistList'
 import SearchResults from './SearchResults'
 
 const LibraryView = (props) => {
+  const { viewportStyle, ...restProps } = props
   const View = props.searchTerm ? SearchResults : ArtistList
 
   return (
-    <AppLayout>
-      {viewportStyle => (
-        <div>
-          <LibraryHeader />
+    <div>
+      <LibraryHeader />
 
-          <View
-            {...props}
-            {...viewportStyle}
-            />
-        </div>
-      )}
-    </AppLayout>
+      <View {...viewportStyle} {...restProps} />
+    </div>
   )
 }
 
 LibraryView.propTypes = {
+  viewportStyle: PropTypes.object.isRequired,
   searchTerm: PropTypes.string.isRequired,
 }
 

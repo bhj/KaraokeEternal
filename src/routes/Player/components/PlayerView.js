@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import AppLayout from 'layouts/AppLayout'
 import PlayerHeader from './PlayerHeader'
 import Providers from 'components/providers'
 import ColorCycle from './ColorCycle'
@@ -16,6 +15,7 @@ class PlayerView extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
+    viewportStyle: PropTypes.object.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     getMedia: PropTypes.func.isRequired,
@@ -70,7 +70,8 @@ class PlayerView extends React.Component {
   }
 
   render () {
-    const { song } = this.props
+    const { song, viewportStyle } = this.props
+    const { width, height, paddingTop, paddingBottom } = viewportStyle
     let Component = 'div'
     let componentProps = {}
 
@@ -100,27 +101,23 @@ class PlayerView extends React.Component {
     }
 
     return (
-      <AppLayout>
-        {(style) => (
-          <div style={{ overflow: 'hidden' }}>
-            <PlayerHeader requestFullscreen={this.handleFullscreen} />
-            <div
-              ref={r => { this.ref = r }}
-              className={classes.container}
-              style={screenfull.isFullscreen ? {} : {
-                marginTop: style.paddingTop,
-                height: style.height - style.paddingTop - style.paddingBottom,
-              }}
-            >
-              <Component
-                {...componentProps}
-                width={style.width}
-                height={style.height - (screenfull.isFullscreen ? 0 : (style.paddingTop + style.paddingBottom))}
-              />
-            </div>
-          </div>
-        )}
-      </AppLayout>
+      <div style={{ overflow: 'hidden' }}>
+        <PlayerHeader requestFullscreen={this.handleFullscreen} />
+        <div
+          ref={r => { this.ref = r }}
+          className={classes.container}
+          style={screenfull.isFullscreen ? {} : {
+            marginTop: paddingTop,
+            height: height - paddingTop - paddingBottom,
+          }}
+        >
+          <Component
+            {...componentProps}
+            width={width}
+            height={height - (screenfull.isFullscreen ? 0 : paddingTop + paddingBottom)}
+          />
+        </div>
+      </div>
     )
   }
 

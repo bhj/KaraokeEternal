@@ -1,4 +1,4 @@
-import AppLayout from './AppLayout'
+import CoreLayout from './CoreLayout'
 import { connect } from 'react-redux'
 import { clearErrorMessage } from 'store/modules/ui'
 
@@ -17,4 +17,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapActionCreators)(AppLayout)
+export default connect(mapStateToProps, mapActionCreators)(CoreLayout)

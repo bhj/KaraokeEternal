@@ -3,7 +3,7 @@ import React from 'react'
 import classes from './QueueItem.css'
 
 export const QueueItem = (props) => (
-  <div className={classes.container} style={{ backgroundSize: props.pctPlayed + '% 100%' }}>
+  <div className={classes.container} style={{ ...props.style, backgroundSize: props.pctPlayed + '% 100%' }}>
     <div className={classes.wait}>
       {props.isActive && 'now'}
       {props.isUpcoming && secToTime(props.wait)}
@@ -46,6 +46,7 @@ QueueItem.propTypes = {
   canRemove: PropTypes.bool.isRequired,
   onRemoveClick: PropTypes.func.isRequired,
   onErrorInfoClick: PropTypes.func.isRequired,
+  style: PropTypes.object.isRequired,
 }
 
 export default QueueItem
