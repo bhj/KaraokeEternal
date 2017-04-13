@@ -23,15 +23,15 @@ function AccountView (props) {
 
       <AccountForm {...restProps} />
 
-      {prefComponents}
+      {props.user.isAdmin && prefComponents}
 
-      {props.user && props.user.isAdmin &&
+      {props.user.isAdmin &&
         <button className='button wide blue raised' onClick={() => { browserHistory.push('/player') }}>
           Start Player
         </button>
       }
 
-      {props.user &&
+      {props.user.userId !== null &&
         <div>
           <br />
           <Logout onLogoutClick={props.logoutUser} />
