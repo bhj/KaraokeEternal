@@ -150,7 +150,7 @@ async function process (file) {
   // already in database with the same path and mtime?
   try {
     const res = await getSongs({
-      meta: {
+      providerData: {
         path: file,
         mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
       }
@@ -204,6 +204,7 @@ async function process (file) {
 
     if (typeof song !== 'object') {
       log('couldn\'t parse artist/title from folder: %s', song)
+      counts.skipped++
       return Promise.reject('couldn\'t parse artist/title')
     }
   }
@@ -231,7 +232,7 @@ async function process (file) {
   song.duration = Math.round(duration)
   song.provider = 'cdg'
 
-  song.meta = {
+  song.providerData = {
     path: file,
     mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
     sha256,

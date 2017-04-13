@@ -14,9 +14,9 @@ async function getSongs (params = {}) {
     .from('songs')
 
   Object.keys(params).map(key => {
-    if (key === 'meta' && typeof params.meta === 'object') {
-      Object.keys(params.meta).map(i => {
-        q.where(`json_extract(provider_json, '$.${i}') = ?`, params.meta[i])
+    if (key === 'providerData' && typeof params.providerData === 'object') {
+      Object.keys(params.providerData).map(i => {
+        q.where(`json_extract(providerData, '$.${i}') = ?`, params.providerData[i])
       })
     } else {
       q.where(`${key} = ?`, params[key])

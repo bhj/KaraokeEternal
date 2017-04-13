@@ -50,7 +50,7 @@ async function process (item) {
 
   // search for this file in the db
   try {
-    let res = await getSongs({ meta: { videoId: item.meta.videoId } })
+    let res = await getSongs({ providerData: { videoId: item.meta.videoId } })
     // @todo: check mtime and title for updates
     if (res.result.length) {
       log('song is in library (same videoId)')
