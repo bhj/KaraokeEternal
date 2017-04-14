@@ -6,7 +6,7 @@ import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
-import { persistStore, autoRehydrate } from 'redux-persist'
+import { autoRehydrate } from 'redux-persist'
 import io from 'socket.io-client'
 
 export default (initialState = {}) => {
@@ -70,15 +70,6 @@ export default (initialState = {}) => {
       store.replaceReducer(reducers(store.asyncReducers))
     })
   }
-
-  // begin periodically persisting the store
-  window._persistor = persistStore(store, { whitelist: ['user'] }, () => {
-    // on rehydrate, attempt socket.io connection
-    // if it looks like we have a valid session
-    if (store.getState().user.userId !== null) {
-      window._socket.open()
-    }
-  })
 
   return store
 }
