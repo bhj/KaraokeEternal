@@ -4,7 +4,7 @@ let nextRequestID = 0
 
 export default function createSocketMiddleware (socket, prefix) {
   return ({ dispatch }) => {
-    // Wire socket.io to dispatch actions sent by the server.
+    // dispatch incoming actions sent by the server
     socket.on('action', dispatch)
 
     return next => action => {
