@@ -22,24 +22,26 @@ export default function createSocketMiddleware (socket, prefix) {
 
       // error action if socket.io callback timeout
       if (!(meta && meta.requireAck === false)) {
-        pendingIds[requestID] = setTimeout(() => {
+        pending[requestID] = setTimeout(() => {
           next({
             type: type + _ERROR,
             meta: {
-              error: `No response from server; check network connection (on action ${type})`,
+              error: `Server didn't respond; check network [${type}]`,
             }
           })
-        }, 2000)
+
+          delete pending[requestID]
+        }, 1000)
       }
 
-      // emit with callback method (3rd arg) that is
-      // called using ctx.acknowledge(action) on the server
+      // emit along with our acknowledgement callback (3rd arg)
+      // that receives data when the server calls ctx.acknowledge(data)
+      // in our case the data should be a *_SUCCESS or *_ERROR action
       socket.emit('action', action, responseAction => {
-        // cancel dead man's timer
-        clearTimeout(pendingIds[requestID])
+        clearTimeout(pending[requestID])
+        delete pending[requestID]
 
-        // action should typically have type *_SUCCESS or *_ERROR
-        return next(responseAction)
+        next(responseAction)
       })
     }
   }
