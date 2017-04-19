@@ -1,5 +1,5 @@
-import { _ERROR } from 'constants'
-const pendingIds = {} // requestIDs to timeoutIDs
+import { _SUCCESS, _ERROR } from 'constants'
+const pending = {} // requestIDs to timeoutIDs
 let nextRequestID = 0
 
 export default function createSocketMiddleware (socket, prefix) {
