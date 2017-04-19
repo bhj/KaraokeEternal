@@ -19,7 +19,7 @@ const ACTION_HANDLERS = {
     let cfg
 
     if (typeof Providers[payload] === 'undefined') {
-      return Promise.reject(`Provider "${payload}" not found`)
+      return Promise.reject(new Error(`Provider "${payload}" not found`))
     }
 
     try {
