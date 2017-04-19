@@ -125,6 +125,7 @@ const ACTION_HANDLERS = {
   [PLAYER_PLAY]: (state, { payload }) => ({
     ...state,
     isPlaying: true,
+    lastRequestID: payload.requestID,
   }),
   [PLAYER_VOLUME]: (state, { payload }) => ({
     ...state,
@@ -167,6 +168,7 @@ const initialState = {
   isPlaying: false,
   isFetching: false,
   isAtQueueEnd: false,
+  lastRequestID: null,
 }
 
 export default function playerReducer (state = initialState, action) {

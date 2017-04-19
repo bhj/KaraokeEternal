@@ -28,6 +28,7 @@ const mapStateToProps = (state) => {
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
     isErrored: typeof state.status.errors[state.status.queueId] !== 'undefined',
+    lastRequestID: player.lastRequestID,
   }
 }
 
