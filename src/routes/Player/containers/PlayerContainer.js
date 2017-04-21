@@ -24,7 +24,7 @@ const mapStateToProps = (state) => {
 
   if (queue.entities[player.queueId]) {
     songId = queue.entities[player.queueId].songId
-    song = state.songs.entities[songId]
+    song = state.library.songs.entities[songId]
   }
 
   return {
@@ -34,7 +34,7 @@ const mapStateToProps = (state) => {
     isAtQueueEnd: player.isAtQueueEnd,
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
-    isErrored: typeof state.status.errors[state.status.queueId] !== 'undefined',
+    isErrored: typeof state.room.errors[state.room.queueId] !== 'undefined',
     lastRequestID: player.lastRequestID,
   }
 }

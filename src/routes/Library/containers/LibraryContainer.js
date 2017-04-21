@@ -14,16 +14,16 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    artists: state.artists,
-    songs: state.songs,
+    artists: state.library.artists,
+    songs: state.library.songs,
     queuedSongs: state.queue.songIds,
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
     // search
     searchTerm: state.library.searchTerm,
-    artistResults: state.artists.searchResult,
-    songResults: state.songs.searchResult,
+    artistResults: state.library.artistSearchResult,
+    songResults: state.library.songSearchResult,
     expandedArtistResults: state.library.expandedArtistResults,
   }
 }

@@ -2,23 +2,19 @@ import { combineReducers } from 'redux'
 import { createResponsiveStateReducer } from 'redux-responsive'
 
 // reducers
-import artists from './modules/artists'
-import location from './modules/location'
-import ui from './modules/ui'
-import status from './modules/status'
-import user from './modules/user'
-import songs from './modules/songs'
 import library from 'routes/Library/modules/library'
+import location from './modules/location'
 import queue from 'routes/Queue/modules/queue'
+import room from './modules/room'
+import ui from './modules/ui'
+import user from './modules/user'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
-    artists,
-    songs,
     library,
     location,
     queue,
-    status,
+    room,
     ui,
     user,
     viewport: createResponsiveStateReducer(null, {

@@ -1,6 +1,8 @@
 import {
   LIBRARY_SEARCH,
   LIBRARY_SEARCH_RESET,
+  LIBRARY_UPDATE,
+  SONG_UPDATE,
 } from 'constants'
 
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
@@ -51,13 +53,56 @@ export function searchReset () {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_SEARCH]: (state, { payload }) => ({
+  [LIBRARY_UPDATE]: (state, { payload }) => ({
     ...state,
-    searchTerm: payload,
+    ...payload,
   }),
+  [SONG_UPDATE]: (state, { payload }) => ({
+    ...state,
+    songs: {
+      ...state.songs,
+      entities: {
+        ...state.songs.entities,
+        [payload.songId]: payload,
+      }
+    }
+  }),
+  [LIBRARY_SEARCH]: (state, { payload }) => {
+    const { artists, songs } = state
+    let artistResults, songResults
+    let term = payload.trim().toLowerCase()
+
+    if (term === '') {
+      return {
+        ...state,
+        artistSearchResult: [],
+        songSearchResult: [],
+        searchTerm: '',
+      }
+    }
+
+    artistResults = artists.result.filter(id => {
+      const artistName = artists.entities[id].name.toLowerCase()
+      return artistName.includes(term)
+    })
+
+    songResults = songs.result.filter((id, i) => {
+      const songTitle = songs.entities[id].title.toLowerCase()
+      return songTitle.includes(term)
+    })
+
+    return {
+      ...state,
+      artistSearchResult: artistResults,
+      songSearchResult: songResults,
+      searchTerm: payload,
+    }
+  },
   [LIBRARY_SEARCH_RESET]: (state, { payload }) => ({
     ...state,
     searchTerm: '',
+    artistSearchResult: [],
+    songSearchResult: [],
   }),
   [SCROLL_ARTISTS]: (state, { payload }) => ({
     ...state,
@@ -99,11 +144,13 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 let initialState = {
+  artists: { result: [], entities: {} },
+  songs: { result: [], entities: {} },
+  searchTerm: '',
+  artistSearchResult: [],
+  songSearchResult: [],
   scrollTop: 0,
   expandedArtists: [],
-  searchTerm: '',
-  artistResults: [],
-  songResults: [],
   expandedArtistResults: [],
 }
 

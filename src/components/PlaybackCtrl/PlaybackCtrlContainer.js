@@ -12,8 +12,8 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
-    isPlaying: state.status.isPlaying,
-    volume: state.status.volume,
+    isPlaying: state.room.isPlaying,
+    volume: state.room.volume,
   }
 }
 

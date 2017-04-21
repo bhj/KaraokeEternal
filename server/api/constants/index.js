@@ -3,7 +3,6 @@ module.exports = {
   SOCKET_AUTH_ERROR: 'SOCKET_AUTH_ERROR',
   // library
   LIBRARY_UPDATE: 'library/FULL_UPDATE',
-  ARTIST_UPDATE: 'library/ARTIST_UPDATE',
   SONG_UPDATE: 'library/SONG_UPDATE',
   LIBRARY_SEARCH: 'library/SEARCH',
   LIBRARY_SEARCH_RESET: 'library/SEARCH_RESET',

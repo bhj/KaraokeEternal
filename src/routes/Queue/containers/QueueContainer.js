@@ -17,12 +17,12 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     queue: state.queue,
-    errors: state.status.errors,
-    curId: state.status.queueId,
-    curPos: state.status.position,
-    isAtQueueEnd: state.status.isAtQueueEnd,
-    artists: state.artists,
-    songs: state.songs,
+    errors: state.room.errors,
+    curId: state.room.queueId,
+    curPos: state.room.position,
+    isAtQueueEnd: state.room.isAtQueueEnd,
+    artists: state.library.artists,
+    songs: state.library.songs,
     // user
     user: state.user,
   }
