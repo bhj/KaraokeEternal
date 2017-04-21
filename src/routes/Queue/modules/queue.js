@@ -2,7 +2,7 @@ import {
   QUEUE_ADD,
   QUEUE_UPDATE,
   QUEUE_REMOVE,
-  PLAYBACK_STATUS,
+  PLAYER_STATUS,
 } from 'constants'
 
 // add to queue
@@ -31,7 +31,7 @@ const ACTION_HANDLERS = {
     entities: setWaits(payload.result, payload.entities, state.curId, state.curPos),
     songIds: payload.result.map(queueId => payload.entities[queueId].songId)
   }),
-  [PLAYBACK_STATUS]: (state, { payload }) => {
+  [PLAYER_STATUS]: (state, { payload }) => {
     const { queueId, position } = payload
 
     return {

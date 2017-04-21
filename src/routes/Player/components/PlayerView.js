@@ -28,6 +28,7 @@ class PlayerView extends React.Component {
   componentDidMount () {
     // emit initial state
     this.props.emitStatus({
+      isPlayerPresent: true,
       isPlaying: this.props.isPlaying,
       position: 0,
       volume: this.props.volume,
@@ -67,6 +68,13 @@ class PlayerView extends React.Component {
     if (this.props.isPlaying !== nextProps.isPlaying) {
       this.props.cancelStatus()
     }
+  }
+
+  componentWillUnmount () {
+    this.props.emitStatus({
+      isPlayerPresent: false,
+      isPlaying: false,
+    })
   }
 
   render () {

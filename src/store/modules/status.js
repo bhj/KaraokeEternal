@@ -1,4 +1,8 @@
-import { PLAYBACK_STATUS, PLAYBACK_ERROR } from 'constants'
+import {
+  PLAYER_STATUS,
+  PLAYER_ERROR,
+  PLAYER_LEAVE,
+} from 'constants'
 
 // ------------------------------------
 // Actions
@@ -8,17 +12,20 @@ import { PLAYBACK_STATUS, PLAYBACK_ERROR } from 'constants'
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYBACK_STATUS]: (state, { payload }) => {
+  [PLAYER_LEAVE]: (state, { payload }) => {
     return {
       ...state,
-      queueId: payload.queueId,
-      position: payload.position,
-      volume: payload.volume,
-      isPlaying: payload.isPlaying,
-      isAtQueueEnd: payload.isAtQueueEnd,
+      isPlayerPresent: false,
+      isPlaying: false,
     }
   },
-  [PLAYBACK_ERROR]: (state, { payload }) => {
+  [PLAYER_STATUS]: (state, { payload }) => {
+    return {
+      ...state,
+      ...payload,
+    }
+  },
+  [PLAYER_ERROR]: (state, { payload }) => {
     const { queueId, message } = payload
 
     return {
@@ -41,6 +48,7 @@ const initialState = {
   volume: 1,
   isPlaying: false,
   isAtQueueEnd: false,
+  isPlayerPresent: false,
   errors: {},   // object of arrays keyed by queueId
 }
 

@@ -12,10 +12,10 @@ const {
   PLAYER_PAUSE,
   PLAYER_VOLUME_REQUEST,
   PLAYER_VOLUME,
-  EMIT_STATUS,
-  EMIT_ERROR,
-  PLAYBACK_STATUS,
-  PLAYBACK_ERROR,
+  EMIT_PLAYER_STATUS,
+  EMIT_PLAYER_ERROR,
+  PLAYER_STATUS,
+  PLAYER_ERROR,
   _SUCCESS,
 } = require('../constants')
 
@@ -42,11 +42,6 @@ const ACTION_HANDLERS = {
       return Promise.reject(err)
     }
 
-    // ack (@todo: wait until player response)
-    ctx.acknowledge({
-      type: PLAYER_NEXT_REQUEST + _SUCCESS,
-    })
-
     if (!item) {
       // we're already on the last queued item
       ctx.io.to(ctx.user.roomId).emit('action', {
@@ -63,22 +58,12 @@ const ACTION_HANDLERS = {
     })
   },
   [PLAYER_PLAY_REQUEST]: async (ctx, { payload }) => {
-    // ack (@todo: wait until player response)
-    ctx.acknowledge({
-      type: PLAYER_PLAY_REQUEST + _SUCCESS,
-    })
-
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PLAY,
       payload: null
     })
   },
   [PLAYER_PAUSE_REQUEST]: async (ctx, { payload }) => {
-    // ack (@todo: wait until player response)
-    ctx.acknowledge({
-      type: PLAYER_PAUSE_REQUEST + _SUCCESS,
-    })
-
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PAUSE,
       payload: null
@@ -90,15 +75,21 @@ const ACTION_HANDLERS = {
       payload
     })
   },
-  [EMIT_STATUS]: async (ctx, { payload }) => {
+  [EMIT_PLAYER_STATUS]: async (ctx, { payload }) => {
+    const sock = ctx.socket.socket
+
+    // flag this socket id as a player so
+    // we can tell the room if/when it leaves
+    sock._isPlayer = true
+
     ctx.io.to(ctx.user.roomId).emit('action', {
-      type: PLAYBACK_STATUS,
-      payload
+      type: PLAYER_STATUS,
+      payload,
     })
   },
-  [EMIT_ERROR]: async (ctx, { payload }) => {
+  [EMIT_PLAYER_ERROR]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
-      type: PLAYBACK_ERROR,
+      type: PLAYER_ERROR,
       payload
     })
   },

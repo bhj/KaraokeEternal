@@ -52,11 +52,6 @@ const ACTION_HANDLERS = {
       })
     }
 
-    // ack request
-    ctx.acknowledge({
-      type: PROVIDER_REFRESH_REQUEST + '_SUCCESS',
-    })
-
     log('provider "%s" starting scan', payload)
     isScanning = true
 

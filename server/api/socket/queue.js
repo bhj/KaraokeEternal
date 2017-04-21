@@ -67,11 +67,6 @@ const ACTION_HANDLERS = {
       return Promise.reject(err)
     }
 
-    // success!
-    ctx.acknowledge({
-      type: QUEUE_ADD + '_SUCCESS',
-    })
-
     // to all in room
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: QUEUE_UPDATE,
@@ -185,11 +180,6 @@ const ACTION_HANDLERS = {
         // well, we tryed...
       }
     }
-
-    // success!
-    ctx.acknowledge({
-      type: QUEUE_REMOVE + '_SUCCESS',
-    })
 
     // tell room
     ctx.io.to(ctx.user.roomId).emit('action', {

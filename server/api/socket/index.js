@@ -39,12 +39,12 @@ module.exports = async function (ctx) {
   try {
     await handler(ctx, action)
   } catch (err) {
-    const msg = `Error handling ${action.type}: ${err.message}`
+    const error = `Error handling ${action.type}: ${err.message}`
 
     return ctx.acknowledge({
       type: ACTION_ERROR,
       meta: {
-        error: msg
+        error,
       }
     })
   }

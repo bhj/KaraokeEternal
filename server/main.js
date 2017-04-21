@@ -22,6 +22,7 @@ const getLibrary = require('./lib/getLibrary')
 const {
   LIBRARY_UPDATE,
   SOCKET_AUTH_ERROR,
+  PLAYER_LEAVE,
 } = require('./api/constants')
 
 const app = new Koa()
@@ -126,6 +127,19 @@ io.on('disconnect', (ctx, data) => {
   debug('%s (%s) left room %s (%s in room)',
     user.name, sock.id, user.roomId, room.length
   )
+
+  if (sock._isPlayer && room.length) {
+    // any other players left in room?
+    const hasPlayer = Object.keys(room.sockets).some(id => {
+      return app._io.sockets.sockets[id]._isPlayer === true
+    })
+
+    if (!hasPlayer) {
+      app._io.to(user.roomId).emit('action', {
+        type: PLAYER_LEAVE,
+      })
+    }
+  }
 })
 
 // ------------------------------------

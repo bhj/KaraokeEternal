@@ -1,6 +1,13 @@
 import PlayerView from '../components/PlayerView'
 import { connect } from 'react-redux'
-import { emitStatus, cancelStatus, emitError, requestPlayNext, getMedia, getMediaSuccess } from '../modules/player'
+import {
+  emitStatus,
+  cancelStatus,
+  emitError,
+  requestPlayNext,
+  getMedia,
+  getMediaSuccess,
+} from '../modules/player'
 
 const mapActionCreators = {
   emitStatus,

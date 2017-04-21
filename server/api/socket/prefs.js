@@ -4,7 +4,6 @@ const squel = require('squel')
 const {
   SET_PREFS,
   PREFS_CHANGE,
-  _SUCCESS,
 } = require('../constants')
 
 const ACTION_HANDLERS = {
@@ -25,10 +24,6 @@ const ACTION_HANDLERS = {
     } catch (err) {
       return Promise.reject(err)
     }
-
-    ctx.acknowledge({
-      type: SET_PREFS + _SUCCESS,
-    })
 
     // send updated prefs
     try {

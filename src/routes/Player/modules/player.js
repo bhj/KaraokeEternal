@@ -10,8 +10,8 @@ import {
   PLAYER_VOLUME_REQUEST,
   PLAYER_VOLUME,
   PLAYER_QUEUE_END,
-  EMIT_STATUS,
-  EMIT_ERROR
+  EMIT_PLAYER_STATUS,
+  EMIT_PLAYER_ERROR
 } from 'constants'
 
 // for informational purposes from provider players
@@ -76,7 +76,7 @@ export function emitStatus (status) {
     const { queueId, isAtQueueEnd } = getState().player
 
     dispatch({
-      type: EMIT_STATUS,
+      type: EMIT_PLAYER_STATUS,
       payload: {
         ...status,
         queueId,
@@ -98,7 +98,7 @@ export function cancelStatus () {
   return {
     type: CANCEL,
     payload: {
-      type: EMIT_STATUS
+      type: EMIT_PLAYER_STATUS
     }
   }
 }
@@ -106,11 +106,17 @@ export function cancelStatus () {
 // have server emit error to room
 export function emitError (queueId, message) {
   return {
-    type: EMIT_ERROR,
+    type: EMIT_PLAYER_ERROR,
     payload: { queueId, message },
     meta: {
       requireAck: false,
     }
+  }
+}
+
+export function playerEnter () {
+  return {
+    type: PLAYER_ENTER,
   }
 }
 
@@ -152,7 +158,7 @@ const ACTION_HANDLERS = {
     isFetching: false,
     isPlaying: true, // all media is loaded
   }),
-  [EMIT_ERROR]: (state, { payload }) => ({
+  [EMIT_PLAYER_ERROR]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
     isFetching: false,
