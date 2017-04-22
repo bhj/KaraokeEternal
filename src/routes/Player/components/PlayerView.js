@@ -23,12 +23,12 @@ class PlayerView extends React.Component {
     emitStatus: PropTypes.func.isRequired,
     cancelStatus: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
+    emitLeave: PropTypes.func.isRequired,
   }
 
   componentDidMount () {
     // emit initial state
     this.props.emitStatus({
-      isPlayerPresent: true,
       isPlaying: this.props.isPlaying,
       position: 0,
       volume: this.props.volume,
@@ -36,26 +36,10 @@ class PlayerView extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.isPlaying && !prevProps.isPlaying) {
-      // playing for first time, after queue end, or after error
-      if (this.props.queueId === -1 || this.props.isAtQueueEnd || this.props.isErrored) {
-        this.props.requestPlayNext()
-      }
-    }
-
-    if (this.props.isAtQueueEnd && !prevProps.isAtQueueEnd) {
-      this.props.emitStatus({
-        isPlaying: false,
-        position: 0,
-        volume: this.props.volume,
-      })
-    }
-
-    // if (this.props.queue !== prevProps.queue) {
-    //   if (this.props.isAtQueueEnd && this.props.isPlaying) {
-    //     this.props.requestPlayNext()
-    //   }
-    // }
+    this.props.emitStatus({
+      isPlaying: this.props.isPlaying,
+      volume: this.props.volume,
+    })
   }
 
   componentWillUpdate (nextProps) {
@@ -71,10 +55,7 @@ class PlayerView extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.emitStatus({
-      isPlayerPresent: false,
-      isPlaying: false,
-    })
+    this.props.emitLeave()
   }
 
   render () {

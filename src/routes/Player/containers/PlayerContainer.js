@@ -2,8 +2,9 @@ import PlayerView from '../components/PlayerView'
 import { connect } from 'react-redux'
 import {
   emitStatus,
-  cancelStatus,
   emitError,
+  emitLeave,
+  cancelStatus,
   requestPlayNext,
   getMedia,
   getMediaSuccess,
@@ -11,8 +12,9 @@ import {
 
 const mapActionCreators = {
   emitStatus,
-  cancelStatus,
   emitError,
+  emitLeave,
+  cancelStatus,
   requestPlayNext,
   getMedia,
   getMediaSuccess,
@@ -35,7 +37,7 @@ const mapStateToProps = (state) => {
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
     isErrored: typeof state.room.errors[state.room.queueId] !== 'undefined',
-    lastRequestID: player.lastRequestID,
+    lastTimestamp: player.lastTimestamp,
   }
 }
 

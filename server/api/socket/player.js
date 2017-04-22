@@ -13,9 +13,11 @@ const {
   PLAYER_VOLUME_REQUEST,
   PLAYER_VOLUME,
   EMIT_PLAYER_STATUS,
-  EMIT_PLAYER_ERROR,
   PLAYER_STATUS,
+  EMIT_PLAYER_ERROR,
   PLAYER_ERROR,
+  EMIT_PLAYER_LEAVE,
+  PLAYER_LEAVE,
   _SUCCESS,
 } = require('../constants')
 
@@ -60,13 +62,11 @@ const ACTION_HANDLERS = {
   [PLAYER_PLAY_REQUEST]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PLAY,
-      payload: null
     })
   },
   [PLAYER_PAUSE_REQUEST]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PAUSE,
-      payload: null
     })
   },
   [PLAYER_VOLUME_REQUEST]: async (ctx, { payload }) => {
@@ -76,11 +76,9 @@ const ACTION_HANDLERS = {
     })
   },
   [EMIT_PLAYER_STATUS]: async (ctx, { payload }) => {
-    const sock = ctx.socket.socket
-
     // flag this socket id as a player so
     // we can tell the room if/when it leaves
-    sock._isPlayer = true
+    ctx.socket.socket._isPlayer = true
 
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_STATUS,
@@ -90,7 +88,15 @@ const ACTION_HANDLERS = {
   [EMIT_PLAYER_ERROR]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_ERROR,
-      payload
+      payload,
+    })
+  },
+  [EMIT_PLAYER_LEAVE]: async (ctx, { payload }) => {
+    ctx.io.to(ctx.user.roomId).emit('action', {
+      type: PLAYER_LEAVE,
+      payload: {
+        socketId: ctx.socket.socket.id,
+      }
     })
   },
 }

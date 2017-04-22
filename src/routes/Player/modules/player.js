@@ -11,7 +11,8 @@ import {
   PLAYER_VOLUME,
   PLAYER_QUEUE_END,
   EMIT_PLAYER_STATUS,
-  EMIT_PLAYER_ERROR
+  EMIT_PLAYER_ERROR,
+  EMIT_PLAYER_LEAVE,
 } from 'constants'
 
 // for informational purposes from provider players
@@ -38,7 +39,6 @@ export function requestVolume (vol) {
     type: PLAYER_VOLUME_REQUEST,
     payload: vol,
     meta: {
-      requireAck: false,
       throttle: {
         wait: 200,
         leading: false,
@@ -52,7 +52,7 @@ export function requestPlayNext () {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_NEXT_REQUEST,
-      payload: getState().status.queueId
+      payload: getState().room.queueId
     })
   }
 }
@@ -83,7 +83,6 @@ export function emitStatus (status) {
         isAtQueueEnd,
       },
       meta: {
-        requireAck: false,
         throttle: {
           wait: 1000,
           leading: true,
@@ -108,15 +107,12 @@ export function emitError (queueId, message) {
   return {
     type: EMIT_PLAYER_ERROR,
     payload: { queueId, message },
-    meta: {
-      requireAck: false,
-    }
   }
 }
 
-export function playerEnter () {
+export function emitLeave () {
   return {
-    type: PLAYER_ENTER,
+    type: EMIT_PLAYER_LEAVE,
   }
 }
 
@@ -127,11 +123,12 @@ const ACTION_HANDLERS = {
   [PLAYER_PAUSE]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
+    lastTimestamp: Date.now(),
   }),
   [PLAYER_PLAY]: (state, { payload }) => ({
     ...state,
     isPlaying: true,
-    lastRequestID: payload.requestID,
+    lastTimestamp: Date.now(),
   }),
   [PLAYER_VOLUME]: (state, { payload }) => ({
     ...state,
@@ -174,7 +171,7 @@ const initialState = {
   isPlaying: false,
   isFetching: false,
   isAtQueueEnd: false,
-  lastRequestID: null,
+  lastTimestamp: null,
 }
 
 export default function playerReducer (state = initialState, action) {

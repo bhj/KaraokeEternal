@@ -23,6 +23,7 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       ...payload,
+      isPlayerPresent: true,
     }
   },
   [PLAYER_ERROR]: (state, { payload }) => {
