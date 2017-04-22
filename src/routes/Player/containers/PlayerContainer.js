@@ -21,16 +21,10 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  const { queue, player } = state
-  let songId, song
-
-  if (queue.entities[player.queueId]) {
-    songId = queue.entities[player.queueId].songId
-    song = state.library.songs.entities[songId]
-  }
+  const { player } = state
 
   return {
-    song,
+    song: state.queue.entities[player.queueId],
     queueId: player.queueId,
     volume: player.volume,
     isAtQueueEnd: player.isAtQueueEnd,

@@ -8,13 +8,12 @@ import screenfull from 'screenfull'
 
 class PlayerView extends React.Component {
   static propTypes = {
-    // queue
-    queueId: PropTypes.number.isRequired,
-    volume: PropTypes.number.isRequired,
     song: PropTypes.object,
-    isPlaying: PropTypes.bool.isRequired,
+    queueId: PropTypes.number.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
-    isErrored: PropTypes.bool.isRequired,
+    volume: PropTypes.number.isRequired,
+    isPlaying: PropTypes.bool.isRequired,
+    // isErrored: PropTypes.bool.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
@@ -36,9 +35,16 @@ class PlayerView extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
+    const { queueId, isPlaying, volume } = this.props
+
+    // playing for first time
+    if (isPlaying && queueId === -1) {
+      this.props.requestPlayNext()
+    }
+
     this.props.emitStatus({
-      isPlaying: this.props.isPlaying,
-      volume: this.props.volume,
+      isPlaying,
+      volume,
     })
   }
 
@@ -74,7 +80,10 @@ class PlayerView extends React.Component {
       Component = ColorCycle
     } else if (typeof Providers[song.provider] === 'undefined') {
       // show 'provider error' placeholder
-      this.props.emitError(this.props.queueId, 'No provider for type: "' + song.provider + '"')
+      const msg = 'No provider for type: "' + song.provider + '"'
+      componentProps.title = msg
+      Component = ColorCycle
+      this.props.emitError(this.props.queueId, msg)
     } else {
       Component = Providers[song.provider].playerComponent
       componentProps = {

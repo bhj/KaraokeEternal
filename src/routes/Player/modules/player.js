@@ -73,14 +73,14 @@ export function getMediaSuccess () {
 // have server emit player status to room
 export function emitStatus (status) {
   return (dispatch, getState) => {
-    const { queueId, isAtQueueEnd } = getState().player
+    const player = getState().player
 
     dispatch({
       type: EMIT_PLAYER_STATUS,
       payload: {
         ...status,
-        queueId,
-        isAtQueueEnd,
+        queueId: player.queueId,
+        isAtQueueEnd: player.isAtQueueEnd,
       },
       meta: {
         throttle: {
@@ -138,7 +138,6 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       queueId: payload,
-      isPlaying: true,
       isAtQueueEnd: false,
     }
   },

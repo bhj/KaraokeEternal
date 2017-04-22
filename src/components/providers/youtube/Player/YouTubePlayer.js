@@ -14,25 +14,12 @@ class YouTubePlayer extends React.Component {
     onStatus: PropTypes.func.isRequired, // action
   }
 
-  state = {
-    videoId: null
-  }
-
-  componentDidMount () {
-    this.updateSources()
-  }
-
   componentWillUnmount () {
     clearInterval(this.statusTimer)
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.song !== this.props.song) {
-      this.updateSources()
-    }
-
-    if (prevProps.isPlaying !== this.props.isPlaying ||
-        prevState.videoId !== this.state.videoId) {
+    if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
     }
 
@@ -41,25 +28,10 @@ class YouTubePlayer extends React.Component {
     }
   }
 
-  updateSources = () => {
-    // get videoId for song
-    const url = '/api/song/' + this.props.song.songId
-
-    fetch(url, fetchConfig)
-      .then(checkStatus)
-      .then(res => res.json())
-      .then(song => {
-        this.setState({ videoId: song.videoId })
-      })
-      .catch((err) => {
-        this.props.onMediaError(err.message)
-      })
-  }
-
   render () {
     if (!this.state.videoId) return null
 
-    const { width, height } = this.props
+    const { width, height, song } = this.props
     const opts = {
       width,
       height,
@@ -76,7 +48,7 @@ class YouTubePlayer extends React.Component {
     return (
       <div style={{ width, height }}>
         <YouTube
-          videoId={this.state.videoId}
+          videoId={song.providerData.videoId}
           opts={opts}
           onReady={this.handleReady}
           onStateChange={this.handleStatus}
@@ -125,24 +97,3 @@ class YouTubePlayer extends React.Component {
 }
 
 export default YouTubePlayer
-
-// helpers for fetch response
-const fetchConfig = {
-  headers: new Headers({
-    'Content-Type': 'application/json'
-  }),
-  // include the cookie that contains our JWT
-  credentials: 'same-origin'
-}
-
-function checkStatus (response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  } else {
-    return response.text().then((txt) => {
-      var error = new Error(txt)
-      error.response = response
-      throw error
-    })
-  }
-}
