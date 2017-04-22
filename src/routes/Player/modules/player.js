@@ -52,7 +52,7 @@ export function requestPlayNext () {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_NEXT_REQUEST,
-      payload: getState().room.queueId
+      payload: getState().player.queueId
     })
   }
 }
