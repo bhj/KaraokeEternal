@@ -1,34 +1,47 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import VolumeSlider from './VolumeSlider'
+import NoPlayer from './NoPlayer'
 import classes from './PlaybackCtrl.css'
 
-const PlaybackCtrl = (props) => (
-  <div className={classes.container}>
-    {!props.isPlaying &&
-      <div onClick={props.requestPlay} className={classes.play}>
-        <i className='material-icons'>play_arrow</i>
-      </div>
-    }
-    {props.isPlaying &&
-      <div onClick={props.requestPause} className={classes.pause}>
-        <i className='material-icons'>pause</i>
-      </div>
-    }
+const PlaybackCtrl = (props) => {
+  if (!props.isAdmin) {
+    return null
+  }
 
-    <div onClick={props.requestPlayNext} className={classes.next + (props.isPlaying ? '' : ' ' + classes.disabled)}>
-      <i className='material-icons'>skip_next</i>
+  if (!props.isPlayerPresent) {
+    return <NoPlayer />
+  }
+
+  return (
+    <div className={classes.container}>
+      {!props.isPlaying &&
+        <div onClick={props.requestPlay} className={classes.play}>
+          <i className='material-icons'>play_arrow</i>
+        </div>
+      }
+      {props.isPlaying &&
+        <div onClick={props.requestPause} className={classes.pause}>
+          <i className='material-icons'>pause</i>
+        </div>
+      }
+
+      <div onClick={props.requestPlayNext} className={classes.next + (props.isPlaying ? '' : ' ' + classes.disabled)}>
+        <i className='material-icons'>skip_next</i>
+      </div>
+
+      <VolumeSlider
+        className={classes.volume}
+        volume={props.volume}
+        onVolumeChange={props.requestVolume}
+      />
     </div>
-
-    <VolumeSlider
-      className={classes.volume}
-      volume={props.volume}
-      onVolumeChange={props.requestVolume}
-    />
-  </div>
-)
+  )
+}
 
 PlaybackCtrl.propTypes = {
+  isAdmin: PropTypes.bool.isRequired,
+  isPlayerPresent: PropTypes.bool.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   volume: PropTypes.number.isRequired,
   // actions

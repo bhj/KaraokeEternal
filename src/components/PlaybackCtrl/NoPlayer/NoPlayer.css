@@ -1,0 +1,10 @@
+.container {
+  font-size: 16px;
+  background-color: #ffff8c;
+}
+
+.msg {
+  margin: 0;
+  padding: 5px;
+  text-align: center;
+}

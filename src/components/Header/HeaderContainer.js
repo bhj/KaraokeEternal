@@ -9,6 +9,7 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     isAdmin: state.user.isAdmin,
+    isPlayerPresent: state.room.isPlayerPresent,
   }
 }
 
