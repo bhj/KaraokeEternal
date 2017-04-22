@@ -200,7 +200,7 @@ async function getQueue (roomId) {
       .field('queueId')
       .field('songId')
       .field('userId')
-      .field('songs.duration')
+      .field('songs.*')
       .field('users.name')
       .join('songs USING(songId)')
       .join('users USING(userId)')
@@ -216,6 +216,7 @@ async function getQueue (roomId) {
   rows.forEach(function (row) {
     result.push(row.queueId)
     entities[row.queueId] = row
+    entities[row.queueId].providerData = JSON.parse(row.providerData)
   })
 
   return { result, entities }
