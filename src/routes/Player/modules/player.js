@@ -8,6 +8,7 @@ import {
   EMIT_PLAYER_STATUS,
   EMIT_PLAYER_ERROR,
   EMIT_PLAYER_LEAVE,
+  QUEUE_UPDATE,
 } from 'constants'
 
 // for informational purposes from provider players
@@ -93,17 +94,23 @@ const ACTION_HANDLERS = {
   }),
   [PLAYER_NEXT]: (state, { payload }) => {
     const curIdx = payload.result.indexOf(state.queueId)
-
-    if (curIdx === payload.result.length - 1) {
-      return {
-        ...state,
-        isAtQueueEnd: true,
-      }
-    }
+    const isAtQueueEnd = curIdx === payload.result.length - 1
 
     return {
       ...state,
-      queueId: payload.result[curIdx + 1],
+      queueId: isAtQueueEnd ? state.queueId : payload.result[curIdx + 1],
+      isAtQueueEnd,
+    }
+  },
+  [QUEUE_UPDATE]: (state, { payload }) => {
+    const curIdx = payload.result.indexOf(state.queueId)
+    const isAtQueueEnd = curIdx === payload.result.length - 1
+
+    return {
+      ...state,
+      // if we're no longer out of songs, play next
+      queueId: (state.isAtQueueEnd && !isAtQueueEnd) ? payload.result[curIdx + 1] : state.queueId,
+      isAtQueueEnd,
     }
   },
   [GET_MEDIA]: (state, { payload }) => ({
@@ -125,7 +132,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  queueId: -1,
+  queueId: null,
   volume: 1,
   isPlaying: false,
   isFetching: false,
