@@ -1,6 +1,6 @@
 export default function createSocketMiddleware (socket, prefix) {
   return store => {
-    // dispatch incoming actions sent by the server
+    // handler for incoming actions (sent from server)
     socket.on('action', action => {
       const { type } = action
 
