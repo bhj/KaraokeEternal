@@ -31,7 +31,7 @@ class CDGPlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.song !== this.props.song) {
+    if (prevProps.song.songId !== this.props.song.songId) {
       this.updateSources()
     }
 
