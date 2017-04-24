@@ -93,10 +93,18 @@ const ACTION_HANDLERS = {
     volume: payload,
   }),
   [PLAYER_NEXT]: (state, { payload }) => {
+    const curIdx = payload.result.indexOf(state.queueId)
+
+    if (curIdx === payload.result.length - 1) {
+      return {
+        ...state,
+        isAtQueueEnd: true,
+      }
+    }
+
     return {
       ...state,
-      queueId: payload,
-      isAtQueueEnd: false,
+      queueId: payload.result[curIdx + 1],
     }
   },
   [PLAYER_QUEUE_END]: (state, { payload }) => ({

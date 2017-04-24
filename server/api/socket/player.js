@@ -1,4 +1,5 @@
 const log = require('debug')('app:socket:player')
+const getQueue = require('../../lib/getQueue')
 
 const {
   REQUEST_PLAYER_NEXT,
@@ -11,7 +12,6 @@ const {
   PLAYER_VOLUME,
   EMIT_PLAYER_STATUS,
   PLAYER_STATUS,
-  PLAYER_QUEUE_END,
   EMIT_PLAYER_ERROR,
   PLAYER_ERROR,
   EMIT_PLAYER_LEAVE,
@@ -23,37 +23,11 @@ const {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [REQUEST_PLAYER_NEXT]: async (ctx, { payload }) => {
-    // get next-highest queue item id
-    let item
-
-    try {
-      const q = squel.select()
-        .from('queue')
-        .join('songs USING(songId)')
-        .where('roomId = ?', ctx.user.roomId)
-        .where('queueId > ?', payload)
-        .limit(1)
-
-      const { text, values } = q.toParam()
-      item = await db.get(text, values)
-    } catch (err) {
-      log(err.message)
-      return Promise.reject(err)
-    }
-
-    if (!item) {
-      // we're already on the last queued item
-      ctx.io.to(ctx.user.roomId).emit('action', {
-        type: PLAYER_QUEUE_END,
-        payload: null
-      })
-      return
-    }
-
-    // emits to room, but only player should be listening
+    // @todo: accept current queueId and pos so server
+    // can decide whether to increment song play count
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_NEXT,
-      payload: item.queueId
+      payload: await getQueue(ctx.user.roomId),
     })
   },
   [REQUEST_PLAYER_PLAY]: async (ctx, { payload }) => {
