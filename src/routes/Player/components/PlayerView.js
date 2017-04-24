@@ -36,16 +36,22 @@ class PlayerView extends React.Component {
 
   componentDidUpdate (prevProps) {
     const { queueId, isPlaying, volume } = this.props
+    const status = {
+      isPlaying,
+      volume,
+    }
 
-    // playing for first time
-    if (isPlaying && queueId === -1) {
+    // playing for first time?
+    if (isPlaying && !this.props.song) {
       this.props.requestPlayNext()
     }
 
-    this.props.emitStatus({
-      isPlaying,
-      volume,
-    })
+    if (prevProps.queueId !== queueId) {
+      // otherwise next song shows previous song's progress
+      status.position = 0
+    }
+
+    this.props.emitStatus(status)
   }
 
   componentWillUpdate (nextProps) {
