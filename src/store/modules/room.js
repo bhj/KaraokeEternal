@@ -1,4 +1,8 @@
 import {
+  REQUEST_PLAYER_PLAY,
+  REQUEST_PLAYER_PAUSE,
+  REQUEST_PLAYER_NEXT,
+  REQUEST_PLAYER_VOLUME,
   PLAYER_STATUS,
   PLAYER_ERROR,
   PLAYER_LEAVE,
@@ -7,23 +11,52 @@ import {
 // ------------------------------------
 // Actions
 // ------------------------------------
+export function requestPlay () {
+  return {
+    type: REQUEST_PLAYER_PLAY,
+  }
+}
+
+export function requestPause () {
+  return {
+    type: REQUEST_PLAYER_PAUSE,
+  }
+}
+
+export function requestPlayNext () {
+  return {
+    type: REQUEST_PLAYER_NEXT,
+  }
+}
+export function requestVolume (vol) {
+  return {
+    type: REQUEST_PLAYER_VOLUME,
+    payload: vol,
+    meta: {
+      throttle: {
+        wait: 200,
+        leading: false,
+      }
+    },
+  }
+}
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_LEAVE]: (state, { payload }) => {
-    return {
-      ...state,
-      isPlayerPresent: false,
-      isPlaying: false,
-    }
-  },
   [PLAYER_STATUS]: (state, { payload }) => {
     return {
       ...state,
       ...payload,
       isPlayerPresent: true,
+    }
+  },
+  [PLAYER_LEAVE]: (state, { payload }) => {
+    return {
+      ...state,
+      isPlayerPresent: false,
+      isPlaying: false,
     }
   },
   [PLAYER_ERROR]: (state, { payload }) => {

@@ -1,11 +1,11 @@
 import PlayerView from '../components/PlayerView'
 import { connect } from 'react-redux'
+import { requestPlayNext } from 'store/modules/room'
 import {
   emitStatus,
   emitError,
   emitLeave,
   cancelStatus,
-  requestPlayNext,
   getMedia,
   getMediaSuccess,
 } from '../modules/player'

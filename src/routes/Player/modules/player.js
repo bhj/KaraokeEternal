@@ -1,13 +1,9 @@
 import { CANCEL } from 'redux-throttle'
 
 import {
-  PLAYER_NEXT_REQUEST,
-  PLAYER_NEXT,
-  PLAYER_PLAY_REQUEST,
   PLAYER_PLAY,
-  PLAYER_PAUSE_REQUEST,
   PLAYER_PAUSE,
-  PLAYER_VOLUME_REQUEST,
+  PLAYER_NEXT,
   PLAYER_VOLUME,
   PLAYER_QUEUE_END,
   EMIT_PLAYER_STATUS,
@@ -18,44 +14,6 @@ import {
 // for informational purposes from provider players
 export const GET_MEDIA = 'player/GET_MEDIA'
 export const GET_MEDIA_SUCCESS = 'player/GET_MEDIA_SUCCESS'
-
-// Request Play
-export function requestPlay () {
-  return {
-    type: PLAYER_PLAY_REQUEST,
-  }
-}
-
-// Request Pause
-export function requestPause () {
-  return {
-    type: PLAYER_PAUSE_REQUEST,
-  }
-}
-
-// Request volume
-export function requestVolume (vol) {
-  return {
-    type: PLAYER_VOLUME_REQUEST,
-    payload: vol,
-    meta: {
-      throttle: {
-        wait: 200,
-        leading: false,
-      }
-    },
-  }
-}
-
-// Request Play Next
-export function requestPlayNext () {
-  return (dispatch, getState) => {
-    dispatch({
-      type: PLAYER_NEXT_REQUEST,
-      payload: getState().player.queueId
-    })
-  }
-}
 
 export function getMedia (url) {
   return {
@@ -152,7 +110,6 @@ const ACTION_HANDLERS = {
   [GET_MEDIA_SUCCESS]: (state, { payload }) => ({
     ...state,
     isFetching: false,
-    isPlaying: true, // all media is loaded
   }),
   [EMIT_PLAYER_ERROR]: (state, { payload }) => ({
     ...state,

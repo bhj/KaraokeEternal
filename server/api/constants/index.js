@@ -11,24 +11,24 @@ module.exports = {
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
   QUEUE_UPDATE: 'queue/QUEUE_UPDATE',
   QUEUE_END: 'queue/QUEUE_END',
-  // player command requests (client -> server)
-  PLAYER_NEXT_REQUEST: 'server/PLAYER_NEXT',
-  PLAYER_PAUSE_REQUEST: 'server/PLAYER_PAUSE',
-  PLAYER_PLAY_REQUEST: 'server/PLAYER_PLAY',
-  PLAYER_VOLUME_REQUEST: 'server/PLAYER_VOLUME',
+  // player command requests (clients -> server)
+  REQUEST_PLAYER_PLAY: 'server/REQUEST_PLAYER_PLAY',
+  REQUEST_PLAYER_PAUSE: 'server/REQUEST_PLAYER_PAUSE',
+  REQUEST_PLAYER_NEXT: 'server/REQUEST_PLAYER_NEXT',
+  REQUEST_PLAYER_VOLUME: 'server/REQUEST_PLAYER_VOLUME',
+  // player commands (server -> player)
+  PLAYER_NEXT: 'player/NEXT',
+  PLAYER_PAUSE: 'player/PAUSE',
+  PLAYER_PLAY: 'player/PLAY',
+  PLAYER_VOLUME: 'player/VOLUME',
+  // player -> server -> clients
+  PLAYER_STATUS: 'room/PLAYER_STATUS',
+  PLAYER_ERROR: 'room/PLAYER_ERROR',
+  PLAYER_LEAVE: 'room/PLAYER_LEAVE',
+  // to room (player -> server -> clients)
   EMIT_PLAYER_STATUS: 'server/EMIT_PLAYER_STATUS',
   EMIT_PLAYER_ERROR: 'server/EMIT_PLAYER_ERROR',
-  EMIT_PLAYER_LEAVE: 'server/EMIT_PLAYER_LEAVE',
-  // player commands (server -> player)
-  PLAYER_NEXT: 'player/PLAYER_NEXT',
-  PLAYER_QUEUE_END: 'player/PLAYER_QUEUE_END',
-  PLAYER_PLAY: 'player/PLAYER_PLAY',
-  PLAYER_PAUSE: 'player/PLAYER_PAUSE',
-  PLAYER_VOLUME: 'player/PLAYER_VOLUME',
-  // status
-  PLAYER_STATUS: 'status/PLAYER_STATUS',
-  PLAYER_ERROR: 'status/PLAYER_ERROR',
-  PLAYER_LEAVE:  'status/PLAYER_LEAVE',
+  EMIT_PLAYER_LEAVE:  'server/EMIT_PLAYER_LEAVE',
   // user
   SET_PREFS: 'server/SET_PREFS',
   PREFS_CHANGE: 'user/PREFS_CHANGE',

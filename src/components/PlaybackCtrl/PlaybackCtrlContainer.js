@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import PlaybackCtrl from './PlaybackCtrl'
-import { requestPlay, requestPause, requestVolume, requestPlayNext } from 'routes/Player/modules/player'
+import { requestPlay, requestPause, requestVolume, requestPlayNext } from 'store/modules/room'
 
 //  Object of action creators (can also be function that returns object).
 const mapActionCreators = {

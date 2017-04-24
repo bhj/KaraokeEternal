@@ -3,29 +3,28 @@ const squel = require('squel')
 const log = require('debug')('app:socket:player')
 
 const {
-  PLAYER_NEXT_REQUEST,
+  REQUEST_PLAYER_NEXT,
   PLAYER_NEXT,
-  PLAYER_QUEUE_END,
-  PLAYER_PLAY_REQUEST,
+  REQUEST_PLAYER_PLAY,
   PLAYER_PLAY,
-  PLAYER_PAUSE_REQUEST,
+  REQUEST_PLAYER_PAUSE,
   PLAYER_PAUSE,
-  PLAYER_VOLUME_REQUEST,
+  REQUEST_PLAYER_VOLUME,
   PLAYER_VOLUME,
   EMIT_PLAYER_STATUS,
   PLAYER_STATUS,
+  PLAYER_QUEUE_END,
   EMIT_PLAYER_ERROR,
   PLAYER_ERROR,
   EMIT_PLAYER_LEAVE,
   PLAYER_LEAVE,
-  _SUCCESS,
 } = require('../constants')
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_NEXT_REQUEST]: async (ctx, { payload }) => {
+  [REQUEST_PLAYER_NEXT]: async (ctx, { payload }) => {
     // get next-highest queue item id
     let item
 
@@ -59,17 +58,17 @@ const ACTION_HANDLERS = {
       payload: item.queueId
     })
   },
-  [PLAYER_PLAY_REQUEST]: async (ctx, { payload }) => {
+  [REQUEST_PLAYER_PLAY]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PLAY,
     })
   },
-  [PLAYER_PAUSE_REQUEST]: async (ctx, { payload }) => {
+  [REQUEST_PLAYER_PAUSE]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_PAUSE,
     })
   },
-  [PLAYER_VOLUME_REQUEST]: async (ctx, { payload }) => {
+  [REQUEST_PLAYER_VOLUME]: async (ctx, { payload }) => {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: PLAYER_VOLUME,
       payload
