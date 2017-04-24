@@ -42,4 +42,5 @@ module.exports = {
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',
+  ACTION_ERROR: 'SERVER_ACTION_HANDLER_ERROR',
 }
