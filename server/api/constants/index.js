@@ -20,7 +20,6 @@ module.exports = {
   PLAYER_PAUSE: 'player/PAUSE',
   PLAYER_PLAY: 'player/PLAY',
   PLAYER_VOLUME: 'player/VOLUME',
-  PLAYER_QUEUE_END: 'player/PLAYER_QUEUE_END',
   // player -> server -> clients
   PLAYER_STATUS: 'room/PLAYER_STATUS',
   PLAYER_ERROR: 'room/PLAYER_ERROR',

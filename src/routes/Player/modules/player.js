@@ -5,7 +5,6 @@ import {
   PLAYER_PAUSE,
   PLAYER_NEXT,
   PLAYER_VOLUME,
-  PLAYER_QUEUE_END,
   EMIT_PLAYER_STATUS,
   EMIT_PLAYER_ERROR,
   EMIT_PLAYER_LEAVE,
@@ -107,10 +106,6 @@ const ACTION_HANDLERS = {
       queueId: payload.result[curIdx + 1],
     }
   },
-  [PLAYER_QUEUE_END]: (state, { payload }) => ({
-    ...state,
-    isAtQueueEnd: true,
-  }),
   [GET_MEDIA]: (state, { payload }) => ({
     ...state,
     isFetching: true,
