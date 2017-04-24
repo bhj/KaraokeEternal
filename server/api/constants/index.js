@@ -10,7 +10,6 @@ module.exports = {
   QUEUE_ADD: 'server/QUEUE_ADD',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
   QUEUE_UPDATE: 'queue/QUEUE_UPDATE',
-  QUEUE_END: 'queue/QUEUE_END',
   // player command requests (clients -> server)
   REQUEST_PLAYER_PLAY: 'server/REQUEST_PLAYER_PLAY',
   REQUEST_PLAYER_PAUSE: 'server/REQUEST_PLAYER_PAUSE',
@@ -21,6 +20,7 @@ module.exports = {
   PLAYER_PAUSE: 'player/PAUSE',
   PLAYER_PLAY: 'player/PLAY',
   PLAYER_VOLUME: 'player/VOLUME',
+  PLAYER_QUEUE_END: 'player/PLAYER_QUEUE_END',
   // player -> server -> clients
   PLAYER_STATUS: 'room/PLAYER_STATUS',
   PLAYER_ERROR: 'room/PLAYER_ERROR',
