@@ -1,13 +1,14 @@
 .rc-slider {
   position: relative;
+  top: -2px;
   width: 100%;
-  height: 14px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  display: flex;
 }
+
 .rc-slider * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
 .rc-slider-rail {
   position: absolute;
   width: 100%;
@@ -15,6 +16,7 @@
   height: 6px;
   border-radius: 6px;
 }
+
 .rc-slider-track {
   position: absolute;
   left: 0;

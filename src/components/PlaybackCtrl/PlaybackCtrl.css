@@ -1,6 +1,5 @@
 .container {
   display: flex;
-  height: 48px;
   line-height: 1;
   align-items: center;
   color: #666;
@@ -9,15 +8,20 @@
 
 .play {
   font-size: 48px;
+  height: 48px;
 }
 
 .pause {
   font-size: 48px;
+  height: 48px;
 }
 
 .next {
-  margin-left: 4px;
+  position: relative;
+  top: -3px;
+  left: 4px;
   font-size: 54px;
+  height: 48px;
 }
 
 .volume {
