@@ -1,13 +1,22 @@
 export default function createSocketMiddleware (socket, prefix) {
-  return ({ dispatch }) => {
+  return store => {
     // dispatch incoming actions sent by the server
-    socket.on('action', dispatch)
+    socket.on('action', action => {
+      const { type } = action
+
+      // can ignore player commands if we're not an active player
+      if (type.startsWith('player/') && !store.getState().player) {
+        return
+      }
+
+      store.dispatch(action)
+    })
 
     return next => action => {
       const { type } = action
 
       // only apply to socket.io requests
-      if (!type || type.indexOf(prefix) !== 0) {
+      if (!type.startsWith(prefix)) {
         return next(action)
       }
 
