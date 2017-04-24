@@ -77,7 +77,4 @@ const ACTION_HANDLERS = {
   },
 }
 
-module.exports = {
-  ACTION_HANDLERS,
-  getLibrary,
-}
+module.exports = ACTION_HANDLERS

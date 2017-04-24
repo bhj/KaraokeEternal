@@ -1,5 +1,5 @@
 const Providers = require('../../providers')
-const getPrefs = require('../socket/prefs').getPrefs
+const getPrefs = require('../../lib/getPrefs')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 

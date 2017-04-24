@@ -3,7 +3,7 @@ import { browserHistory } from 'react-router'
 
 import {
   SET_PREFS,
-  PREFS_CHANGE,
+  PREFS_UPDATE,
   PROVIDER_REFRESH_REQUEST,
   TOGGLE_SONG_STARRED,
   LOGIN,
@@ -357,7 +357,7 @@ const ACTION_HANDLERS = {
     ...state,
     starredSongs: payload,
   }),
-  [PREFS_CHANGE]: (state, { payload }) => ({
+  [PREFS_UPDATE]: (state, { payload }) => ({
     ...state,
     prefs: payload,
   }),

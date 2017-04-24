@@ -1,5 +1,3 @@
-const db = require('sqlite')
-const squel = require('squel')
 const log = require('debug')('app:socket:player')
 
 const {
@@ -100,6 +98,4 @@ const ACTION_HANDLERS = {
   },
 }
 
-module.exports = {
-  ACTION_HANDLERS,
-}
+module.exports = ACTION_HANDLERS

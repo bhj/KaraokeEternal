@@ -16,11 +16,13 @@ const jwtVerify = require('jsonwebtoken').verify
 
 const apiRoutes = require('./api/http')
 const socketActions = require('./api/socket')
-const Queue = require('./api/socket/queue')
-const Prefs = require('./api/socket/prefs')
 const getLibrary = require('./lib/getLibrary')
+const getQueue = require('./lib/getQueue')
+const getPrefs = require('./lib/getPrefs')
 const {
   LIBRARY_UPDATE,
+  QUEUE_UPDATE,
+  PREFS_UPDATE,
   SOCKET_AUTH_ERROR,
   PLAYER_LEAVE,
 } = require('./api/constants')
@@ -93,14 +95,14 @@ app._io.on('connection', async (sock) => {
 
   // send queue
   app._io.to(sock.id).emit('action', {
-    type: Queue.QUEUE_UPDATE,
-    payload: await Queue.getQueue(user.roomId),
+    type: QUEUE_UPDATE,
+    payload: await getQueue(user.roomId),
   })
 
   // send prefs
   app._io.to(sock.id).emit('action', {
-    type: Prefs.PREFS_CHANGE,
-    payload: await Prefs.getPrefs(),
+    type: PREFS_UPDATE,
+    payload: await getPrefs(),
   })
 })
 

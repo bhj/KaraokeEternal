@@ -10,17 +10,18 @@ const {
   ACTION_ERROR,
 } = require('../constants')
 
-let ACTION_HANDLERS = Object.assign({},
-  Library.ACTION_HANDLERS,
-  Queue.ACTION_HANDLERS,
-  Player.ACTION_HANDLERS,
-  Prefs.ACTION_HANDLERS,
-  Provider.ACTION_HANDLERS
+let SOCKET_ACTIONS = Object.assign({},
+  Library,
+  Queue,
+  Player,
+  Prefs,
+  Provider
 )
 
 module.exports = async function (ctx) {
   const action = ctx.data
-  const handler = ACTION_HANDLERS[action.type]
+  const { type } = action
+  const handler = SOCKET_ACTIONS[type]
 
   if (!ctx.user) {
     return ctx.acknowledge({
@@ -32,14 +33,14 @@ module.exports = async function (ctx) {
   }
 
   if (!handler) {
-    log('No handler for type: %s', action.type)
+    log('No handler for type: %s', type)
     return
   }
 
   try {
     await handler(ctx, action)
   } catch (err) {
-    const error = `Error handling ${action.type}: ${err.message}`
+    const error = `Error handling ${type}: ${err.message}`
 
     return ctx.acknowledge({
       type: ACTION_ERROR,

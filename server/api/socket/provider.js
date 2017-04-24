@@ -2,7 +2,7 @@ const db = require('sqlite')
 const squel = require('squel')
 const debug = require('debug')
 const Providers = require('../../providers')
-const getPrefs = require('./prefs').getPrefs
+const getPrefs = require('../../lib/getPrefs')
 
 const {
   PROVIDER_REFRESH_REQUEST,
@@ -83,6 +83,4 @@ const ACTION_HANDLERS = {
   },
 }
 
-module.exports = {
-  ACTION_HANDLERS,
-}
+module.exports = ACTION_HANDLERS
