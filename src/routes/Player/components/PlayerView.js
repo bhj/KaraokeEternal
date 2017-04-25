@@ -8,8 +8,8 @@ import screenfull from 'screenfull'
 
 class PlayerView extends React.Component {
   static propTypes = {
-    curItem: PropTypes.object,
-    nextItem: PropTypes.object,
+    queueId: PropTypes.number,
+    queueItem: PropTypes.object,
     isAtQueueEnd: PropTypes.bool.isRequired,
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
@@ -35,18 +35,19 @@ class PlayerView extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { curItem, isPlaying, isAtQueueEnd, volume } = this.props
+    const { queueId, isPlaying, volume } = this.props
     const status = {
       isPlaying,
       volume,
     }
 
     // playing for first time?
-    if (isPlaying && !curItem) {
+    if (isPlaying && queueId === null) {
       this.props.requestPlayNext()
+      return
     }
 
-    if (prevProps.curItem !== curItem) {
+    if (prevProps.queueId !== queueId) {
       // otherwise we'll emit new item with old's progress
       status.position = 0
     }
@@ -56,7 +57,7 @@ class PlayerView extends React.Component {
 
   componentWillUpdate (nextProps) {
     // cancel any pending status emits having an old queueId
-    if (this.props.curItem !== nextProps.curItem) {
+    if (this.props.queueId !== nextProps.queueId) {
       this.props.cancelStatus()
     }
 
@@ -71,7 +72,7 @@ class PlayerView extends React.Component {
   }
 
   render () {
-    const { curItem, viewportStyle } = this.props
+    const { queueId, queueItem, viewportStyle } = this.props
     const { width, height, paddingTop, paddingBottom } = viewportStyle
     let Component = 'div'
     let componentProps = {}
@@ -80,20 +81,20 @@ class PlayerView extends React.Component {
       // show 'add more songs' placeholder
       componentProps.title = 'CAN HAZ MOAR SONGZ?'
       Component = ColorCycle
-    } else if (!curItem) {
+    } else if (!queueItem) {
       // show 'press play to begin' placeholder
       componentProps.title = 'PRESS PLAY TO BEGIN'
       Component = ColorCycle
-    } else if (typeof Providers[curItem.provider] === 'undefined') {
+    } else if (typeof Providers[queueItem.provider] === 'undefined') {
       // show 'provider error' placeholder
-      const msg = 'No provider for type: "' + curItem.provider + '"'
+      const msg = 'No provider for type: "' + queueItem.provider + '"'
       componentProps.title = msg
       Component = ColorCycle
-      this.props.emitError(curItem.queueId, msg)
+      this.props.emitError(queueId, msg)
     } else {
-      Component = Providers[curItem.provider].playerComponent
+      Component = Providers[queueItem.provider].playerComponent
       componentProps = {
-        song: curItem,
+        queueItem,
         volume: this.props.volume,
         isPlaying: this.props.isPlaying,
         getMedia: this.props.getMedia,
@@ -130,7 +131,7 @@ class PlayerView extends React.Component {
   }
 
   handleError = (err) => {
-    this.props.emitError(this.props.curItem.queueId, err)
+    this.props.emitError(this.props.queueId, err)
   }
 }
 

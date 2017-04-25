@@ -22,11 +22,10 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   const { player, queue } = state
-  const curIdx = queue.result.indexOf[player.queueId]
 
   return {
-    curItem: queue.entities[player.queueId],
-    nextItem: queue.entities[curIdx + 1],
+    queueId: player.queueId,
+    queueItem: queue.entities[player.queueId],
     isAtQueueEnd: player.isAtQueueEnd,
     volume: player.volume,
     isPlaying: player.isPlaying,

@@ -5,16 +5,17 @@ import classes from './CDGPlayer.css'
 
 class CDGPlayer extends React.Component {
   static propTypes = {
+    queueItem: PropTypes.object.isRequired,
+    isPlaying: PropTypes.bool.isRequired,
+    volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    volume: PropTypes.number.isRequired,
-    isPlaying: PropTypes.bool.isRequired,
-    song: PropTypes.object.isRequired,
-    getMedia: PropTypes.func.isRequired, // action
-    getMediaSuccess: PropTypes.func.isRequired, // action
-    onMediaError: PropTypes.func.isRequired, // action
-    onMediaEnd: PropTypes.func.isRequired, // action
-    onStatus: PropTypes.func.isRequired, // action
+    // actions
+    getMedia: PropTypes.func.isRequired,
+    getMediaSuccess: PropTypes.func.isRequired,
+    onMediaError: PropTypes.func.isRequired,
+    onMediaEnd: PropTypes.func.isRequired,
+    onStatus: PropTypes.func.isRequired,
   }
 
   state = {
@@ -31,16 +32,18 @@ class CDGPlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.song.songId !== this.props.song.songId) {
+    const { queueItem, isPlaying, volume } = this.props
+
+    if (prevProps.queueItem.queueId !== queueItem.queueId) {
       this.updateSources()
     }
 
-    if (prevProps.isPlaying !== this.props.isPlaying) {
+    if (prevProps.isPlaying !== isPlaying) {
       this.updateIsPlaying()
     }
 
-    if (prevProps.volume !== this.props.volume) {
-      this.setVolume(this.props.volume)
+    if (prevProps.volume !== volume) {
+      this.setVolume(volume)
     }
   }
 
@@ -63,7 +66,7 @@ class CDGPlayer extends React.Component {
           cdgData={this.cdgData}
         />
         <br />
-        <audio src={'/api/provider/cdg/resource?type=audio&songId=' + this.props.song.songId}
+        <audio src={'/api/provider/cdg/resource?type=audio&songId=' + this.props.queueItem.songId}
           preload='none'
           onCanPlayThrough={this.handleOnCanPlayThrough}
           onTimeUpdate={this.handleOnTimeUpdate}
@@ -83,7 +86,7 @@ class CDGPlayer extends React.Component {
     this.audio.load()
 
     // get cdgData
-    const url = '/api/provider/cdg/resource?type=cdg&songId=' + this.props.song.songId
+    const url = '/api/provider/cdg/resource?type=cdg&songId=' + this.props.queueItem.songId
 
     // notification
     this.props.getMedia(this.url)
