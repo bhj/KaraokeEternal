@@ -16,7 +16,7 @@ export default function createSocketMiddleware (socket, prefix) {
       const { type } = action
 
       // only apply to socket.io requests
-      if (!type.startsWith(prefix)) {
+      if (!type || !type.startsWith(prefix)) {
         return next(action)
       }
 
