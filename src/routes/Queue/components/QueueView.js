@@ -37,6 +37,7 @@ class QueueView extends React.Component {
           curId={props.curId} // pass-through forces List refresh
           curPos={props.curPos} // pass-through forces List refresh
           errors={props.errors} // pass-through forces List refresh
+          isAtQueueEnd={props.isAtQueueEnd} // pass-through forces List refresh
         />
       </div>
     )
