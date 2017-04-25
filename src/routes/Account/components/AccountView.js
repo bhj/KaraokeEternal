@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 import Header from 'components/Header'
 import AccountForm from './AccountForm'
 import Logout from './Logout'
-import Providers from 'components/providers'
+import Providers from 'providers'
 
 function AccountView (props) {
   const { viewportStyle, ...restProps } = props
