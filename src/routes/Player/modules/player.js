@@ -98,6 +98,7 @@ const ACTION_HANDLERS = {
 
     return {
       ...state,
+      isPlaying: true,
       queueId: isAtQueueEnd ? state.queueId : payload.result[curIdx + 1],
       isAtQueueEnd,
     }
