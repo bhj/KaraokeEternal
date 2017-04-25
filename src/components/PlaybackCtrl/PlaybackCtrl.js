@@ -13,20 +13,24 @@ const PlaybackCtrl = (props) => {
     return <NoPlayer />
   }
 
+  const { isPlaying, isAtQueueEnd } = props
+
   return (
     <div className={classes.container}>
-      {!props.isPlaying &&
-        <div onClick={props.requestPlay} className={classes.play}>
-          <i className='material-icons'>play_arrow</i>
-        </div>
-      }
-      {props.isPlaying &&
+      {isPlaying &&
         <div onClick={props.requestPause} className={classes.pause}>
           <i className='material-icons'>pause</i>
         </div>
       }
+      {!isPlaying &&
+        <div onClick={props.requestPlay} className={classes.play}>
+          <i className='material-icons'>play_arrow</i>
+        </div>
+      }
 
-      <div onClick={props.requestPlayNext} className={classes.next + (props.isPlaying ? '' : ' ' + classes.disabled)}>
+      <div onClick={props.requestPlayNext} className={
+        classes.next + (!isPlaying || isAtQueueEnd ? ' ' + classes.disabled : '')
+      }>
         <i className='material-icons'>skip_next</i>
       </div>
 
@@ -43,6 +47,7 @@ PlaybackCtrl.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   isPlayerPresent: PropTypes.bool.isRequired,
   isPlaying: PropTypes.bool.isRequired,
+  isAtQueueEnd: PropTypes.bool.isRequired,
   volume: PropTypes.number.isRequired,
   // actions
   requestPlay: PropTypes.func.isRequired,
