@@ -3,47 +3,88 @@ const log = require('debug')('app:provider:youtube')
 const { parse, toSeconds } = require('iso8601-duration')
 const parseArtistTitle = require('../../lib/parseArtistTitle')
 const addSong = require('../../lib/addSong')
+const getPrefs = require('../../lib/getPrefs')
 const getSongs = require('../../lib/getSongs')
+const {
+  REQUEST_PROVIDER_SCAN,
+  LIBRARY_UPDATE,
+  _ERROR,
+} = require('../../api/constants')
+
 let stats
+let isScanning
 
-async function scan (ctx, cfg) {
-  const { channels } = cfg
+const ACTION_HANDLERS = {
+  [REQUEST_PROVIDER_SCAN]: async (ctx, { payload }) => {
+    let cfg
 
-  if (typeof channels === 'undefined' || !Array.isArray(channels)) {
-    log('No channels configured; skipping scan')
-    return Promise.resolve()
-  }
-
-  if (typeof cfg.apiKey === 'undefined') {
-    log(' => no API key configured; skipping scan')
-    return Promise.resolve()
-  }
-
-  let validIds = [] // songIds for cleanup
-  stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
-
-  for (let channel of channels) {
-    let songs
+    if (payload !== 'youtube') {
+      log(`ignoring scan request for provider: ${payload}`)
+      return
+    }
 
     try {
-      songs = await getPlaylistItems(channel, cfg.apiKey)
+      cfg = await getPrefs('provider.youtube')
+
+      if (!typeof cfg === 'object' || !Array.isArray(cfg.channels)) {
+        throw new Error('No channels configured; skipping scan')
+      }
+
+      if (typeof cfg.apiKey === 'undefined') {
+        throw new Error('no API key configured; skipping scan')
+      }
     } catch (err) {
-      log('  => %s', err)
+      return ctx.acknowledge({
+        type: REQUEST_PROVIDER_SCAN + _ERROR,
+        meta: {
+          error: err.message,
+        }
+      })
     }
 
-    for (let song of songs) {
+    if (isScanning) {
+      return ctx.acknowledge({
+        type: REQUEST_PROVIDER_SCAN + '_ERROR',
+        meta: {
+          error: `Scan already in progress`
+        }
+      })
+    }
+
+    isScanning = true
+    log('starting scan')
+
+    let validIds = [] // songIds for cleanup
+    stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
+
+    for (let channel of cfg.channels) {
+      let songs
+
       try {
-        let songId = await process(song)
-        validIds.push(songId)
+        songs = await getPlaylistItems(channel, cfg.apiKey)
       } catch (err) {
-        log(err.message)
+        log('  => %s', err)
+      }
+
+      for (let song of songs) {
+        try {
+          let songId = await process(song)
+          validIds.push(songId)
+        } catch (err) {
+          log(err.message)
+        }
       }
     }
-  }
 
-  log(JSON.stringify(stats))
-  return Promise.resolve(validIds)
+    // @todo: song cleanup
+    isScanning = false
+    log(JSON.stringify(stats))
+
+    return Promise.resolve()
+  },
 }
+
+module.exports = ACTION_HANDLERS
 
 async function process (item) {
   log('processing: %s', JSON.stringify(item))
@@ -68,10 +109,11 @@ async function process (item) {
   if (typeof song !== 'object') {
     log('couldn\'t parse artist/title from video: %s', item.title)
     stats.skipped++
-    return Promise.reject('couldn\'t parse artist/title')
+    return Promise.reject(new Error('couldn\'t parse artist/title'))
   }
 
   song.provider = 'youtube'
+  song.duration = item.duration
 
   try {
     let songId = await addSong(song)
@@ -83,8 +125,6 @@ async function process (item) {
     return Promise.reject(err)
   }
 }
-
-module.exports = exports = { scan }
 
 // function parseArtistTitle (str) {
 //   let title, artist

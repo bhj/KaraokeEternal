@@ -1,5 +1,5 @@
-const cdg = require('./cdg/cdg')
-const youtube = require('./youtube/youtube')
+const cdg = require('./cdg')
+const youtube = require('./youtube')
 
 module.exports = {
   cdg,

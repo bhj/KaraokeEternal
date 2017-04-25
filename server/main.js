@@ -14,7 +14,7 @@ const KoaSocket = require('koa-socket')
 const koaLogger = require('koa-logger')
 const jwtVerify = require('jsonwebtoken').verify
 
-const apiRoutes = require('./api/http')
+const httpRoutes = require('./api/http')
 const socketActions = require('./api/socket')
 const getLibrary = require('./lib/getLibrary')
 const getQueue = require('./lib/getQueue')
@@ -48,8 +48,8 @@ app.use(async (ctx, next) => {
 })
 
 // koa-router (http) api endpoints
-for (let route in apiRoutes) {
-  app.use(apiRoutes[route].routes())
+for (let route in httpRoutes) {
+  app.use(httpRoutes[route].routes())
 }
 
 // make koa-socket available as app.io

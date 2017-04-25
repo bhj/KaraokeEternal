@@ -31,7 +31,6 @@ module.exports = {
   // user
   SET_PREFS: 'server/SET_PREFS',
   PREFS_UPDATE: 'user/PREFS_UPDATE',
-  PROVIDER_REFRESH_REQUEST: 'server/PROVIDER_REFRESH',
   TOGGLE_SONG_STARRED: 'server/TOGGLE_SONG_STARRED',
   LOGIN: 'user/LOGIN',
   LOGOUT: 'user/LOGOUT',
@@ -41,5 +40,6 @@ module.exports = {
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',
-  ACTION_ERROR: 'SERVER_ACTION_HANDLER_ERROR',
+  // provider
+  REQUEST_PROVIDER_SCAN: 'server/REQUEST_PROVIDER_SCAN',
 }

@@ -1,4 +1,3 @@
-const fs = require('fs')
 const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:cdg')
@@ -9,130 +8,114 @@ const musicmetadata = require('../../lib/thunks/musicmetadata')
 const mp3duration = require('../../lib/thunks/mp3duration')
 const stat = require('../../lib/thunks/stat')
 
+const getPrefs = require('../../lib/getPrefs')
 const getLibrary = require('../../lib/getLibrary')
 const getSongs = require('../../lib/getSongs')
 const addSong = require('../../lib/addSong')
 const parseArtistTitle = require('../../lib/parseArtistTitle')
 
 const {
+  REQUEST_PROVIDER_SCAN,
   LIBRARY_UPDATE,
+  _ERROR,
 } = require('../../api/constants')
 
 const allowedExts = ['.mp3', '.m4a']
-let counts
+let isScanning, counts
 
-async function scan (ctx, cfg) {
-  if (!Array.isArray(cfg.paths) || !cfg.paths.length) {
-    log('No paths configured; aborting scan')
-    return Promise.resolve()
-  }
+const ACTION_HANDLERS = {
+  [REQUEST_PROVIDER_SCAN]: async (ctx, { payload }) => {
+    let cfg
 
-  let validIds = [] // songIds for cleanup
-  counts = { new: 0, ok: 0, skipped: 0 }
-
-  for (const dir of cfg.paths) {
-    let files = []
-
-    // get list of files
-    try {
-      log('searching path: %s', dir)
-      files = await getFiles(dir, file => allowedExts.includes(path.extname(file).toLowerCase()))
-      log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
-    } catch (err) {
-      // try next configured path
-      log(err.message)
-      continue
+    if (payload !== 'cdg') {
+      log(`ignoring scan request for provider: ${payload}`)
+      return
     }
 
-    for (let i = 0; i < files.length; i++) {
-      log('[%s/%s] %s', i + 1, files.length, files[i])
-      let songId, newCount
+    try {
+      cfg = await getPrefs('provider.cdg')
+      if (!typeof cfg === 'object' || !Array.isArray(cfg.paths)) {
+        throw new Error('No paths configured; aborting scan')
+      }
+    } catch (err) {
+      return ctx.acknowledge({
+        type: REQUEST_PROVIDER_SCAN + _ERROR,
+        meta: {
+          error: err.message,
+        }
+      })
+    }
 
+    if (isScanning) {
+      return ctx.acknowledge({
+        type: REQUEST_PROVIDER_SCAN + '_ERROR',
+        meta: {
+          error: `Scan already in progress`
+        }
+      })
+    }
+
+    isScanning = true
+    log('starting scan')
+
+    let validIds = [] // songIds for cleanup
+    counts = { new: 0, ok: 0, skipped: 0 }
+
+    for (const dir of cfg.paths) {
+      let files = []
+
+      // get list of files
       try {
-        songId = await process(files[i])
+        log('searching path: %s', dir)
+        files = await getFiles(dir, file => allowedExts.includes(path.extname(file).toLowerCase()))
+        log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
       } catch (err) {
-        // try next file
+        // try next configured path
         log(err.message)
         continue
       }
 
-      validIds.push(songId)
+      for (let i = 0; i < files.length; i++) {
+        log('[%s/%s] %s', i + 1, files.length, files[i])
+        let songId, newCount
 
-      if (counts.new !== newCount) {
-        newCount = counts.new
-        // emit updated library
-        ctx.io.emit('action', {
-          type: LIBRARY_UPDATE,
-          payload: await getLibrary(),
-        })
+        try {
+          songId = await process(files[i])
+        } catch (err) {
+          // try next file
+          log(err.message)
+          continue
+        }
+
+        validIds.push(songId)
+
+        if (counts.new !== newCount) {
+          newCount = counts.new
+          // emit updated library
+          ctx.io.emit('action', {
+            type: LIBRARY_UPDATE,
+            payload: await getLibrary(),
+          })
+        }
+
+        // emit progress
+        // ctx.io.emit('action', {
+        //   type: PROVIDER_SCAN_STATUS,
+        //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
+        // })
       }
+    } // end for loop
 
-      // emit progress
-      // ctx.io.emit('action', {
-      //   type: PROVIDER_SCAN_STATUS,
-      //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
-      // })
-    }
-  }
+    // // delete songs not in our valid list
+    // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
+    // log('cleanup: removed %s invalid songs', res.stmt.changes)
+    //
 
-  // // delete songs not in our valid list
-  // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
-  // log('cleanup: removed %s invalid songs', res.stmt.changes)
-  //
+    isScanning = false
 
-  return Promise.resolve()
+    return Promise.resolve()
+  },
 }
-
-async function resource (ctx, cfg) {
-  const { type, songId } = ctx.query
-  let file, stats
-
-  if (!type || !songId) {
-    ctx.status = 422
-    ctx.body = "Missing 'type' or 'songId' in url"
-    return
-  }
-
-  // get song from db
-  try {
-    const res = await getSongs({ songId })
-
-    if (!res.result.length) {
-      ctx.status = 404
-      ctx.body = `songId not found: ${songId}`
-      return
-    }
-
-    const row = res.entities[res.result[0]]
-    // should be the audio file path
-    file = JSON.parse(row.providerData).path
-  } catch (err) {
-    log(err.message)
-    return Promise.reject(err)
-  }
-
-  if (type === 'cdg') {
-    const info = path.parse(file)
-    file = file.substr(0, file.length - info.ext.length) + '.cdg'
-  }
-
-  // get file size (and does it exist?)
-  try {
-    stats = await stat(file)
-  } catch (err) {
-    ctx.status = 404
-    ctx.body = `File not found: ${file}`
-    return
-  }
-
-  // stream it!
-  log('Streaming file: %s', file)
-
-  ctx.length = stats.size
-  ctx.body = fs.createReadStream(file)
-}
-
-module.exports = { scan, resource }
 
 async function process (file) {
   const pathInfo = path.parse(file)
@@ -205,7 +188,7 @@ async function process (file) {
     if (typeof song !== 'object') {
       log('couldn\'t parse artist/title from folder: %s', song)
       counts.skipped++
-      return Promise.reject('couldn\'t parse artist/title')
+      return Promise.reject(new Error('couldn\'t parse artist/title'))
     }
   }
 
@@ -252,3 +235,5 @@ async function process (file) {
     return Promise.reject(err)
   }
 }
+
+module.exports = ACTION_HANDLERS

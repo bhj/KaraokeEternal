@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 import {
   SET_PREFS,
   PREFS_UPDATE,
-  PROVIDER_REFRESH_REQUEST,
+  REQUEST_PROVIDER_SCAN,
   TOGGLE_SONG_STARRED,
   LOGIN,
   LOGOUT,
@@ -309,7 +309,7 @@ export function setPrefs (domain, data) {
 // ------------------------------------
 export function providerRefresh (provider) {
   return {
-    type: PROVIDER_REFRESH_REQUEST,
+    type: REQUEST_PROVIDER_SCAN,
     payload: provider,
   }
 }

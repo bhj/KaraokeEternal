@@ -3,25 +3,32 @@ const Library = require('./library')
 const Queue = require('./queue')
 const Player = require('./player')
 const Prefs = require('./prefs')
-const Provider = require('./provider')
+const Providers = require('../../providers')
 
 const {
   SOCKET_AUTH_ERROR,
-  ACTION_ERROR,
+  _ERROR,
 } = require('../constants')
 
-let SOCKET_ACTIONS = Object.assign({},
+// built-in api actions
+let handlers = {
   Library,
   Queue,
   Player,
   Prefs,
-  Provider
-)
+}
+
+// provider actions
+for (let p in Providers) {
+  if (typeof Providers[p].ACTION_HANDLERS === 'object') {
+    handlers[p] = Providers[p].ACTION_HANDLERS
+  }
+}
 
 module.exports = async function (ctx) {
   const action = ctx.data
   const { type } = action
-  const handler = SOCKET_ACTIONS[type]
+  let called = false
 
   if (!ctx.user) {
     return ctx.acknowledge({
@@ -32,21 +39,26 @@ module.exports = async function (ctx) {
     })
   }
 
-  if (!handler) {
-    log('No handler for type: %s', type)
-    return
+  for (let h in handlers) {
+    if (typeof handlers[h][type] === 'function') {
+      called = true
+
+      try {
+        await handlers[h][type](ctx, action)
+      } catch (err) {
+        const error = `Error in ${h}.${type}: ${err.message}`
+
+        return ctx.acknowledge({
+          type: type + _ERROR,
+          meta: {
+            error,
+          }
+        })
+      }
+    }
   }
 
-  try {
-    await handler(ctx, action)
-  } catch (err) {
-    const error = `Error handling ${type}: ${err.message}`
-
-    return ctx.acknowledge({
-      type: ACTION_ERROR,
-      meta: {
-        error,
-      }
-    })
+  if (!called) {
+    log('warning: no handler for action type: %s', type)
   }
 }
