@@ -24,7 +24,8 @@ const allowedExts = ['.mp3', '.m4a']
 let isScanning, counts
 
 const ACTION_HANDLERS = {
-  [REQUEST_PROVIDER_SCAN]: async (ctx, { payload }) => {
+  [REQUEST_PROVIDER_SCAN]: async (ctx, action) => {
+    const { type, payload } = action
     let cfg
 
     if (payload !== 'cdg') {
@@ -32,6 +33,16 @@ const ACTION_HANDLERS = {
       return
     }
 
+    if (isScanning) {
+      return ctx.acknowledge({
+        type: type + _ERROR,
+        meta: {
+          error: `Scan already in progress`
+        }
+      })
+    }
+
+    // get preferences
     try {
       cfg = await getPrefs('provider.cdg')
       if (!typeof cfg === 'object' || !Array.isArray(cfg.paths)) {
@@ -39,18 +50,9 @@ const ACTION_HANDLERS = {
       }
     } catch (err) {
       return ctx.acknowledge({
-        type: REQUEST_PROVIDER_SCAN + _ERROR,
+        type: type + _ERROR,
         meta: {
           error: err.message,
-        }
-      })
-    }
-
-    if (isScanning) {
-      return ctx.acknowledge({
-        type: REQUEST_PROVIDER_SCAN + '_ERROR',
-        meta: {
-          error: `Scan already in progress`
         }
       })
     }
@@ -116,6 +118,8 @@ const ACTION_HANDLERS = {
     return Promise.resolve()
   },
 }
+
+module.exports = ACTION_HANDLERS
 
 async function process (file) {
   const pathInfo = path.parse(file)
@@ -235,5 +239,3 @@ async function process (file) {
     return Promise.reject(err)
   }
 }
-
-module.exports = ACTION_HANDLERS
