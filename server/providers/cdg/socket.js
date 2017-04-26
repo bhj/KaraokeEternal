@@ -8,10 +8,10 @@ const musicmetadata = require('../../lib/thunks/musicmetadata')
 const mp3duration = require('../../lib/thunks/mp3duration')
 const stat = require('../../lib/thunks/stat')
 
-const getPrefs = require('../../lib/getPrefs')
-const getLibrary = require('../../lib/getLibrary')
-const getSongs = require('../../lib/getSongs')
 const addSong = require('../../lib/addSong')
+const getLibrary = require('../../lib/getLibrary')
+const getPrefs = require('../../lib/getPrefs')
+const getSongs = require('../../lib/getSongs')
 const parseArtistTitle = require('../../lib/parseArtistTitle')
 
 const {
