@@ -1,10 +1,13 @@
 const fetch = require('isomorphic-fetch')
 const log = require('debug')('app:provider:youtube')
 const { parse, toSeconds } = require('iso8601-duration')
-const parseArtistTitle = require('../../lib/parseArtistTitle')
+
 const addSong = require('../../lib/addSong')
+const getLibrary = require('../../lib/getLibrary')
 const getPrefs = require('../../lib/getPrefs')
 const getSongs = require('../../lib/getSongs')
+const parseArtistTitle = require('../../lib/parseArtistTitle')
+
 const {
   REQUEST_PROVIDER_SCAN,
   LIBRARY_UPDATE,
@@ -58,17 +61,17 @@ const ACTION_HANDLERS = {
     stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
 
     for (let channel of cfg.channels) {
-      let songs
+      let items
 
       try {
-        songs = await getPlaylistItems(channel, cfg.apiKey)
+        items = await getPlaylistItems(channel, cfg.apiKey)
       } catch (err) {
         log('  => %s', err)
       }
 
-      for (let song of songs) {
+      for (let item of items) {
         try {
-          let songId = await process(song)
+          let songId = await process(item)
           validIds.push(songId)
         } catch (err) {
           log(err.message)
@@ -80,6 +83,14 @@ const ACTION_HANDLERS = {
     isScanning = false
     log(JSON.stringify(stats))
 
+    // emit updated library?
+    if (stats.new) {
+      ctx.io.emit('action', {
+        type: LIBRARY_UPDATE,
+        payload: await getLibrary(),
+      })
+    }
+
     return Promise.resolve()
   },
 }
@@ -87,11 +98,15 @@ const ACTION_HANDLERS = {
 module.exports = ACTION_HANDLERS
 
 async function process (item) {
-  log('processing: %s', JSON.stringify(item))
+  log('processing: %s', JSON.stringify({
+    title: item.snippet.title,
+    videoId: item.id,
+    duration: item.contentDetails.duration,
+  }))
 
   // search for this file in the db
   try {
-    let res = await getSongs({ providerData: { videoId: item.meta.videoId } })
+    let res = await getSongs({ providerData: { videoId: item.id } })
     // @todo: check mtime and title for updates
     if (res.result.length) {
       log('song is in library (same videoId)')
@@ -104,16 +119,25 @@ async function process (item) {
   }
 
   // new song
-  let song = parseArtistTitle(item.title)
+  const { artist, title } = parseArtistTitle(item.snippet.title)
 
-  if (typeof song !== 'object') {
-    log('couldn\'t parse artist/title from video: %s', item.title)
+  if (!artist || !title) {
+    log(' => skipping: couldn\'t parse artist/title from video title')
     stats.skipped++
     return Promise.reject(new Error('couldn\'t parse artist/title'))
   }
 
-  song.provider = 'youtube'
-  song.duration = item.duration
+  const song = {
+    artist,
+    title,
+    provider: 'youtube',
+    duration: toSeconds(parse(item.contentDetails.duration)),
+    providerData: {
+      videoId: item.id,
+      username: item.username,
+      publishedAt: item.snippet.publishedAt,
+    }
+  }
 
   try {
     let songId = await addSong(song)
@@ -168,9 +192,9 @@ async function process (item) {
 async function getPlaylistItems (username, key) {
   let api = getApi(key)
   let playlistId, playlist
-  let songs = []
+  let items = []
 
-  log('Fetching items by username: %s', username)
+  log('Fetching videos by username: %s', username)
 
   // get channel/playlist info for youtube user
   try {
@@ -211,22 +235,18 @@ async function getPlaylistItems (username, key) {
       return Promise.reject(err)
     }
 
-    // build song data
+    // merge snippet and contentDetails data into one
+    // object and add it to our final array of items
     playlist.items.forEach((item, i) => {
-      songs.push({
-        title: item.snippet.title,
-        duration: toSeconds(parse(details.items[i].contentDetails.duration)),
-        meta: {
-          username,
-          videoId: videoIds[i],
-        },
-      })
+      items.push(Object.assign({
+        username,
+      }, playlist.items[i], details.items[i]))
     })
 
-    log('got %s of %s items', songs.length, playlist.pageInfo.totalResults)
+    log('got %s of %s items', items.length, playlist.pageInfo.totalResults)
   } while (playlist.nextPageToken)
 
-  return songs
+  return items
 }
 
 function getApi (key) {
