@@ -66,7 +66,7 @@ class CDGPlayer extends React.Component {
           cdgData={this.cdgData}
         />
         <br />
-        <audio src={'/api/provider/cdg/resource?type=audio&songId=' + this.props.queueItem.songId}
+        <audio src={'/api/provider/cdg/media?type=audio&songId=' + this.props.queueItem.songId}
           preload='none'
           onCanPlayThrough={this.handleOnCanPlayThrough}
           onTimeUpdate={this.handleOnTimeUpdate}
@@ -86,7 +86,7 @@ class CDGPlayer extends React.Component {
     this.audio.load()
 
     // get cdgData
-    const url = '/api/provider/cdg/resource?type=cdg&songId=' + this.props.queueItem.songId
+    const url = '/api/provider/cdg/media?type=cdg&songId=' + this.props.queueItem.songId
 
     // notification
     this.props.getMedia(this.url)

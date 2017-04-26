@@ -7,7 +7,7 @@ const stat = require('../../lib/thunks/stat')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/cdg' })
 
-router.get('/resource', async (ctx, next) => {
+router.get('/media', async (ctx, next) => {
   const { type, songId } = ctx.query
   let file, stats
 
