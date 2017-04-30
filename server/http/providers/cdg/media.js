@@ -8,6 +8,12 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/cdg' })
 
 router.get('/media', async (ctx, next) => {
+  // check jwt validity
+  if (!ctx.user || !ctx.user.isAdmin) {
+    ctx.status = 401
+    return
+  }
+
   const { type, songId } = ctx.query
   let file, stats
 

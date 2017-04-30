@@ -19,6 +19,19 @@ let stats
 let isScanning
 
 router.get('/scan', async (ctx, next) => {
+  // check jwt validity
+  if (!ctx.user || !ctx.user.isAdmin) {
+    ctx.status = 401
+    return
+  }
+
+  if (isScanning) {
+    ctx.status = 409
+    ctx.body = 'Scan already in progress'
+    return
+  }
+
+  // get preferences
   let cfg
 
   try {
@@ -34,12 +47,6 @@ router.get('/scan', async (ctx, next) => {
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message
-    return
-  }
-
-  if (isScanning) {
-    ctx.status = 409
-    ctx.body = 'Scan already in progress'
     return
   }
 

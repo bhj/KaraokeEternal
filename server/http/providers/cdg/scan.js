@@ -22,9 +22,15 @@ const {
 } = require('../../../constants')
 
 const allowedExts = ['.mp3', '.m4a']
-let cfg, isScanning, counts
+let isScanning, counts
 
 router.get('/scan', async (ctx, next) => {
+  // check jwt validity
+  if (!ctx.user || !ctx.user.isAdmin) {
+    ctx.status = 401
+    return
+  }
+
   if (isScanning) {
     ctx.status = 409
     ctx.body = `Scan already in progress`
@@ -32,6 +38,8 @@ router.get('/scan', async (ctx, next) => {
   }
 
   // get preferences
+  let cfg
+
   try {
     cfg = await getPrefs('provider.cdg')
 
