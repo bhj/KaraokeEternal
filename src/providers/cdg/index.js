@@ -1,9 +1,8 @@
-import Player from './Player'
-import Prefs from './Prefs'
+import CDGPlayer from './CDGPlayer/CDGPlayer'
+import CDGPrefs from './CDGPrefs/CDGPrefs'
 
 export default {
-  name: 'cdg',
   title: 'CD+Graphics (audio with .cdg file)',
-  playerComponent: Player,
-  prefComponent: Prefs,
+  playerComponent: CDGPlayer,
+  prefComponent: CDGPrefs,
 }

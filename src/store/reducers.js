@@ -4,6 +4,7 @@ import { createResponsiveStateReducer } from 'redux-responsive'
 // reducers
 import library from 'routes/Library/modules/library'
 import location from './modules/location'
+import prefs from './modules/prefs'
 import queue from 'routes/Queue/modules/queue'
 import room from './modules/room'
 import ui from './modules/ui'
@@ -13,6 +14,7 @@ export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     library,
     location,
+    prefs,
     queue,
     room,
     ui,

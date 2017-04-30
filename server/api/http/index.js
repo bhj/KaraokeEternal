@@ -1,7 +1,10 @@
 const user = require('./user')
+const prefs = require('./prefs')
+
 const Providers = require('../../providers')
 let ROUTE_HANDLERS = {
   user,
+  prefs,
 }
 
 // provider routes

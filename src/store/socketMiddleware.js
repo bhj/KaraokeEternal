@@ -5,7 +5,7 @@ export default function createSocketMiddleware (socket, prefix) {
       const { type } = action
 
       // can ignore player commands if we're not an active player
-      if (type.startsWith('player/') && !store.getState().player) {
+      if (type && type.startsWith('player/') && !store.getState().player) {
         return
       }
 

@@ -1,0 +1,5 @@
+.current {
+  font-weight: bold;
+  padding: 5px;
+  border: 1px solid #ccc;
+}

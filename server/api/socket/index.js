@@ -2,7 +2,6 @@ const log = require('debug')('app:socket')
 const Library = require('./library')
 const Queue = require('./queue')
 const Player = require('./player')
-const Prefs = require('./prefs')
 const Providers = require('../../providers')
 
 const {
@@ -15,7 +14,6 @@ let handlers = {
   Library,
   Queue,
   Player,
-  Prefs,
 }
 
 // provider actions

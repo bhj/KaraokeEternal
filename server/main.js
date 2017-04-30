@@ -22,7 +22,6 @@ const getPrefs = require('./lib/getPrefs')
 const {
   LIBRARY_UPDATE,
   QUEUE_UPDATE,
-  PREFS_UPDATE,
   SOCKET_AUTH_ERROR,
   PLAYER_LEAVE,
 } = require('./api/constants')
@@ -97,12 +96,6 @@ app._io.on('connection', async (sock) => {
   app._io.to(sock.id).emit('action', {
     type: QUEUE_UPDATE,
     payload: await getQueue(user.roomId),
-  })
-
-  // send prefs
-  app._io.to(sock.id).emit('action', {
-    type: PREFS_UPDATE,
-    payload: await getPrefs(),
   })
 })
 

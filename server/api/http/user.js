@@ -327,6 +327,7 @@ async function _login (ctx, creds) {
   // @todo use async version
   const token = jwtSign({
     userId: user.userId,
+    isAdmin: user.isAdmin === true,
     name: user.name,
     roomId: user.roomId,
   }, 'shared-secret')

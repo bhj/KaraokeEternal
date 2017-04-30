@@ -1,8 +1,8 @@
-import Player from './Player'
-import Prefs from './Prefs'
+import YouTubePlayer from './YouTubePlayer/YouTubePlayer'
+import YouTubePrefs from './YouTubePrefs/YouTubePrefs'
 
 export default {
-  name: 'youtube',
-  playerComponent: Player,
-  prefComponent: Prefs,
+  title: 'YouTube channels',
+  playerComponent: YouTubePlayer,
+  prefComponent: YouTubePrefs,
 }

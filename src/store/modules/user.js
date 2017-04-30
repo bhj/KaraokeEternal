@@ -2,9 +2,6 @@ import fetch from 'isomorphic-fetch'
 import { browserHistory } from 'react-router'
 
 import {
-  SET_PREFS,
-  PREFS_UPDATE,
-  REQUEST_PROVIDER_SCAN,
   TOGGLE_SONG_STARRED,
   LOGIN,
   LOGOUT,
@@ -294,26 +291,6 @@ export function toggleSongStarred (songId) {
   }
 }
 
-// ------------------------------------
-// Set prefs
-// ------------------------------------
-export function setPrefs (domain, data) {
-  return {
-    type: SET_PREFS,
-    payload: { domain, data },
-  }
-}
-
-// ------------------------------------
-// Provider re-scan
-// ------------------------------------
-export function providerRefresh (provider) {
-  return {
-    type: REQUEST_PROVIDER_SCAN,
-    payload: provider,
-  }
-}
-
 // helper for fetch response
 function checkStatus (response) {
   if (response.status >= 200 && response.status < 300) {
@@ -356,10 +333,6 @@ const ACTION_HANDLERS = {
   [TOGGLE_SONG_STARRED + _SUCCESS]: (state, { payload }) => ({
     ...state,
     starredSongs: payload,
-  }),
-  [PREFS_UPDATE]: (state, { payload }) => ({
-    ...state,
-    prefs: payload,
   }),
 }
 

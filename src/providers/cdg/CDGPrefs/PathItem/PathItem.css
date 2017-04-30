@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  height: 40px;
+  cursor: pointer;
+  align-items: center;
+  background: #eee;
+}
+
+.path {
+  font-size: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.remove {
+  font-size: 48px;
+}
+
+.folder {
+  font-size: 24px;
+}
