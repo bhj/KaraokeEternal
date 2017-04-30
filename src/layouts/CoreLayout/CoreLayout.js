@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Navigation from 'components/Navigation'
 import { SkyLightStateless } from 'react-skylight'
-import './CoreLayout.scss'
 import 'styles/core.scss'
 import 'styles/material-icons.scss'
 
@@ -12,8 +11,8 @@ export const CoreLayout = (props) => {
     height: props.viewportHeight,
     paddingTop: props.headerHeight,
     paddingBottom: props.footerHeight,
-    overflowY: 'scroll',
-    WebkitOverflowScrolling: 'touch',
+    // overflowY: 'scroll',
+    // WebkitOverflowScrolling: 'touch',
   }
 
   return (

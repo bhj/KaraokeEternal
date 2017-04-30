@@ -1,125 +1,111 @@
 const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:cdg')
+const KoaRouter = require('koa-router')
+const router = KoaRouter({ prefix: '/api/provider/cdg' })
 
-const getFiles = require('../../lib/thunks/getFiles')
-const hashfiles = require('../../lib/thunks/hashfiles')
-const musicmetadata = require('../../lib/thunks/musicmetadata')
-const mp3duration = require('../../lib/thunks/mp3duration')
-const stat = require('../../lib/thunks/stat')
+const getFiles = require('../../../lib/thunks/getFiles')
+const hashfiles = require('../../../lib/thunks/hashfiles')
+const musicmetadata = require('../../../lib/thunks/musicmetadata')
+const mp3duration = require('../../../lib/thunks/mp3duration')
+const stat = require('../../../lib/thunks/stat')
 
-const addSong = require('../../lib/addSong')
-const getLibrary = require('../../lib/getLibrary')
-const getPrefs = require('../../lib/getPrefs')
-const getSongs = require('../../lib/getSongs')
-const parseArtistTitle = require('../../lib/parseArtistTitle')
+const addSong = require('../../../lib/addSong')
+const getLibrary = require('../../../lib/getLibrary')
+const getPrefs = require('../../../lib/getPrefs')
+const getSongs = require('../../../lib/getSongs')
+const parseArtistTitle = require('../../../lib/parseArtistTitle')
 
 const {
-  REQUEST_PROVIDER_SCAN,
   LIBRARY_UPDATE,
   _ERROR,
-} = require('../../api/constants')
+} = require('../../../constants')
 
 const allowedExts = ['.mp3', '.m4a']
-let isScanning, counts
+let cfg, isScanning, counts
 
-const ACTION_HANDLERS = {
-  [REQUEST_PROVIDER_SCAN]: async (ctx, action) => {
-    const { type, payload } = action
-    let cfg
+router.get('/scan', async (ctx, next) => {
+  if (isScanning) {
+    ctx.status = 409
+    ctx.body = `Scan already in progress`
+    return
+  }
 
-    if (payload !== 'cdg') {
-      log(`ignoring scan request for provider: ${payload}`)
-      return
+  // get preferences
+  try {
+    cfg = await getPrefs('provider.cdg')
+
+    if (!cfg || !Array.isArray(cfg.paths) || !cfg.paths.length) {
+      throw new Error('No paths configured; skipping scan')
     }
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = err.message
+    return
+  }
 
-    if (isScanning) {
-      return ctx.acknowledge({
-        type: type + _ERROR,
-        meta: {
-          error: `Scan already in progress`
-        }
-      })
-    }
+  isScanning = true
+  log('started scan')
 
-    // get preferences
+  let validIds = [] // songIds for cleanup
+  counts = { new: 0, ok: 0, skipped: 0 }
+
+  for (const dir of cfg.paths) {
+    let files = []
+
+    // get list of files
     try {
-      cfg = await getPrefs('provider.cdg')
-      if (!typeof cfg === 'object' || !Array.isArray(cfg.paths)) {
-        throw new Error('No paths configured; aborting scan')
-      }
+      log('searching path: %s', dir)
+      files = await getFiles(dir, file => allowedExts.includes(path.extname(file).toLowerCase()))
+      log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
     } catch (err) {
-      return ctx.acknowledge({
-        type: type + _ERROR,
-        meta: {
-          error: err.message,
-        }
-      })
+      // try next configured path
+      log(err.message)
+      continue
     }
 
-    isScanning = true
-    log('starting scan')
+    for (let i = 0; i < files.length; i++) {
+      log('[%s/%s] %s', i + 1, files.length, files[i])
+      let songId, newCount
 
-    let validIds = [] // songIds for cleanup
-    counts = { new: 0, ok: 0, skipped: 0 }
-
-    for (const dir of cfg.paths) {
-      let files = []
-
-      // get list of files
       try {
-        log('searching path: %s', dir)
-        files = await getFiles(dir, file => allowedExts.includes(path.extname(file).toLowerCase()))
-        log('found %s files with valid extensions (%s)', files.length, allowedExts.join(','))
+        songId = await process(files[i])
       } catch (err) {
-        // try next configured path
+        // try next file
         log(err.message)
         continue
       }
 
-      for (let i = 0; i < files.length; i++) {
-        log('[%s/%s] %s', i + 1, files.length, files[i])
-        let songId, newCount
+      validIds.push(songId)
 
-        try {
-          songId = await process(files[i])
-        } catch (err) {
-          // try next file
-          log(err.message)
-          continue
-        }
-
-        validIds.push(songId)
-
-        if (counts.new !== newCount) {
-          newCount = counts.new
-          // emit updated library
-          ctx.io.emit('action', {
-            type: LIBRARY_UPDATE,
-            payload: await getLibrary(),
-          })
-        }
-
-        // emit progress
-        // ctx.io.emit('action', {
-        //   type: PROVIDER_SCAN_STATUS,
-        //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
+      if (counts.new !== newCount) {
+        newCount = counts.new
+        // emit updated library
+        // ctx.socket.emit('action', {
+        //   type: LIBRARY_UPDATE,
+        //   payload: await getLibrary(),
         // })
       }
-    } // end for loop
 
-    // // delete songs not in our valid list
-    // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
-    // log('cleanup: removed %s invalid songs', res.stmt.changes)
-    //
+      // emit progress
+      // ctx.io.emit('action', {
+      //   type: PROVIDER_SCAN_STATUS,
+      //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
+      // })
+    }
+  } // end for loop
 
-    isScanning = false
+  // // delete songs not in our valid list
+  // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
+  // log('cleanup: removed %s invalid songs', res.stmt.changes)
+  //
+  ctx.status = 200
+  isScanning = false
+  log('finished scan')
+  return Promise.resolve()
+})
 
-    return Promise.resolve()
-  },
-}
-
-module.exports = ACTION_HANDLERS
+module.exports = router
 
 async function process (file) {
   const pathInfo = path.parse(file)

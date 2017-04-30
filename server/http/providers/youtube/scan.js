@@ -1,101 +1,91 @@
 const fetch = require('isomorphic-fetch')
 const log = require('debug')('app:provider:youtube')
+const KoaRouter = require('koa-router')
+const router = KoaRouter({ prefix: '/api/provider/youtube' })
 const { parse, toSeconds } = require('iso8601-duration')
 
-const addSong = require('../../lib/addSong')
-const getLibrary = require('../../lib/getLibrary')
-const getPrefs = require('../../lib/getPrefs')
-const getSongs = require('../../lib/getSongs')
-const parseArtistTitle = require('../../lib/parseArtistTitle')
+const addSong = require('../../../lib/addSong')
+const getLibrary = require('../../../lib/getLibrary')
+const getPrefs = require('../../../lib/getPrefs')
+const getSongs = require('../../../lib/getSongs')
+const parseArtistTitle = require('../../../lib/parseArtistTitle')
 
 const {
-  REQUEST_PROVIDER_SCAN,
   LIBRARY_UPDATE,
   _ERROR,
-} = require('../../api/constants')
+} = require('../../../constants')
 
 let stats
 let isScanning
 
-const ACTION_HANDLERS = {
-  [REQUEST_PROVIDER_SCAN]: async (ctx, { payload }) => {
-    let cfg
+router.get('/scan', async (ctx, next) => {
+  let cfg
 
-    if (payload !== 'youtube') {
-      log(`ignoring scan request for provider: ${payload}`)
-      return
+  try {
+    cfg = await getPrefs('provider.youtube')
+
+    if (!cfg || !Array.isArray(cfg.channels) || !cfg.channels.length) {
+      throw new Error('No channels configured; skipping scan')
     }
+
+    if (typeof cfg.apiKey === 'undefined') {
+      throw new Error('no API key configured; skipping scan')
+    }
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = err.message
+    return
+  }
+
+  if (isScanning) {
+    ctx.status = 409
+    ctx.body = 'Scan already in progress'
+    return
+  }
+
+  isScanning = true
+  log('started scan')
+
+  let validIds = [] // songIds for cleanup
+  stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
+
+  for (let channel of cfg.channels) {
+    let items
 
     try {
-      cfg = await getPrefs('provider.youtube')
-
-      if (!typeof cfg === 'object' || !Array.isArray(cfg.channels)) {
-        throw new Error('No channels configured; skipping scan')
-      }
-
-      if (typeof cfg.apiKey === 'undefined') {
-        throw new Error('no API key configured; skipping scan')
-      }
+      items = await getPlaylistItems(channel, cfg.apiKey)
     } catch (err) {
-      return ctx.acknowledge({
-        type: REQUEST_PROVIDER_SCAN + _ERROR,
-        meta: {
-          error: err.message,
-        }
-      })
+      log('  => %s', err)
     }
 
-    if (isScanning) {
-      return ctx.acknowledge({
-        type: REQUEST_PROVIDER_SCAN + '_ERROR',
-        meta: {
-          error: `Scan already in progress`
-        }
-      })
-    }
-
-    isScanning = true
-    log('starting scan')
-
-    let validIds = [] // songIds for cleanup
-    stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
-
-    for (let channel of cfg.channels) {
-      let items
-
+    for (let item of items) {
       try {
-        items = await getPlaylistItems(channel, cfg.apiKey)
+        let songId = await process(item)
+        validIds.push(songId)
       } catch (err) {
-        log('  => %s', err)
-      }
-
-      for (let item of items) {
-        try {
-          let songId = await process(item)
-          validIds.push(songId)
-        } catch (err) {
-          log(err.message)
-        }
+        log(err.message)
       }
     }
+  }
 
-    // @todo: song cleanup
-    isScanning = false
-    log(JSON.stringify(stats))
+  // @todo: song cleanup
+  ctx.status = 200
+  isScanning = false
+  log('finished scan')
+  log(JSON.stringify(stats))
 
-    // emit updated library?
-    if (stats.new) {
-      ctx.io.emit('action', {
-        type: LIBRARY_UPDATE,
-        payload: await getLibrary(),
-      })
-    }
+  // emit updated library?
+  // if (stats.new) {
+  //   ctx.io.emit('action', {
+  //     type: LIBRARY_UPDATE,
+  //     payload: await getLibrary(),
+  //   })
+  // }
 
-    return Promise.resolve()
-  },
-}
+  return Promise.resolve()
+})
 
-module.exports = ACTION_HANDLERS
+module.exports = router
 
 async function process (item) {
   log('processing: %s', JSON.stringify({

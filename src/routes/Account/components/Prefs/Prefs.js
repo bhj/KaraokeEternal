@@ -6,6 +6,7 @@ export default class Prefs extends React.Component {
   static propTypes = {
     prefs: PropTypes.object.isRequired,
     setPrefs: PropTypes.func.isRequired,
+    requestScan: PropTypes.func.isRequired,
     isAdmin: PropTypes.bool.isRequired,
   }
 
@@ -25,6 +26,7 @@ export default class Prefs extends React.Component {
                 prefs={prefs.provider[p]}
                 isAdmin={isAdmin}
                 setPrefs={this.props.setPrefs}
+                requestScan={this.props.requestScan}
               />
             )
           }

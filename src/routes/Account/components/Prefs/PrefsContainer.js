@@ -1,10 +1,10 @@
 import { connect } from 'react-redux'
 import Prefs from './Prefs'
-import { setPrefs, providerRefresh } from 'store/modules/prefs'
+import { setPrefs, requestScan } from 'store/modules/prefs'
 
 const mapActionCreators = {
   setPrefs,
-  providerRefresh,
+  requestScan,
 }
 
 const mapStateToProps = (state) => ({

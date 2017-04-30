@@ -14,8 +14,8 @@ const KoaSocket = require('koa-socket')
 const koaLogger = require('koa-logger')
 const jwtVerify = require('jsonwebtoken').verify
 
-const httpRoutes = require('./api/http')
-const socketActions = require('./api/socket')
+const httpRoutes = require('./http')
+const socketActions = require('./socket')
 const getLibrary = require('./lib/getLibrary')
 const getQueue = require('./lib/getQueue')
 const getPrefs = require('./lib/getPrefs')
@@ -24,7 +24,7 @@ const {
   QUEUE_UPDATE,
   SOCKET_AUTH_ERROR,
   PLAYER_LEAVE,
-} = require('./api/constants')
+} = require('./constants')
 
 const app = new Koa()
 const io = new KoaSocket()

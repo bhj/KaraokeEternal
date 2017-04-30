@@ -4,7 +4,7 @@ const debug = require('debug')
 const log = debug('app:prefs')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
-const getPrefs = require('../../lib/getPrefs')
+const getPrefs = require('../lib/getPrefs')
 
 router.post('/prefs', async (ctx, next) => {
   // must be admin

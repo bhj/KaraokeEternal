@@ -40,7 +40,7 @@ module.exports = {
   _ERROR: '_ERROR',
   // provider
   // @todo: move these to respective provider folder
-  REQUEST_PROVIDER_SCAN: 'server/REQUEST_PROVIDER_SCAN',
+  REQUEST_SCAN: 'provider/REQUEST_SCAN',
   // prefs
   PREFS_REQUEST: 'prefs/PREFS_REQUEST',
   PREFS_SET: 'prefs/PREFS_SET',

@@ -2,7 +2,6 @@ const log = require('debug')('app:socket')
 const Library = require('./library')
 const Queue = require('./queue')
 const Player = require('./player')
-const Providers = require('../../providers')
 
 const {
   SOCKET_AUTH_ERROR,
@@ -14,13 +13,6 @@ let handlers = {
   Library,
   Queue,
   Player,
-}
-
-// provider actions
-for (let p in Providers) {
-  if (typeof Providers[p].ACTION_HANDLERS === 'object') {
-    handlers[p] = Providers[p].ACTION_HANDLERS
-  }
 }
 
 module.exports = async function (ctx) {

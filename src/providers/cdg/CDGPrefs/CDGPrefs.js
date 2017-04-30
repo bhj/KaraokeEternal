@@ -7,7 +7,7 @@ export default class CDGPrefs extends React.Component {
   static propTypes = {
     prefs: PropTypes.object.isRequired,
     setPrefs: PropTypes.func.isRequired,
-    providerRefresh: PropTypes.func.isRequired,
+    requestScan: PropTypes.func.isRequired,
   }
 
   state = {
@@ -44,7 +44,7 @@ export default class CDGPrefs extends React.Component {
   }
 
   handleRefresh = () => {
-    this.props.providerRefresh('cdg')
+    this.props.requestScan('cdg')
   }
 
   handleOpenChooser = () => { this.setState({ isChoosing: true }) }

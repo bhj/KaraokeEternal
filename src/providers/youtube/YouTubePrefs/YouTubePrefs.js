@@ -5,7 +5,7 @@ export default class YouTubePrefs extends React.Component {
   static propTypes = {
     prefs: PropTypes.object.isRequired,
     setPrefs: PropTypes.func.isRequired,
-    providerRefresh: PropTypes.func.isRequired,
+    requestScan: PropTypes.func.isRequired,
   }
 
   updateEnabled = (e) => {
@@ -13,7 +13,7 @@ export default class YouTubePrefs extends React.Component {
   }
 
   handleRefresh = () => {
-    this.props.providerRefresh('youtube')
+    this.props.requestScan('youtube')
   }
 
   render () {

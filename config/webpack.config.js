@@ -19,7 +19,7 @@ const webpackConfig = {
     root       : project.paths.client(),
     extensions : ['', '.js', '.jsx', '.json'],
     alias      : {
-      'constants': project.paths.server('api/constants'),
+      'constants': project.paths.server('./constants'),
     }
   },
   module : {}

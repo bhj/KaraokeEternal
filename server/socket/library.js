@@ -1,7 +1,7 @@
 const db = require('sqlite')
 const squel = require('squel')
-const getSongs = require('../../lib/getSongs')
-const getLibrary = require('../../lib/getLibrary')
+const getSongs = require('../lib/getSongs')
+const getLibrary = require('../lib/getLibrary')
 
 const {
   SONG_UPDATE,

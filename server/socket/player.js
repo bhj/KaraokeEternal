@@ -1,5 +1,5 @@
 const log = require('debug')('app:socket:player')
-const getQueue = require('../../lib/getQueue')
+const getQueue = require('../lib/getQueue')
 
 const {
   REQUEST_PLAYER_NEXT,

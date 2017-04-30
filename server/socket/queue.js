@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const getQueue = require('../../lib/getQueue')
+const getQueue = require('../lib/getQueue')
 const log = require('debug')('app:socket:queue')
 
 const {
