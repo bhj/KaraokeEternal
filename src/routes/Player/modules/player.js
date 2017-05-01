@@ -82,16 +82,17 @@ const ACTION_HANDLERS = {
   [PLAYER_PAUSE]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
-    lastTimestamp: Date.now(),
+    lastCommandAt: Date.now(),
   }),
   [PLAYER_PLAY]: (state, { payload }) => ({
     ...state,
     isPlaying: true,
-    lastTimestamp: Date.now(),
+    lastCommandAt: Date.now(),
   }),
   [PLAYER_VOLUME]: (state, { payload }) => ({
     ...state,
     volume: payload,
+    lastCommandAt: Date.now(),
   }),
   [PLAYER_NEXT]: (state, { payload }) => {
     const curIdx = payload.result.indexOf(state.queueId)
@@ -139,7 +140,7 @@ const initialState = {
   isPlaying: false,
   isFetching: false,
   isAtQueueEnd: false,
-  lastTimestamp: null,
+  lastCommandAt: null,
 }
 
 export default function playerReducer (state = initialState, action) {

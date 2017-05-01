@@ -31,9 +31,8 @@ const mapStateToProps = (state) => {
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
     isErrored: typeof state.room.errors[state.room.queueId] !== 'undefined',
-    // this is passed through to trigger a component update (and
-    // therefore a status emission) for client -> player commands
-    lastTimestamp: player.lastTimestamp,
+    // timestamp pass-through triggers status emission for each received command
+    lastCommandAt: player.lastCommandAt,
   }
 }
 
