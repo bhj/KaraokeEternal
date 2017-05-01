@@ -18,7 +18,6 @@ const httpRoutes = require('./http')
 const socketActions = require('./socket')
 const getLibrary = require('./lib/getLibrary')
 const getQueue = require('./lib/getQueue')
-const getPrefs = require('./lib/getPrefs')
 const {
   LIBRARY_UPDATE,
   QUEUE_UPDATE,
