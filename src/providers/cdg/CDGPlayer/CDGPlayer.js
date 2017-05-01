@@ -32,19 +32,14 @@ class CDGPlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, isPlaying, volume } = this.props
+    const { queueItem, volume } = this.props
 
     if (prevProps.queueItem.queueId !== queueItem.queueId) {
       this.updateSources()
     }
 
-    if (prevProps.isPlaying !== isPlaying) {
-      this.updateIsPlaying()
-    }
-
-    if (prevProps.volume !== volume) {
-      this.setVolume(volume)
-    }
+    this.updateIsPlaying()
+    this.setVolume(volume)
   }
 
   render () {
@@ -133,7 +128,6 @@ class CDGPlayer extends React.Component {
     })
 
     this.props.onStatus({
-      isPlaying: !this.audio.paused,
       position: this.audio.currentTime,
       volume: this.audio.volume,
     })
