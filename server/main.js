@@ -32,8 +32,9 @@ app.use(koaLogger())
 app.use(koaRange)
 app.use(koaBodyparser())
 
-// make JWT data available on koa context
+// all http (koa) requests
 app.use(async (ctx, next) => {
+  // make JWT data available on ctx
   const { id_token } = parseCookie(ctx.request.header.cookie)
 
   try {
@@ -42,15 +43,18 @@ app.use(async (ctx, next) => {
     ctx.user = null
   }
 
+  // make socket.io server (not koa-socket) available on ctx
+  ctx._io = app._io
+
   await next()
 })
 
-// koa-router (http) api endpoints
+// http api (koa-router) endpoints
 for (let route in httpRoutes) {
   app.use(httpRoutes[route].routes())
 }
 
-// make koa-socket available as app.io
+// makes koa-socket available as app.io
 // and the "real" socket.io instance as app._io
 io.attach(app)
 
@@ -99,12 +103,14 @@ app._io.on('connection', async (sock) => {
 })
 
 // koa-socket middleware
-// makes user, db and socket.io instance available
+// makes user and socket.io instance available
 // to downstream middleware and event listeners
 // note: ctx is not the same ctx as koa middleware
 io.use(async (ctx, next) => {
-  ctx.user = ctx.socket.socket.decoded_token || null
-  ctx.io = app._io
+  // koa-socket puts socket instances behind
+  // cleverly named 'socket' property...
+  ctx.sock = ctx.socket.socket
+  ctx.user = ctx.sock.decoded_token || null
 
   await next()
 })

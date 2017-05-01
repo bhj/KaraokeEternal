@@ -1,7 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
 const getSongs = require('../lib/getSongs')
-const getLibrary = require('../lib/getLibrary')
 
 const {
   SONG_UPDATE,
@@ -67,7 +66,7 @@ const ACTION_HANDLERS = {
         throw new Error(res.result.length + ' results (expected 1)')
       }
 
-      ctx.io.to(ctx.user.roomId).emit('action', {
+      ctx.sock.server.to(ctx.user.roomId).emit('action', {
         type: SONG_UPDATE,
         payload: res.entities[res.result[0]],
       })

@@ -69,7 +69,7 @@ const ACTION_HANDLERS = {
     }
 
     // to all in room
-    ctx.io.to(ctx.user.roomId).emit('action', {
+    ctx.sock.server.to(ctx.user.roomId).emit('action', {
       type: QUEUE_UPDATE,
       payload: await getQueue(ctx.user.roomId)
     })
@@ -183,7 +183,7 @@ const ACTION_HANDLERS = {
     }
 
     // tell room
-    ctx.io.to(ctx.user.roomId).emit('action', {
+    ctx.sock.server.to(ctx.user.roomId).emit('action', {
       type: QUEUE_UPDATE,
       payload: await getQueue(ctx.user.roomId)
     })

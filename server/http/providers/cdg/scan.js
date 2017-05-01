@@ -89,14 +89,14 @@ router.get('/scan', async (ctx, next) => {
       if (counts.new !== newCount) {
         newCount = counts.new
         // emit updated library
-        // ctx.socket.emit('action', {
-        //   type: LIBRARY_UPDATE,
-        //   payload: await getLibrary(),
-        // })
+        ctx._io.emit('action', {
+          type: LIBRARY_UPDATE,
+          payload: await getLibrary(),
+        })
       }
 
       // emit progress
-      // ctx.io.emit('action', {
+      // ctx._io.emit('action', {
       //   type: PROVIDER_SCAN_STATUS,
       //   payload: {provider: 'cdg', pct: (files.length/i) * 100},
       // })

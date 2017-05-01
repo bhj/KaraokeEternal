@@ -82,12 +82,12 @@ router.get('/scan', async (ctx, next) => {
   log(JSON.stringify(stats))
 
   // emit updated library?
-  // if (stats.new) {
-  //   ctx.io.emit('action', {
-  //     type: LIBRARY_UPDATE,
-  //     payload: await getLibrary(),
-  //   })
-  // }
+  if (stats.new) {
+    ctx._io.emit('action', {
+      type: LIBRARY_UPDATE,
+      payload: await getLibrary(),
+    })
+  }
 
   return Promise.resolve()
 })
