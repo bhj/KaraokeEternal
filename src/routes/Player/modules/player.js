@@ -36,9 +36,10 @@ export function emitStatus (status) {
     dispatch({
       type: EMIT_PLAYER_STATUS,
       payload: {
-        ...status,
         queueId: player.queueId,
+        isPlaying: player.isPlaying,
         isAtQueueEnd: player.isAtQueueEnd,
+        ...status,
       },
       meta: {
         throttle: {
