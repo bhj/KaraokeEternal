@@ -285,18 +285,17 @@ webpackConfig.module.rules.push(
 // need to use the extractTextPlugin to fix this issue:
 // http://stackoverflow.com/questions/34133808/webpack-ots-parsing-error-loading-fonts/34133809#34133809
 if (!__DEV__) {
-  debug('Applying ExtractTextPlugin to CSS loaders.')
-  webpackConfig.module.rules.filter(rule =>
-    rule.loader && /css/.test(rule.loader)
-  ).forEach(loader => {
-    const first = rule.loader
-    const rest = rule.loader.slice(1)
+  debug('Apply ExtractTextPlugin to CSS loaders.')
 
-    rule.loader = ExtractTextPlugin.extract({
+  webpackConfig.module.rules.filter(rule =>
+    rule.use && rule.use.some(loader => /css/.test(loader.loader))
+  ).forEach(rule => {
+    const [first, ...rest] = rule.use
+
+    rule.use = ExtractTextPlugin.extract({
       fallback: first,
       use: rest.join('!')
     })
-    delete rule.loader
   })
 
   webpackConfig.plugins.push(
