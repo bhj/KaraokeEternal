@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import CDGCanvas from './CDGCanvas'
-import classes from './CDGPlayer.css'
 
 class CDGPlayer extends React.Component {
   static propTypes = {
@@ -52,7 +51,7 @@ class CDGPlayer extends React.Component {
     }
 
     return (
-      <div style={{ width, height }} className={classes.background}>
+      <div style={{ width, height, backgroundColor: 'black' }} >
         <CDGCanvas
           width={canvasScale * 300}
           height={canvasScale * 300 * 0.72}

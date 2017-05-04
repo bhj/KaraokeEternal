@@ -3,7 +3,7 @@ import React from 'react'
 import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
-import classes from './SearchResults.css'
+import './SearchResults.css'
 const ROW_HEIGHT = 40
 
 class SearchResults extends React.Component {
@@ -53,7 +53,7 @@ class SearchResults extends React.Component {
     // # artist results heading
     if (index === 0) {
       return (
-        <div key={key} style={style} className={classes.artistsHeading}>
+        <div key={key} style={style} styleName='artistsHeading'>
           {artistResults.length} artists
         </div>
       )
@@ -84,7 +84,7 @@ class SearchResults extends React.Component {
     // # song results heading
     if (index === artistResults.length + 1) {
       return (
-        <div key={key} style={style} className={classes.songsHeading}>
+        <div key={key} style={style} styleName='songsHeading'>
           {songResults.length} songs
         </div>
       )

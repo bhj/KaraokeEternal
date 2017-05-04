@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 /* eslint react/no-unused-prop-types: 0 */
 import React from 'react'
 import SongItem from '../SongItem'
-import classes from './ArtistItem.css'
+import './ArtistItem.css'
 
 const ArtistItem = (props) => {
   let children = []
@@ -29,17 +29,17 @@ const ArtistItem = (props) => {
 
   return (
     <div style={props.style}>
-      <div onClick={props.onArtistClick} className={classes.container + (isChildQueued ? ' ' + classes.hasQueued : '')}>
-        <div className={classes.folder}>
-          <i className={'material-icons ' + classes.icon}>folder</i>
+      <div onClick={props.onArtistClick} styleName={'container' + (isChildQueued ? ' hasQueued' : '')}>
+        <div styleName='folder'>
+          <i className='material-icons' styleName='icon'>folder</i>
           {props.isExpanded &&
-            <div className={classes.arrowDown}><i className='material-icons'>keyboard_arrow_down</i></div>
+            <div styleName='arrowDown'><i className='material-icons'>keyboard_arrow_down</i></div>
           }
           {!props.isExpanded &&
-            <div className={classes.count}>{props.songIds.length}</div>
+            <div styleName='count'>{props.songIds.length}</div>
           }
         </div>
-        <div className={classes.name}>{props.name}</div>
+        <div styleName='name'>{props.name}</div>
       </div>
       {children}
     </div>

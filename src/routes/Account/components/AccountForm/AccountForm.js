@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import classes from './AccountForm.css'
 import Login from '../Login'
 
 export default class AccountForm extends Component {
@@ -32,7 +31,7 @@ export default class AccountForm extends Component {
     const view = this.props.user.userId !== null ? 'edit' : this.state.view
 
     return (
-      <div className={classes.section}>
+      <div>
         {view === 'login' &&
           <div>
             <p>Sign in below or <a onClick={this.viewCreate}>create a new account</a>.</p>

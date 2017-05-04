@@ -27,6 +27,10 @@
 .wait {
 }
 
+.user {
+  font-weight: bold;
+}
+
 /* Actions */
 .button {
   font-size: 48px;

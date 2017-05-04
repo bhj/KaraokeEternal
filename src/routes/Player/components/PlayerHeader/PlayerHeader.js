@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Header from 'components/Header'
-import classes from './PlayerHeader.css'
+import './PlayerHeader.css'
 
 const PlayerHeader = (props) => (
   <Header>
-    <div className={classes.container}>
-      <div onClick={props.requestFullscreen} className={classes.fullscreen}>
+    <div styleName='container'>
+      <div onClick={props.requestFullscreen}>
         <i className='material-icons'>fullscreen</i>
       </div>
     </div>

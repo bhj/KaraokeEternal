@@ -1,31 +1,31 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import classes from './QueueItem.css'
+import './QueueItem.css'
 
 export const QueueItem = (props) => (
-  <div className={classes.container} style={{ ...props.style, backgroundSize: props.pctPlayed + '% 100%' }}>
-    <div className={classes.wait}>
+  <div styleName='container' style={{ ...props.style, backgroundSize: props.pctPlayed + '% 100%' }}>
+    <div styleName='wait'>
       {props.isActive && 'now'}
       {props.isUpcoming && secToTime(props.wait)}
     </div>
 
-    <div className={classes.primary}>
-      <div className={classes.user}>{props.name}</div>
-      <div className={classes.title}>{props.artist} - {props.title}</div>
+    <div styleName='primary'>
+      <div styleName='user'>{props.name}</div>
+      <div styleName='title'>{props.artist} - {props.title}</div>
     </div>
 
     {props.hasErrors &&
-      <div onClick={props.onErrorInfoClick} className={classes.errorInfo}>
+      <div onClick={props.onErrorInfoClick} styleName='errorInfo'>
         <i className='material-icons'>info_outline</i>
       </div>
     }
     {props.canSkip &&
-      <div onClick={props.onSkipClick} className={classes.skip}>
+      <div onClick={props.onSkipClick} styleName='skip'>
         <i className='material-icons'>skip_next</i>
       </div>
     }
     {props.canRemove &&
-      <div onClick={props.onRemoveClick} className={classes.remove}>
+      <div onClick={props.onRemoveClick} styleName='remove'>
         <i className='material-icons'>clear</i>
       </div>
     }

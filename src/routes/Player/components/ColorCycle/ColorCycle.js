@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import chroma from 'chroma-js'
-import classes from './ColorCycle.css'
+import './ColorCycle.css'
 
 const colorNames = ['red', 'purple', 'blue', 'green', 'yellow', 'orange', 'red']
 const cycleSpeed = 50 // ms
@@ -33,7 +33,7 @@ class ColorCycle extends React.Component {
     })
 
     return (
-      <div className={classes.text}>
+      <div styleName='text'>
         {text}
       </div>
     )

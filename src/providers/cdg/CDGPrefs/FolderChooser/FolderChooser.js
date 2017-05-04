@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import PathItem from '../PathItem'
 import { SkyLightStateless } from 'react-skylight'
-import classes from './FolderChooser.css'
+import './FolderChooser.css'
 
 export default class FolderChooser extends React.Component {
   static propTypes = {
@@ -54,7 +54,7 @@ export default class FolderChooser extends React.Component {
         }}
       >
         <div style={{ height: '90%', display: 'flex', flexDirection: 'column' }}>
-          <div className={classes.current}>
+          <div styleName='current'>
             {this.state.current}
           </div>
 

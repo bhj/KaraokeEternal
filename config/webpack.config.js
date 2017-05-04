@@ -1,6 +1,5 @@
 const argv = require('yargs').argv
 const webpack = require('webpack')
-const cssnano = require('cssnano')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const project = require('./project.config')
@@ -122,6 +121,7 @@ if (!__TEST__) {
 // ------------------------------------
 // Loaders
 // ------------------------------------
+
 // JavaScript
 webpackConfig.module.rules = [{
   test    : /\.(js|jsx)$/,
@@ -134,91 +134,44 @@ webpackConfig.module.rules = [{
   ],
 }]
 
-// ------------------------------------
-// Style Loaders
-// ------------------------------------
-// We use cssnano with the postcss loader, so we tell
-// css-loader not to duplicate minimization.
+// Global Style
 webpackConfig.module.rules.push({
-  test : /\.scss$/,
-  use  : [
-    {
-      loader: 'style-loader'
-    },
-    {
-      loader      : 'css-loader',
-      options     : {
-        sourceMap : true,
-        minimize  : true,
-      }
-    },
-    {
-      loader : 'postcss-loader'
-    },
-    {
-      loader  : 'sass-loader',
-      options : {
-        sourceMap : true,
-        includePaths: [...project.paths.client('styles'), './node_modules'],
-      }
+  test : /(globalStyle)\.css$/,
+  use  : [{
+    loader : 'style-loader'
+  }, {
+    loader  : 'css-loader',
+    options : {
+      modules   : false,
+      sourceMap : false,
+      minimize  : false
     }
-  ]
+  }],
 })
+
+// CSS Modules
 webpackConfig.module.rules.push({
   test : /\.css$/,
-  use  : [
-    {
-      loader : 'style-loader'
-    },
-    {
-      loader  : 'css-loader',
-      options : {
-        modules   : true,
-        sourceMap : true,
-        minimize  : true
-      }
-    },
-    {
-      loader : 'postcss-loader'
+  exclude : /(globalStyle)\.css$/,
+  use  : [{
+    loader : 'style-loader'
+  }, {
+    loader  : 'css-loader',
+    options : {
+      modules   : true,
+      localIdentName: '[name]__[local]___[hash:base64:5]',
     }
-  ]
+  }],
 })
 
-webpackConfig.plugins.push(
-  new webpack.LoaderOptionsPlugin({
-    options : {
-      postcss : [
-        cssnano({
-          autoprefixer : {
-            add      : true,
-            remove   : true,
-            browsers : ['last 2 versions']
-          },
-          discardComments: {
-            removeAll : true
-          },
-          discardUnused : false,
-          mergeIdents   : false,
-          reduceIdents  : false,
-          safe          : true,
-          sourcemap     : true
-        })
-      ],
-      sassLoader : {
-        includePaths : project.paths.client('styles')
-      }
-    }
-  })
-)
-
-// File loaders
+// Files
 /* eslint-disable */
 webpackConfig.module.rules.push(
   {
     test    : /\.woff(\?.*)?$/,
     loader  : 'url-loader',
     options : {
-      prefix : 'fonts/',
+      prefix   : 'fonts/',
       name     : 'fonts/[name].[ext]',
       limit    : '10000',
       mimetype : 'application/font-woff'
@@ -232,34 +185,6 @@ webpackConfig.module.rules.push(
       name     : 'fonts/[name].[ext]',
       limit    : '10000',
       mimetype : 'application/font-woff2'
-    }
-  },
-  {
-    test    : /\.otf(\?.*)?$/,
-    loader  : 'file-loader',
-    options : {
-      prefix   : 'fonts/',
-      name     : 'fonts/[name].[ext]',
-      limit    : '10000',
-      mimetype : 'font/opentype'
-    }
-  },
-  {
-    test    : /\.ttf(\?.*)?$/,
-    loader  : 'url-loader',
-    options : {
-      prefix   : 'fonts/',
-      name     : 'fonts/[name].[ext]',
-      limit    : '10000',
-      mimetype : 'application/octet-stream'
-    }
-  },
-  {
-    test    : /\.eot(\?.*)?$/,
-    loader  : 'file-loader',
-    options : {
-      prefix : 'fonts/',
-      name   : 'fonts/[name].[ext]'
     }
   },
   {

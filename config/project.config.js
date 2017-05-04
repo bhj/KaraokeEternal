@@ -36,9 +36,16 @@ const config = {
   // Compiler Configuration
   // ----------------------------------
   compiler_babel : {
-    cacheDirectory : true,
-    plugins        : ['transform-runtime'],
-    presets        : [['es2015', { modules: false }], 'react', 'stage-0']
+    cacheDirectory : false,
+    plugins: [
+      'transform-runtime',
+      'transform-react-jsx',
+      ['react-css-modules', {
+        webpackHotModuleReloading: true,
+        'generateScopedName' : '[name]__[local]___[hash:base64:5]',
+      }]
+    ],
+    presets: [['es2015', { modules: false }], 'react', 'stage-0']
   },
   compiler_devtool         : 'source-map',
   compiler_hash_type       : 'hash',

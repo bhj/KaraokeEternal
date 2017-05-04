@@ -1,20 +1,20 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import classes from './SongItem.css'
+import './SongItem.css'
 
 export const SongItem = (props) => (
-  <div style={props.style} className={classes.container + (props.isQueued ? ' ' + classes.isQueued : '')}>
-    <div className={classes.duration}>
+  <div style={props.style} styleName={'container' + (props.isQueued ? ' isQueued' : '')}>
+    <div styleName='duration'>
       {toMMSS(props.duration)}
     </div>
 
-    <div onClick={props.onSongClick} className={classes.title}>
+    <div onClick={props.onSongClick} styleName='title'>
       {props.title}
     </div>
 
-    <div onClick={props.onSongStarClick} className={props.isStarred ? classes.starStarred : classes.star}>
+    <div onClick={props.onSongStarClick} styleName={props.isStarred ? 'starStarred' : 'star'}>
       <i className='material-icons' style={{ position: 'absolute' }}>{props.isStarred ? 'star' : 'star_border'}</i>
-      <div className={props.isStarred ? classes.starredCountStarred : classes.starredCount}>{props.stars}</div>
+      <div styleName={props.isStarred ? 'starredCountStarred' : 'starredCount'}>{props.stars}</div>
     </div>
   </div>
 )

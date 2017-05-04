@@ -3,8 +3,8 @@ import React from 'react'
 import PlayerHeader from './PlayerHeader'
 import Providers from 'providers'
 import ColorCycle from './ColorCycle'
-import classes from './PlayerView.css'
 import screenfull from 'screenfull'
+import './PlayerView.css'
 
 class PlayerView extends React.Component {
   static propTypes = {
@@ -112,7 +112,7 @@ class PlayerView extends React.Component {
         <PlayerHeader requestFullscreen={this.handleFullscreen} />
         <div
           ref={r => { this.ref = r }}
-          className={classes.container}
+          styleName='container'
           style={screenfull.isFullscreen ? {} : {
             marginTop: paddingTop,
             height: height - paddingTop - paddingBottom,

@@ -2,7 +2,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Slider, { Handle } from 'rc-slider'
-import './VolumeSlider.scss'
+// depends on styles/global/rc-slider
 
 export default class VolumeSlider extends React.Component {
   static propTypes = {

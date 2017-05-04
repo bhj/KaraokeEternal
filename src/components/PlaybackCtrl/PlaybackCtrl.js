@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import VolumeSlider from './VolumeSlider'
 import NoPlayer from './NoPlayer'
-import classes from './PlaybackCtrl.css'
+import './PlaybackCtrl.css'
 
 const PlaybackCtrl = (props) => {
   if (!props.isAdmin) {
@@ -16,26 +16,24 @@ const PlaybackCtrl = (props) => {
   const { isPlaying, isAtQueueEnd } = props
 
   return (
-    <div className={classes.container}>
+    <div styleName='container'>
       {isPlaying &&
-        <div onClick={props.requestPause} className={classes.pause}>
+        <div onClick={props.requestPause} styleName='pause'>
           <i className='material-icons'>pause</i>
         </div>
       }
       {!isPlaying &&
-        <div onClick={props.requestPlay} className={classes.play}>
+        <div onClick={props.requestPlay} styleName='play'>
           <i className='material-icons'>play_arrow</i>
         </div>
       }
 
-      <div onClick={props.requestPlayNext} className={
-        classes.next + (!isPlaying || isAtQueueEnd ? ' ' + classes.disabled : '')
-      }>
+      <div onClick={props.requestPlayNext} styleName={'next ' + (isAtQueueEnd ? ' disabled' : '')}>
         <i className='material-icons'>skip_next</i>
       </div>
 
       <VolumeSlider
-        className={classes.volume}
+        styleName='volume'
         volume={props.volume}
         onVolumeChange={props.requestVolume}
       />

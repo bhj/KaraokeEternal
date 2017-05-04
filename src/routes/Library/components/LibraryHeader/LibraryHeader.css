@@ -16,19 +16,3 @@
   border: none;
   background-color: inherit;
 }
-
-::placeholder {
- text-align: center;
-}
-
-/* Reset HTML5 Search Input in Webkit */
-input[type=search] {
-  -webkit-appearance:none;
-  -webkit-border-radius:0;
-}
-input[type=search]::-webkit-search-cancel-button,
-input[type=search]::-webkit-search-decoration,
-input[type=search]::-webkit-search-results-button,
-input[type=search]::-webkit-search-results-decoration {
-  -webkit-appearance:none;
-}
