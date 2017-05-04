@@ -294,7 +294,7 @@ if (!__DEV__) {
 
     rule.use = ExtractTextPlugin.extract({
       fallback: first,
-      use: rest.join('!')
+      use: rest
     })
   })
 
