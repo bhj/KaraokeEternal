@@ -1,4 +1,4 @@
-import QueueContainer from './containers/QueueContainer'
+import QueueContainer from './views/QueueContainer'
 import requireAuth from 'components/requireAuth'
 
 // route definition

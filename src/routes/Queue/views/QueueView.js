@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Header from 'components/Header'
 import PaddedList from 'components/PaddedList'
-import QueueItem from './QueueItem'
+import QueueItem from '../components/QueueItem'
 
 class QueueView extends React.Component {
   static propTypes = {

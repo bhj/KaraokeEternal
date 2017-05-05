@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
+import AccountView from './AccountView'
 import { loginUser, logoutUser, createUser, updateUser } from 'store/modules/user'
-import AccountView from '../components/AccountView'
 
 const mapActionCreators = {
   loginUser,

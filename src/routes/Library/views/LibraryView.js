@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import LibraryHeader from './LibraryHeader'
-import ArtistList from './ArtistList'
-import SearchResults from './SearchResults'
+import LibraryHeader from '../components/LibraryHeader'
+import ArtistList from '../components/ArtistList'
+import SearchResults from '../components/SearchResults'
 
 const LibraryView = (props) => {
   const { viewportStyle, ...restProps } = props

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import LibraryView from '../components/LibraryView'
+import LibraryView from './LibraryView'
 import { queueSong } from '../../Queue/modules/queue'
 import { toggleSongStarred } from 'store/modules/user'
 import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'

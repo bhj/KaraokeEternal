@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import QueueView from '../components/QueueView'
+import QueueView from './QueueView'
 import { showErrorMessage } from 'store/modules/ui'
 import { requestPlay, requestPause, requestPlayNext } from 'store/modules/room'
 import { queueSong, removeItem } from '../modules/queue'

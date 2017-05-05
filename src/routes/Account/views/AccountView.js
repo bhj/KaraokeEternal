@@ -2,9 +2,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { browserHistory } from 'react-router'
 import Header from 'components/Header'
-import Prefs from './Prefs'
-import AccountForm from './AccountForm'
-import Logout from './Logout'
+import Prefs from '../components/Prefs'
+import AccountForm from '../components/AccountForm'
+import Logout from '../components/Logout'
 
 function AccountView (props) {
   const { viewportStyle, ...restProps } = props
