@@ -1,4 +1,4 @@
-import PlayerView from '../components/PlayerView'
+import Player from './Player'
 import { connect } from 'react-redux'
 import { requestPlayNext } from 'store/modules/room'
 import {
@@ -8,7 +8,7 @@ import {
   cancelStatus,
   getMedia,
   getMediaSuccess,
-} from '../modules/player'
+} from '../../modules/player'
 
 const mapActionCreators = {
   emitStatus,
@@ -36,4 +36,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapActionCreators)(PlayerView)
+export default connect(mapStateToProps, mapActionCreators)(Player)
