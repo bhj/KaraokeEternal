@@ -8,7 +8,7 @@ const karmaConfig = {
   basePath : '../', // project root in relation to bin/karma.js
   files    : [
     {
-      pattern  : `./${project.dir_test}/test-bundler.js`,
+      pattern  : `./${project.path_base}/bin/test-bundler.js`,
       watched  : false,
       served   : true,
       included : true
@@ -18,12 +18,12 @@ const karmaConfig = {
   frameworks    : ['mocha'],
   reporters     : ['mocha'],
   preprocessors : {
-    [`${project.dir_test}/test-bundler.js`] : ['webpack']
+    [`${project.path_base}/bin/test-bundler.js`] : ['webpack']
   },
   browsers : ['PhantomJS'],
   webpack  : {
     devtool : 'cheap-module-source-map',
-    entry   : './tests/test-bundler.js',
+    entry   : `${project.path_base}/bin/test-bundler.js`,
     resolve : Object.assign({}, webpackConfig.resolve, {
       alias : Object.assign({}, webpackConfig.resolve.alias, {
         sinon : 'sinon/pkg/sinon.js'
