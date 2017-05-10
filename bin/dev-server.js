@@ -16,7 +16,7 @@ async function init () {
     })
 
     server.listen(project.server_port)
-    debug(`Server is now running at http://localhost:${project.server_port}.`)
+    debug(`Server is now running at http://${project.server_host}:${project.server_port}.`)
   } catch (e) {
     debug(e)
     process.exit(1)
