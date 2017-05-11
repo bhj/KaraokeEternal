@@ -1,10 +1,12 @@
 {
-  "name": "react-redux-starter-kit",
-  "version": "3.0.0-alpha.2",
-  "description": "Get started with React, Redux, and React-Router!",
+  "name": "karaoke-forever",
+  "version": "0.0.1",
+  "description": "Self-hosted, multi-room, multi-user karaoke party system built on open web
+  technologies",
+  "private:": true,
   "main": "index.js",
   "engines": {
-    "node": ">=4.5.0",
+    "node": ">=7.6.0",
     "npm": "^3.0.0"
   },
   "scripts": {
@@ -71,9 +73,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davezuko/react-redux-starter-kit.git"
+    "url": "git+https://github.com/bhj/karaoke-forever.git"
   },
-  "author": "David Zukowski <david@zuko.me> (http://zuko.me)",
+  "author": "Brandon H. Jones (http://karaoke-forever.com)",
   "license": "MIT",
   "dependencies": {
     "babel-core": "^6.24.1",
