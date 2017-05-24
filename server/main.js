@@ -87,18 +87,20 @@ app._io.on('connection', async (sock) => {
     debug('%s (%s) joined room %s (%s in room)',
       user.name, sock.id, user.roomId, room.length
     )
+
+    // send queue
+    // @todo add try/catch
+    app._io.to(sock.id).emit('action', {
+      type: QUEUE_UPDATE,
+      payload: await getQueue(user.roomId),
+    })
   }
 
   // send library
+  // @todo add try/catch
   app._io.to(sock.id).emit('action', {
     type: LIBRARY_UPDATE,
     payload: await getLibrary(),
-  })
-
-  // send queue
-  app._io.to(sock.id).emit('action', {
-    type: QUEUE_UPDATE,
-    payload: await getQueue(user.roomId),
   })
 })
 
