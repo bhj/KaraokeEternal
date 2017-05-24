@@ -66,10 +66,13 @@ export function fetchPrefs () {
         dispatch(receivePrefs(prefs))
       })
       .catch(err => {
-        dispatch({
-          type: PREFS_REQUEST + _ERROR,
-          meta: { error: err.message },
-        })
+        // ignore if we aren't an admin
+        if (getState().user.isAdmin) {
+          dispatch({
+            type: PREFS_REQUEST + _ERROR,
+            meta: { error: err.message },
+          })
+        }
       })
   }
 }

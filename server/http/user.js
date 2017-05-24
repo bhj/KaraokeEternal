@@ -6,6 +6,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const debug = require('debug')
 const log = debug('app:account')
+const getPrefs = require('../lib/getPrefs')
 
 // list available rooms
 router.get('/rooms', async (ctx, next) => {
@@ -17,9 +18,8 @@ router.get('/rooms', async (ctx, next) => {
     const { text, values } = q.toParam()
     ctx.body = await db.all(text, values)
   } catch (err) {
-    log(err.message)
+    log(err)
     ctx.status = 500
-    return Promise.reject(err)
   }
 })
 
@@ -28,9 +28,8 @@ router.post('/login', async (ctx, next) => {
   try {
     await _login(ctx, ctx.request.body)
   } catch (err) {
-    log(err.message)
+    log(err)
     ctx.status = 500
-    return Promise.reject(err)
   }
 })
 
@@ -42,13 +41,13 @@ router.get('/logout', async (ctx, next) => {
 
 // create
 router.post('/account/create', async (ctx, next) => {
-  let { name, email, password, passwordConfirm } = ctx.request.body
+  let { name, email, newPassword, newPasswordConfirm, roomId } = ctx.request.body
 
   name = name.trim()
   email = email.trim().toLowerCase()
 
   // check presence of all fields
-  if (!name || !email || !password || !passwordConfirm) {
+  if (!name || !email || !newPassword || !newPasswordConfirm) {
     ctx.status = 422
     ctx.body = 'All fields are required'
     return
@@ -71,38 +70,38 @@ router.post('/account/create', async (ctx, next) => {
 
     if (await db.get(text, values)) {
       ctx.status = 401
-      ctx.body = 'Email address is already registered'
+      ctx.body = 'Email address is already taken'
       return
     }
   } catch (err) {
-    log(err.message)
-    return Promise.reject(err)
-  }
-
-  // check that passwords match
-  if (password !== passwordConfirm) {
-    ctx.status = 422
-    ctx.body = 'Passwords do not match'
+    log(err)
+    ctx.status = 500
     return
   }
 
-  // hash new password
-  let hashedPwd
-  try {
-    hashedPwd = await bcrypt.hash(password, 10)
-  } catch (err) {
-    log(err.message)
-    ctx.status = 500
-    return Promise.reject(err)
+  // check that passwords match
+  if (newPassword !== newPasswordConfirm) {
+    ctx.status = 422
+    ctx.body = 'Password fields do not match'
+    return
   }
 
-  // insert user
   try {
+    // will need to make an admin if it's first run
+    const prefs = await getPrefs('app')
+
+    // hash new password
+    const hashedPwd = await bcrypt.hash(newPassword, 12)
+
+    // @todo validate roomId
+
+    // insert user
     const q = squel.insert()
       .into('users')
       .set('email', email)
       .set('password', hashedPwd)
       .set('name', name)
+      .set('isAdmin', prefs.firstRun === true ? 1 : 0)
 
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
@@ -110,13 +109,38 @@ router.post('/account/create', async (ctx, next) => {
     if (res.stmt.changes !== 1) {
       throw new Error('insert failed')
     }
+
+    // remove firstRun flag if necessary
+    if (prefs.firstRun === true) {
+      const q = squel.update()
+        .table('prefs')
+        .where('domain = ?', 'app')
+        .set('data', squel.select()
+        .field(`json_set(data, '$.firstRun', json('false'))`)
+        .from('prefs')
+        .where('domain = ?', 'app')
+      )
+
+      const { text, values } = q.toParam()
+      const res = await db.run(text, values)
+
+      if (res.stmt.changes !== 1) {
+        throw new Error('could not remove firstRun flag')
+      }
+    }
   } catch (err) {
-    log(err.message)
+    log(err)
     ctx.status = 500
-    return Promise.reject(err)
+    return
   }
 
-  ctx.status = 200
+  // log them in automatically
+  try {
+    await _login(ctx, { email, password: newPassword, roomId })
+  } catch (err) {
+    log(err)
+    ctx.status = 500
+  }
 })
 
 // update
@@ -139,9 +163,9 @@ router.post('/account/update', async (ctx, next) => {
     const { text, values } = q.toParam()
     user = await db.get(text, values)
   } catch (err) {
-    log(err.message)
+    log(err)
     ctx.status = 500
-    return Promise.reject(err)
+    return
   }
 
   if (!user) {
@@ -169,25 +193,6 @@ router.post('/account/update', async (ctx, next) => {
     return
   }
 
-  // changing password?
-  if (newPassword && newPasswordConfirm) {
-    if (newPassword !== newPasswordConfirm) {
-      ctx.status = 422
-      ctx.body = 'New passwords do not match'
-      return
-    }
-
-    try {
-      password = await bcrypt.hash(newPassword, 10)
-    } catch (err) {
-      log(err.message)
-      ctx.status = 500
-      return Promise.reject(err)
-    }
-  } else {
-    password = user.password
-  }
-
   // validate email
   if (!validateEmail(email)) {
     ctx.status = 422
@@ -210,35 +215,53 @@ router.post('/account/update', async (ctx, next) => {
       return
     }
   } catch (err) {
-    log(err.message)
+    log(err)
     ctx.status = 500
-    return Promise.reject(err)
+    return
+  }
+
+  // begin query
+  const u = squel.update()
+    .table('users')
+    .where('userId = ?', ctx.user.userId)
+    .set('name', name)
+    .set('email', email)
+
+  // changing password?
+  if (newPassword) {
+    if (newPassword !== newPasswordConfirm) {
+      ctx.status = 422
+      ctx.body = 'New passwords do not match'
+      return
+    }
+
+    try {
+      u.set('password', await bcrypt.hash(newPassword, 10))
+    } catch (err) {
+      log(err)
+      ctx.status = 500
+      return
+    }
+
+    password = newPassword
   }
 
   // do update!
   try {
-    const q = squel.update()
-      .table('users')
-      .where('userId = ?', ctx.user.userId)
-      .set('name', name)
-      .set('email', email)
-      .set('password', password)
-
-    const { text, values } = q.toParam()
+    const { text, values } = u.toParam()
     await db.run(text, values)
   } catch (err) {
-    log(err.message)
+    log(err)
     ctx.status = 500
-    return Promise.reject(err)
+    return
   }
 
   // attempt re-login
   try {
     await _login(ctx, { email, password, roomId: ctx.user.roomId })
   } catch (err) {
-    log(err.message)
+    log(err)
     ctx.status = 500
-    return Promise.reject(err)
   }
 })
 
@@ -246,16 +269,15 @@ module.exports = router
 
 async function _login (ctx, creds) {
   const { email, password, roomId } = creds
+  let user
 
-  // check presence of all fields
-  if (!email || !password || !roomId) {
+  if (!email || !password) {
     ctx.status = 422
-    ctx.body = 'Email, password, and room are required'
+    ctx.body = 'Email and password are required'
     return
   }
 
   // get user
-  let user
   try {
     const q = squel.select()
       .from('users')
@@ -272,24 +294,6 @@ async function _login (ctx, creds) {
     return Promise.reject(err)
   }
 
-  // validate roomId
-  try {
-    const q = squel.select()
-      .from('rooms')
-      .where('roomId = ?', roomId)
-
-    const { text, values } = q.toParam()
-    const row = await db.get(text, values)
-
-    if (!row || row.status !== 'open') {
-      ctx.status = 401
-      ctx.body = 'Invalid Room'
-      return
-    }
-  } catch (err) {
-    return Promise.reject(err)
-  }
-
   // validate password
   try {
     if (!await bcrypt.compare(password, user.password)) {
@@ -298,6 +302,32 @@ async function _login (ctx, creds) {
     }
   } catch (err) {
     return Promise.reject(err)
+  }
+
+  // validate roomId (if not an admin)
+  if (!user.isAdmin) {
+    if (typeof roomId === 'undefined') {
+      ctx.status = 422
+      ctx.body = 'RoomId is required'
+      return
+    }
+
+    try {
+      const q = squel.select()
+        .from('rooms')
+        .where('roomId = ?', roomId)
+
+      const { text, values } = q.toParam()
+      const row = await db.get(text, values)
+
+      if (!row || row.status !== 'open') {
+        ctx.status = 401
+        ctx.body = 'Invalid Room'
+        return
+      }
+    } catch (err) {
+      return Promise.reject(err)
+    }
   }
 
   // get starred songs

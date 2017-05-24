@@ -1,43 +1,75 @@
 import PropTypes from 'prop-types'
-import React from 'react'
-import { browserHistory } from 'react-router'
+import React, { Component } from 'react'
 import Header from 'components/Header'
 import Prefs from '../components/Prefs'
 import AccountForm from '../components/AccountForm'
+import Login from '../components/Login'
 import Logout from '../components/Logout'
 
-function AccountView (props) {
-  const { viewportStyle, ...restProps } = props
+export default class AccountView extends Component {
+  static propTypes = {
+    isLoggedIn: PropTypes.bool,
+    isFirstRun: PropTypes.bool,
+    viewportStyle: PropTypes.object.isRequired,
+    // actions
+    loginUser: PropTypes.func.isRequired,
+    logoutUser: PropTypes.func.isRequired,
+  }
 
-  return (
-    <div style={{ ...viewportStyle }}>
-      <Header />
+  state = {
+    view: 'login',
+  }
 
-      <AccountForm {...restProps} />
+  viewLogin = () => this.setState({ view: 'login' })
+  viewCreate = () => this.setState({ view: 'create' })
 
-      <Prefs />
+  render () {
+    const { viewportStyle, isFirstRun, isLoggedIn, ...props } = this.props
+    const { view } = this.state
 
-      {props.user.isAdmin &&
-        <button className='button wide blue raised' onClick={() => { browserHistory.push('/player') }}>
-          Start Player
-        </button>
-      }
+    return (
+      <div style={{ ...viewportStyle }}>
+        <Header />
 
-      {props.user.userId !== null &&
-        <div>
-          <br />
-          <Logout onLogoutClick={props.logoutUser} />
-        </div>
-      }
-    </div>
-  )
+        {!isLoggedIn &&
+          <h2>Welcome to Karaoke Forever!</h2>
+        }
+
+        {isFirstRun &&
+          <div>
+            <p>Create your <b>admin</b> account to get started.</p>
+            <AccountForm mode='create' {...props} />
+          </div>
+        }
+
+        {!isFirstRun && !isLoggedIn && view === 'login' &&
+          <div>
+            <p>Please sign in or <a onClick={this.viewCreate}>create an account</a>.</p>
+            <Login onSubmitClick={this.props.loginUser} />
+          </div>
+        }
+
+        {!isFirstRun && !isLoggedIn && view === 'create' &&
+          <div>
+            <p>Create an account below to join the party.<br />
+              Already have an account? <a onClick={this.viewLogin}>Sign in</a>
+            </p>
+            <AccountForm mode='create' {...props} />
+          </div>
+        }
+
+        {isLoggedIn &&
+          <div>
+            <Prefs />
+
+            <h2>Account</h2>
+            <p>You're signed in as <b>{props.user.email}</b></p>
+            <AccountForm mode='update' {...props} />
+
+            <Logout onLogoutClick={props.logoutUser} />
+          </div>
+        }
+      </div>
+    )
+  }
 }
-
-AccountView.propTypes = {
-  user: PropTypes.object,
-  viewportStyle: PropTypes.object.isRequired,
-  // actions
-  logoutUser: PropTypes.func.isRequired,
-}
-
-export default AccountView

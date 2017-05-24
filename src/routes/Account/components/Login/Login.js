@@ -2,9 +2,10 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 
 export default class Login extends Component {
-
   render () {
-    let roomOpts = this.props.rooms.map(function (room, i) {
+    const rooms = this.props.rooms || []
+
+    let roomOpts = rooms.map(function (room, i) {
       return (
         <option key={room.roomId} value={room.roomId}>{room.name}</option>
       )
@@ -39,6 +40,6 @@ export default class Login extends Component {
 }
 
 Login.propTypes = {
-  rooms: PropTypes.array.isRequired,
+  rooms: PropTypes.array,
   onSubmitClick: PropTypes.func.isRequired,
 }

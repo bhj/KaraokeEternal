@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import { fetchPrefs } from './prefs'
 import { browserHistory } from 'react-router'
 
 import {
@@ -137,6 +138,8 @@ export function logoutUser () {
 
       // disconnect socket
       window._socket.close()
+    }).catch(() => {
+      // not much we can do
     })
   }
 }
@@ -151,10 +154,10 @@ function requestCreate (user) {
   }
 }
 
-function receiveCreate () {
+function receiveCreate (user) {
   return {
     type: CREATE + _SUCCESS,
-    payload: null
+    payload: user
   }
 }
 
@@ -173,16 +176,20 @@ export function createUser (user) {
 
     return fetch('/api/account/create', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
       body: JSON.stringify(user)
     })
       .then(checkStatus)
-      .then(response => {
-        dispatch(receiveCreate())
-        // should now be able to login
-        // this.loginUser({email: user.email, password: user.password})
+      .then(res => res.json())
+      .then(user => {
+        dispatch(receiveCreate(user))
+
+        if (user.isAdmin) {
+          dispatch(fetchPrefs())
+        }
       })
       .catch(err => {
         dispatch(createError(err.message))
@@ -313,6 +320,10 @@ const ACTION_HANDLERS = {
     ...payload,
   }),
   [UPDATE + _SUCCESS]: (state, { payload }) => ({
+    ...state,
+    ...payload,
+  }),
+  [CREATE + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),
