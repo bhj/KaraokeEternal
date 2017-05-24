@@ -79,19 +79,31 @@ router.post('/prefs', async (ctx, next) => {
 })
 
 router.get('/prefs', async (ctx, next) => {
-  // must be admin
+  let prefs
+
+  // get prefs from all domains
+  try {
+    prefs = await getPrefs()
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = err.message
+    return
+  }
+
+  // if not an admin, must be firstRun...
   if (!ctx.user || !ctx.user.isAdmin) {
+    if (prefs.app && prefs.app.firstRun === true) {
+      // ...and we only send prefs domain
+      ctx.body = { app: prefs.app }
+      return
+    }
+
+    // ...or else
     ctx.status = 401
     return
   }
 
-  // get prefs
-  try {
-    ctx.body = await getPrefs()
-  } catch (err) {
-    ctx.status = 500
-    ctx.body = err.message
-  }
+  ctx.body = prefs
 })
 
 module.exports = router
