@@ -346,10 +346,10 @@ function validateEmail (email) {
   var at = email.indexOf('@')
   var dot = email.lastIndexOf('.')
   return email.length > 0 &&
-         at > 0 &&
-         dot > at + 1 &&
-         dot < email.length &&
-         email[at + 1] !== '.' &&
-         email.contains(' ') &&
-         !email.contains('..')
+    at > 0 &&
+    dot > at + 1 &&
+    dot < email.length &&
+    email[at + 1] !== '.' &&
+    !email.includes(' ') &&
+    !email.includes('..')
 }
