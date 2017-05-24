@@ -124,7 +124,11 @@ io.on('action', socketActions)
 io.on('disconnect', (ctx, data) => {
   const user = ctx.user
   const sock = ctx.socket.socket
-  const room = sock.adapter.rooms[user.roomId] || []
+  const room = sock.adapter.rooms[user.roomId]
+
+  if (!user.roomId || !room) {
+    return
+  }
 
   debug('%s (%s) left room %s (%s in room)',
     user.name, sock.id, user.roomId, room.length
