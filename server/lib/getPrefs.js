@@ -33,7 +33,7 @@ async function getPrefs (domain) {
       // no dot in domain
       prefs[parts[0]] = JSON.parse(row.data)
     } else if (parts.length === 2) {
-      prefs[parts[0]] = {}
+      prefs[parts[0]] = prefs[parts[0]] || {}
       prefs[parts[0]][parts[1]] = JSON.parse(row.data)
     }
   })
