@@ -53,7 +53,7 @@ router.get('/scan', async (ctx, next) => {
   }
 
   isScanning = true
-  log('started scan')
+  log('%s started media scan', ctx.user.name)
 
   let validIds = [] // songIds for cleanup
   counts = { new: 0, ok: 0, skipped: 0 }

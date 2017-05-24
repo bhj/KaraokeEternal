@@ -25,7 +25,7 @@ router.get('/ls', async (ctx, next) => {
       }
     })
 
-    log('listed %s folders in %s', list.length, dir)
+    log('%s listed folder: %s', ctx.user.name, current)
 
     ctx.body = {
       current,

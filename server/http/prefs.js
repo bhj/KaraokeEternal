@@ -61,7 +61,7 @@ router.post('/prefs', async (ctx, next) => {
     const res = await db.run(text, values)
 
     if (res.stmt.changes) {
-      log('updated pref: %s.%s', domain, keys[0])
+      log('%s updated %s.%s', ctx.user.name, domain, keys[0])
     }
   } catch (err) {
     ctx.status = 500
