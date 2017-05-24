@@ -62,8 +62,8 @@ export default class AccountView extends Component {
           <div>
             <Prefs />
 
-            <h2>Account</h2>
-            <p>You're signed in as <b>{props.user.email}</b></p>
+            <h2>My Account</h2>
+            <p>Signed in as <b>{props.user.email}</b></p>
             <AccountForm mode='update' {...props} />
 
             <Logout onLogoutClick={props.logoutUser} />
