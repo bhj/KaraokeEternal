@@ -2,6 +2,7 @@ const db = require('sqlite')
 const squel = require('squel')
 
 async function getPrefs (domain) {
+  const prefs = {}
   let res
 
   try {
@@ -25,14 +26,19 @@ async function getPrefs (domain) {
     return JSON.parse(res[0].data)
   }
 
-  let cfg = {}
   res.forEach(function (row) {
     let parts = row.domain.split('.')
-    if (typeof cfg[parts[0]] === 'undefined') cfg[parts[0]] = {}
-    cfg[parts[0]][parts[1]] = JSON.parse(row.data)
+
+    if (parts.length === 1) {
+      // no dot in domain
+      prefs[parts[0]] = JSON.parse(row.data)
+    } else if (parts.length === 2) {
+      prefs[parts[0]] = {}
+      prefs[parts[0]][parts[1]] = JSON.parse(row.data)
+    }
   })
 
-  return cfg
+  return prefs
 }
 
 module.exports = getPrefs
