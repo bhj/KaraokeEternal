@@ -187,6 +187,10 @@ export function createUser (user) {
       .then(user => {
         dispatch(receiveCreate(user))
 
+        // socket.io handshake happens over http so
+        // our JWT will be sent in the cookie
+        window._socket.open()
+
         if (user.isAdmin) {
           dispatch(fetchPrefs())
         }
