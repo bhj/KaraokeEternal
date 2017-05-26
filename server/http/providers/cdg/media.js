@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:cdg')
-const getSongs = require('../../../lib/getSongs')
+const getLibrary = require('../../../lib/getLibrary')
 const stat = require('../../../lib/thunks/stat')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/cdg' })
@@ -25,15 +25,15 @@ router.get('/media', async (ctx, next) => {
 
   // get song from db
   try {
-    const res = await getSongs({ songId })
+    const res = await getLibrary({ songId })
 
-    if (!res.result.length) {
+    if (!res.songs.result.length) {
       ctx.status = 404
       ctx.body = `songId not found: ${songId}`
       return
     }
 
-    const row = res.entities[res.result[0]]
+    const row = res.songs.entities[res.songs.result[0]]
     // should be the audio file path
     file = JSON.parse(row.providerData).path
   } catch (err) {

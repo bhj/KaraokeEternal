@@ -90,14 +90,14 @@ async function process (item) {
     duration: item.contentDetails.duration,
   }))
 
-  // search for this file in the db
+  // is video already in the db?
   try {
-    let res = await getSongs({ providerData: { videoId: item.id } })
+    let res = await getLibrary({ providerData: { videoId: item.id } })
     // @todo: check mtime and title for updates
-    if (res.result.length) {
+    if (res.songs.result.length) {
       log('song is in library (same videoId)')
       stats.ok++
-      return Promise.resolve(res.result[0])
+      return Promise.resolve(res.songs.result[0])
     }
   } catch (err) {
     log(err.message)

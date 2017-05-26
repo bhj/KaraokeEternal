@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const getSongs = require('../lib/getSongs')
+const getLibrary = require('../lib/getLibrary')
 
 const {
   SONG_UPDATE,
@@ -56,19 +56,19 @@ const ACTION_HANDLERS = {
       return Promise.reject(err)
     }
 
-    // emit updated star count to room
+    // emit updated star count
     try {
-      const res = await getSongs({
+      const res = await getLibrary({
         songId: payload,
       })
 
-      if (res.result.length !== 1) {
-        throw new Error(res.result.length + ' results (expected 1)')
+      if (res.songs.result.length !== 1) {
+        throw new Error(res.songs.result.length + ' results (expected 1)')
       }
 
-      ctx.sock.server.to(ctx.user.roomId).emit('action', {
+      ctx.sock.server.emit('action', {
         type: SONG_UPDATE,
-        payload: res.entities[res.result[0]],
+        payload: res.songs.entities[res.songs.result[0]],
       })
     } catch (err) {
       return Promise.reject(err)

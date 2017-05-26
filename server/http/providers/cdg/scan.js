@@ -117,17 +117,17 @@ async function process (file) {
 
   // already in database with the same path and mtime?
   try {
-    const res = await getSongs({
+    const res = await getLibrary({
       providerData: {
         path: file,
         mtime: stats.mtime.getTime() / 1000, // Date to timestamp (s)
       }
     })
 
-    if (res.result.length) {
+    if (res.songs.result.length) {
       log('song is in library (same path/mtime)')
       counts.ok++
-      return Promise.resolve(res.result[0])
+      return Promise.resolve(res.songs.result[0])
     }
   } catch (err) {
     log('skipping: %s', err.message)
