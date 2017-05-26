@@ -3,6 +3,7 @@ import React from 'react'
 import Header from 'components/Header'
 import PaddedList from 'components/PaddedList'
 import QueueItem from '../components/QueueItem'
+import NoRoom from './NoRoom'
 
 class QueueView extends React.Component {
   static propTypes = {
@@ -26,19 +27,26 @@ class QueueView extends React.Component {
     return (
       <div>
         <Header />
-        <PaddedList
-          {...props.viewportStyle}
-          rowCount={props.queue.result.length}
-          rowHeight={this.rowHeight}
-          rowRenderer={this.rowRenderer}
-          scrollToIndex={props.queue.result.indexOf(props.curId)}
-          scrollToAlignment={'center'}
-          queuedSongs={props.queue.result} // pass-through forces List refresh
-          curId={props.curId} // pass-through forces List refresh
-          curPos={props.curPos} // pass-through forces List refresh
-          errors={props.errors} // pass-through forces List refresh
-          isAtQueueEnd={props.isAtQueueEnd} // pass-through forces List refresh
-        />
+
+        {props.user.roomId &&
+          <PaddedList
+            {...props.viewportStyle}
+            rowCount={props.queue.result.length}
+            rowHeight={this.rowHeight}
+            rowRenderer={this.rowRenderer}
+            scrollToIndex={props.queue.result.indexOf(props.curId)}
+            scrollToAlignment={'center'}
+            queuedSongs={props.queue.result} // pass-through forces List refresh
+            curId={props.curId} // pass-through forces List refresh
+            curPos={props.curPos} // pass-through forces List refresh
+            errors={props.errors} // pass-through forces List refresh
+            isAtQueueEnd={props.isAtQueueEnd} // pass-through forces List refresh
+          />
+        }
+
+        {!props.user.roomId &&
+          <NoRoom viewportStyle={props.viewportStyle} />
+        }
       </div>
     )
   }
