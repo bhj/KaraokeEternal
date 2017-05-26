@@ -86,6 +86,7 @@ async function addSong (ctx, song) {
 
     return Promise.resolve(res.stmt.lastID)
   } catch (err) {
+    log(err)
     return Promise.reject(err)
   }
 }
