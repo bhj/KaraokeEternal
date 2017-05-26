@@ -36,6 +36,7 @@ module.exports = async function (ctx) {
       try {
         await handlers[h][type](ctx, action)
       } catch (err) {
+        log(err)
         const error = `Error in ${h}.${type}: ${err.message}`
 
         return ctx.acknowledge({
