@@ -19,9 +19,6 @@ const allowedExts = ['.mp3', '.m4a']
 let isScanning, counts
 
 router.get('/scan', async (ctx, next) => {
-  // addSong needs ctx so it can broadcast library updates
-  addSong = addSong.bind(null, ctx)
-
   // check jwt validity
   if (!ctx.user || !ctx.user.isAdmin) {
     ctx.status = 401
@@ -51,6 +48,9 @@ router.get('/scan', async (ctx, next) => {
 
   isScanning = true
   log('%s started media scan', ctx.user.name)
+
+  // addSong needs ctx so it can broadcast library updates
+  addSong = addSong.bind(null, ctx)
 
   let validIds = [] // songIds for cleanup
   counts = { new: 0, ok: 0, skipped: 0 }

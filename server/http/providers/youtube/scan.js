@@ -13,9 +13,6 @@ let stats
 let isScanning
 
 router.get('/scan', async (ctx, next) => {
-  // addSong needs ctx so it can broadcast library updates
-  addSong = addSong.bind(null, ctx)
-
   // check jwt validity
   if (!ctx.user || !ctx.user.isAdmin) {
     ctx.status = 401
@@ -49,6 +46,9 @@ router.get('/scan', async (ctx, next) => {
 
   isScanning = true
   log('%s started media scan', ctx.user.name)
+
+  // addSong needs ctx so it can broadcast library updates
+  addSong = addSong.bind(null, ctx)
 
   let validIds = [] // songIds for cleanup
   stats = { new: 0, moved: 0, ok: 0, removed: 0, skipped: 0, error: 0 }
