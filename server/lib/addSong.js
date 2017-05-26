@@ -2,9 +2,14 @@ const db = require('sqlite')
 const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:addSong')
+const getLibrary = require('./getLibrary')
+const {
+  LIBRARY_UPDATE,
+} = require('../constants')
 
-async function addSong ({ artist, title, duration, provider, providerData }) {
-  log('new song: %s', JSON.stringify({ artist, title, duration, provider, providerData }))
+async function addSong (ctx, song) {
+  const { artist, title, duration, provider, providerData } = song
+  log('new song: %s', JSON.stringify(song))
 
   if (!artist || !title || !duration || !provider) {
     return Promise.reject(new Error('invalid song data'))
@@ -12,6 +17,7 @@ async function addSong ({ artist, title, duration, provider, providerData }) {
 
   // does the artist already exist?
   let row, artistId
+
   try {
     const q = squel.select()
       .from('artists')
@@ -70,6 +76,13 @@ async function addSong ({ artist, title, duration, provider, providerData }) {
     if (!Number.isInteger(res.stmt.lastID)) {
       throw new Error('got invalid lastID after song insert')
     }
+
+    // emit updated library
+    // @todo partial updates
+    ctx._io.emit('action', {
+      type: LIBRARY_UPDATE,
+      payload: await getLibrary(),
+    })
 
     return Promise.resolve(res.stmt.lastID)
   } catch (err) {

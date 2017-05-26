@@ -10,21 +10,18 @@ const musicmetadata = require('../../../lib/thunks/musicmetadata')
 const mp3duration = require('../../../lib/thunks/mp3duration')
 const stat = require('../../../lib/thunks/stat')
 
-const addSong = require('../../../lib/addSong')
-const getLibrary = require('../../../lib/getLibrary')
+let addSong = require('../../../lib/addSong')
 const getPrefs = require('../../../lib/getPrefs')
-const getSongs = require('../../../lib/getSongs')
+const getLibrary = require('../../../lib/getLibrary')
 const parseArtistTitle = require('../../../lib/parseArtistTitle')
-
-const {
-  LIBRARY_UPDATE,
-  _ERROR,
-} = require('../../../constants')
 
 const allowedExts = ['.mp3', '.m4a']
 let isScanning, counts
 
 router.get('/scan', async (ctx, next) => {
+  // addSong needs ctx so it can broadcast library updates
+  addSong = addSong.bind(null, ctx)
+
   // check jwt validity
   if (!ctx.user || !ctx.user.isAdmin) {
     ctx.status = 401
@@ -74,25 +71,15 @@ router.get('/scan', async (ctx, next) => {
 
     for (let i = 0; i < files.length; i++) {
       log('[%s/%s] %s', i + 1, files.length, files[i])
-      let songId, newCount
 
       try {
-        songId = await process(files[i])
+        let songId = await process(files[i])
+
+        // successfuly processed
+        validIds.push(songId)
       } catch (err) {
-        // try next file
+        // just try the next file...
         log(err.message)
-        continue
-      }
-
-      validIds.push(songId)
-
-      if (counts.new !== newCount) {
-        newCount = counts.new
-        // emit updated library
-        ctx._io.emit('action', {
-          type: LIBRARY_UPDATE,
-          payload: await getLibrary(),
-        })
       }
 
       // emit progress

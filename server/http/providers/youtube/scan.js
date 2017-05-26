@@ -4,21 +4,18 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/youtube' })
 const { parse, toSeconds } = require('iso8601-duration')
 
-const addSong = require('../../../lib/addSong')
+let addSong = require('../../../lib/addSong')
 const getLibrary = require('../../../lib/getLibrary')
 const getPrefs = require('../../../lib/getPrefs')
-const getSongs = require('../../../lib/getSongs')
 const parseArtistTitle = require('../../../lib/parseArtistTitle')
-
-const {
-  LIBRARY_UPDATE,
-  _ERROR,
-} = require('../../../constants')
 
 let stats
 let isScanning
 
 router.get('/scan', async (ctx, next) => {
+  // addSong needs ctx so it can broadcast library updates
+  addSong = addSong.bind(null, ctx)
+
   // check jwt validity
   if (!ctx.user || !ctx.user.isAdmin) {
     ctx.status = 401
@@ -80,14 +77,6 @@ router.get('/scan', async (ctx, next) => {
   isScanning = false
   log('finished scan')
   log(JSON.stringify(stats))
-
-  // emit updated library?
-  if (stats.new) {
-    ctx._io.emit('action', {
-      type: LIBRARY_UPDATE,
-      payload: await getLibrary(),
-    })
-  }
 
   return Promise.resolve()
 })
