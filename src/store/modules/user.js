@@ -8,7 +8,6 @@ import {
   LOGOUT,
   CREATE,
   UPDATE,
-  GET_ROOMS,
   _SUCCESS,
   _ERROR,
 } from 'constants'
@@ -251,47 +250,6 @@ export function updateUser (data) {
 }
 
 // ------------------------------------
-// Available Rooms
-// ------------------------------------
-function requestRooms () {
-  return {
-    type: GET_ROOMS,
-    payload: null
-  }
-}
-
-function receiveRooms (response) {
-  return {
-    type: GET_ROOMS + _SUCCESS,
-    payload: response
-  }
-}
-
-function roomsError (message) {
-  return {
-    type: GET_ROOMS + _ERROR,
-    meta: {
-      error: message,
-    }
-  }
-}
-
-export function fetchRooms () {
-  return dispatch => {
-    dispatch(requestRooms())
-
-    return fetch('/api/rooms')
-      .then(checkStatus)
-      .then(response => response.json())
-      .then(response => {
-        dispatch(receiveRooms(response))
-      })
-      .catch(err => {
-        dispatch(roomsError(err.message))
-      })
-  }
-}
-
 // ------------------------------------
 // Star songs
 // ------------------------------------
@@ -340,10 +298,6 @@ const ACTION_HANDLERS = {
     roomId: null,
     starredSongs: [],
   }),
-  [GET_ROOMS + _SUCCESS]: (state, { payload }) => ({
-    ...state,
-    rooms: payload,
-  }),
   [TOGGLE_SONG_STARRED + _SUCCESS]: (state, { payload }) => ({
     ...state,
     starredSongs: payload,
@@ -359,7 +313,6 @@ let initialState = {
   name: null,
   isAdmin: false,
   roomId: null,
-  rooms: [],
   starredSongs: [],
 }
 

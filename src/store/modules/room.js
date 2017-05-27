@@ -6,6 +6,9 @@ import {
   PLAYER_STATUS,
   PLAYER_ERROR,
   PLAYER_LEAVE,
+  GET_ROOMS,
+  _SUCCESS,
+  _ERROR,
 } from 'constants'
 
 // ------------------------------------
@@ -42,6 +45,61 @@ export function requestVolume (vol) {
 }
 
 // ------------------------------------
+// Rooms
+// ------------------------------------
+function requestRooms () {
+  return {
+    type: GET_ROOMS,
+    payload: null
+  }
+}
+
+function receiveRooms (response) {
+  return {
+    type: GET_ROOMS + _SUCCESS,
+    payload: response
+  }
+}
+
+function roomsError (message) {
+  return {
+    type: GET_ROOMS + _ERROR,
+    meta: {
+      error: message,
+    }
+  }
+}
+
+export function fetchRooms () {
+  return dispatch => {
+    dispatch(requestRooms())
+
+    return fetch('/api/rooms')
+      .then(checkStatus)
+      .then(response => response.json())
+      .then(response => {
+        dispatch(receiveRooms(response))
+      })
+      .catch(err => {
+        dispatch(roomsError(err.message))
+      })
+  }
+}
+
+// helper for fetch response
+function checkStatus (response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response
+  } else {
+    return response.text().then((txt) => {
+      var error = new Error(txt)
+      error.response = response
+      throw error
+    })
+  }
+}
+
+// ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
@@ -71,6 +129,10 @@ const ACTION_HANDLERS = {
       }
     }
   },
+  [GET_ROOMS + _SUCCESS]: (state, { payload }) => ({
+    ...state,
+    rooms: payload,
+  }),
 }
 
 // ------------------------------------
@@ -83,6 +145,7 @@ const initialState = {
   isPlaying: false,
   isAtQueueEnd: false,
   isPlayerPresent: false,
+  rooms: [],
   errors: {},   // object of arrays keyed by queueId
 }
 

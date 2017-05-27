@@ -14,6 +14,7 @@ const mapStateToProps = (state) => {
     user: state.user,
     isLoggedIn: state.user.userId !== null,
     isFirstRun: state.prefs.app && state.prefs.app.firstRun,
+    rooms: state.room.rooms,
   }
 }
 

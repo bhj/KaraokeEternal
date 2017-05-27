@@ -10,6 +10,7 @@ export default class AccountView extends Component {
   static propTypes = {
     isLoggedIn: PropTypes.bool,
     isFirstRun: PropTypes.bool,
+    rooms: PropTypes.array.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
     loginUser: PropTypes.func.isRequired,
@@ -45,7 +46,7 @@ export default class AccountView extends Component {
         {!isFirstRun && !isLoggedIn && view === 'login' &&
           <div>
             <p>Please sign in or <a onClick={this.viewCreate}>create an account</a>.</p>
-            <Login onSubmitClick={this.props.loginUser} />
+            <Login rooms={props.rooms} onSubmitClick={this.props.loginUser} />
           </div>
         }
 

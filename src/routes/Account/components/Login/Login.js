@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 
 export default class Login extends Component {
   render () {
-    const rooms = this.props.rooms || []
+    const { rooms } = this.props
 
     let roomOpts = rooms.map(function (room, i) {
       return (
@@ -40,6 +40,6 @@ export default class Login extends Component {
 }
 
 Login.propTypes = {
-  rooms: PropTypes.array,
+  rooms: PropTypes.array.isRequired,
   onSubmitClick: PropTypes.func.isRequired,
 }
