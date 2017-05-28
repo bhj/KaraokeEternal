@@ -8,21 +8,6 @@ const debug = require('debug')
 const log = debug('app:account')
 const getPrefs = require('../lib/getPrefs')
 
-// list available rooms
-router.get('/rooms', async (ctx, next) => {
-  const q = squel.select()
-    .from('rooms')
-    .where('status = ?', 'open')
-
-  try {
-    const { text, values } = q.toParam()
-    ctx.body = await db.all(text, values)
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-  }
-})
-
 // login
 router.post('/login', async (ctx, next) => {
   try {
