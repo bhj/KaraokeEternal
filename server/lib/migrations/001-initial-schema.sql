@@ -22,8 +22,9 @@ CREATE TABLE IF NOT EXISTS "queue" (
 
 CREATE TABLE IF NOT EXISTS "rooms" (
   "roomId" integer PRIMARY KEY AUTOINCREMENT,
+  "name" text,
   "status" text,
-  "name" text
+  "dateCreated" integer
 );
 
 CREATE TABLE IF NOT EXISTS "songs" (
