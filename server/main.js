@@ -40,7 +40,13 @@ app.use(async (ctx, next) => {
   try {
     ctx.user = jwtVerify(id_token, 'shared-secret')
   } catch (err) {
-    ctx.user = null
+    ctx.user = {
+      userId: null,
+      email: null,
+      name: null,
+      isAdmin: false,
+      roomId: null,
+    }
   }
 
   // make socket.io server (not koa-socket) available on ctx

@@ -7,7 +7,7 @@ const router = KoaRouter({ prefix: '/api/provider/cdg' })
 
 router.get('/ls', async (ctx, next) => {
   // check jwt validity
-  if (!ctx.user || !ctx.user.isAdmin) {
+  if (!ctx.user.isAdmin) {
     ctx.status = 401
     return
   }

@@ -14,7 +14,7 @@ let isScanning
 
 router.get('/scan', async (ctx, next) => {
   // check jwt validity
-  if (!ctx.user || !ctx.user.isAdmin) {
+  if (!ctx.user.isAdmin) {
     ctx.status = 401
     return
   }

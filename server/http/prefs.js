@@ -8,7 +8,7 @@ const getPrefs = require('../lib/getPrefs')
 
 router.post('/prefs', async (ctx, next) => {
   // must be admin
-  if (!ctx.user || !ctx.user.isAdmin) {
+  if (!ctx.user.isAdmin) {
     ctx.status = 401
     return
   }
@@ -91,7 +91,7 @@ router.get('/prefs', async (ctx, next) => {
   }
 
   // if not an admin, must be firstRun...
-  if (!ctx.user || !ctx.user.isAdmin) {
+  if (!ctx.user.isAdmin) {
     if (prefs.app && prefs.app.firstRun === true) {
       // ...and we only send prefs domain
       ctx.body = { app: prefs.app }
