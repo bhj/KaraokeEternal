@@ -1,12 +1,12 @@
 const user = require('./user')
 const prefs = require('./prefs')
-const room = require('./room')
+const rooms = require('./rooms')
 const Providers = require('./providers')
 
 let ROUTE_HANDLERS = {
   user,
   prefs,
-  room,
+  rooms,
 }
 
 // provider routes
