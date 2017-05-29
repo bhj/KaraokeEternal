@@ -5,7 +5,7 @@ import NoPlayer from './NoPlayer'
 import './PlaybackCtrl.css'
 
 const PlaybackCtrl = (props) => {
-  if (!props.isAdmin) {
+  if (!props.isInRoom) {
     return null
   }
 
@@ -42,8 +42,8 @@ const PlaybackCtrl = (props) => {
 }
 
 PlaybackCtrl.propTypes = {
-  isAdmin: PropTypes.bool.isRequired,
   isPlayerPresent: PropTypes.bool.isRequired,
+  isInRoom: PropTypes.bool.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   isAtQueueEnd: PropTypes.bool.isRequired,
   volume: PropTypes.number.isRequired,

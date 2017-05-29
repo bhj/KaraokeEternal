@@ -12,6 +12,8 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
+    isAdmin: state.user.isAdmin,
+    isInRoom: state.user.roomId !== null,
     isPlaying: state.room.isPlaying,
     isAtQueueEnd: state.room.isAtQueueEnd,
     volume: state.room.volume,
