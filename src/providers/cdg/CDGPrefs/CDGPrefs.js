@@ -69,9 +69,6 @@ export default class CDGPrefs extends React.Component {
           <PathItem key={i} path={path} onRemoveClick={() => this.removePath(path)} isRemovable />
         )}
 
-        <br />
-        <br />
-        <br />
         <FolderChooser
           isVisible={this.state.isChoosing}
           onClosed={this.handleCloseChooser}
