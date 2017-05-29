@@ -34,11 +34,11 @@ export default class AccountForm extends Component {
           placeholder={mode === 'create' ? 'password' : 'new password (optional)'}
         />
         <input type='password' ref='newPasswordConfirm'
-          placeholder={mode === 'create' ? 'confirm password' : 'confirm new password'}
+          placeholder={mode === 'create' ? 'confirm password' : 'new password confirm'}
         />
 
         {mode === 'update' &&
-          <input type='password' ref='curPassword' placeholder='current password (required)' />
+          <input type='password' ref='curPassword' placeholder='current password' />
         }
 
         <br />
