@@ -6,7 +6,7 @@ A self-hosted, multi-room, multi-user karaoke party system built on open web tec
 
 ## Overview
 
-Karaoke Forever lets you host awesome karaoke parties without requiring proprietary apps, 3rd-party services or even an internet connection. Everyone gets a simple email/password-based account on your (local) server and can use their phone's browser to search and queue songs. The player is also browser-based and currently supports most .cdg (CD+Graphics) lyrics files with audio as well as YouTube channels (experimental). It takes a few bits and pieces to make all this work:
+Karaoke Forever lets you host awesome karaoke parties without requiring proprietary apps, 3rd-party services or even an internet connection. Everyone gets a simple email/password-based account on your (local) server and can use their phone's browser to search, queue and favorite songs. The player is also browser-based and currently supports most .cdg (CD+Graphics) lyrics files with audio as well as YouTube channels (experimental). It takes a few bits and pieces to make all this work:
 
 ### Server
 
@@ -14,7 +14,7 @@ Runs on a Mac/Win/Linux/etc. system on your local network to serve the app/playe
 
 ### App (Client)
 
-Everyone can use their phone's modern mobile browser to search by artist and title, queue songs and see who's up next without installing anything.
+Everyone can use their phone's modern mobile browser to search by artist and title, queue and favorite songs, and see who's up next without installing anything.
 
 ### Player (Client)
 
@@ -22,7 +22,7 @@ Just another name for the app when it's in "player" mode, so also completely bro
 
 ### Rooms
 
-Rooms (*think: sessions*) help organize parties by space, time or both (spacetime?) Even if you only have one physical room, create a new KF room before each session so you start with an empty queue (and keep a nice record of who sang what previously).
+Rooms (*think: sessions*) help organize parties by space, time or both (spacetime?) Even if you only have one physical room, create a new KF room before each session so that you 1) start with an empty queue and 2) keep a nice record of who sang what and when (this will be useful for generating fun statistics in the future)
 
 ### Audio Input
 
@@ -32,7 +32,7 @@ Karaoke Forever does not currently handle audio *input* since there are a wide v
 
 ### Install and run the server ###
 
-Requires [Node.js 8 or later](https://nodejs.org/en/) or later running on Mac, Windows, Linux or whatever else Node.js and SQLite will work on.
+Requires [Node.js 8](https://nodejs.org/en/) or later on Mac, Windows, Linux or whatever else Node.js, SQLite and bcrypt will work on.
 
 *These steps must be performed on the system that will run the Karaoke Forever server.*
 
