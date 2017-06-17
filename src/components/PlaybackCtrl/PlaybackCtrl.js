@@ -42,7 +42,6 @@ const PlaybackCtrl = (props) => {
 }
 
 PlaybackCtrl.propTypes = {
-  isPlayerPresent: PropTypes.bool.isRequired,
   isInRoom: PropTypes.bool.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   isAtQueueEnd: PropTypes.bool.isRequired,
