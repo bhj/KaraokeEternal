@@ -10,8 +10,7 @@ import {
 } from 'constants'
 
 // ------------------------------------
-// Set prefs (curried with domain before being
-// passed to providers)
+// Set prefs
 // ------------------------------------
 export function setPrefs (domain, data) {
   return (dispatch, getState) => {
