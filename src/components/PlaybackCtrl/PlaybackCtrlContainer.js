@@ -17,6 +17,7 @@ const mapStateToProps = (state) => {
     isPlaying: state.status.isPlaying,
     isAtQueueEnd: state.status.isAtQueueEnd,
     volume: state.status.volume,
+    isPlayerPresent: state.status.isPlayerPresent,
   }
 }
 
