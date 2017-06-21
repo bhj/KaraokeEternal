@@ -25,7 +25,8 @@ router.get('/media', async (ctx, next) => {
 
   // get song from db
   try {
-    const res = await getLibrary({ songId })
+    // 2nd param is true since we need providerData
+    const res = await getLibrary({ songId }, true)
 
     if (!res.songs.result.length) {
       ctx.status = 404
@@ -34,8 +35,7 @@ router.get('/media', async (ctx, next) => {
     }
 
     const row = res.songs.entities[res.songs.result[0]]
-    // should be the audio file path
-    file = JSON.parse(row.providerData).path
+    file = row.providerData.path
   } catch (err) {
     log(err.message)
     return Promise.reject(err)

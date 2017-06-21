@@ -3,7 +3,7 @@ const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:library:get')
 
-async function getLibrary (find = {}) {
+async function getLibrary (find = {}, providerData = false) {
   let artists = {
     result: [],
     entities: {}
@@ -22,6 +22,11 @@ async function getLibrary (find = {}) {
       .left_join('stars USING(songId)')
       .group('songId')
       .order('title')
+
+    // off by default since it requires extra processing
+    if (providerData) {
+      q.field('providerData')
+    }
 
     // artistId filter
     if (typeof find.artistId !== 'undefined') {
@@ -45,6 +50,10 @@ async function getLibrary (find = {}) {
 
     // normalize results
     rows.forEach(function (row) {
+      if (providerData) {
+        row.providerData = JSON.parse(row.providerData)
+      }
+
       songs.result.push(row.songId)
       songs.entities[row.songId] = row
 
