@@ -7,6 +7,11 @@ import {
   PLAYER_ERROR,
   PLAYER_LEAVE,
   GET_ROOMS,
+  ROOM_EDITOR_OPEN,
+  ROOM_EDITOR_CLOSE,
+  ROOM_UPDATE,
+  ROOM_CREATE,
+  ROOM_REMOVE,
   _SUCCESS,
   _ERROR,
 } from 'constants'
@@ -86,6 +91,124 @@ export function fetchRooms () {
   }
 }
 
+// ------------------------------------
+// Create room
+// ------------------------------------
+export function createRoom (data) {
+  return (dispatch, getState) => {
+    // informational
+    dispatch({
+      type: ROOM_CREATE,
+      payload: { data },
+    })
+
+    return fetch(`/api/rooms`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(data)
+    })
+      .then(checkStatus)
+      .then(res => res.json())
+      .then(res => {
+        dispatch(receiveRooms(res))
+        dispatch(closeRoomEditor())
+      })
+      .catch(err => {
+        dispatch({
+          type: ROOM_CREATE + _ERROR,
+          meta: { error: err.message },
+        })
+      })
+  }
+}
+
+// ------------------------------------
+// Update room
+// ------------------------------------
+export function updateRoom (roomId, data) {
+  return (dispatch, getState) => {
+    // informational
+    dispatch({
+      type: ROOM_UPDATE,
+      payload: { roomId, ...data },
+    })
+
+    return fetch(`/api/rooms/${roomId}`, {
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(data)
+    })
+      .then(checkStatus)
+      .then(res => res.json())
+      .then(res => {
+        dispatch(receiveRooms(res))
+        dispatch(closeRoomEditor())
+      })
+      .catch(err => {
+        dispatch({
+          type: ROOM_UPDATE + _ERROR,
+          meta: { error: err.message },
+        })
+      })
+  }
+}
+
+// ------------------------------------
+// Remove room
+// ------------------------------------
+export function removeRoom (roomId) {
+  return (dispatch, getState) => {
+    // informational
+    dispatch({
+      type: ROOM_REMOVE,
+      payload: roomId,
+    })
+
+    return fetch(`/api/rooms/${roomId}`, {
+      method: 'DELETE',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(checkStatus)
+      .then(res => res.json())
+      .then(res => {
+        dispatch(receiveRooms(res))
+        dispatch(closeRoomEditor())
+      })
+      .catch(err => {
+        dispatch({
+          type: ROOM_REMOVE + _ERROR,
+          meta: { error: err.message },
+        })
+      })
+  }
+}
+
+// ------------------------------------
+// open/close room editor dialog
+// ------------------------------------
+export function openRoomEditor (roomId) {
+  return {
+    type: ROOM_EDITOR_OPEN,
+    payload: roomId,
+  }
+}
+
+export function closeRoomEditor () {
+  return {
+    type: ROOM_EDITOR_CLOSE,
+    payload: null
+  }
+}
+
 // helper for fetch response
 function checkStatus (response) {
   if (response.status >= 200 && response.status < 300) {
@@ -133,6 +256,16 @@ const ACTION_HANDLERS = {
     ...state,
     rooms: payload,
   }),
+  [ROOM_EDITOR_OPEN]: (state, { payload }) => ({
+    ...state,
+    isEditing: true,
+    editingRoomId: payload,
+  }),
+  [ROOM_EDITOR_CLOSE]: (state, { payload }) => ({
+    ...state,
+    isEditing: false,
+    editingRoomId: null,
+  }),
 }
 
 // ------------------------------------
@@ -145,8 +278,10 @@ const initialState = {
   isPlaying: false,
   isAtQueueEnd: false,
   isPlayerPresent: false,
-  rooms: [],
+  rooms: { result: [], entities: {} },
   errors: {},   // object of arrays keyed by queueId
+  isEditing: false,
+  editingRoomId: null,
 }
 
 export default function status (state = initialState, action) {

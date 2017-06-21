@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import Header from 'components/Header'
+import Rooms from '../components/Rooms'
 import Prefs from '../components/Prefs'
 import AccountForm from '../components/AccountForm'
 import Login from '../components/Login'
@@ -10,7 +11,7 @@ export default class AccountView extends Component {
   static propTypes = {
     isLoggedIn: PropTypes.bool,
     isFirstRun: PropTypes.bool,
-    rooms: PropTypes.array.isRequired,
+    rooms: PropTypes.object.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
     loginUser: PropTypes.func.isRequired,
@@ -61,6 +62,7 @@ export default class AccountView extends Component {
 
         {isLoggedIn &&
           <div>
+            <Rooms />
             <Prefs />
 
             <h2>My Account</h2>

@@ -35,6 +35,11 @@ module.exports = {
   CREATE: 'user/CREATE',
   UPDATE: 'user/UPDATE',
   GET_ROOMS: 'user/GET_ROOMS',
+  ROOM_UPDATE: 'room/UPDATE',
+  ROOM_CREATE: 'room/CREATE',
+  ROOM_REMOVE: 'room/REMOVE',
+  ROOM_EDITOR_OPEN: 'room/EDITOR_OPEN',
+  ROOM_EDITOR_CLOSE: 'room/EDITOR_CLOSE',
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',

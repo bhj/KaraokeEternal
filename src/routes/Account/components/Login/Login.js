@@ -5,11 +5,13 @@ export default class Login extends Component {
   render () {
     const { rooms } = this.props
 
-    let roomOpts = rooms.map(function (room, i) {
+    let roomOpts = rooms.result.map(roomId => {
+      const room = rooms.entities[roomId]
+
       return (
-        <option key={room.roomId} value={room.roomId}>{room.name}</option>
+        <option key={roomId} value={roomId}>{room.name}</option>
       )
-    }, this)
+    })
 
     return (
       <form>
@@ -40,6 +42,6 @@ export default class Login extends Component {
 }
 
 Login.propTypes = {
-  rooms: PropTypes.array.isRequired,
+  rooms: PropTypes.object.isRequired,
   onSubmitClick: PropTypes.func.isRequired,
 }
