@@ -1,5 +1,5 @@
 import AccountContainer from './views/AccountContainer'
-import { fetchRooms } from 'store/modules/room'
+import { fetchRooms } from 'store/modules/rooms'
 import { fetchPrefs } from 'store/modules/prefs'
 
 // route definition

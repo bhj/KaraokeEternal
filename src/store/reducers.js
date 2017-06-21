@@ -6,7 +6,8 @@ import library from 'routes/Library/modules/library'
 import location from './modules/location'
 import prefs from './modules/prefs'
 import queue from 'routes/Queue/modules/queue'
-import room from './modules/room'
+import rooms from './modules/rooms'
+import status from './modules/status'
 import ui from './modules/ui'
 import user from './modules/user'
 
@@ -16,7 +17,8 @@ export const makeRootReducer = (asyncReducers) => {
     location,
     prefs,
     queue,
-    room,
+    rooms,
+    status,
     ui,
     user,
     viewport: createResponsiveStateReducer(null, {
