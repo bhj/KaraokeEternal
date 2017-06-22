@@ -104,7 +104,7 @@ async function getLibrary (find = {}, providerData = false) {
     return Promise.reject(err)
   }
 
-  log('retrieved %s artists, %s songs', artists.result.length, songs.result.length)
+  log('%s songs by %s artists', songs.result.length, artists.result.length)
   return { artists, songs }
 }
 

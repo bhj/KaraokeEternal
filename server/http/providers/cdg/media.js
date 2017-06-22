@@ -56,7 +56,7 @@ router.get('/media', async (ctx, next) => {
   }
 
   // stream it!
-  log('starting stream: %s', file)
+  log('streaming %s', file)
 
   ctx.length = stats.size
   ctx.body = fs.createReadStream(file)
