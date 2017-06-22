@@ -22,6 +22,7 @@ const {
   LIBRARY_UPDATE,
   QUEUE_UPDATE,
   SOCKET_AUTH_ERROR,
+  PLAYER_ENTER,
   PLAYER_LEAVE,
 } = require('./constants')
 
@@ -119,7 +120,17 @@ app._io.on('connection', async (sock) => {
   } catch (err) {
     debug(err)
   }
+
+  // player in room?
+  const hasPlayer = Object.keys(room.sockets).some(id => {
+    return app._io.sockets.sockets[id]._isPlayer === true
   })
+
+  if (hasPlayer) {
+    app._io.to(user.roomId).emit('action', {
+      type: PLAYER_ENTER,
+    })
+  }
 })
 
 // koa-socket middleware

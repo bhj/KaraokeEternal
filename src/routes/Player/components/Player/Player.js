@@ -19,17 +19,17 @@ class Player extends React.Component {
     getMediaSuccess: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
     cancelStatus: PropTypes.func.isRequired,
+    emitEnter: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
     emitLeave: PropTypes.func.isRequired,
   }
 
   componentDidMount () {
-    // emit initial state
-    this.props.emitStatus({
-      isPlaying: this.props.isPlaying,
-      position: 0,
-      volume: this.props.volume,
-    })
+    this.props.emitEnter()
+  }
+
+  componentWillUnmount () {
+    this.props.emitLeave()
   }
 
   componentDidUpdate (prevProps) {
@@ -63,10 +63,6 @@ class Player extends React.Component {
     if (this.props.isPlaying !== nextProps.isPlaying) {
       this.props.cancelStatus()
     }
-  }
-
-  componentWillUnmount () {
-    this.props.emitLeave()
   }
 
   render () {

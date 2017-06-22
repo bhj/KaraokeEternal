@@ -7,6 +7,7 @@ import {
   PLAYER_VOLUME,
   EMIT_PLAYER_STATUS,
   EMIT_PLAYER_ERROR,
+  EMIT_PLAYER_ENTER,
   EMIT_PLAYER_LEAVE,
   QUEUE_UPDATE,
 } from 'constants'
@@ -66,6 +67,12 @@ export function emitError (queueId, message) {
   return {
     type: EMIT_PLAYER_ERROR,
     payload: { queueId, message },
+  }
+}
+
+export function emitEnter () {
+  return {
+    type: EMIT_PLAYER_ENTER,
   }
 }
 

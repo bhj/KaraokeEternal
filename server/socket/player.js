@@ -14,6 +14,8 @@ const {
   PLAYER_STATUS,
   EMIT_PLAYER_ERROR,
   PLAYER_ERROR,
+  EMIT_PLAYER_ENTER,
+  PLAYER_ENTER,
   EMIT_PLAYER_LEAVE,
   PLAYER_LEAVE,
 } = require('../constants')
@@ -47,10 +49,6 @@ const ACTION_HANDLERS = {
     })
   },
   [EMIT_PLAYER_STATUS]: async (ctx, { payload }) => {
-    // flag this socket id as a player so
-    // we can tell the room if/when it leaves
-    ctx.sock._isPlayer = true
-
     ctx.sock.server.to(ctx.user.roomId).emit('action', {
       type: PLAYER_STATUS,
       payload,
@@ -60,6 +58,17 @@ const ACTION_HANDLERS = {
     ctx.sock.server.to(ctx.user.roomId).emit('action', {
       type: PLAYER_ERROR,
       payload,
+    })
+  },
+  [EMIT_PLAYER_ENTER]: async (ctx, { payload }) => {
+    // so we can tell the room when player leaves
+    ctx.sock._isPlayer = true
+
+    ctx.sock.server.to(ctx.user.roomId).emit('action', {
+      type: PLAYER_ENTER,
+      payload: {
+        socketId: ctx.socket.socket.id,
+      }
     })
   },
   [EMIT_PLAYER_LEAVE]: async (ctx, { payload }) => {

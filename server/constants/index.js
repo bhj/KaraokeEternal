@@ -21,12 +21,14 @@ module.exports = {
   PLAYER_PLAY: 'player/PLAY',
   PLAYER_VOLUME: 'player/VOLUME',
   // player -> server -> clients
-  PLAYER_STATUS: 'room/PLAYER_STATUS',
-  PLAYER_ERROR: 'room/PLAYER_ERROR',
-  PLAYER_LEAVE: 'room/PLAYER_LEAVE',
+  PLAYER_STATUS: 'status/PLAYER_STATUS',
+  PLAYER_ERROR: 'status/PLAYER_ERROR',
+  PLAYER_ENTER: 'status/PLAYER_ENTER',
+  PLAYER_LEAVE: 'status/PLAYER_LEAVE',
   // to room (player -> server -> clients)
   EMIT_PLAYER_STATUS: 'server/EMIT_PLAYER_STATUS',
   EMIT_PLAYER_ERROR: 'server/EMIT_PLAYER_ERROR',
+  EMIT_PLAYER_ENTER:  'server/EMIT_PLAYER_ENTER',
   EMIT_PLAYER_LEAVE:  'server/EMIT_PLAYER_LEAVE',
   // user
   TOGGLE_SONG_STARRED: 'server/TOGGLE_SONG_STARRED',
