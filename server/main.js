@@ -71,11 +71,10 @@ io.attach(app)
 
 app._io.on('connection', async (sock) => {
   const { id_token } = parseCookie(sock.handshake.headers.cookie)
-  let user
+  let user, room
 
   try {
     sock.decoded_token = jwtVerify(id_token, 'shared-secret')
-    user = sock.decoded_token
   } catch (err) {
     app._io.to(sock.id).emit('action', {
       type: SOCKET_AUTH_ERROR,
@@ -90,28 +89,36 @@ app._io.on('connection', async (sock) => {
   }
 
   // authentication successful
-  // join socket room
-  if (user.roomId) {
-    sock.join(user.roomId)
-    const room = sock.adapter.rooms[user.roomId] || []
+  user = sock.decoded_token
 
-    debug('%s (%s) joined room %s (%s in room)',
-      user.name, sock.id, user.roomId, room.length
-    )
+  // add user to socket room
+  sock.join(user.roomId)
 
-    // send queue
-    // @todo add try/catch
+  room = sock.adapter.rooms[user.roomId]
+
+  debug('%s (%s) joined room %s (%s in room)',
+    user.name, sock.id, user.roomId, room.length
+  )
+
+  // send queue
+  try {
     app._io.to(sock.id).emit('action', {
       type: QUEUE_UPDATE,
       payload: await getQueue(user.roomId),
     })
+  } catch (err) {
+    debug(err)
   }
 
   // send library
-  // @todo add try/catch
-  app._io.to(sock.id).emit('action', {
-    type: LIBRARY_UPDATE,
-    payload: await getLibrary(),
+  try {
+    app._io.to(sock.id).emit('action', {
+      type: LIBRARY_UPDATE,
+      payload: await getLibrary(),
+    })
+  } catch (err) {
+    debug(err)
+  }
   })
 })
 
