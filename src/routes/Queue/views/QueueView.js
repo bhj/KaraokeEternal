@@ -24,6 +24,10 @@ class QueueView extends React.Component {
 
   render () {
     const props = this.props
+
+    // library may not have loaded yet
+    if (!props.artists.result.length) return null
+
     return (
       <div>
         <Header />
