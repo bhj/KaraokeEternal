@@ -25,6 +25,11 @@ const {
   PLAYER_LEAVE,
 } = require('./constants')
 
+// debug: log stack trace for unhandled promise rejections
+process.on('unhandledRejection', (reason, p) => {
+  debug('Unhandled Rejection at: Promise', p, 'reason:', reason)
+})
+
 const app = new Koa()
 const io = new KoaSocket()
 
