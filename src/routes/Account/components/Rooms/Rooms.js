@@ -7,6 +7,7 @@ import styles from 'react-virtualized/styles.css'
 export default class Rooms extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
     width: PropTypes.number,
     // Actions
     openRoomEditor: PropTypes.func.isRequired,
@@ -18,9 +19,9 @@ export default class Rooms extends Component {
   }
 
   render () {
-    const { rooms, width } = this.props
+    const { rooms, isAdmin, width } = this.props
 
-    if (typeof width === 'undefined') return null
+    if (!isAdmin || typeof width === 'undefined') return null
 
     return (
       <div>
