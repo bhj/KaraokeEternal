@@ -125,7 +125,7 @@ export function logoutUser () {
     })
     .then(checkStatus)
     .then(response => {
-      // should clear cookie field containing JWT
+      // server response should have cleared our cookie
       dispatch(receiveLogout())
     })
     .catch(err => {
@@ -137,8 +137,6 @@ export function logoutUser () {
 
       // disconnect socket
       window._socket.close()
-    }).catch(() => {
-      // not much we can do
     })
   }
 }

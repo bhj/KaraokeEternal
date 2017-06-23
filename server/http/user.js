@@ -20,6 +20,7 @@ router.post('/login', async (ctx, next) => {
 
 // logout
 router.get('/logout', async (ctx, next) => {
+  // @todo force socket room leave
   ctx.cookies.set('id_token', '')
   ctx.status = 200
 })

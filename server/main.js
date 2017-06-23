@@ -152,12 +152,13 @@ io.on('action', socketActions)
 // log disconnect/leave
 io.on('disconnect', (ctx, data) => {
   const user = ctx.user
-  const sock = ctx.socket.socket
-  const room = sock.adapter.rooms[user.roomId]
 
-  if (!user.roomId || !room) {
+  if (!user.roomId) {
     return
   }
+
+  const sock = ctx.socket.socket
+  const room = sock.adapter.rooms[user.roomId] || []
 
   debug('%s (%s) left room %s (%s in room)',
     user.name, sock.id, user.roomId, room.length
