@@ -22,7 +22,7 @@ Just another name for the app when it's in "player" mode, so also completely bro
 
 ### Rooms
 
-Rooms (*think: sessions*) help organize parties by space, time or both (spacetime?) Even if you only have one physical room, create a new KF room before each session so that you 1) start with an empty queue and 2) keep a nice record of who sang what and when (this will be useful for generating fun statistics in the future)
+Rooms (*think: sessions*) help organize parties by space, time or both (spacetime?) Even if you only have one physical room, create a new KF room before each session so that you 1) start with an empty queue and 2) preserve a record of who sang what previously (this will be useful for generating fun statistics in the future)
 
 ### Audio Input
 
@@ -47,7 +47,7 @@ Requires [Node.js 8](https://nodejs.org/en/) or later on Mac, Windows, Linux or 
 
 1. Browse to the **server URL** (include the port number, e.g. http://10.0.1.2:3000) and you should see the app prompting to create your first (admin) account
 2. Enter your user details and click Create Account
-3. You should now be signed in to your account page and see the **Providers** and **Rooms** sections. Onward!
+3. You're now signed in as an admin to a default room ("Room 1"). At this point others can visit the server URL from their phone's browser and login or create an account, choosing Room 1 as they do so. Of course, we'll still need to get some songs added to the library. Onward!
 
 ### Set up providers ###
 
@@ -63,23 +63,13 @@ Supports YouTube videos on a per-channel basis. This requires a [YouTube API Dev
 
 - singkingkaraoke ([Patreon](https://www.patreon.com/singkingkaraoke), [YouTube](https://www.youtube.com/user/singkingkaraoke))
 
-### Create and join a room ###
-
-There needs to be an open room before others can sign in. Only admins can create rooms, so it's up to you!
-
-1. In the Rooms section of your account page, click Create Room
-2. On the just-created room, click Join
-3. You'll be taken to the room's Queue view (currently empty of course) and can now queue songs from the Library view
-
-We're still missing a player, but at this point others can visit the server URL from their phone's browser and select this room to login or create an account.
-
 ### Start player ###
 
-*If you're not on the system that will be running the player (see **Player** in the Overview above) go there now, sign in via the server URL, and join the room.*
+*If you're not on the system that will be running the player (see **Player** in the Overview above) go there now and sign in via the server URL.*
 
 When you're an admin in a room without a player, you'll see a notice at the top with a **Start Player** link. Click it and you should now see the player, along with playback controls and a button to go fullscreen.
 
-The room's playback controls (play/pause, next and volume) are always available as an admin. When in play mode, the player will play as long as there are songs in the queue. It will stay in play mode even when out of songs so that the next time a song is queued it will start automatically.
+The room's playback controls (play/pause, next and volume) are always available as an admin. In play mode, the player  plays as long as there are songs in the queue. It will stay in play mode even when out of songs so that the next time a song is queued it will start automatically.
 
 You're now ready to test your audio setup and start the party!
 
