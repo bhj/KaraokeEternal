@@ -30,7 +30,7 @@ export default class AccountView extends Component {
     const { view } = this.state
 
     return (
-      <div style={{ ...viewportStyle }}>
+      <div style={{ overflowY: 'scroll', ...viewportStyle }}>
         <Header />
 
         {!isLoggedIn &&
