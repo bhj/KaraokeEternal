@@ -72,13 +72,26 @@ router.post('/account/create', async (ctx, next) => {
   }
 
   try {
-    // will need to make an admin if it's first run
     const prefs = await getPrefs('app')
+
+    if (prefs.firstRun === true) {
+      // create default room
+      const q = squel.insert()
+        .into('rooms')
+        .set('name', 'Room 1')
+        .set('status', 'open')
+        .set('dateCreated', Math.floor(Date.now() / 1000))
+
+      const { text, values } = q.toParam()
+      const res = await db.run(text, values)
+
+      roomId = res.stmt.lastID
+    } else {
+      // @todo: validate roomId
+    }
 
     // hash new password
     const hashedPwd = await bcrypt.hash(newPassword, 12)
-
-    // @todo validate roomId
 
     // insert user
     const q = squel.insert()

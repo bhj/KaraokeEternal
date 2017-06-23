@@ -40,7 +40,7 @@ export default class AccountView extends Component {
         {isFirstRun &&
           <div>
             <p>Create your <b>admin</b> account to get started.</p>
-            <AccountForm mode='create' {...props} />
+            <AccountForm mode='create' isFirstRun={isFirstRun} {...props} />
           </div>
         }
 
@@ -56,7 +56,7 @@ export default class AccountView extends Component {
             <p>Create an account below to join the party.<br />
               Already have an account? <a onClick={this.viewLogin}>Sign in</a>
             </p>
-            <AccountForm mode='create' {...props} />
+            <AccountForm mode='create' isFirstRun={isFirstRun} {...props} />
           </div>
         }
 
@@ -67,7 +67,7 @@ export default class AccountView extends Component {
 
             <h2>My Account</h2>
             <p>Signed in as <b>{props.user.email}</b></p>
-            <AccountForm mode='update' {...props} />
+            <AccountForm mode='update' isFirstRun={isFirstRun} {...props} />
 
             <Logout onLogoutClick={props.logoutUser} />
           </div>

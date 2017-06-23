@@ -10,6 +10,11 @@ export default class Rooms extends Component {
     width: PropTypes.number,
     // Actions
     openRoomEditor: PropTypes.func.isRequired,
+    fetchRooms: PropTypes.func.isRequired,
+  }
+
+  componentDidMount () {
+    this.props.fetchRooms()
   }
 
   render () {

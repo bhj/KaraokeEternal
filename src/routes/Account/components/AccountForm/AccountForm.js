@@ -5,6 +5,8 @@ export default class AccountForm extends Component {
   static propTypes = {
     user: PropTypes.object,
     mode: PropTypes.string.isRequired,
+    rooms: PropTypes.object.isRequired,
+    isFirstRun: PropTypes.bool.isRequired,
     createUser: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
   }
@@ -15,7 +17,15 @@ export default class AccountForm extends Component {
   }
 
   render () {
-    const { mode } = this.props
+    const { mode, isFirstRun, rooms } = this.props
+
+    let roomOpts = rooms.result.map(roomId => {
+      const room = rooms.entities[roomId]
+
+      return (
+        <option key={roomId} value={roomId}>{room.name}</option>
+      )
+    })
 
     return (
       <form>
@@ -39,6 +49,12 @@ export default class AccountForm extends Component {
 
         {mode === 'update' &&
           <input type='password' ref='curPassword' placeholder='current password' />
+        }
+
+        {mode === 'create' && !isFirstRun &&
+          <label>Choose Room
+            <select ref='room'>{roomOpts}</select>
+          </label>
         }
 
         <br />
@@ -70,6 +86,10 @@ export default class AccountForm extends Component {
     if (this.props.mode === 'update') {
       this.props.updateUser(user)
     } else {
+      if (!this.props.isFirstRun) {
+        user.roomId = parseInt(this.refs.room.value, 10)
+      }
+
       this.props.createUser(user)
     }
   }

@@ -7,7 +7,7 @@ export const NoRoom = ({ viewportStyle }) => (
   <div style={viewportStyle} styleName='container'>
     <div styleName='text'>
       <h1>Get a Room!</h1>
-      <p><Link to='/account'>Join a room</Link> to start queueing songs.</p>
+      <p><Link to='/account'>Sign in to a room</Link> to start queueing songs.</p>
     </div>
   </div>
 )
