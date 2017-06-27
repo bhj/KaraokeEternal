@@ -153,7 +153,7 @@ io.on('action', socketActions)
 io.on('disconnect', (ctx, data) => {
   const user = ctx.user
 
-  if (!user.roomId) {
+  if (!user || !user.roomId) {
     return
   }
 
