@@ -1,6 +1,7 @@
 .container {
   position: fixed;
   bottom: 0;
+  left: 0;
   display: flex;
   padding-top: 6px;
   border-top: 1px solid #ddd;
