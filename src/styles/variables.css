@@ -1,0 +1,12 @@
+:root {
+  /* Defaults */
+  --background: #333;
+  --text: #ccc;
+  --border-radius: 5px;
+  --container-padding: 10px;
+
+  /* Account widgets */
+  --widget-background-color: #555;
+  --widget-title-size: 24px;
+  --widget-title-margin: 0 0 10px 0;
+}

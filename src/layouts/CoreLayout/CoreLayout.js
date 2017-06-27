@@ -5,7 +5,7 @@ import { SkyLightStateless } from 'react-skylight'
 // global styles should be imported early to ensure
 // they appear before styles imported by components
 import 'normalize.css'
-import '../../styles/globalStyle.css'
+import '../../styles/global.css'
 
 export const CoreLayout = (props) => {
   const viewportStyle = {

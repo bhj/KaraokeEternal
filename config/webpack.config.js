@@ -136,7 +136,7 @@ webpackConfig.module.rules = [{
 
 // Global Style
 webpackConfig.module.rules.push({
-  test : /(globalStyle)\.css$/,
+  test : /(global)\.css$/,
   use  : [{
     loader : 'style-loader'
   }, {
@@ -152,7 +152,7 @@ webpackConfig.module.rules.push({
 // CSS Modules
 webpackConfig.module.rules.push({
   test : /\.css$/,
-  exclude : /(globalStyle)\.css$/,
+  exclude : /(global)\.css$/,
   use  : [{
     loader : 'style-loader'
   }, {
