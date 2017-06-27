@@ -1,0 +1,12 @@
+.container {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding: var(--container-padding);
+}
+
+.widget-container {
+  background-color: var(--widget-background-color);
+  border-radius: var(--border-radius);
+  padding: var(--container-padding);
+  margin: 10px 0;
+}

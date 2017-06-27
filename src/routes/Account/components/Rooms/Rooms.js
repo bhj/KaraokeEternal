@@ -2,7 +2,8 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import EditRoom from './EditRoom'
 import { Column, Table } from 'react-virtualized'
-import styles from 'react-virtualized/styles.css'
+import style from './Rooms.css'
+import tableStyle from 'react-virtualized/styles.css'
 
 export default class Rooms extends Component {
   static propTypes = {
@@ -25,7 +26,7 @@ export default class Rooms extends Component {
 
     return (
       <div>
-        <h1>Rooms</h1>
+        <h1 styleName='style.title'>Rooms</h1>
         <Table
           width={width}
           height={rooms.result.length * 30 + 20}
@@ -33,8 +34,8 @@ export default class Rooms extends Component {
           rowHeight={30}
           rowCount={rooms.result.length}
           rowGetter={({ index }) => rooms.entities[rooms.result[index]]}
-          headerClassName={styles.ReactVirtualized__Table__headerRow}
-          rowClassName={styles.ReactVirtualized__Table__row}
+          headerClassName={tableStyle.ReactVirtualized__Table__headerRow}
+          rowClassName={tableStyle.ReactVirtualized__Table__row}
         >
           <Column
             label='Name'

@@ -4,11 +4,10 @@ import React, { Component } from 'react'
 export default class AccountForm extends Component {
   static propTypes = {
     user: PropTypes.object,
-    mode: PropTypes.string.isRequired,
     rooms: PropTypes.object.isRequired,
-    isFirstRun: PropTypes.bool.isRequired,
-    createUser: PropTypes.func.isRequired,
-    updateUser: PropTypes.func.isRequired,
+    requireRoom: PropTypes.bool.isRequired,
+    // actions
+    onSubmitClick: PropTypes.func.isRequired,
   }
 
   state = {
@@ -17,7 +16,7 @@ export default class AccountForm extends Component {
   }
 
   render () {
-    const { mode, isFirstRun, rooms } = this.props
+    const { user, requireRoom, rooms } = this.props
 
     let roomOpts = rooms.result.map(roomId => {
       const room = rooms.entities[roomId]
@@ -28,30 +27,28 @@ export default class AccountForm extends Component {
     })
 
     return (
-      <form>
+      <div>
         <input type='text' ref='name' placeholder='name (visible to others)'
-          value={this.state.name || ''}
+          value={this.state.name}
           onChange={this.handleNameChange}
-          autoFocus={mode === 'create'}
+          autoFocus={!user}
         />
         <input type='email' ref='email' placeholder='email (private)'
-          value={this.state.email || ''}
+          value={this.state.email}
           onChange={this.handleEmailChange}
-          autoFocus={mode === 'edit'}
         />
-
         <input type='password' ref='newPassword'
-          placeholder={mode === 'create' ? 'password' : 'new password (optional)'}
+          placeholder={user ? 'password' : 'new password (optional)'}
         />
         <input type='password' ref='newPasswordConfirm'
-          placeholder={mode === 'create' ? 'confirm password' : 'new password confirm'}
+          placeholder={user ? 'confirm password' : 'new password confirm'}
         />
 
-        {mode === 'update' &&
+        {user &&
           <input type='password' ref='curPassword' placeholder='current password' />
         }
 
-        {mode === 'create' && !isFirstRun &&
+        {requireRoom &&
           <label>Choose Room
             <select ref='room'>{roomOpts}</select>
           </label>
@@ -59,23 +56,22 @@ export default class AccountForm extends Component {
 
         <br />
         <button onClick={this.handleClick} className='button wide green raised'>
-          {mode === 'create' ? 'Create Account' : 'Update Account'}
+          {user ? 'Update Account' : 'Create Account'}
         </button>
-      </form>
+      </div>
     )
   }
 
   handleChange = (inputName, event) => {
     this.setState({ [inputName]: event.target.value })
   }
-
   handleNameChange = this.handleChange.bind(this, 'name')
   handleEmailChange = this.handleChange.bind(this, 'email')
 
   handleClick = (event) => {
     event.preventDefault()
     const { name, email, newPassword, newPasswordConfirm, curPassword } = this.refs
-    const user = {
+    const data = {
       name: name.value.trim(),
       email: email.value.trim(),
       password: curPassword ? curPassword.value : null,
@@ -83,14 +79,10 @@ export default class AccountForm extends Component {
       newPasswordConfirm: newPasswordConfirm.value
     }
 
-    if (this.props.mode === 'update') {
-      this.props.updateUser(user)
-    } else {
-      if (!this.props.isFirstRun) {
-        user.roomId = parseInt(this.refs.room.value, 10)
-      }
-
-      this.props.createUser(user)
+    if (this.props.requireRoom) {
+      data.roomId = parseInt(this.refs.room.value, 10)
     }
+
+    this.props.onSubmitClick(data)
   }
 }

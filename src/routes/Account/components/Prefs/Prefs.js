@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Providers from 'providers'
+import './Prefs.css'
 
 export default class Prefs extends React.Component {
   static propTypes = {
@@ -15,6 +16,8 @@ export default class Prefs extends React.Component {
 
     return (
       <div>
+        <h1 styleName='title'>Providers</h1>
+
         {Object.keys(Providers).map((p, i) => {
           const Component = Providers[p].prefComponent
 

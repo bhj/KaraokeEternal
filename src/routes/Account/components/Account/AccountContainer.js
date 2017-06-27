@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import AccountView from './AccountView'
+import Account from './Account'
 import { loginUser, logoutUser, createUser, updateUser } from 'store/modules/user'
 
 const mapActionCreators = {
@@ -12,10 +12,10 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
+    rooms: state.rooms,
     isLoggedIn: state.user.userId !== null,
     isFirstRun: state.prefs.app ? state.prefs.app.firstRun : false,
-    rooms: state.rooms,
   }
 }
 
-export default connect(mapStateToProps, mapActionCreators)(AccountView)
+export default connect(mapStateToProps, mapActionCreators)(Account)

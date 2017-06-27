@@ -1,4 +1,4 @@
-import AccountContainer from './views/AccountContainer'
+import AccountViewContainer from './views/AccountViewContainer'
 import { fetchRooms } from 'store/modules/rooms'
 import { fetchPrefs } from 'store/modules/prefs'
 
@@ -10,7 +10,7 @@ export default function (store) {
       store.dispatch(fetchRooms())
       store.dispatch(fetchPrefs())
 
-      cb(null, AccountContainer)
+      cb(null, AccountViewContainer)
     }
   }
 }
