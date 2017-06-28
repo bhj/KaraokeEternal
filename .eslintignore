@@ -1,6 +1,6 @@
-blueprints/**/files/**
-coverage/**
 node_modules/**
-dist/**
 src/index.html
+coverage/**
+*.spec.js
+dist/**
 wcdg.js

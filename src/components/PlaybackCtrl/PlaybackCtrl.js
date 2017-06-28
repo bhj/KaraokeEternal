@@ -46,6 +46,7 @@ PlaybackCtrl.propTypes = {
   isPlaying: PropTypes.bool.isRequired,
   isAtQueueEnd: PropTypes.bool.isRequired,
   volume: PropTypes.number.isRequired,
+  isPlayerPresent: PropTypes.bool.isRequired,
   // actions
   requestPlay: PropTypes.func.isRequired,
   requestPlayNext: PropTypes.func.isRequired,

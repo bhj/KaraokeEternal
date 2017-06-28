@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Link } from 'react-router'
 import './NoPlayer.css'
@@ -10,8 +9,5 @@ export const NoPlayer = (props) => (
     </p>
   </div>
 )
-
-NoPlayer.propTypes = {
-}
 
 export default NoPlayer
