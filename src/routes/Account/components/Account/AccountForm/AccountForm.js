@@ -55,7 +55,7 @@ export default class AccountForm extends Component {
         }
 
         <br />
-        <button onClick={this.handleClick} className='button wide green raised'>
+        <button onClick={this.handleClick} className='button primary'>
           {user ? 'Update Account' : 'Create Account'}
         </button>
       </div>

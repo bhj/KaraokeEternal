@@ -46,10 +46,10 @@ export default class FolderChooser extends React.Component {
         onOverlayClicked={this.props.onClosed}
         title='Add Folder'
         dialogStyles={{
-          width: '80%',
+          width: '90%',
           height: '90%',
           top: '5%',
-          left: '10%',
+          left: '5%',
           margin: 0,
         }}
       >
@@ -69,8 +69,8 @@ export default class FolderChooser extends React.Component {
           </div>
 
           <div style={{ display: 'flex' }}>
-            <button style={{ marginRight: '1em' }} className='button raised' onClick={this.props.onClosed}>Cancel</button>
-            <button style={{ flex: 1 }} className='button raised' onClick={this.handleChooseFolder}>Add Folder</button>
+            <button style={{ marginRight: '1em', width: 'auto' }} className='button' onClick={this.props.onClosed}>Cancel</button>
+            <button style={{ flex: 1, width: 'auto' }} className='button' onClick={this.handleChooseFolder}>Add Folder</button>
           </div>
         </div>
       </SkyLightStateless>

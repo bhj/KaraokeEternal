@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function Logout (props) {
   return (
-    <button className='button wide grey raised' onClick={props.onLogoutClick}>
+    <button className='button' onClick={props.onLogoutClick}>
       Sign Out
     </button>
   )

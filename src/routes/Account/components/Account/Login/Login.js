@@ -22,7 +22,7 @@ export default class Login extends Component {
         <select ref='room'>{roomOpts}</select>
         <br />
 
-        <button onClick={this.handleClick} className='button wide green raised'>
+        <button onClick={this.handleClick} className='button primary'>
           Sign In
         </button>
       </form>

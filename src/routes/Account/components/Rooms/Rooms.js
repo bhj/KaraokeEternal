@@ -62,7 +62,7 @@ export default class Rooms extends Component {
           />
         </Table>
 
-        <button onClick={() => this.props.openRoomEditor()} className='button wide green raised'>
+        <button onClick={() => this.props.openRoomEditor()} className='button primary'>
           Create Room
         </button>
 
