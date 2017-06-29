@@ -1,7 +1,7 @@
 :root {
   /* Defaults */
-  --background: #333;
-  --text: #ccc;
+  --background-color: #191F32;
+  --text-color: #ccc;
   --border-radius: 5px;
   --container-padding: 10px;
 
@@ -9,4 +9,15 @@
   --widget-background-color: #555;
   --widget-title-size: 24px;
   --widget-title-margin: 0 0 10px 0;
+
+  /* Library */
+  --artist-item-height: 44px;
+  --song-item-height: 44px;
+
+  /* PlaybackCtrl */
+  --transport-btn-color: #BA3A95;
+
+  /* Header/Footer (UI chrome) */
+  --chrome-background-color: var(--background-color);
+  --chrome-border-color: #333;
 }

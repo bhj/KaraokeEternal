@@ -2,18 +2,19 @@
   display: flex;
   line-height: 1;
   align-items: center;
-  color: #666;
   padding: 0 12px;
 }
 
 .play {
   font-size: 48px;
   height: 48px;
+  color: var(--transport-btn-color);
 }
 
 .pause {
   font-size: 48px;
   height: 48px;
+  color: var(--transport-btn-color);
 }
 
 .next {
@@ -22,10 +23,12 @@
   left: 4px;
   font-size: 54px;
   height: 48px;
+  color: var(--transport-btn-color);
 }
 
 .volume {
   margin: 0 30px;
+  color: var(--transport-btn-color);
 }
 
 .disabled {

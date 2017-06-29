@@ -1,6 +1,6 @@
 .container {
   display: flex;
-  height: 40px;
+  height: var(--artist-item-height);
   align-items: center;
   overflow: hidden;
 }
@@ -18,14 +18,14 @@
 }
 
 .folder {
-  height: 40px;
-  width: 40px;
+  height: var(--artist-item-height);
+  width: var(--artist-item-height);
   margin-right: 2px;
 }
 
 .icon {
   position: absolute;
-  font-size: 40px;
+  font-size: var(--artist-item-height);
   color: #999;
 }
 

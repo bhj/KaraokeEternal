@@ -6,7 +6,7 @@ import styles from './Navigation.css'
 
 export const Navigation = (props) => (
   <Measure onMeasure={props.setFooterHeight} whitelist={['height']}>
-    <div styleName='container'>
+    <div styleName='container' className='bg-blur'>
       <Link to='/library' styleName='styles.button' activeClassName={styles.active}>
         <i className='material-icons'>library_music</i>
       </Link>

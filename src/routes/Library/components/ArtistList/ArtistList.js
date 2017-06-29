@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
-const ROW_HEIGHT = 40
+const ROW_HEIGHT = 44
 
 class ArtistList extends React.Component {
   static propTypes = {

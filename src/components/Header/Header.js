@@ -7,7 +7,7 @@ import './Header.css'
 const Header = (props) => {
   return (
     <Measure onMeasure={props.setHeaderHeight} whitelist={['height']}>
-      <div styleName='container'>
+      <div styleName='container' className='bg-blur'>
         {props.isAdmin &&
           <PlaybackCtrl />
         }

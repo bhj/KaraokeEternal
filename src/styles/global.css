@@ -23,7 +23,7 @@ html,
 body {
   /* Helvetica Neue Regular Font Stack */
   font-family: "HelveticaNeue", "Helvetica Neue", "HelveticaNeueRoman", "HelveticaNeue-Roman", "Helvetica Neue Roman", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:400; font-stretch:normal;
-  color: var(--text);
+  color: var(--text-color);
 }
 
 a {
@@ -32,7 +32,7 @@ a {
 }
 
 body {
-  background-color: var(--background);
+  background-color: var(--background-color);
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -65,7 +65,7 @@ select:focus{
 
 /* Modal dialog */
 .skylight-dialog {
-  background-color: var(--background) !important;
+  background-color: var(--background-color) !important;
   border-radius: var(--border-radius) !important;
 }
 
@@ -84,4 +84,16 @@ select:focus{
   border: none;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   width: 100%;
+}
+
+.button.primary {
+
+}
+
+@supports (backdrop-filter: blur(10px) saturate(200%)) or (-webkit-backdrop-filter: blur(10px) saturate(200%)) {
+  .bg-blur {
+    background-color: transparent !important;
+    backdrop-filter: blur(10px) saturate(200%);
+    -webkit-backdrop-filter: blur(10px) saturate(200%);
+  }
 }
