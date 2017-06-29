@@ -1,18 +1,26 @@
 .container {
   display: flex;
+  align-items: center;
 }
 
-.clear {
-  height: 48px;
-  font-size: 48px;
-  color: #666;
-}
-
-.search {
+.searchInput {
   flex: 1;
   height: 48px;
   padding-left: 5px;
   font-size: 18px;
   border: none;
+  color: var(--text-color);
   background-color: inherit;
+}
+
+.searchIcon {
+  height: 40px;
+  font-size: 40px;
+  color: #666;
+}
+
+.clearIcon {
+  height: 48px;
+  font-size: 48px;
+  color: #666;
 }
