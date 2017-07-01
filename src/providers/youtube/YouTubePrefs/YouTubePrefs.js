@@ -76,20 +76,20 @@ export default class YouTubePrefs extends React.Component {
         </label>
 
         {prefs.enabled &&
-          <form onSubmit={this.updateApiKey}>
+          <div>
             <input type='text' ref='apiKey' placeholder='API key'
               defaultValue={prefs.apiKey}
               onBlur={this.updateApiKey}
             />
-          </form>
+
+            {prefs.channels.map((name, i) =>
+              <ChannelItem key={i} name={name} onRemoveClick={() => this.handleRemoveClick(name)} />
+            )}
+
+            <button onClick={this.handleOpenAdder}>Add Channel</button>
+            <button onClick={this.handleRefresh}>Refresh</button>
+          </div>
         }
-
-        {prefs.channels.map((name, i) =>
-          <ChannelItem key={i} name={name} onRemoveClick={() => this.handleRemoveClick(name)} />
-        )}
-
-        <button onClick={this.handleOpenAdder}>Add Channel</button>
-        <button onClick={this.handleRefresh}>Refresh</button>
 
         <SkyLightStateless
           isVisible={this.state.isAdding}
@@ -103,6 +103,7 @@ export default class YouTubePrefs extends React.Component {
             marginLeft: '0' }}
         >
           <input type='text' ref='name' placeholder='channel name' autoFocus />
+          <br />
           <button onClick={this.handleAddClick} className='button'>Add Channel</button>
         </SkyLightStateless>
       </div>
