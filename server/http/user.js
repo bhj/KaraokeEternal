@@ -143,7 +143,7 @@ router.post('/account/create', async (ctx, next) => {
 })
 
 // update
-router.post('/account/update', async (ctx, next) => {
+router.put('/account/update', async (ctx, next) => {
   let user
 
   // check jwt validity

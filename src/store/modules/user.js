@@ -229,7 +229,7 @@ export function updateUser (data) {
     dispatch(requestUpdate(data))
 
     return fetch('/api/account/update', {
-      method: 'POST',
+      method: 'PUT',
       credentials: 'same-origin',
       headers: new Headers({
         'Content-Type': 'application/json',
