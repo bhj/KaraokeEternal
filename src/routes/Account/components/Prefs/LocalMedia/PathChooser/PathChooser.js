@@ -2,9 +2,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import PathItem from '../PathItem'
 import { SkyLightStateless } from 'react-skylight'
-import './FolderChooser.css'
+import './PathChooser.css'
 
-export default class FolderChooser extends React.Component {
+export default class PathChooser extends React.Component {
   static propTypes = {
     isVisible: PropTypes.bool.isRequired,
     onChoose: PropTypes.func.isRequired,
@@ -22,7 +22,7 @@ export default class FolderChooser extends React.Component {
   }
 
   getListing = (dir) => {
-    const url = '/api/provider/cdg/ls?dir=' + encodeURIComponent(dir)
+    const url = '/api/prefs/ls?dir=' + encodeURIComponent(dir)
 
     fetch(url, fetchConfig)
       .then(checkStatus)

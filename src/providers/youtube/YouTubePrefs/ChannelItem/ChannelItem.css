@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  height: 40px;
+}
+
+.name {
+  font-size: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex: 1;
+}
+
+.remove {
+  font-size: 48px;
+}
+
+.folder {
+  font-size: 24px;
+  margin-right: 5px;
+}

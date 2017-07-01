@@ -2,11 +2,14 @@ const db = require('sqlite')
 const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:prefs')
+const path = require('path')
 const KoaRouter = require('koa-router')
-const router = KoaRouter({ prefix: '/api' })
+const router = KoaRouter({ prefix: '/api/prefs' })
 const getPrefs = require('../lib/getPrefs')
+const getFolders = require('../lib/thunks/getFolders')
 
-router.post('/prefs', async (ctx, next) => {
+// set preferences
+router.put('/', async (ctx, next) => {
   // must be admin
   if (!ctx.user.isAdmin) {
     ctx.status = 401
@@ -20,48 +23,44 @@ router.post('/prefs', async (ctx, next) => {
     return
   }
 
-  // currently only updates one key at a time
-  const keys = Object.keys(ctx.request.body)
-  const domain = decodeURIComponent(ctx.query.domain)
+  const q = squel.update()
+    .table('prefs')
+    .where('domain = ?', ctx.query.domain)
 
-  if (keys.length !== 1) {
-    ctx.status = 422
-    ctx.body = `One pref key per request required; got ${keys.length}`
-    return
-  }
+  Object.keys(ctx.request.body).forEach(key => {
+    let val = ctx.request.body[key]
 
-  // validated
-  let val = ctx.request.body[keys[0]]
-
-  // @todo: this sucks
-  if (Array.isArray(val)) {
-    if (val.length) {
-      // escape any double quotes
-      val = val.map(v => v.replace(/"/g, '\\"'))
-      // add double quotes around each element
-      // and the brackets to signify an array
-      val = '["' + val.join('","') + '"]'
-    } else {
-      val = '[]'
+    // @todo: this sucks
+    if (Array.isArray(val)) {
+      if (val.length) {
+        // escape any double quotes
+        val = val.map(v => v.replace(/"/g, '\\"'))
+        // add double quotes around each element
+        // and the brackets to signify an array
+        val = '["' + val.join('","') + '"]'
+      } else {
+        val = '[]'
+      }
+    } else if (typeof val === 'string') {
+      // force quotes
+      val = `"${val}"`
     }
-  }
 
-  // update db
-  try {
-    const q = squel.update()
-      .table('prefs')
-      .where('domain = ?', domain)
-      .set('data', squel.select()
-      .field(`json_set(data, '$.${keys[0]}', json('${val}'))`)
+    q.set('data', squel.select()
+      .field(`json_set(data, '$.${key}', json('${val}'))`)
       .from('prefs')
-      .where('domain = ?', domain)
+      .where('domain = ?', ctx.query.domain)
     )
+  })
 
+  // do update
+  try {
+    // console.log(q.toString())
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
 
     if (res.stmt.changes) {
-      log('%s updated %s.%s', ctx.user.name, domain, keys[0])
+      log('%s updated prefs in domain: %s', ctx.user.name, ctx.query.domain)
     }
   } catch (err) {
     ctx.status = 500
@@ -78,7 +77,8 @@ router.post('/prefs', async (ctx, next) => {
   }
 })
 
-router.get('/prefs', async (ctx, next) => {
+// get preferences
+router.get('/', async (ctx, next) => {
   let prefs
 
   // get prefs from all domains
@@ -104,6 +104,42 @@ router.get('/prefs', async (ctx, next) => {
   }
 
   ctx.body = prefs
+})
+
+// get folder listing
+router.get('/ls', async (ctx, next) => {
+  // check jwt validity
+  if (!ctx.user.isAdmin) {
+    ctx.status = 401
+    return
+  }
+
+  const dir = decodeURIComponent(ctx.query.dir)
+  const current = path.resolve(dir)
+  const parent = path.resolve(dir, '../')
+
+  try {
+    const list = await getFolders(dir)
+    const children = list.map(d => {
+      return {
+        path: d,
+        displayPath: d.replace(current + path.sep, '')
+      }
+    })
+
+    log('%s listed folder %s', ctx.user.name, current)
+
+    ctx.body = {
+      current,
+      // if at root, parent and current are the same
+      parent: parent === current ? false : parent,
+      // don't show hidden folders
+      children: children.filter(c => !c.displayPath.startsWith('.')),
+    }
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = err.message
+  }
 })
 
 module.exports = router

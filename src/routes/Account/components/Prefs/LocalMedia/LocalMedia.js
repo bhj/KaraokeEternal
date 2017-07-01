@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import PathItem from './PathItem'
-import FolderChooser from './FolderChooser'
+import PathChooser from './PathChooser'
 
-export default class CDGPrefs extends React.Component {
+export default class Paths extends React.Component {
   static propTypes = {
-    prefs: PropTypes.object.isRequired,
+    paths: PropTypes.array.isRequired,
     setPrefs: PropTypes.func.isRequired,
     requestScan: PropTypes.func.isRequired,
   }
@@ -14,12 +14,8 @@ export default class CDGPrefs extends React.Component {
     isChoosing: false,
   }
 
-  updateEnabled = (e) => {
-    this.props.setPrefs('provider.cdg', { enabled: e.target.checked })
-  }
-
   addPath = (path) => {
-    const { paths } = this.props.prefs
+    const { paths } = this.props
 
     // is path already configured?
     if (paths.includes(path)) {
@@ -27,20 +23,22 @@ export default class CDGPrefs extends React.Component {
       return
     }
 
-    this.props.setPrefs('provider.cdg', { paths: [...paths, path] })
+    this.props.setPrefs('app', { paths: [...paths, path] })
     this.setState({ isChoosing: false })
   }
 
   removePath = (path) => {
-    const { paths } = this.props.prefs
+    const { paths } = this.props
     const idx = paths.indexOf(path)
 
     if (idx === -1) {
-      alert('Path not in library; nothing to do')
+      // nothing to do
       return
     }
 
-    this.props.setPrefs('provider.cdg', { paths: paths.filter(p => p !== path) })
+    if (confirm(`Remove this folder from the library?\n\n${path}`)) {
+      this.props.setPrefs('app', { paths: paths.filter(p => p !== path) })
+    }
   }
 
   handleRefresh = () => {
@@ -51,25 +49,24 @@ export default class CDGPrefs extends React.Component {
   handleCloseChooser = () => { this.setState({ isChoosing: false }) }
 
   render () {
-    const { prefs } = this.props
-    if (!prefs) return null
+    const { paths } = this.props
 
     return (
       <div style={{ overflow: 'hidden' }}>
-        <label>
-          <input type='checkbox' checked={prefs.enabled} onChange={this.updateEnabled} />
-          <strong> CD+Graphics (.cdg + audio)</strong>
-        </label>
+        <h2>Media folders</h2>
 
-        <br />
-        <button onClick={this.handleOpenChooser}>Add Folder</button>
-        <button onClick={this.handleRefresh}>Refresh</button>
+        {paths.length === 0 &&
+          <p>There are no folders configured.</p>
+        }
 
-        {prefs.paths.map((path, i) =>
+        {paths.map((path, i) =>
           <PathItem key={i} path={path} onRemoveClick={() => this.removePath(path)} isRemovable />
         )}
 
-        <FolderChooser
+        <button onClick={this.handleOpenChooser}>Add Folder</button>
+        <button onClick={this.handleOpenChooser}>Refresh</button>
+
+        <PathChooser
           isVisible={this.state.isChoosing}
           onClosed={this.handleCloseChooser}
           onChoose={this.addPath}

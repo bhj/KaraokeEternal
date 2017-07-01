@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS "prefs" (
   "data" text
 );
 
-INSERT INTO prefs (domain,data) VALUES ('app','{"firstRun":true}');
-INSERT INTO prefs (domain,data) VALUES ('provider.cdg','{"enabled":true,"paths":[]}');
+INSERT INTO prefs (domain,data) VALUES ('app','{"firstRun":true,"paths":[]}');
+INSERT INTO prefs (domain,data) VALUES ('provider.cdg','{"enabled":true}');
 INSERT INTO prefs (domain,data) VALUES ('provider.youtube','{"enabled":true,"channels":[],"apiKey":""}');
 
 CREATE TABLE IF NOT EXISTS "queue" (

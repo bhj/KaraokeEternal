@@ -21,7 +21,7 @@ export function setPrefs (domain, data) {
     })
 
     return fetch(`/api/prefs?domain=${encodeURIComponent(domain)}`, {
-      method: 'POST',
+      method: 'PUT',
       credentials: 'same-origin',
       headers: new Headers({
         'Content-Type': 'application/json',
