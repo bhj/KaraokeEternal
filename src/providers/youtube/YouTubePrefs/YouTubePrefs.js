@@ -30,6 +30,11 @@ export default class YouTubePrefs extends React.Component {
     const { channels } = this.props.prefs
     const name = this.refs.name.value
 
+    if (!name.trim()) {
+      alert('Invalid channel name')
+      return
+    }
+
     if (channels.includes(name)) {
       alert('Channel is already added')
       return
