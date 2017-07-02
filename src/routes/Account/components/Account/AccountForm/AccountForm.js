@@ -38,10 +38,10 @@ export default class AccountForm extends Component {
           onChange={this.handleEmailChange}
         />
         <input type='password' ref='newPassword'
-          placeholder={user ? 'password' : 'new password (optional)'}
+          placeholder={user ? 'new password (optional)' : 'password'}
         />
         <input type='password' ref='newPasswordConfirm'
-          placeholder={user ? 'confirm password' : 'new password confirm'}
+          placeholder={user ? 'new password confirm' : 'confirm password'}
         />
 
         {user &&
