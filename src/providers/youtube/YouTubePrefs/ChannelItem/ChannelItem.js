@@ -6,13 +6,13 @@ const ChannelItem = (props) => {
   return (
     <div styleName='container'>
       <div>
-        <i className='material-icons' styleName='folder'>folder</i>
+        <i className='material-icons' styleName='channelIcon'>cloud</i>
       </div>
       <div styleName='name'>
         {props.name}
       </div>
       <div onClick={props.onRemoveClick}>
-        <i className='material-icons' styleName='remove'>clear</i>
+        <i className='material-icons' styleName='removeIcon'>clear</i>
       </div>
     </div>
   )

@@ -35,7 +35,7 @@ export const CoreLayout = (props) => {
       >
         <p>{props.errorMessage}</p>
         <br /><br /><br />
-        <button className='button' onClick={props.clearErrorMessage}>Dismiss</button>
+        <button onClick={props.clearErrorMessage}>Dismiss</button>
       </SkyLightStateless>
     </div>
   )

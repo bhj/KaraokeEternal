@@ -63,8 +63,12 @@ export default class Paths extends React.Component {
           <PathItem key={i} path={path} onRemoveClick={() => this.removePath(path)} isRemovable />
         )}
 
-        <button onClick={this.handleOpenChooser}>Add Folder</button>
-        <button onClick={this.handleOpenChooser}>Refresh</button>
+        <div style={{ display: 'flex' }}>
+          <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenChooser}>Add Folder</button>
+          {paths.length > 0 &&
+            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleOpenChooser}>Refresh</button>
+          }
+        </div>
 
         <PathChooser
           isVisible={this.state.isChoosing}

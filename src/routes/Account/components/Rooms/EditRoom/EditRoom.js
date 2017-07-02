@@ -41,24 +41,24 @@ export default class EditRoom extends Component {
         </label>
 
         {!room &&
-          <button onClick={this.handleCreateClick} className='button'>
+          <button onClick={this.handleCreateClick}>
             Create Room
           </button>
         }
 
         {room &&
-          <button onClick={this.handleUpdateClick} className='button'>
+          <button onClick={this.handleUpdateClick}>
             Update Room
           </button>
         }
 
         {room &&
-          <button onClick={this.handleRemoveClick} className='button'>
+          <button onClick={this.handleRemoveClick}>
             Remove Room
           </button>
         }
 
-        <button onClick={this.props.closeRoomEditor} className='button'>Cancel</button>
+        <button onClick={this.props.closeRoomEditor}>Cancel</button>
       </SkyLightStateless>
     )
   }

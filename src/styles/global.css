@@ -75,7 +75,7 @@ select:focus{
 }
 
 /* Buttons */
-.button {
+button {
   display: inline-block;
   padding: 16px;
   border-radius: var(--border-radius);

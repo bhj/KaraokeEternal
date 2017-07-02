@@ -72,7 +72,7 @@ export default class YouTubePrefs extends React.Component {
       <div>
         <label>
           <input type='checkbox' checked={prefs.enabled} onChange={this.updateEnabled} />
-          YouTube Channels
+          &nbsp;YouTube Channels
         </label>
 
         {prefs.enabled &&
@@ -86,8 +86,12 @@ export default class YouTubePrefs extends React.Component {
               <ChannelItem key={i} name={name} onRemoveClick={() => this.handleRemoveClick(name)} />
             )}
 
-            <button onClick={this.handleOpenAdder}>Add Channel</button>
-            <button onClick={this.handleRefresh}>Refresh</button>
+            <div style={{ display: 'flex' }}>
+              <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenAdder}>Add Channel</button>
+              {prefs.channels.length > 0 &&
+                <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleOpenChooser}>Refresh</button>
+              }
+            </div>
           </div>
         }
 
@@ -104,7 +108,10 @@ export default class YouTubePrefs extends React.Component {
         >
           <input type='text' ref='name' placeholder='channel name' autoFocus />
           <br />
-          <button onClick={this.handleAddClick} className='button'>Add Channel</button>
+          <div style={{ display: 'flex' }}>
+            <button style={{ flex: 1, width: 'auto' }} onClick={this.handleAddClick}>Add Channel</button>
+            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleCloseAdder}>Cancel</button>
+          </div>
         </SkyLightStateless>
       </div>
     )

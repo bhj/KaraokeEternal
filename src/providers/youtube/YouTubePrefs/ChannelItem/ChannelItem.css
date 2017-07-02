@@ -12,11 +12,11 @@
   flex: 1;
 }
 
-.remove {
-  font-size: 48px;
-}
-
-.folder {
+.channelIcon {
   font-size: 24px;
   margin-right: 5px;
+}
+
+.removeIcon {
+  font-size: 48px;
 }
