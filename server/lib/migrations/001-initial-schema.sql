@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "prefs" (
 
 INSERT INTO prefs (domain,data) VALUES ('app','{"firstRun":true,"paths":[]}');
 INSERT INTO prefs (domain,data) VALUES ('provider.cdg','{"enabled":true}');
-INSERT INTO prefs (domain,data) VALUES ('provider.youtube','{"enabled":true,"channels":[],"apiKey":""}');
+INSERT INTO prefs (domain,data) VALUES ('provider.youtube','{"enabled":false,"channels":[],"apiKey":""}');
 
 CREATE TABLE IF NOT EXISTS "queue" (
   "queueId" integer PRIMARY KEY AUTOINCREMENT,
