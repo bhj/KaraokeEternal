@@ -1,8 +1,9 @@
 import { connect } from 'react-redux'
 import Prefs from './Prefs'
-import { setPrefs, requestScan } from 'store/modules/prefs'
+import { fetchPrefs, setPrefs, requestScan } from 'store/modules/prefs'
 
 const mapActionCreators = {
+  fetchPrefs,
   setPrefs,
   requestScan,
 }

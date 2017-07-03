@@ -6,7 +6,12 @@ import './Prefs.css'
 
 export default class Prefs extends React.Component {
   static propTypes = {
+    fetchPrefs: PropTypes.func.isRequired,
     prefs: PropTypes.object.isRequired,
+  }
+
+  componentDidMount () {
+    this.props.fetchPrefs()
   }
 
   render () {
