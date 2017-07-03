@@ -1,4 +1,22 @@
+.container {
+  background-color: var(--widget-background-color);
+  border-radius: var(--border-radius);
+  margin: 10px 0;
+  overflow: hidden;
+}
+
 .title {
+  margin: 0;
   font-size: var(--widget-title-size);
-  margin: var(--widget-title-margin);
+  padding: var(--widget-title-padding);
+  background-color: var(--widget-title-background-color);
+}
+
+.content {
+  padding: var(--container-padding);
+}
+
+.subheading {
+  font-size: 18px;
+  border-bottom: 1px solid var(--widget-title-color);
 }

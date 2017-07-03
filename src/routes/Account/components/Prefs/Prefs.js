@@ -7,7 +7,6 @@ import './Prefs.css'
 export default class Prefs extends React.Component {
   static propTypes = {
     fetchPrefs: PropTypes.func.isRequired,
-    prefs: PropTypes.object.isRequired,
   }
 
   componentDidMount () {
@@ -15,17 +14,16 @@ export default class Prefs extends React.Component {
   }
 
   render () {
-    const { prefs } = this.props
-
-    // @todo: bail if prefs haven't loaded yet
-
     return (
-      <div>
+      <div styleName='container'>
         <h1 styleName='title'>Preferences</h1>
+        <div styleName='content'>
+          <h2 styleName='subheading'>Media folders</h2>
+          <LocalMedia />
 
-        <LocalMedia />
-
-        <OnlineMedia />
+          <h2 styleName='subheading'>Online media</h2>
+          <OnlineMedia />
+        </div>
       </div>
     )
   }

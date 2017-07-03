@@ -20,20 +20,14 @@ export default class AccountView extends Component {
         <Header />
 
         {isAdmin &&
-          <div styleName='widget-container'>
-            <Rooms />
-          </div>
+          <Rooms />
         }
 
         {isAdmin &&
-          <div styleName='widget-container'>
-            <Prefs />
-          </div>
+          <Prefs />
         }
 
-        <div styleName='widget-container'>
-          <Account />
-        </div>
+        <Account />
       </div>
     )
   }

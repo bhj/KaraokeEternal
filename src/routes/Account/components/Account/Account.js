@@ -31,39 +31,48 @@ export default class Account extends Component {
     const { mode } = this.state
 
     return (
-      <div>
+      <div styleName='container'>
         {!isFirstRun && !isLoggedIn && mode === 'login' &&
           <div>
             <h1 styleName='title'>Welcome</h1>
-            <p>Please sign in or <a onClick={this.toggleMode}>create an account</a>.</p>
-            <Login rooms={rooms} onSubmitClick={this.props.loginUser} />
+            <div styleName='content'>
+              <p>Please sign in or <a onClick={this.toggleMode}>create an account</a>.</p>
+              <Login rooms={rooms} onSubmitClick={this.props.loginUser} />
+            </div>
           </div>
         }
 
         {isFirstRun &&
           <div>
             <h1 styleName='title'>Welcome</h1>
-            <p>Create your <b>admin</b> account to get started.</p>
-            <AccountForm requireRoom={false} user={null} rooms={rooms} onSubmitClick={this.props.createUser} />
+            <div styleName='content'>
+              <p>Create your <b>admin</b> account to get started.</p>
+              <AccountForm requireRoom={false} user={null} rooms={rooms} onSubmitClick={this.props.createUser} />
+            </div>
           </div>
         }
 
         {!isFirstRun && !isLoggedIn && mode === 'create' &&
           <div>
             <h1 styleName='title'>Welcome</h1>
-            <p>Create an account below to join the party.<br />
-              Already have an account? <a onClick={this.toggleMode}>Sign in</a>
-            </p>
-            <AccountForm requireRoom user={null} rooms={rooms} onSubmitClick={this.props.createUser} />
+            <div styleName='content'>
+              <p>Create an account below to join the party.<br />
+                Already have an account? <a onClick={this.toggleMode}>Sign in</a>
+              </p>
+              <AccountForm requireRoom user={null} rooms={rooms} onSubmitClick={this.props.createUser} />
+            </div>
           </div>
         }
 
         {isLoggedIn &&
           <div>
             <h1 styleName='title'>My Account</h1>
-            <p>Signed in as <strong>{user.email}</strong></p>
-            <AccountForm requireRoom={false} user={user} rooms={rooms} onSubmitClick={this.props.updateUser} />
-            <Logout onLogoutClick={this.props.logoutUser} />
+            <div styleName='content'>
+              <p>Signed in as <strong>{user.email}</strong></p>
+              <AccountForm requireRoom={false} user={user} rooms={rooms} onSubmitClick={this.props.updateUser} />
+              <br />
+              <Logout onLogoutClick={this.props.logoutUser} />
+            </div>
           </div>
         }
       </div>

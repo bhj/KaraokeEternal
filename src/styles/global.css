@@ -27,7 +27,7 @@ body {
 }
 
 a {
-  color: #4962c7;
+  color: var(--link-color);
   font-weight: bold;
 }
 

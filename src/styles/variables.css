@@ -2,13 +2,16 @@
   /* Defaults */
   --background-color: #191F32;
   --text-color: #ccc;
+  --link-color: #2A48BF;
   --border-radius: 5px;
   --container-padding: 10px;
 
   /* Account widgets */
-  --widget-background-color: #555;
+  --widget-background-color: #333;
+  --widget-title-color: var(--text-color);
+  --widget-title-background-color: #555;
   --widget-title-size: 24px;
-  --widget-title-margin: 0 0 10px 0;
+  --widget-title-padding: 10px;
 
   /* Library */
   --artist-item-height: 44px;
@@ -17,7 +20,7 @@
   /* PlaybackCtrl */
   --transport-btn-color: #BA3A95;
 
-  /* Header/Footer (UI chrome) */
+  /* UI chrome (header/footer) */
   --chrome-background-color: var(--background-color);
   --chrome-border-color: #333;
 }

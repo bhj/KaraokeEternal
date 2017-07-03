@@ -18,8 +18,6 @@ export default class OnlineMedia extends React.Component {
 
     return (
       <div style={{ overflow: 'hidden' }}>
-        <h2>Online media</h2>
-
         {Object.keys(Providers).filter(p => !p.isLocal).map((p, i) => {
           const Component = Providers[p].prefsComponent
 

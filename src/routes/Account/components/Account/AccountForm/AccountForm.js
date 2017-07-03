@@ -49,9 +49,12 @@ export default class AccountForm extends Component {
         }
 
         {requireRoom &&
-          <label>Choose Room
-            <select ref='room'>{roomOpts}</select>
-          </label>
+          <div>
+            <br />
+            <label>Select Room
+              <select ref='room'>{roomOpts}</select>
+            </label>
+          </div>
         }
 
         <br />
