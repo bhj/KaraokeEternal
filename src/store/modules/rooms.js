@@ -39,7 +39,13 @@ export function fetchRooms () {
   return dispatch => {
     dispatch(requestRooms())
 
-    return fetch('/api/rooms')
+    return fetch('/api/rooms', {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    })
       .then(checkStatus)
       .then(response => response.json())
       .then(response => {
