@@ -17,6 +17,9 @@
 }
 
 .subheading {
+  display: flex;
+  align-items: center;
   font-size: 18px;
+  font-weight: normal;
   border-bottom: 1px solid var(--widget-title-color);
 }

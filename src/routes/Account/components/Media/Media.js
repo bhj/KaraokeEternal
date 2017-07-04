@@ -2,9 +2,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import LocalMedia from './LocalMedia'
 import OnlineMedia from './OnlineMedia'
-import './Prefs.css'
+import './Media.css'
 
-export default class Prefs extends React.Component {
+export default class Media extends React.Component {
   static propTypes = {
     fetchPrefs: PropTypes.func.isRequired,
   }
@@ -16,12 +16,14 @@ export default class Prefs extends React.Component {
   render () {
     return (
       <div styleName='container'>
-        <h1 styleName='title'>Preferences</h1>
+        <h1 styleName='title'>Media</h1>
         <div styleName='content'>
-          <h2 styleName='subheading'>Media folders</h2>
           <LocalMedia />
 
-          <h2 styleName='subheading'>Online media</h2>
+          <h2 styleName='subheading'>
+            <i className='material-icons'>cloud</i>
+            &nbsp;Online
+          </h2>
           <OnlineMedia />
         </div>
       </div>

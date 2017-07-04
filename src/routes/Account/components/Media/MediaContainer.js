@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import Prefs from './Prefs'
+import Media from './Media'
 import { fetchPrefs } from 'store/modules/prefs'
 
 const mapActionCreators = {
@@ -9,4 +9,4 @@ const mapActionCreators = {
 const mapStateToProps = (state) => ({
 })
 
-export default connect(mapStateToProps, mapActionCreators)(Prefs)
+export default connect(mapStateToProps, mapActionCreators)(Media)

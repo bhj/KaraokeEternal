@@ -54,7 +54,7 @@ export default class Paths extends React.Component {
     return (
       <div style={{ overflow: 'hidden' }}>
         {paths.length === 0 &&
-          <p style={{ marginTop: 0 }}>There are no folders configured.</p>
+          <p style={{ marginTop: 0 }}>No folders configured.</p>
         }
 
         {paths.map((path, i) =>

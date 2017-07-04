@@ -77,10 +77,15 @@ export default class YouTubePrefs extends React.Component {
 
         {prefs.enabled &&
           <div>
+            <br />
             <input type='text' ref='apiKey' placeholder='API key'
               defaultValue={prefs.apiKey}
               onBlur={this.updateApiKey}
             />
+
+            {!prefs.channels.length &&
+              <p>No channels configured.</p>
+            }
 
             {prefs.channels.map((name, i) =>
               <ChannelItem key={i} name={name} onRemoveClick={() => this.handleRemoveClick(name)} />
