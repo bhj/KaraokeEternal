@@ -1,47 +1,38 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import RoomSelect from '../RoomSelect'
 
 export default class Login extends Component {
+  static propTypes = {
+    onSubmitClick: PropTypes.func.isRequired,
+  }
+
   render () {
-    const { rooms } = this.props
-
-    let roomOpts = rooms.result.map(roomId => {
-      const room = rooms.entities[roomId]
-
-      return (
-        <option key={roomId} value={roomId}>{room.name}</option>
-      )
-    })
-
     return (
       <form>
         <input type='email' ref='email' placeholder='email' autoFocus />
         <input type='password' ref='password' placeholder='password' />
-        <br />
-        <label>Select Room</label>
-        <select ref='room'>{roomOpts}</select>
-        <br />
+        <RoomSelect onRoomSelect={this.handleRoomSelect} />
 
-        <button onClick={this.handleClick}>
+        <button onClick={this.handleSubmit}>
           Sign In
         </button>
       </form>
     )
   }
 
-  handleClick = (event) => {
+  handleRoomSelect = (roomId) => {
+    this.roomId = roomId
+  }
+
+  handleSubmit = (event) => {
     event.preventDefault()
     const creds = {
       email: this.refs.email.value,
       password: this.refs.password.value,
-      roomId: parseInt(this.refs.room.value, 10),
+      roomId: this.roomId,
     }
 
     this.props.onSubmitClick(creds)
   }
-}
-
-Login.propTypes = {
-  rooms: PropTypes.object.isRequired,
-  onSubmitClick: PropTypes.func.isRequired,
 }

@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import RoomSelect from '../RoomSelect'
 
 export default class AccountForm extends Component {
   static propTypes = {
     user: PropTypes.object,
-    rooms: PropTypes.object.isRequired,
     requireRoom: PropTypes.bool.isRequired,
     // actions
     onSubmitClick: PropTypes.func.isRequired,
@@ -16,15 +16,7 @@ export default class AccountForm extends Component {
   }
 
   render () {
-    const { user, requireRoom, rooms } = this.props
-
-    let roomOpts = rooms.result.map(roomId => {
-      const room = rooms.entities[roomId]
-
-      return (
-        <option key={roomId} value={roomId}>{room.name}</option>
-      )
-    })
+    const { user, requireRoom } = this.props
 
     return (
       <div>
@@ -49,12 +41,7 @@ export default class AccountForm extends Component {
         }
 
         {requireRoom &&
-          <div>
-            <br />
-            <label>Select Room
-              <select ref='room'>{roomOpts}</select>
-            </label>
-          </div>
+          <RoomSelect onRoomSelect={this.handleRoomSelect} />
         }
 
         <br />
@@ -70,6 +57,9 @@ export default class AccountForm extends Component {
   }
   handleNameChange = this.handleChange.bind(this, 'name')
   handleEmailChange = this.handleChange.bind(this, 'email')
+  handleRoomSelect = (roomId) => {
+    this.roomId = roomId
+  }
 
   handleClick = (event) => {
     event.preventDefault()
@@ -83,7 +73,7 @@ export default class AccountForm extends Component {
     }
 
     if (this.props.requireRoom) {
-      data.roomId = parseInt(this.refs.room.value, 10)
+      data.roomId = this.roomId
     }
 
     this.props.onSubmitClick(data)

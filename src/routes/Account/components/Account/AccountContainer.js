@@ -12,7 +12,6 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    rooms: state.rooms,
     isLoggedIn: state.user.userId !== null,
     isFirstRun: state.prefs.app ? state.prefs.app.firstRun : false,
   }
