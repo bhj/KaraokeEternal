@@ -13,10 +13,17 @@ export default class Rooms extends Component {
     // Actions
     openRoomEditor: PropTypes.func.isRequired,
     fetchRooms: PropTypes.func.isRequired,
+    updateRoom: PropTypes.func.isRequired,
   }
 
   componentDidMount () {
     this.props.fetchRooms()
+  }
+
+  toggleStatus (roomId) {
+    this.props.updateRoom(roomId, {
+      status: this.props.rooms.entities[roomId].status === 'open' ? 'closed' : 'open',
+    })
   }
 
   render () {
@@ -47,9 +54,15 @@ export default class Rooms extends Component {
               )}
             />
             <Column
-              label='Status'
+              label='Open'
               dataKey='status'
               width={width * 0.20}
+              cellRenderer={({ rowData }) => (
+                <input type='checkbox'
+                  checked={rowData.status === 'open'}
+                  onChange={() => this.toggleStatus(rowData.roomId)}
+                />
+              )}
             />
             <Column
               label='Created'

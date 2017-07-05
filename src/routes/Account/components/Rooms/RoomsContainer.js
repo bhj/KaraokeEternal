@@ -1,11 +1,12 @@
 import { connect } from 'react-redux'
 import Rooms from './Rooms'
-import { fetchRooms, openRoomEditor, closeRoomEditor } from 'store/modules/rooms'
+import { fetchRooms, openRoomEditor, closeRoomEditor, updateRoom } from 'store/modules/rooms'
 
 const mapActionCreators = {
   fetchRooms,
   openRoomEditor,
   closeRoomEditor,
+  updateRoom,
 }
 
 const mapStateToProps = (state) => ({

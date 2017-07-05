@@ -34,11 +34,7 @@ export default class EditRoom extends Component {
           autoFocus={typeof room === 'undefined'}
         />
 
-        <label>
-          <input type='checkbox' ref='status'
-            defaultChecked={!room || room.status === 'open'} />
-          &nbsp;Open
-        </label>
+        <br />
 
         {!room &&
           <button onClick={this.handleCreateClick}>
@@ -64,20 +60,15 @@ export default class EditRoom extends Component {
   }
 
   handleCreateClick = () => {
-    const { name, status } = this.refs
-
     this.props.createRoom({
-      name: name.value,
-      status: status.checked ? 'open' : 'closed',
+      name: this.refs.name.value,
+      status: 'open',
     })
   }
 
   handleUpdateClick = () => {
-    const { name, status } = this.refs
-
     this.props.updateRoom(this.props.room.roomId, {
-      name: name.value,
-      status: status.checked ? 'open' : 'closed',
+      name: this.refs.name.value,
     })
   }
 
