@@ -248,7 +248,6 @@ export function updateUser (data) {
 }
 
 // ------------------------------------
-// ------------------------------------
 // Star songs
 // ------------------------------------
 export function toggleSongStarred (songId) {
