@@ -1,10 +1,9 @@
-// ------------------------------------
-// Constants
-// ------------------------------------
-export const HEADER_HEIGHT_CHANGE = 'ui/HEADER_HEIGHT_CHANGE'
-export const FOOTER_HEIGHT_CHANGE = 'ui/FOOTER_HEIGHT_CHANGE'
-export const SHOW_ERROR_MESSAGE = 'ui/SHOW_ERROR_MESSAGE'
-export const CLEAR_ERROR_MESSAGE = 'ui/CLEAR_ERROR_MESSAGE'
+import {
+  HEADER_HEIGHT_CHANGE,
+  FOOTER_HEIGHT_CHANGE,
+  SHOW_ERROR_MESSAGE,
+  CLEAR_ERROR_MESSAGE,
+} from 'constants'
 
 // ------------------------------------
 // Actions
