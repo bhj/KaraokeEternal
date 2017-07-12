@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import OnlineMedia from './OnlineMedia'
-import { setPrefs, requestScan } from 'store/modules/prefs'
+import { setPrefs } from 'store/modules/prefs'
+import { requestScan } from 'routes/Library/modules/library'
 
 const mapActionCreators = {
   setPrefs,

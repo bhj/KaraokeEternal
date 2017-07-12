@@ -1,10 +1,11 @@
 import { connect } from 'react-redux'
 import LocalMedia from './LocalMedia'
-import { setPrefs, requestScan } from 'store/modules/prefs'
+import { setPrefs } from 'store/modules/prefs'
+import { requestUpdate } from 'routes/Library/modules/library'
 
 const mapActionCreators = {
   setPrefs,
-  requestScan,
+  requestUpdate,
 }
 
 const mapStateToProps = (state) => ({

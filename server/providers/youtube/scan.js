@@ -4,10 +4,10 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/youtube' })
 const { parse, toSeconds } = require('iso8601-duration')
 
-let addSong = require('../../../lib/addSong')
-const getLibrary = require('../../../lib/getLibrary')
-const getPrefs = require('../../../lib/getPrefs')
-const parseArtistTitle = require('../../../lib/parseArtistTitle')
+let addSong = require('../../lib/addSong')
+const getLibrary = require('../../lib/getLibrary')
+const getPrefs = require('../../lib/getPrefs')
+const parseArtistTitle = require('../../lib/parseArtistTitle')
 
 let stats
 let isScanning

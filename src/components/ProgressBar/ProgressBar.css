@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: 100%;
+  background-image: linear-gradient(to right, #f3f3f3, #ddd);
+  background-repeat: no-repeat;
+}
+
+.text {
+  flex: 1;
+  font-size: 16px;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.cancel {
+  font-size: 36px;
+}

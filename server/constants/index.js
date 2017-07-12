@@ -2,6 +2,9 @@ module.exports = {
   // authentication
   SOCKET_AUTH_ERROR: 'SOCKET_AUTH_ERROR',
   // library
+  LIBRARY_UPDATE_REQUEST: 'server/LIBRARY_UPDATE_REQUEST',
+  LIBRARY_UPDATE_CANCEL: 'server/LIBRARY_UPDATE_CANCEL',
+  LIBRARY_UPDATE_STATUS: 'library/UPDATE_STATUS',
   LIBRARY_UPDATE: 'library/FULL_UPDATE',
   SONG_UPDATE: 'library/SONG_UPDATE',
   LIBRARY_SEARCH: 'library/SEARCH',
@@ -45,9 +48,6 @@ module.exports = {
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',
-  // provider
-  // @todo: move these to respective provider folder
-  REQUEST_SCAN: 'provider/REQUEST_SCAN',
   // prefs
   PREFS_REQUEST: 'prefs/PREFS_REQUEST',
   PREFS_SET: 'prefs/PREFS_SET',

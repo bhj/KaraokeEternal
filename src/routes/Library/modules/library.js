@@ -1,8 +1,11 @@
 import {
+  LIBRARY_UPDATE,
+  LIBRARY_UPDATE_REQUEST,
+  LIBRARY_UPDATE_STATUS,
+  LIBRARY_UPDATE_CANCEL,
   LIBRARY_SEARCH,
   LIBRARY_SEARCH_RESET,
-  LIBRARY_UPDATE,
-  SONG_UPDATE,
+  SONG_UPDATE
 } from 'constants'
 
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
@@ -49,6 +52,20 @@ export function searchReset () {
   }
 }
 
+export function requestUpdate (provider) {
+  return {
+    type: LIBRARY_UPDATE_REQUEST,
+    payload: provider,
+  }
+}
+
+export function cancelUpdate () {
+  return {
+    type: LIBRARY_UPDATE_CANCEL,
+    payload: null,
+  }
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -56,6 +73,12 @@ const ACTION_HANDLERS = {
   [LIBRARY_UPDATE]: (state, { payload }) => ({
     ...state,
     ...payload,
+  }),
+  [LIBRARY_UPDATE_STATUS]: (state, { payload }) => ({
+    ...state,
+    isUpdating: !payload.complete,
+    updateText: payload.text || '',
+    updateProgress: payload.progress || 0,
   }),
   [SONG_UPDATE]: (state, { payload }) => ({
     ...state,
@@ -152,6 +175,10 @@ let initialState = {
   scrollTop: 0,
   expandedArtists: [],
   expandedArtistResults: [],
+  // update status
+  isUpdating: false,
+  updateText: '',
+  updateProgress: 0,
 }
 
 export default function libraryReducer (state = initialState, action) {

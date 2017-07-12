@@ -7,7 +7,7 @@ export default class Paths extends React.Component {
   static propTypes = {
     paths: PropTypes.array.isRequired,
     setPrefs: PropTypes.func.isRequired,
-    requestScan: PropTypes.func.isRequired,
+    requestUpdate: PropTypes.func.isRequired,
   }
 
   state = {
@@ -42,7 +42,7 @@ export default class Paths extends React.Component {
   }
 
   handleRefresh = () => {
-    this.props.requestScan('cdg')
+    this.props.requestUpdate('')
   }
 
   handleOpenChooser = () => { this.setState({ isChoosing: true }) }
@@ -64,7 +64,7 @@ export default class Paths extends React.Component {
         <div style={{ display: 'flex' }}>
           <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenChooser}>Add Folder</button>
           {paths.length > 0 &&
-            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleOpenChooser}>Refresh</button>
+            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleRefresh}>Refresh</button>
           }
         </div>
 

@@ -4,7 +4,6 @@ import {
   PREFS_REQUEST,
   PREFS_SET,
   PREFS_RECEIVE,
-  REQUEST_SCAN,
   _SUCCESS,
   _ERROR,
 } from 'constants'
@@ -83,40 +82,6 @@ export function receivePrefs (data) {
   return {
     type: PREFS_RECEIVE,
     payload: data,
-  }
-}
-
-// ------------------------------------
-// Provider re-scan
-// ------------------------------------
-export function requestScan (provider) {
-  return (dispatch, getState) => {
-    // informational only
-    dispatch({
-      type: REQUEST_SCAN,
-      payload: { provider },
-    })
-
-    return fetch(`/api/provider/${provider}/scan`, {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    })
-      .then(checkStatus)
-      .then(() => {
-        // informational only
-        dispatch({
-          type: REQUEST_SCAN + _SUCCESS,
-        })
-      })
-      .catch(err => {
-        dispatch({
-          type: REQUEST_SCAN + _ERROR,
-          meta: { error: err.message },
-        })
-      })
   }
 }
 

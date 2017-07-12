@@ -1,13 +1,22 @@
 const db = require('sqlite')
 const squel = require('squel')
+const { updateLibrary, cancelUpdate } = require('../lib/updateLibrary')
 const getLibrary = require('../lib/getLibrary')
 
 const {
   SONG_UPDATE,
-  TOGGLE_SONG_STARRED
+  TOGGLE_SONG_STARRED,
+  LIBRARY_UPDATE_REQUEST,
+  LIBRARY_UPDATE_CANCEL,
 } = require('../constants')
 
 const ACTION_HANDLERS = {
+  [LIBRARY_UPDATE_REQUEST]: async (ctx, { payload }) => {
+    await updateLibrary(ctx, { provider: payload })
+  },
+  [LIBRARY_UPDATE_CANCEL]: async (ctx, { payload }) => {
+    cancelUpdate()
+  },
   [TOGGLE_SONG_STARRED]: async (ctx, { payload }) => {
     // already starred?
     try {
