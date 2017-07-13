@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Measure from 'react-measure'
 import PlaybackCtrl from 'components/PlaybackCtrl'
-import ProgressBar from '../ProgressBar'
+import ProgressBar from 'components/ProgressBar'
 import './Header.css'
 
 const Header = (props) => {
