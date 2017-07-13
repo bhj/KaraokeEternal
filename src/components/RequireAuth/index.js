@@ -1,16 +1,15 @@
-import { UserAuthWrapper } from 'redux-auth-wrapper'
+import { connectedReduxRedirect } from 'redux-auth-wrapper/history3/redirect'
 import { browserHistory } from 'react-router'
 
-// Redirects to /login by default
-const requireAuth = UserAuthWrapper({
-  // how to get the user state
-  authSelector: state => state.user,
-  predicate: user => (user.userId !== null),
-  failureRedirectPath: '/account',
-  wrapperDisplayName: 'requireAuth', // a nice name for this auth check
+const requireAuth = connectedReduxRedirect({
+  // how to check auth status
+  authenticatedSelector: state => state.user.userId !== null,
+  // HoC's display name
+  wrapperDisplayName: 'UserIsAuthenticated',
+  // on auth failure
+  redirectPath: '/account',
   redirectAction: (newLoc) => (dispatch) => {
     browserHistory.push(newLoc)
-     // dispatch(addNotification({ message: 'Sorry, you are not an administrator' }));
   },
 })
 
