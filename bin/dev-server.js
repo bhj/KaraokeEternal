@@ -6,13 +6,13 @@ const db = require('sqlite')
 // open/init/migrate database and start koa server listen()
 async function init () {
   try {
-    debug('Opening database: %s', project.path_database)
+    debug('Opening database file %s', project.path_database)
     await db.open(project.path_database)
 
-    debug('Running database migration checks')
+    debug('Running database migrations')
     await db.migrate({
       // force: 'last',
-      migrationsPath: project.paths.server('lib/migrations'),
+      migrationsPath: project.paths.server('lib/db'),
     })
 
     server.listen(project.server_port)
