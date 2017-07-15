@@ -6,7 +6,7 @@ const path = require('path')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/prefs' })
 const getPrefs = require('../lib/getPrefs')
-const getFolders = require('../lib/thunks/getFolders')
+const getFolders = require('../lib/async/getFolders')
 
 // set preferences
 router.put('/', async (ctx, next) => {

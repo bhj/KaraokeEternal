@@ -3,7 +3,7 @@ const path = require('path')
 const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.config')
 const project = require('../config/project.config')
-const readFile = require('./lib/thunks/readfile')
+const readFile = require('./lib/async/readfile')
 
 const Koa = require('koa')
 const convert = require('koa-convert')

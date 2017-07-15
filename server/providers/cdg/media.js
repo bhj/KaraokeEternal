@@ -3,7 +3,7 @@ const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:cdg')
 const getLibrary = require('../../lib/getLibrary')
-const stat = require('../../lib/thunks/stat')
+const stat = require('../../lib/async/stat')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/cdg' })
 

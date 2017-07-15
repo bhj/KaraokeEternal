@@ -5,9 +5,9 @@ const log = debug('app:library')
 const Providers = require('../providers')
 const getLibrary = require('./getLibrary')
 const getPrefs = require('./getPrefs')
-const getFiles = require('./thunks/getFiles')
+const getFiles = require('./async/getFiles')
 const getSongAdder = require('./songAdder')
-const throttle = require('./throttle')
+const throttle = require('./async/throttle')
 
 const {
   LIBRARY_UPDATE,
