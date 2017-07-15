@@ -92,7 +92,6 @@
     "debug": "^2.6.8",
     "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^0.11.2",
-    "fs-extra": "^3.0.1",
     "html-webpack-plugin": "^2.29.0",
     "imports-loader": "^0.7.1",
     "ip": "^1.1.5",
