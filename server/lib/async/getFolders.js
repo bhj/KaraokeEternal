@@ -14,6 +14,9 @@ const getFolders = function (dir, filterFn) {
         if (stat.isDirectory()) {
           return filterFn(file) ? file : ''
         }
+      }).catch(err => {
+        // stat failed for this folder
+        console.error(err.message)
       })
     })).then(results => {
       return results.filter(f => {
