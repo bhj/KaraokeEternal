@@ -1,17 +1,17 @@
 const debug = require('debug')('app:server')
 const path = require('path')
 const webpack = require('webpack')
-const webpackConfig = require('../config/webpack.config')
-const project = require('../config/project.config')
+const webpackConfig = require('../build/webpack.config')
+const project = require('../project.config')
 const readFile = require('./lib/async/readfile')
 
 const Koa = require('koa')
-const convert = require('koa-convert')
-const serve = require('koa-static')
-const koaBodyparser = require('koa-bodyparser')
-const koaRange = require('koa-range')
+const KoaWebpack = require('koa-webpack')
 const KoaSocket = require('koa-socket')
-const koaLogger = require('koa-logger')
+const KoaStatic = require('koa-static')
+const KoaBodyparser = require('koa-bodyparser')
+const KoaRange = require('koa-range')
+const KoaLogger = require('koa-logger')
 const jwtVerify = require('jsonwebtoken').verify
 
 const httpRoutes = require('./http')
@@ -34,9 +34,9 @@ process.on('unhandledRejection', (reason, p) => {
 const app = new Koa()
 const io = new KoaSocket()
 
-app.use(koaLogger())
-app.use(koaRange)
-app.use(koaBodyparser())
+app.use(KoaLogger())
+app.use(KoaRange)
+app.use(KoaBodyparser())
 
 // all http (koa) requests
 app.use(async (ctx, next) => {
@@ -185,24 +185,28 @@ if (project.env === 'development') {
   const compiler = webpack(webpackConfig)
 
   debug('Enabling webpack dev and HMR middleware')
-  app.use(convert(require('koa-webpack-dev-middleware')(compiler, {
-    publicPath  : webpackConfig.output.publicPath,
-    contentBase : project.paths.client(),
-    hot         : true,
-    quiet       : project.compiler_quiet,
-    noInfo      : project.compiler_quiet,
-    lazy        : false,
-    stats       : project.compiler_stats
-  })))
-  app.use(convert(require('koa-webpack-hot-middleware')(compiler, {
-    path: '/__webpack_hmr'
-  })))
+
+  app.use(KoaWebpack({
+    compiler,
+    dev: {
+      publicPath  : webpackConfig.output.publicPath,
+      contentBase : path.resolve(project.basePath, project.srcDir),
+      hot         : true,
+      quiet       : false,
+      noInfo      : false,
+      lazy        : false,
+      stats       : 'normal',
+    },
+    hot: {
+      path: '/__webpack_hmr'
+    }
+  }))
 
   // Serve static assets from ~/public since Webpack is unaware of
   // these files. This middleware doesn't need to be enabled outside
   // of development since this directory will be copied into ~/dist
   // when the application is compiled.
-  app.use(serve(project.paths.public()))
+  app.use(KoaStatic(path.resolve(project.basePath, 'public')))
 
   // This rewrites all routes requests to the root /index.html file
   // (ignoring file requests). If you want to implement universal
@@ -230,7 +234,7 @@ if (project.env === 'development') {
   // Serving ~/dist by default. Ideally these files should be served by
   // the web server and not the app server, but this helps to demo the
   // server in production.
-  app.use(serve(project.paths.dist()))
+  app.use(KoaStatic(path.resolve(project.basePath, project.outDir)))
 }
 
 module.exports = app
