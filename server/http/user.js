@@ -73,9 +73,9 @@ router.post('/account/create', async (ctx, next) => {
   }
 
   try {
-    const prefs = await getPrefs('app')
+    const prefs = await getPrefs()
 
-    if (prefs.firstRun === true) {
+    if (prefs.app.firstRun === true) {
       // create default room
       const q = squel.insert()
         .into('rooms')
@@ -100,7 +100,7 @@ router.post('/account/create', async (ctx, next) => {
       .set('email', email)
       .set('password', hashedPwd)
       .set('name', name)
-      .set('isAdmin', prefs.firstRun === true ? 1 : 0)
+      .set('isAdmin', prefs.app.firstRun === true ? 1 : 0)
 
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
@@ -110,7 +110,7 @@ router.post('/account/create', async (ctx, next) => {
     }
 
     // remove firstRun flag if necessary
-    if (prefs.firstRun === true) {
+    if (prefs.app.firstRun === true) {
       const q = squel.update()
         .table('prefs')
         .where('domain = ?', 'app')
