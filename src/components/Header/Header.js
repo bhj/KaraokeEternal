@@ -13,8 +13,12 @@ const Header = (props) => {
           <PlaybackCtrl />
         }
 
-        {props.isUpdating &&
-          <ProgressBar text={props.updateText} progress={props.updateProgress} onCancel={props.cancelUpdate} />
+        {props.isAdmin && props.isUpdating &&
+          <ProgressBar
+            text={props.updateText}
+            progress={props.updateProgress}
+            onCancel={props.requestScanCancel}
+          />
         }
 
         {props.children}
@@ -31,7 +35,7 @@ Header.propTypes = {
   updateProgress: PropTypes.number.isRequired,
   // actions
   setHeaderHeight: PropTypes.func.isRequired,
-  cancelUpdate: PropTypes.func.isRequired,
+  requestScanCancel: PropTypes.func.isRequired,
 }
 
 export default Header

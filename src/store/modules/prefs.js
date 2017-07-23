@@ -4,7 +4,6 @@ import {
   PREFS_REQUEST,
   PREFS_SET,
   PREFS_RECEIVE,
-  _SUCCESS,
   _ERROR,
 } from 'constants'
 
@@ -42,7 +41,7 @@ export function setPrefs (domain, data) {
 }
 
 // ------------------------------------
-// fetch() prefs
+// Fetch all prefs
 // ------------------------------------
 export function fetchPrefs () {
   return (dispatch, getState) => {

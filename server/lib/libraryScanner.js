@@ -1,9 +1,12 @@
 const path = require('path')
 const debug = require('debug')
-const log = debug('app:library')
+const log = debug('app:library:scanner')
+const squel = require('squel')
+const db = require('sqlite')
 
 const Providers = require('../providers')
 const getLibrary = require('./getLibrary')
+const getPaths = require('../lib/getPaths')
 const getPrefs = require('./getPrefs')
 const getFiles = require('./async/getFiles')
 const getSongAdder = require('./songAdder')
@@ -11,15 +14,16 @@ const throttle = require('./async/throttle')
 
 const {
   LIBRARY_UPDATE,
-  LIBRARY_UPDATE_STATUS,
+  LIBRARY_SCAN_STATUS,
+  LIBRARY_SCAN_COMPLETE,
 } = require('../constants')
 
-let isScanning, isCanceling
-let validIds = [] // songIds for cleanup
+let isScanning, cancelRequested
 
-async function updateLibrary (ctx, { provider }) {
+async function scan (ctx, { provider }) {
   // curried with ctx and throttled
   const emitStatus = getStatusEmitter(ctx)
+  const emitDone = getDoneEmitter(ctx)
   const emitLibrary = getLibraryEmitter(ctx)
 
   // curried with library emitter and passed to each provider
@@ -27,6 +31,7 @@ async function updateLibrary (ctx, { provider }) {
 
   const localProviders = {} // map of file extensions to provider
   const onlineProviders = []
+  const validIds = [] // songIds for cleanup
   let prefs
 
   if (isScanning) {
@@ -34,7 +39,7 @@ async function updateLibrary (ctx, { provider }) {
   }
 
   isScanning = true
-  log('Library update requested')
+  log('Library scan requested')
 
   // get all prefs
   try {
@@ -64,12 +69,7 @@ async function updateLibrary (ctx, { provider }) {
 
     // local vs. online
     if (Providers[name].isLocal) {
-      if (!Array.isArray(prefs.app.paths) || !prefs.app.paths.length) {
-        log(`  => skipping provider "${name}" (no media paths configured)`)
-        continue
-      }
-
-      log(`  => using provider "${name}" (local; supported types: ${Providers[name].extensions.join(',')})`)
+      log(`  => using file provider "${name}" (types: ${Providers[name].extensions.join(',')})`)
 
       // map file extensions to Provider
       for (const ext of Providers[name].extensions) {
@@ -85,28 +85,34 @@ async function updateLibrary (ctx, { provider }) {
   if (Object.keys(localProviders).length) {
     const allowedExts = Object.keys(localProviders)
     let files = []
+    let paths
+
+    try {
+      paths = await getPaths()
+    } catch (err) {
+      log(`  => ${err.message}`)
+      // something's pretty screwed up; bail
+      return emitDone()
+    }
 
     // emit start
     emitStatus('Searching media folders', 0)
 
-    for (const p of prefs.app.paths) {
+    for (const pathId of paths.result) {
+      const curPath = paths.entities[pathId].path
       let list
 
-      if (isCanceling) {
-        log('Canceling library update (user requested)')
-        emitStatus(null, null, true)
-        isCanceling = false
-        isScanning = false
-        return
+      try {
+        log('Searching path: %s', curPath)
+        list = await getFiles(curPath, file => allowedExts.includes(path.extname(file).toLowerCase()))
+      } catch (err) {
+        log(`  => ${err.message}`)
+        continue
       }
 
-      try {
-        log('Searching path: %s', p)
-        list = await getFiles(p, file => allowedExts.includes(path.extname(file).toLowerCase()))
-      } catch (err) {
-        // try next configured path
-        log(err.message)
-        continue
+      if (cancelRequested) {
+        log('Canceling library scan (user requested)')
+        return emitDone()
       }
 
       log('  => found %s files with supported extensions', list.length)
@@ -133,14 +139,29 @@ async function updateLibrary (ctx, { provider }) {
         log(err.message)
       }
 
-      if (isCanceling) {
-        log('Canceling library update (user requested)')
-        emitStatus(null, null, true)
-        isCanceling = false
-        isScanning = false
-        return
+      if (cancelRequested) {
+        log('Canceling library scan (user requested)')
+        return emitDone()
       }
     } // end for
+
+    // cleanup: delete songs not in our valid list
+    // try {
+    //   const q = squel.delete()
+    //     .from('songs')
+    //     .where('provider IN ?', Object.keys(localProviders))
+    //     .where('songId NOT IN ?', validIds)
+    //     .where(`json_extract(providerData, '$.basePath') IN ?`, prefs.app.paths)
+    //
+    //   console.log(q.toString())
+    //
+    //   const { text, values } = q.toParam()
+    //   const res = await db.run(text, values)
+    //
+    //   log('cleanup: removed %s songs', res.stmt.changes)
+    // } catch (err) {
+    //   log(err.message)
+    // }
   } // end if
 
   // any enabled online providers?
@@ -150,31 +171,22 @@ async function updateLibrary (ctx, { provider }) {
     }
   }
 
-  // emit completion
-  emitStatus(null, null, true)
-
-  // // delete songs not in our valid list
-  // let res = await db.run('DELETE FROM songs WHERE provider = ? AND songId NOT IN ('+validIds.join(',')+')', payload)
-  // log('cleanup: removed %s invalid songs', res.stmt.changes)
-  //
-  isScanning = false
-  log('finished scan')
-  return Promise.resolve()
+  return emitDone()
 }
 
-function cancelUpdate () {
-  isCanceling = true
+function cancelScan () {
+  cancelRequested = true
 }
 
-module.exports = { updateLibrary, cancelUpdate }
+module.exports = { scan, cancelScan }
 
 function getStatusEmitter (ctx) {
-  return throttle(function (text, progress, complete = false) {
+  return throttle(function (text, progress) {
     // thunkify
     return Promise.resolve().then(() => {
-      ctx.sock.server.emit('action', {
-        type: LIBRARY_UPDATE_STATUS,
-        payload: { text, progress, complete },
+      ctx._io.emit('action', {
+        type: LIBRARY_SCAN_STATUS,
+        payload: { text, progress },
       })
     })
   }, 500)
@@ -182,9 +194,21 @@ function getStatusEmitter (ctx) {
 
 function getLibraryEmitter (ctx) {
   return throttle(async function () {
-    ctx.sock.server.emit('action', {
+    ctx._io.emit('action', {
       type: LIBRARY_UPDATE,
       payload: await getLibrary(),
     })
   }, 2000)
+}
+
+function getDoneEmitter (ctx) {
+  return async function () {
+    ctx._io.emit('action', {
+      type: LIBRARY_SCAN_COMPLETE,
+      payload: null,
+    })
+
+    cancelRequested = false
+    isScanning = false
+  }
 }

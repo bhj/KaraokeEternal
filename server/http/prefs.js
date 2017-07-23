@@ -1,14 +1,41 @@
 const db = require('sqlite')
 const squel = require('squel')
 const debug = require('debug')
-const log = debug('app:prefs')
-const path = require('path')
+const log = debug('app:api:prefs')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/prefs' })
 const getPrefs = require('../lib/getPrefs')
-const getFolders = require('../lib/async/getFolders')
 
-// set preferences
+// get preferences
+router.get('/', async (ctx, next) => {
+  let prefs
+
+  // get prefs from all domains
+  try {
+    prefs = await getPrefs()
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = err.message
+    return
+  }
+
+  // if not an admin, must be firstRun...
+  if (!ctx.user.isAdmin) {
+    if (prefs.app && prefs.app.firstRun === true) {
+      // ...and we only send prefs domain
+      ctx.body = { app: prefs.app }
+      return
+    }
+
+    // ...or else
+    ctx.status = 401
+    return
+  }
+
+  ctx.body = prefs
+})
+
+// set (non-path) preferences
 router.put('/', async (ctx, next) => {
   // must be admin
   if (!ctx.user.isAdmin) {
@@ -68,74 +95,9 @@ router.put('/', async (ctx, next) => {
     return
   }
 
-  // send updated prefs
+  // respond with updated prefs
   try {
     ctx.body = await getPrefs()
-  } catch (err) {
-    ctx.status = 500
-    ctx.body = err.message
-  }
-})
-
-// get preferences
-router.get('/', async (ctx, next) => {
-  let prefs
-
-  // get prefs from all domains
-  try {
-    prefs = await getPrefs()
-  } catch (err) {
-    ctx.status = 500
-    ctx.body = err.message
-    return
-  }
-
-  // if not an admin, must be firstRun...
-  if (!ctx.user.isAdmin) {
-    if (prefs.app && prefs.app.firstRun === true) {
-      // ...and we only send prefs domain
-      ctx.body = { app: prefs.app }
-      return
-    }
-
-    // ...or else
-    ctx.status = 401
-    return
-  }
-
-  ctx.body = prefs
-})
-
-// get folder listing
-router.get('/ls', async (ctx, next) => {
-  // check jwt validity
-  if (!ctx.user.isAdmin) {
-    ctx.status = 401
-    return
-  }
-
-  const dir = decodeURIComponent(ctx.query.dir)
-  const current = path.resolve(dir)
-  const parent = path.resolve(dir, '../')
-
-  try {
-    const list = await getFolders(dir)
-    const children = list.map(d => {
-      return {
-        path: d,
-        displayPath: d.replace(current + path.sep, '')
-      }
-    })
-
-    log('%s listed folder %s', ctx.user.name, current)
-
-    ctx.body = {
-      current,
-      // if at root, parent and current are the same
-      parent: parent === current ? false : parent,
-      // don't show hidden folders
-      children: children.filter(c => !c.displayPath.startsWith('.')),
-    }
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message

@@ -22,7 +22,7 @@ export default class PathChooser extends React.Component {
   }
 
   getListing = (dir) => {
-    const url = '/api/prefs/ls?dir=' + encodeURIComponent(dir)
+    const url = '/api/paths/ls?dir=' + encodeURIComponent(dir)
 
     fetch(url, fetchConfig)
       .then(checkStatus)

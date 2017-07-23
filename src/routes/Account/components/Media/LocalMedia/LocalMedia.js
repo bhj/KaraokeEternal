@@ -5,73 +5,56 @@ import PathChooser from './PathChooser'
 
 export default class Paths extends React.Component {
   static propTypes = {
-    paths: PropTypes.array.isRequired,
-    setPrefs: PropTypes.func.isRequired,
-    requestUpdate: PropTypes.func.isRequired,
+    paths: PropTypes.object.isRequired,
+    addPath: PropTypes.func.isRequired,
+    removePath: PropTypes.func.isRequired,
+    openPathChooser: PropTypes.func.isRequired,
+    closePathChooser: PropTypes.func.isRequired,
+    isChoosing: PropTypes.bool.isRequired,
+    requestScan: PropTypes.func.isRequired,
   }
 
-  state = {
-    isChoosing: false,
-  }
-
-  addPath = (path) => {
-    const { paths } = this.props
-
-    // is path already configured?
-    if (paths.includes(path)) {
-      alert('Path is already in library')
-      return
-    }
-
-    this.props.setPrefs('app', { paths: [...paths, path] })
-    this.setState({ isChoosing: false })
-  }
-
-  removePath = (path) => {
-    const { paths } = this.props
-    const idx = paths.indexOf(path)
-
-    if (idx === -1) {
-      // nothing to do
-      return
-    }
+  handleRemove = (pathId) => {
+    const path = this.props.paths.entities[pathId].path
 
     if (confirm(`Remove this folder from the library?\n\n${path}`)) {
-      this.props.setPrefs('app', { paths: paths.filter(p => p !== path) })
+      this.props.removePath(pathId)
     }
   }
 
   handleRefresh = () => {
-    this.props.requestUpdate('')
+    this.props.requestScan('')
   }
-
-  handleOpenChooser = () => { this.setState({ isChoosing: true }) }
-  handleCloseChooser = () => { this.setState({ isChoosing: false }) }
 
   render () {
     const { paths } = this.props
 
     return (
       <div style={{ overflow: 'hidden' }}>
-        {paths.length === 0 &&
+        {paths.result.length === 0 &&
           <p style={{ marginTop: 0 }}>No folders configured.</p>
         }
 
-        {paths.map((path, i) =>
-          <PathItem key={i} path={path} onRemoveClick={() => this.removePath(path)} isRemovable />
+        {paths.result.map(pathId =>
+          <PathItem
+            key={pathId}
+            path={paths.entities[pathId].path}
+            onRemoveClick={() => this.handleRemove(pathId)}
+            isRemovable
+          />
         )}
 
         <div style={{ display: 'flex' }}>
-          <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenChooser}>Add Folder</button>
-          {paths.length > 0 &&
+          <button style={{ flex: 1, width: 'auto' }} onClick={this.props.openPathChooser}>Add Folder</button>
+          {paths.result.length > 0 &&
             <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleRefresh}>Refresh</button>
           }
         </div>
 
         <PathChooser
-          isVisible={this.state.isChoosing}
-          onClosed={this.handleCloseChooser}
-          onChoose={this.addPath}
+          isVisible={this.props.isChoosing}
+          onClosed={this.props.closePathChooser}
+          onChoose={this.props.addPath}
         />
       </div>
     )

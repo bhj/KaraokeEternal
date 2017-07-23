@@ -1,15 +1,19 @@
 import { connect } from 'react-redux'
 import LocalMedia from './LocalMedia'
-import { setPrefs } from 'store/modules/prefs'
-import { requestUpdate } from 'routes/Library/modules/library'
+import { requestScan } from 'routes/Library/modules/library'
+import { addPath, removePath, openPathChooser, closePathChooser } from 'store/modules/paths'
 
 const mapActionCreators = {
-  setPrefs,
-  requestUpdate,
+  addPath,
+  removePath,
+  openPathChooser,
+  closePathChooser,
+  requestScan,
 }
 
 const mapStateToProps = (state) => ({
-  paths: state.prefs.app ? state.prefs.app.paths : [],
+  paths: state.paths,
+  isChoosing: state.paths.isChoosing,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(LocalMedia)

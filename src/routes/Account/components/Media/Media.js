@@ -6,10 +6,12 @@ import './Media.css'
 
 export default class Media extends React.Component {
   static propTypes = {
+    fetchPaths: PropTypes.func.isRequired,
     fetchPrefs: PropTypes.func.isRequired,
   }
 
   componentDidMount () {
+    this.props.fetchPaths()
     this.props.fetchPrefs()
   }
 

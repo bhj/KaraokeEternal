@@ -1,8 +1,9 @@
 import {
   LIBRARY_UPDATE,
-  LIBRARY_UPDATE_REQUEST,
-  LIBRARY_UPDATE_STATUS,
-  LIBRARY_UPDATE_CANCEL,
+  LIBRARY_REQUEST_SCAN,
+  LIBRARY_REQUEST_SCAN_CANCEL,
+  LIBRARY_SCAN_STATUS,
+  LIBRARY_SCAN_COMPLETE,
   LIBRARY_SEARCH,
   LIBRARY_SEARCH_RESET,
   SONG_UPDATE
@@ -52,17 +53,72 @@ export function searchReset () {
   }
 }
 
-export function requestUpdate (provider) {
-  return {
-    type: LIBRARY_UPDATE_REQUEST,
-    payload: provider,
+// ------------------------------------
+// request media scan
+// ------------------------------------
+export function requestScan (provider) {
+  return (dispatch, getState) => {
+    // informational
+    dispatch({
+      type: LIBRARY_REQUEST_SCAN,
+      payload: provider,
+    })
+
+    return fetch(`/api/library/scan?provider=${provider}`, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(checkStatus)
+      .catch(err => {
+        dispatch({
+          type: LIBRARY_REQUEST_SCAN + '_ERROR',
+          meta: { error: err.message },
+        })
+      })
   }
 }
 
-export function cancelUpdate () {
-  return {
-    type: LIBRARY_UPDATE_CANCEL,
-    payload: null,
+// ------------------------------------
+// request cancelation of media scan
+// ------------------------------------
+export function requestScanCancel (provider) {
+  return (dispatch, getState) => {
+    // informational
+    dispatch({
+      type: LIBRARY_REQUEST_SCAN_CANCEL,
+      payload: null,
+    })
+
+    return fetch(`/api/library/scan/cancel`, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(checkStatus)
+      .catch(err => {
+        dispatch({
+          type: LIBRARY_REQUEST_SCAN_CANCEL + '_ERROR',
+          meta: { error: err.message },
+        })
+      })
+  }
+}
+
+// helper for fetch response
+function checkStatus (response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response
+  } else {
+    return response.text().then((txt) => {
+      var error = new Error(txt)
+      error.response = response
+      throw error
+    })
   }
 }
 
@@ -74,11 +130,17 @@ const ACTION_HANDLERS = {
     ...state,
     ...payload,
   }),
-  [LIBRARY_UPDATE_STATUS]: (state, { payload }) => ({
+  [LIBRARY_SCAN_STATUS]: (state, { payload }) => ({
     ...state,
-    isUpdating: !payload.complete,
-    updateText: payload.text || '',
-    updateProgress: payload.progress || 0,
+    isUpdating: true,
+    updateText: payload.text,
+    updateProgress: payload.progress,
+  }),
+  [LIBRARY_SCAN_COMPLETE]: (state, { payload }) => ({
+    ...state,
+    isUpdating: false,
+    updateText: '',
+    updateProgress: 0,
   }),
   [SONG_UPDATE]: (state, { payload }) => ({
     ...state,

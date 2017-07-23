@@ -1,11 +1,11 @@
 import { connect } from 'react-redux'
 import Header from './Header'
 import { setHeaderHeight } from 'store/modules/ui'
-import { cancelUpdate } from 'routes/Library/modules/library'
+import { requestScanCancel } from 'routes/Library/modules/library'
 
 const mapActionCreators = {
   setHeaderHeight,
-  cancelUpdate,
+  requestScanCancel,
 }
 
 const mapStateToProps = (state) => {

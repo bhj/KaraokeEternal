@@ -4,12 +4,17 @@ CREATE TABLE IF NOT EXISTS "artists" (
   "name" text
 );
 
+CREATE TABLE IF NOT EXISTS "paths" (
+  "pathId" integer PRIMARY KEY AUTOINCREMENT,
+  "path" varchar NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS "prefs" (
   "domain" text,
   "data" text
 );
 
-INSERT INTO prefs (domain,data) VALUES ('app','{"firstRun":true,"paths":[]}');
+INSERT INTO prefs (domain,data) VALUES ('app','{"firstRun":true}');
 INSERT INTO prefs (domain,data) VALUES ('provider.cdg','{"enabled":true}');
 INSERT INTO prefs (domain,data) VALUES ('provider.youtube','{"enabled":false,"channels":[],"apiKey":""}');
 
@@ -53,6 +58,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 
 -- Down
 DROP TABLE artists;
+DROP TABLE paths;
 DROP TABLE prefs;
 DROP TABLE queue;
 DROP TABLE rooms;
