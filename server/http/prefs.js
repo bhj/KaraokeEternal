@@ -22,7 +22,7 @@ router.get('/', async (ctx, next) => {
   // if not an admin, must be firstRun...
   if (!ctx.user.isAdmin) {
     if (prefs.app && prefs.app.firstRun === true) {
-      // ...and we only send prefs domain
+      // ...and we only send app domain
       ctx.body = { app: prefs.app }
       return
     }

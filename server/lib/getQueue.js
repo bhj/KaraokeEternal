@@ -2,8 +2,8 @@ const db = require('sqlite')
 const squel = require('squel')
 
 async function getQueue (roomId) {
-  let result = []
-  let entities = {}
+  const result = []
+  const entities = {}
   let rows
 
   try {

@@ -62,7 +62,7 @@ app.use(async (ctx, next) => {
 })
 
 // http api (koa-router) endpoints
-for (let route in httpRoutes) {
+for (const route in httpRoutes) {
   app.use(httpRoutes[route].routes())
 }
 
