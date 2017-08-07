@@ -10,7 +10,7 @@ export const QueueItem = (props) => (
     </div>
 
     <div styleName='primary'>
-      <div styleName='user'>{props.name}</div>
+      <div styleName='user'>{props.username}</div>
       <div styleName='title'>{props.artist} - {props.title}</div>
     </div>
 
@@ -35,7 +35,7 @@ export const QueueItem = (props) => (
 QueueItem.propTypes = {
   title: PropTypes.string.isRequired,
   artist: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
   wait: PropTypes.number.isRequired,
   isActive: PropTypes.bool.isRequired,
   isUpcoming: PropTypes.bool.isRequired,

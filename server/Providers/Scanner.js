@@ -1,0 +1,44 @@
+const throttle = require('../lib/async/throttle')
+const Media = require('../Media')
+const {
+  LIBRARY_UPDATE,
+  PROVIDER_SCAN_STATUS,
+} = require('../constants')
+
+class Scanner {
+  constructor (ctx) {
+    this.ctx = ctx
+    this.isCanceling = false
+
+    this.emitLibrary = this.getLibraryEmitter()
+    this.emitStatus = this.getStatusEmitter()
+    this.emitDone = this.emitStatus.bind(this, '', 0, false)
+  }
+
+  stop () {
+    this.isCanceling = true
+  }
+
+  getStatusEmitter () {
+    return throttle((text, progress, isUpdating = true) => {
+      // thunkify
+      return Promise.resolve().then(() => {
+        this.ctx._io.emit('action', {
+          type: PROVIDER_SCAN_STATUS,
+          payload: { text, progress, isUpdating },
+        })
+      })
+    }, 500)
+  }
+
+  getLibraryEmitter () {
+    return throttle(async () => {
+      this.ctx._io.emit('action', {
+        type: LIBRARY_UPDATE,
+        payload: await Media.getLibrary(),
+      })
+    }, 2000)
+  }
+}
+
+module.exports = Scanner

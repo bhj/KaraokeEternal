@@ -122,22 +122,21 @@ export function logoutUser () {
 
     return fetch('/api/logout', {
       credentials: 'same-origin',
-    })
-    .then(checkStatus)
-    .then(response => {
-      // server response should have cleared our cookie
-      dispatch(receiveLogout())
-    })
-    .catch(err => {
-      dispatch(logoutError(err.message))
-    })
-    .then(() => {
-      // regardless of server response; we tried!
-      window._persistor.purge()
+    }).then(checkStatus)
+      .then(response => {
+        // server response should have cleared our cookie
+        dispatch(receiveLogout())
+      })
+      .catch(err => {
+        dispatch(logoutError(err.message))
+      })
+      .then(() => {
+        // regardless of server response; we tried!
+        window._persistor.purge()
 
-      // disconnect socket
-      window._socket.close()
-    })
+        // disconnect socket
+        window._socket.close()
+      })
   }
 }
 
@@ -250,10 +249,10 @@ export function updateUser (data) {
 // ------------------------------------
 // Star songs
 // ------------------------------------
-export function toggleSongStarred (songId) {
+export function toggleSongStarred (mediaId) {
   return {
     type: TOGGLE_SONG_STARRED,
-    payload: songId,
+    payload: mediaId,
   }
 }
 

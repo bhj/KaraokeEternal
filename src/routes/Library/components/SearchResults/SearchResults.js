@@ -9,12 +9,12 @@ const ROW_HEIGHT = 40
 class SearchResults extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
-    songs: PropTypes.object.isRequired,
+    media: PropTypes.object.isRequired,
     artistResults: PropTypes.array.isRequired,  // artistIds
-    songResults: PropTypes.array.isRequired,  // songIds
+    songResults: PropTypes.array.isRequired,  // mediaIds
     starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
-    queuedSongs: PropTypes.array.isRequired,
+    queuedMediaIds: PropTypes.array.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     paddingTop: PropTypes.number.isRequired,
@@ -66,9 +66,9 @@ class SearchResults extends React.Component {
 
       return (
         <ArtistItem
-          songs={this.props.songs}
-          songIds={artist.songIds} // "children"
-          queuedSongs={this.props.queuedSongs}
+          media={this.props.media}
+          artistMediaIds={artist.mediaIds} // "children"
+          queuedMediaIds={this.props.queuedMediaIds}
           starredSongs={this.props.starredSongs}
           name={artist.name}
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
@@ -91,18 +91,17 @@ class SearchResults extends React.Component {
     }
 
     // song results; compensate for artists & heading
-    const songId = songResults[index - (artistResults.length + 2)]
-    const song = this.props.songs.entities[songId]
+    const mediaId = songResults[index - (artistResults.length + 2)]
+    const song = this.props.media.entities[mediaId]
 
     return (
-      <SongItem
-        {...song}
+      <SongItem {...song}
+        onSongClick={() => this.handleSongClick(mediaId)}
+        onSongStarClick={() => this.handleSongStarClick(mediaId)}
+        isQueued={this.props.queuedMediaIds.includes(mediaId)}
+        isStarred={this.props.starredSongs.includes(mediaId)}
         key={key}
         style={style}
-        onSongClick={() => this.handleSongClick(songId)}
-        onSongStarClick={() => this.handleSongStarClick(songId)}
-        isQueued={this.props.queuedSongs.includes(songId)}
-        isStarred={this.props.starredSongs.includes(songId)}
       />
     )
   }
@@ -115,7 +114,7 @@ class SearchResults extends React.Component {
     let rows = 1
 
     if (this.props.expandedArtistResults.includes(artistId)) {
-      rows += this.props.artists.entities[artistId].songIds.length
+      rows += this.props.artists.entities[artistId].mediaIds.length
     }
 
     return rows * ROW_HEIGHT
@@ -125,12 +124,12 @@ class SearchResults extends React.Component {
     this.props.toggleArtistResultExpanded(artistId)
   }
 
-  handleSongClick = (songId) => {
-    this.props.queueSong(songId)
+  handleSongClick = (mediaId) => {
+    this.props.queueSong(mediaId)
   }
 
-  handleSongStarClick = (songId) => {
-    this.props.toggleSongStarred(songId)
+  handleSongStarClick = (mediaId) => {
+    this.props.toggleSongStarred(mediaId)
   }
 
   setRef = (ref) => {

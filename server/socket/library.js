@@ -1,9 +1,9 @@
 const db = require('sqlite')
 const squel = require('squel')
-const getLibrary = require('../lib/getLibrary')
+const Media = require('../Media')
 
 const {
-  SONG_UPDATE,
+  LIBRARY_UPDATE,
   TOGGLE_SONG_STARRED,
 } = require('../constants')
 
@@ -13,7 +13,7 @@ const ACTION_HANDLERS = {
     try {
       const q = squel.delete()
         .from('stars')
-        .where('songId = ?', payload)
+        .where('mediaId = ?', payload)
         .where('userId = ?', ctx.user.userId)
 
       const { text, values } = q.toParam()
@@ -23,7 +23,7 @@ const ACTION_HANDLERS = {
         // song wasn't starred, so now we need to!
         const q = squel.insert()
           .into('stars')
-          .set('songId', payload)
+          .set('mediaId', payload)
           .set('userId', ctx.user.userId)
 
         const { text, values } = q.toParam()
@@ -37,7 +37,7 @@ const ACTION_HANDLERS = {
     try {
       const q = squel.select()
         .from('stars')
-        .field('songId')
+        .field('mediaId')
         .where('userId = ?', ctx.user.userId)
 
       const { text, values } = q.toParam()
@@ -45,7 +45,7 @@ const ACTION_HANDLERS = {
 
       const starredSongs = []
       rows.forEach(row => {
-        starredSongs.push(row.songId)
+        starredSongs.push(row.mediaId)
       })
 
       ctx.acknowledge({
@@ -58,17 +58,9 @@ const ACTION_HANDLERS = {
 
     // emit updated star count
     try {
-      const res = await getLibrary({
-        songId: payload,
-      })
-
-      if (res.songs.result.length !== 1) {
-        throw new Error(res.songs.result.length + ' results (expected 1)')
-      }
-
       ctx.sock.server.emit('action', {
-        type: SONG_UPDATE,
-        payload: res.songs.entities[res.songs.result[0]],
+        type: LIBRARY_UPDATE,
+        payload: await Media.getLibrary(),
       })
     } catch (err) {
       return Promise.reject(err)

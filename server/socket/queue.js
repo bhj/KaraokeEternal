@@ -32,8 +32,8 @@ const ACTION_HANDLERS = {
     let song
     try {
       const q = squel.select()
-        .from('songs')
-        .where('songId = ?', payload)
+        .from('media')
+        .where('mediaId = ?', payload)
 
       const { text, values } = q.toParam()
       song = await db.get(text, values)
@@ -45,7 +45,7 @@ const ACTION_HANDLERS = {
       return ctx.acknowledge({
         type: QUEUE_ADD + '_ERROR',
         meta: {
-          error: 'songId not found: ' + payload
+          error: 'mediaId not found: ' + payload
         }
       })
     }
@@ -55,14 +55,14 @@ const ACTION_HANDLERS = {
       const q = squel.insert()
         .into('queue')
         .set('roomId', ctx.user.roomId)
-        .set('songId', payload)
+        .set('mediaId', payload)
         .set('userId', ctx.user.userId)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
 
       if (res.stmt.changes !== 1) {
-        throw new Error('Could not add song to queue')
+        throw new Error('Could not add media item to queue')
       }
     } catch (err) {
       return Promise.reject(err)

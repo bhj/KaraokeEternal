@@ -6,10 +6,10 @@ import {
 } from 'constants'
 
 // add to queue
-export function queueSong (songId) {
+export function queueSong (mediaId) {
   return {
     type: QUEUE_ADD,
-    payload: songId,
+    payload: mediaId,
   }
 }
 
@@ -28,8 +28,7 @@ const ACTION_HANDLERS = {
   [QUEUE_UPDATE]: (state, { payload }) => ({
     ...state,
     result: payload.result,
-    entities: setWaits(payload.result, payload.entities, state.curId, state.curPos),
-    songIds: payload.result.map(queueId => payload.entities[queueId].songId)
+    entities: setWaits(payload, state.curId, state.curPos),
   }),
   [PLAYER_STATUS]: (state, { payload }) => {
     const { queueId, position } = payload
@@ -38,7 +37,7 @@ const ACTION_HANDLERS = {
       ...state,
       curId: queueId,
       curPos: position,
-      entities: setWaits(state.result, state.entities, queueId, position),
+      entities: setWaits(state, queueId, position),
     }
   },
 }
@@ -47,9 +46,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  result: [],   // item ids
+  result: [], // item ids
   entities: {}, // keyed by queueId
-  songIds: [], // optimistic index for Library lookup
   // these are siphoned off of player status
   // because we need to calculate wait times
   curId: -1,
@@ -64,7 +62,8 @@ export default function queueReducer (state = initialState, action) {
 
 // calculates and adds the wait (in sec) property
 // to each entity. @todo this is hacky
-function setWaits (result, entities, curId, curPos) {
+function setWaits (payload, curId, curPos) {
+  const { result, entities } = payload
   let newItems = Object.assign({}, entities)
 
   let wait = 0

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import Header from './Header'
 import { setHeaderHeight } from 'store/modules/ui'
-import { requestScanCancel } from 'routes/Library/modules/library'
+import { requestScanCancel } from 'store/modules/providers'
 
 const mapActionCreators = {
   setHeaderHeight,
@@ -11,9 +11,9 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     isAdmin: state.user.isAdmin,
-    isUpdating: state.library.isUpdating,
-    updateText: state.library.updateText,
-    updateProgress: state.library.updateProgress,
+    isUpdating: state.providers.isUpdating,
+    updateText: state.providers.updateText,
+    updateProgress: state.providers.updateProgress,
   }
 }
 

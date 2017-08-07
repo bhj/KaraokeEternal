@@ -1,7 +1,7 @@
-const cdg = require('./cdg')
+const file = require('./file')
 // const youtube = require('./youtube')
 
 module.exports = {
-  cdg,
+  file,
   // youtube,
 }

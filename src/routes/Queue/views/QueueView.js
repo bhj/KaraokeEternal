@@ -8,8 +8,6 @@ import NoRoom from './NoRoom'
 class QueueView extends React.Component {
   static propTypes = {
     queue: PropTypes.object.isRequired,
-    artists: PropTypes.object.isRequired,
-    songs: PropTypes.object.isRequired,
     errors: PropTypes.object,
     curId: PropTypes.number,
     curPos: PropTypes.number,
@@ -24,9 +22,6 @@ class QueueView extends React.Component {
 
   render () {
     const props = this.props
-
-    // library may not have loaded yet
-    if (!props.artists.result.length) return null
 
     return (
       <div>
@@ -57,7 +52,6 @@ class QueueView extends React.Component {
 
   rowRenderer = ({ index, key, style }) => {
     const item = this.props.queue.entities[this.props.queue.result[index]]
-    const song = this.props.songs.entities[item.songId]
     const queueId = item.queueId
 
     const isActive = (queueId === this.props.curId) && !this.props.isAtQueueEnd
@@ -65,17 +59,13 @@ class QueueView extends React.Component {
     const isOwner = item.userId === this.props.user.userId
 
     return (
-      <QueueItem
-        artist={this.props.artists.entities[song.artistId].name}
-        title={song.title}
-        name={item.name}
-        wait={item.wait}
+      <QueueItem {...item}
         isActive={isActive}
         isUpcoming={isUpcoming}
         canSkip={isActive && isOwner}
         canRemove={isUpcoming && isOwner}
         hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
-        pctPlayed={isActive ? this.props.curPos / song.duration * 100 : 0}
+        pctPlayed={isActive ? this.props.curPos / item.duration * 100 : 0}
         onRemoveClick={() => this.handleRemoveClick(queueId)}
         onSkipClick={this.props.requestPlayNext}
         onErrorInfoClick={() => this.handleErrorInfoClick(queueId)}

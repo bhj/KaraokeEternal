@@ -1,8 +1,8 @@
-import LibraryContainer from './views/LibraryContainer'
+import LibraryViewContainer from './views/LibraryViewContainer'
 
 export default (store) => ({
   path: 'library',
   getComponent (nextState, cb) {
-    cb(null, LibraryContainer)
+    cb(null, LibraryViewContainer)
   },
 })

@@ -5,7 +5,7 @@ const bcrypt = require('../lib/async/bcrypt')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const debug = require('debug')
-const log = debug('app:account')
+const log = debug('app:user')
 const getPrefs = require('../lib/getPrefs')
 
 // login
@@ -75,7 +75,7 @@ router.post('/account/create', async (ctx, next) => {
   try {
     const prefs = await getPrefs()
 
-    if (prefs.app.firstRun === true) {
+    if (prefs.firstRun === true) {
       // create default room
       const q = squel.insert()
         .into('rooms')
@@ -100,7 +100,7 @@ router.post('/account/create', async (ctx, next) => {
       .set('email', email)
       .set('password', hashedPwd)
       .set('name', name)
-      .set('isAdmin', prefs.app.firstRun === true ? 1 : 0)
+      .set('isAdmin', prefs.firstRun === true ? 1 : 0)
 
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
@@ -110,14 +110,12 @@ router.post('/account/create', async (ctx, next) => {
     }
 
     // remove firstRun flag if necessary
-    if (prefs.app.firstRun === true) {
+    if (prefs.firstRun === true) {
       const q = squel.update()
         .table('prefs')
-        .where('domain = ?', 'app')
+        .where('key = ?', 'firstRun')
         .set('data', squel.select()
-          .field(`json_set(data, '$.firstRun', json('false'))`)
-          .from('prefs')
-          .where('domain = ?', 'app')
+          .field(`json('false')`)
         )
 
       const { text, values } = q.toParam()
@@ -334,14 +332,14 @@ async function _login (ctx, creds) {
   try {
     const q = squel.select()
       .from('stars')
-      .field('songId')
+      .field('mediaId')
       .where('userId = ?', user.userId)
 
     const { text, values } = q.toParam()
     const rows = await db.all(text, values)
 
     rows.forEach(row => {
-      starredSongs.push(row.songId)
+      starredSongs.push(row.mediaId)
     })
   } catch (err) {
     return Promise.reject(err)

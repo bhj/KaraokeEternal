@@ -9,12 +9,12 @@ export const SongItem = (props) => (
     </div>
 
     <div onClick={props.onSongClick} styleName='title'>
-      {props.title}
+      {props.title} ({props.numMedia})
     </div>
 
     <div onClick={props.onSongStarClick} styleName={props.isStarred ? 'starStarred' : 'star'}>
       <i className='material-icons' style={{ position: 'absolute' }}>{props.isStarred ? 'star' : 'star_border'}</i>
-      <div styleName={props.isStarred ? 'starredCountStarred' : 'starredCount'}>{props.stars}</div>
+      <div styleName={props.isStarred ? 'starredCountStarred' : 'starredCount'}>{props.numStars}</div>
     </div>
   </div>
 )
@@ -22,12 +22,13 @@ export const SongItem = (props) => (
 SongItem.propTypes = {
   title: PropTypes.string.isRequired,
   duration: PropTypes.number.isRequired,
-  stars: PropTypes.number.isRequired,
   style: PropTypes.object,
   onSongClick: PropTypes.func.isRequired,
   onSongStarClick: PropTypes.func.isRequired,
   isQueued: PropTypes.bool.isRequired,
   isStarred: PropTypes.bool.isRequired,
+  numStars: PropTypes.number.isRequired,
+  numMedia: PropTypes.number.isRequired,
 }
 
 export default SongItem

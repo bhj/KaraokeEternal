@@ -15,16 +15,9 @@ async function getPrefs () {
     return Promise.reject(err)
   }
 
-  // convert domain column's 'dot format' to object
+  // json-decode key/val pairs
   res.forEach(row => {
-    const parts = row.domain.split('.')
-
-    if (parts.length === 1) {
-      prefs[parts[0]] = JSON.parse(row.data)
-    } else if (parts.length === 2) {
-      prefs[parts[0]] = prefs[parts[0]] || {}
-      prefs[parts[0]][parts[1]] = JSON.parse(row.data)
-    }
+    prefs[row.key] = JSON.parse(row.data)
   })
 
   return prefs

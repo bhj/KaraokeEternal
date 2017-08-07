@@ -1,12 +1,7 @@
 import {
   LIBRARY_UPDATE,
-  LIBRARY_REQUEST_SCAN,
-  LIBRARY_REQUEST_SCAN_CANCEL,
-  LIBRARY_SCAN_STATUS,
-  LIBRARY_SCAN_COMPLETE,
   LIBRARY_SEARCH,
   LIBRARY_SEARCH_RESET,
-  SONG_UPDATE
 } from 'constants'
 
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
@@ -54,75 +49,6 @@ export function searchReset () {
 }
 
 // ------------------------------------
-// request media scan
-// ------------------------------------
-export function requestScan (provider) {
-  return (dispatch, getState) => {
-    // informational
-    dispatch({
-      type: LIBRARY_REQUEST_SCAN,
-      payload: provider,
-    })
-
-    return fetch(`/api/library/scan?provider=${provider}`, {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    })
-      .then(checkStatus)
-      .catch(err => {
-        dispatch({
-          type: LIBRARY_REQUEST_SCAN + '_ERROR',
-          meta: { error: err.message },
-        })
-      })
-  }
-}
-
-// ------------------------------------
-// request cancelation of media scan
-// ------------------------------------
-export function requestScanCancel (provider) {
-  return (dispatch, getState) => {
-    // informational
-    dispatch({
-      type: LIBRARY_REQUEST_SCAN_CANCEL,
-      payload: null,
-    })
-
-    return fetch(`/api/library/scan/cancel`, {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    })
-      .then(checkStatus)
-      .catch(err => {
-        dispatch({
-          type: LIBRARY_REQUEST_SCAN_CANCEL + '_ERROR',
-          meta: { error: err.message },
-        })
-      })
-  }
-}
-
-// helper for fetch response
-function checkStatus (response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  } else {
-    return response.text().then((txt) => {
-      var error = new Error(txt)
-      error.response = response
-      throw error
-    })
-  }
-}
-
-// ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
@@ -130,30 +56,8 @@ const ACTION_HANDLERS = {
     ...state,
     ...payload,
   }),
-  [LIBRARY_SCAN_STATUS]: (state, { payload }) => ({
-    ...state,
-    isUpdating: true,
-    updateText: payload.text,
-    updateProgress: payload.progress,
-  }),
-  [LIBRARY_SCAN_COMPLETE]: (state, { payload }) => ({
-    ...state,
-    isUpdating: false,
-    updateText: '',
-    updateProgress: 0,
-  }),
-  [SONG_UPDATE]: (state, { payload }) => ({
-    ...state,
-    songs: {
-      ...state.songs,
-      entities: {
-        ...state.songs.entities,
-        [payload.songId]: payload,
-      }
-    }
-  }),
   [LIBRARY_SEARCH]: (state, { payload }) => {
-    const { artists, songs } = state
+    const { artists, media } = state
     let artistResults, songResults
     let term = payload.trim().toLowerCase()
 
@@ -171,8 +75,8 @@ const ACTION_HANDLERS = {
       return artistName.includes(term)
     })
 
-    songResults = songs.result.filter((id, i) => {
-      const songTitle = songs.entities[id].title.toLowerCase()
+    songResults = media.result.filter((id, i) => {
+      const songTitle = media.entities[id].title.toLowerCase()
       return songTitle.includes(term)
     })
 
@@ -230,17 +134,13 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   artists: { result: [], entities: {} },
-  songs: { result: [], entities: {} },
+  media: { result: [], entities: {} },
   searchTerm: '',
   artistSearchResult: [],
   songSearchResult: [],
   scrollTop: 0,
   expandedArtists: [],
   expandedArtistResults: [],
-  // update status
-  isUpdating: false,
-  updateText: '',
-  updateProgress: 0,
 }
 
 export default function libraryReducer (state = initialState, action) {

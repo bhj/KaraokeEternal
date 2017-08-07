@@ -1,7 +1,7 @@
-import cdg from './cdg'
+import file from './file'
 import youtube from './youtube'
 
 export default {
-  cdg,
-  youtube,
+  file,
+  // youtube,
 }

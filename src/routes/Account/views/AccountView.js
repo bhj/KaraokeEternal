@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import Header from 'components/Header'
 import Rooms from '../components/Rooms'
-import Media from '../components/Media'
+import Prefs from '../components/Prefs'
 import Account from '../components/Account'
 import './AccountView.css'
 
@@ -24,7 +24,7 @@ export default class AccountView extends Component {
         }
 
         {isAdmin &&
-          <Media />
+          <Prefs />
         }
 
         <Account />

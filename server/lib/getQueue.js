@@ -4,32 +4,28 @@ const squel = require('squel')
 async function getQueue (roomId) {
   const result = []
   const entities = {}
-  let rows
 
   try {
     const q = squel.select()
+      .field('queueId, mediaId, userId')
+      .field ('media.title, media.duration, users.name AS username, artists.name AS artist')
       .from('queue')
-      .field('queueId')
-      .field('songId')
-      .field('userId')
-      .field('songs.*')
-      .field('users.name')
-      .join('songs USING(songId)')
       .join('users USING(userId)')
+      .join('media USING(mediaId)')
+      .join('artists USING (artistId)')
       .where('roomId = ?', roomId)
       .order('queueId')
 
     const { text, values } = q.toParam()
-    rows = await db.all(text, values)
+    const rows = await db.all(text, values)
+
+    for (const row of rows) {
+      result.push(row.queueId)
+      entities[row.queueId] = row
+    }
   } catch (err) {
     return Promise.reject(err)
   }
-
-  rows.forEach(function (row) {
-    result.push(row.queueId)
-    entities[row.queueId] = row
-    entities[row.queueId].providerData = JSON.parse(row.providerData)
-  })
 
   return { result, entities }
 }

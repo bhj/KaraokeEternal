@@ -3,7 +3,7 @@ const squel = require('squel')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const debug = require('debug')
-const log = debug('app:room')
+const log = debug('app:rooms')
 
 // list available rooms
 router.get('/rooms', async (ctx, next) => {

@@ -15,8 +15,9 @@ const KoaLogger = require('koa-logger')
 const jwtVerify = require('jsonwebtoken').verify
 
 const httpRoutes = require('./http')
+const providerRouters = require('./Providers/routers')
 const socketActions = require('./socket')
-const getLibrary = require('./lib/getLibrary')
+const Media = require('./Media')
 const getQueue = require('./lib/getQueue')
 const {
   LIBRARY_UPDATE,
@@ -64,6 +65,10 @@ app.use(async (ctx, next) => {
 // http api (koa-router) endpoints
 for (const route in httpRoutes) {
   app.use(httpRoutes[route].routes())
+}
+
+for (const router in providerRouters) {
+  app.use(providerRouters[router].routes())
 }
 
 // makes koa-socket available as app.io
@@ -115,7 +120,7 @@ app._io.on('connection', async (sock) => {
   try {
     app._io.to(sock.id).emit('action', {
       type: LIBRARY_UPDATE,
-      payload: await getLibrary(),
+      payload: await Media.getLibrary(),
     })
   } catch (err) {
     debug(err)

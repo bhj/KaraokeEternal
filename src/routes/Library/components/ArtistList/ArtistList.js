@@ -7,12 +7,12 @@ const ROW_HEIGHT = 44
 class ArtistList extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
-    songs: PropTypes.object.isRequired,
+    media: PropTypes.object.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     paddingTop: PropTypes.number.isRequired,
     paddingBottom: PropTypes.number.isRequired,
-    queuedSongs: PropTypes.array.isRequired,
+    queuedMediaIds: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
@@ -54,14 +54,14 @@ class ArtistList extends React.Component {
   }
 
   rowRenderer = ({ index, key, style }) => {
-    const { artists, songs, expandedArtists } = this.props
+    const { artists, expandedArtists } = this.props
     const artist = artists.entities[artists.result[index]]
 
     return (
       <ArtistItem
-        songs={songs}
-        songIds={artist.songIds} // "children"
-        queuedSongs={this.props.queuedSongs}
+        media={this.props.media}
+        artistMediaIds={artist.mediaIds} // "children"
+        queuedMediaIds={this.props.queuedMediaIds}
         starredSongs={this.props.starredSongs}
         name={artist.name}
         isExpanded={expandedArtists.includes(artist.artistId)}
@@ -79,7 +79,7 @@ class ArtistList extends React.Component {
     let rows = 1
 
     if (this.props.expandedArtists.includes(artistId)) {
-      rows += this.props.artists.entities[artistId].songIds.length
+      rows += this.props.artists.entities[artistId].mediaIds.length
     }
 
     return rows * ROW_HEIGHT
