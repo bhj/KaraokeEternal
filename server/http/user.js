@@ -26,7 +26,7 @@ router.get('/logout', async (ctx, next) => {
 })
 
 // create
-router.post('/account/create', async (ctx, next) => {
+router.post('/account', async (ctx, next) => {
   let { name, email, newPassword, newPasswordConfirm, roomId } = ctx.request.body
 
   name = name.trim()
@@ -140,8 +140,8 @@ router.post('/account/create', async (ctx, next) => {
   }
 })
 
-// update
-router.put('/account/update', async (ctx, next) => {
+// update account
+router.put('/account', async (ctx, next) => {
   let user
 
   // check jwt validity

@@ -1,7 +1,3 @@
-import fetch from 'isomorphic-fetch'
-import { fetchPrefs } from './prefs'
-import { browserHistory } from 'react-router'
-
 import {
   TOGGLE_SONG_STARRED,
   LOGIN,
@@ -11,6 +7,11 @@ import {
   _SUCCESS,
   _ERROR,
 } from 'constants'
+import { fetchPrefs } from './prefs'
+import { browserHistory } from 'react-router'
+
+import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('/api')
 
 // ------------------------------------
 // Login
@@ -44,15 +45,9 @@ export function loginUser (data) {
   return (dispatch, getState) => {
     dispatch(requestLogin(data))
 
-    return fetch('/api/login', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
+    return api('POST', '/login', {
       body: JSON.stringify(data)
     })
-      .then(checkStatus)
       .then(res => res.json())
       .then(res => {
         // user object in response body
@@ -120,9 +115,7 @@ export function logoutUser () {
   return (dispatch, getState) => {
     dispatch(requestLogout())
 
-    return fetch('/api/logout', {
-      credentials: 'same-origin',
-    }).then(checkStatus)
+    return api('GET', '/logout')
       .then(response => {
         // server response should have cleared our cookie
         dispatch(receiveLogout())
@@ -170,15 +163,9 @@ export function createUser (user) {
   return dispatch => {
     dispatch(requestCreate(user))
 
-    return fetch('/api/account/create', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
+    return api('POST', '/account', {
       body: JSON.stringify(user)
     })
-      .then(checkStatus)
       .then(res => res.json())
       .then(user => {
         dispatch(receiveCreate(user))
@@ -227,15 +214,9 @@ export function updateUser (data) {
   return (dispatch, getState) => {
     dispatch(requestUpdate(data))
 
-    return fetch('/api/account/update', {
-      method: 'PUT',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
+    return api('PUT', '/account', {
       body: JSON.stringify(data)
     })
-      .then(checkStatus)
       .then(response => response.json())
       .then(user => {
         dispatch(receiveUpdate(user))
@@ -253,19 +234,6 @@ export function toggleSongStarred (mediaId) {
   return {
     type: TOGGLE_SONG_STARRED,
     payload: mediaId,
-  }
-}
-
-// helper for fetch response
-function checkStatus (response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  } else {
-    return response.text().then((txt) => {
-      var error = new Error(txt)
-      error.response = response
-      throw error
-    })
   }
 }
 

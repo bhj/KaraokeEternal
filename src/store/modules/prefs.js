@@ -1,5 +1,3 @@
-import fetch from 'isomorphic-fetch'
-
 import {
   PREFS_REQUEST,
   PREFS_SET,
@@ -7,6 +5,8 @@ import {
   _ERROR,
 } from 'constants'
 
+import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('/api/prefs')
 // ------------------------------------
 // Set prefs
 // ------------------------------------
@@ -18,15 +18,9 @@ export function setPrefs (domain, data) {
       payload: { domain, data },
     })
 
-    return fetch(`/api/prefs?domain=${encodeURIComponent(domain)}`, {
-      method: 'PUT',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
+    return api('PUT', `?domain=${encodeURIComponent(domain)}`, {
       body: JSON.stringify(data)
     })
-      .then(checkStatus)
       .then(res => res.json())
       .then(prefs => {
         dispatch(receivePrefs(prefs))
@@ -50,14 +44,7 @@ export function fetchPrefs () {
       type: PREFS_REQUEST,
     })
 
-    return fetch(`/api/prefs`, {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    })
-      .then(checkStatus)
+    return api('GET', '')
       .then(res => res.json())
       .then(prefs => {
         dispatch(receivePrefs(prefs))
@@ -81,19 +68,6 @@ export function receivePrefs (data) {
   return {
     type: PREFS_RECEIVE,
     payload: data,
-  }
-}
-
-// helper for fetch response
-function checkStatus (response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  } else {
-    return response.text().then((txt) => {
-      var error = new Error(txt)
-      error.response = response
-      throw error
-    })
   }
 }
 

@@ -9,6 +9,9 @@ import {
   _ERROR,
 } from 'constants'
 
+import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('/api/rooms')
+
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -39,14 +42,7 @@ export function fetchRooms () {
   return dispatch => {
     dispatch(requestRooms())
 
-    return fetch('/api/rooms', {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    })
-      .then(checkStatus)
+    return api('GET', '')
       .then(response => response.json())
       .then(response => {
         dispatch(receiveRooms(response))
@@ -68,15 +64,9 @@ export function createRoom (data) {
       payload: { data },
     })
 
-    return fetch(`/api/rooms`, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
+    return api('POST', '', {
       body: JSON.stringify(data)
     })
-      .then(checkStatus)
       .then(res => res.json())
       .then(res => {
         dispatch(receiveRooms(res))
@@ -102,15 +92,9 @@ export function updateRoom (roomId, data) {
       payload: { roomId, ...data },
     })
 
-    return fetch(`/api/rooms/${roomId}`, {
-      method: 'PUT',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
+    return api('PUT', `/${roomId}`, {
       body: JSON.stringify(data)
     })
-      .then(checkStatus)
       .then(res => res.json())
       .then(res => {
         dispatch(receiveRooms(res))
@@ -136,14 +120,7 @@ export function removeRoom (roomId) {
       payload: roomId,
     })
 
-    return fetch(`/api/rooms/${roomId}`, {
-      method: 'DELETE',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    })
-      .then(checkStatus)
+    return api('DELETE', `/${roomId}`)
       .then(res => res.json())
       .then(res => {
         dispatch(receiveRooms(res))
@@ -172,19 +149,6 @@ export function closeRoomEditor () {
   return {
     type: ROOM_EDITOR_CLOSE,
     payload: null
-  }
-}
-
-// helper for fetch response
-function checkStatus (response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  } else {
-    return response.text().then((txt) => {
-      var error = new Error(txt)
-      error.response = response
-      throw error
-    })
   }
 }
 
