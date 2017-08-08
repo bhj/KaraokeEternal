@@ -26,5 +26,6 @@ export default class HttpApi {
           })
         }
       })
+      .then(response => response.json())
   }
 }

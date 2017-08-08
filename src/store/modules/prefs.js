@@ -21,7 +21,6 @@ export function setPrefs (domain, data) {
     return api('PUT', `?domain=${encodeURIComponent(domain)}`, {
       body: JSON.stringify(data)
     })
-      .then(res => res.json())
       .then(prefs => {
         dispatch(receivePrefs(prefs))
       })
@@ -45,7 +44,6 @@ export function fetchPrefs () {
     })
 
     return api('GET', '')
-      .then(res => res.json())
       .then(prefs => {
         dispatch(receivePrefs(prefs))
       })

@@ -41,7 +41,6 @@ export function fetchProviders () {
     })
 
     return api('GET', '/')
-      .then(res => res.json())
       .then(res => {
         dispatch(receiveProviders(res))
       })

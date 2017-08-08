@@ -3,6 +3,7 @@ import React from 'react'
 import PathItem from './PathItem'
 import PathChooser from './PathChooser'
 import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('/api/provider/file')
 
 export default class FilePrefs extends React.Component {
   static propTypes = {
@@ -15,10 +16,8 @@ export default class FilePrefs extends React.Component {
     isChoosing: false,
   }
 
-  api = new HttpApi('/api/provider/file')
-
   handleAddPath = (dir) => {
-    this.api('POST', `/path/?dir=${encodeURIComponent(dir)}`)
+    api('POST', `/path/?dir=${encodeURIComponent(dir)}`)
       .then(() => {
         // success; update data and close chooser
         this.props.fetchProviders()
@@ -36,7 +35,7 @@ export default class FilePrefs extends React.Component {
       return
     }
 
-    this.api('DELETE', `/path/${index}`)
+    api('DELETE', `/path/${index}`)
       .then(() => {
         // success; update data and close chooser
         this.props.fetchProviders()

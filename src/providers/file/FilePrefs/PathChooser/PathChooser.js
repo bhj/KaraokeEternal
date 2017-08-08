@@ -22,7 +22,6 @@ export default class PathChooser extends React.Component {
 
   getListing = (dir) => {
     this.api('GET', `/ls?dir=${encodeURIComponent(dir)}`)
-      .then(res => res.json())
       .then(res => this.setState(res))
       .catch(err => {
         alert(err)

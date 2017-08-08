@@ -43,7 +43,6 @@ export function fetchRooms () {
     dispatch(requestRooms())
 
     return api('GET', '')
-      .then(response => response.json())
       .then(response => {
         dispatch(receiveRooms(response))
       })
@@ -67,7 +66,6 @@ export function createRoom (data) {
     return api('POST', '', {
       body: JSON.stringify(data)
     })
-      .then(res => res.json())
       .then(res => {
         dispatch(receiveRooms(res))
         dispatch(closeRoomEditor())
@@ -95,7 +93,6 @@ export function updateRoom (roomId, data) {
     return api('PUT', `/${roomId}`, {
       body: JSON.stringify(data)
     })
-      .then(res => res.json())
       .then(res => {
         dispatch(receiveRooms(res))
         dispatch(closeRoomEditor())
@@ -121,7 +118,6 @@ export function removeRoom (roomId) {
     })
 
     return api('DELETE', `/${roomId}`)
-      .then(res => res.json())
       .then(res => {
         dispatch(receiveRooms(res))
         dispatch(closeRoomEditor())
