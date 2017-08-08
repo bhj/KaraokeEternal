@@ -17,15 +17,20 @@ export default class HttpApi {
     opts.method = method
 
     return fetch(`${this.prefix}${url}`, opts)
-      .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          return response
-        } else {
-          return response.text().then(txt => {
-            return Promise.reject(new Error(txt))
-          })
+      .then(res => {
+        if (res.status >= 200 && res.status < 300) {
+          // success
+          if (res.headers.get('Content-Type').includes('application/json')) {
+            return res.json()
+          } else {
+            return res
+          }
         }
+
+        // error
+        return res.text().then(txt => {
+          return Promise.reject(new Error(txt))
+        })
       })
-      .then(response => response.json())
   }
 }
