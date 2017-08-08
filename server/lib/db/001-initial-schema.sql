@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "artists" (
 CREATE TABLE IF NOT EXISTS "media" (
   "mediaId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "artistId" integer NOT NULL,
-  "title" text,
+  "title" text NOT NULL,
   "duration" integer NOT NULL,
   "provider" text NOT NULL,
   "providerData" text NOT NULL,
