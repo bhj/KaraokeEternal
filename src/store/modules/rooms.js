@@ -42,7 +42,7 @@ export function fetchRooms () {
   return dispatch => {
     dispatch(requestRooms())
 
-    return api('GET', '')
+    return api('GET', '/')
       .then(response => {
         dispatch(receiveRooms(response))
       })
@@ -63,7 +63,7 @@ export function createRoom (data) {
       payload: { data },
     })
 
-    return api('POST', '', {
+    return api('POST', '/', {
       body: JSON.stringify(data)
     })
       .then(res => {
