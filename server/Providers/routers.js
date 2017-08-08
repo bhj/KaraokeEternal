@@ -36,10 +36,7 @@ router.get('/scan', async (ctx, next) => {
     return
   }
 
-  // let middleware finish and send 200 response...
-  await next()
-
-  // ...then do the heavy lifting
+  ctx.status = 200
   Providers.startScan(ctx)
 })
 
@@ -51,7 +48,7 @@ router.get('/scan/cancel', async (ctx, next) => {
     return
   }
 
-  await next()
+  ctx.status = 200
   Providers.cancelScan()
 })
 
