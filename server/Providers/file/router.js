@@ -7,9 +7,10 @@ const log = debug('app:provider:file')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/file' })
 
-const getFolders = require('../../lib/async/getFolders')
+const getFolders = require('./lib/getFolders')
 const getProviders = require('../getProviders')
-const stat = require('../../lib/async/stat')
+const { promisify } = require('util')
+const stat = promisify(fs.stat)
 
 // add media file path
 router.post('/path', async (ctx, next) => {

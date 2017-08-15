@@ -5,16 +5,16 @@ const Media = require('../Media')
 const {
   LIBRARY_UPDATE,
   TOGGLE_SONG_STARRED,
-} = require('../constants')
+} = require('../../actions')
 
 const ACTION_HANDLERS = {
-  [TOGGLE_SONG_STARRED]: async (ctx, { payload }) => {
+  [TOGGLE_SONG_STARRED]: async (sock, { payload }, acknowledge) => {
     // already starred?
     try {
       const q = squel.delete()
         .from('stars')
         .where('mediaId = ?', payload)
-        .where('userId = ?', ctx.user.userId)
+        .where('userId = ?', sock.user.userId)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
@@ -24,7 +24,7 @@ const ACTION_HANDLERS = {
         const q = squel.insert()
           .into('stars')
           .set('mediaId', payload)
-          .set('userId', ctx.user.userId)
+          .set('userId', sock.user.userId)
 
         const { text, values } = q.toParam()
         await db.run(text, values)
@@ -38,7 +38,7 @@ const ACTION_HANDLERS = {
       const q = squel.select()
         .from('stars')
         .field('mediaId')
-        .where('userId = ?', ctx.user.userId)
+        .where('userId = ?', sock.user.userId)
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -48,7 +48,7 @@ const ACTION_HANDLERS = {
         starredSongs.push(row.mediaId)
       })
 
-      ctx.acknowledge({
+      acknowledge({
         type: TOGGLE_SONG_STARRED + '_SUCCESS',
         payload: starredSongs,
       })
@@ -58,7 +58,7 @@ const ACTION_HANDLERS = {
 
     // emit updated star count
     try {
-      ctx.sock.server.emit('action', {
+      sock.server.emit('action', {
         type: LIBRARY_UPDATE,
         payload: await Media.getLibrary(),
       })

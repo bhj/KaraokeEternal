@@ -1,23 +1,23 @@
 const db = require('sqlite')
 const squel = require('squel')
-const getQueue = require('../lib/getQueue')
+const getQueue = require('./getQueue')
 const log = require('debug')('app:socket:queue')
 
 const {
   QUEUE_ADD,
   QUEUE_REMOVE,
   QUEUE_UPDATE,
-} = require('../constants')
+} = require('../../actions')
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_ADD]: async (ctx, { payload }) => {
+  [QUEUE_ADD]: async (sock, { payload }, acknowledge) => {
     // is room open?
     try {
-      if (!await _isRoomOpen(ctx.user.roomId)) {
-        return ctx.acknowledge({
+      if (!await _isRoomOpen(sock.user.roomId)) {
+        return acknowledge({
           type: QUEUE_ADD + '_ERROR',
           meta: {
             error: 'Room is no longer open'
@@ -42,7 +42,7 @@ const ACTION_HANDLERS = {
     }
 
     if (!song) {
-      return ctx.acknowledge({
+      return acknowledge({
         type: QUEUE_ADD + '_ERROR',
         meta: {
           error: 'mediaId not found: ' + payload
@@ -54,9 +54,9 @@ const ACTION_HANDLERS = {
     try {
       const q = squel.insert()
         .into('queue')
-        .set('roomId', ctx.user.roomId)
+        .set('roomId', sock.user.roomId)
         .set('mediaId', payload)
-        .set('userId', ctx.user.userId)
+        .set('userId', sock.user.userId)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
@@ -69,19 +69,19 @@ const ACTION_HANDLERS = {
     }
 
     // to all in room
-    ctx.sock.server.to(ctx.user.roomId).emit('action', {
+    sock.server.to(sock.user.roomId).emit('action', {
       type: QUEUE_UPDATE,
-      payload: await getQueue(ctx.user.roomId)
+      payload: await getQueue(sock.user.roomId)
     })
   },
-  [QUEUE_REMOVE]: async (ctx, { payload }) => {
+  [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
     const queueId = payload
     let item, nextItem
 
     // is room open?
     try {
-      if (!await _isRoomOpen(ctx.user.roomId)) {
-        return ctx.acknowledge({
+      if (!await _isRoomOpen(sock.user.roomId)) {
+        return acknowledge({
           type: QUEUE_REMOVE + '_ERROR',
           meta: {
             error: 'Room is no longer open'
@@ -105,7 +105,7 @@ const ACTION_HANDLERS = {
     }
 
     if (!item) {
-      return ctx.acknowledge({
+      return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         meta: {
           error: 'queueId not found: ' + queueId
@@ -114,8 +114,8 @@ const ACTION_HANDLERS = {
     }
 
     // is it in the user's room?
-    if (item.roomId !== ctx.user.roomId) {
-      return ctx.acknowledge({
+    if (item.roomId !== sock.user.roomId) {
+      return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         meta: {
           error: 'queueId is not in your room: ' + queueId
@@ -124,8 +124,8 @@ const ACTION_HANDLERS = {
     }
 
     // is it the user's item?
-    if (item.userId !== ctx.user.userId) {
-      return ctx.acknowledge({
+    if (item.userId !== sock.user.userId) {
+      return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         meta: {
           error: 'Item is NOT YOURS: ' + queueId
@@ -183,9 +183,9 @@ const ACTION_HANDLERS = {
     }
 
     // tell room
-    ctx.sock.server.to(ctx.user.roomId).emit('action', {
+    sock.server.to(sock.user.roomId).emit('action', {
       type: QUEUE_UPDATE,
-      payload: await getQueue(ctx.user.roomId)
+      payload: await getQueue(sock.user.roomId)
     })
   },
 }

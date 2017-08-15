@@ -1,6 +1,8 @@
 const path = require('path')
-const stat = require('./stat')
-const readdir = require('./readdir')
+const fs = require('fs')
+const { promisify } = require('util')
+const readdir = promisify(fs.readdir)
+const stat = promisify(fs.stat)
 
 // based on http://stackoverflow.com/a/38314404/2533525
 const getFolders = function (dir, filterFn) {

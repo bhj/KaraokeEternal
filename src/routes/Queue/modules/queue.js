@@ -3,7 +3,7 @@ import {
   QUEUE_UPDATE,
   QUEUE_REMOVE,
   PLAYER_STATUS,
-} from 'constants'
+} from 'actions'
 
 // add to queue
 export function queueSong (mediaId) {

@@ -1,3 +1,4 @@
+const path = require('path')
 const NODE_ENV = process.env.NODE_ENV || 'development'
 
 module.exports = {
@@ -12,9 +13,9 @@ module.exports = {
   /** Directory containing the client application source code */
   srcDir: 'src',
   /** Filename of the application's entry point */
-  main: 'main',
-  /** Filename of the SQLite database */
-  database: 'database.sqlite3',
+  main: 'main.js',
+  /** Path to SQLite database */
+  database: path.resolve(__dirname, 'database.sqlite3'),
   /** Directory in which to emit compiled assets */
   outDir: 'dist',
   /** Base path for all project assets (relative to the website root) */

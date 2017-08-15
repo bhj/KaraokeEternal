@@ -4,6 +4,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider' })
 const Providers = require('../Providers/Providers')
 const providerImports = require('./')
+const { PROVIDER_REQUEST_SCAN, PROVIDER_REQUEST_SCAN_CANCEL } = require('../../actions')
 
 // get provider list (ordered by priority)
 router.get('/', async (ctx, next) => {
@@ -30,14 +31,8 @@ router.get('/scan', async (ctx, next) => {
     return
   }
 
-  if (Providers.isScanning()) {
-    ctx.status = 500
-    ctx.body = 'Media scan already in progress'
-    return
-  }
-
   ctx.status = 200
-  Providers.startScan(ctx)
+  process.send({ 'type': PROVIDER_REQUEST_SCAN })
 })
 
 // cancel media scan
@@ -49,7 +44,7 @@ router.get('/scan/cancel', async (ctx, next) => {
   }
 
   ctx.status = 200
-  Providers.cancelScan()
+  process.send({ 'type': PROVIDER_REQUEST_SCAN_CANCEL })
 })
 
 // export this file's router...
@@ -59,8 +54,8 @@ const routers = {
 
 // ... and each provider's
 for (const name in providerImports) {
-  if (providerImports[name] && providerImports[name].Router) {
-    routers['provider_' + name] = providerImports[name].Router
+  if (providerImports[name] && providerImports[name].router) {
+    routers['provider_' + name] = providerImports[name].router
   }
 }
 

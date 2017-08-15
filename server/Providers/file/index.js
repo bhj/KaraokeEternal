@@ -1,7 +1,7 @@
 const FileScanner = require('./FileScanner')
-const api = require('./api')
+const router = require('./router')
 
 module.exports = {
   Scanner: FileScanner,
-  Router: api,
+  router,
 }

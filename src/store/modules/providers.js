@@ -5,7 +5,7 @@ import {
   PROVIDER_REQUEST_SCAN_CANCEL,
   PROVIDER_SCAN_STATUS,
   PROVIDER_SCAN_COMPLETE,
-} from 'constants'
+} from 'actions'
 
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('/api/provider')

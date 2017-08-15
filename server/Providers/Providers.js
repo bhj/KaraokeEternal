@@ -4,10 +4,17 @@ const getProviders = require('./getProviders')
 const providerImports = require('./')
 
 class Providers {
-  static async startScan (ctx) {
+  static async startScan (providerName) {
+    if (this._isScanning) {
+      log('Ignoring media scan request (already in progress)')
+      return
+    }
+
+    log(`Media scan requested (providerName=${providerName})`)
+
     let providers
     this._isScanning = true
-    log(`Media scan requested (provider=${ctx.query.provider})`)
+    this._isCanceling = false
 
     try {
       providers = await this.getAll()
@@ -16,8 +23,8 @@ class Providers {
     }
 
     // was a particular provider requested?
-    if (ctx.query.provider) {
-      providers.result = providers.result.filter(name => name === ctx.query.provider)
+    if (providerName) {
+      providers.result = providers.result.filter(name => name === providerName)
     }
 
     for (const name of providers.result) {
@@ -38,26 +45,28 @@ class Providers {
       log(`  => scanning media with provider: ${name}`)
 
       try {
-        this._scanner = new providerImports[name].Scanner(ctx, providerCfg.prefs)
+        this._scanner = new providerImports[name].Scanner(providerCfg.prefs)
         await this._scanner.run()
       } catch (err) {
         log(`  => ${err}`)
+      }
+
+      if (this._isCanceling) {
+        break
       }
     } // end for
 
     this._scanner = null
     this._isScanning = false
+    this._isCanceling = false
     log('Media scan complete')
   }
 
   static cancelScan () {
     if (this._scanner) {
+      this._isCanceling = true
       this._scanner.stop()
     }
-  }
-
-  static isScanning () {
-    return this._isScanning
   }
 
   static async getAll () {

@@ -1,10 +1,11 @@
 const path = require('path')
 const debug = require('debug')
 const log = debug('app:Providers:FileScanner')
-
-const stat = require('../../lib/async/stat')
-const mp3duration = require('../../lib/async/mp3duration')
-const getFiles = require('../../lib/async/getFiles')
+const { promisify } = require('util')
+const fs = require('fs')
+const stat = promisify(fs.stat)
+const mp3duration = promisify(require('mp3-duration'))
+const getFiles = require('./lib/getFiles')
 const Scanner = require('../Scanner')
 
 const Media = require('../../Media')
@@ -14,8 +15,8 @@ const fileExts = ['.cdg', '.mp4', '.m4v']
 const audioExts = ['.m4a', '.mp3']
 
 class FileScanner extends Scanner {
-  constructor (ctx, prefs) {
-    super(ctx)
+  constructor (prefs) {
+    super()
     this.paths = prefs.paths || []
   }
 
@@ -25,15 +26,15 @@ class FileScanner extends Scanner {
     let files = []
 
     // emit start
-    this.emitStatus('Searching media folders', 0)
+    this.emitStatus('Gathering file list', 0)
 
     // count files to scan from all paths
     for (const p of this.paths) {
       try {
         log('Searching path: %s', p)
         let list = await getFiles(p)
-
         list = list.filter(file => fileExts.includes(path.extname(file)))
+
         log('  => found %s files with valid extensions (%s)', list.length, fileExts.join(', '))
         files = files.concat(list)
       } catch (err) {
@@ -92,6 +93,7 @@ class FileScanner extends Scanner {
     //   log(err.message)
     // }
 
+    console.log('end of run()')
     this.emitDone()
   }
 
@@ -171,6 +173,8 @@ class FileScanner extends Scanner {
       if (!Number.isInteger(mediaId)) {
         throw new Error('got invalid lastID')
       }
+
+      this.emitLibrary()
 
       return Promise.resolve(mediaId)
     } catch (err) {

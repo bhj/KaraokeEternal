@@ -2,7 +2,7 @@ import {
   LIBRARY_UPDATE,
   LIBRARY_SEARCH,
   LIBRARY_SEARCH_RESET,
-} from 'constants'
+} from 'actions'
 
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
 export function scrollArtists (scrollTop) {

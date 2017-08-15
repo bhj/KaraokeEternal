@@ -1,13 +1,12 @@
-const throttle = require('../lib/async/throttle')
+const throttle = require('../lib/throttle')
 const Media = require('../Media')
 const {
   LIBRARY_UPDATE,
   PROVIDER_SCAN_STATUS,
-} = require('../constants')
+} = require('../../actions')
 
 class Scanner {
-  constructor (ctx) {
-    this.ctx = ctx
+  constructor () {
     this.isCanceling = false
 
     this.emitLibrary = this.getLibraryEmitter()
@@ -23,7 +22,7 @@ class Scanner {
     return throttle((text, progress, isUpdating = true) => {
       // thunkify
       return Promise.resolve().then(() => {
-        this.ctx._io.emit('action', {
+        process.send({
           type: PROVIDER_SCAN_STATUS,
           payload: { text, progress, isUpdating },
         })
@@ -33,7 +32,7 @@ class Scanner {
 
   getLibraryEmitter () {
     return throttle(async () => {
-      this.ctx._io.emit('action', {
+      process.send({
         type: LIBRARY_UPDATE,
         payload: await Media.getLibrary(),
       })
