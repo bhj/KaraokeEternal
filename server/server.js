@@ -72,14 +72,9 @@ module.exports = function () {
         publicPath  : webpackConfig.output.publicPath,
         contentBase : path.resolve(project.basePath, project.srcDir),
         hot         : true,
-        quiet       : false,
-        noInfo      : false,
         lazy        : false,
-        stats       : 'normal',
+        stats       : 'minimal',
       },
-      hot: {
-        path: '/__webpack_hmr'
-      }
     }))
 
     // Serve static assets from ~/public since Webpack is unaware of
