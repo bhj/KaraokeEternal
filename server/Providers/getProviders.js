@@ -17,8 +17,9 @@ async function getProviders () {
 
     // normalize
     res.forEach(row => {
-      providers.result.push(row.name)
+      row.isEnabled = row.isEnabled === 1
       providers.entities[row.name] = row
+      providers.result.push(row.name)
 
       // parse JSON in prefs column
       providers.entities[row.name].prefs = JSON.parse(row.prefs)

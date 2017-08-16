@@ -1,16 +1,18 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Providers from 'providers' // src/providers
+import HttpApi from 'lib/HttpApi'
 import './ProviderPrefs.css'
 
 export default class ProviderPrefs extends React.Component {
   static propTypes = {
     providers: PropTypes.object.isRequired,
-    // setEnabled: PropTypes.func.isRequired,
+    // actions
     fetchProviders: PropTypes.func.isRequired,
     requestScan: PropTypes.func.isRequired,
   }
 
+  api = new HttpApi('/api/providers')
   state = {
     expanded: [],
   }
@@ -22,10 +24,20 @@ export default class ProviderPrefs extends React.Component {
   toggleExpanded (e, name) {
     if (e.target.nodeName !== 'DIV') return
 
-    const cur = this.state.expanded.slice()
-    const idx = cur.indexOf(name)
-    idx === -1 ? cur.push(name) : cur.splice(idx, 1)
-    this.setState({ expanded: cur })
+    const arr = this.state.expanded.slice()
+    arr.indexOf(name) === -1 ? arr.push(name) : arr.splice(arr.indexOf(name), 1)
+    this.setState({ expanded: arr })
+  }
+
+  toggleEnabled (name) {
+    const enable = !this.props.providers.entities[name].isEnabled
+    this.api('PUT', `/enable?provider=${name}&enable=${enable}`)
+      .then(() => {
+        // success; update data
+        this.props.fetchProviders()
+      }).catch(err => {
+        alert(err)
+      })
   }
 
   handleRefresh = () => {
@@ -37,6 +49,7 @@ export default class ProviderPrefs extends React.Component {
     return (
       <div>
         {this.props.providers.result
+          .filter(name => typeof this.props.providers.entities[name] === 'object')
           .filter(name => typeof Providers[name] === 'object')
           .filter(name => typeof Providers[name.prefsComponent === 'object'])
           .map((name, i) => {
@@ -44,7 +57,10 @@ export default class ProviderPrefs extends React.Component {
             return (
               <div key={i} styleName='provider' onClick={(e) => this.toggleExpanded(e, name)}>
                 <label>
-                  <input type='checkbox' checked /> {Providers[name].title}
+                  <input type='checkbox'
+                    checked={this.props.providers.entities[name].isEnabled}
+                    onChange={() => this.toggleEnabled(name)}
+                  /> {Providers[name].title}
                 </label>
                 <Component style={{ display: this.state.expanded.includes(name) ? 'block' : 'none' }} />
               </div>

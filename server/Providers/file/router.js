@@ -5,7 +5,7 @@ const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:file')
 const KoaRouter = require('koa-router')
-const router = KoaRouter({ prefix: '/api/provider/file' })
+const router = KoaRouter({ prefix: '/api/provider/file' }) // singular
 
 const getFolders = require('./lib/getFolders')
 const getProviders = require('../getProviders')

@@ -8,7 +8,7 @@ import {
 } from 'actions'
 
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('/api/provider')
+const api = new HttpApi('/api/providers') // plural
 
 // ------------------------------------
 // Actions

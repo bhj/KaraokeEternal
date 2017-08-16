@@ -23,8 +23,7 @@ export default class FilePrefs extends React.Component {
         // success; update data and close chooser
         this.props.fetchProviders()
         this.setState({ isChoosing: false })
-      })
-      .catch(err => {
+      }).catch(err => {
         alert(err)
       })
   }
@@ -41,8 +40,7 @@ export default class FilePrefs extends React.Component {
         // success; update data and close chooser
         this.props.fetchProviders()
         this.setState({ isChoosing: false })
-      })
-      .catch(err => {
+      }).catch(err => {
         alert(err)
       })
   }
