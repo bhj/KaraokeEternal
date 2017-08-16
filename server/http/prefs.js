@@ -10,7 +10,7 @@ const getPrefs = require('../lib/getPrefs')
 router.get('/', async (ctx, next) => {
   let prefs
 
-  // get prefs from all domains
+  // get all keys
   try {
     prefs = await getPrefs()
   } catch (err) {
@@ -19,17 +19,12 @@ router.get('/', async (ctx, next) => {
     return
   }
 
-  // if not an admin, must be firstRun...
+  // if not an admin, must be first run...
   if (!ctx.user.isAdmin) {
-    if (prefs.firstRun === true) {
-      // ...and we only send fistRun flag
-      ctx.body = { firstRun: true }
+    if (prefs.isFirstRun !== true) {
+      ctx.status = 401
       return
     }
-
-    // ...or else
-    ctx.status = 401
-    return
   }
 
   ctx.body = prefs

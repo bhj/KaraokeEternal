@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS "prefs" (
   "data" text NOT NULL
 );
 
-INSERT INTO prefs (key,data) VALUES ('firstRun','true');
+INSERT INTO prefs (key,data) VALUES ('isFirstRun','true');
 
 CREATE TABLE IF NOT EXISTS "providers" (
   "name" text PRIMARY KEY NOT NULL,
