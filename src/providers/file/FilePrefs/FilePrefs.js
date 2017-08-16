@@ -8,6 +8,7 @@ const api = new HttpApi('/api/provider/file')
 export default class FilePrefs extends React.Component {
   static propTypes = {
     prefs: PropTypes.object.isRequired,
+    style: PropTypes.object.isRequired,
     fetchProviders: PropTypes.func.isRequired,
     requestScan: PropTypes.func.isRequired,
   }
@@ -62,7 +63,7 @@ export default class FilePrefs extends React.Component {
     const { paths } = this.props.prefs
 
     return (
-      <div style={{ overflow: 'hidden' }}>
+      <div style={this.props.style}>
         {paths.length === 0 &&
           <p style={{ marginTop: 0 }}>No folders configured.</p>
         }

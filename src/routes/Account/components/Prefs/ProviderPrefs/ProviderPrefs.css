@@ -1,0 +1,6 @@
+.provider {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #666;
+  border-radius: var(--border-radius);
+}
