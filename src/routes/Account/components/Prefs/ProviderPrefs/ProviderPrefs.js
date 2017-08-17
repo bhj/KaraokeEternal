@@ -62,7 +62,12 @@ export default class ProviderPrefs extends React.Component {
                     onChange={() => this.toggleEnabled(name)}
                   /> {Providers[name].title}
                 </label>
-                <Component style={{ display: this.state.expanded.includes(name) ? 'block' : 'none' }} />
+                <Component
+                  prefs={this.props.providers.entities[name].prefs}
+                  fetchProviders={this.props.fetchProviders}
+                  requestScan={this.props.requestScan}
+                  style={{ display: this.state.expanded.includes(name) ? 'block' : 'none' }}
+                />
               </div>
             )
           }

@@ -1,3 +1,3 @@
-import FilePrefsContainer from './FilePrefsContainer'
+import FilePrefs from './FilePrefs'
 
-export default FilePrefsContainer
+export default FilePrefs
