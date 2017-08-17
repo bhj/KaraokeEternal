@@ -10,9 +10,9 @@ const {
 module.exports = function scanner () {
   log('Opening database file %s', project.database)
   db.open(project.database).then(() => {
-    process.on('message', function ({ type }) {
+    process.on('message', function ({ type, payload }) {
       if (type === PROVIDER_REQUEST_SCAN) {
-        Providers.startScan()
+        Providers.startScan(payload)
       } else if (type === PROVIDER_REQUEST_SCAN_CANCEL) {
         Providers.cancelScan()
       }

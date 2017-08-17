@@ -53,15 +53,15 @@ export function fetchProviders () {
 // ------------------------------------
 // request media scan
 // ------------------------------------
-export function requestScan (providerName) {
+export function requestScan (name) {
   return (dispatch, getState) => {
     // informational
     dispatch({
       type: PROVIDER_REQUEST_SCAN,
-      payload: providerName,
+      payload: name,
     })
 
-    return api('GET', `/scan?provider=${providerName}`)
+    return api('GET', `/scan?provider=${name}`)
       .catch(err => {
         dispatch({
           type: PROVIDER_REQUEST_SCAN + '_ERROR',

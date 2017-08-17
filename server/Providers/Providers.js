@@ -10,7 +10,7 @@ class Providers {
       return
     }
 
-    log(`Media scan requested (providerName=${providerName})`)
+    log(`Media scan requested (provider=${providerName})`)
 
     let providers
     this._isScanning = true

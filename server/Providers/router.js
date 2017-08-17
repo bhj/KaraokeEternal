@@ -67,7 +67,10 @@ router.get('/scan', async (ctx, next) => {
   }
 
   ctx.status = 200
-  process.send({ 'type': PROVIDER_REQUEST_SCAN })
+  process.send({
+    'type': PROVIDER_REQUEST_SCAN,
+    'payload': ctx.query.provider,
+  })
 })
 
 // cancel media scan
