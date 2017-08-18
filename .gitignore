@@ -1,10 +1,7 @@
+coverage
+dist
+node_modules
+
 .DS_Store
 *.log
-
-node_modules
-package-lock.json
-
-dist
-coverage
-
 database.sqlite3
