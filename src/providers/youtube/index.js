@@ -1,5 +1,5 @@
 import YouTubePlayer from './YouTubePlayer/YouTubePlayer'
-import YouTubePrefs from './YouTubePrefs'
+import YouTubePrefs from './YouTubePrefs/YouTubePrefs'
 
 export default {
   title: 'YouTube Channels',

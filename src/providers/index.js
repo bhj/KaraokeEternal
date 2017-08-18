@@ -3,5 +3,5 @@ import youtube from './youtube'
 
 export default {
   file,
-  // youtube,
+  youtube,
 }

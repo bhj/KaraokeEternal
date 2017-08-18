@@ -48,7 +48,7 @@ class Providers {
         this._scanner = new providerImports[name].Scanner(providerCfg.prefs)
         await this._scanner.run()
       } catch (err) {
-        log(`  => ${err}`)
+        log(err)
       }
 
       if (this._isCanceling) {

@@ -2,11 +2,14 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { SkyLightStateless } from 'react-skylight'
 import ChannelItem from './ChannelItem'
+import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('/api/provider/youtube')
 
 export default class YouTubePrefs extends React.Component {
   static propTypes = {
     prefs: PropTypes.object.isRequired,
-    setPrefs: PropTypes.func.isRequired,
+    style: PropTypes.object.isRequired,
+    fetchProviders: PropTypes.func.isRequired,
     requestScan: PropTypes.func.isRequired,
   }
 
@@ -14,48 +17,43 @@ export default class YouTubePrefs extends React.Component {
     isAdding: false,
   }
 
-  updateEnabled = (e) => {
-    this.props.setPrefs('provider.youtube', { enabled: e.target.checked })
-  }
-
   updateApiKey = (e) => {
     e.preventDefault()
 
-    this.props.setPrefs('provider.youtube', {
-      apiKey: this.refs.apiKey.value.toString(),
+    api('PUT', `/apiKey`, {
+      body: JSON.stringify({ apiKey: this.refs.apiKey.value.toString() })
     })
+      .then(() => {
+        this.props.fetchProviders()
+      }).catch(err => {
+        alert(err)
+      })
   }
 
   handleAddClick = () => {
-    const { channels } = this.props.prefs
-    const name = this.refs.name.value
-
-    if (!name.trim()) {
-      alert('Invalid channel name')
-      return
-    }
-
-    if (channels.includes(name)) {
-      alert('Channel is already added')
-      return
-    }
-
-    this.props.setPrefs('provider.youtube', { channels: [...channels, name] })
-    this.setState({ isAdding: false })
+    api('POST', `/channel`, {
+      body: JSON.stringify({ channel: this.refs.name.value })
+    })
+      .then(() => {
+        this.props.fetchProviders()
+        this.setState({ isAdding: false })
+      }).catch(err => {
+        alert(err)
+      })
   }
 
   handleRemoveClick = (name) => {
-    const { channels } = this.props.prefs
-    const idx = channels.indexOf(name)
-
-    if (idx === -1) {
-      // nothing to do
+    if (!confirm(`Remove "${name}"?`)) {
       return
     }
 
-    if (confirm(`Remove this channel?\n\n${name}`)) {
-      this.props.setPrefs('provider.youtube', { channels: channels.filter(c => c !== name) })
-    }
+    api('DELETE', `/channel/${name}`)
+      .then(() => {
+        this.props.fetchProviders()
+        this.setState({ isAdding: false })
+      }).catch(err => {
+        alert(err)
+      })
   }
 
   handleOpenAdder = () => { this.setState({ isAdding: true }) }
@@ -69,36 +67,26 @@ export default class YouTubePrefs extends React.Component {
     const { prefs } = this.props
 
     return (
-      <div>
-        <label>
-          <input type='checkbox' checked={prefs.enabled} onChange={this.updateEnabled} />
-          &nbsp;YouTube Channels
-        </label>
+      <div style={this.props.style}>
+        <input type='text' ref='apiKey' placeholder='API key'
+          defaultValue={prefs.apiKey}
+          onBlur={this.updateApiKey}
+        />
 
-        {prefs.enabled &&
-          <div>
-            <br />
-            <input type='text' ref='apiKey' placeholder='API key'
-              defaultValue={prefs.apiKey}
-              onBlur={this.updateApiKey}
-            />
-
-            {!prefs.channels.length &&
-              <p>No channels configured.</p>
-            }
-
-            {prefs.channels.map((name, i) =>
-              <ChannelItem key={i} name={name} onRemoveClick={() => this.handleRemoveClick(name)} />
-            )}
-
-            <div style={{ display: 'flex' }}>
-              <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenAdder}>Add Channel</button>
-              {prefs.channels.length > 0 &&
-                <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleOpenChooser}>Refresh</button>
-              }
-            </div>
-          </div>
+        {!prefs.channels.length &&
+          <p>No channels configured.</p>
         }
+
+        {prefs.channels.map((name, i) =>
+          <ChannelItem key={i} name={name} onRemoveClick={() => this.handleRemoveClick(name)} />
+        )}
+
+        <div style={{ display: 'flex' }}>
+          <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenAdder}>Add Channel</button>
+          {prefs.channels.length > 0 &&
+            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleRefresh}>Refresh</button>
+          }
+        </div>
 
         <SkyLightStateless
           isVisible={this.state.isAdding}

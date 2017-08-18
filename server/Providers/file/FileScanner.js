@@ -1,6 +1,6 @@
 const path = require('path')
 const debug = require('debug')
-const log = debug('app:Providers:FileScanner')
+const log = debug('app:provider:file')
 const { promisify } = require('util')
 const fs = require('fs')
 const stat = promisify(fs.stat)

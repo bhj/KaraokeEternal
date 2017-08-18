@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Providers from 'providers' // src/providers
 import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('/api/providers')
 import './ProviderPrefs.css'
 
 export default class ProviderPrefs extends React.Component {
@@ -12,7 +13,6 @@ export default class ProviderPrefs extends React.Component {
     requestScan: PropTypes.func.isRequired,
   }
 
-  api = new HttpApi('/api/providers')
   state = {
     expanded: [],
   }
@@ -31,7 +31,7 @@ export default class ProviderPrefs extends React.Component {
 
   toggleEnabled (name) {
     const enable = !this.props.providers.entities[name].isEnabled
-    this.api('PUT', `/enable?provider=${name}&enable=${enable}`)
+    api('PUT', `/enable?provider=${name}&enable=${enable}`)
       .then(() => {
         // success; update data
         this.props.fetchProviders()

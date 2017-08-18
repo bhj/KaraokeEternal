@@ -1,5 +1,7 @@
-const scan = require('./scan')
+const YouTubeScanner = require('./YouTubeScanner')
+const router = require('./router')
 
 module.exports = {
-  scan,
+  Scanner: YouTubeScanner,
+  router,
 }
