@@ -14,34 +14,11 @@ class Media {
       entities: {}
     }
 
-    // First query: artists
-    try {
-      const q = squel.select()
-        .from('artists')
-        .order('name')
-
-      // log(q.toString())
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
-
-      // normalize results
-      for (const row of rows) {
-        artists.result.push(row.artistId)
-        artists.entities[row.artistId] = row
-        // prep LUT for mediaIds
-        artists.entities[row.artistId].mediaIds = []
-      }
-    } catch (err) {
-      log(err.message)
-      return Promise.reject(err)
-    }
-
-    // Second query: media/songs
     try {
       const q = squel.select()
         .field('media.mediaId, media.title, media.duration, media.artistId')
         .field('artists.name AS artist')
-        // .field('MAX(media.isPreferred) AS isPreferred')
+        .field('MAX(media.isPreferred) AS isPreferred')
         .field('COUNT(*) AS numMedia')
         .field('COUNT(stars.userId) AS numStars')
         .from('media')
@@ -61,6 +38,20 @@ class Media {
       const rows = await db.all(text, values)
 
       for (const row of rows) {
+        // no need to send over the wire but we needed it
+        // in the query to show the correct mediaId
+        delete row.isPreferred
+
+        // new artist?
+        if (typeof artists.entities[row.artistId] === 'undefined') {
+          artists.result.push(row.artistId)
+          artists.entities[row.artistId] = {
+            artistId: row.artistId,
+            name: row.artist,
+            mediaIds: [],
+          }
+        }
+
         // add mediaId to artist's LUT
         artists.entities[row.artistId].mediaIds.push(row.mediaId)
 
