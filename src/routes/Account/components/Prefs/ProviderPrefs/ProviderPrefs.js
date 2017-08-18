@@ -2,8 +2,11 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Providers from 'providers' // src/providers
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('/api/providers')
+import Icon from 'components/Icon'
+import ICONS from 'constants/icons'
 import './ProviderPrefs.css'
+
+const api = new HttpApi('/api/providers')
 
 export default class ProviderPrefs extends React.Component {
   static propTypes = {
@@ -54,6 +57,8 @@ export default class ProviderPrefs extends React.Component {
           .filter(name => typeof Providers[name.prefsComponent === 'object'])
           .map((name, i) => {
             const Component = Providers[name].prefsComponent
+            const isExpanded = this.state.expanded.includes(name)
+
             return (
               <div key={i} styleName='provider' onClick={(e) => this.toggleExpanded(e, name)}>
                 <label>
@@ -62,11 +67,12 @@ export default class ProviderPrefs extends React.Component {
                     onChange={() => this.toggleEnabled(name)}
                   /> {Providers[name].title}
                 </label>
+                <Icon icon={isExpanded ? ICONS.EXPAND_LESS : ICONS.EXPAND_MORE} size={24} color='white' />
                 <Component
                   prefs={this.props.providers.entities[name].prefs}
                   fetchProviders={this.props.fetchProviders}
                   requestScan={this.props.requestScan}
-                  style={{ display: this.state.expanded.includes(name) ? 'block' : 'none' }}
+                  style={{ display: isExpanded ? 'block' : 'none' }}
                 />
               </div>
             )
