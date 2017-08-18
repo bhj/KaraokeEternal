@@ -5,7 +5,7 @@ const Media = require('../Media')
 const {
   LIBRARY_UPDATE,
   TOGGLE_SONG_STARRED,
-} = require('../../actions')
+} = require('../../constants/actions')
 
 const ACTION_HANDLERS = {
   [TOGGLE_SONG_STARRED]: async (sock, { payload }, acknowledge) => {

@@ -6,7 +6,7 @@ import {
   UPDATE,
   _SUCCESS,
   _ERROR,
-} from 'actions'
+} from 'constants/actions'
 import { fetchPrefs } from './prefs'
 import { browserHistory } from 'react-router'
 

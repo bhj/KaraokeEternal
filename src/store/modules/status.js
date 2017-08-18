@@ -7,7 +7,7 @@ import {
   PLAYER_ERROR,
   PLAYER_ENTER,
   PLAYER_LEAVE,
-} from 'actions'
+} from 'constants/actions'
 
 // ------------------------------------
 // Actions

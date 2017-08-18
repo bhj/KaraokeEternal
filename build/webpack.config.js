@@ -33,7 +33,7 @@ const config = {
     ],
     extensions: ['*', '.js', '.jsx', '.json'],
     alias: {
-      'actions': path.resolve(project.basePath, 'actions/index'),
+      'constants': path.resolve(project.basePath, 'constants'),
     }
   },
   externals: project.externals,

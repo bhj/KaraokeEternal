@@ -18,7 +18,7 @@ const {
   PLAYER_ENTER,
   EMIT_PLAYER_LEAVE,
   PLAYER_LEAVE,
-} = require('../../actions')
+} = require('../../constants/actions')
 
 // ------------------------------------
 // Action Handlers

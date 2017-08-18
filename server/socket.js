@@ -15,7 +15,7 @@ const {
   PLAYER_LEAVE,
   SOCKET_AUTH_ERROR,
   _ERROR,
-} = require('../actions')
+} = require('../constants/actions')
 
 const handlers = {
   ...User,

@@ -3,7 +3,7 @@ const Media = require('../Media')
 const {
   LIBRARY_UPDATE,
   PROVIDER_SCAN_STATUS,
-} = require('../../actions')
+} = require('../../constants/actions')
 
 class Scanner {
   constructor () {

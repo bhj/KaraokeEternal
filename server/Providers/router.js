@@ -6,7 +6,10 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/providers' }) // plural
 const Providers = require('../Providers/Providers')
 const providerImports = require('./')
-const { PROVIDER_REQUEST_SCAN, PROVIDER_REQUEST_SCAN_CANCEL } = require('../../actions')
+const {
+  PROVIDER_REQUEST_SCAN,
+  PROVIDER_REQUEST_SCAN_CANCEL,
+} = require('../../constants/actions')
 
 // get provider list (ordered by priority)
 router.get('/', async (ctx, next) => {

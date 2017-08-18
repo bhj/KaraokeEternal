@@ -10,7 +10,7 @@ import {
   EMIT_PLAYER_ENTER,
   EMIT_PLAYER_LEAVE,
   QUEUE_UPDATE,
-} from 'actions'
+} from 'constants/actions'
 
 // for informational purposes from provider players
 export const GET_MEDIA = 'player/GET_MEDIA'

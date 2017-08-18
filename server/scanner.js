@@ -5,7 +5,7 @@ const Providers = require('./Providers/Providers')
 const {
   PROVIDER_REQUEST_SCAN,
   PROVIDER_REQUEST_SCAN_CANCEL
-} = require('../actions')
+} = require('../constants/actions')
 
 module.exports = function scanner () {
   log('Opening database file %s', project.database)

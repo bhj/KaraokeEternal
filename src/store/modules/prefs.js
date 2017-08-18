@@ -3,7 +3,7 @@ import {
   PREFS_SET,
   PREFS_RECEIVE,
   _ERROR,
-} from 'actions'
+} from 'constants/actions'
 
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('/api/prefs')
