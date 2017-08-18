@@ -12,8 +12,6 @@ const Icon = props => {
     },
   }
 
-  console.log(props.icon)
-
   return (
     <svg
       style={styles.svg}
