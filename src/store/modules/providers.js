@@ -4,7 +4,6 @@ import {
   PROVIDER_REQUEST_SCAN,
   PROVIDER_REQUEST_SCAN_CANCEL,
   PROVIDER_SCAN_STATUS,
-  PROVIDER_SCAN_COMPLETE,
 } from 'actions'
 
 import HttpApi from 'lib/HttpApi'
