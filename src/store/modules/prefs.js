@@ -19,7 +19,7 @@ export function setPrefs (domain, data) {
     })
 
     return api('PUT', `?domain=${encodeURIComponent(domain)}`, {
-      body: JSON.stringify(data)
+      body: data
     })
       .then(prefs => {
         dispatch(receivePrefs(prefs))

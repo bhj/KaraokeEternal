@@ -64,7 +64,7 @@ export function createRoom (data) {
     })
 
     return api('POST', '/', {
-      body: JSON.stringify(data)
+      body: data
     })
       .then(res => {
         dispatch(receiveRooms(res))
@@ -91,7 +91,7 @@ export function updateRoom (roomId, data) {
     })
 
     return api('PUT', `/${roomId}`, {
-      body: JSON.stringify(data)
+      body: data
     })
       .then(res => {
         dispatch(receiveRooms(res))

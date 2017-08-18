@@ -16,6 +16,10 @@ export default class HttpApi {
     opts = Object.assign({}, this.opts, opts)
     opts.method = method
 
+    if (typeof opts.body === 'object') {
+      opts.body = JSON.stringify(opts.body)
+    }
+
     return fetch(`${this.prefix}${url}`, opts)
       .then(res => {
         if (res.status >= 200 && res.status < 300) {

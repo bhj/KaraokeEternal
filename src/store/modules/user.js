@@ -46,7 +46,7 @@ export function loginUser (data) {
     dispatch(requestLogin(data))
 
     return api('POST', '/login', {
-      body: JSON.stringify(data)
+      body: data
     })
       .then(res => {
         // user object in response body
@@ -163,7 +163,7 @@ export function createUser (user) {
     dispatch(requestCreate(user))
 
     return api('POST', '/account', {
-      body: JSON.stringify(user)
+      body: user
     })
       .then(user => {
         dispatch(receiveCreate(user))
@@ -213,7 +213,7 @@ export function updateUser (data) {
     dispatch(requestUpdate(data))
 
     return api('PUT', '/account', {
-      body: JSON.stringify(data)
+      body: data
     })
       .then(user => {
         dispatch(receiveUpdate(user))
