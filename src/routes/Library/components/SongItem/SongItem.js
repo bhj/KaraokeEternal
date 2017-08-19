@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import Icon from 'components/Icon'
 import './SongItem.css'
 
 export const SongItem = (props) => (
@@ -12,9 +13,11 @@ export const SongItem = (props) => (
       {props.title} ({props.numMedia})
     </div>
 
-    <div onClick={props.onSongStarClick} styleName={props.isStarred ? 'starStarred' : 'star'}>
-      <i className='material-icons' style={{ position: 'absolute' }}>{props.isStarred ? 'star' : 'star_border'}</i>
-      <div styleName={props.isStarred ? 'starredCountStarred' : 'starredCount'}>{props.numStars}</div>
+    <div onClick={props.onSongStarClick}>
+      <Icon size={36} icon={props.isStarred ? 'STAR_FULL' : 'STAR_EMPTY'}
+        styleName={props.isStarred ? 'starFull' : 'star'}
+      />
+      <div styleName={props.isStarred ? 'numStarsFull' : 'numStars'}>{props.numStars}</div>
     </div>
   </div>
 )

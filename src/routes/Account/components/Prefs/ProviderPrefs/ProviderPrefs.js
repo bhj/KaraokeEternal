@@ -3,7 +3,6 @@ import React from 'react'
 import Providers from 'providers' // src/providers
 import HttpApi from 'lib/HttpApi'
 import Icon from 'components/Icon'
-import ICONS from 'constants/icons'
 import './ProviderPrefs.css'
 
 const api = new HttpApi('/api/providers')
@@ -69,7 +68,7 @@ export default class ProviderPrefs extends React.Component {
                     </label>
                   </div>
                   <div style={{ flex: 1, textAlign: 'right' }} onClick={(e) => this.toggleExpanded(e, name)}>
-                    <Icon icon={isExpanded ? ICONS.EXPAND_LESS : ICONS.EXPAND_MORE} size={32} styleName='icon' />
+                    <Icon icon={isExpanded ? 'EXPAND_LESS' : 'EXPAND_MORE'} size={32} styleName='icon' />
                   </div>
                 </div>
 

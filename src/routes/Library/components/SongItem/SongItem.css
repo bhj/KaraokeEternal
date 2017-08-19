@@ -17,29 +17,25 @@
 }
 
 .star {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  color: #efefef;
-  margin: 0 10px;
+  fill: var(--text-color);
 }
 
-.starStarred {
+.starFull {
   composes: star;
-  color: #999;
+  fill: var(--text-color);
 }
 
-.starredCount {
+.numStars {
   position: relative;
   font-size: 12px;
-  top: 18px;
+  top: -22px;
   text-align: center;
-  color: #ccc;
+  color: var(--text-color);
 }
 
-.starredCountStarred {
-  composes: starredCount;
-  color: white;
+.numStarsFull {
+  composes: numStars;
+  color: #555;
 }
 
 .isQueued {
