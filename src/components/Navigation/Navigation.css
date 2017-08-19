@@ -3,7 +3,6 @@
   bottom: 0;
   left: 0;
   display: flex;
-  padding-top: 6px;
   text-decoration: none;
   width: 100%;
   background-color: var(--chrome-background-color);
@@ -13,12 +12,19 @@
 
 .button {
   flex: 1;
-  display: block;
+  padding: 5px 0;
   text-align: center;
-  color: #a9a9a9;
-  font-size: 40px;
+  background-color: var(--nav-link-background-color);
 }
 
-.active {
-  color: #4962c7;
+.activeButton {
+  background-color: var(--nav-active-background-color);
+}
+
+.icon {
+  fill: var(--nav-link-color);
+}
+
+.activeIcon {
+  fill: var(--nav-active-color);
 }

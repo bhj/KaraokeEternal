@@ -8,6 +8,7 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
+    loc: state.location.pathname,
   }
 }
 

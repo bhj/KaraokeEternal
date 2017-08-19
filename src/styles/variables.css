@@ -21,6 +21,12 @@
   --transport-btn-color: #BA3A95;
 
   /* UI chrome (header/footer) */
-  --chrome-background-color: var(--background-color);
+  --chrome-background-color: rgba(248, 248, 248, 0.2);
   --chrome-border-color: #333;
+
+  /* Navigation */
+  --nav-link-color: var(--text-color);
+  --nav-link-background-color: var(--chrome-background-color);
+  --nav-active-color: var(--link-color);
+  --nav-active-background-color: var(--chrome-background-color);
 }
