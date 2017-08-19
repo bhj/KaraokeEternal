@@ -25,8 +25,6 @@ export default class ProviderPrefs extends React.Component {
   }
 
   toggleExpanded (e, name) {
-    if (e.target.nodeName !== 'DIV') return
-
     const arr = this.state.expanded.slice()
     arr.indexOf(name) === -1 ? arr.push(name) : arr.splice(arr.indexOf(name), 1)
     this.setState({ expanded: arr })
@@ -60,19 +58,26 @@ export default class ProviderPrefs extends React.Component {
             const isExpanded = this.state.expanded.includes(name)
 
             return (
-              <div key={i} styleName='provider' onClick={(e) => this.toggleExpanded(e, name)}>
-                <label>
-                  <input type='checkbox'
-                    checked={this.props.providers.entities[name].isEnabled}
-                    onChange={() => this.toggleEnabled(name)}
-                  /> {Providers[name].title}
-                </label>
-                <Icon icon={isExpanded ? ICONS.EXPAND_LESS : ICONS.EXPAND_MORE} size={24} color='white' />
+              <div key={i} styleName='provider'>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div>
+                    <label>
+                      <input type='checkbox'
+                        checked={this.props.providers.entities[name].isEnabled}
+                        onChange={() => this.toggleEnabled(name)}
+                      /> {Providers[name].title}
+                    </label>
+                  </div>
+                  <div style={{ flex: 1, textAlign: 'right' }} onClick={(e) => this.toggleExpanded(e, name)}>
+                    <Icon icon={isExpanded ? ICONS.EXPAND_LESS : ICONS.EXPAND_MORE} size={32} styleName='icon' />
+                  </div>
+                </div>
+
                 <Component
                   prefs={this.props.providers.entities[name].prefs}
                   fetchProviders={this.props.fetchProviders}
                   requestScan={this.props.requestScan}
-                  style={{ display: isExpanded ? 'block' : 'none' }}
+                  style={{ display: isExpanded ? 'block' : 'none', marginTop: '1em' }}
                 />
               </div>
             )

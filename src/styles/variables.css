@@ -11,7 +11,7 @@
   --widget-title-color: var(--text-color);
   --widget-title-background-color: #555;
   --widget-title-size: 18px;
-  --widget-title-padding: 10px;
+  --widget-title-padding: 8px;
 
   /* Library */
   --artist-item-height: 44px;
