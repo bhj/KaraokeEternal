@@ -21,6 +21,7 @@ const Icon = props => {
     >
       <path
         style={styles.path}
+        className={props.className}
         d={props.icon}
       />
     </svg>
@@ -31,6 +32,7 @@ Icon.propTypes = {
   icon: PropTypes.string.isRequired,
   size: PropTypes.number,
   color: PropTypes.string,
+  className: PropTypes.string,
 }
 
 Icon.defaultProps = {
