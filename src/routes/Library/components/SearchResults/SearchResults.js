@@ -4,7 +4,7 @@ import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 import './SearchResults.css'
-const ROW_HEIGHT = 40
+const ROW_HEIGHT = 44
 
 class SearchResults extends React.Component {
   static propTypes = {

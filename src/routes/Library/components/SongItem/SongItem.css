@@ -16,12 +16,15 @@
   white-space: nowrap;
 }
 
-.star {
+.starContainer {
+  height: 36px;
+}
+
+.starIcon {
   fill: var(--text-color);
 }
 
-.starFull {
-  composes: star;
+.starIconFull {
   fill: var(--text-color);
 }
 

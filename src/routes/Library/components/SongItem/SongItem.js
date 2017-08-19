@@ -13,9 +13,9 @@ export const SongItem = (props) => (
       {props.title} ({props.numMedia})
     </div>
 
-    <div onClick={props.onSongStarClick}>
+    <div onClick={props.onSongStarClick} styleName='starContainer'>
       <Icon size={36} icon={props.isStarred ? 'STAR_FULL' : 'STAR_EMPTY'}
-        styleName={props.isStarred ? 'starFull' : 'star'}
+        styleName={props.isStarred ? 'starIconFull' : 'starIcon'}
       />
       <div styleName={props.isStarred ? 'numStarsFull' : 'numStars'}>{props.numStars}</div>
     </div>
