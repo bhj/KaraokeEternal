@@ -18,7 +18,7 @@ export default class Prefs extends React.Component {
       <div styleName='container'>
         <h1 styleName='title'>Preferences</h1>
         <div styleName='content'>
-          <h2 styleName='subheading'>Media</h2>
+          <h2 styleName='subheading'>Library</h2>
           <ProviderPrefs />
         </div>
       </div>
