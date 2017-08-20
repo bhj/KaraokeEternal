@@ -1,0 +1,7 @@
+.slider {
+  margin: 0 30px;
+}
+
+.icon {
+  fill: var(--transport-btn-color);
+}

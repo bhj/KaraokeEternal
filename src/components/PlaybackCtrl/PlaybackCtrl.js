@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import Icon from 'components/Icon'
 import VolumeSlider from './VolumeSlider'
 import NoPlayer from './NoPlayer'
 import './PlaybackCtrl.css'
@@ -18,18 +19,18 @@ const PlaybackCtrl = (props) => {
   return (
     <div styleName='container'>
       {isPlaying &&
-        <div onClick={props.requestPause} styleName='pause'>
-          <i className='material-icons'>pause</i>
+        <div onClick={props.requestPause}>
+          <Icon icon='PAUSE' size={42} styleName='pause' />
         </div>
       }
       {!isPlaying &&
-        <div onClick={props.requestPlay} styleName='play'>
-          <i className='material-icons'>play_arrow</i>
+        <div onClick={props.requestPlay}>
+          <Icon icon='PLAY' size={42} styleName='play' />
         </div>
       }
 
-      <div onClick={props.requestPlayNext} styleName={'next ' + (isAtQueueEnd ? ' disabled' : '')}>
-        <i className='material-icons'>skip_next</i>
+      <div onClick={props.requestPlayNext}>
+        <Icon icon='PLAY_NEXT' size={48} styleName={'next ' + (isAtQueueEnd ? ' disabled' : '')} />
       </div>
 
       <VolumeSlider

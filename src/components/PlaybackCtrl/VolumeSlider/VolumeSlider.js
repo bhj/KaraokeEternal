@@ -2,6 +2,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Slider, { Handle } from 'rc-slider'
+import Icon from 'components/Icon'
+import './VolumeSlider.css'
 // depends on styles/global/rc-slider
 
 export default class VolumeSlider extends React.Component {
@@ -50,7 +52,7 @@ export default class VolumeSlider extends React.Component {
         onChange={this.handleChange}
         onAfterChange={this.handleAfterChange}
         handle={handle}
-        className={this.props.className}
+        styleName='slider'
       />
     )
   }
@@ -59,25 +61,23 @@ export default class VolumeSlider extends React.Component {
 // volume slider handle/grabber
 const handle = (props) => {
   const { value, dragging, ...restProps } = props
-
+  console.log(props)
   const style = Object.assign({ left: `${props.offset}%` }, {
     position: 'absolute',
-    transform: 'translate(-50%, -50%)',
-    marginTop: '6px',
-    fontSize: dragging ? '50px' : '40px',
+    transform: 'translate(-50%, -42%)',
     opacity: 0.7,
-    color: '#333',
+    // color: '#333',
     touchAction: 'pan-x',
   })
 
-  let icon = 'volume_up'
-  if (value === 0) icon = 'volume_off'
-  else if (value < 0.4) icon = 'volume_mute'
-  else if (value < 0.7) icon = 'volume_down'
+  let icon = 'VOLUME_UP'
+  if (value === 0) icon = 'VOLUME_OFF'
+  else if (value < 0.4) icon = 'VOLUME_MUTE'
+  else if (value < 0.7) icon = 'VOLUME_DOWN'
 
   return (
     <div style={style}>
-      <i className='material-icons'>{icon}</i>
+      <Icon icon={icon} size={42} styleName='icon' />
       <Handle {...restProps} />
     </div>
   )
