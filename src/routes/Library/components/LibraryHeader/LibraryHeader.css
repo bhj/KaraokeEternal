@@ -13,10 +13,8 @@
   background-color: inherit;
 }
 
-.searchIcon {
-  height: 40px;
-  font-size: 40px;
-  color: #666;
+.magnifier {
+  fill: var(--text-color);
 }
 
 .clear {

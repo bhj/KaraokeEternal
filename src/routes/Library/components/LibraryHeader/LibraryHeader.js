@@ -30,7 +30,7 @@ class LibraryHeader extends React.Component {
     return (
       <Header>
         <div styleName='container'>
-          <i className='material-icons' styleName='searchIcon'>search</i>
+          <Icon icon='MAGNIFIER' size={36} styleName='magnifier' />
           <input type='search'
             styleName='searchInput'
             placeholder='search library'
