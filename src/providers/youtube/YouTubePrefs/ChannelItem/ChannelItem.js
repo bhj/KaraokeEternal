@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import Icon from 'components/Icon'
 import './ChannelItem.css'
 
 const ChannelItem = (props) => {
@@ -12,7 +13,7 @@ const ChannelItem = (props) => {
         {props.name}
       </div>
       <div onClick={props.onRemoveClick}>
-        <i className='material-icons' styleName='removeIcon'>clear</i>
+        <Icon icon='CLEAR' size={36} styleName='clear' />
       </div>
     </div>
   )

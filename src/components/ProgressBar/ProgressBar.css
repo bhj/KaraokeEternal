@@ -16,6 +16,6 @@
   overflow: hidden;
 }
 
-.cancel {
-  font-size: 36px;
+.clear {
+  fill: var(--item-remove-color);
 }

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Header from 'components/Header'
+import Icon from 'components/Icon'
 import './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
@@ -37,8 +38,8 @@ class LibraryHeader extends React.Component {
             onChange={this.handleChange}
           />
           {this.props.searchTerm &&
-            <div onClick={this.clearSearch} styleName='clearIcon'>
-              <i className='material-icons'>clear</i>
+            <div onClick={this.clearSearch}>
+              <Icon icon='CLEAR' size={36} styleName='clear' />
             </div>
           }
         </div>

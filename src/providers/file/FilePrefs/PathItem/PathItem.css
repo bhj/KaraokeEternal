@@ -13,8 +13,8 @@
   flex: 1;
 }
 
-.remove {
-  font-size: 36px;
+.clear {
+  fill: var(--item-remove-color);
 }
 
 .folder {

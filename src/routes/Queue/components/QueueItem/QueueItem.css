@@ -37,6 +37,10 @@
   color: rgba(10, 10, 10, 0.5);
 }
 
+.clear {
+  fill: var(--item-remove-color);
+}
+
 .skip, .remove, .star, .errorInfo {
   composes: button;
 }

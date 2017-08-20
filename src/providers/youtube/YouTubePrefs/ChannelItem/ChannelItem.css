@@ -17,6 +17,6 @@
   margin-right: 5px;
 }
 
-.removeIcon {
-  font-size: 48px;
+.clear {
+  fill: var(--item-remove-color);
 }

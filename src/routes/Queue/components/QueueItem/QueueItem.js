@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import Icon from 'components/Icon'
 import './QueueItem.css'
 
 export const QueueItem = (props) => (
@@ -26,7 +27,7 @@ export const QueueItem = (props) => (
     }
     {props.canRemove &&
       <div onClick={props.onRemoveClick} styleName='remove'>
-        <i className='material-icons'>clear</i>
+        <Icon icon='CLEAR' size={40} styleName='clear' />
       </div>
     }
   </div>
