@@ -17,7 +17,8 @@
   /* Library */
   --artist-item-height: 44px;
   --song-item-height: 44px;
-
+  --artist-folder-color: var(--text-color);
+  --artist-folder-text-color: white;
   /* PlaybackCtrl */
   --transport-btn-color: #BA3A95;
 

@@ -16,18 +16,18 @@ export const QueueItem = (props) => (
     </div>
 
     {props.hasErrors &&
-      <div onClick={props.onErrorInfoClick} styleName='errorInfo'>
-        <i className='material-icons'>info_outline</i>
+      <div onClick={props.onErrorInfoClick}>
+        <Icon icon='INFO_OUTLINE' size={40} styleName='info' />
       </div>
     }
     {props.canSkip &&
-      <div onClick={props.onSkipClick} styleName='skip'>
-        <i className='material-icons'>skip_next</i>
+      <div onClick={props.onSkipClick}>
+        <Icon icon='PLAY_NEXT' size={40} styleName='playNext' />
       </div>
     }
     {props.canRemove &&
-      <div onClick={props.onRemoveClick} styleName='remove'>
-        <Icon icon='CLEAR' size={40} styleName='clear' />
+      <div onClick={props.onRemoveClick}>
+        <Icon icon='CLEAR' size={40} styleName='remove' />
       </div>
     }
   </div>

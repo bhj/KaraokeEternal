@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 /* eslint react/no-unused-prop-types: 0 */
 import React from 'react'
 import SongItem from '../SongItem'
+import Icon from 'components/Icon'
 import './ArtistItem.css'
 
 const ArtistItem = (props) => {
@@ -30,10 +31,10 @@ const ArtistItem = (props) => {
   return (
     <div style={props.style}>
       <div onClick={props.onArtistClick} styleName={'container' + (isChildQueued ? ' hasQueued' : '')}>
-        <div styleName='folder'>
-          <i className='material-icons' styleName='icon'>folder</i>
+        <div styleName='folderContainer'>
+          <Icon icon='FOLDER' size={40} styleName='folderIcon' />
           {props.isExpanded &&
-            <div styleName='arrowDown'><i className='material-icons'>keyboard_arrow_down</i></div>
+            <div styleName='expandedIcon'><Icon icon='EXPAND_LESS' size={24} /></div>
           }
           {!props.isExpanded &&
             <div styleName='count'>{props.artistMediaIds.length}</div>

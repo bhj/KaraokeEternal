@@ -17,30 +17,26 @@
   background: #ffff8c;
 }
 
-.folder {
+.folderContainer {
   height: var(--artist-item-height);
-  width: var(--artist-item-height);
-  margin-right: 2px;
+  margin-right: 3px;
 }
 
-.icon {
-  position: absolute;
-  font-size: var(--artist-item-height);
-  color: #999;
+.folderIcon {
+  fill: var(--artist-folder-color);
 }
 
 .count {
   position: relative;
-  top: 14px;
+  top: -26px;
   text-align: center;
   font-size: 14px;
-  color: #efefef;
+  color: var(--artist-folder-text-color);
 }
 
-.arrowDown {
+.expandedIcon {
   position: relative;
-  top: 10px;
+  top: -32px;
   text-align: center;
-  font-size: 24px;
-  color: #ccc;
+  fill: var(--artist-folder-text-color);
 }
