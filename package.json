@@ -36,7 +36,6 @@
     "koa-range": "^0.3.0",
     "koa-router": "^7.2.1",
     "koa-static": "^4.0.1",
-    "material-design-icons": "^3.0.1",
     "mp3-duration": "^1.0.10",
     "node-fetch": "^1.7.2",
     "normalize.css": "^7.0.0",
