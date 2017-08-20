@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Measure from 'react-measure'
 import { Link } from 'react-router'
-import Icon from 'components/icon'
+import Icon from 'components/Icon'
 import styles from './Navigation.css'
 
 export const Navigation = (props) => (
