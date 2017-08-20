@@ -61,7 +61,7 @@ export default class VolumeSlider extends React.Component {
 // volume slider handle/grabber
 const handle = (props) => {
   const { value, dragging, ...restProps } = props
-  console.log(props)
+
   const style = Object.assign({ left: `${props.offset}%` }, {
     position: 'absolute',
     transform: 'translate(-50%, -42%)',
