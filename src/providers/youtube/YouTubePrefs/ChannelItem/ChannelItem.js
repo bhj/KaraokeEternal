@@ -7,7 +7,7 @@ const ChannelItem = (props) => {
   return (
     <div styleName='container'>
       <div>
-        <i className='material-icons' styleName='channelIcon'>cloud</i>
+        <Icon icon='CLOUD' size={24} styleName='cloud' />
       </div>
       <div styleName='name'>
         {props.name}

@@ -6,11 +6,12 @@
 }
 
 .path {
-  font-size: 18px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
   flex: 1;
+  font-size: 18px;
+  margin-left: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .clear {
@@ -18,6 +19,6 @@
 }
 
 .folder {
-  font-size: 24px;
+  fill: var(--text-color);
   margin-right: 5px;
 }
