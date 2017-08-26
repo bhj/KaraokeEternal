@@ -10,7 +10,10 @@ export const SongItem = (props) => (
     </div>
 
     <div onClick={props.onSongClick} styleName='title'>
-      {props.title} {props.numMedia > 1 ? `(${props.numMedia})` : ''}
+      {props.title}
+      {props.numMedia > 1 &&
+        <i> ({props.numMedia})</i>
+      }
     </div>
 
     <div onClick={props.onSongMediaClick} styleName='info'>
