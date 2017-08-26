@@ -32,7 +32,7 @@ const ArtistItem = (props) => {
     <div style={props.style}>
       <div onClick={props.onArtistClick} styleName={'container' + (isChildQueued ? ' hasQueued' : '')}>
         <div styleName='folderContainer'>
-          <Icon icon='FOLDER' size={40} styleName='folderIcon' />
+          <Icon icon='FOLDER' size={44} styleName='folderIcon' />
           {props.isExpanded &&
             <div styleName='expandedIcon'><Icon icon='EXPAND_LESS' size={24} /></div>
           }

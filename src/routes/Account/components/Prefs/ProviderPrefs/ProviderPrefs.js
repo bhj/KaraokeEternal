@@ -68,7 +68,9 @@ export default class ProviderPrefs extends React.Component {
                     </label>
                   </div>
                   <div style={{ flex: 1, textAlign: 'right' }} onClick={(e) => this.toggleExpanded(e, name)}>
-                    <Icon icon={isExpanded ? 'EXPAND_LESS' : 'EXPAND_MORE'} size={32} styleName='icon' />
+                    <div style={{ display: 'inline-block' }}>
+                      <Icon icon={isExpanded ? 'EXPAND_LESS' : 'EXPAND_MORE'} size={32} styleName='icon' />
+                    </div>
                   </div>
                 </div>
 

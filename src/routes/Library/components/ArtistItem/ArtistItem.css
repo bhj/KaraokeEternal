@@ -3,6 +3,7 @@
   height: var(--artist-item-height);
   align-items: center;
   overflow: hidden;
+  padding: 0 5px;
 }
 
 .name {
@@ -28,7 +29,7 @@
 
 .count {
   position: relative;
-  top: -26px;
+  top: -28px;
   text-align: center;
   font-size: 14px;
   color: var(--artist-folder-text-color);

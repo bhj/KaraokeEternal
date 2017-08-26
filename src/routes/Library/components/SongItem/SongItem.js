@@ -10,11 +10,15 @@ export const SongItem = (props) => (
     </div>
 
     <div onClick={props.onSongClick} styleName='title'>
-      {props.title} ({props.numMedia})
+      {props.title} {props.numMedia > 1 ? `(${props.numMedia})` : ''}
     </div>
 
-    <div onClick={props.onSongStarClick} styleName='starContainer'>
-      <Icon size={36} icon={props.isStarred ? 'STAR_FULL' : 'STAR_EMPTY'}
+    <div onClick={props.onSongMediaClick} styleName='info'>
+      <Icon size={32} icon='MORE_HORIZ' styleName='infoIcon' />
+    </div>
+
+    <div onClick={props.onSongStarClick} styleName='star'>
+      <Icon size={44} icon={props.isStarred ? 'STAR_FULL' : 'STAR_EMPTY'}
         styleName={props.isStarred ? 'starIconFull' : 'starIcon'}
       />
       <div styleName={props.isStarred ? 'numStarsFull' : 'numStars'}>{props.numStars}</div>

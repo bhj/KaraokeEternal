@@ -5,8 +5,8 @@ import icons from './icons'
 const Icon = props => {
   const styles = {
     svg: {
-      display: 'inline-block',
-      verticalAlign: 'middle',
+      display: 'block',
+      margin: 'auto',
     },
     path: {
       fill: props.color,
@@ -37,7 +37,7 @@ Icon.propTypes = {
 }
 
 Icon.defaultProps = {
-  size: 16,
+  size: 32,
 }
 
 export default Icon
