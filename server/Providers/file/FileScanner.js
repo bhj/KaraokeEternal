@@ -1,3 +1,5 @@
+const db = require('sqlite')
+const squel = require('squel')
 const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:file')
@@ -76,24 +78,29 @@ class FileScanner extends Scanner {
     } // end for
 
     // cleanup: delete songs not in our valid list
-    // try {
-    //   const q = squel.delete()
-    //     .from('songs')
-    //     .where('provider IN ?', Object.keys(localProviders))
-    //     .where('mediaId NOT IN ?', validIds)
-    //     .where(`json_extract(providerData, '$.basePath') IN ?`, prefs.app.paths)
-    //
-    //   console.log(q.toString())
-    //
-    //   const { text, values } = q.toParam()
-    //   const res = await db.run(text, values)
-    //
-    //   log('cleanup: removed %s songs', res.stmt.changes)
-    // } catch (err) {
-    //   log(err.message)
-    // }
+    // -------------------------------------------
+    log('Removing orphaned songs')
+    const cleanupPaths = this.paths.filter(p => !offlinePaths.includes(p))
 
-    console.log('end of run()')
+    if (cleanupPaths.length) {
+      try {
+        const q = squel.delete()
+          .from('media')
+          .where('provider = ?', 'file')
+          .where(`json_extract(providerData, '$.basePath') IN ?`, cleanupPaths)
+
+        if (validIds.length) {
+          q.where('mediaId NOT IN ?', validIds)
+        }
+
+        const { text, values } = q.toParam()
+        const res = await db.run(text, values)
+        log('  => removed %s songs', res.stmt.changes)
+      } catch (err) {
+        log(err.message)
+      }
+    }
+
     this.emitDone()
   }
 
