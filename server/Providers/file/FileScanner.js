@@ -114,22 +114,24 @@ class FileScanner extends Scanner {
     }
 
     // already in database with the same path?
-    // const res = await Media.get({
-    //   provider: 'cdg',
-    //   providerData: {
-    //     basePath,
-    //     relPath: file.substr(basePath.length)
-    //   }
-    // })
+    try {
+      const res = await Media.getMedia(media)
+      log('  => %s result(s) for existing media', res.result.length)
 
-    // console.log(res)
+      if (res.result.length) {
+        log('  => found media in library (same path)')
+        return Promise.resolve(res.result[0])
+      }
+    } catch (err) {
+      log(err.message)
+      return Promise.reject(err)
+    }
 
-    // calculate current metadata and update db if different
+    // @todo: calculate current metadata and update db if different
     // (there may be a new parser configuration, for example)
-    // if (res.songs.result.length) {
-    //   log('  => song is in library (location matched)')
-    //   return Promise.resolve(res.songs.result[0])
-    // }
+
+    // new song
+    // -------------------------------
 
     // need to look for an audio file?
     if (path.extname(file).toLowerCase() === '.cdg') {
