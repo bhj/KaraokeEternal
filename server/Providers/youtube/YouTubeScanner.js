@@ -97,6 +97,10 @@ class YouTubeScanner extends Scanner {
         return Promise.reject(err)
       }
 
+      if (this.isCanceling) {
+        break
+      }
+
       // get durations for playlist items
       let videoIds = playlist.items.map(item => item.snippet.resourceId.videoId)
       let details
@@ -106,10 +110,6 @@ class YouTubeScanner extends Scanner {
       } catch (err) {
         log(err.message)
         return Promise.reject(err)
-      }
-
-      if (this.isCanceling) {
-        break
       }
 
       // merge snippet and contentDetails data into one
