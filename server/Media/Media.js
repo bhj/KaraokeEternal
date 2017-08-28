@@ -108,7 +108,6 @@ class Media {
     })
 
     try {
-      console.log(q.toString())
       const { text, values } = q.toParam()
       rows = await db.all(text, values)
     } catch (err) {
