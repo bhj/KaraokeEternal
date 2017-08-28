@@ -72,7 +72,55 @@ class Media {
     return { artists, media }
   }
 
+  /**
+   * Get media items matching all search criteria
+   *
+   * @param  {object}  fields Search criteria
+   * @return {Promise}        Object with media results
+   */
   static async getMedia (fields) {
+    let rows
+    const media = {
+      result: [],
+      entities: {}
+    }
+
+    const q = squel.select()
+      .field('media.*')
+      .from('media')
+      .join(squel.select()
+        .from('providers')
+        .where('providers.isEnabled = 1')
+        .order('priority'),
+      'providers', 'media.provider = providers.name')
+      .group('artistId')
+      .group('title')
+
+    // filters
+    Object.keys(fields).map(key => {
+      if (key === 'providerData' && typeof fields.providerData === 'object') {
+        Object.keys(fields.providerData).map(i => {
+          q.where(`json_extract(providerData, '$.${i}') = ?`, fields.providerData[i])
+        })
+      } else {
+        q.where(`${key} = ?`, fields[key])
+      }
+    })
+
+    try {
+      console.log(q.toString())
+      const { text, values } = q.toParam()
+      rows = await db.all(text, values)
+    } catch (err) {
+      return Promise.reject(err)
+    }
+
+    for (const row of rows) {
+      media.result.push(row.mediaId)
+      media.entities[row.mediaId] = row
+    }
+
+    return media
   }
 
   /**
