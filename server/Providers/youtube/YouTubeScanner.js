@@ -32,7 +32,7 @@ class YouTubeScanner extends Scanner {
         const res = await this.getPlaylistItems(channel)
         items = items.concat(res)
       } catch (err) {
-        log('  => %s', err)
+        log(err)
       }
     } // end for
 
@@ -48,7 +48,7 @@ class YouTubeScanner extends Scanner {
         const mediaId = await this.process(items[i])
         validIds.push(mediaId)
       } catch (err) {
-        log(err.message)
+        log(err)
       }
     } // end for
 
@@ -74,7 +74,6 @@ class YouTubeScanner extends Scanner {
         throw new Error('invalid playlist id')
       }
     } catch (err) {
-      log(err.message)
       return Promise.reject(err)
     }
 
@@ -93,7 +92,6 @@ class YouTubeScanner extends Scanner {
       try {
         playlist = await this.callApi(url)
       } catch (err) {
-        log(err.message)
         return Promise.reject(err)
       }
 
@@ -108,7 +106,6 @@ class YouTubeScanner extends Scanner {
       try {
         details = await this.callApi(`videos?part=contentDetails&id=` + videoIds.join(','))
       } catch (err) {
-        log(err.message)
         return Promise.reject(err)
       }
 
@@ -185,7 +182,6 @@ class YouTubeScanner extends Scanner {
       const mediaId = await Media.add(song)
       return Promise.resolve(mediaId)
     } catch (err) {
-      log(err.message)
       return Promise.reject(err)
     }
   }
@@ -206,7 +202,6 @@ class YouTubeScanner extends Scanner {
       let decoded = await res.json()
       return Promise.resolve(decoded)
     } catch (err) {
-      log(err.message)
       return Promise.reject(err)
     }
   }

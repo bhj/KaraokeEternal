@@ -97,7 +97,7 @@ class FileScanner extends Scanner {
         const res = await db.run(text, values)
         log('  => removed %s songs', res.stmt.changes)
       } catch (err) {
-        log(err.message)
+        log(err)
       }
     }
 
@@ -123,7 +123,6 @@ class FileScanner extends Scanner {
         return Promise.resolve(res.result[0])
       }
     } catch (err) {
-      log(err.message)
       return Promise.reject(err)
     }
 
@@ -149,7 +148,7 @@ class FileScanner extends Scanner {
           log('  => found %s audio file', ext)
           break
         } catch (err) {
-          // keep looking
+          // keep looking...
         }
       }
 
