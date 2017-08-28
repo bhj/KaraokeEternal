@@ -143,18 +143,23 @@ class YouTubeScanner extends Scanner {
     }))
 
     // is video already in the db?
-    // try {
-    //   let res = await getLibrary({ providerData: { videoId: item.id } })
-    //   // @todo: check mtime and title for updates
-    //   if (res.songs.result.length) {
-    //     log('song is in library (same videoId)')
-    //     stats.ok++
-    //     return Promise.resolve(res.songs.result[0])
-    //   }
-    // } catch (err) {
-    //   log(err.message)
-    //   return Promise.reject(err)
-    // }
+    try {
+      const res = await Media.getMedia({
+        provider: 'youtube',
+        providerData: { videoId: item.id },
+      })
+
+      log('  => %s result(s) for existing media', res.result.length)
+
+      // @todo: check mtime and title for updates
+
+      if (res.result.length) {
+        log('  => found media in library (same videoId)')
+        return Promise.resolve(res.result[0])
+      }
+    } catch (err) {
+      return Promise.reject(err)
+    }
 
     // new song
     const { artist, title } = parseArtistTitle(item.snippet.title)
