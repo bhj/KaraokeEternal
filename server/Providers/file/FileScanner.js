@@ -22,7 +22,7 @@ class FileScanner extends Scanner {
     this.paths = prefs.paths || []
   }
 
-  async run () {
+  async scan () {
     const offlinePaths = []
     const validIds = [] // mediaIds for cleanup
     let files = []

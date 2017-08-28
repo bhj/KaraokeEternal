@@ -12,7 +12,7 @@ class YouTubeScanner extends Scanner {
     this.prefs = prefs
   }
 
-  async run () {
+  async scan () {
     let validIds = [] // mediaIds for cleanup
 
     if (!this.prefs.apiKey) {
