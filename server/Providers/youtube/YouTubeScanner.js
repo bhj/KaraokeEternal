@@ -171,7 +171,7 @@ class YouTubeScanner extends Scanner {
       duration: toSeconds(parse(item.contentDetails.duration)),
       providerData: {
         videoId: item.id,
-        channel: item.username,
+        channel: item.channel,
         publishedAt: item.snippet.publishedAt,
       }
     }
