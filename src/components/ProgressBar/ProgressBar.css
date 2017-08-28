@@ -3,7 +3,7 @@
   align-items: center;
   height: 40px;
   width: 100%;
-  background-image: linear-gradient(to right, #f3f3f3, #ccc);
+  background-image: linear-gradient(to right, #ccc, #fff);
   background-repeat: no-repeat;
 }
 
@@ -15,7 +15,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   mix-blend-mode: difference;
-  color: #666; /* opposite of progress bar fill color */
+  color: var(--text-color);
 }
 
 .clear {
