@@ -4,6 +4,13 @@ const debug = require('debug')
 const log = debug('app:media')
 
 class Media {
+/**
+ * Get artists and "songs" in a format suitable for sending to clients
+ * as quickly as possible. Only lists one media item per song (the
+ * preferred item, if one is set) and does not include providerData
+ *
+ * @return {Promise} Object with artist and media results
+ */
   static async getLibrary () {
     const artists = {
       result: [],
@@ -68,6 +75,12 @@ class Media {
   static async getMedia (fields) {
   }
 
+  /**
+   * Add media item to the library, matching or adding artist
+   *
+   * @param  {object}  media Media item
+   * @return {Promise}       Newly added item's mediaId (number)
+   */
   static async add (media) {
     if (!media.artist || !media.title || !media.duration || !media.provider) {
       return Promise.reject(new Error('Invalid media data: ' + JSON.stringify(media)))
