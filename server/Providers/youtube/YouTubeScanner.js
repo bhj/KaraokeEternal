@@ -45,7 +45,7 @@ class YouTubeScanner extends Scanner {
       this.emitStatus(`Processing videos (${i} of ${items.length})`, (i / items.length) * 100)
 
       try {
-        const mediaId = await process(items[i])
+        const mediaId = await this.process(items[i])
         validIds.push(mediaId)
       } catch (err) {
         log(err.message)
