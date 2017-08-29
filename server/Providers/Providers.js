@@ -65,7 +65,7 @@ class Providers {
   static cancelScan () {
     if (this._scanner) {
       this._isCanceling = true
-      this._scanner.stop()
+      this._scanner.cancel()
     }
   }
 

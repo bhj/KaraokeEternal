@@ -14,7 +14,7 @@ class Scanner {
     this.emitDone = this.emitStatus.bind(this, '', 0, false)
   }
 
-  stop () {
+  cancel () {
     this.isCanceling = true
   }
 
