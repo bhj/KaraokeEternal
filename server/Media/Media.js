@@ -204,6 +204,29 @@ class Media {
       return Promise.reject(err)
     }
   }
+
+  /**
+   * Removes mediaIds in sqlite-friendly batches
+   *
+   * @param  {array}  mediaIds
+   * @return {Promise}
+   */
+  static async remove (mediaIds) {
+    const batchSize = 999
+
+    while (mediaIds.length) {
+      const q = squel.delete()
+        .from('media')
+        .where('mediaId IN ?', mediaIds.splice(0, batchSize))
+
+      try {
+        const { text, values } = q.toParam()
+        await db.run(text, values)
+      } catch (err) {
+        return Promise.reject(err)
+      }
+    }
+  }
 }
 
 module.exports = Media
