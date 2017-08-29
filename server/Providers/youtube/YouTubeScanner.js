@@ -17,6 +17,7 @@ class YouTubeScanner extends Scanner {
   }
 
   async scan () {
+    const offlineChannels = []
     let items = []
     let validIds = [] // mediaIds for cleanup
 
@@ -32,16 +33,21 @@ class YouTubeScanner extends Scanner {
         const res = await this.getPlaylistItems(channel)
         items = items.concat(res)
       } catch (err) {
-        log(err)
+        log(`  => ${err.message} (channel offline)`)
+        offlineChannels.push(channel)
       }
     } // end for
 
     if (this.isCanceling) {
       log('Canceling scan (user requested)')
-      return this.emitDone()
+      return
     }
 
     for (let i = 0; i < items.length; i++) {
+      if (this.isCanceling) {
+        break
+      }
+
       this.emitStatus(`Processing videos (${i} of ${items.length})`, (i / items.length) * 100)
 
       try {
@@ -52,7 +58,36 @@ class YouTubeScanner extends Scanner {
       }
     } // end for
 
-    return this.emitDone()
+    if (this.isCanceling) {
+      log('Canceling scan (user requested)')
+
+      // at this point, it is what it is!
+      return this.emitLibrary()
+    }
+
+    // cleanup
+    log('Cleanup: getting orphaned songs')
+
+    try {
+      // get all media from valid/online channels
+      const res = await Media.getMedia({
+        provider: 'youtube',
+        providerData: {
+          channel: this.prefs.channels.filter(c => !offlineChannels.includes(c)),
+        }
+      })
+
+      // media we didn't encounter during the scan are invalid
+      const invalidIds = res.result.filter(id => !validIds.includes(id))
+
+      log('  => removing %s songs', invalidIds.length)
+      await Media.remove(invalidIds)
+    } catch (err) {
+      log(err)
+    }
+
+    // done
+    this.emitLibrary()
   }
 
   /**

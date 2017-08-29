@@ -1,5 +1,3 @@
-const db = require('sqlite')
-const squel = require('squel')
 const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:file')
@@ -46,7 +44,7 @@ class FileScanner extends Scanner {
 
       if (this.isCanceling) {
         log('Canceling scan (user requested)')
-        return this.emitDone()
+        return
       }
     }
 
@@ -73,35 +71,33 @@ class FileScanner extends Scanner {
 
       if (this.isCanceling) {
         log('Canceling scan (user requested)')
-        return this.emitDone()
+        return
       }
     } // end for
 
-    // cleanup: delete songs not in our valid list
-    // -------------------------------------------
-    log('Removing orphaned songs')
-    const cleanupPaths = this.paths.filter(p => !offlinePaths.includes(p))
+    // cleanup
+    log('Cleanup: getting orphaned songs')
 
-    if (cleanupPaths.length) {
-      try {
-        const q = squel.delete()
-          .from('media')
-          .where('provider = ?', 'file')
-          .where(`json_extract(providerData, '$.basePath') IN ?`, cleanupPaths)
-
-        if (validIds.length) {
-          q.where('mediaId NOT IN ?', validIds)
+    try {
+      // get all media from valid/online paths
+      const res = await Media.getMedia({
+        provider: 'file',
+        providerData: {
+          basePath: this.paths.filter(p => !offlinePaths.includes(p)),
         }
+      })
 
-        const { text, values } = q.toParam()
-        const res = await db.run(text, values)
-        log('  => removed %s songs', res.stmt.changes)
-      } catch (err) {
-        log(err)
-      }
+      // media we didn't encounter during the scan are invalid
+      const invalidIds = res.result.filter(id => !validIds.includes(id))
+
+      log('  => removing %s songs', invalidIds.length)
+      await Media.remove(invalidIds)
+    } catch (err) {
+      log(err)
     }
 
-    this.emitDone()
+    // done
+    this.emitLibrary()
   }
 
   async processFile ({ file, basePath }) {
