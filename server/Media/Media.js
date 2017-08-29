@@ -98,13 +98,14 @@ class Media {
 
     // filters
     Object.keys(fields).map(key => {
-      if (key === 'providerData' && typeof fields.providerData === 'object') {
+      if (key === 'providerData') {
         Object.keys(fields.providerData).map(pKey => {
           const val = fields.providerData[pKey]
 
-          if (Array.isArray(val)) {
+          // handle arrays (do nothing if val is an empty array)
+          if (Array.isArray(val) && val.length) {
             q.where(`json_extract(providerData, '$.${pKey}') IN ?`, val)
-          } else {
+          } else if (!Array.isArray(val)) {
             q.where(`json_extract(providerData, '$.${pKey}') = ?`, val)
           }
         })
