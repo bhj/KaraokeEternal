@@ -93,8 +93,6 @@ class Media {
         .where('providers.isEnabled = 1')
         .order('priority'),
       'providers', 'media.provider = providers.name')
-      .group('artistId')
-      .group('title')
 
     // filters
     Object.keys(fields).map(key => {
