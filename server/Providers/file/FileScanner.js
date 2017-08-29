@@ -43,7 +43,6 @@ class FileScanner extends Scanner {
       }
 
       if (this.isCanceling) {
-        log('Canceling scan (user requested)')
         return
       }
     }
@@ -70,7 +69,6 @@ class FileScanner extends Scanner {
       }
 
       if (this.isCanceling) {
-        log('Canceling scan (user requested)')
         return
       }
     } // end for
@@ -97,7 +95,6 @@ class FileScanner extends Scanner {
     }
 
     // done
-    this.emitLibrary()
   }
 
   async processFile ({ file, basePath }) {

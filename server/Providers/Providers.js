@@ -47,15 +47,18 @@ class Providers {
       try {
         this._scanner = new providerImports[name].Scanner(providerCfg.prefs)
         await this._scanner.scan()
-        this._scanner.emitDone()
       } catch (err) {
         log(err)
       }
 
       if (this._isCanceling) {
+        log('Scan canceled by user')
         break
       }
     } // end for
+
+    this._scanner.emitDone()
+    this._scanner.emitLibrary()
 
     this._scanner = null
     this._isScanning = false

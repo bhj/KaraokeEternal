@@ -39,7 +39,6 @@ class YouTubeScanner extends Scanner {
     } // end for
 
     if (this.isCanceling) {
-      log('Canceling scan (user requested)')
       return
     }
 
@@ -59,10 +58,7 @@ class YouTubeScanner extends Scanner {
     } // end for
 
     if (this.isCanceling) {
-      log('Canceling scan (user requested)')
-
-      // at this point, it is what it is!
-      return this.emitLibrary()
+      return
     }
 
     // cleanup
@@ -87,7 +83,6 @@ class YouTubeScanner extends Scanner {
     }
 
     // done
-    this.emitLibrary()
   }
 
   /**
