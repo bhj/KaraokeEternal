@@ -47,6 +47,7 @@ class Providers {
       try {
         this._scanner = new providerImports[name].Scanner(providerCfg.prefs)
         await this._scanner.scan()
+        this._scanner.emitDone()
       } catch (err) {
         log(err)
       }
