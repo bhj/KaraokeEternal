@@ -31,6 +31,7 @@ export default class EditRoom extends Component {
 
         <input type='text' ref='name' placeholder='room name'
           defaultValue={room ? room.name : ''}
+          onKeyPress={this.handleKeyPress}
           autoFocus={typeof room === 'undefined'}
         />
 
@@ -75,6 +76,12 @@ export default class EditRoom extends Component {
   handleRemoveClick = () => {
     if (confirm(`Remove room "${this.props.room.name}"?`)) {
       this.props.removeRoom(this.props.room.roomId)
+    }
+  }
+
+  handleKeyPress = (e) => {
+    if (e.charCode === 13) {
+      this.props.room ? this.handleUpdateClick() : this.handleCreateClick()
     }
   }
 }

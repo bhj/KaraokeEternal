@@ -56,6 +56,12 @@ export default class YouTubePrefs extends React.Component {
       })
   }
 
+  handleKeyPress = (e) => {
+    if (e.charCode === 13) {
+      this.handleAddClick()
+    }
+  }
+
   handleOpenAdder = () => { this.setState({ isAdding: true }) }
   handleCloseAdder = () => { this.setState({ isAdding: false }) }
 
@@ -99,7 +105,7 @@ export default class YouTubePrefs extends React.Component {
             left: '10%',
             marginLeft: '0' }}
         >
-          <input type='text' ref='name' placeholder='channel name' autoFocus />
+          <input type='text' ref='name' placeholder='channel name' onKeyPress={this.handleKeyPress} autoFocus />
           <br />
           <div style={{ display: 'flex' }}>
             <button style={{ flex: 1, width: 'auto' }} onClick={this.handleAddClick}>Add Channel</button>
