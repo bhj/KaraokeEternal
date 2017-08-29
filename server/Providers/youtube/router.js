@@ -2,8 +2,12 @@ const db = require('sqlite')
 const squel = require('squel')
 const log = require('debug')('app:provider:youtube')
 const KoaRouter = require('koa-router')
+
 const router = KoaRouter({ prefix: '/api/provider/youtube' })
 const getProviders = require('../getProviders')
+const {
+  PROVIDER_REQUEST_SCAN,
+} = require('../../../constants/actions')
 
 // set api key
 router.put('/apiKey', async (ctx, next) => {
@@ -81,6 +85,12 @@ router.post('/channel', async (ctx, next) => {
     ctx.status = 500
     ctx.body = err.message
   }
+
+  // auto scan
+  process.send({
+    'type': PROVIDER_REQUEST_SCAN,
+    'payload': 'youtube',
+  })
 })
 
 // remove channel
@@ -118,6 +128,12 @@ router.delete('/channel/:name', async (ctx, next) => {
     ctx.status = 500
     ctx.body = err.message
   }
+
+  // auto scan
+  process.send({
+    'type': PROVIDER_REQUEST_SCAN,
+    'payload': 'youtube',
+  })
 })
 
 module.exports = router

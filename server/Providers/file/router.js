@@ -1,16 +1,19 @@
 const db = require('sqlite')
 const squel = require('squel')
+const { promisify } = require('util')
 const fs = require('fs')
+const stat = promisify(fs.stat)
 const path = require('path')
 const debug = require('debug')
 const log = debug('app:provider:file')
 const KoaRouter = require('koa-router')
-const router = KoaRouter({ prefix: '/api/provider/file' }) // singular
 
+const router = KoaRouter({ prefix: '/api/provider/file' }) // singular
 const getFolders = require('./lib/getFolders')
 const getProviders = require('../getProviders')
-const { promisify } = require('util')
-const stat = promisify(fs.stat)
+const {
+  PROVIDER_REQUEST_SCAN,
+} = require('../../../constants/actions')
 
 // add media file path
 router.post('/path', async (ctx, next) => {
@@ -56,6 +59,12 @@ router.post('/path', async (ctx, next) => {
     ctx.status = 500
     ctx.body = err.message
   }
+
+  // auto scan
+  process.send({
+    'type': PROVIDER_REQUEST_SCAN,
+    'payload': 'file',
+  })
 })
 
 // remove media file path
@@ -94,6 +103,12 @@ router.delete('/path/:idx', async (ctx, next) => {
     ctx.status = 500
     ctx.body = err.message
   }
+
+  // auto scan
+  process.send({
+    'type': PROVIDER_REQUEST_SCAN,
+    'payload': 'file',
+  })
 })
 
 // get folder listing for path browser
