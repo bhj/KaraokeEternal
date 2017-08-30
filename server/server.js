@@ -8,6 +8,7 @@ const parseCookie = require('./lib/parseCookie')
 const jwtVerify = require('jsonwebtoken').verify
 
 const project = require('../project.config')
+const http = require('http')
 const Koa = require('koa')
 const KoaBodyparser = require('koa-bodyparser')
 const KoaRange = require('koa-range')
@@ -20,16 +21,20 @@ const httpRoutes = require('./http')
 const userRouter = require('./User/router')
 const providerRouters = require('./Providers/router')
 
-const socketIo = require('socket.io')
+const SocketIO = require('socket.io')
 const socketActions = require('./socket')
 
 module.exports = function () {
+  let io
+
   app.use(KoaLogger())
   app.use(KoaRange)
   app.use(KoaBodyparser())
 
   // all http (koa) requests
   app.use(async (ctx, next) => {
+    ctx.io = io
+
     // make JWT data available on ctx
     const { id_token } = parseCookie(ctx.request.header.cookie)
 
@@ -113,15 +118,16 @@ module.exports = function () {
   }
 
   log('Opening database file %s', project.database)
+
   db.open(project.database).then(() => {
     db.migrate({
       migrationsPath: path.resolve(project.serverDir, 'lib', 'db'),
       // force: 'last',
     })
   }).then(() => {
-    // start http and socket.io server
-    const server = app.listen(project.serverPort)
-    const io = socketIo.listen(server)
+    // start koa and socket.io server
+    const server = http.createServer(app.callback())
+    io = new SocketIO(server)
 
     // attach socket.io event handlers
     socketActions(io)
@@ -130,6 +136,8 @@ module.exports = function () {
     process.on('message', function (action) {
       io.emit('action', action)
     })
+
+    server.listen(project.serverPort)
 
     log(`Server listening on port ${project.serverPort}`)
   })
