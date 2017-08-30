@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS "rooms" (
   "roomId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "name" text NOT NULL,
   "status" text NOT NULL,
-  "dateCreated" integer NOT NULL
+  "dateCreated" text NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "stars" (

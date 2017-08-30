@@ -41,7 +41,7 @@ router.post('/rooms', async (ctx, next) => {
       q.set(key, room[key])
     })
 
-    q.set('dateCreated', Math.floor(Date.now() / 1000))
+    q.set('dateCreated', new Date().toISOString())
 
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
@@ -155,33 +155,35 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
 module.exports = router
 
 async function getRooms (ctx) {
-  let result = []
-  let entities = {}
-  let rows
-
-  const q = squel.select()
-    .from('rooms')
-
-  if (!ctx.user.isAdmin) {
-    q.where('status = ?', 'open')
-  }
+  const result = []
+  const entities = {}
 
   // console.log(ctx._io.sockets.adapter.rooms)
+  console.log(ctx.socket)
 
   try {
+    const q = squel.select()
+      .from('rooms')
+
+    if (!ctx.user.isAdmin) {
+      q.where('status = ?', 'open')
+    }
+
     const { text, values } = q.toParam()
-    rows = await db.all(text, values)
+    const res = await db.all(text, values)
+
+    res.forEach(row => {
+      result.push(row.roomId)
+
+      row.numOccupants = 0
+      row.dateCreated = row.dateCreated.substr(0, 10)
+      entities[row.roomId] = row
+    })
   } catch (err) {
     log(err)
     ctx.status = 500
     return
   }
-
-  rows.forEach(row => {
-    result.push(row.roomId)
-    entities[row.roomId] = row
-    entities[row.roomId].numOccupants = 0
-  })
 
   return { result, entities }
 }
