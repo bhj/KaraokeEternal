@@ -8,7 +8,7 @@ async function getQueue (roomId) {
   try {
     const q = squel.select()
       .field('queueId, mediaId, userId')
-      .field('media.title, media.duration, users.name AS username, artists.name AS artist')
+      .field('media.title, media.duration, media.provider, users.name AS username, artists.name AS artist')
       .from('queue')
       .join('users USING(userId)')
       .join('media USING(mediaId)')

@@ -11,6 +11,8 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/provider/file' }) // singular
 const getFolders = require('./lib/getFolders')
 const getProviders = require('../getProviders')
+const Media = require('../../Media')
+
 const {
   PROVIDER_REQUEST_SCAN,
 } = require('../../../constants/actions')
@@ -148,58 +150,56 @@ router.get('/ls', async (ctx, next) => {
 })
 
 router.get('/media', async (ctx, next) => {
-  // check jwt validity
+  // must be admin
   if (!ctx.user.isAdmin) {
     ctx.status = 401
     return
   }
 
-  const { type, songId } = ctx.query
-  let file, stats
+  let media, file, stats
+  const { type, mediaId } = ctx.query
 
-  if (!type || !songId) {
+  if (!type || !mediaId) {
     ctx.status = 422
-    ctx.body = "Missing 'type' or 'songId' in url"
+    ctx.body = "Missing 'type' or 'mediaId'"
     return
   }
 
-  // get song from db
+  // get media info
   try {
-    // 2nd param is true since we need providerData
-    const res = await getLibrary({ songId }, true)
+    const res = await Media.getMedia({ mediaId })
 
-    if (!res.songs.result.length) {
+    if (!res.result.length) {
       ctx.status = 404
-      ctx.body = `songId not found: ${songId}`
+      ctx.body = `mediaId not found: ${mediaId}`
       return
     }
 
-    const row = res.songs.entities[res.songs.result[0]]
-    file = row.providerData.path
+    media = res.entities[mediaId]
+    file = media.providerData.basePath + media.providerData.relPath
   } catch (err) {
-    log(err.message)
+    log(err)
     return Promise.reject(err)
   }
 
-  if (type === 'cdg') {
+  if (type === 'audio') {
     const info = path.parse(file)
-    file = file.substr(0, file.length - info.ext.length) + '.cdg'
+    file = file.substr(0, file.length - info.ext.length) + media.providerData.audioExt
   }
 
   // get file size (and does it exist?)
   try {
-    stats = await stat(file)
+    const stats = await stat(file)
+
+    // stream it!
+    log('streaming file (%s bytes): %s', stats.size, file)
+    ctx.length = stats.size
+    ctx.body = fs.createReadStream(file)
   } catch (err) {
+    log(err)
     ctx.status = 404
     ctx.body = `File not found: ${file}`
-    return
   }
-
-  // stream it!
-  log('streaming %s', file)
-
-  ctx.length = stats.size
-  ctx.body = fs.createReadStream(file)
 })
 
 module.exports = router

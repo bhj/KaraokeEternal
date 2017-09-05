@@ -79,7 +79,6 @@ class Media {
    * @return {Promise}        Object with media results
    */
   static async getMedia (fields) {
-    let rows
     const media = {
       result: [],
       entities: {}
@@ -114,14 +113,15 @@ class Media {
 
     try {
       const { text, values } = q.toParam()
-      rows = await db.all(text, values)
+      const res = await db.all(text, values)
+
+      for (const row of res) {
+        media.result.push(row.mediaId)
+        row.providerData = JSON.parse(row.providerData)
+        media.entities[row.mediaId] = row
+      }
     } catch (err) {
       return Promise.reject(err)
-    }
-
-    for (const row of rows) {
-      media.result.push(row.mediaId)
-      media.entities[row.mediaId] = row
     }
 
     return media

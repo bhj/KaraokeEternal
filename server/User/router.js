@@ -145,7 +145,7 @@ router.post('/account', async (ctx, next) => {
 router.put('/account', async (ctx, next) => {
   let user
 
-  // check jwt validity
+  // must be admin
   if (!ctx.user) {
     ctx.status = 401
     ctx.body = 'Invalid token'

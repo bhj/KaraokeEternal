@@ -77,7 +77,7 @@ class Player extends React.Component {
     }
 
     if (props.isErrored) {
-      return <ColorCycle title='crap' />
+      return <ColorCycle title='Something went wrong! (press Next to continue)' />
     }
 
     if (props.isAtQueueEnd) {

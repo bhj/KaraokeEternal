@@ -102,7 +102,7 @@ class FileScanner extends Scanner {
       provider: 'file',
       providerData: {
         basePath,
-        file: file.substr(basePath.length)
+        relPath: file.substr(basePath.length)
       }
     }
 
@@ -139,15 +139,16 @@ class FileScanner extends Scanner {
 
           // success
           log('  => found %s audio file', ext)
+          media.providerData.audioExt = ext.toLowerCase()
           break
         } catch (err) {
           // keep looking...
         }
-      }
+      } // end for
 
       // get audio duration
       try {
-        if (path.extname(audioFile).toLowerCase() === '.mp3') {
+        if (media.providerData.audioExt === '.mp3') {
           log('  => getting duration (mp3-duration)')
           media.duration = await mp3duration(audioFile)
         }
