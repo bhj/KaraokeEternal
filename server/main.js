@@ -22,7 +22,7 @@ if (cluster.isMaster) {
         log('starting web server')
         refs.server = cluster.fork({ ROLE: 'server' })
         refs.server.on('exit', function () {
-          log('died :(')
+          log('web server died :(')
           delete refs.server
         })
         refs.server.on('message', function (action) {
@@ -38,7 +38,7 @@ if (cluster.isMaster) {
 
         refs.scanner = cluster.fork({ ROLE: 'scanner' })
         refs.scanner.on('exit', function () {
-          log('died :(')
+          log('media scanner died :(')
           delete refs.scanner
         })
         refs.scanner.on('message', function (action) {
