@@ -8,7 +8,8 @@ async function getQueue (roomId) {
   try {
     const q = squel.select()
       .field('queueId, mediaId, userId')
-      .field('media.title, media.duration, media.provider, users.name AS username, artists.name AS artist')
+      .field('media.title, media.duration, media.provider, media.providerData')
+      .field('users.name AS username, artists.name AS artist')
       .from('queue')
       .join('users USING(userId)')
       .join('media USING(mediaId)')
@@ -21,6 +22,7 @@ async function getQueue (roomId) {
 
     for (const row of rows) {
       result.push(row.queueId)
+      row.providerData = JSON.parse(row.providerData)
       entities[row.queueId] = row
     }
   } catch (err) {
