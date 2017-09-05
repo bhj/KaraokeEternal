@@ -28,9 +28,10 @@ export default class PathChooser extends React.Component {
       })
   }
 
-  componentDidMount () {
-    // node's current working directory
-    this.getListing('.')
+  componentDidUpdate (prevProps, prevState) {
+    if (this.props.isVisible && !prevProps.isVisible) {
+      this.getListing(this.state.current || '.')
+    }
   }
 
   render () {
