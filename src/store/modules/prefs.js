@@ -6,7 +6,7 @@ import {
 } from 'constants/actions'
 
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('/api/prefs')
+const api = new HttpApi('prefs')
 // ------------------------------------
 // Set prefs
 // ------------------------------------

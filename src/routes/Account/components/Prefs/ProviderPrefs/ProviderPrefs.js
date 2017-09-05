@@ -5,7 +5,7 @@ import HttpApi from 'lib/HttpApi'
 import Icon from 'components/Icon'
 import './ProviderPrefs.css'
 
-const api = new HttpApi('/api/providers')
+const api = new HttpApi('providers')
 
 export default class ProviderPrefs extends React.Component {
   static propTypes = {

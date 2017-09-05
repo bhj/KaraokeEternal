@@ -1,5 +1,5 @@
 export default class HttpApi {
-  constructor (prefix) {
+  constructor (prefix = '') {
     this.prefix = prefix
     this.opts = {
       credentials: 'same-origin',
@@ -8,7 +8,6 @@ export default class HttpApi {
       })
     }
 
-    // do fetch()
     return this.callApi
   }
 
@@ -20,7 +19,7 @@ export default class HttpApi {
       opts.body = JSON.stringify(opts.body)
     }
 
-    return fetch(`${this.prefix}${url}`, opts)
+    return fetch(`/api/${this.prefix}${url}`, opts)
       .then(res => {
         if (res.status >= 200 && res.status < 300) {
           // success

@@ -4,7 +4,7 @@ import { SkyLightStateless } from 'react-skylight'
 import ChannelItem from './ChannelItem'
 import './YouTubePrefs.css'
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('/api/provider/youtube')
+const api = new HttpApi('provider/youtube')
 
 export default class YouTubePrefs extends React.Component {
   static propTypes = {

@@ -4,7 +4,7 @@ import PathItem from './PathItem'
 import PathChooser from './PathChooser'
 import './FilePrefs.css'
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('/api/provider/file')
+const api = new HttpApi('provider/file')
 
 export default class FilePrefs extends React.Component {
   static propTypes = {

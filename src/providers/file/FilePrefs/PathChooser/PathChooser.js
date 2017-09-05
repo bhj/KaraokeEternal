@@ -18,7 +18,7 @@ export default class PathChooser extends React.Component {
     children: [],
   }
 
-  api = new HttpApi('/api/provider/file')
+  api = new HttpApi('provider/file')
 
   getListing = (dir) => {
     this.api('GET', `/ls?dir=${encodeURIComponent(dir)}`)

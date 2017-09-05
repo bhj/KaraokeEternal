@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import CDGCanvas from './CDGCanvas'
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('/api/provider/file')
+const api = new HttpApi('provider/file')
 
 class CDGPlayer extends React.Component {
   static propTypes = {
