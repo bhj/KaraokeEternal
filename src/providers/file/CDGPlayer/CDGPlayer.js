@@ -89,8 +89,8 @@ class CDGPlayer extends React.Component {
       .then(checkStatus)
       .then(res => res.arrayBuffer())
       .then(res => {
-        // arrayBuffer to Uint8Array to standard Array
-        this.cdgData = Array.from(new Uint8Array(res))
+        // arrayBuffer to Uint8Array
+        this.cdgData = new Uint8Array(res)
       }).then(() => { this.handleOnCdgLoaded() })
       .catch((err) => {
         this.props.onMediaError(err.message)
