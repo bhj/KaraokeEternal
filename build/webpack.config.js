@@ -41,6 +41,7 @@ const config = {
     rules: [],
   },
   plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.DefinePlugin(Object.assign({
       'process.env': { NODE_ENV: JSON.stringify(project.env) },
       __DEV__,
