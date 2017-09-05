@@ -3,12 +3,12 @@ const log = require('debug')(`app:server [${process.pid}]`)
 const path = require('path')
 const webpack = require('webpack')
 const webpackConfig = require('../build/webpack.config')
+const project = require('../project.config')
+
+const http = require('http')
 const readFile = require('./lib/readFile')
 const parseCookie = require('./lib/parseCookie')
 const jwtVerify = require('jsonwebtoken').verify
-
-const project = require('../project.config')
-const http = require('http')
 const Koa = require('koa')
 const KoaBodyparser = require('koa-bodyparser')
 const KoaRange = require('koa-range')
@@ -17,7 +17,8 @@ const KoaWebpack = require('koa-webpack')
 const KoaStatic = require('koa-static')
 const app = new Koa()
 
-const httpRoutes = require('./http')
+const prefsRouter = require('./Prefs/router')
+const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
 const providerRouters = require('./Providers/router')
 
@@ -54,15 +55,13 @@ module.exports = function () {
   })
 
   // http api (koa-router) endpoints
-  for (const route in httpRoutes) {
-    app.use(httpRoutes[route].routes())
-  }
+  app.use(prefsRouter.routes())
+  app.use(roomsRouter.routes())
+  app.use(userRouter.routes())
 
   for (const router in providerRouters) {
     app.use(providerRouters[router].routes())
   }
-
-  app.use(userRouter.routes())
 
   // Apply Webpack HMR Middleware
   // ------------------------------------
