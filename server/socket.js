@@ -73,11 +73,7 @@ module.exports = function (io) {
     }
 
     // player in room?
-    const hasPlayer = Object.keys(room.sockets).some(id => {
-      return io.sockets.sockets[id]._isPlayer === true
-    })
-
-    if (hasPlayer) {
+    if (Object.keys(room.sockets).some(id => io.sockets.sockets[id]._isPlayer)) {
       io.to(sock.user.roomId).emit('action', {
         type: PLAYER_ENTER,
       })
@@ -96,12 +92,8 @@ module.exports = function (io) {
       )
 
       if (sock._isPlayer && room.length) {
-        // any other players left in room?
-        const hasPlayer = Object.keys(room.sockets).some(id => {
-          return io.sockets.sockets[id]._isPlayer === true
-        })
-
-        if (!hasPlayer) {
+        // any players left in room?
+        if (!Object.keys(room.sockets).some(id => io.sockets.sockets[id]._isPlayer)) {
           io.to(sock.user.roomId).emit('action', {
             type: PLAYER_LEAVE,
           })
