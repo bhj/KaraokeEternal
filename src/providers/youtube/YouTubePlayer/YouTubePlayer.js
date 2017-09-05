@@ -28,8 +28,8 @@ class YouTubePlayer extends React.Component {
     if (!queueItem) return null
 
     const opts = {
-      width,
-      height,
+      width: '100%',
+      height: '100%',
       // https://developers.google.com/youtube/player_parameters
       playerVars: {
         autoplay: 0,
