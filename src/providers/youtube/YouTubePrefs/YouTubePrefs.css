@@ -1,3 +1,9 @@
-.section {
-  margin-bottom: 1em;
+.container {
+  padding: var(--container-padding);
+}
+
+.button-container {
+  display: flex;
+  margin-top: var(--container-padding);
+  margin-bottom: var(--container-padding);
 }

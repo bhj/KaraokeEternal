@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import PathItem from './PathItem'
 import PathChooser from './PathChooser'
+import './FilePrefs.css'
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('/api/provider/file')
 
@@ -61,9 +62,9 @@ export default class FilePrefs extends React.Component {
     const { paths } = this.props.prefs
 
     return (
-      <div style={this.props.style}>
+      <div style={this.props.style} styleName='container'>
         {paths.length === 0 &&
-          <p style={{ marginTop: 0 }}>No folders configured.</p>
+          <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>
         }
 
         {paths.map((path, index) =>

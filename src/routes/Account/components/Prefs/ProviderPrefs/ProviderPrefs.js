@@ -55,10 +55,11 @@ export default class ProviderPrefs extends React.Component {
           .map((name, i) => {
             const Component = Providers[name].prefsComponent
             const isExpanded = this.state.expanded.includes(name)
+            const isLast = i === this.props.providers.result.length - 1
 
             return (
-              <div key={i} styleName='provider'>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div key={i} styleName={isLast ? 'provider-last' : 'provider'}>
+                <div styleName='provider-title'>
                   <div>
                     <label>
                       <input type='checkbox'
@@ -78,7 +79,7 @@ export default class ProviderPrefs extends React.Component {
                   prefs={this.props.providers.entities[name].prefs}
                   fetchProviders={this.props.fetchProviders}
                   requestScan={this.props.requestScan}
-                  style={{ display: isExpanded ? 'block' : 'none', marginTop: '1em' }}
+                  style={{ display: isExpanded ? 'block' : 'none' }}
                 />
               </div>
             )

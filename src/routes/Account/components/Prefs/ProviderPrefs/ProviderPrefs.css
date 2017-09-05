@@ -1,9 +1,18 @@
 .provider {
-  padding: 5px;
-  padding-left: 10px;
-  margin-bottom: 10px;
   background-color: #555;
   border-radius: var(--border-radius);
+  margin-bottom: var(--container-padding);
+}
+
+.provider-last {
+  composes: provider;
+  margin-bottom: 0;
+}
+
+.provider-title {
+  display: flex;
+  align-items: center;
+  padding-left: var(--container-padding);
 }
 
 .icon {

@@ -1,7 +1,6 @@
 .container {
   background-color: var(--widget-background-color);
   border-radius: var(--border-radius);
-  margin: 10px 0;
   overflow: hidden;
 }
 

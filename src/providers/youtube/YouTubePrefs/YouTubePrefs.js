@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { SkyLightStateless } from 'react-skylight'
 import ChannelItem from './ChannelItem'
+import './YouTubePrefs.css'
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('/api/provider/youtube')
 
@@ -73,26 +74,26 @@ export default class YouTubePrefs extends React.Component {
     const { prefs } = this.props
 
     return (
-      <div style={this.props.style}>
-        <input type='text' ref='apiKey' placeholder='API key'
-          defaultValue={prefs.apiKey}
-          onBlur={this.updateApiKey}
-        />
-
+      <div style={this.props.style} styleName='container'>
         {!prefs.channels.length &&
-          <p>No channels configured.</p>
+          <p style={{ marginTop: 0 }}>Add a channel to get started.</p>
         }
 
         {prefs.channels.map((name, i) =>
           <ChannelItem key={i} name={name} onRemoveClick={() => this.handleRemoveClick(name)} />
         )}
 
-        <div style={{ display: 'flex' }}>
+        <div styleName='button-container'>
           <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenAdder}>Add Channel</button>
           {prefs.channels.length > 0 &&
             <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleRefresh}>Refresh</button>
           }
         </div>
+
+        <input type='text' ref='apiKey' placeholder='API key'
+          defaultValue={prefs.apiKey}
+          onBlur={this.updateApiKey}
+        />
 
         <SkyLightStateless
           isVisible={this.state.isAdding}
