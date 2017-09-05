@@ -101,10 +101,8 @@ class YouTubePlayer extends React.Component {
   }
 
   updateIsPlaying = () => {
-    if (this.props.isPlaying) {
-      this.player.playVideo()
-    } else {
-      this.player.pauseVideo()
+    if (this.player) {
+      this.props.isPlaying ? this.player.playVideo() : this.player.pauseVideo()
     }
   }
 }
