@@ -149,6 +149,7 @@ router.get('/ls', async (ctx, next) => {
   }
 })
 
+// get media file
 router.get('/media', async (ctx, next) => {
   // must be admin
   if (!ctx.user.isAdmin) {
@@ -156,7 +157,7 @@ router.get('/media', async (ctx, next) => {
     return
   }
 
-  let media, file, stats
+  let media, file
   const { type, mediaId } = ctx.query
 
   if (!type || !mediaId) {
