@@ -25,7 +25,7 @@ class CDGPlayer extends React.Component {
 
   isAudioLoaded = false
   isCDGLoaded = false
-  cdgData = []
+  cdgData = {} // Uint8Array
 
   componentDidMount () {
     this.updateSources()

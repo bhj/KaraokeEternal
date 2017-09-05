@@ -8,7 +8,7 @@ export default class CDGCanvas extends React.Component {
     height: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     audioPos: PropTypes.number.isRequired,
-    cdgData: PropTypes.array.isRequired,
+    cdgData: PropTypes.object.isRequired, // Uint8Array
   }
 
   componentDidMount () {
