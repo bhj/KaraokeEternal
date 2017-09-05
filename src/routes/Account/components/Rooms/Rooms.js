@@ -71,7 +71,7 @@ export default class Rooms extends Component {
             />
             <Column
               label='# in'
-              dataKey='numOccupants'
+              dataKey='numUsers'
               width={width * 0.10}
             />
           </Table>

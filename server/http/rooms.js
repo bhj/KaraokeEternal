@@ -157,9 +157,7 @@ module.exports = router
 async function getRooms (ctx) {
   const result = []
   const entities = {}
-
-  // console.log(ctx._io.sockets.adapter.rooms)
-  console.log(ctx.socket)
+  let res
 
   try {
     const q = squel.select()
@@ -170,20 +168,21 @@ async function getRooms (ctx) {
     }
 
     const { text, values } = q.toParam()
-    const res = await db.all(text, values)
-
-    res.forEach(row => {
-      result.push(row.roomId)
-
-      row.numOccupants = 0
-      row.dateCreated = row.dateCreated.substr(0, 10)
-      entities[row.roomId] = row
-    })
+    res = await db.all(text, values)
   } catch (err) {
     log(err)
     ctx.status = 500
     return
   }
+
+  res.forEach(row => {
+    const room = ctx.io.sockets.adapter.rooms[row.roomId]
+    result.push(row.roomId)
+
+    row.numUsers = room ? room.length : 0
+    row.dateCreated = row.dateCreated.substr(0, 10)
+    entities[row.roomId] = row
+  })
 
   return { result, entities }
 }
