@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import CDGCanvas from './CDGCanvas'
+import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('/api/provider/file')
 
 class CDGPlayer extends React.Component {
   static propTypes = {
@@ -80,13 +82,12 @@ class CDGPlayer extends React.Component {
     this.audio.load()
 
     // get cdgData
-    const url = '/api/provider/file/media?type=cdg&mediaId=' + this.props.queueItem.mediaId
+    const url = '/media?type=cdg&mediaId=' + this.props.queueItem.mediaId
 
     // notification
     this.props.getMedia(this.url)
 
-    fetch(url, fetchConfig)
-      .then(checkStatus)
+    api('GET', url)
       .then(res => res.arrayBuffer())
       .then(res => {
         // arrayBuffer to Uint8Array
@@ -150,24 +151,3 @@ class CDGPlayer extends React.Component {
 }
 
 export default CDGPlayer
-
-// helpers for fetch response
-const fetchConfig = {
-  headers: new Headers({
-    'Content-Type': 'application/json'
-  }),
-  // include the cookie that contains our JWT
-  credentials: 'same-origin'
-}
-
-function checkStatus (response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  } else {
-    return response.text().then((txt) => {
-      var error = new Error(txt)
-      error.response = response
-      throw error
-    })
-  }
-}
