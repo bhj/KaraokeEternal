@@ -7,9 +7,9 @@ const stat = promisify(fs.stat)
 const mp3duration = promisify(require('mp3-duration'))
 const getFiles = require('./lib/getFiles')
 const Scanner = require('../Scanner')
-
 const Media = require('../../Media')
-const parseArtistTitle = require('../../lib/parseArtistTitle')
+const parseMeta = require('../../lib/parseMeta')
+const parseMetaCfg = require('./lib/parseMetaCfg') // look for .js, .json
 
 const fileExts = ['.cdg', '.mp4', '.m4v']
 const audioExts = ['.m4a', '.mp3']
@@ -164,7 +164,7 @@ class FileScanner extends Scanner {
     }
 
     // try getting artist and title from filename
-    const { artist, title } = parseArtistTitle(path.parse(file).name)
+    const { artist, title } = parseMeta(path.parse(file).name, parseMetaCfg)
 
     media.artist = artist
     media.title = title
@@ -188,7 +188,7 @@ class FileScanner extends Scanner {
   // if (typeof song !== 'object') {
   //   // try parent folder?
   //   log(`  => couldn't parse artist/title from filename; trying parent folder name`)
-  //   song = parseArtistTitle(cdgPathInfo.dir.split(cdgPathInfo.sep).pop())
+  //   song = parseMeta(cdgPathInfo.dir.split(cdgPathInfo.sep).pop())
   //
   //   if (typeof song !== 'object') {
   //     return Promise.reject(new Error(`couldn't parse artist/title`))

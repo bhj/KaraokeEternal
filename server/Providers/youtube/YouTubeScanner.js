@@ -3,7 +3,8 @@ const fetch = require('node-fetch')
 const log = debug('app:provider:youtube')
 const Scanner = require('../Scanner')
 const Media = require('../../Media')
-const parseArtistTitle = require('../../lib/parseArtistTitle')
+const parseMeta = require('../../lib/parseMeta')
+const parseMetaCfg = require('./lib/parseMetaCfg') // look for .js, .json
 const { parse, toSeconds } = require('iso8601-duration')
 
 class YouTubeScanner extends Scanner {
@@ -189,7 +190,7 @@ class YouTubeScanner extends Scanner {
     }
 
     // new song
-    const { artist, title } = parseArtistTitle(item.snippet.title)
+    const { artist, title } = parseMeta(item.snippet.title, parseMetaCfg)
 
     if (!artist || !title) {
       log(' => skipping: couldn\'t parse artist/title from video title')
@@ -238,42 +239,3 @@ class YouTubeScanner extends Scanner {
 }
 
 module.exports = YouTubeScanner
-
-// function parseArtistTitle (str) {
-//   let title, artist
-//   const phrases = [
-//     'karaoke video version with lyrics',
-//     'karaoke version with lyrics',
-//     'karaoke video with lyrics',
-//     'karaoke version with lyrics',
-//     'karaoke video',
-//     'karaoke version',
-//     'with lyrics',
-//     'no lead vocal',
-//     'singalong',
-//   ]
-//
-//   // remove anything after last |
-//   if (str.lastIndexOf('|') !== -1) {
-//     str = str.substring(0, str.lastIndexOf('|'))
-//   }
-//
-//   // remove anything in parantheses
-//   str = str.replace(/ *\([^)]*\) */g, '')
-//
-//   // de-"in the style of"
-//   let delim = str.toLowerCase().indexOf('in the style of')
-//   if (delim !== -1) {
-//     let parts = str.split(str.substring(delim, delim + 15))
-//     str = parts[1] + '-' + parts[0]
-//   }
-//
-//   // split into song title and artist
-//   let parts = str.split('-')
-//
-//   if (parts.length < 2) {
-//     return false
-//   }
-//
-//   return { artist : parts[0].trim(), title : parts[1].trim() }
-// }

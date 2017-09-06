@@ -1,7 +1,4 @@
-const parserDefaults = require('./kfconfig-default.js')
-
-function parseArtistTitle (str, cfg) {
-  cfg = cfg || parserDefaults
+module.exports = function (str, cfg) {
   let artist, title
 
   // global pre-processing
@@ -34,8 +31,6 @@ function parseArtistTitle (str, cfg) {
 
   return { artist, title }
 }
-
-module.exports = parseArtistTitle
 
 function titleCase (str) {
   return str.replace(/\w\S*/g, function (tStr) {
