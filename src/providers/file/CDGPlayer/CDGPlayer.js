@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import CDGCanvas from './CDGCanvas'
+import './CDGPlayer.css'
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('provider/file')
 
@@ -53,7 +54,7 @@ class CDGPlayer extends React.Component {
     }
 
     return (
-      <div style={{ width, height, backgroundColor: 'black' }} >
+      <div style={{ width, height }} styleName='container'>
         <CDGCanvas
           width={canvasScale * 300}
           height={canvasScale * 300 * 0.72}
