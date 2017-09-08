@@ -1,5 +1,6 @@
 import {
   TOGGLE_SONG_STARRED,
+  SOCKET_AUTH_ERROR,
   LOGIN,
   LOGOUT,
   CREATE,
@@ -251,13 +252,10 @@ const ACTION_HANDLERS = {
     ...payload,
   }),
   [LOGOUT + _SUCCESS]: (state, { payload }) => ({
-    ...state,
-    userId: null,
-    email: null,
-    name: null,
-    isAdmin: false,
-    roomId: null,
-    starredSongs: [],
+    ...initialState,
+  }),
+  [SOCKET_AUTH_ERROR]: (state, { payload }) => ({
+    ...initialState,
   }),
   [TOGGLE_SONG_STARRED + _SUCCESS]: (state, { payload }) => ({
     ...state,
