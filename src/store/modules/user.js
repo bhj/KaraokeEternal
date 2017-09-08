@@ -11,7 +11,7 @@ import { fetchPrefs } from './prefs'
 import { browserHistory } from 'react-router'
 
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('/api')
+const api = new HttpApi('')
 
 // ------------------------------------
 // Login
@@ -45,7 +45,7 @@ export function loginUser (data) {
   return (dispatch, getState) => {
     dispatch(requestLogin(data))
 
-    return api('POST', '/login', {
+    return api('POST', 'login', {
       body: data
     })
       .then(res => {
@@ -114,7 +114,7 @@ export function logoutUser () {
   return (dispatch, getState) => {
     dispatch(requestLogout())
 
-    return api('GET', '/logout')
+    return api('GET', 'logout')
       .then(response => {
         // server response should have cleared our cookie
         dispatch(receiveLogout())
@@ -162,7 +162,7 @@ export function createUser (user) {
   return dispatch => {
     dispatch(requestCreate(user))
 
-    return api('POST', '/account', {
+    return api('POST', 'account', {
       body: user
     })
       .then(user => {
@@ -212,7 +212,7 @@ export function updateUser (data) {
   return (dispatch, getState) => {
     dispatch(requestUpdate(data))
 
-    return api('PUT', '/account', {
+    return api('PUT', 'account', {
       body: data
     })
       .then(user => {
