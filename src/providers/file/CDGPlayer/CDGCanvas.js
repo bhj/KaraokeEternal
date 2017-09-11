@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import CDGCore from './wcdg'
+import CDGCore from 'cdgraphics'
 
 export default class CDGCanvas extends React.Component {
   static propTypes = {
