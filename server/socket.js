@@ -52,21 +52,16 @@ module.exports = function (io) {
       sock.user.name, sock.id, sock.user.roomId, room.length
     )
 
-    // send queue
-    try {
-      io.to(sock.id).emit('action', {
-        type: QUEUE_UPDATE,
-        payload: await Queue.getQueue(sock.user.roomId),
-      })
-    } catch (err) {
-      log(err)
-    }
-
-    // send library
+    // send library and queue
     try {
       io.to(sock.id).emit('action', {
         type: LIBRARY_UPDATE,
         payload: await Media.getLibrary(),
+      })
+
+      io.to(sock.id).emit('action', {
+        type: QUEUE_UPDATE,
+        payload: await Queue.getQueue(sock.user.roomId),
       })
     } catch (err) {
       log(err)
