@@ -1,15 +1,14 @@
 sudo: false
 language: node_js
 node_js:
-  - "7"
+  - "8"
 
 cache:
   directories:
     - node_modules
 
 install:
-  - npm install -g yarn
-  - yarn install
+  - npm install
 
 script:
   - npm run deploy:dev
