@@ -40,6 +40,7 @@ module.exports = function (io) {
 
       sock.user = null
       sock.disconnect()
+      log(err)
       return
     }
 
