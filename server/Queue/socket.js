@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const getQueue = require('./getQueue')
+const Queue = require('./Queue')
 const log = require('debug')('app:socket:queue')
 
 const {
@@ -71,7 +71,7 @@ const ACTION_HANDLERS = {
     // to all in room
     sock.server.to(sock.user.roomId).emit('action', {
       type: QUEUE_UPDATE,
-      payload: await getQueue(sock.user.roomId)
+      payload: await Queue.getQueue(sock.user.roomId)
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
@@ -185,7 +185,7 @@ const ACTION_HANDLERS = {
     // tell room
     sock.server.to(sock.user.roomId).emit('action', {
       type: QUEUE_UPDATE,
-      payload: await getQueue(sock.user.roomId)
+      payload: await Queue.getQueue(sock.user.roomId)
     })
   },
 }

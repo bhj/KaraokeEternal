@@ -1,11 +1,11 @@
 const log = require('debug')(`app:server [${process.pid}]`)
 const jwtVerify = require('jsonwebtoken').verify
 
-const User = require('./User/socket')
-const Queue = require('./Queue/socket')
-const Player = require('./Player/socket')
+const UserSocket = require('./User/socket')
+const QueueSocket = require('./Queue/socket')
+const PlayerSocket = require('./Player/socket')
 const Media = require('./Media')
-const getQueue = require('./Queue/getQueue')
+const Queue = require('./Queue')
 const parseCookie = require('./lib/parseCookie')
 
 const {
@@ -18,9 +18,9 @@ const {
 } = require('../constants/actions')
 
 const handlers = {
-  ...User,
-  ...Queue,
-  ...Player,
+  ...UserSocket,
+  ...QueueSocket,
+  ...PlayerSocket,
 }
 
 module.exports = function (io) {
@@ -56,7 +56,7 @@ module.exports = function (io) {
     try {
       io.to(sock.id).emit('action', {
         type: QUEUE_UPDATE,
-        payload: await getQueue(sock.user.roomId),
+        payload: await Queue.getQueue(sock.user.roomId),
       })
     } catch (err) {
       log(err)

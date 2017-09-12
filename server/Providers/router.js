@@ -6,6 +6,9 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/providers' }) // plural
 const Providers = require('../Providers/Providers')
 const providerImports = require('./')
+const Media = require('../Media')
+const Queue = require('../Queue')
+
 const {
   PROVIDER_REQUEST_SCAN,
   PROVIDER_REQUEST_SCAN_CANCEL,

@@ -1,5 +1,5 @@
 const log = require('debug')('app:socket:player')
-const getQueue = require('../Queue/getQueue')
+const Queue = require('../Queue')
 
 const {
   REQUEST_PLAYER_NEXT,
@@ -29,7 +29,7 @@ const ACTION_HANDLERS = {
     // can decide whether to increment song play count
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_NEXT,
-      payload: await getQueue(sock.user.roomId),
+      payload: await Queue.getQueue(sock.user.roomId),
     })
   },
   [REQUEST_PLAYER_PLAY]: async (sock, { payload }) => {
