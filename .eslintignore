@@ -3,4 +3,3 @@ src/index.html
 coverage/**
 *.spec.js
 dist/**
-wcdg.js
