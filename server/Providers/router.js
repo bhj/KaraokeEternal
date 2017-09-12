@@ -7,9 +7,9 @@ const router = KoaRouter({ prefix: '/api/providers' }) // plural
 const Providers = require('../Providers/Providers')
 const providerImports = require('./')
 const Media = require('../Media')
-const Queue = require('../Queue')
 
 const {
+  LIBRARY_UPDATE,
   PROVIDER_REQUEST_SCAN,
   PROVIDER_REQUEST_SCAN_CANCEL,
 } = require('../../constants/actions')
@@ -47,6 +47,7 @@ router.put('/enable', async (ctx, next) => {
   }
 
   try {
+    // update db
     const q = squel.update()
       .table('providers')
       .where('name = ?', ctx.query.provider)
@@ -57,6 +58,12 @@ router.put('/enable', async (ctx, next) => {
 
     // respond with updated providers
     ctx.body = await Providers.getAll()
+
+    // emit library since enabled providers have changed
+    ctx.io.emit('action', {
+      type: LIBRARY_UPDATE,
+      payload: await Media.getLibrary(),
+    })
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message
