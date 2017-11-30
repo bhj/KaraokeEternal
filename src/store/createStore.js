@@ -6,7 +6,6 @@ import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
-import { autoRehydrate } from 'redux-persist'
 import io from 'socket.io-client'
 
 export default (initialState = {}) => {
@@ -33,7 +32,6 @@ export default (initialState = {}) => {
   // Store Enhancers
   // ======================================================
   const enhancers = [
-    autoRehydrate(),
     responsiveStoreEnhancer,
   ]
 

@@ -1,4 +1,5 @@
-import { combineReducers } from 'redux'
+import { persistCombineReducers } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 import { createResponsiveStateReducer } from 'redux-responsive'
 
 // reducers
@@ -13,7 +14,7 @@ import ui from './modules/ui'
 import user from './modules/user'
 
 export const makeRootReducer = (asyncReducers) => {
-  return combineReducers({
+  const reducers = {
     library,
     location,
     prefs,
@@ -30,7 +31,15 @@ export const makeRootReducer = (asyncReducers) => {
       }),
     }),
     ...asyncReducers
-  })
+  }
+
+  const persistConfig = {
+    key: 'primary',
+    whitelist: ['user'],
+    storage,
+  }
+
+  return persistCombineReducers(persistConfig, reducers)
 }
 
 export const injectReducer = (store, { key, reducer }) => {

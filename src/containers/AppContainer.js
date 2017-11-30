@@ -19,7 +19,7 @@ class AppContainer extends Component {
     const { store } = this.props
 
     // begin periodically persisting the store
-    window._persistor = persistStore(store, { whitelist: ['user'] }, () => {
+    window._persistor = persistStore(store, null, () => {
       this.setState({ rehydrated: true })
 
       // if it looks like we have/had a valid session
