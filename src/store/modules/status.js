@@ -88,7 +88,7 @@ const initialState = {
   isPlaying: false,
   isAtQueueEnd: false,
   isPlayerPresent: false,
-  errors: {},   // object of arrays keyed by queueId
+  errors: {}, // object of arrays keyed by queueId
 }
 
 export default function status (state = initialState, action) {

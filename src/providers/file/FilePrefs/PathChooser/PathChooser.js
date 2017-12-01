@@ -65,8 +65,16 @@ export default class PathChooser extends React.Component {
           </div>
 
           <div style={{ display: 'flex' }}>
-            <button style={{ flex: 1, width: 'auto' }} onClick={() => this.props.onChoose(this.state.current)}>Add Folder</button>
-            <button style={{ marginLeft: '1em', width: 'auto' }} onClick={this.props.onCancel}>Cancel</button>
+            <button
+              style={{ flex: 1, width: 'auto' }}
+              onClick={() => this.props.onChoose(this.state.current)}>
+                Add Folder
+            </button>
+            <button
+              style={{ marginLeft: '1em', width: 'auto' }}
+              onClick={this.props.onCancel}>
+              Cancel
+            </button>
           </div>
         </div>
       </SkyLightStateless>

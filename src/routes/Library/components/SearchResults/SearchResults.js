@@ -10,8 +10,8 @@ class SearchResults extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
     media: PropTypes.object.isRequired,
-    artistResults: PropTypes.array.isRequired,  // artistIds
-    songResults: PropTypes.array.isRequired,  // mediaIds
+    artistResults: PropTypes.array.isRequired, // artistIds
+    songResults: PropTypes.array.isRequired, // mediaIds
     starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
     queuedMediaIds: PropTypes.array.isRequired,
