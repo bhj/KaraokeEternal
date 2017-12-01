@@ -41,7 +41,7 @@
     "node-fetch": "^1.7.3",
     "normalize.css": "^7.0.0",
     "prop-types": "^15.6.0",
-    "rc-slider": "^8.4.1",
+    "rc-slider": "^8.5.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-measure": "^1.4.7",
@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.2",
+    "babel-eslint": "^8.0.3",
     "babel-loader": "^7.1.2",
     "babel-plugin-istanbul": "^4.1.5",
     "babel-plugin-react-css-modules": "^3.3.2",
@@ -80,7 +80,7 @@
     "cross-env": "^5.1.1",
     "css-loader": "^0.28.7",
     "enzyme": "^3.2.0",
-    "eslint": "^4.12.0",
+    "eslint": "^4.12.1",
     "eslint-config-standard": "^10.2.1",
     "eslint-config-standard-react": "^5.0.0",
     "eslint-plugin-babel": "^4.1.2",
@@ -107,7 +107,7 @@
     "sinon-chai": "^2.14.0",
     "style-loader": "^0.19.0",
     "url-loader": "^0.6.2",
-    "webpack": "^3.8.1",
+    "webpack": "^3.9.1",
     "when": "^3.7.8",
     "yargs": "^10.0.3"
   }
