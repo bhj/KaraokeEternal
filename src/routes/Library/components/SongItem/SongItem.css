@@ -23,18 +23,6 @@
   white-space: nowrap;
 }
 
-.info {
-  margin-right: 5px;
-  height: var(--song-item-height);
-  width: var(--song-item-height);
-  display: flex;
-  align-items: center;
-}
-
-.infoIcon {
-  fill: var(--text-color);
-}
-
 .star {
   height: var(--song-item-height);
   width: var(--song-item-height);
