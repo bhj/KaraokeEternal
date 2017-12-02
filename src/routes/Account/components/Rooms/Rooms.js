@@ -8,6 +8,7 @@ import tableStyle from 'react-virtualized/styles.css'
 export default class Rooms extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
+    isEditing: PropTypes.bool.isRequired,
     isAdmin: PropTypes.bool.isRequired,
     width: PropTypes.number,
     // Actions
@@ -81,7 +82,9 @@ export default class Rooms extends Component {
             Create Room
           </button>
 
-          <EditRoom />
+          {this.props.isEditing &&
+            <EditRoom />
+          }
         </div>
       </div>
     )

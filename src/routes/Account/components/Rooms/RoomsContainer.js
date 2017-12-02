@@ -11,7 +11,7 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => ({
   rooms: state.rooms,
-  isEditing: state.roomsisEditing,
+  isEditing: state.rooms.isEditing,
   isAdmin: state.user.isAdmin,
   width: state.viewport.width,
 })
