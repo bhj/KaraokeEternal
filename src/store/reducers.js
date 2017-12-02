@@ -13,8 +13,14 @@ import status from './modules/status'
 import ui from './modules/ui'
 import user from './modules/user'
 
+const persistConfig = {
+  key: 'primary',
+  whitelist: ['user'],
+  storage,
+}
+
 export const makeRootReducer = (asyncReducers) => {
-  const reducers = {
+  return persistCombineReducers(persistConfig, {
     library,
     location,
     prefs,
@@ -30,16 +36,8 @@ export const makeRootReducer = (asyncReducers) => {
         height: window.innerHeight,
       }),
     }),
-    ...asyncReducers
-  }
-
-  const persistConfig = {
-    key: 'primary',
-    whitelist: ['user'],
-    storage,
-  }
-
-  return persistCombineReducers(persistConfig, reducers)
+    ...asyncReducers,
+  })
 }
 
 export const injectReducer = (store, { key, reducer }) => {
