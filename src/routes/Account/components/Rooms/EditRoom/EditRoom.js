@@ -4,7 +4,6 @@ import { SkyLightStateless } from 'react-skylight'
 
 export default class EditRoom extends Component {
   static propTypes = {
-    isEditing: PropTypes.bool.isRequired,
     room: PropTypes.object,
     // actions
     closeRoomEditor: PropTypes.func.isRequired,
@@ -14,11 +13,11 @@ export default class EditRoom extends Component {
   }
 
   render () {
-    const { isEditing, room } = this.props
+    const { room } = this.props
 
     return (
       <SkyLightStateless
-        isVisible={isEditing}
+        isVisible
         onCloseClicked={this.props.closeRoomEditor}
         onOverlayClicked={this.props.closeRoomEditor}
         title={room ? 'Room' : 'Create Room'}

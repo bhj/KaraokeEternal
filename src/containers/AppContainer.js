@@ -2,45 +2,28 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { browserHistory, Router } from 'react-router'
 import { Provider } from 'react-redux'
-import { persistStore } from 'redux-persist'
+import { PersistGate } from 'redux-persist/es/integration/react'
 
 class AppContainer extends Component {
   static propTypes = {
-    routes : PropTypes.object.isRequired,
-    store  : PropTypes.object.isRequired
-  }
-
-  constructor (props) {
-    super(props)
-    this.state = { rehydrated: false }
-  }
-
-  componentWillMount () {
-    const { store } = this.props
-
-    // begin periodically persisting the store
-    window._persistor = persistStore(store, null, () => {
-      this.setState({ rehydrated: true })
-
-      // if it looks like we have/had a valid session
-      if (store.getState().user.userId !== null) {
-        window._socket.open()
-      }
-    })
+    routes: PropTypes.object.isRequired,
+    store: PropTypes.object.isRequired,
+    persistor: PropTypes.object.isRequired,
   }
 
   render () {
-    const { routes, store } = this.props
-
-    if (!this.state.rehydrated) {
-      return (<div>Loading...</div>)
-    }
+    const { routes, store, persistor } = this.props
 
     return (
       <Provider store={store}>
-        <div style={{ height: '100%' }}>
-          <Router history={browserHistory} children={routes} />
-        </div>
+        <PersistGate
+          loading={null}
+          persistor={persistor}
+        >
+          <div style={{ height: '100%' }}>
+            <Router history={browserHistory} children={routes} />
+          </div>
+        </PersistGate>
       </Provider>
     )
   }

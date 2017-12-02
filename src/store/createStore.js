@@ -6,15 +6,8 @@ import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
 import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
-import io from 'socket.io-client'
 
 export default (initialState = {}) => {
-  // the "socket" side of the api requires authentication, so
-  // we only want to attempt socket connection if we think we
-  // have (or just received) a JWT set via http cookie on login.
-  // socket.io handshake will then contain the JWT
-  window._socket = io({ autoConnect: false })
-
   // ======================================================
   // Middleware Configuration
   // ======================================================
