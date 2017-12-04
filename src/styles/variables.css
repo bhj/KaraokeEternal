@@ -31,4 +31,8 @@
   --nav-link-background-color: var(--chrome-background-color);
   --nav-active-color: var(--link-color);
   --nav-active-background-color: var(--chrome-background-color);
+
+  /* Icon buttons */
+  --btn-inactive-color: #222a44;
+  --btn-active-color: #2e4fd1;
 }

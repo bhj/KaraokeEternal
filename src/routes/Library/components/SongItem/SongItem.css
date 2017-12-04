@@ -34,15 +34,15 @@
   width: var(--song-item-height);
 }
 
-.starIcon {
-  fill: var(--text-color);
+.star {
+  fill: var(--btn-inactive-color);
 }
 
-.starIconFull {
-  fill: var(--text-color);
+.starStarred {
+  fill: var(--btn-active-color);
 }
 
-.numStars {
+.starCount {
   position: relative;
   font-size: 12px;
   top: -26px;
@@ -50,7 +50,7 @@
   color: var(--text-color);
 }
 
-.numStarsFull {
-  composes: numStars;
-  color: #555;
+.starCountStarred {
+  composes: starCount;
+  color: var(--text-color);
 }
