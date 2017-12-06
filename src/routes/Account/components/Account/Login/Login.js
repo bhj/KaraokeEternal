@@ -14,7 +14,7 @@ export default class Login extends Component {
         <input type='password' ref='password' placeholder='password' />
         <RoomSelect onRoomSelect={this.handleRoomSelect} />
 
-        <button onClick={this.handleSubmit}>
+        <button onClick={this.handleSubmit} className='primary'>
           Sign In
         </button>
       </form>

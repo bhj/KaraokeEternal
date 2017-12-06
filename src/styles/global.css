@@ -78,6 +78,8 @@ button {
   display: inline-block;
   padding: 16px;
   border-radius: var(--border-radius);
+  background-color: var(--btn-default-background-color);
+  color: var(--btn-default-color);
   font-size: 16px;
   font-weight: lighter;
   border: none;
@@ -85,8 +87,9 @@ button {
   width: 100%;
 }
 
-.button.primary {
-
+button.primary {
+  background-color: var(--btn-primary-background-color);
+  color: var(--btn-primary-color);
 }
 
 @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {

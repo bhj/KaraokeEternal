@@ -3,9 +3,11 @@
   --background-color: #191F32;
   --text-color: #a9a9a9;
   --link-color: #2A48BF;
-  --item-remove-color: #BA3A95;
   --border-radius: 5px;
   --container-padding: 10px;
+
+  --action-primary-color: #2e4fd1;
+  --action-warning-color: #BA3A95;
 
   /* Account widgets */
   --widget-background-color: #333;
@@ -16,9 +18,14 @@
 
   /* Library */
   --artist-item-height: 44px;
-  --song-item-height: 44px;
   --artist-folder-color: #3f4e7d;
   --artist-folder-text-color: white;
+
+  --song-item-height: 44px;
+  --song-item-btn-color: var(--action-primary-color);
+  --song-item-btn-active-color: var(--action-primary-color);
+  --song-item-btn-inactive-color: 222a44;
+
   /* PlaybackCtrl */
   --transport-btn-color: #BA3A95;
 
@@ -32,7 +39,10 @@
   --nav-active-color: var(--link-color);
   --nav-active-background-color: var(--chrome-background-color);
 
-  /* Icon buttons */
-  --btn-inactive-color: #222a44;
-  --btn-active-color: #2e4fd1;
+  /* <button> colors */
+  --btn-default-color: #141414;
+  --btn-default-background-color: #a9a9a9;
+
+  --btn-primary-color: #ccc;
+  --btn-primary-background-color: var(--action-primary-color);
 }

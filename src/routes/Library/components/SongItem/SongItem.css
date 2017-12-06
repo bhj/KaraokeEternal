@@ -35,11 +35,11 @@
 }
 
 .star {
-  fill: var(--btn-inactive-color);
+  fill: var(--song-item-btn-inactive-color);
 }
 
 .starStarred {
-  fill: var(--btn-active-color);
+  fill: var(--song-item-btn-active-color);
 }
 
 .starCount {
@@ -53,4 +53,12 @@
 .starCountStarred {
   composes: starCount;
   color: var(--text-color);
+}
+
+.info {
+  fill: var(--song-item-btn-color);
+}
+
+.hide {
+  fill: var(--song-item-btn-color);
 }

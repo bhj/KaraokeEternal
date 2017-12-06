@@ -33,7 +33,7 @@
 
 /* Actions */
 .button {
-  fill: var(--item-remove-color);
+  fill: var(--action-warning-color);
 }
 
 .playNext, .remove, .star, .info {
