@@ -54,22 +54,18 @@ export default class SongItem extends React.Component {
         </div>
 
         <div styleName='btnContainer'
-          style={{ width: this.state.expanded ? BTN_WIDTH * 4 + 'px' : BTN_WIDTH + 'px' }}
+          style={{ width: this.state.expanded ? BTN_WIDTH * 3 + 'px' : BTN_WIDTH + 'px' }}
         >
           <div onClick={props.onSongStarClick} styleName='button'>
-            <Icon size={44} icon={'STAR_FULL'}
-              styleName={props.isStarred ? 'starStarred' : 'star'}
+            <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}
             />
             <div styleName={props.isStarred ? 'starCountStarred' : 'starCount'}>{props.numStars}</div>
           </div>
           <div onClick={props.onSongStarClick} styleName='button'>
-            <Icon size={44} icon='INFO_OUTLINE' />
+            <Icon size={44} icon='VISIBILITY_OFF' styleName='hide' />
           </div>
           <div onClick={props.onSongStarClick} styleName='button'>
-            <Icon size={44} icon='FLAG' />
-          </div>
-          <div onClick={props.onSongStarClick} styleName='button'>
-            <Icon size={44} icon='DELETE' />
+            <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
           </div>
         </div>
       </Swipeable>
