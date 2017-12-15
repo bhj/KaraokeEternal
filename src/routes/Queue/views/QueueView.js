@@ -29,7 +29,7 @@ class QueueView extends React.Component {
 
         {props.user.roomId &&
           <PaddedList
-            {...props.viewportStyle}
+            viewportStyle={props.viewportStyle}
             rowCount={props.queue.result.length}
             rowHeight={this.rowHeight}
             rowRenderer={this.rowRenderer}

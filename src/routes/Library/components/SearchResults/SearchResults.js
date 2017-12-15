@@ -15,10 +15,7 @@ class SearchResults extends React.Component {
     starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
     queuedMediaIds: PropTypes.array.isRequired,
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    paddingTop: PropTypes.number.isRequired,
-    paddingBottom: PropTypes.number.isRequired,
+    viewportStyle: PropTypes.object.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
     toggleSongStarred: PropTypes.func.isRequired,
@@ -35,10 +32,7 @@ class SearchResults extends React.Component {
   render () {
     return (
       <PaddedList
-        width={this.props.width}
-        height={this.props.height}
-        paddingTop={this.props.paddingTop}
-        paddingBottom={this.props.paddingBottom}
+        viewportStyle={this.props.viewportStyle}
         rowCount={this.props.artistResults.length + this.props.songResults.length + 2}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}

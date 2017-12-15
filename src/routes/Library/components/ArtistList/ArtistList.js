@@ -8,14 +8,11 @@ class ArtistList extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
     media: PropTypes.object.isRequired,
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    paddingTop: PropTypes.number.isRequired,
-    paddingBottom: PropTypes.number.isRequired,
     queuedMediaIds: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
+    viewportStyle: PropTypes.object.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
     toggleSongStarred: PropTypes.func.isRequired,
@@ -28,11 +25,8 @@ class ArtistList extends React.Component {
 
     return (
       <PaddedList
-        width={this.props.width}
-        height={this.props.height}
+        viewportStyle={this.props.viewportStyle}
         scrollTop={this.props.scrollTop}
-        paddingTop={this.props.paddingTop}
-        paddingBottom={this.props.paddingBottom}
         rowCount={this.props.artists.result.length}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}

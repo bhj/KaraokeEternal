@@ -4,24 +4,21 @@ import { List } from 'react-virtualized'
 
 class PaddedList extends React.Component {
   static propTypes = {
+    viewportStyle: PropTypes.object.isRequired,
     rowRenderer: PropTypes.func.isRequired,
     rowCount: PropTypes.number.isRequired,
     rowHeight: PropTypes.func.isRequired,
     onScroll: PropTypes.func,
     onRef: PropTypes.func,
     scrollTop: PropTypes.number,
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    paddingTop: PropTypes.number.isRequired,
-    paddingBottom: PropTypes.number.isRequired,
   }
 
   render () {
     return (
       <List
         {...this.props}
-        width={this.props.width}
-        height={this.props.height}
+        width={this.props.viewportStyle.width}
+        height={this.props.viewportStyle.height}
         rowCount={this.props.rowCount + 2} // top & bottom spacer
         overscanRowCount={10}
         onScroll={this.props.onScroll}
@@ -35,8 +32,8 @@ class PaddedList extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.paddingTop !== prevProps.paddingTop ||
-      this.props.paddingBottom !== prevProps.paddingBottom) {
+    const { paddingTop, paddingBottom } = this.props.viewportStyle
+    if (paddingTop !== prevProps.paddingTop || paddingBottom !== prevProps.paddingBottom) {
       this.ref.recomputeRowHeights()
     }
   }
@@ -57,9 +54,9 @@ class PaddedList extends React.Component {
   rowHeight = ({ index }) => {
     // top & bottom spacer
     if (index === 0) {
-      return this.props.paddingTop
+      return this.props.viewportStyle.paddingTop
     } else if (index === this.props.rowCount + 1) {
-      return this.props.paddingBottom
+      return this.props.viewportStyle.paddingBottom
     } else {
       index--
     }
