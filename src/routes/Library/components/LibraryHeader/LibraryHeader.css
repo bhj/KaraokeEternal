@@ -20,3 +20,7 @@
 .clear {
   fill: var(--action-warning-color);
 }
+
+.eye {
+  fill: var(--action-warning-color);
+}

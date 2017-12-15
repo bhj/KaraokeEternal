@@ -6,6 +6,7 @@
   --border-radius: 5px;
   --container-padding: 10px;
 
+  --action-default-color: var(--text-color);
   --action-primary-color: #2e4fd1;
   --action-warning-color: #BA3A95;
 
@@ -34,17 +35,23 @@
   --chrome-border-color: #333;
 
   /* Navigation */
-  --nav-link-color: var(--text-color);
+  --nav-link-color: var(--action-default-color);
   --nav-link-background-color: var(--chrome-background-color);
-  --nav-active-color: var(--link-color);
+  --nav-active-color: var(--action-primary-color);
   --nav-active-background-color: var(--chrome-background-color);
 
   /* <button> colors */
   --btn-default-color: #141414;
-  --btn-default-background-color: #a9a9a9;
+  --btn-default-background-color: var(--action-default-color);
 
   --btn-primary-color: #ccc;
   --btn-primary-background-color: var(--action-primary-color);
+
+  /* Segmented controls (radio button groups) */
+  --segment-active-color: #eee;
+  --segment-active-background-color: var(--action-primary-color);
+  --segment-inactive-color: #141414;
+  --segment-inactive-background-color: var(--action-default-color);
 
   /* Animation */
   --spring-duration: .5s;

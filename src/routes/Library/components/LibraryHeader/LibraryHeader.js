@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Header from 'components/Header'
 import Icon from 'components/Icon'
+import ViewOptions from './ViewOptions'
 import './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
@@ -14,6 +15,7 @@ class LibraryHeader extends React.Component {
 
   state = {
     value: this.props.searchTerm,
+    viewOptions: false,
   }
 
   handleChange = (event) => {
@@ -24,6 +26,10 @@ class LibraryHeader extends React.Component {
   clearSearch = () => {
     this.setState({ value: '' })
     this.props.searchReset()
+  }
+
+  toggleViewOptions = () => {
+    this.setState({ viewOptions: !this.state.viewOptions })
   }
 
   render () {
@@ -42,7 +48,13 @@ class LibraryHeader extends React.Component {
               <Icon icon='CLEAR' size={36} styleName='clear' />
             </div>
           }
+
+          <div onClick={this.toggleViewOptions}>
+            <Icon icon='VISIBILITY' size={36} styleName='magnifier' />
+          </div>
         </div>
+
+        <ViewOptions isExpanded={this.state.viewOptions} />
       </Header>
     )
   }

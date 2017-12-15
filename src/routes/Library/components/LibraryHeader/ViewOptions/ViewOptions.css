@@ -1,0 +1,50 @@
+.container {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
+
+.content {
+  position: relative;
+  transition: all var(--spring-duration) var(--spring-function);
+}
+
+.collapsed {
+  height: 0;
+  top: -150px;
+}
+
+.expanded {
+  height: 150px;
+  top: 0;
+}
+
+.radioGroup {
+  display: flex;
+  overflow: hidden;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: var(--border-radius);
+}
+
+.radioLabel {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.radioInput {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+
+.active {
+  color: var(--segment-active-color);
+  background-color: var(--segment-active-background-color);
+}
+
+.inactive {
+  color: var(--segment-inactive-color);
+  background-color: var(--segment-inactive-background-color);
+}
