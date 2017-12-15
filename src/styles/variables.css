@@ -45,4 +45,8 @@
 
   --btn-primary-color: #ccc;
   --btn-primary-background-color: var(--action-primary-color);
+
+  /* Animation */
+  --spring-duration: .5s;
+  --spring-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
