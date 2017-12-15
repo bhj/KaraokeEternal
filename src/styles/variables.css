@@ -24,7 +24,7 @@
   --song-item-height: 44px;
   --song-item-btn-color: var(--action-primary-color);
   --song-item-btn-active-color: var(--action-primary-color);
-  --song-item-btn-inactive-color: 222a44;
+  --song-item-btn-inactive-color: #222a44;
 
   /* PlaybackCtrl */
   --transport-btn-color: #BA3A95;
