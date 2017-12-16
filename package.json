@@ -58,6 +58,7 @@
     "redux-responsive": "^4.3.5",
     "redux-throttle": "^0.1.1",
     "redux-thunk": "^2.0.0",
+    "reselect": "^3.0.1",
     "rimraf": "^2.6.2",
     "screenfull": "^3.3.2",
     "socket.io": "^2.0.4",
