@@ -43,7 +43,7 @@ class ArtistList extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.scrollArtists(this.lastScrollPos)
+    this.props.scrollArtists(this.lastScrollTop || this.props.scrollTop)
   }
 
   rowRenderer = ({ index, key, style }) => {
@@ -83,7 +83,7 @@ class ArtistList extends React.Component {
   }
 
   handleScroll = ({ scrollTop }) => {
-    this.lastScrollPos = scrollTop
+    this.lastScrollTop = scrollTop
   }
 
   setRef = (ref) => {
