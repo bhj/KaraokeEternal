@@ -2,6 +2,7 @@ import {
   LIBRARY_UPDATE,
   LIBRARY_SEARCH,
   LIBRARY_SEARCH_RESET,
+  TOGGLE_ARTIST_EXPANDED,
 } from 'constants/actions'
 
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
@@ -12,10 +13,9 @@ export function scrollArtists (scrollTop) {
   }
 }
 
-const ARTIST_EXPAND_TOGGLE = 'library/ARTIST_EXPAND_TOGGLE'
 export function toggleArtistExpanded (artistId) {
   return {
-    type: ARTIST_EXPAND_TOGGLE,
+    type: TOGGLE_ARTIST_EXPANDED,
     payload: artistId,
   }
 }
@@ -96,15 +96,10 @@ const ACTION_HANDLERS = {
     ...state,
     scrollTop: payload,
   }),
-  [ARTIST_EXPAND_TOGGLE]: (state, { payload }) => {
+  [TOGGLE_ARTIST_EXPANDED]: (state, { payload }) => {
     let list = state.expandedArtists.slice()
     const i = list.indexOf(payload)
-
-    if (i === -1) {
-      list.push(payload)
-    } else {
-      list.splice(i, 1)
-    }
+    i === -1 ? list.push(payload) : list.splice(i, 1)
 
     return {
       ...state,

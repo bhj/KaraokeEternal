@@ -6,6 +6,7 @@ module.exports = {
   SONG_UPDATE: 'library/SONG_UPDATE',
   LIBRARY_SEARCH: 'library/SEARCH',
   LIBRARY_SEARCH_RESET: 'library/SEARCH_RESET',
+  TOGGLE_ARTIST_EXPANDED: 'library/TOGGLE_ARTIST_EXPANDED',
   // queue
   QUEUE_ADD: 'server/QUEUE_ADD',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
