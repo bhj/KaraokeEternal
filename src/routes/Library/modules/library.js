@@ -44,7 +44,6 @@ export function searchLibrary (term) {
 export function searchReset () {
   return {
     type: LIBRARY_SEARCH_RESET,
-    payload: null,
   }
 }
 

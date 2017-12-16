@@ -36,7 +36,6 @@ export function fetchProviders () {
     // informational
     dispatch({
       type: PROVIDER_REQUEST_PROVIDERS,
-      payload: null,
     })
 
     return api('GET', '/')
@@ -78,7 +77,6 @@ export function requestScanCancel (provider) {
     // informational
     dispatch({
       type: PROVIDER_REQUEST_SCAN_CANCEL,
-      payload: null,
     })
 
     return api('GET', `/scan/cancel`)
