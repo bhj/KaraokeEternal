@@ -58,7 +58,7 @@ const ACTION_HANDLERS = {
         ...state,
         artistSearchResult: [],
         songSearchResult: [],
-        searchTerm: '',
+        searchStr: '',
       }
     }
 
@@ -79,12 +79,6 @@ const ACTION_HANDLERS = {
       searchTerm: payload,
     }
   },
-  [LIBRARY_SEARCH_RESET]: (state, { payload }) => ({
-    ...state,
-    searchTerm: '',
-    artistSearchResult: [],
-    songSearchResult: [],
-  }),
   [SCROLL_ARTISTS]: (state, { payload }) => ({
     ...state,
     scrollTop: payload,
