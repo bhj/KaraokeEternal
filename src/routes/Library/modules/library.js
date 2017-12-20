@@ -1,8 +1,16 @@
 import {
   LIBRARY_UPDATE,
   LIBRARY_SEARCH,
+  LIBRARY_CHANGE_VIEW,
   TOGGLE_ARTIST_EXPANDED,
 } from 'constants/actions'
+
+export function changeView (view) {
+  return {
+    type: LIBRARY_CHANGE_VIEW,
+    payload: view,
+  }
+}
 
 const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
 export function scrollArtists (scrollTop) {
@@ -79,6 +87,10 @@ const ACTION_HANDLERS = {
       searchTerm: payload,
     }
   },
+  [LIBRARY_CHANGE_VIEW]: (state, { payload }) => ({
+    ...state,
+    view: payload,
+  }),
   [SCROLL_ARTISTS]: (state, { payload }) => ({
     ...state,
     scrollTop: payload,
@@ -117,6 +129,7 @@ let initialState = {
   artists: { result: [], entities: {} },
   media: { result: [], entities: {} },
   searchStr: '',
+  view: 'all',
   artistSearchResult: [],
   songSearchResult: [],
   scrollTop: 0,

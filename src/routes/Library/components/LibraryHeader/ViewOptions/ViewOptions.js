@@ -1,42 +1,39 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Icon from 'components/Icon'
 import { RadioGroup, Radio } from 'react-radio-group'
 import './ViewOptions.css'
 
 class ViewOptions extends React.Component {
   static propTypes = {
     isExpanded: PropTypes.bool.isRequired,
+    view: PropTypes.string.isRequired,
+    // actions
+    changeView: PropTypes.func.isRequired,
   }
 
-  state = {
-    filter: 'all',
-  }
-
-  handleFilterChange = filter => {
-    this.setState({ filter })
+  handleViewChange = view => {
+    this.props.changeView(view)
   }
 
   render () {
-    const { isExpanded } = this.props
-    const { filter } = this.state
+    const { isExpanded, view } = this.props
 
     return (
       <div className='bg-blur' styleName='container'>
         <div styleName={'content ' + (isExpanded ? 'expanded' : 'collapsed')}>
           <RadioGroup
-            name='filter'
-            selectedValue={this.state.filter}
-            onChange={this.handleFilterChange}
+            name='view'
+            selectedValue={view}
+            onChange={this.handleViewChange}
             styleName='radioGroup'
           >
-            <label styleName={'radioLabel ' + (filter === 'all' ? 'active' : 'inactive')}>
+            <label styleName={'radioLabel ' + (view === 'all' ? 'active' : 'inactive')}>
               <Radio styleName='radioInput' value='all' />All
             </label>
-            <label styleName={'radioLabel ' + (filter === 'starred' ? 'active' : 'inactive')}>
+            <label styleName={'radioLabel ' + (view === 'starred' ? 'active' : 'inactive')}>
               <Radio styleName='radioInput' value='starred' />Starred
             </label>
-            <label styleName={'radioLabel ' + (filter === 'hidden' ? 'active' : 'inactive')}>
+            <label styleName={'radioLabel ' + (view === 'hidden' ? 'active' : 'inactive')}>
               <Radio styleName='radioInput' value='hidden' />Hidden
             </label>
           </RadioGroup>

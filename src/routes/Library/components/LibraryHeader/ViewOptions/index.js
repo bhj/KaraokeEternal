@@ -1,3 +1,3 @@
-import ViewOptions from './ViewOptions'
+import ViewOptionsContainer from './ViewOptionsContainer'
 
-export default ViewOptions
+export default ViewOptionsContainer
