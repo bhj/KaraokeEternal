@@ -7,14 +7,13 @@ import './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
   static propTypes = {
-    searchTerm: PropTypes.string.isRequired,
+    searchStr: PropTypes.string.isRequired,
     // actions
     searchLibrary: PropTypes.func.isRequired,
-    searchReset: PropTypes.func.isRequired,
   }
 
   state = {
-    value: this.props.searchTerm,
+    value: this.props.searchStr,
     viewOptions: false,
   }
 
@@ -25,7 +24,7 @@ class LibraryHeader extends React.Component {
 
   clearSearch = () => {
     this.setState({ value: '' })
-    this.props.searchReset()
+    this.props.searchLibrary('')
   }
 
   toggleViewOptions = () => {
@@ -43,7 +42,7 @@ class LibraryHeader extends React.Component {
             value={this.state.value}
             onChange={this.handleChange}
           />
-          {this.props.searchTerm &&
+          {this.props.searchStr &&
             <div onClick={this.clearSearch}>
               <Icon icon='CLEAR' size={36} styleName='clear' />
             </div>

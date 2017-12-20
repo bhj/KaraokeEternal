@@ -5,7 +5,7 @@ import ArtistList from '../components/ArtistList'
 import SearchResults from '../components/SearchResults'
 
 const LibraryView = (props) => {
-  const View = props.searchTerm ? SearchResults : ArtistList
+  const View = props.searchStr ? SearchResults : ArtistList
 
   return (
     <div>
@@ -17,7 +17,7 @@ const LibraryView = (props) => {
 }
 
 LibraryView.propTypes = {
-  searchTerm: PropTypes.string.isRequired,
+  searchStr: PropTypes.string.isRequired,
   viewportStyle: PropTypes.object.isRequired,
 }
 

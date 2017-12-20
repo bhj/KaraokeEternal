@@ -1,7 +1,6 @@
 import {
   LIBRARY_UPDATE,
   LIBRARY_SEARCH,
-  LIBRARY_SEARCH_RESET,
   TOGGLE_ARTIST_EXPANDED,
 } from 'constants/actions'
 
@@ -28,22 +27,16 @@ export function toggleArtistResultExpanded (artistId) {
   }
 }
 
-export function searchLibrary (term) {
+export function searchLibrary (str) {
   return {
     type: LIBRARY_SEARCH,
-    payload: term,
+    payload: str,
     meta: {
       throttle: {
         wait: 300,
         leading: false,
       }
     },
-  }
-}
-
-export function searchReset () {
-  return {
-    type: LIBRARY_SEARCH_RESET,
   }
 }
 
@@ -129,7 +122,7 @@ const ACTION_HANDLERS = {
 let initialState = {
   artists: { result: [], entities: {} },
   media: { result: [], entities: {} },
-  searchTerm: '',
+  searchStr: '',
   artistSearchResult: [],
   songSearchResult: [],
   scrollTop: 0,
