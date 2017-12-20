@@ -6,7 +6,7 @@ const log = require('debug')('app:socket:queue')
 const {
   QUEUE_ADD,
   QUEUE_REMOVE,
-  QUEUE_UPDATE,
+  QUEUE_PUSH,
 } = require('../../constants/actions')
 
 // ------------------------------------
@@ -70,7 +70,7 @@ const ACTION_HANDLERS = {
 
     // to all in room
     sock.server.to(sock.user.roomId).emit('action', {
-      type: QUEUE_UPDATE,
+      type: QUEUE_PUSH,
       payload: await Queue.getQueue(sock.user.roomId)
     })
   },
@@ -184,7 +184,7 @@ const ACTION_HANDLERS = {
 
     // tell room
     sock.server.to(sock.user.roomId).emit('action', {
-      type: QUEUE_UPDATE,
+      type: QUEUE_PUSH,
       payload: await Queue.getQueue(sock.user.roomId)
     })
   },

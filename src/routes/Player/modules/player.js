@@ -9,7 +9,7 @@ import {
   EMIT_PLAYER_ERROR,
   EMIT_PLAYER_ENTER,
   EMIT_PLAYER_LEAVE,
-  QUEUE_UPDATE,
+  QUEUE_PUSH,
 } from 'constants/actions'
 
 // for informational purposes from provider players
@@ -112,7 +112,7 @@ const ACTION_HANDLERS = {
       isAtQueueEnd,
     }
   },
-  [QUEUE_UPDATE]: (state, { payload }) => {
+  [QUEUE_PUSH]: (state, { payload }) => {
     const curIdx = payload.result.indexOf(state.queueId)
     const isAtQueueEnd = curIdx === payload.result.length - 1
 

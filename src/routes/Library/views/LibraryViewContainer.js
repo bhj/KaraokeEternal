@@ -5,46 +5,50 @@ import { queueSong } from 'routes/Queue/modules/queue'
 import { toggleSongStarred } from 'store/modules/user'
 import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'
 
-const getArtists = (state) => state.library.artists
-const getMedia = (state) => state.library.media
+const getMedia = (state) => state.media
 const getView = (state) => state.library.view
 const getSearchStr = (state) => state.library.searchStr
+const getQueue = (state) => state.queue
 
 const getVisibleArtists = createSelector(
-  [getArtists, getView, getSearchStr],
-  (artists, view, searchStr) => {
-    let result = artist.result.slice()
+  [getMedia, getView, getSearchStr],
+  (media, view, searchStr) => {
+    const artists = {
+      result: [],
+      entities: {},
+    }
 
-    // return artists.result.filter(id => {
-    //   const name = artists.entities[id].name.toLowerCase()
-    //   return name.includes(searchStr)
-    // })
-    return result
+    for (const row of media) {
+      // todo: are we searching/filtering?
+
+      // new artist?
+      if (typeof artists.entities[row.artistId] === 'undefined') {
+        artists.result.push(row.artistId)
+        artists.entities[row.artistId] = {
+          artistId: row.artistId,
+          name: row.artist,
+          songs: [],
+        }
+      }
+
+      artists.entities[row.artistId].songs.push(row)
+    }
+
+    return artists
   }
 )
 
-const getVisibleMedia = createSelector(
-  [getMedia, getView, getSearchStr],
-  (media, view, searchStr) => {
-    let result = media.result.slice()
-
-    // return media.result.filter((id, i) => {
-    //   const title = media.entities[id].title.toLowerCase()
-    //   return title.includes(searchStr)
-    // })
-    return result
-  }
+const getQueuedMediaIds = createSelector(
+  [getQueue],
+  (queue) => queue.result.map(queueId =>
+    queue.entities[queueId].mediaId
+  )
 )
 
 const mapStateToProps = (state) => {
-  const queuedMediaIds = state.queue.result.map(queueId =>
-    state.queue.entities[queueId].mediaId
-  )
-
   return {
-    artists: state.library.artists,
-    media: state.library.media,
-    queuedMediaIds,
+    artists: getVisibleArtists(state),
+    queuedMediaIds: getQueuedMediaIds(state),
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,

@@ -5,6 +5,7 @@ import { createResponsiveStateReducer } from 'redux-responsive'
 // reducers
 import library from 'routes/Library/modules/library'
 import location from './modules/location'
+import media from './modules/media'
 import prefs from './modules/prefs'
 import providers from './modules/providers'
 import queue from 'routes/Queue/modules/queue'
@@ -23,6 +24,7 @@ export const makeRootReducer = (asyncReducers) => {
   return persistCombineReducers(persistConfig, {
     library,
     location,
+    media,
     prefs,
     providers,
     queue,

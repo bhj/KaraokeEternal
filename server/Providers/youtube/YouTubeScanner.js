@@ -67,7 +67,7 @@ class YouTubeScanner extends Scanner {
 
     try {
       // get all media from valid/online channels
-      const res = await Media.getMedia({
+      const res = await Media.searchMedia({
         provider: 'youtube',
         providerData: {
           channel: this.prefs.channels.filter(c => !offlineChannels.includes(c)),
@@ -172,7 +172,7 @@ class YouTubeScanner extends Scanner {
 
     // is video already in the db?
     try {
-      const res = await Media.getMedia({
+      const res = await Media.searchMedia({
         provider: 'youtube',
         providerData: { videoId: item.id },
       })

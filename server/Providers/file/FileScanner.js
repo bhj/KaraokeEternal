@@ -78,7 +78,7 @@ class FileScanner extends Scanner {
 
     try {
       // get all media from valid/online paths
-      const res = await Media.getMedia({
+      const res = await Media.searchMedia({
         provider: 'file',
         providerData: {
           basePath: this.paths.filter(p => !offlinePaths.includes(p)),
@@ -108,7 +108,7 @@ class FileScanner extends Scanner {
 
     // already in database with the same path?
     try {
-      const res = await Media.getMedia(media)
+      const res = await Media.searchMedia(media)
       log('  => %s result(s) for existing media', res.result.length)
 
       if (res.result.length) {

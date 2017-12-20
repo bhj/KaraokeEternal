@@ -168,7 +168,7 @@ router.get('/media', async (ctx, next) => {
 
   // get media info
   try {
-    const res = await Media.getMedia({ mediaId })
+    const res = await Media.searchMedia({ mediaId })
 
     if (!res.result.length) {
       ctx.status = 404

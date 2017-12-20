@@ -5,22 +5,13 @@ const log = debug('app:media')
 
 class Media {
 /**
- * Get artists and "songs" in a format suitable for sending to clients
- * as quickly as possible. Only lists one media item per song (the
+ * Get media list as quickly as possible (single query) for
+ * pushing to clients. Only includes one media item per song (the
  * preferred item, if one is set) and does not include providerData
  *
  * @return {Promise} Object with artist and media results
  */
-  static async getLibrary () {
-    const artists = {
-      result: [],
-      entities: {}
-    }
-    const media = {
-      result: [],
-      entities: {}
-    }
-
+  static async getMedia () {
     try {
       const q = squel.select()
         .field('media.mediaId, media.title, media.duration, media.artistId')
@@ -42,34 +33,10 @@ class Media {
         .order('media.title')
 
       const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
-
-      for (const row of rows) {
-        // no need to send over the wire but we needed it
-        // in the query to show the correct mediaId
-        delete row.isPreferred
-
-        // new artist?
-        if (typeof artists.entities[row.artistId] === 'undefined') {
-          artists.result.push(row.artistId)
-          artists.entities[row.artistId] = {
-            artistId: row.artistId,
-            name: row.artist,
-            mediaIds: [],
-          }
-        }
-
-        // add mediaId to artist's LUT
-        artists.entities[row.artistId].mediaIds.push(row.mediaId)
-
-        media.result.push(row.mediaId)
-        media.entities[row.mediaId] = row
-      }
+      return await db.all(text, values)
     } catch (err) {
       return Promise.reject(err)
     }
-
-    return { artists, media }
   }
 
   /**
@@ -78,7 +45,7 @@ class Media {
    * @param  {object}  fields Search criteria
    * @return {Promise}        Object with media results
    */
-  static async getMedia (fields) {
+  static async searchMedia (fields) {
     const media = {
       result: [],
       entities: {}

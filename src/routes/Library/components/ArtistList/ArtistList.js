@@ -7,7 +7,6 @@ const ROW_HEIGHT = 44
 class ArtistList extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
-    media: PropTypes.object.isRequired,
     queuedMediaIds: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
@@ -52,11 +51,10 @@ class ArtistList extends React.Component {
 
     return (
       <ArtistItem
-        media={this.props.media}
-        artistMediaIds={artist.mediaIds} // "children"
+        name={artist.name}
+        songs={artist.songs}
         queuedMediaIds={this.props.queuedMediaIds}
         starredSongs={this.props.starredSongs}
-        name={artist.name}
         isExpanded={expandedArtists.includes(artist.artistId)}
         onArtistClick={() => this.handleArtistClick(artist.artistId)}
         onSongStarClick={this.props.toggleSongStarred}
@@ -72,7 +70,7 @@ class ArtistList extends React.Component {
     let rows = 1
 
     if (this.props.expandedArtists.includes(artistId)) {
-      rows += this.props.artists.entities[artistId].mediaIds.length
+      rows += this.props.artists.entities[artistId].songs.length
     }
 
     return rows * ROW_HEIGHT

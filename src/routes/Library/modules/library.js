@@ -1,5 +1,4 @@
 import {
-  LIBRARY_UPDATE,
   LIBRARY_SEARCH,
   LIBRARY_CHANGE_VIEW,
   TOGGLE_ARTIST_EXPANDED,
@@ -52,41 +51,11 @@ export function searchLibrary (str) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_UPDATE]: (state, { payload }) => ({
+  [LIBRARY_SEARCH]: (state, { payload }) => ({
     ...state,
-    ...payload,
+    searchStr: payload,
+    view: 'all',
   }),
-  [LIBRARY_SEARCH]: (state, { payload }) => {
-    const { artists, media } = state
-    let artistResults, songResults
-    let term = payload.trim().toLowerCase()
-
-    if (term === '') {
-      return {
-        ...state,
-        artistSearchResult: [],
-        songSearchResult: [],
-        searchStr: '',
-      }
-    }
-
-    artistResults = artists.result.filter(id => {
-      const artistName = artists.entities[id].name.toLowerCase()
-      return artistName.includes(term)
-    })
-
-    songResults = media.result.filter((id, i) => {
-      const songTitle = media.entities[id].title.toLowerCase()
-      return songTitle.includes(term)
-    })
-
-    return {
-      ...state,
-      artistSearchResult: artistResults,
-      songSearchResult: songResults,
-      searchTerm: payload,
-    }
-  },
   [LIBRARY_CHANGE_VIEW]: (state, { payload }) => ({
     ...state,
     view: payload,
@@ -126,8 +95,6 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 let initialState = {
-  artists: { result: [], entities: {} },
-  media: { result: [], entities: {} },
   searchStr: '',
   view: 'all',
   artistSearchResult: [],

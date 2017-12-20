@@ -1,6 +1,6 @@
 import {
   QUEUE_ADD,
-  QUEUE_UPDATE,
+  QUEUE_PUSH,
   QUEUE_REMOVE,
   PLAYER_STATUS,
 } from 'constants/actions'
@@ -25,7 +25,7 @@ export function removeItem (queueId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [QUEUE_UPDATE]: (state, { payload }) => ({
+  [QUEUE_PUSH]: (state, { payload }) => ({
     ...state,
     result: payload.result,
     entities: setWaits(payload, state.curId, state.curPos),

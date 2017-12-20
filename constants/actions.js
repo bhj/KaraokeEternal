@@ -2,15 +2,16 @@ module.exports = {
   // authentication
   SOCKET_AUTH_ERROR: 'SOCKET_AUTH_ERROR',
   // library
-  LIBRARY_UPDATE: 'library/FULL_UPDATE',
   SONG_UPDATE: 'library/SONG_UPDATE',
   LIBRARY_SEARCH: 'library/SEARCH',
   LIBRARY_CHANGE_VIEW: 'library/LIBRARY_CHANGE_VIEW',
   TOGGLE_ARTIST_EXPANDED: 'library/TOGGLE_ARTIST_EXPANDED',
+  // media
+  MEDIA_PUSH: 'media/MEDIA_PUSH',
   // queue
   QUEUE_ADD: 'server/QUEUE_ADD',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
-  QUEUE_UPDATE: 'queue/QUEUE_UPDATE',
+  QUEUE_PUSH: 'queue/QUEUE_PUSH',
   // player command requests (clients -> server)
   REQUEST_PLAYER_PLAY: 'server/REQUEST_PLAYER_PLAY',
   REQUEST_PLAYER_PAUSE: 'server/REQUEST_PLAYER_PAUSE',
