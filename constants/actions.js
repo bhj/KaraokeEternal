@@ -7,7 +7,7 @@ module.exports = {
   LIBRARY_CHANGE_VIEW: 'library/LIBRARY_CHANGE_VIEW',
   TOGGLE_ARTIST_EXPANDED: 'library/TOGGLE_ARTIST_EXPANDED',
   // media
-  MEDIA_PUSH: 'media/MEDIA_PUSH',
+  LIBRARY_PUSH: 'library/LIBRARY_PUSH',
   // queue
   QUEUE_ADD: 'server/QUEUE_ADD',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',

@@ -3,7 +3,7 @@ const squel = require('squel')
 const Media = require('../Media')
 
 const {
-  MEDIA_PUSH,
+  LIBRARY_PUSH,
   TOGGLE_SONG_STARRED,
 } = require('../../constants/actions')
 
@@ -59,8 +59,8 @@ const ACTION_HANDLERS = {
     // emit updated star count
     try {
       sock.server.emit('action', {
-        type: MEDIA_PUSH,
-        payload: await Media.getMedia(),
+        type: LIBRARY_PUSH,
+        payload: await Media.getLibrary(),
       })
     } catch (err) {
       return Promise.reject(err)

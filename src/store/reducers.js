@@ -3,6 +3,7 @@ import storage from 'redux-persist/lib/storage'
 import { createResponsiveStateReducer } from 'redux-responsive'
 
 // reducers
+import artists from './modules/artists'
 import library from 'routes/Library/modules/library'
 import location from './modules/location'
 import media from './modules/media'
@@ -22,6 +23,7 @@ const persistConfig = {
 
 export const makeRootReducer = (asyncReducers) => {
   return persistCombineReducers(persistConfig, {
+    artists,
     library,
     location,
     media,

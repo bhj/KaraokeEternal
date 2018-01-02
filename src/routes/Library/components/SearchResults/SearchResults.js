@@ -9,9 +9,9 @@ const ROW_HEIGHT = 44
 class SearchResults extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
+    artistsResult: PropTypes.array.isRequired,
     media: PropTypes.object.isRequired,
-    artistResults: PropTypes.array.isRequired, // artistIds
-    songResults: PropTypes.array.isRequired, // mediaIds
+    mediaResult: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
     queuedMediaIds: PropTypes.array.isRequired,
@@ -33,7 +33,7 @@ class SearchResults extends React.Component {
     return (
       <PaddedList
         viewportStyle={this.props.viewportStyle}
-        rowCount={this.props.artistResults.length + this.props.songResults.length + 2}
+        rowCount={this.props.artistsResult.length + this.props.mediaResult.length + 2}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         onRef={this.setRef}
@@ -42,20 +42,20 @@ class SearchResults extends React.Component {
   }
 
   rowRenderer = ({ index, key, style }) => {
-    const { artistResults, songResults } = this.props
+    const { artistsResult, mediaResult } = this.props
 
     // # artist results heading
     if (index === 0) {
       return (
         <div key={key} style={style} styleName='artistsHeading'>
-          {artistResults.length} artists
+          {artistsResult.length} artists
         </div>
       )
     }
 
     // artist results
-    if (index > 0 && index < artistResults.length + 1) {
-      const artistId = artistResults[index - 1]
+    if (index > 0 && index < artistsResult.length + 1) {
+      const artistId = artistsResult[index - 1]
       const artist = this.props.artists.entities[artistId]
 
       return (
@@ -76,16 +76,16 @@ class SearchResults extends React.Component {
     }
 
     // # song results heading
-    if (index === artistResults.length + 1) {
+    if (index === artistsResult.length + 1) {
       return (
         <div key={key} style={style} styleName='songsHeading'>
-          {songResults.length} songs
+          {mediaResult.length} songs
         </div>
       )
     }
 
     // song results; compensate for artists & heading
-    const mediaId = songResults[index - (artistResults.length + 2)]
+    const mediaId = mediaResult[index - (artistsResult.length + 2)]
     const song = this.props.media.entities[mediaId]
 
     return (
@@ -104,7 +104,7 @@ class SearchResults extends React.Component {
     // header
     if (index === 0) return ROW_HEIGHT
 
-    const artistId = this.props.artistResults[index - 1]
+    const artistId = this.props.artistsResult[index - 1]
     let rows = 1
 
     if (this.props.expandedArtistResults.includes(artistId)) {

@@ -5,57 +5,47 @@ import { queueSong } from 'routes/Queue/modules/queue'
 import { toggleSongStarred } from 'store/modules/user'
 import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'
 
+const getArtists = (state) => state.artists
 const getMedia = (state) => state.media
-const getView = (state) => state.library.view
-const getSearchStr = (state) => state.library.searchStr
-const getQueue = (state) => state.queue
+const getSearchStr = (state) => state.library.searchStr.toLowerCase()
+// const getView = (state) => state.library.view
+// const getStarredMedia = (state) => state.user.starredSongs
 
-const getVisibleArtists = createSelector(
-  [getMedia, getView, getSearchStr],
-  (media, view, searchStr) => {
-    const artists = {
-      result: [],
-      entities: {},
-    }
+const getResultsWithKeyword = createSelector(
+  [getArtists, getMedia, getSearchStr],
+  (artists, media, searchStr) => {
+    const artistsResult = artists.result.filter(id =>
+      artists.entities[id].name.toLowerCase().includes(searchStr)
+    )
 
-    for (const row of media) {
-      // todo: are we searching/filtering?
+    const mediaResult = media.result.filter(id =>
+      media.entities[id].title.toLowerCase().includes(searchStr)
+    )
 
-      // new artist?
-      if (typeof artists.entities[row.artistId] === 'undefined') {
-        artists.result.push(row.artistId)
-        artists.entities[row.artistId] = {
-          artistId: row.artistId,
-          name: row.artist,
-          songs: [],
-        }
-      }
-
-      artists.entities[row.artistId].songs.push(row)
-    }
-
-    return artists
+    return { artistsResult, mediaResult }
   }
 )
 
+const getQueue = (state) => state.queue
 const getQueuedMediaIds = createSelector(
   [getQueue],
-  (queue) => queue.result.map(queueId =>
-    queue.entities[queueId].mediaId
-  )
+  (queue) => queue.result.map(queueId => queue.entities[queueId].mediaId)
 )
 
 const mapStateToProps = (state) => {
+  const { artistsResult, mediaResult } = getResultsWithKeyword(state)
+
   return {
-    artists: getVisibleArtists(state),
+    artists: state.artists,
+    artistsResult,
+    media: state.media,
+    mediaResult,
     queuedMediaIds: getQueuedMediaIds(state),
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
-    // search
+    // search view
     searchStr: state.library.searchStr,
-    artistResults: state.library.artistSearchResult,
-    songResults: state.library.songSearchResult,
     expandedArtistResults: state.library.expandedArtistResults,
   }
 }

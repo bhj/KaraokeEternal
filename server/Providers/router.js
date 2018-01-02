@@ -9,7 +9,7 @@ const providerImports = require('./')
 const Media = require('../Media')
 
 const {
-  MEDIA_PUSH,
+  LIBRARY_PUSH,
   PROVIDER_REQUEST_SCAN,
   PROVIDER_REQUEST_SCAN_CANCEL,
 } = require('../../constants/actions')
@@ -61,8 +61,8 @@ router.put('/enable', async (ctx, next) => {
 
     // emit library since enabled providers have changed
     ctx.io.emit('action', {
-      type: MEDIA_PUSH,
-      payload: await Media.getMedia(),
+      type: LIBRARY_PUSH,
+      payload: await Media.getLibrary(),
     })
   } catch (err) {
     ctx.status = 500

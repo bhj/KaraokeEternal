@@ -9,20 +9,20 @@ const ArtistItem = (props) => {
   let children = []
   let isChildQueued = false
 
-  props.songs.forEach(song => {
-    if (props.queuedMediaIds.includes(song.mediaId)) {
+  props.artistMediaIds.forEach(mediaId => {
+    if (props.queuedMediaIds.includes(mediaId)) {
       isChildQueued = true
     }
 
     if (props.isExpanded) {
       children.push(
         <SongItem
-          {...song}
-          onSongClick={() => props.onSongClick(song.mediaId)}
-          onSongStarClick={() => props.onSongStarClick(song.mediaId)}
-          isQueued={props.queuedMediaIds.includes(song.mediaId)}
-          isStarred={props.starredSongs.includes(song.mediaId)}
-          key={song.mediaId}
+          {...props.media.entities[mediaId]}
+          onSongClick={() => props.onSongClick(mediaId)}
+          onSongStarClick={() => props.onSongStarClick(mediaId)}
+          isQueued={props.queuedMediaIds.includes(mediaId)}
+          isStarred={props.starredSongs.includes(mediaId)}
+          key={mediaId}
         />
       )
     }
@@ -37,7 +37,7 @@ const ArtistItem = (props) => {
             <div styleName='expandedIcon'><Icon icon='EXPAND_LESS' size={24} /></div>
           }
           {!props.isExpanded &&
-            <div styleName='count'>{props.songs.length}</div>
+            <div styleName='count'>{props.artistMediaIds.length}</div>
           }
         </div>
         <div styleName='name'>{props.name}</div>
@@ -48,10 +48,11 @@ const ArtistItem = (props) => {
 }
 
 ArtistItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  songs: PropTypes.array.isRequired,
+  media: PropTypes.object.isRequired,
+  artistMediaIds: PropTypes.array.isRequired,
   queuedMediaIds: PropTypes.array.isRequired,
   starredSongs: PropTypes.array.isRequired,
+  name: PropTypes.string.isRequired,
   isExpanded: PropTypes.bool.isRequired,
   onArtistClick: PropTypes.func.isRequired,
   onSongClick: PropTypes.func.isRequired,

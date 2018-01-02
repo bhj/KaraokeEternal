@@ -8,8 +8,8 @@ import {
 const ACTION_HANDLERS = {
   [LIBRARY_PUSH]: (state, { payload }) => ({
     ...state,
-    result: payload.media.result,
-    entities: payload.media.entities,
+    result: payload.artists.result,
+    entities: payload.artists.entities,
   }),
 }
 
@@ -21,7 +21,7 @@ let initialState = {
   entities: {},
 }
 
-export default function mediaReducer (state = initialState, action) {
+export default function artistsReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

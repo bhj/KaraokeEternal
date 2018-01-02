@@ -1,7 +1,7 @@
 const throttle = require('../lib/throttle')
 const Media = require('../Media')
 const {
-  MEDIA_PUSH,
+  LIBRARY_PUSH,
   PROVIDER_SCAN_STATUS,
 } = require('../../constants/actions')
 
@@ -33,8 +33,8 @@ class Scanner {
   getMediaEmitter () {
     return throttle(async () => {
       process.send({
-        type: MEDIA_PUSH,
-        payload: await Media.getMedia(),
+        type: LIBRARY_PUSH,
+        payload: await Media.getLibary(),
       })
     }, 2000)
   }

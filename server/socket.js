@@ -9,7 +9,7 @@ const Queue = require('./Queue')
 const parseCookie = require('./lib/parseCookie')
 
 const {
-  MEDIA_PUSH,
+  LIBRARY_PUSH,
   QUEUE_PUSH,
   PLAYER_ENTER,
   PLAYER_LEAVE,
@@ -56,8 +56,8 @@ module.exports = function (io) {
     // send library and queue
     try {
       io.to(sock.id).emit('action', {
-        type: MEDIA_PUSH,
-        payload: await Media.getMedia(),
+        type: LIBRARY_PUSH,
+        payload: await Media.getLibrary(),
       })
 
       io.to(sock.id).emit('action', {

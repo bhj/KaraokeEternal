@@ -7,6 +7,9 @@ const ROW_HEIGHT = 44
 class ArtistList extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
+    artistsResult: PropTypes.array.isRequired,
+    media: PropTypes.object.isRequired,
+    mediaResult: PropTypes.array.isRequired,
     queuedMediaIds: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
@@ -20,13 +23,13 @@ class ArtistList extends React.Component {
   }
 
   render () {
-    if (this.props.artists.result.length === 0) return null
+    if (this.props.artistsResult.length === 0) return null
 
     return (
       <PaddedList
         viewportStyle={this.props.viewportStyle}
         scrollTop={this.props.scrollTop}
-        rowCount={this.props.artists.result.length}
+        rowCount={this.props.artistsResult.length}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         onScroll={this.handleScroll}
@@ -46,15 +49,16 @@ class ArtistList extends React.Component {
   }
 
   rowRenderer = ({ index, key, style }) => {
-    const { artists, expandedArtists } = this.props
-    const artist = artists.entities[artists.result[index]]
+    const { artists, artistsResult, expandedArtists } = this.props
+    const artist = artists.entities[artistsResult[index]]
 
     return (
       <ArtistItem
-        name={artist.name}
-        songs={artist.songs}
+        media={this.props.media}
+        artistMediaIds={artist.mediaIds} // "children"
         queuedMediaIds={this.props.queuedMediaIds}
         starredSongs={this.props.starredSongs}
+        name={artist.name}
         isExpanded={expandedArtists.includes(artist.artistId)}
         onArtistClick={() => this.handleArtistClick(artist.artistId)}
         onSongStarClick={this.props.toggleSongStarred}
@@ -66,11 +70,11 @@ class ArtistList extends React.Component {
   }
 
   rowHeight = ({ index }) => {
-    const artistId = this.props.artists.result[index]
+    const artistId = this.props.artistsResult[index]
     let rows = 1
 
     if (this.props.expandedArtists.includes(artistId)) {
-      rows += this.props.artists.entities[artistId].songs.length
+      rows += this.props.artists.entities[artistId].mediaIds.length
     }
 
     return rows * ROW_HEIGHT
