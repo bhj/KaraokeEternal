@@ -21,10 +21,12 @@ if (cluster.isMaster) {
       if (refs.server === undefined) {
         log('starting web server')
         refs.server = cluster.fork({ ROLE: 'server' })
+
         refs.server.on('exit', function () {
           log('web server died :(')
           delete refs.server
         })
+
         refs.server.on('message', function (action) {
           // log('relaying to scanner: ' + JSON.stringify(action))
           refs.scanner.send(action)
@@ -35,12 +37,13 @@ if (cluster.isMaster) {
     function checkScanner () {
       if (refs.scanner === undefined) {
         log('starting media scanner')
-
         refs.scanner = cluster.fork({ ROLE: 'scanner' })
+
         refs.scanner.on('exit', function () {
           log('media scanner died :(')
           delete refs.scanner
         })
+
         refs.scanner.on('message', function (action) {
           // log('relaying to server: ' + JSON.stringify(action))
           refs.server.send(action)
