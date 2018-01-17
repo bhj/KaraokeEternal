@@ -34,7 +34,7 @@ class Scanner {
     return throttle(async () => {
       process.send({
         type: LIBRARY_PUSH,
-        payload: await Media.getLibary(),
+        payload: await Media.getLibrary(),
       })
     }, 2000)
   }
