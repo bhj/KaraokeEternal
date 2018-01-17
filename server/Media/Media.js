@@ -271,6 +271,8 @@ class Media {
   static async remove (mediaIds) {
     const batchSize = 999
 
+    log(`removing ${mediaIds.length} media entries`)
+
     while (mediaIds.length) {
       const q = squel.delete()
         .from('media')
@@ -284,7 +286,31 @@ class Media {
       }
     }
 
-    // @todo: remove songs without associated media
+    // remove songs without associated media
+    try {
+      const res = await db.run(`
+        DELETE FROM songs WHERE songId IN (
+          SELECT songs.songId FROM songs LEFT JOIN media USING(songId) WHERE media.mediaId IS NULL
+        )
+      `)
+
+      log(`removed ${res.stmt.changes} songs with no associated media`)
+    } catch (err) {
+      return Promise.reject(err)
+    }
+
+    // remove artists without associated songs
+    try {
+      const res = await db.run(`
+        DELETE FROM artists WHERE artistId IN (
+          SELECT artists.artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.songId IS NULL
+        )
+      `)
+
+      log(`removed ${res.stmt.changes} artists with no associated songs`)
+    } catch (err) {
+      return Promise.reject(err)
+    }
   }
 }
 
