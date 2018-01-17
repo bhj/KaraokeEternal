@@ -110,11 +110,11 @@ router.post('/account', async (ctx, next) => {
       throw new Error('insert failed')
     }
 
-    // remove firstRun flag if necessary
+    // remove isFirstRun flag if necessary
     if (prefs.isFirstRun === true) {
       const q = squel.update()
         .table('prefs')
-        .where('key = ?', 'firstRun')
+        .where('key = ?', 'isFirstRun')
         .set('data', squel.select()
           .field(`json('false')`)
         )
