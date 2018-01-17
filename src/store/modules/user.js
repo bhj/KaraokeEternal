@@ -1,5 +1,5 @@
 import {
-  TOGGLE_SONG_STARRED,
+  SONG_TOGGLE_STARRED,
   SOCKET_AUTH_ERROR,
   LOGIN,
   LOGOUT,
@@ -228,10 +228,10 @@ export function updateUser (data) {
 // ------------------------------------
 // Star songs
 // ------------------------------------
-export function toggleSongStarred (mediaId) {
+export function toggleSongStarred (songId) {
   return {
-    type: TOGGLE_SONG_STARRED,
-    payload: mediaId,
+    type: SONG_TOGGLE_STARRED,
+    payload: { songId },
   }
 }
 
@@ -257,7 +257,7 @@ const ACTION_HANDLERS = {
   [SOCKET_AUTH_ERROR]: (state, { payload }) => ({
     ...initialState,
   }),
-  [TOGGLE_SONG_STARRED + _SUCCESS]: (state, { payload }) => ({
+  [SONG_TOGGLE_STARRED + _SUCCESS]: (state, { payload }) => ({
     ...state,
     starredSongs: payload,
   }),
