@@ -5,16 +5,14 @@ const providerImports = require('./')
 
 class Providers {
   static async startScan (providerName) {
+    let providers
+
     if (this._isScanning) {
       log('Ignoring media scan request (already in progress)')
       return
     }
 
     log(`Media scan requested (provider=${providerName})`)
-
-    let providers
-    this._isScanning = true
-    this._isCanceling = false
 
     try {
       providers = await this.getAll()
@@ -26,6 +24,14 @@ class Providers {
     if (providerName) {
       providers.result = providers.result.filter(name => name === providerName)
     }
+
+    if (!providers.result.length) {
+      log(`  => skipping scan: no matching providers found`)
+      return
+    }
+
+    this._isScanning = true
+    this._isCanceling = false
 
     for (const name of providers.result) {
       const providerCfg = providers.entities[name]
