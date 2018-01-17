@@ -6,10 +6,14 @@ import {
 } from 'constants/actions'
 
 // add to queue
-export function queueSong (mediaId) {
-  return {
-    type: QUEUE_ADD,
-    payload: mediaId,
+export function queueSong (songId) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: QUEUE_ADD,
+      payload: {
+        mediaId: getState().songs.entities[songId].mediaId
+      },
+    })
   }
 }
 
@@ -17,7 +21,7 @@ export function queueSong (mediaId) {
 export function removeItem (queueId) {
   return {
     type: QUEUE_REMOVE,
-    payload: queueId,
+    payload: { queueId },
   }
 }
 

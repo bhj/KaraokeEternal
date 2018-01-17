@@ -11,8 +11,11 @@ const Media = require('../../Media')
 const parseMeta = require('../../lib/parseMeta')
 const parseMetaCfg = require('./lib/parseMetaCfg') // look for .js, .json
 
-const fileExts = ['.cdg', '.mp4', '.m4v']
+const mediaExts = ['.cdg', '.mp4', '.m4v']
+const mediaExtPerms = mediaExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
+
 const audioExts = ['.m4a', '.mp3']
+const audioExtPerms = audioExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
 class FileScanner extends Scanner {
   constructor (prefs) {
@@ -33,9 +36,9 @@ class FileScanner extends Scanner {
       try {
         log('Searching path: %s', p)
         let list = await getFiles(p)
-        list = list.filter(file => fileExts.includes(path.extname(file)))
+        list = list.filter(file => mediaExtPerms.includes(path.extname(file)))
 
-        log('  => found %s files with valid extensions (%s)', list.length, fileExts.join(', '))
+        log('  => found %s files with valid extensions (%s)', list.length, mediaExts.join(', '))
         files = files.concat(list)
       } catch (err) {
         log(`  => ${err.message} (path offline)`)
@@ -122,7 +125,7 @@ class FileScanner extends Scanner {
     // @todo: calculate current metadata and update db if different
     // (there may be a new parser configuration, for example)
 
-    // new song
+    // new media
     // -------------------------------
 
     // need to look for an audio file?
@@ -131,7 +134,7 @@ class FileScanner extends Scanner {
 
       // look for all uppercase and lowercase permutations
       // since we may be on a case-sensitive fs
-      for (const ext of audioExts.reduce((perms, ext) => perms.concat(getPermutations(ext)), [])) {
+      for (const ext of audioExtPerms) {
         audioFile = file.substr(0, file.length - path.extname(file).length) + ext
 
         try {
@@ -199,7 +202,7 @@ module.exports = FileScanner
 
 // return all uppercase and lowercase permutations of str
 // based on https://stackoverflow.com/a/27995370
-function getPermutations (str) {
+function getPerms (str) {
   var results = []
   var arr = str.split('')
   var len = Math.pow(arr.length, 2)

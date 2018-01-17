@@ -6,11 +6,11 @@ import { createResponsiveStateReducer } from 'redux-responsive'
 import artists from './modules/artists'
 import library from 'routes/Library/modules/library'
 import location from './modules/location'
-import media from './modules/media'
 import prefs from './modules/prefs'
 import providers from './modules/providers'
 import queue from 'routes/Queue/modules/queue'
 import rooms from './modules/rooms'
+import songs from './modules/songs'
 import status from './modules/status'
 import ui from './modules/ui'
 import user from './modules/user'
@@ -26,11 +26,11 @@ export const makeRootReducer = (asyncReducers) => {
     artists,
     library,
     location,
-    media,
     prefs,
     providers,
     queue,
     rooms,
+    songs,
     status,
     ui,
     user,

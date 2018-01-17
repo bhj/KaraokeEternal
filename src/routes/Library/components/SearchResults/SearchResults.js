@@ -10,11 +10,11 @@ class SearchResults extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
     artistsResult: PropTypes.array.isRequired,
-    media: PropTypes.object.isRequired,
-    mediaResult: PropTypes.array.isRequired,
+    songs: PropTypes.object.isRequired,
+    songsResult: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
-    queuedMediaIds: PropTypes.array.isRequired,
+    queuedSongIds: PropTypes.array.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
     queueSong: PropTypes.func.isRequired,
@@ -33,7 +33,7 @@ class SearchResults extends React.Component {
     return (
       <PaddedList
         viewportStyle={this.props.viewportStyle}
-        rowCount={this.props.artistsResult.length + this.props.mediaResult.length + 2}
+        rowCount={this.props.artistsResult.length + this.props.songsResult.length + 2}
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         onRef={this.setRef}
@@ -42,7 +42,7 @@ class SearchResults extends React.Component {
   }
 
   rowRenderer = ({ index, key, style }) => {
-    const { artistsResult, mediaResult } = this.props
+    const { artistsResult, songsResult } = this.props
 
     // # artist results heading
     if (index === 0) {
@@ -56,15 +56,15 @@ class SearchResults extends React.Component {
     // artist results
     if (index > 0 && index < artistsResult.length + 1) {
       const artistId = artistsResult[index - 1]
-      const artist = this.props.artists.entities[artistId]
+      const artist = this.props.artists[artistId]
 
       return (
         <ArtistItem
-          media={this.props.media}
-          artistMediaIds={artist.mediaIds} // "children"
-          queuedMediaIds={this.props.queuedMediaIds}
-          starredSongs={this.props.starredSongs}
+          songs={this.props.songs}
           name={artist.name}
+          artistSongIds={artist.songIds} // "children"
+          queuedSongIds={this.props.queuedSongIds}
+          starredSongs={this.props.starredSongs}
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
           onArtistClick={() => this.handleArtistClick(artistId)}
           onSongClick={this.props.queueSong}
@@ -79,21 +79,21 @@ class SearchResults extends React.Component {
     if (index === artistsResult.length + 1) {
       return (
         <div key={key} style={style} styleName='songsHeading'>
-          {mediaResult.length} songs
+          {songsResult.length} songs
         </div>
       )
     }
 
     // song results; compensate for artists & heading
-    const mediaId = mediaResult[index - (artistsResult.length + 2)]
-    const song = this.props.media.entities[mediaId]
+    const songId = songsResult[index - (artistsResult.length + 2)]
+    const song = this.props.songs[songId]
 
     return (
       <SongItem {...song}
-        onSongClick={() => this.handleSongClick(mediaId)}
-        onSongStarClick={() => this.handleSongStarClick(mediaId)}
-        isQueued={this.props.queuedMediaIds.includes(mediaId)}
-        isStarred={this.props.starredSongs.includes(mediaId)}
+        onSongClick={() => this.handleSongClick(songId)}
+        onSongStarClick={() => this.handleSongStarClick(songId)}
+        isQueued={this.props.queuedSongIds.includes(songId)}
+        isStarred={this.props.starredSongs.includes(songId)}
         key={key}
         style={style}
       />
@@ -108,7 +108,7 @@ class SearchResults extends React.Component {
     let rows = 1
 
     if (this.props.expandedArtistResults.includes(artistId)) {
-      rows += this.props.artists.entities[artistId].mediaIds.length
+      rows += this.props.artists[artistId].songIds.length
     }
 
     return rows * ROW_HEIGHT
@@ -118,12 +118,12 @@ class SearchResults extends React.Component {
     this.props.toggleArtistResultExpanded(artistId)
   }
 
-  handleSongClick = (mediaId) => {
-    this.props.queueSong(mediaId)
+  handleSongClick = (songId) => {
+    this.props.queueSong(songId)
   }
 
-  handleSongStarClick = (mediaId) => {
-    this.props.toggleSongStarred(mediaId)
+  handleSongStarClick = (songId) => {
+    this.props.toggleSongStarred(songId)
   }
 
   setRef = (ref) => {

@@ -123,7 +123,7 @@ router.post('/account', async (ctx, next) => {
       const res = await db.run(text, values)
 
       if (res.stmt.changes !== 1) {
-        throw new Error('could not remove firstRun flag')
+        throw new Error('could not set isFirstRun = false')
       }
     }
   } catch (err) {
@@ -329,19 +329,16 @@ async function _login (ctx, creds) {
   }
 
   // get starred songs
-  const starredSongs = []
   try {
     const q = squel.select()
       .from('stars')
-      .field('mediaId')
+      .field('songId')
       .where('userId = ?', user.userId)
 
     const { text, values } = q.toParam()
     const rows = await db.all(text, values)
 
-    rows.forEach(row => {
-      starredSongs.push(row.mediaId)
-    })
+    user.starredSongs = rows.map(row => row.songId)
   } catch (err) {
     return Promise.reject(err)
   }
@@ -349,7 +346,6 @@ async function _login (ctx, creds) {
   delete user.password
   user.roomId = roomId
   user.isAdmin = (user.isAdmin === 1)
-  user.starredSongs = starredSongs
 
   // encrypt JWT based on subset of user object
   // @todo use async version

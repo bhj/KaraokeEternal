@@ -28,34 +28,33 @@ const ACTION_HANDLERS = {
       return Promise.reject(err)
     }
 
-    // verify song exists
-    let song
+    // verify media exists
     try {
       const q = squel.select()
         .from('media')
-        .where('mediaId = ?', payload)
+        .where('mediaId = ?', payload.mediaId)
 
       const { text, values } = q.toParam()
-      song = await db.get(text, values)
+      const row = await db.get(text, values)
+
+      if (!row) {
+        return acknowledge({
+          type: QUEUE_ADD + '_ERROR',
+          meta: {
+            error: 'mediaId not found: ' + payload.mediaId
+          }
+        })
+      }
     } catch (err) {
       return Promise.reject(err)
     }
 
-    if (!song) {
-      return acknowledge({
-        type: QUEUE_ADD + '_ERROR',
-        meta: {
-          error: 'mediaId not found: ' + payload
-        }
-      })
-    }
-
-    // insert row
+    // insert queue item
     try {
       const q = squel.insert()
         .into('queue')
         .set('roomId', sock.user.roomId)
-        .set('mediaId', payload)
+        .set('mediaId', payload.mediaId)
         .set('userId', sock.user.userId)
 
       const { text, values } = q.toParam()
@@ -75,7 +74,7 @@ const ACTION_HANDLERS = {
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
-    const queueId = payload
+    const { queueId } = payload
     let item, nextItem
 
     // is room open?

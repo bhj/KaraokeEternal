@@ -16,30 +16,49 @@ class Media {
       result: [],
       entities: {}
     }
-    const media = {
+    const songs = {
       result: [],
       entities: {}
     }
 
+    // query #1: artists
     try {
       const q = squel.select()
-        .field('media.mediaId, media.title, media.duration, media.artistId')
-        .field('artists.name AS artist')
+        .from('artists')
+        .order('name')
+
+      const { text, values } = q.toParam()
+      const rows = await db.all(text, values)
+
+      for (const row of rows) {
+        artists.result.push(row.artistId)
+        artists.entities[row.artistId] = {
+          ...row,
+          songIds: [],
+        }
+      }
+    } catch (err) {
+      return Promise.reject(err)
+    }
+
+    // query #2: songs
+    try {
+      const q = squel.select()
+        .field('media.mediaId, media.duration')
+        .field('songs.artistId, songs.songId, songs.title')
         .field('MAX(media.isPreferred) AS isPreferred')
-        .field('COUNT(*) AS numMedia')
-        .field('COUNT(stars.userId) AS numStars')
+        .field('COUNT(DISTINCT media.mediaId) AS numMedia')
+        .field('COUNT(DISTINCT stars.userId) AS numStars')
         .from('media')
         .join(squel.select()
           .from('providers')
           .where('providers.isEnabled = 1')
           .order('priority'),
         'providers', 'media.provider = providers.name')
-        .join('artists USING (artistId)')
-        .left_join('stars USING(mediaId)')
-        .group('artistId')
-        .group('title')
-        .order('artists.name')
-        .order('media.title')
+        .join('songs USING (songId)')
+        .left_join('stars USING(songId)')
+        .group('songs.songId')
+        .order('songs.title')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -49,27 +68,23 @@ class Media {
         // in the query to show the correct mediaId
         delete row.isPreferred
 
-        // new artist?
+        // ensure artist exists
         if (typeof artists.entities[row.artistId] === 'undefined') {
-          artists.result.push(row.artistId)
-          artists.entities[row.artistId] = {
-            artistId: row.artistId,
-            name: row.artist,
-            mediaIds: [],
-          }
+          log(`Warning: artist does not exist for song: ${JSON.stringify(row)}`)
+          continue
         }
 
-        // add mediaId to artist's LUT
-        artists.entities[row.artistId].mediaIds.push(row.mediaId)
+        // add songId to artist's data
+        artists.entities[row.artistId].songIds.push(row.songId)
 
-        media.result.push(row.mediaId)
-        media.entities[row.mediaId] = row
+        songs.result.push(row.songId)
+        songs.entities[row.songId] = row
       }
     } catch (err) {
       return Promise.reject(err)
     }
 
-    return { artists, media }
+    return { artists, songs }
   }
 
   /**
@@ -133,67 +148,110 @@ class Media {
    * @param  {object}  media Media item
    * @return {Promise}       Newly added item's mediaId (number)
    */
-  static async add (media) {
-    if (!media.artist || !media.title || !media.duration || !media.provider) {
-      return Promise.reject(new Error('Invalid media data: ' + JSON.stringify(media)))
+  static async add (meta) {
+    let artistId, songId
+
+    if (!meta.artist || !meta.title || !meta.duration || !meta.provider) {
+      return Promise.reject(new Error('invalid metadata: ' + JSON.stringify(meta)))
     }
 
-    // does the artist already exist?
-    let row
-
+    // match/create artist
     try {
       const q = squel.select()
         .from('artists')
-        .where('name = ?', media.artist)
+        .where('name = ?', meta.artist)
 
       const { text, values } = q.toParam()
-      row = await db.get(text, values)
+      const row = await db.get(text, values)
+
+      if (row) {
+        log('matched artist: %s', row.name)
+        artistId = row.artistId
+      }
     } catch (err) {
       return Promise.reject(err)
     }
 
-    if (row) {
-      log('matched artist: %s', row.name)
-      media.artistId = row.artistId
-    } else {
-      log('new artist: %s', media.artist)
+    // new artist?
+    if (typeof artistId === 'undefined') {
+      log('new artist: %s', meta.artist)
 
       try {
         const q = squel.insert()
           .into('artists')
-          .set('name', media.artist)
+          .set('name', meta.artist)
 
         const { text, values } = q.toParam()
         const res = await db.run(text, values)
 
         if (!Number.isInteger(res.stmt.lastID)) {
-          throw new Error('invalid lastID after artist insert')
+          throw new Error('invalid lastID from artist insert')
         }
 
-        media.artistId = res.stmt.lastID
+        artistId = res.stmt.lastID
       } catch (err) {
         return Promise.reject(err)
       }
     }
 
-    // prep for insert; we have the artistId now
-    delete media.artist
-    media.duration = Math.round(media.duration)
-    media.providerData = JSON.stringify(media.providerData || {})
+    // match/create song
+    try {
+      const q = squel.select()
+        .from('songs')
+        .where('artistId = ?', artistId)
+        .where('title = ?', meta.title)
 
+      const { text, values } = q.toParam()
+      const row = await db.get(text, values)
+
+      if (row) {
+        log('matched song: %s', row.title)
+        songId = row.songId
+      }
+    } catch (err) {
+      return Promise.reject(err)
+    }
+
+    // new song?
+    if (typeof songId === 'undefined') {
+      log('new song: %s', meta.title)
+
+      try {
+        const q = squel.insert()
+          .into('songs')
+          .set('artistId', artistId)
+          .set('title', meta.title)
+
+        const { text, values } = q.toParam()
+        const res = await db.run(text, values)
+
+        if (!Number.isInteger(res.stmt.lastID)) {
+          throw new Error('invalid lastID from song insert')
+        }
+
+        // we have our new songId
+        songId = res.stmt.lastID
+      } catch (err) {
+        return Promise.reject(err)
+      }
+    }
+
+    // create media entry
     try {
       const q = squel.insert()
         .into('media')
-
-      Object.keys(media).forEach(key => {
-        q.set(key, media[key])
-      })
+        .set('songId', songId)
+        .set('duration', Math.round(meta.duration))
+        .set('provider', meta.provider)
+        .set('providerData', JSON.stringify(meta.providerData || {}))
+        // @todo
+        // .set('lastTimestamp', meta.timestamp)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
 
       if (!Number.isInteger(res.stmt.lastID)) {
-        throw new Error('got invalid lastID after song insert')
+        throw new Error('invalid lastID from media insert')
       }
 
       // return mediaId
@@ -225,6 +283,8 @@ class Media {
         return Promise.reject(err)
       }
     }
+
+    // @todo: remove songs without associated media
   }
 }
 

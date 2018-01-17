@@ -4,17 +4,17 @@ const Media = require('../Media')
 
 const {
   LIBRARY_PUSH,
-  TOGGLE_SONG_STARRED,
+  SONG_TOGGLE_STARRED,
 } = require('../../constants/actions')
 
 const ACTION_HANDLERS = {
-  [TOGGLE_SONG_STARRED]: async (sock, { payload }, acknowledge) => {
+  [SONG_TOGGLE_STARRED]: async (sock, { payload }, acknowledge) => {
     // already starred?
     try {
       const q = squel.delete()
         .from('stars')
-        .where('mediaId = ?', payload)
         .where('userId = ?', sock.user.userId)
+        .where('songId = ?', payload.songId)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
@@ -23,8 +23,8 @@ const ACTION_HANDLERS = {
         // song wasn't starred, so now we need to!
         const q = squel.insert()
           .into('stars')
-          .set('mediaId', payload)
           .set('userId', sock.user.userId)
+          .set('songId', payload.songId)
 
         const { text, values } = q.toParam()
         await db.run(text, values)
@@ -37,7 +37,7 @@ const ACTION_HANDLERS = {
     try {
       const q = squel.select()
         .from('stars')
-        .field('mediaId')
+        .field('songId')
         .where('userId = ?', sock.user.userId)
 
       const { text, values } = q.toParam()
@@ -45,11 +45,11 @@ const ACTION_HANDLERS = {
 
       const starredSongs = []
       rows.forEach(row => {
-        starredSongs.push(row.mediaId)
+        starredSongs.push(row.songId)
       })
 
       acknowledge({
-        type: TOGGLE_SONG_STARRED + '_SUCCESS',
+        type: SONG_TOGGLE_STARRED + '_SUCCESS',
         payload: starredSongs,
       })
     } catch (err) {
