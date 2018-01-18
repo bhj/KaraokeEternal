@@ -91,7 +91,6 @@ class FileScanner extends Scanner {
       // media we didn't encounter during the scan are invalid
       const invalidIds = res.result.filter(id => !validIds.includes(id))
 
-      log('  => removing %s songs', invalidIds.length)
       await Media.remove(invalidIds)
     } catch (err) {
       log(err)
