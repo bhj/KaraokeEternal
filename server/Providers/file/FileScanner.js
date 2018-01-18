@@ -77,7 +77,7 @@ class FileScanner extends Scanner {
     } // end for
 
     // cleanup
-    log('Cleanup: getting orphaned songs')
+    log('cleanup: getting media entries no longer associated with a file')
 
     try {
       // get all media from valid/online paths
