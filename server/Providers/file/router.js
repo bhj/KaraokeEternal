@@ -14,6 +14,7 @@ const getProviders = require('../getProviders')
 const Media = require('../../Media')
 
 const {
+  LIBRARY_PUSH,
   PROVIDER_REQUEST_SCAN,
 } = require('../../../constants/actions')
 
@@ -71,7 +72,7 @@ router.post('/path', async (ctx, next) => {
 
 // remove media file path
 router.delete('/path/:idx', async (ctx, next) => {
-  let paths
+  let { idx } = ctx.params
 
   // must be admin
   if (!ctx.user.isAdmin) {
@@ -79,38 +80,60 @@ router.delete('/path/:idx', async (ctx, next) => {
     return
   }
 
-  // required
-  if (!ctx.params.idx) {
+  // required param
+  if (typeof idx === 'undefined') {
     ctx.status = 422
-    ctx.body = `Invalid path index`
+    ctx.body = `Missing param: idx`
+    return
+  }
+
+  // convert param to int
+  idx = parseInt(idx, 10)
+
+  if (Number.isNaN(idx) || idx < 0) {
+    ctx.status = 422
+    ctx.body = `Invalid value for param: idx`
     return
   }
 
   try {
     const res = await getProviders()
-    paths = res.entities.file.prefs.paths || []
+    const paths = res.entities.file.prefs.paths
+
+    if (typeof paths[idx] === 'undefined') {
+      throw new Error('Path not found')
+    }
+
+    const removedPath = paths.splice(idx, 1)[0]
+
+    // update paths pref
+    await setPaths(paths)
+
+    log(`removed library path: ${removedPath}`)
+
+    // get all media from the removed path
+    const rows = await Media.searchMedia({
+      provider: 'file',
+      providerData: {
+        basePath: removedPath,
+      }
+    })
+
+    // remove the media
+    await Media.remove(rows.result)
+
+    // emit updated library
+    ctx.io.emit('action', {
+      type: LIBRARY_PUSH,
+      payload: await Media.getLibrary(),
+    })
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message
     return Promise.reject(err)
   }
 
-  // update paths
-  paths.splice(ctx.params.idx, 1)
-
-  try {
-    await setPaths(paths)
-    ctx.status = 200
-  } catch (err) {
-    ctx.status = 500
-    ctx.body = err.message
-  }
-
-  // auto scan
-  process.send({
-    'type': PROVIDER_REQUEST_SCAN,
-    'payload': 'file',
-  })
+  ctx.status = 200
 })
 
 // get folder listing for path browser
