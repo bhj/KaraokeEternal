@@ -77,7 +77,7 @@ class FileScanner extends Scanner {
     } // end for
 
     // cleanup
-    log('cleanup: getting media entries no longer associated with a file')
+    log('getting media entries no longer associated with files')
 
     try {
       // get all media from valid/online paths
