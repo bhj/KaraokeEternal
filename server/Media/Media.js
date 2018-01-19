@@ -286,28 +286,33 @@ class Media {
       }
     }
 
-    // remove songs without associated media
+    // cleanup
     try {
-      const res = await db.run(`
+      let res
+
+      // remove songs without associated media
+      res = await db.run(`
         DELETE FROM songs WHERE songId IN (
           SELECT songs.songId FROM songs LEFT JOIN media USING(songId) WHERE media.mediaId IS NULL
         )
       `)
+      log(`cleanup: removed ${res.stmt.changes} songs with no associated media`)
 
-      log(`removed ${res.stmt.changes} songs with no associated media`)
-    } catch (err) {
-      return Promise.reject(err)
-    }
-
-    // remove artists without associated songs
-    try {
-      const res = await db.run(`
+      // remove artists without associated songs
+      res = await db.run(`
         DELETE FROM artists WHERE artistId IN (
           SELECT artists.artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.songId IS NULL
         )
       `)
+      log(`cleanup: removed ${res.stmt.changes} artists with no associated songs`)
 
-      log(`removed ${res.stmt.changes} artists with no associated songs`)
+      // remove stars for nonexistent songs
+      res = await db.run(`
+        DELETE FROM stars WHERE songId IN (
+          SELECT stars.songId FROM stars LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
+        )
+      `)
+      log(`cleanup: removed ${res.stmt.changes} stars for nonexistent songs`)
     } catch (err) {
       return Promise.reject(err)
     }
