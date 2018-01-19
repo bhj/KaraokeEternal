@@ -313,6 +313,18 @@ class Media {
         )
       `)
       log(`cleanup: removed ${res.stmt.changes} stars for nonexistent songs`)
+
+      // remove nonexistent media from the queue
+      res = await db.run(`
+        DELETE FROM queue WHERE mediaId IN (
+          SELECT queue.mediaId FROM queue LEFT JOIN media USING(mediaId) WHERE media.mediaId IS NULL
+        )
+      `)
+      log(`cleanup: removed ${res.stmt.changes} queue entries for nonexistent media`)
+
+      // VACUUM database
+      log(`cleanup: vacuuming database`)
+      await db.run('VACUUM')
     } catch (err) {
       return Promise.reject(err)
     }
