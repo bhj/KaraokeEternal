@@ -77,7 +77,7 @@ class FileScanner extends Scanner {
     } // end for
 
     // cleanup
-    log('getting media entries no longer associated with files')
+    log('getting media entries with nonexistent files')
 
     try {
       // get all media from valid/online paths
@@ -91,7 +91,11 @@ class FileScanner extends Scanner {
       // media we didn't encounter during the scan are invalid
       const invalidIds = res.result.filter(id => !validIds.includes(id))
 
-      await Media.remove(invalidIds)
+      log(`  => ${invalidIds.length} result(s)`)
+
+      if (invalidIds.length) {
+        await Media.remove(invalidIds)
+      }
     } catch (err) {
       log(err)
     }
