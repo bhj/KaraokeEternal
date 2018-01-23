@@ -74,9 +74,6 @@ module.exports = function () {
       compiler,
       dev: {
         publicPath  : webpackConfig.output.publicPath,
-        contentBase : path.resolve(project.basePath, project.srcDir),
-        hot         : true,
-        lazy        : false,
         stats       : 'minimal',
       },
     }))
