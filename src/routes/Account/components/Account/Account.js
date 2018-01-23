@@ -35,7 +35,7 @@ export default class Account extends Component {
           <div>
             <h1 styleName='title'>Welcome</h1>
             <div styleName='content'>
-              <p>Please sign in or <a onClick={this.toggleMode}>create an account</a>.</p>
+              <p>Sign in or <a onClick={this.toggleMode}>create an account</a> to join the party.</p>
               <Login onSubmitClick={this.props.loginUser} />
             </div>
           </div>
@@ -55,7 +55,7 @@ export default class Account extends Component {
           <div>
             <h1 styleName='title'>Welcome</h1>
             <div styleName='content'>
-              <p>Create an account below to join the party.<br />
+              <p>Create an account to join the party.<br />
                 Already have an account? <a onClick={this.toggleMode}>Sign in</a>
               </p>
               <AccountForm requireRoom user={null} onSubmitClick={this.props.createUser} />
