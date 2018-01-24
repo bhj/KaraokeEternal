@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import CDGCanvas from './CDGCanvas'
+import CDGraphics from 'cdgraphics'
 import './CDGPlayer.css'
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('provider/file')
@@ -13,34 +13,31 @@ class CDGPlayer extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
-    getMedia: PropTypes.func.isRequired,
-    getMediaSuccess: PropTypes.func.isRequired,
+    mediaRequest: PropTypes.func.isRequired,
+    mediaRequestSuccess: PropTypes.func.isRequired,
+    mediaRequestError: PropTypes.func.isRequired,
     onMediaError: PropTypes.func.isRequired,
     onMediaEnd: PropTypes.func.isRequired,
     onStatus: PropTypes.func.isRequired,
   }
 
-  state = {
-    audioPos: 0, // ms
-  }
-
-  isAudioLoaded = false
-  isCDGLoaded = false
-  cdgData = {} // Uint8Array
-
   componentDidMount () {
-    this.updateSources()
+    this.cdgraphics = new CDGraphics(this.canvas)
     this.setVolume(this.props.volume)
+    this.updateSources()
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, volume } = this.props
+    const { queueItem, isPlaying, volume } = this.props
 
     if (prevProps.queueItem.queueId !== queueItem.queueId) {
       this.updateSources()
     }
 
-    this.updateIsPlaying()
+    if (prevProps.isPlaying !== isPlaying) {
+      this.updateIsPlaying()
+    }
+
     this.setVolume(volume)
   }
 
@@ -55,18 +52,16 @@ class CDGPlayer extends React.Component {
 
     return (
       <div style={{ width, height }} styleName='container'>
-        <CDGCanvas
+        <canvas
           width={canvasScale * 300}
           height={canvasScale * 300 * 0.72}
-          isPlaying={this.props.isPlaying}
-          audioPos={this.state.audioPos}
-          cdgData={this.cdgData}
+          ref={(c) => { this.canvas = c }}
         />
         <br />
-        <audio src={'/api/provider/file/media?type=audio&mediaId=' + this.props.queueItem.mediaId}
+        <audio
           preload='none'
-          onCanPlayThrough={this.handleOnCanPlayThrough}
-          onTimeUpdate={this.handleOnTimeUpdate}
+          onCanPlayThrough={this.handleCanPlayThrough}
+          onTimeUpdate={this.handleTimeUpdate}
           onEnded={this.props.onMediaEnd}
           onError={this.handleAudioError}
           ref={(c) => { this.audio = c }}
@@ -76,25 +71,27 @@ class CDGPlayer extends React.Component {
   }
 
   updateSources = () => {
-    // notification
-    this.props.getMedia(this.audio.src)
+    const { mediaId } = this.props.queueItem
+    const cdgUrl = `/media?type=cdg&mediaId=${mediaId}`
+    const audioSrc = `/api/provider/file/media?type=audio&mediaId=${mediaId}`
 
-    // tell audio element its source updated
-    this.audio.load()
+    // media request started
+    this.props.mediaRequest(mediaId)
 
-    // get cdgData
-    const url = '/media?type=cdg&mediaId=' + this.props.queueItem.mediaId
-
-    // notification
-    this.props.getMedia(this.url)
-
-    api('GET', url)
+    // load .cdg file
+    api('GET', cdgUrl)
       .then(res => res.arrayBuffer())
-      .then(res => {
-        // arrayBuffer to Uint8Array
-        this.cdgData = new Uint8Array(res)
-      }).then(() => { this.handleOnCdgLoaded() })
-      .catch((err) => {
+      // arrayBuffer to Uint8Array
+      .then(res => this.cdgraphics.load(new Uint8Array(res)))
+      .then(() => {
+        // load audio file
+        this.audio.src = audioSrc
+        this.audio.load()
+      }).catch(err => {
+        // media request failed (informational)
+        this.props.mediaRequestError(mediaId, err.message)
+
+        // emit error to room
         this.props.onMediaError(err.message)
       })
   }
@@ -109,25 +106,25 @@ class CDGPlayer extends React.Component {
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
       this.audio.play()
+      this.cdgraphics.play()
     } else {
       this.audio.pause()
+      this.cdgraphics.stop()
     }
   }
 
-  handleOnCanPlayThrough = () => {
-    this.isAudioLoaded = true
+  handleCanPlayThrough = () => {
+    // media request finished
+    this.props.mediaRequestSuccess()
 
-    if (this.isCDGLoaded) {
-      this.props.getMediaSuccess()
-      this.updateIsPlaying()
-    }
+    // start playback
+    this.updateIsPlaying()
   }
 
-  handleOnTimeUpdate = () => {
-    this.setState({
-      audioPos: this.audio.currentTime * 1000
-    })
+  handleTimeUpdate = () => {
+    this.cdgraphics.sync(this.audio.currentTime * 1000)
 
+    // emit player status
     this.props.onStatus({
       position: this.audio.currentTime,
       volume: this.audio.volume,
@@ -135,19 +132,13 @@ class CDGPlayer extends React.Component {
   }
 
   handleAudioError = (err) => {
-    this.props.onMediaError('Could not load audio (error ' + err.target.error.code + ')')
-  }
+    const msg = `Could not load audio (error ${err.target.error.code})`
 
-  /**
-   * CDGPlayer event handlers
-   */
-  handleOnCdgLoaded = () => {
-    this.isCDGLoaded = true
+    // media request failed; stops playing
+    this.props.mediaRequestError(this.props.queueItem.mediaId, msg)
 
-    if (this.isAudioLoaded) {
-      this.props.getMediaSuccess()
-      this.updateIsPlaying()
-    }
+    // emit error to room
+    this.props.onMediaError(msg)
   }
 }
 

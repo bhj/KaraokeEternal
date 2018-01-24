@@ -15,8 +15,9 @@ class Player extends React.Component {
     height: PropTypes.number.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
-    getMedia: PropTypes.func.isRequired,
-    getMediaSuccess: PropTypes.func.isRequired,
+    mediaRequest: PropTypes.func.isRequired,
+    mediaRequestSuccess: PropTypes.func.isRequired,
+    mediaRequestError: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
     cancelStatus: PropTypes.func.isRequired,
     emitEnter: PropTypes.func.isRequired,
@@ -92,18 +93,19 @@ class Player extends React.Component {
         queueItem={props.queueItem}
         volume={props.volume}
         isPlaying={props.isPlaying}
-        getMedia={props.getMedia}
-        getMediaSuccess={props.getMediaSuccess}
+        mediaRequest={props.mediaRequest}
+        mediaRequestSuccess={props.mediaRequestSuccess}
+        mediaRequestError={props.mediaRequestError}
         onStatus={props.emitStatus}
         onMediaEnd={props.requestPlayNext}
-        onMediaError={this.handleError}
+        onMediaError={this.handleMediaError}
         width={props.width}
         height={props.height}
       />
     )
   }
 
-  handleError = (err) => {
+  handleMediaError = (err) => {
     this.props.emitError(this.props.queueId, err)
   }
 }

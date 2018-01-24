@@ -1,6 +1,8 @@
 import { CANCEL } from 'redux-throttle'
-
 import {
+  PLAYER_MEDIA_REQUEST,
+  PLAYER_MEDIA_REQUEST_SUCCESS,
+  PLAYER_MEDIA_REQUEST_ERROR,
   PLAYER_PLAY,
   PLAYER_PAUSE,
   PLAYER_NEXT,
@@ -12,20 +14,24 @@ import {
   QUEUE_PUSH,
 } from 'constants/actions'
 
-// for informational purposes from provider players
-export const GET_MEDIA = 'player/GET_MEDIA'
-export const GET_MEDIA_SUCCESS = 'player/GET_MEDIA_SUCCESS'
-
-export function getMedia (url) {
+export function mediaRequest (mediaId) {
   return {
-    type: GET_MEDIA,
-    payload: url
+    type: PLAYER_MEDIA_REQUEST,
+    payload: { mediaId },
   }
 }
 
-export function getMediaSuccess () {
+export function mediaRequestSuccess (mediaId) {
   return {
-    type: GET_MEDIA_SUCCESS,
+    type: PLAYER_MEDIA_REQUEST_SUCCESS,
+    payload: { mediaId },
+  }
+}
+
+export function mediaRequestError (mediaId, error) {
+  return {
+    type: PLAYER_MEDIA_REQUEST_ERROR,
+    payload: { mediaId, error },
   }
 }
 
@@ -123,18 +129,18 @@ const ACTION_HANDLERS = {
       isAtQueueEnd,
     }
   },
-  [GET_MEDIA]: (state, { payload }) => ({
+  [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
     ...state,
     isFetching: true,
   }),
-  [GET_MEDIA_SUCCESS]: (state, { payload }) => ({
+  [PLAYER_MEDIA_REQUEST_SUCCESS]: (state, { payload }) => ({
     ...state,
     isFetching: false,
   }),
-  [EMIT_PLAYER_ERROR]: (state, { payload }) => ({
+  [PLAYER_MEDIA_REQUEST_ERROR]: (state, { payload }) => ({
     ...state,
-    isPlaying: false,
     isFetching: false,
+    isPlaying: false,
   }),
 }
 

@@ -7,8 +7,9 @@ import {
   emitEnter,
   emitLeave,
   cancelStatus,
-  getMedia,
-  getMediaSuccess,
+  mediaRequest,
+  mediaRequestSuccess,
+  mediaRequestError,
 } from '../../modules/player'
 
 const mapActionCreators = {
@@ -18,8 +19,9 @@ const mapActionCreators = {
   emitLeave,
   cancelStatus,
   requestPlayNext,
-  getMedia,
-  getMediaSuccess,
+  mediaRequest,
+  mediaRequestSuccess,
+  mediaRequestError,
 }
 
 const mapStateToProps = (state) => {

@@ -9,9 +9,13 @@ class YouTubePlayer extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     volume: PropTypes.number.isRequired,
-    onMediaError: PropTypes.func.isRequired, // action
-    onMediaEnd: PropTypes.func.isRequired, // action
-    onStatus: PropTypes.func.isRequired, // action
+    // actions
+    mediaRequest: PropTypes.func.isRequired,
+    mediaRequestSuccess: PropTypes.func.isRequired,
+    mediaRequestError: PropTypes.func.isRequired,
+    onMediaError: PropTypes.func.isRequired,
+    onMediaEnd: PropTypes.func.isRequired,
+    onStatus: PropTypes.func.isRequired,
   }
 
   componentWillUnmount () {
@@ -93,7 +97,11 @@ class YouTubePlayer extends React.Component {
   }
 
   handleError = (event) => {
-    this.props.onMediaError('Error ' + event.data)
+    // media request failed; stops playing
+    this.props.mediaRequestError(this.props.queueItem.mediaId, event.data)
+
+    // emit error to room
+    this.props.onMediaError(event.data)
   }
 
   setVolume = (vol) => {
