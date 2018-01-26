@@ -86,10 +86,6 @@ class QueueView extends React.Component {
   handleErrorInfoClick = (queueId) => {
     this.props.showErrorMessage(this.props.errors[queueId].join('\n\n'))
   }
-
-  setRef = (ref) => {
-    this.ref = ref
-  }
 }
 
 export default QueueView
