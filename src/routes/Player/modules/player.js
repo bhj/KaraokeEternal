@@ -46,6 +46,7 @@ export function emitStatus (status) {
         queueId: player.queueId,
         isPlaying: player.isPlaying,
         isAtQueueEnd: player.isAtQueueEnd,
+        volume: player.volume,
         ...status,
       },
       meta: {
@@ -113,8 +114,8 @@ const ACTION_HANDLERS = {
 
     return {
       ...state,
-      isPlaying: true,
       queueId: isAtQueueEnd ? state.queueId : payload.result[curIdx + 1],
+      isPlaying: true,
       isAtQueueEnd,
     }
   },
@@ -148,7 +149,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  queueId: null,
+  queueId: -1,
   volume: 1,
   isPlaying: false,
   isFetching: false,

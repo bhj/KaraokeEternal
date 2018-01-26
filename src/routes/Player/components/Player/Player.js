@@ -5,8 +5,7 @@ import ColorCycle from '../ColorCycle'
 
 class Player extends React.Component {
   static propTypes = {
-    queueId: PropTypes.number,
-    queueItem: PropTypes.object,
+    queueItem: PropTypes.object.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
@@ -34,34 +33,32 @@ class Player extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { queueId, isPlaying, volume } = this.props
-    const status = {
-      isPlaying,
-      volume,
-    }
+    const { queueItem, isPlaying } = this.props
 
     // playing for first time?
-    if (isPlaying && queueId === null) {
+    if (isPlaying && queueItem.queueId === -1) {
       this.props.requestPlayNext()
       return
     }
 
-    if (prevProps.queueId !== queueId) {
+    if (prevProps.queueItem.queueId !== queueItem.queueId) {
       // otherwise we'll emit new item with old's progress
-      status.position = 0
+      this.props.emitStatus({ position: 0 })
     }
 
-    this.props.emitStatus(status)
+    this.props.emitStatus()
   }
 
   componentWillUpdate (nextProps) {
+    const { queueItem, isPlaying } = this.props
+
     // cancel any pending status emits having an old queueId
-    if (this.props.queueId !== nextProps.queueId) {
+    if (queueItem.queueId !== nextProps.queueItem.queueId) {
       this.props.cancelStatus()
     }
 
     // improve play/pause feedback lag
-    if (this.props.isPlaying !== nextProps.isPlaying) {
+    if (isPlaying !== nextProps.isPlaying) {
       this.props.cancelStatus()
     }
   }
@@ -69,7 +66,7 @@ class Player extends React.Component {
   render () {
     const { props } = this
 
-    if (typeof props.queueItem !== 'object') {
+    if (props.queueItem.queueId === -1) {
       return <ColorCycle title='PRESS PLAY TO BEGIN' />
     }
 
@@ -106,7 +103,7 @@ class Player extends React.Component {
   }
 
   handleMediaError = (err) => {
-    this.props.emitError(this.props.queueId, err)
+    this.props.emitError(this.props.queueItem.queueId, err)
   }
 }
 

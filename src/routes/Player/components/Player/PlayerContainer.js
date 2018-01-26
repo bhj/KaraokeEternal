@@ -24,17 +24,22 @@ const mapActionCreators = {
   mediaRequestError,
 }
 
+// simplify player logic; if this reference changes on each
+// render it will cause an infinite loop of status updates
+const defaultQueueItem = {
+  queueId: -1,
+}
+
 const mapStateToProps = (state) => {
-  const { player, queue } = state
+  const { player, queue, status } = state
 
   return {
-    queueId: player.queueId,
-    queueItem: queue.entities[player.queueId],
+    queueItem: queue.entities[player.queueId] || defaultQueueItem,
     isAtQueueEnd: player.isAtQueueEnd,
     volume: player.volume,
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
-    isErrored: typeof state.status.errors[state.status.queueId] !== 'undefined',
+    isErrored: typeof status.errors[status.queueId] !== 'undefined',
     // timestamp pass-through triggers status emission for each received command
     lastCommandAt: player.lastCommandAt,
   }
