@@ -12,6 +12,7 @@ class QueueView extends React.Component {
     curId: PropTypes.number,
     curPos: PropTypes.number,
     isAtQueueEnd: PropTypes.bool.isRequired,
+    waits: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
@@ -66,6 +67,7 @@ class QueueView extends React.Component {
         canRemove={isUpcoming && isOwner}
         hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
         pctPlayed={isActive ? this.props.curPos / item.duration * 100 : 0}
+        wait={this.props.waits[queueId]}
         onRemoveClick={() => this.handleRemoveClick(queueId)}
         onSkipClick={this.props.requestPlayNext}
         onErrorInfoClick={() => this.handleErrorInfoClick(queueId)}
