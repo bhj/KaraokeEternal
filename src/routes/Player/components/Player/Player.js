@@ -37,13 +37,12 @@ class Player extends React.Component {
 
     // playing for first time?
     if (isPlaying && queueItem.queueId === -1) {
-      this.props.requestPlayNext()
-      return
+      return this.props.requestPlayNext()
     }
 
     if (prevProps.queueItem.queueId !== queueItem.queueId) {
       // otherwise we'll emit new item with old's progress
-      this.props.emitStatus({ position: 0 })
+      return this.props.emitStatus({ position: 0 })
     }
 
     this.props.emitStatus()
