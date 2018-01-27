@@ -21,8 +21,6 @@ class CDGPlayer extends React.Component {
     onStatus: PropTypes.func.isRequired,
   }
 
-  isCDGLoaded = false
-
   componentDidMount () {
     this.cdgraphics = new CDGraphics(this.canvas)
     this.setVolume(this.props.volume)
