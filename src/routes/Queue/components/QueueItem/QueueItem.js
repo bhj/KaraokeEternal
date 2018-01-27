@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Icon from 'components/Icon'
+import secToTxt from 'lib/secToTxt'
 import './QueueItem.css'
 
 export const QueueItem = (props) => (
   <div styleName='container' style={{ ...props.style, backgroundSize: props.pctPlayed + '% 100%' }}>
     <div styleName='wait'>
       {props.isActive && 'now'}
-      {props.isUpcoming && secToTime(props.wait)}
+      {props.isUpcoming && secToTxt(props.wait)}
     </div>
 
     <div styleName='primary'>
@@ -51,11 +52,3 @@ QueueItem.propTypes = {
 }
 
 export default QueueItem
-
-function secToTime (sec) {
-  if (sec >= 60) {
-    return Math.round(sec / 60) + 'm'
-  } else {
-    return Math.floor(sec) + 's'
-  }
-}
