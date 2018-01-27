@@ -36,9 +36,9 @@
 
   /* Navigation */
   --nav-link-color: var(--action-default-color);
-  --nav-link-background-color: var(--chrome-background-color);
+  --nav-link-background-color: transparent;
   --nav-active-color: var(--action-primary-color);
-  --nav-active-background-color: var(--chrome-background-color);
+  --nav-active-background-color: transparent;
 
   /* <button> colors */
   --btn-default-color: #141414;
