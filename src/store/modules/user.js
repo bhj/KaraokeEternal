@@ -272,6 +272,7 @@ let initialState = {
   name: null,
   isAdmin: false,
   roomId: null,
+  starredArtists: [],
   starredSongs: [],
 }
 

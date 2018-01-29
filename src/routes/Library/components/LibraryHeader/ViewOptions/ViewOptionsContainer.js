@@ -1,14 +1,14 @@
 import { connect } from 'react-redux'
 import ViewOptions from './ViewOptions'
-import { changeView } from '../../../modules/library'
+import { setFilterStatus } from '../../../modules/library'
 
 const mapActionCreators = {
-  changeView,
+  setFilterStatus,
 }
 
 const mapStateToProps = (state) => {
   return {
-    view: state.library.view,
+    filterStatus: state.library.filterStatus,
   }
 }
 

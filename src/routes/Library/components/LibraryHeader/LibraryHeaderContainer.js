@@ -1,14 +1,15 @@
 import { connect } from 'react-redux'
 import LibraryHeader from './LibraryHeader'
-import { searchLibrary } from '../../modules/library'
+import { setFilterString, resetFilterString } from '../../modules/library'
 
 const mapActionCreators = {
-  searchLibrary,
+  setFilterString,
+  resetFilterString,
 }
 
 const mapStateToProps = (state) => {
   return {
-    searchStr: state.library.searchStr,
+    filterString: state.library.filterString,
   }
 }
 

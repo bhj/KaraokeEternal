@@ -7,45 +7,64 @@ import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from 
 
 const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs
-const getSearchStr = (state) => state.library.searchStr.toLowerCase()
-// const getView = (state) => state.library.view
-// const getStarredMedia = (state) => state.user.starredSongs
-
-const getResultsWithKeyword = createSelector(
-  [getArtists, getSongs, getSearchStr],
-  (artists, songs, searchStr) => {
-    const artistsResult = artists.result.filter(id =>
-      artists.entities[id].name.toLowerCase().includes(searchStr)
-    )
-
-    const songsResult = songs.result.filter(id =>
-      songs.entities[id].title.toLowerCase().includes(searchStr)
-    )
-
-    return { artistsResult, songsResult }
-  }
-)
-
+const getFilterStr = (state) => state.library.filterString.toLowerCase()
+const getFilterStatus = (state) => state.library.filterStatus
+const getStarredArtists = (state) => state.user.starredArtists
+const getStarredSongs = (state) => state.user.starredSongs
 const getQueue = (state) => state.queue
+
 const getQueuedSongs = createSelector(
   [getQueue],
   (queue) => queue.result.map(queueId => queue.entities[queueId].songId)
 )
 
-const mapStateToProps = (state) => {
-  const { artistsResult, songsResult } = getResultsWithKeyword(state)
+// library filters
+// ---------------------
 
+// #1: keyword filter
+const getArtistsWithKeyword = createSelector(
+  [getArtists, getFilterStr],
+  (artists, filterString) =>
+    artists.result.filter(id => artists.entities[id].name.toLowerCase().includes(filterString))
+)
+
+const getSongsWithKeyword = createSelector(
+  [getSongs, getFilterStr],
+  (songs, filterString) =>
+    songs.result.filter(id => songs.entities[id].title.toLowerCase().includes(filterString))
+)
+
+// #2: starred/hidden status filter
+const getArtistsByView = createSelector(
+  [getArtistsWithKeyword, getFilterStatus, getStarredArtists],
+  (artistsWithKeyword, filterStatus, starredArtists) =>
+    artistsWithKeyword.filter(artistId => {
+      if (filterStatus === '') return true
+      else if (filterStatus === 'starred') return starredArtists.includes(artistId)
+    })
+)
+
+const getSongsByView = createSelector(
+  [getSongsWithKeyword, getFilterStatus, getStarredSongs],
+  (songsWithKeyword, filterStatus, starredSongs) =>
+    songsWithKeyword.filter(songId => {
+      if (filterStatus === '') return true
+      else if (filterStatus === 'starred') return starredSongs.includes(songId)
+    })
+)
+
+const mapStateToProps = (state) => {
   return {
     artists: state.artists.entities,
-    artistsResult,
+    artistsResult: getArtistsByView(state),
     songs: state.songs.entities,
-    songsResult,
+    songsResult: getSongsByView(state),
     queuedSongIds: getQueuedSongs(state),
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
-    // search view
-    searchStr: state.library.searchStr,
+    // filters
+    isFiltering: state.library.filterString || state.library.filterStatus,
     expandedArtistResults: state.library.expandedArtistResults,
   }
 }

@@ -1,17 +1,12 @@
 import {
-  LIBRARY_SEARCH,
-  LIBRARY_CHANGE_VIEW,
+  LIBRARY_FILTER_STRING,
+  LIBRARY_FILTER_STRING_RESET,
+  LIBRARY_FILTER_STATUS,
   TOGGLE_ARTIST_EXPANDED,
+  TOGGLE_ARTIST_RESULT_EXPANDED,
+  SCROLL_ARTISTS,
 } from 'constants/actions'
 
-export function changeView (view) {
-  return {
-    type: LIBRARY_CHANGE_VIEW,
-    payload: view,
-  }
-}
-
-const SCROLL_ARTISTS = 'library/SCROLL_ARTISTS'
 export function scrollArtists (scrollTop) {
   return {
     type: SCROLL_ARTISTS,
@@ -26,17 +21,16 @@ export function toggleArtistExpanded (artistId) {
   }
 }
 
-const ARTIST_RESULT_EXPAND_TOGGLE = 'library/ARTIST_RESULT_EXPAND_TOGGLE'
 export function toggleArtistResultExpanded (artistId) {
   return {
-    type: ARTIST_RESULT_EXPAND_TOGGLE,
+    type: TOGGLE_ARTIST_RESULT_EXPANDED,
     payload: artistId,
   }
 }
 
-export function searchLibrary (str) {
+export function setFilterString (str) {
   return {
-    type: LIBRARY_SEARCH,
+    type: LIBRARY_FILTER_STRING,
     payload: str,
     meta: {
       throttle: {
@@ -47,18 +41,34 @@ export function searchLibrary (str) {
   }
 }
 
+export function resetFilterString () {
+  return {
+    type: LIBRARY_FILTER_STRING_RESET,
+  }
+}
+
+export function setFilterStatus (status) {
+  return {
+    type: LIBRARY_FILTER_STATUS,
+    payload: status,
+  }
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LIBRARY_SEARCH]: (state, { payload }) => ({
+  [LIBRARY_FILTER_STRING]: (state, { payload }) => ({
     ...state,
-    searchStr: payload,
-    view: 'all',
+    filterString: payload,
   }),
-  [LIBRARY_CHANGE_VIEW]: (state, { payload }) => ({
+  [LIBRARY_FILTER_STRING_RESET]: (state, { payload }) => ({
     ...state,
-    view: payload,
+    filterString: '',
+  }),
+  [LIBRARY_FILTER_STATUS]: (state, { payload }) => ({
+    ...state,
+    filterStatus: payload,
   }),
   [SCROLL_ARTISTS]: (state, { payload }) => ({
     ...state,
@@ -74,7 +84,7 @@ const ACTION_HANDLERS = {
       expandedArtists: list,
     }
   },
-  [ARTIST_RESULT_EXPAND_TOGGLE]: (state, { payload }) => {
+  [TOGGLE_ARTIST_RESULT_EXPANDED]: (state, { payload }) => {
     let list = state.expandedArtistResults.slice()
     const i = list.indexOf(payload)
 
@@ -95,10 +105,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 let initialState = {
-  searchStr: '',
-  view: 'all',
-  artistSearchResult: [],
-  songSearchResult: [],
+  filterString: '',
+  filterStatus: '', // '' (all), 'starred', 'hidden'
   scrollTop: 0,
   expandedArtists: [],
   expandedArtistResults: [],
