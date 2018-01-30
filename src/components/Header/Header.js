@@ -10,7 +10,9 @@ const Header = (props) => {
   return (
     <Measure onMeasure={props.setHeaderHeight} whitelist={['height']}>
       <div styleName='container' className='bg-blur'>
-        <UpNext />
+        {!props.isPlayer &&
+          <UpNext />
+        }
 
         {props.isAdmin &&
           <PlaybackCtrl />
@@ -33,6 +35,7 @@ const Header = (props) => {
 Header.propTypes = {
   children: PropTypes.node,
   isAdmin: PropTypes.bool.isRequired,
+  isPlayer: PropTypes.bool.isRequired,
   isUpdating: PropTypes.bool.isRequired,
   updateText: PropTypes.string.isRequired,
   updateProgress: PropTypes.number.isRequired,

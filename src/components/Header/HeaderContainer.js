@@ -11,6 +11,7 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     isAdmin: state.user.isAdmin,
+    isPlayer: state.location.pathname === '/player',
     isUpdating: state.providers.isUpdating,
     updateText: state.providers.updateText,
     updateProgress: state.providers.updateProgress,
