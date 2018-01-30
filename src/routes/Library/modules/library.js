@@ -87,12 +87,7 @@ const ACTION_HANDLERS = {
   [TOGGLE_ARTIST_RESULT_EXPANDED]: (state, { payload }) => {
     let list = state.expandedArtistResults.slice()
     const i = list.indexOf(payload)
-
-    if (i === -1) {
-      list.push(payload)
-    } else {
-      list.splice(i, 1)
-    }
+    i === -1 ? list.push(payload) : list.splice(i, 1)
 
     return {
       ...state,
