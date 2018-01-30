@@ -1,6 +1,8 @@
 .container {
   display: flex;
   align-items: center;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
 }
 
 .searchInput {
@@ -14,13 +16,17 @@
 }
 
 .magnifier {
-  fill: var(--text-color);
+  fill: var(--btn-inactive-color);
 }
 
 .clear {
-  fill: var(--action-warning-color);
+  fill: var(--btn-active-color);
 }
 
 .eye {
-  fill: var(--action-warning-color);
+  fill: var(--btn-inactive-color);
+}
+
+.eye-active {
+  fill: var(--btn-active-color);
 }

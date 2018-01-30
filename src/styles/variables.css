@@ -6,8 +6,8 @@
   --border-radius: 5px;
   --container-padding: 10px;
 
-  --action-default-color: var(--text-color);
-  --action-primary-color: #2e4fd1;
+  --btn-inactive-color: var(--text-color);
+  --btn-active-color: #2e4fd1;
   --action-warning-color: #BA3A95;
 
   /* Account widgets */
@@ -23,8 +23,8 @@
   --artist-folder-text-color: white;
 
   --song-item-height: 44px;
-  --song-item-btn-color: var(--action-primary-color);
-  --song-item-btn-active-color: var(--action-primary-color);
+  --song-item-btn-color: var(--btn-active-color);
+  --song-item-btn-active-color: var(--btn-active-color);
   --song-item-btn-inactive-color: #222a44;
 
   /* PlaybackCtrl */
@@ -35,23 +35,23 @@
   --chrome-border-color: #333;
 
   /* Navigation */
-  --nav-link-color: var(--action-default-color);
+  --nav-link-color: var(--btn-inactive-color);
   --nav-link-background-color: transparent;
-  --nav-active-color: var(--action-primary-color);
+  --nav-active-color: var(--btn-active-color);
   --nav-active-background-color: transparent;
 
   /* <button> colors */
   --btn-default-color: #141414;
-  --btn-default-background-color: var(--action-default-color);
+  --btn-default-background-color: var(--btn-inactive-color);
 
   --btn-primary-color: #ccc;
-  --btn-primary-background-color: var(--action-primary-color);
+  --btn-primary-background-color: var(--btn-active-color);
 
   /* Segmented controls (radio button groups) */
   --segment-active-color: #eee;
-  --segment-active-background-color: var(--action-primary-color);
+  --segment-active-background-color: var(--btn-active-color);
   --segment-inactive-color: #141414;
-  --segment-inactive-background-color: var(--action-default-color);
+  --segment-inactive-background-color: var(--btn-inactive-color);
 
   /* Animation */
   --spring-duration: .5s;

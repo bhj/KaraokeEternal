@@ -33,6 +33,8 @@ class LibraryHeader extends React.Component {
   }
 
   render () {
+    const { viewOptions } = this.state
+
     return (
       <Header>
         <div styleName='container'>
@@ -50,7 +52,7 @@ class LibraryHeader extends React.Component {
           }
 
           <div onClick={this.toggleViewOptions}>
-            <Icon icon='VISIBILITY' size={36} styleName='magnifier' />
+            <Icon icon='VISIBILITY' size={36} styleName={viewOptions ? 'eye-active' : 'eye'} />
           </div>
         </div>
 
