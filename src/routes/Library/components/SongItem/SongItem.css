@@ -1,6 +1,5 @@
 .container {
   display: flex;
-  height: var(--song-item-height);
   align-items: center;
   padding: 0 5px;
 }
@@ -23,6 +22,10 @@
   white-space: nowrap;
 }
 
+.artist {
+  font-size: 14px;
+}
+
 .btnContainer {
   display: flex;
   overflow: hidden;
@@ -30,8 +33,8 @@
 }
 
 .button {
-  height: var(--song-item-height);
-  width: var(--song-item-height);
+  height: var(--song-item-btn-height);
+  width: var(--song-item-btn-height);
 }
 
 .star {

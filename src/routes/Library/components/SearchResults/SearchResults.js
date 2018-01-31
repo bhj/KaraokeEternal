@@ -4,7 +4,11 @@ import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongItem from '../SongItem'
 import './SearchResults.css'
-const ROW_HEIGHT = 44
+
+const ARTIST_HEADER_HEIGHT = 22
+const ARTIST_RESULT_HEIGHT = 44
+const SONG_HEADER_HEIGHT = 22
+const SONG_RESULT_HEIGHT = 60
 
 class SearchResults extends React.Component {
   static propTypes = {
@@ -94,6 +98,8 @@ class SearchResults extends React.Component {
         onSongStarClick={() => this.handleSongStarClick(songId)}
         isQueued={this.props.queuedSongIds.includes(songId)}
         isStarred={this.props.starredSongs.includes(songId)}
+        artist={this.props.artists[song.artistId].name}
+        showArtist
         key={key}
         style={style}
       />
@@ -101,17 +107,26 @@ class SearchResults extends React.Component {
   }
 
   rowHeight = ({ index }) => {
-    // header
-    if (index === 0) return ROW_HEIGHT
+    // artists heading
+    if (index === 0) return ARTIST_HEADER_HEIGHT
 
-    const artistId = this.props.artistsResult[index - 1]
-    let rows = 1
+    // artist results
+    if (index > 0 && index < this.props.artistsResult.length + 1) {
+      let rows = 1
+      const artistId = this.props.artistsResult[index - 1]
 
-    if (this.props.expandedArtistResults.includes(artistId)) {
-      rows += this.props.artists[artistId].songIds.length
+      if (this.props.expandedArtistResults.includes(artistId)) {
+        rows += this.props.artists[artistId].songIds.length
+      }
+
+      return rows * ARTIST_RESULT_HEIGHT
     }
 
-    return rows * ROW_HEIGHT
+    // songs heading
+    if (index === this.props.artistsResult.length + 1) return SONG_HEADER_HEIGHT
+
+    // song results
+    return SONG_RESULT_HEIGHT
   }
 
   handleArtistClick = (artistId) => {

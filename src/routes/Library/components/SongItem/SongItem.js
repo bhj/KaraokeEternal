@@ -8,6 +8,8 @@ const BTN_WIDTH = 44
 
 export default class SongItem extends React.Component {
   static propTypes = {
+    artist: PropTypes.string,
+    showArtist: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
     duration: PropTypes.number.isRequired,
     style: PropTypes.object,
@@ -47,10 +49,13 @@ export default class SongItem extends React.Component {
         </div>
 
         <div onClick={props.onSongClick} styleName='title'>
-          {props.title}
-          {props.numMedia > 1 &&
-            <i> ({props.numMedia})</i>
-          }
+          <div styleName='title'>
+            {props.title} {props.numMedia > 1 && <i>({props.numMedia})</i>}
+
+            {props.showArtist &&
+              <div styleName='artist'>{props.artist}</div>
+            }
+          </div>
         </div>
 
         <div styleName='btnContainer'

@@ -22,6 +22,7 @@ const ArtistItem = (props) => {
           onSongStarClick={() => props.onSongStarClick(songId)}
           isQueued={props.queuedSongIds.includes(songId)}
           isStarred={props.starredSongs.includes(songId)}
+          showArtist={false}
           key={songId}
         />
       )

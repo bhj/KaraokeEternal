@@ -22,7 +22,7 @@
   --artist-folder-color: #3f4e7d;
   --artist-folder-text-color: white;
 
-  --song-item-height: 44px;
+  --song-item-btn-height: 44px;
   --song-item-btn-color: var(--btn-active-color);
   --song-item-btn-active-color: var(--btn-active-color);
   --song-item-btn-inactive-color: #222a44;
