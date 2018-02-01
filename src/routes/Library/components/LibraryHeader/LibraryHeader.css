@@ -23,10 +23,10 @@
   fill: var(--btn-active-color);
 }
 
-.eye {
+.inactive {
   fill: var(--btn-inactive-color);
 }
 
-.eye-active {
+.active {
   fill: var(--btn-active-color);
 }

@@ -2,15 +2,16 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Header from 'components/Header'
 import Icon from 'components/Icon'
-import ViewOptions from './ViewOptions'
 import './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
   static propTypes = {
     filterString: PropTypes.string.isRequired,
+    filterStarred: PropTypes.bool.isRequired,
     // actions
     setFilterString: PropTypes.func.isRequired,
     resetFilterString: PropTypes.func.isRequired,
+    toggleFilterStarred: PropTypes.func.isRequired,
   }
 
   state = {
@@ -28,12 +29,12 @@ class LibraryHeader extends React.Component {
     this.props.resetFilterString()
   }
 
-  toggleViewOptions = () => {
-    this.setState({ viewOptions: !this.state.viewOptions })
+  toggleStarred = () => {
+    this.props.toggleFilterStarred()
   }
 
   render () {
-    const { viewOptions } = this.state
+    const { filterString, filterStarred } = this.props
 
     return (
       <Header>
@@ -45,18 +46,16 @@ class LibraryHeader extends React.Component {
             value={this.state.value}
             onChange={this.handleChange}
           />
-          {this.props.filterString &&
+          {filterString &&
             <div onClick={this.clearSearch}>
               <Icon icon='CLEAR' size={36} styleName='clear' />
             </div>
           }
 
-          <div onClick={this.toggleViewOptions}>
-            <Icon icon='VISIBILITY' size={36} styleName={viewOptions ? 'eye-active' : 'eye'} />
+          <div onClick={this.props.toggleFilterStarred}>
+            <Icon icon='STAR_FULL' size={36} styleName={filterStarred ? 'active' : 'inactive'} />
           </div>
         </div>
-
-        <ViewOptions isExpanded={this.state.viewOptions} />
       </Header>
     )
   }

@@ -8,7 +8,7 @@ import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from 
 const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs
 const getFilterStr = (state) => state.library.filterString.toLowerCase()
-const getFilterStatus = (state) => state.library.filterStatus
+const getFilterStarred = (state) => state.library.filterStarred
 const getStarredArtists = (state) => state.user.starredArtists
 const getStarredSongs = (state) => state.user.starredSongs
 const getQueue = (state) => state.queue
@@ -21,7 +21,7 @@ const getQueuedSongs = createSelector(
 // library filters
 // ---------------------
 
-// #1: keyword filter
+// #1: keyword filters
 const getArtistsWithKeyword = createSelector(
   [getArtists, getFilterStr],
   (artists, filterString) =>
@@ -34,22 +34,20 @@ const getSongsWithKeyword = createSelector(
     songs.result.filter(id => songs.entities[id].title.toLowerCase().includes(filterString))
 )
 
-// #2: starred/hidden status filter
+// #2: starred/hidden filters
 const getArtistsByView = createSelector(
-  [getArtistsWithKeyword, getFilterStatus, getStarredArtists],
-  (artistsWithKeyword, filterStatus, starredArtists) =>
+  [getArtistsWithKeyword, getFilterStarred, getStarredArtists],
+  (artistsWithKeyword, filterStarred, starredArtists) =>
     artistsWithKeyword.filter(artistId => {
-      if (filterStatus === '') return true
-      else if (filterStatus === 'starred') return starredArtists.includes(artistId)
+      return filterStarred ? starredArtists.includes(artistId) : true
     })
 )
 
 const getSongsByView = createSelector(
-  [getSongsWithKeyword, getFilterStatus, getStarredSongs],
-  (songsWithKeyword, filterStatus, starredSongs) =>
+  [getSongsWithKeyword, getFilterStarred, getStarredSongs],
+  (songsWithKeyword, filterStarred, starredSongs) =>
     songsWithKeyword.filter(songId => {
-      if (filterStatus === '') return true
-      else if (filterStatus === 'starred') return starredSongs.includes(songId)
+      return filterStarred ? starredSongs.includes(songId) : true
     })
 )
 
@@ -64,7 +62,7 @@ const mapStateToProps = (state) => {
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
     // filters
-    isFiltering: state.library.filterString || state.library.filterStatus,
+    isFiltering: state.library.filterString !== '' || state.library.filterStarred,
     expandedArtistResults: state.library.expandedArtistResults,
   }
 }

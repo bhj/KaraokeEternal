@@ -1,7 +1,7 @@
 import {
   LIBRARY_FILTER_STRING,
   LIBRARY_FILTER_STRING_RESET,
-  LIBRARY_FILTER_STATUS,
+  LIBRARY_FILTER_TOGGLE_STARRED,
   TOGGLE_ARTIST_EXPANDED,
   TOGGLE_ARTIST_RESULT_EXPANDED,
   SCROLL_ARTISTS,
@@ -47,10 +47,9 @@ export function resetFilterString () {
   }
 }
 
-export function setFilterStatus (status) {
+export function toggleFilterStarred () {
   return {
-    type: LIBRARY_FILTER_STATUS,
-    payload: status,
+    type: LIBRARY_FILTER_TOGGLE_STARRED,
   }
 }
 
@@ -66,9 +65,9 @@ const ACTION_HANDLERS = {
     ...state,
     filterString: '',
   }),
-  [LIBRARY_FILTER_STATUS]: (state, { payload }) => ({
+  [LIBRARY_FILTER_TOGGLE_STARRED]: (state, { payload }) => ({
     ...state,
-    filterStatus: payload,
+    filterStarred: !state.filterStarred,
   }),
   [SCROLL_ARTISTS]: (state, { payload }) => ({
     ...state,
@@ -101,7 +100,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   filterString: '',
-  filterStatus: '', // '' (all), 'starred', 'hidden'
+  filterStarred: false,
   scrollTop: 0,
   expandedArtists: [],
   expandedArtistResults: [],
