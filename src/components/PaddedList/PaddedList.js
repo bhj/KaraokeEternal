@@ -13,6 +13,12 @@ class PaddedList extends React.Component {
     scrollTop: PropTypes.number,
   }
 
+  componentDidMount () {
+    if (this.props.onRef) {
+      this.props.onRef(this.list)
+    }
+  }
+
   render () {
     return (
       <List
@@ -23,7 +29,7 @@ class PaddedList extends React.Component {
         overscanRowCount={10}
         onScroll={this.props.onScroll}
         scrollTop={this.props.scrollTop} // initial list pos
-        ref={r => { this.ref = r; if (this.props.onRef) this.props.onRef(r) }}
+        ref={this.setRef}
         // facades
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
@@ -34,7 +40,7 @@ class PaddedList extends React.Component {
   componentDidUpdate (prevProps) {
     const { paddingTop, paddingBottom } = this.props.viewportStyle
     if (paddingTop !== prevProps.paddingTop || paddingBottom !== prevProps.paddingBottom) {
-      this.ref.recomputeRowHeights()
+      this.list.recomputeRowHeights()
     }
   }
 
@@ -62,6 +68,10 @@ class PaddedList extends React.Component {
     }
 
     return this.props.rowHeight({ index })
+  }
+
+  setRef = (ref) => {
+    this.list = ref
   }
 }
 
