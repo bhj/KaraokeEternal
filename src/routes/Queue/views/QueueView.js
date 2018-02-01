@@ -5,6 +5,8 @@ import PaddedList from 'components/PaddedList'
 import QueueItem from '../components/QueueItem'
 import NoRoom from './NoRoom'
 
+const QUEUE_ITEM_HEIGHT = 64
+
 class QueueView extends React.Component {
   static propTypes = {
     queue: PropTypes.object.isRequired,
@@ -21,6 +23,12 @@ class QueueView extends React.Component {
     showErrorMessage: PropTypes.func.isRequired,
   }
 
+  componentDidMount () {
+    // ensure current song is visible
+    const idx = this.props.queue.result.indexOf(this.props.curId)
+    this.list.scrollToRow(idx)
+  }
+
   render () {
     const props = this.props
 
@@ -34,13 +42,13 @@ class QueueView extends React.Component {
             rowCount={props.queue.result.length}
             rowHeight={this.rowHeight}
             rowRenderer={this.rowRenderer}
-            scrollToIndex={props.queue.result.indexOf(props.curId)}
             scrollToAlignment={'center'}
             queuedSongs={props.queue.result} // pass-through forces List refresh
             curId={props.curId} // pass-through forces List refresh
             curPos={props.curPos} // pass-through forces List refresh
             errors={props.errors} // pass-through forces List refresh
             isAtQueueEnd={props.isAtQueueEnd} // pass-through forces List refresh
+            onRef={this.setRef}
           />
         }
 
@@ -78,7 +86,7 @@ class QueueView extends React.Component {
   }
 
   rowHeight = ({ index }) => {
-    return 64
+    return QUEUE_ITEM_HEIGHT
   }
 
   handleRemoveClick = (queueId) => {
@@ -87,6 +95,10 @@ class QueueView extends React.Component {
 
   handleErrorInfoClick = (queueId) => {
     this.props.showErrorMessage(this.props.errors[queueId].join('\n\n'))
+  }
+
+  setRef = (ref) => {
+    this.list = ref
   }
 }
 
