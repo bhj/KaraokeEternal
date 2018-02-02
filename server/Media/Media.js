@@ -56,6 +56,7 @@ class Media {
           .order('priority'),
         'providers', 'media.provider = providers.name')
         .join('songs USING (songId)')
+        .join('artists USING (artistId)')
         .left_join('stars USING(songId)')
         .group('songs.songId')
         .order('songs.title')
@@ -67,12 +68,6 @@ class Media {
         // no need to send over the wire but we needed it
         // in the query to show the correct mediaId
         delete row.isPreferred
-
-        // ensure artist exists
-        if (typeof artists.entities[row.artistId] === 'undefined') {
-          log(`Warning: artist does not exist for song: ${JSON.stringify(row)}`)
-          continue
-        }
 
         // add songId to artist's data
         artists.entities[row.artistId].songIds.push(row.songId)
