@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Swipeable from 'react-swipeable'
 import Icon from 'components/Icon'
+import Highlighter from 'react-highlight-words'
 import './SongItem.css'
 
 const BTN_WIDTH = 44
@@ -19,6 +20,7 @@ export default class SongItem extends React.Component {
     isStarred: PropTypes.bool.isRequired,
     numStars: PropTypes.number.isRequired,
     numMedia: PropTypes.number.isRequired,
+    filterKeywords: PropTypes.array.isRequired,
   }
 
   state = {
@@ -50,8 +52,8 @@ export default class SongItem extends React.Component {
 
         <div onClick={props.onSongClick} styleName='title'>
           <div styleName='title'>
-            {props.title} {props.numMedia > 1 && <i>({props.numMedia})</i>}
-
+            <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
+            {props.numMedia > 1 && <i>({props.numMedia})</i>}
             {props.showArtist &&
               <div styleName='artist'>{props.artist}</div>
             }

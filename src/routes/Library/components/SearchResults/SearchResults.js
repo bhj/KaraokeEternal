@@ -18,6 +18,7 @@ class SearchResults extends React.Component {
     songsResult: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
+    filterKeywords: PropTypes.array.isRequired,
     queuedSongIds: PropTypes.array.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
@@ -70,6 +71,7 @@ class SearchResults extends React.Component {
           queuedSongIds={this.props.queuedSongIds}
           starredSongs={this.props.starredSongs}
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
+          filterKeywords={this.props.filterKeywords}
           onArtistClick={() => this.handleArtistClick(artistId)}
           onSongClick={this.props.queueSong}
           onSongStarClick={this.props.toggleSongStarred}
@@ -99,6 +101,7 @@ class SearchResults extends React.Component {
         isQueued={this.props.queuedSongIds.includes(songId)}
         isStarred={this.props.starredSongs.includes(songId)}
         artist={this.props.artists[song.artistId].name}
+        filterKeywords={this.props.filterKeywords}
         showArtist
         key={key}
         style={style}

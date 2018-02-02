@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import SongItem from '../SongItem'
 import Icon from 'components/Icon'
+import Highlighter from 'react-highlight-words'
 import './ArtistItem.css'
 
 const ArtistItem = (props) => {
@@ -41,7 +42,9 @@ const ArtistItem = (props) => {
             <div styleName='count'>{props.artistSongIds.length}</div>
           }
         </div>
-        <div styleName='name'>{props.name}</div>
+        <div styleName='name'>
+          <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
+        </div>
       </div>
       {children}
     </div>
@@ -55,10 +58,12 @@ ArtistItem.propTypes = {
   starredSongs: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
   isExpanded: PropTypes.bool.isRequired,
+  filterKeywords: PropTypes.array.isRequired,
+  style: PropTypes.object,
+  // actions
   onArtistClick: PropTypes.func.isRequired,
   onSongClick: PropTypes.func.isRequired,
   onSongStarClick: PropTypes.func.isRequired,
-  style: PropTypes.object,
 }
 
 export default ArtistItem

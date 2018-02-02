@@ -6,47 +6,42 @@ import './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
   static propTypes = {
-    filterString: PropTypes.string.isRequired,
+    filterStr: PropTypes.string.isRequired,
     filterStarred: PropTypes.bool.isRequired,
     // actions
-    setFilterString: PropTypes.func.isRequired,
-    resetFilterString: PropTypes.func.isRequired,
+    setFilterStr: PropTypes.func.isRequired,
+    resetFilterStr: PropTypes.func.isRequired,
     toggleFilterStarred: PropTypes.func.isRequired,
   }
 
   state = {
-    value: this.props.filterString,
-    viewOptions: false,
+    value: this.props.filterStr,
   }
 
   handleChange = (event) => {
     this.setState({ value: event.target.value })
-    this.props.setFilterString(event.target.value)
+    this.props.setFilterStr(event.target.value)
   }
 
   clearSearch = () => {
     this.setState({ value: '' })
-    this.props.resetFilterString()
-  }
-
-  toggleStarred = () => {
-    this.props.toggleFilterStarred()
+    this.props.resetFilterStr()
   }
 
   render () {
-    const { filterString, filterStarred } = this.props
+    const { filterStr, filterStarred } = this.props
 
     return (
       <Header>
         <div styleName='container'>
-          <Icon icon='MAGNIFIER' size={36} styleName='magnifier' />
+          <Icon icon='MAGNIFIER' size={36} styleName={filterStr ? 'active' : 'inactive'} />
           <input type='search'
             styleName='searchInput'
             placeholder='search library'
             value={this.state.value}
             onChange={this.handleChange}
           />
-          {filterString &&
+          {filterStr &&
             <div onClick={this.clearSearch}>
               <Icon icon='CLEAR' size={36} styleName='clear' />
             </div>

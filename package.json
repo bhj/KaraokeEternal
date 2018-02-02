@@ -44,6 +44,7 @@
     "rc-slider": "^8.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-highlight-words": "^0.10.0",
     "react-measure": "^1.4.7",
     "react-radio-group": "^3.0.2",
     "react-redux": "^5.0.6",

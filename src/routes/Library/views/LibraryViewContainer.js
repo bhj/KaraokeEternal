@@ -7,7 +7,7 @@ import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from 
 
 const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs
-const getFilterStr = (state) => state.library.filterString.toLowerCase()
+const getFilterStr = (state) => state.library.filterStr.trim().toLowerCase()
 const getFilterStarred = (state) => state.library.filterStarred
 const getStarredArtists = (state) => state.user.starredArtists
 const getStarredSongs = (state) => state.user.starredSongs
@@ -18,21 +18,28 @@ const getQueuedSongs = createSelector(
   (queue) => queue.result.map(queueId => queue.entities[queueId].songId)
 )
 
+const getFilterKeywords = createSelector(
+  [getFilterStr],
+  (str) => str.split(' ')
+)
+
 // library filters
 // ---------------------
 
 // #1: keyword filters
 const getArtistsWithKeyword = createSelector(
-  [getArtists, getFilterStr],
-  (artists, filterString) =>
-    artists.result.filter(id => artists.entities[id].name.toLowerCase().includes(filterString))
-)
+  [getArtists, getFilterStr, getFilterKeywords],
+  (artists, str, keywords) => {
+    if (!str) return artists.result
+    return artists.result.filter(id => keywords.some(word => artists.entities[id].name.toLowerCase().includes(word)))
+  })
 
 const getSongsWithKeyword = createSelector(
-  [getSongs, getFilterStr],
-  (songs, filterString) =>
-    songs.result.filter(id => songs.entities[id].title.toLowerCase().includes(filterString))
-)
+  [getSongs, getFilterStr, getFilterKeywords],
+  (songs, str, keywords) => {
+    if (!str) return songs.result
+    return songs.result.filter(id => keywords.some(word => songs.entities[id].title.toLowerCase().includes(word)))
+  })
 
 // #2: starred/hidden filters
 const getArtistsByView = createSelector(
@@ -62,7 +69,8 @@ const mapStateToProps = (state) => {
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
     // filters
-    isFiltering: state.library.filterString !== '' || state.library.filterStarred,
+    isFiltering: state.library.filterStr !== '' || state.library.filterStarred,
+    filterKeywords: getFilterKeywords(state),
     expandedArtistResults: state.library.expandedArtistResults,
   }
 }

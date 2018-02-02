@@ -12,6 +12,7 @@ class ArtistList extends React.Component {
     queuedSongIds: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
+    filterKeywords: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
@@ -59,6 +60,7 @@ class ArtistList extends React.Component {
         starredSongs={this.props.starredSongs}
         name={artist.name}
         isExpanded={expandedArtists.includes(artist.artistId)}
+        filterKeywords={this.props.filterKeywords}
         onArtistClick={() => this.handleArtistClick(artist.artistId)}
         onSongStarClick={this.props.toggleSongStarred}
         onSongClick={this.props.queueSong}

@@ -28,10 +28,10 @@ export function toggleArtistResultExpanded (artistId) {
   }
 }
 
-export function setFilterString (str) {
+export function setFilterStr (str) {
   return {
     type: LIBRARY_FILTER_STRING,
-    payload: str,
+    payload: { str },
     meta: {
       throttle: {
         wait: 300,
@@ -41,7 +41,7 @@ export function setFilterString (str) {
   }
 }
 
-export function resetFilterString () {
+export function resetFilterStr () {
   return {
     type: LIBRARY_FILTER_STRING_RESET,
   }
@@ -59,11 +59,11 @@ export function toggleFilterStarred () {
 const ACTION_HANDLERS = {
   [LIBRARY_FILTER_STRING]: (state, { payload }) => ({
     ...state,
-    filterString: payload,
+    filterStr: payload.str,
   }),
   [LIBRARY_FILTER_STRING_RESET]: (state, { payload }) => ({
     ...state,
-    filterString: '',
+    filterStr: '',
   }),
   [LIBRARY_FILTER_TOGGLE_STARRED]: (state, { payload }) => ({
     ...state,
@@ -99,7 +99,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 let initialState = {
-  filterString: '',
+  filterStr: '',
   filterStarred: false,
   scrollTop: 0,
   expandedArtists: [],

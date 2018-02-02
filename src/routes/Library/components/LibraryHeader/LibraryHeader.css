@@ -15,10 +15,6 @@
   background-color: inherit;
 }
 
-.magnifier {
-  fill: var(--btn-inactive-color);
-}
-
 .clear {
   fill: var(--btn-active-color);
 }
