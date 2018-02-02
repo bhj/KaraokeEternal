@@ -24,6 +24,7 @@ const ArtistItem = (props) => {
           isQueued={props.queuedSongIds.includes(songId)}
           isStarred={props.starredSongs.includes(songId)}
           showArtist={false}
+          filterKeywords={props.filterKeywords}
           key={songId}
         />
       )
