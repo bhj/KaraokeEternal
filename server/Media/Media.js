@@ -12,6 +12,7 @@ class Media {
  * @return {Promise} Object with artist and media results
  */
   static async getLibrary () {
+    const SongIdsByArtist = {}
     const artists = {
       result: [],
       entities: {}
@@ -21,27 +22,7 @@ class Media {
       entities: {}
     }
 
-    // query #1: artists
-    try {
-      const q = squel.select()
-        .from('artists')
-        .order('name')
-
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
-
-      for (const row of rows) {
-        artists.result.push(row.artistId)
-        artists.entities[row.artistId] = {
-          ...row,
-          songIds: [],
-        }
-      }
-    } catch (err) {
-      return Promise.reject(err)
-    }
-
-    // query #2: songs
+    // query #1: songs
     try {
       const q = squel.select()
         .field('media.mediaId, media.duration')
@@ -69,11 +50,43 @@ class Media {
         // in the query to show the correct mediaId
         delete row.isPreferred
 
-        // add songId to artist's data
-        artists.entities[row.artistId].songIds.push(row.songId)
-
+        // normalize song data
         songs.result.push(row.songId)
         songs.entities[row.songId] = row
+
+        // add to artist's songIds
+        if (typeof SongIdsByArtist[row.artistId] === 'undefined') {
+          SongIdsByArtist[row.artistId] = []
+        }
+
+        SongIdsByArtist[row.artistId].push(row.songId)
+      }
+    } catch (err) {
+      return Promise.reject(err)
+    }
+
+    // query #2: artists (we do this after songs so we can ignore
+    // artists having no songs, e.g. when a provider is disabled)
+    try {
+      const q = squel.select()
+        .from('artists')
+        .order('name')
+
+      const { text, values } = q.toParam()
+      const rows = await db.all(text, values)
+
+      for (const row of rows) {
+        // don't include artists without any songs
+        if (typeof SongIdsByArtist[row.artistId] === 'undefined') {
+          continue
+        }
+
+        // normalize artist data
+        artists.result.push(row.artistId)
+        artists.entities[row.artistId] = {
+          ...row,
+          songIds: SongIdsByArtist[row.artistId],
+        }
       }
     } catch (err) {
       return Promise.reject(err)
