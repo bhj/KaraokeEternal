@@ -31,14 +31,14 @@ const getArtistsWithKeyword = createSelector(
   [getArtists, getFilterStr, getFilterKeywords],
   (artists, str, keywords) => {
     if (!str) return artists.result
-    return artists.result.filter(id => keywords.some(word => artists.entities[id].name.toLowerCase().includes(word)))
+    return artists.result.filter(id => keywords.every(word => artists.entities[id].name.toLowerCase().includes(word)))
   })
 
 const getSongsWithKeyword = createSelector(
   [getSongs, getFilterStr, getFilterKeywords],
   (songs, str, keywords) => {
     if (!str) return songs.result
-    return songs.result.filter(id => keywords.some(word => songs.entities[id].title.toLowerCase().includes(word)))
+    return songs.result.filter(id => keywords.every(word => songs.entities[id].title.toLowerCase().includes(word)))
   })
 
 // #2: starred/hidden filters
