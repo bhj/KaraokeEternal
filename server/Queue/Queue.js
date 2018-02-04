@@ -3,7 +3,7 @@ const squel = require('squel')
 
 class Queue {
   /**
-   * Get queued "songs" for a given room
+   * Get queued items for a given room
    *
    * @param  {[type]}  roomId
    * @return {Promise}
