@@ -127,7 +127,8 @@ const ACTION_HANDLERS = {
       ...state,
       // if we're no longer out of songs, play next
       queueId: (state.isAtQueueEnd && !isAtQueueEnd) ? payload.result[curIdx + 1] : state.queueId,
-      isAtQueueEnd,
+      // this should only flip from true -> false here, otherwise playback will stop
+      isAtQueueEnd: (state.isAtQueueEnd && !isAtQueueEnd) ? false : state.isAtQueueEnd,
     }
   },
   [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
