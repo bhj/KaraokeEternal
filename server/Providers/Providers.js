@@ -2,66 +2,68 @@ const debug = require('debug')
 const log = debug('app:Providers')
 const getProviders = require('./getProviders')
 const providerImports = require('./')
+let providerQueue = []
 
 class Providers {
   static async startScan (providerName) {
-    let providers
-
-    if (this._isScanning) {
-      log('Ignoring media scan request (already in progress)')
-      return
-    }
-
     log(`Media scan requested (provider=${providerName})`)
 
-    try {
-      providers = await this.getAll()
-    } catch (err) {
-      return Promise.reject(err)
+    // already in the queue?
+    if (providerQueue.includes(providerName)) {
+      log(`  => skipping (already in scanner queue)`)
+      return
+    } else {
+      providerQueue.push(providerName)
+      log(`  => added to scanner queue at position ${providerQueue.length}`)
     }
 
-    // was a particular provider requested?
-    if (providerName) {
-      providers.result = providers.result.filter(name => name === providerName)
-    }
-
-    if (!providers.result.length) {
-      log(`  => skipping scan: no matching providers found`)
+    if (this._isScanning) {
+      // let the loop do its thing
       return
     }
 
     this._isScanning = true
     this._isCanceling = false
 
-    for (const name of providers.result) {
-      const providerCfg = providers.entities[name]
-
-      // is provider enabled?
-      if (!providerCfg || !providerCfg.isEnabled) {
-        log(`  => skipping provider: ${name} (not enabled)`)
-        continue
-      }
-
-      // sanity check on provider scanner
-      if (!providerImports[name] || !providerImports[name].Scanner) {
-        log(`  => skipping provider: ${name} (invalid scanner)`)
-        continue
-      }
-
-      log(`  => scanning media with provider: ${name}`)
+    while (providerQueue.length) {
+      const name = providerQueue.shift()
+      log(`Preparing to scan with provider '${name}'`)
 
       try {
-        this._scanner = new providerImports[name].Scanner(providerCfg.prefs)
+        const providers = await this.getAll()
+        const provider = providers.entities[name]
+
+        // provider exists?
+        if (typeof provider !== 'object') {
+          log(`  => skipping (not found)`)
+          continue
+        }
+
+        // provider enabled?
+        if (!provider.isEnabled) {
+          log(`  => skipping (not enabled)`)
+          continue
+        }
+
+        // sanity check on provider scanner
+        if (!providerImports[name] || !providerImports[name].Scanner) {
+          log(`  => skipping (invalid scanner)`)
+          continue
+        }
+
+        log(`  => starting scan`)
+        this._scanner = new providerImports[name].Scanner(provider.prefs)
         await this._scanner.scan()
+        log(`Finished scan with provider '${name}'`)
       } catch (err) {
         log(err)
       }
 
       if (this._isCanceling) {
-        log('Scan canceled by user')
+        log('Media scan canceled by user')
         break
       }
-    } // end for
+    } // end while
 
     this._scanner.emitDone()
     this._scanner.emitLibrary()
@@ -69,6 +71,7 @@ class Providers {
     this._scanner = null
     this._isScanning = false
     this._isCanceling = false
+    providerQueue = []
     log('Media scan complete')
   }
 
