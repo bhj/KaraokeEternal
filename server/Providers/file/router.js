@@ -14,7 +14,6 @@ const getProviders = require('../getProviders')
 const Media = require('../../Media')
 
 const {
-  LIBRARY_PUSH,
   PROVIDER_REQUEST_SCAN,
 } = require('../../../constants/actions')
 
@@ -111,21 +110,10 @@ router.delete('/path/:idx', async (ctx, next) => {
 
     log(`removed library path: ${removedPath}`)
 
-    // get all media from the removed path
-    const rows = await Media.searchMedia({
-      provider: 'file',
-      providerData: {
-        basePath: removedPath,
-      }
-    })
-
-    // remove the media
-    await Media.remove(rows.result)
-
-    // emit updated library
-    ctx.io.emit('action', {
-      type: LIBRARY_PUSH,
-      payload: await Media.getLibrary(),
+    // update library
+    process.send({
+      'type': PROVIDER_REQUEST_SCAN,
+      'payload': 'file',
     })
   } catch (err) {
     ctx.status = 500

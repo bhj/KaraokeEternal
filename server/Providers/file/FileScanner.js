@@ -77,21 +77,31 @@ class FileScanner extends Scanner {
     } // end for
 
     // cleanup
-    log('getting media entries with nonexistent files')
+    log('Looking for orphaned media entries')
 
     try {
-      // get all media from valid/online paths
+      const invalidIds = []
       const res = await Media.searchMedia({
         provider: 'file',
-        providerData: {
-          basePath: this.paths.filter(p => !offlinePaths.includes(p)),
-        }
       })
 
-      // media we didn't encounter during the scan are invalid
-      const invalidIds = res.result.filter(id => !validIds.includes(id))
+      res.result.forEach(id => {
+        // was this media item just verified?
+        if (validIds.includes(id)) {
+          return
+        }
 
-      log(`  => ${invalidIds.length} result(s)`)
+        // is media item in an offline path?
+        if (offlinePaths.includes(res.entities[id].providerData.basePath)) {
+          return
+        }
+
+        // looks like we need to remove it
+        invalidIds.push(id)
+        log(`  => ${res.entities[id].providerData.basePath}${res.entities[id].providerData.relPath}`)
+      })
+
+      log(`Removing ${invalidIds.length} orphaned media entries`)
 
       if (invalidIds.length) {
         await Media.remove(invalidIds)
