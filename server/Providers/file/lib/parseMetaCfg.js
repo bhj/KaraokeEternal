@@ -12,8 +12,8 @@ module.exports = {
   replacements: {
     // applied to input string before split to Artist/Title
     preSplit: [
-      // at least 2 word chars followed by at least 3 digits
-      /\D{2,}[^\s]\d{3,}/i,
+      // at least 2 non-digits followed by at least 3 digits
+      /\D{2,}\d{3,}/i,
       // track numbers
       /^[\d\-.\s]+/,
       // remove text between (), [], or {}
