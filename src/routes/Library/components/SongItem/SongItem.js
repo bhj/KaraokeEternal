@@ -16,6 +16,7 @@ export default class SongItem extends React.Component {
     style: PropTypes.object,
     onSongClick: PropTypes.func.isRequired,
     onSongStarClick: PropTypes.func.isRequired,
+    onSongInfoClick: PropTypes.func.isRequired,
     isQueued: PropTypes.bool.isRequired,
     isStarred: PropTypes.bool.isRequired,
     numStars: PropTypes.number.isRequired,
@@ -71,7 +72,7 @@ export default class SongItem extends React.Component {
           <div onClick={props.onSongStarClick} styleName='button'>
             <Icon size={44} icon='VISIBILITY_OFF' styleName='hide' />
           </div>
-          <div onClick={props.onSongStarClick} styleName='button'>
+          <div onClick={props.onSongInfoClick} styleName='button'>
             <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
           </div>
         </div>

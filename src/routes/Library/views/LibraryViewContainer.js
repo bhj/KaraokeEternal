@@ -3,7 +3,12 @@ import { createSelector } from 'reselect'
 import LibraryView from './LibraryView'
 import { queueSong } from 'routes/Queue/modules/queue'
 import { toggleSongStarred } from 'store/modules/user'
-import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'
+import {
+  scrollArtists,
+  toggleArtistExpanded,
+  toggleArtistResultExpanded,
+  showSongInfo,
+} from '../modules/library'
 
 const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs
@@ -68,6 +73,7 @@ const mapStateToProps = (state) => {
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,
     scrollTop: state.library.scrollTop,
+    isShowingSongInfo: !(state.library.songInfoSongId === null),
     // filters
     isFiltering: state.library.filterStr !== '' || state.library.filterStarred,
     filterKeywords: getFilterKeywords(state),
@@ -81,6 +87,7 @@ const mapActionCreators = {
   toggleArtistExpanded,
   toggleArtistResultExpanded,
   scrollArtists,
+  showSongInfo,
 }
 
 export default connect(mapStateToProps, mapActionCreators)(LibraryView)

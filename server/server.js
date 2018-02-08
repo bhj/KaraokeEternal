@@ -17,10 +17,11 @@ const KoaWebpack = require('koa-webpack')
 const KoaStatic = require('koa-static')
 const app = new Koa()
 
+const LibraryRouter = require('./Library/router')
 const prefsRouter = require('./Prefs/router')
+const providerRouters = require('./Providers/router')
 const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
-const providerRouters = require('./Providers/router')
 
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
@@ -55,6 +56,7 @@ module.exports = function () {
   })
 
   // http api (koa-router) endpoints
+  app.use(LibraryRouter.routes())
   app.use(prefsRouter.routes())
   app.use(roomsRouter.routes())
   app.use(userRouter.routes())

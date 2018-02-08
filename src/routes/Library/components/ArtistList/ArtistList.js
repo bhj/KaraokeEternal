@@ -20,6 +20,7 @@ class ArtistList extends React.Component {
     toggleSongStarred: PropTypes.func.isRequired,
     toggleArtistExpanded: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
+    showSongInfo: PropTypes.func.isRequired,
   }
 
   render () {
@@ -62,8 +63,9 @@ class ArtistList extends React.Component {
         isExpanded={expandedArtists.includes(artist.artistId)}
         filterKeywords={this.props.filterKeywords}
         onArtistClick={() => this.handleArtistClick(artist.artistId)}
-        onSongStarClick={this.props.toggleSongStarred}
         onSongClick={this.props.queueSong}
+        onSongStarClick={this.props.toggleSongStarred}
+        onSongInfoClick={this.props.showSongInfo}
         key={key}
         style={style}
       />
