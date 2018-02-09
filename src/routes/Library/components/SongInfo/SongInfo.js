@@ -42,9 +42,11 @@ export default class SongInfo extends Component {
         onOverlayClicked={this.props.closeSongInfo}
         title={'Song Details'}
         dialogStyles={{
-          width: '80%',
-          left: '10%',
-          marginLeft: '0',
+          width: '90%',
+          height: '90%',
+          top: '5%',
+          left: '5%',
+          margin: 0,
           overflow: 'auto',
         }}
       >
