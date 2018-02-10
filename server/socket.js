@@ -53,21 +53,6 @@ module.exports = function (io) {
       sock.user.name, sock.id, sock.user.roomId, room.length
     )
 
-    // send library and queue
-    try {
-      io.to(sock.id).emit('action', {
-        type: LIBRARY_PUSH,
-        payload: await Media.getLibrary(),
-      })
-
-      io.to(sock.id).emit('action', {
-        type: QUEUE_PUSH,
-        payload: await Queue.getQueue(sock.user.roomId),
-      })
-    } catch (err) {
-      log(err)
-    }
-
     // player in room?
     if (Object.keys(room.sockets).some(id => io.sockets.sockets[id]._isPlayer)) {
       io.to(sock.user.roomId).emit('action', {
@@ -133,5 +118,20 @@ module.exports = function (io) {
         log('warning: no handler for action type: %s', type)
       }
     })
+
+    // send library and queue
+    try {
+      io.to(sock.id).emit('action', {
+        type: LIBRARY_PUSH,
+        payload: await Media.getLibrary(),
+      })
+
+      io.to(sock.id).emit('action', {
+        type: QUEUE_PUSH,
+        payload: await Queue.getQueue(sock.user.roomId),
+      })
+    } catch (err) {
+      log(err)
+    }
   })
 }
