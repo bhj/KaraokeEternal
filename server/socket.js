@@ -44,22 +44,6 @@ module.exports = function (io) {
       return
     }
 
-    // add user to the room on their jwt
-    sock.join(sock.user.roomId)
-
-    const room = sock.adapter.rooms[sock.user.roomId]
-
-    log('%s (%s) joined room %s (%s in room)',
-      sock.user.name, sock.id, sock.user.roomId, room.length
-    )
-
-    // player in room?
-    if (Object.keys(room.sockets).some(id => io.sockets.sockets[id]._isPlayer)) {
-      io.to(sock.user.roomId).emit('action', {
-        type: PLAYER_ENTER,
-      })
-    }
-
     // attach disconnect handler
     sock.on('disconnect', (reason) => {
       if (!sock.user || !sock.user.roomId) {
@@ -118,6 +102,22 @@ module.exports = function (io) {
         log('warning: no handler for action type: %s', type)
       }
     })
+
+    // add user to the room on their jwt
+    sock.join(sock.user.roomId)
+
+    const room = sock.adapter.rooms[sock.user.roomId]
+
+    log('%s (%s) joined room %s (%s in room)',
+      sock.user.name, sock.id, sock.user.roomId, room.length
+    )
+
+    // player in room?
+    if (Object.keys(room.sockets).some(id => io.sockets.sockets[id]._isPlayer)) {
+      io.to(sock.user.roomId).emit('action', {
+        type: PLAYER_ENTER,
+      })
+    }
 
     // send library and queue
     try {
