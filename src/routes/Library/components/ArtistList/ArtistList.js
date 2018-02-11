@@ -62,7 +62,7 @@ class ArtistList extends React.Component {
         name={artist.name}
         isExpanded={expandedArtists.includes(artist.artistId)}
         filterKeywords={this.props.filterKeywords}
-        onArtistClick={() => this.handleArtistClick(artist.artistId)}
+        onArtistClick={() => this.props.toggleArtistExpanded(artist.artistId)}
         onSongClick={this.props.queueSong}
         onSongStarClick={this.props.toggleSongStarred}
         onSongInfoClick={this.props.showSongInfo}
@@ -81,10 +81,6 @@ class ArtistList extends React.Component {
     }
 
     return rows * ROW_HEIGHT
-  }
-
-  handleArtistClick = (artistId) => {
-    this.props.toggleArtistExpanded(artistId)
   }
 
   handleScroll = ({ scrollTop }) => {

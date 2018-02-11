@@ -25,6 +25,7 @@ class SearchResults extends React.Component {
     queueSong: PropTypes.func.isRequired,
     toggleSongStarred: PropTypes.func.isRequired,
     toggleArtistResultExpanded: PropTypes.func.isRequired,
+    showSongInfo: PropTypes.func.isRequired,
   }
 
   componentDidUpdate (prevProps) {
@@ -72,9 +73,10 @@ class SearchResults extends React.Component {
           starredSongs={this.props.starredSongs}
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
           filterKeywords={this.props.filterKeywords}
-          onArtistClick={() => this.handleArtistClick(artistId)}
+          onArtistClick={() => this.props.toggleArtistResultExpanded(artistId)}
           onSongClick={this.props.queueSong}
           onSongStarClick={this.props.toggleSongStarred}
+          onSongInfoClick={this.props.showSongInfo}
           key={key}
           style={style}
         />
@@ -96,8 +98,9 @@ class SearchResults extends React.Component {
 
     return (
       <SongItem {...song}
-        onSongClick={() => this.handleSongClick(songId)}
-        onSongStarClick={() => this.handleSongStarClick(songId)}
+        onSongClick={() => this.props.queueSong(songId)}
+        onSongStarClick={() => this.props.toggleSongStarred(songId)}
+        onSongInfoClick={() => this.props.showSongInfo(songId)}
         isQueued={this.props.queuedSongIds.includes(songId)}
         isStarred={this.props.starredSongs.includes(songId)}
         artist={this.props.artists[song.artistId].name}
@@ -130,18 +133,6 @@ class SearchResults extends React.Component {
 
     // song results
     return SONG_RESULT_HEIGHT
-  }
-
-  handleArtistClick = (artistId) => {
-    this.props.toggleArtistResultExpanded(artistId)
-  }
-
-  handleSongClick = (songId) => {
-    this.props.queueSong(songId)
-  }
-
-  handleSongStarClick = (songId) => {
-    this.props.toggleSongStarred(songId)
   }
 
   setRef = (ref) => {
