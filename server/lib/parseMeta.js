@@ -1,11 +1,15 @@
 module.exports = function (str, cfg) {
   let artist, title
+  const parts = []
 
-  // global pre-processing
-  str = replaceMulti(str, cfg.replacements.preSplit)
+  // global replacements
+  str = replaceMulti(str, cfg.replPre)
 
-  // split at delimiter
-  let parts = str.split(cfg.delimiter)
+  // split at delimiter and run replacements on each part
+  str.split(cfg.delimiter).forEach(part => {
+    part = replaceMulti(part, cfg.replPost)
+    if (part) parts.push(part)
+  })
 
   // @todo this assumes delimiter won't appear in title
   title = cfg.artistFirst ? parts.pop() : parts.shift()
@@ -19,14 +23,12 @@ module.exports = function (str, cfg) {
     return 'no parts left to parse'
   }
 
-  // artist processing & global post-processing
-  artist = replaceMulti(artist, cfg.replacements.postSplit)
-  artist = replaceMulti(artist, cfg.replacements.artist)
+  // artist processing
+  artist = replaceMulti(artist, cfg.replArtist)
   artist = titleCase(artist)
 
   // title processing & global post-processing
-  title = replaceMulti(title, cfg.replacements.postSplit)
-  title = replaceMulti(title, cfg.replacements.title)
+  title = replaceMulti(title, cfg.replTitle)
   title = titleCase(title)
 
   return { artist, title }
