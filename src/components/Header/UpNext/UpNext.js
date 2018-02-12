@@ -13,7 +13,7 @@ const UpNext = props => (
 
     {props.isUpNext && !props.isUpNow &&
       <p styleName='msg'>
-        You&rsquo;re up next in {secToTxt(props.wait)}...
+        You&rsquo;re up next{props.wait ? ` in ${secToTxt(props.wait)}` : ''}...
       </p>
     }
   </div>
