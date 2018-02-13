@@ -10,7 +10,6 @@ const BTN_WIDTH = 44
 export default class SongItem extends React.Component {
   static propTypes = {
     artist: PropTypes.string,
-    showArtist: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
     duration: PropTypes.number.isRequired,
     style: PropTypes.object,
@@ -55,7 +54,7 @@ export default class SongItem extends React.Component {
           <div styleName='title'>
             <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
             {props.numMedia > 1 && <i>({props.numMedia})</i>}
-            {props.showArtist &&
+            {props.artist &&
               <div styleName='artist'>{props.artist}</div>
             }
           </div>

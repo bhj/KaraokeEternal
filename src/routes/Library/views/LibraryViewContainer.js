@@ -1,13 +1,10 @@
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import LibraryView from './LibraryView'
-import { queueSong } from 'routes/Queue/modules/queue'
-import { toggleSongStarred } from 'store/modules/user'
 import {
   scrollArtists,
   toggleArtistExpanded,
   toggleArtistResultExpanded,
-  showSongInfo,
 } from '../modules/library'
 
 const getArtists = (state) => state.artists
@@ -82,12 +79,9 @@ const mapStateToProps = (state) => {
 }
 
 const mapActionCreators = {
-  queueSong,
-  toggleSongStarred,
   toggleArtistExpanded,
   toggleArtistResultExpanded,
   scrollArtists,
-  showSongInfo,
 }
 
 export default connect(mapStateToProps, mapActionCreators)(LibraryView)

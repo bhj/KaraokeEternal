@@ -16,11 +16,8 @@ class ArtistList extends React.Component {
     scrollTop: PropTypes.number.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
-    queueSong: PropTypes.func.isRequired,
-    toggleSongStarred: PropTypes.func.isRequired,
     toggleArtistExpanded: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
-    showSongInfo: PropTypes.func.isRequired,
   }
 
   render () {
@@ -63,9 +60,6 @@ class ArtistList extends React.Component {
         isExpanded={expandedArtists.includes(artist.artistId)}
         filterKeywords={this.props.filterKeywords}
         onArtistClick={() => this.props.toggleArtistExpanded(artist.artistId)}
-        onSongClick={this.props.queueSong}
-        onSongStarClick={this.props.toggleSongStarred}
-        onSongInfoClick={this.props.showSongInfo}
         key={key}
         style={style}
       />

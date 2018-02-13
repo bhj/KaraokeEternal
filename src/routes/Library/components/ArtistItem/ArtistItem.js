@@ -1,34 +1,16 @@
 import PropTypes from 'prop-types'
-/* eslint react/no-unused-prop-types: 0 */
 import React from 'react'
-import SongItem from '../SongItem'
+import SongList from '../SongList'
 import Icon from 'components/Icon'
 import Highlighter from 'react-highlight-words'
 import './ArtistItem.css'
 
 const ArtistItem = (props) => {
-  let children = []
   let isChildQueued = false
 
   props.artistSongIds.forEach(songId => {
     if (props.queuedSongIds.includes(songId)) {
       isChildQueued = true
-    }
-
-    if (props.isExpanded) {
-      children.push(
-        <SongItem
-          {...props.songs[songId]}
-          onSongClick={() => props.onSongClick(songId)}
-          onSongStarClick={() => props.onSongStarClick(songId)}
-          onSongInfoClick={() => props.onSongInfoClick(songId)}
-          isQueued={props.queuedSongIds.includes(songId)}
-          isStarred={props.starredSongs.includes(songId)}
-          showArtist={false}
-          filterKeywords={props.filterKeywords}
-          key={songId}
-        />
-      )
     }
   })
 
@@ -48,24 +30,26 @@ const ArtistItem = (props) => {
           <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
         </div>
       </div>
-      {children}
+      {props.isExpanded &&
+        <SongList
+          songIds={props.artistSongIds}
+          showArtist={false}
+          filterKeywords={props.filterKeywords}
+        />
+      }
     </div>
   )
 }
 
 ArtistItem.propTypes = {
-  songs: PropTypes.object.isRequired,
   artistSongIds: PropTypes.array.isRequired,
   queuedSongIds: PropTypes.array.isRequired,
-  starredSongs: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
   isExpanded: PropTypes.bool.isRequired,
   filterKeywords: PropTypes.array.isRequired,
   style: PropTypes.object,
   // actions
   onArtistClick: PropTypes.func.isRequired,
-  onSongClick: PropTypes.func.isRequired,
-  onSongStarClick: PropTypes.func.isRequired,
 }
 
 export default ArtistItem

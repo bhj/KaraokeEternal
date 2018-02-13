@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
-import SongItem from '../SongItem'
+import SongList from '../SongList'
 import './SearchResults.css'
 
 const ARTIST_HEADER_HEIGHT = 22
@@ -22,10 +22,7 @@ class SearchResults extends React.Component {
     queuedSongIds: PropTypes.array.isRequired,
     viewportStyle: PropTypes.object.isRequired,
     // actions
-    queueSong: PropTypes.func.isRequired,
-    toggleSongStarred: PropTypes.func.isRequired,
     toggleArtistResultExpanded: PropTypes.func.isRequired,
-    showSongInfo: PropTypes.func.isRequired,
   }
 
   componentDidUpdate (prevProps) {
@@ -39,7 +36,7 @@ class SearchResults extends React.Component {
     return (
       <PaddedList
         viewportStyle={this.props.viewportStyle}
-        rowCount={this.props.artistsResult.length + this.props.songsResult.length + 2}
+        rowCount={this.props.artistsResult.length + 3} // both headers + SongList
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         onRef={this.setRef}
@@ -74,9 +71,6 @@ class SearchResults extends React.Component {
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
           filterKeywords={this.props.filterKeywords}
           onArtistClick={() => this.props.toggleArtistResultExpanded(artistId)}
-          onSongClick={this.props.queueSong}
-          onSongStarClick={this.props.toggleSongStarred}
-          onSongInfoClick={this.props.showSongInfo}
           key={key}
           style={style}
         />
@@ -92,23 +86,15 @@ class SearchResults extends React.Component {
       )
     }
 
-    // song results; compensate for artists & heading
-    const songId = songsResult[index - (artistsResult.length + 2)]
-    const song = this.props.songs[songId]
-
+    // song results
     return (
-      <SongItem {...song}
-        onSongClick={() => this.props.queueSong(songId)}
-        onSongStarClick={() => this.props.toggleSongStarred(songId)}
-        onSongInfoClick={() => this.props.showSongInfo(songId)}
-        isQueued={this.props.queuedSongIds.includes(songId)}
-        isStarred={this.props.starredSongs.includes(songId)}
-        artist={this.props.artists[song.artistId].name}
-        filterKeywords={this.props.filterKeywords}
-        showArtist
-        key={key}
-        style={style}
-      />
+      <div style={style} key={key}>
+        <SongList
+          songIds={songsResult}
+          showArtist
+          filterKeywords={this.props.filterKeywords}
+        />
+      </div>
     )
   }
 
@@ -132,7 +118,7 @@ class SearchResults extends React.Component {
     if (index === this.props.artistsResult.length + 1) return SONG_HEADER_HEIGHT
 
     // song results
-    return SONG_RESULT_HEIGHT
+    return this.props.songsResult.length * SONG_RESULT_HEIGHT
   }
 
   setRef = (ref) => {
