@@ -6,13 +6,7 @@ import Highlighter from 'react-highlight-words'
 import './ArtistItem.css'
 
 const ArtistItem = (props) => {
-  let isChildQueued = false
-
-  props.artistSongIds.forEach(songId => {
-    if (props.queuedSongIds.includes(songId)) {
-      isChildQueued = true
-    }
-  })
+  const isChildQueued = props.artistSongIds.some(songId => props.queuedSongIds.includes(songId))
 
   return (
     <div style={props.style}>
