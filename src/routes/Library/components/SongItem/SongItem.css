@@ -62,10 +62,10 @@
   color: var(--text-color);
 }
 
-.info {
-  fill: var(--song-item-btn-color);
+.hide {
+  fill: var(--song-item-btn-inactive-color);
 }
 
-.hide {
+.info {
   fill: var(--song-item-btn-color);
 }
