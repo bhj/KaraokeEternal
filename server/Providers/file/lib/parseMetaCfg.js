@@ -18,19 +18,21 @@ module.exports = {
   ],
   // applied to each part after splitting
   replPost: [
-    // at least 2 letters followed by at least 2 digits
-    /[a-zA-Z]{2,}\d{2,}/i,
+    // 2-4 letters followed by 1 or more digits
+    /^[a-zA-Z]{2,4}\d{1,}$/i,
     // track numbers
-    /\d{1,2}\.?$/,
+    /^\d{1,2}\.?$/,
     // remove text having 'karaoke' between (), [], or {}
     /[([{](?=[^([{]*$).*karaoke.*[)\]}]/i,
+    // correct for "..., The"
+    [/(.*)(, The)$/i, 'The $1'],
+    // correct for "..., A"
+    [/(.*)(, A)$/i, 'A $1'],
   ],
   // applied to what is determined to be the artist name
   replArtist: [
     // Last, First [Middle] -> First [Middle] Last
     [/^(\w+), (\w+ ?\w+)$/ig, '$2 $1'],
-    // correct for "..., The"
-    [/(.*)(, The)$/i, 'The $1'],
   ],
   // applied to what is determined to be the song title
   replTitle: [
