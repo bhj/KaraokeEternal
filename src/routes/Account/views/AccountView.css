@@ -2,4 +2,5 @@
   overflow-x: hidden;
   overflow-y: scroll;
   padding: var(--container-padding);
+  -webkit-overflow-scrolling: touch;
 }

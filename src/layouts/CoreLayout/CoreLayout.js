@@ -13,7 +13,6 @@ export const CoreLayout = (props) => {
     height: props.viewportHeight,
     paddingTop: props.headerHeight,
     paddingBottom: props.footerHeight,
-    WebkitOverflowScrolling: 'touch',
   }
 
   return (
