@@ -27,6 +27,10 @@
   --song-item-btn-active-color: var(--btn-active-color);
   --song-item-btn-inactive-color: #222a44;
 
+  --alpha-picker-color: var(--artist-folder-color);
+  --alpha-picker-popover-color: var(--text-color);
+  --alpha-picker-popover-background-color: var(--alpha-picker-color);
+
   /* PlaybackCtrl */
   --transport-btn-color: #BA3A95;
 

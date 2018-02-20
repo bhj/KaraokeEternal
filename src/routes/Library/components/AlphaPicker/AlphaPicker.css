@@ -1,0 +1,11 @@
+.container {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 2vh;
+  right: 0;
+  touch-action: none;
+  width: 30px;
+  color: var(--alpha-picker-color);
+}

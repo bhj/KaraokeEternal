@@ -1,0 +1,19 @@
+.container {
+  right: 60px;
+  position: absolute;
+  height: 80px;
+  z-index: 9999;
+}
+
+.icon {
+  fill: var(--alpha-picker-popover-background-color);
+}
+
+.char {
+  position: relative;
+  font-size: 36px;
+  top: -60px;
+  left: -4px;
+  text-align: center;
+  color: var(--alpha-picker-popover-color);
+}

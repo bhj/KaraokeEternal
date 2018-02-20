@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import PaddedList from 'components/PaddedList'
+import AlphaPicker from '../AlphaPicker'
 import ArtistItem from '../ArtistItem'
 const ROW_HEIGHT = 44
 
@@ -22,17 +23,29 @@ class ArtistList extends React.Component {
 
   render () {
     if (this.props.artistsResult.length === 0) return null
+    const { viewportStyle } = this.props
 
     return (
-      <PaddedList
-        viewportStyle={this.props.viewportStyle}
-        scrollTop={this.props.scrollTop}
-        rowCount={this.props.artistsResult.length}
-        rowHeight={this.rowHeight}
-        rowRenderer={this.rowRenderer}
-        onScroll={this.handleScroll}
-        onRef={this.setRef}
-      />
+      <div>
+        <PaddedList
+          viewportStyle={viewportStyle}
+          scrollTop={this.props.scrollTop}
+          scrollToAlignment='start'
+          rowCount={this.props.artistsResult.length}
+          rowHeight={this.rowHeight}
+          rowRenderer={this.rowRenderer}
+          onScroll={this.handleScroll}
+          onRef={this.setRef}
+          style={{ paddingRight: '30px' }} // width of AlphaPicker
+        />
+        <AlphaPicker
+          onPick={this.handleAlphaPick}
+          style={{
+            top: viewportStyle.paddingTop + 25,
+            height: viewportStyle.height - viewportStyle.paddingTop - viewportStyle.paddingBottom - 50,
+          }}
+        />
+      </div>
     )
   }
 
@@ -79,6 +92,14 @@ class ArtistList extends React.Component {
 
   handleScroll = ({ scrollTop }) => {
     this.lastScrollTop = scrollTop
+  }
+
+  handleAlphaPick = (char) => {
+    for (let i = 0; i < this.props.artistsResult.length; i++) {
+      if (this.props.artists[this.props.artistsResult[i]].name.toUpperCase().startsWith(char)) {
+        return this.ref.scrollToRow(i > 0 ? i - 1 : i)
+      }
+    }
   }
 
   setRef = (ref) => {
