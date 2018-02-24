@@ -167,7 +167,7 @@ class Media {
     try {
       const q = squel.select()
         .from('artists')
-        .where('name = ?', meta.artist)
+        .where('name = ? COLLATE NOCASE', meta.artist)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
@@ -207,7 +207,7 @@ class Media {
       const q = squel.select()
         .from('songs')
         .where('artistId = ?', artistId)
-        .where('title = ?', meta.title)
+        .where('title = ? COLLATE NOCASE', meta.title)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
