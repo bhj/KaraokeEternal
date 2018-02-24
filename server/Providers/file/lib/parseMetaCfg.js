@@ -33,6 +33,10 @@ module.exports = {
   replArtist: [
     // Last, First [Middle] -> First [Middle] Last
     [/^(\w+), (\w+ ?\w+)$/ig, '$2 $1'],
+    // featuring feat. feat ft => ft.
+    [/ featuring /i, ' ft. '],
+    [/ feat.? /i, ' ft. '],
+    [/ ft /i, ' ft. '],
   ],
   // applied to what is determined to be the song title
   replTitle: [
