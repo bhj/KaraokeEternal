@@ -101,7 +101,7 @@ class FileScanner extends Scanner {
         log(`  => ${res.entities[id].providerData.basePath}${res.entities[id].providerData.relPath}`)
       })
 
-      log(`Removing ${invalidIds.length} orphaned media entries`)
+      log(`Found ${invalidIds.length} orphaned media entries`)
 
       if (invalidIds.length) {
         await Media.remove(invalidIds)
