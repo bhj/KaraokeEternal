@@ -164,10 +164,20 @@ class Media {
     }
 
     // match/create artist
+    // -------------------
+    const artists = [meta.artist]
+
+    // try with and without 'The'
+    if (/^the /i.test(meta.artist)) {
+      artists.push(meta.artist.replace(/^the /i, ''))
+    } else {
+      artists.push(`The ${meta.artist}`)
+    }
+
     try {
       const q = squel.select()
         .from('artists')
-        .where('name = ? COLLATE NOCASE', meta.artist)
+        .where('name IN ? COLLATE NOCASE', artists)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
