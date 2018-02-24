@@ -51,7 +51,7 @@ router.post('/account', async (ctx, next) => {
   try {
     const q = squel.select()
       .from('users')
-      .where('email = ?', email)
+      .where('email = ? COLLATE NOCASE', email)
 
     const { text, values } = q.toParam()
 
