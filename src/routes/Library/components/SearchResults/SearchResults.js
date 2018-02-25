@@ -20,7 +20,7 @@ class SearchResults extends React.Component {
     expandedArtistResults: PropTypes.array.isRequired,
     filterKeywords: PropTypes.array.isRequired,
     queuedSongIds: PropTypes.array.isRequired,
-    viewportStyle: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
     // actions
     toggleArtistResultExpanded: PropTypes.func.isRequired,
   }
@@ -35,10 +35,13 @@ class SearchResults extends React.Component {
   render () {
     return (
       <PaddedList
-        viewportStyle={this.props.viewportStyle}
         rowCount={this.props.artistsResult.length + 3} // both headers + SongList
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
+        paddingTop={this.props.ui.headerHeight}
+        paddingBottom={this.props.ui.footerHeight}
+        width={this.props.ui.browserWidth}
+        height={this.props.ui.browserHeight}
         onRef={this.setRef}
       />
     )

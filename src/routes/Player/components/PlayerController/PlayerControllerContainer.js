@@ -1,4 +1,4 @@
-import Player from './Player'
+import PlayerController from './PlayerController'
 import { connect } from 'react-redux'
 import { requestPlayNext } from 'store/modules/status'
 import {
@@ -45,4 +45,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapActionCreators)(Player)
+export default connect(mapStateToProps, mapActionCreators)(PlayerController)

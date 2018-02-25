@@ -9,14 +9,19 @@ import './AccountView.css'
 export default class AccountView extends Component {
   static propTypes = {
     isAdmin: PropTypes.bool,
-    viewportStyle: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
   }
 
   render () {
-    const { isAdmin, viewportStyle } = this.props
+    const { isAdmin, ui } = this.props
 
     return (
-      <div styleName='container' style={viewportStyle}>
+      <div styleName='container' style={{
+        paddingTop: ui.headerHeight,
+        paddingBottom: ui.footerHeight,
+        width: ui.browserWidth,
+        height: ui.browserHeight,
+      }}>
         <Header />
 
         {isAdmin &&

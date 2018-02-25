@@ -24,7 +24,7 @@ const LibraryView = (props) => {
 LibraryView.propTypes = {
   isFiltering: PropTypes.bool.isRequired,
   isShowingSongInfo: PropTypes.bool.isRequired,
-  viewportStyle: PropTypes.object.isRequired,
+  ui: PropTypes.object.isRequired,
 }
 
 export default LibraryView

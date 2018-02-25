@@ -24,6 +24,12 @@ const persistConfig = {
 export const makeRootReducer = (asyncReducers) => {
   return persistCombineReducers(persistConfig, {
     artists,
+    browser: createResponsiveStateReducer(null, {
+      extraFields: () => ({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }),
+    }),
     library,
     location,
     prefs,
@@ -34,12 +40,6 @@ export const makeRootReducer = (asyncReducers) => {
     status,
     ui,
     user,
-    viewport: createResponsiveStateReducer(null, {
-      extraFields: () => ({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      }),
-    }),
     ...asyncReducers,
   })
 }

@@ -16,7 +16,7 @@ class QueueView extends React.Component {
     isAtQueueEnd: PropTypes.bool.isRequired,
     waits: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
-    viewportStyle: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
@@ -38,10 +38,13 @@ class QueueView extends React.Component {
 
         {props.user.roomId &&
           <PaddedList
-            viewportStyle={props.viewportStyle}
             rowCount={props.queue.result.length}
             rowHeight={this.rowHeight}
             rowRenderer={this.rowRenderer}
+            paddingTop={props.ui.headerHeight}
+            paddingBottom={props.ui.footerHeight}
+            width={props.ui.browserWidth}
+            height={props.ui.browserHeight}
             scrollToAlignment={'center'}
             queuedSongs={props.queue.result} // pass-through forces List refresh
             curId={props.curId} // pass-through forces List refresh

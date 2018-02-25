@@ -8,16 +8,18 @@ import 'normalize.css'
 import '../../styles/global.css'
 
 export const CoreLayout = (props) => {
-  const viewportStyle = {
-    width: props.viewportWidth,
-    height: props.viewportHeight,
-    paddingTop: props.headerHeight,
-    paddingBottom: props.footerHeight,
+  const ui = {
+    browserWidth: props.browserWidth,
+    browserHeight: props.browserHeight,
+    headerHeight: props.headerHeight,
+    footerHeight: props.footerHeight,
+    viewportWidth: props.browserWidth,
+    viewportHeight: props.browserHeight - props.headerHeight - props.footerHeight,
   }
 
   return (
     <div>
-      { React.cloneElement(props.children, { viewportStyle }) }
+      { React.cloneElement(props.children, { ui }) }
 
       <Navigation />
 
@@ -44,8 +46,8 @@ export default CoreLayout
 
 CoreLayout.propTypes = {
   children: PropTypes.any,
-  viewportWidth: PropTypes.number.isRequired,
-  viewportHeight: PropTypes.number.isRequired,
+  browserWidth: PropTypes.number.isRequired,
+  browserHeight: PropTypes.number.isRequired,
   headerHeight: PropTypes.number.isRequired,
   footerHeight: PropTypes.number.isRequired,
   errorMessage: PropTypes.any,

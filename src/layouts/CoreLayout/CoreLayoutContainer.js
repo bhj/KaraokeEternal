@@ -10,8 +10,8 @@ const mapActionCreators = {
 const mapStateToProps = (state) => {
   return {
     errorMessage: state.ui.errorMessage,
-    viewportWidth: state.viewport.width,
-    viewportHeight: state.viewport.height,
+    browserWidth: state.browser.width,
+    browserHeight: state.browser.height,
     headerHeight: state.ui.headerHeight,
     footerHeight: state.ui.footerHeight,
   }

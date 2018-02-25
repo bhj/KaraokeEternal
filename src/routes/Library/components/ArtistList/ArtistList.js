@@ -15,7 +15,7 @@ class ArtistList extends React.Component {
     expandedArtists: PropTypes.array.isRequired,
     filterKeywords: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
-    viewportStyle: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
     // actions
     toggleArtistExpanded: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
@@ -23,26 +23,29 @@ class ArtistList extends React.Component {
 
   render () {
     if (this.props.artistsResult.length === 0) return null
-    const { viewportStyle } = this.props
+    const { ui } = this.props
 
     return (
       <div>
         <PaddedList
-          viewportStyle={viewportStyle}
-          scrollTop={this.props.scrollTop}
-          scrollToAlignment='start'
           rowCount={this.props.artistsResult.length}
           rowHeight={this.rowHeight}
           rowRenderer={this.rowRenderer}
           onScroll={this.handleScroll}
           onRef={this.setRef}
+          paddingTop={ui.headerHeight}
+          paddingBottom={ui.footerHeight}
+          width={ui.browserWidth}
+          height={ui.browserHeight}
+          scrollTop={this.props.scrollTop}
+          scrollToAlignment='start'
           style={{ paddingRight: '30px' }} // width of AlphaPicker
         />
         <AlphaPicker
           onPick={this.handleAlphaPick}
           style={{
-            top: viewportStyle.paddingTop + 25,
-            height: viewportStyle.height - viewportStyle.paddingTop - viewportStyle.paddingBottom - 50,
+            top: ui.headerHeight + 25,
+            height: ui.viewportHeight - 50,
           }}
         />
       </div>

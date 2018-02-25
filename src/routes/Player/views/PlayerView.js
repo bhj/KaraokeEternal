@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import PlayerHeader from '../components/PlayerHeader'
-import Player from '../components/Player'
+import PlayerController from '../components/PlayerController'
 import screenfull from 'screenfull'
 import './PlayerView.css'
 
 class PlayerView extends React.Component {
   static propTypes = {
-    viewportStyle: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
   }
 
   render () {
-    const { width, height, paddingTop, paddingBottom } = this.props.viewportStyle
+    const { ui } = this.props
     const { isFullscreen } = screenfull
 
     return (
@@ -20,14 +20,16 @@ class PlayerView extends React.Component {
         <div
           ref={r => { this.ref = r }}
           styleName='container'
-          style={isFullscreen ? {} : {
-            marginTop: paddingTop,
-            height: height - paddingTop - paddingBottom,
+          style={{
+            marginTop: isFullscreen ? 0 : ui.headerHeight,
           }}
         >
-          <Player
-            width={width}
-            height={height - (isFullscreen ? 0 : paddingTop + paddingBottom)}
+          <PlayerController
+            style={{
+              width: ui.browserWidth,
+              height: isFullscreen ? ui.browserHeight : ui.viewportHeight,
+              top: isFullscreen ? 0 : ui.headerHeight,
+            }}
           />
         </div>
       </div>
