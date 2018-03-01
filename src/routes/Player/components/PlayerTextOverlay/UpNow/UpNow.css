@@ -2,9 +2,8 @@
   background-color: var(--chrome-background-color);
   border-radius: var(--border-radius);
   color: white;
-  font-size: 36px;
-  /* opacity: 0; */
-  padding: 50px;
+  font-size: 8vh;
+  padding: 30px 60px;
 }
 
 .fadeEnter {

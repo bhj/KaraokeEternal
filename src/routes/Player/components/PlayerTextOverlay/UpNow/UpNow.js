@@ -14,18 +14,18 @@ class UpNow extends React.Component {
   }
 
   componentDidMount () {
-    this.setState({ show: true })
-
-    clearTimeout(this.timeoutID)
-    this.timeoutID = setTimeout(() => {
-      this.setState({ show: false })
-    }, 5000)
+    this.animate()
   }
 
   componentWillReceiveProps () {
+    this.animate()
+  }
+
+  animate () {
+    clearTimeout(this.timeoutID)
+
     this.setState({ show: true })
 
-    clearTimeout(this.timeoutID)
     this.timeoutID = setTimeout(() => {
       this.setState({ show: false })
     }, 5000)
@@ -34,7 +34,6 @@ class UpNow extends React.Component {
   render () {
     return (
       <CSSTransition
-        appear
         unmountOnExit
         in={this.state.show}
         timeout={1000}

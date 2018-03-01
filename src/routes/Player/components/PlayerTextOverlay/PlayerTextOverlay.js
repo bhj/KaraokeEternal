@@ -21,6 +21,9 @@ class PlayerTextOverlay extends React.Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
+    // @todo: this is a hacky way of preventing
+    // children from updating and re-triggering
+    // any of their animations
     return this.shouldUpdate === true
   }
 
@@ -29,7 +32,7 @@ class PlayerTextOverlay extends React.Component {
 
     this.setState({
       component: 'UpNow',
-      text: `Up now: ${name}`,
+      text: name,
     }, () => { this.shouldUpdate = false })
   }
 
