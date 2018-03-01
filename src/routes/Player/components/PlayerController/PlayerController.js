@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Player from '../Player'
 import PlayerTextOverlay from '../PlayerTextOverlay'
+
 class PlayerController extends React.Component {
   static propTypes = {
     queueItem: PropTypes.object.isRequired,
@@ -9,7 +10,8 @@ class PlayerController extends React.Component {
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
-    style: PropTypes.object.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     mediaRequest: PropTypes.func.isRequired,
@@ -54,7 +56,7 @@ class PlayerController extends React.Component {
       this.props.cancelStatus()
 
       // push notification
-      this.overlay.upNext(nextProps.queueItem.username)
+      this.overlay.upNow(nextProps.queueItem.username)
     }
 
     // improve play/pause feedback lag
@@ -65,6 +67,7 @@ class PlayerController extends React.Component {
 
   handleMediaError = (err) => {
     this.props.emitError(this.props.queueItem.queueId, err)
+    this.overlay.error()
   }
 
   render () {
@@ -98,12 +101,13 @@ class PlayerController extends React.Component {
           onStatus={props.emitStatus}
           onMediaEnd={props.requestPlayNext}
           onMediaError={this.handleMediaError}
-          width={props.style.width}
-          height={props.style.height}
+          width={props.width}
+          height={props.height}
         />
         <PlayerTextOverlay
           ref={r => { this.overlay = r }}
-          style={props.style}
+          width={props.width}
+          height={props.height}
         />
       </div>
     )

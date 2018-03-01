@@ -1,0 +1,28 @@
+.textContainer {
+  background-color: var(--chrome-background-color);
+  border-radius: var(--border-radius);
+  color: white;
+  font-size: 36px;
+  /* opacity: 0; */
+  padding: 50px;
+}
+
+.fadeEnter {
+  opacity: 0.01;
+}
+
+.fadeEnterActive {
+  composes: fadeEnter;
+  opacity: 1;
+  transition: opacity 1000ms ease-in;
+}
+
+.fadeExit {
+  opacity: 1;
+}
+
+.fadeExitActive {
+  composes: fadeExit;
+  opacity: 0.01;
+  transition: opacity 1000ms ease-in;
+}

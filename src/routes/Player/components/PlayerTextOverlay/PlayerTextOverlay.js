@@ -1,49 +1,55 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-// import ColorCycle from '../ColorCycle'
-import { CSSTransition } from 'react-transition-group'
-import styles from './PlayerTextOverlay.css'
+import Fire from './Fire'
+import UpNow from './UpNow'
+import './PlayerTextOverlay.css'
+
+const Components = {
+  Fire,
+  UpNow,
+}
 
 class PlayerTextOverlay extends React.Component {
   static propTypes = {
-    style: PropTypes.object.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
   }
 
-  timeoutID = null
   state = {
-    show: false,
+    component: null,
+    text: '',
   }
 
-  upNext (name) {
-    clearTimeout(this.timeoutID)
-    this.timeoutID = setTimeout(() => {
-      this.setState({ show: false })
-    }, 2000)
+  shouldComponentUpdate (nextProps, nextState) {
+    return this.shouldUpdate === true
+  }
+
+  upNow (name) {
+    this.shouldUpdate = true
 
     this.setState({
-      show: true,
+      component: 'UpNow',
       text: `Up now: ${name}`,
+    }, () => { this.shouldUpdate = false })
+  }
+
+  error () {
+    this.shouldUpdate = true
+    this.setState({
+      component: 'Fire',
+      text: 'CRAP',
     })
   }
 
   render () {
+    if (this.state.component === null) return null
+
+    const { width, height } = this.props
+    const Component = Components[this.state.component]
+
     return (
-      <div style={this.props.style} styleName='styles.container'>
-        <CSSTransition
-          in={this.state.show}
-          timeout={10000}
-          classNames={{
-            appear: '',
-            appearActive: '',
-            enter: styles.fadeEnter,
-            enterActive: styles.fadeEnterActive,
-            exit: styles.fadeExit,
-            exitActive: styles.fadeExitActive,
-          }}>
-          <div className='bg-blur' styleName='styles.textContainer'>
-            {this.state.text}
-          </div>
-        </CSSTransition>
+      <div style={{ width, height }} styleName='container'>
+        <Component text={this.state.text} />
       </div>
 
     )

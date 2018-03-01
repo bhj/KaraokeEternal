@@ -13,6 +13,7 @@ class PlayerView extends React.Component {
   render () {
     const { ui } = this.props
     const { isFullscreen } = screenfull
+    const height = isFullscreen ? ui.browserHeight : ui.viewportHeight
 
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -21,16 +22,12 @@ class PlayerView extends React.Component {
           ref={r => { this.ref = r }}
           styleName='container'
           style={{
-            marginTop: isFullscreen ? 0 : ui.headerHeight,
+            top: isFullscreen ? 0 : ui.headerHeight,
+            width: ui.browserWidth,
+            height,
           }}
         >
-          <PlayerController
-            style={{
-              width: ui.browserWidth,
-              height: isFullscreen ? ui.browserHeight : ui.viewportHeight,
-              top: isFullscreen ? 0 : ui.headerHeight,
-            }}
-          />
+          <PlayerController width={ui.browserWidth} height={height} />
         </div>
       </div>
     )
