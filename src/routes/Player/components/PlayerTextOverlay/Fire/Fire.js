@@ -1,3 +1,4 @@
+// Adapted from https://codepen.io/N00R_alhassan1/pen/myLPzR
 import PropTypes from 'prop-types'
 import React from 'react'
 import FireImage from './fire.gif'
@@ -11,7 +12,7 @@ export const Fire = (props) => (
         viewBox='30 100 186 200'
         patternUnits='userSpaceOnUse'
         width='216' height='200'
-        x='-70' y='35'>
+        x='-30' y='35'>
         <image href={FireImage} width='256' height='300' />
       </pattern>
 
