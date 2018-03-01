@@ -158,7 +158,7 @@ config.module.rules.push(
     }
   },
   {
-    test    : /\.(png|jpg)$/,
+    test    : /\.(png|jpg|gif)$/,
     loader  : 'url-loader',
     options : {
       limit : '8192'
