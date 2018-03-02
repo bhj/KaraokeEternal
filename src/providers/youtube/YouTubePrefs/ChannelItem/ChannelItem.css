@@ -18,5 +18,5 @@
 }
 
 .clear {
-  fill: var(--action-warning-color);
+  fill: var(--btn-danger-color);
 }

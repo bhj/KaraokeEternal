@@ -92,9 +92,10 @@ button.primary {
   color: var(--btn-primary-color);
 }
 
-@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+@supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
   .bg-blur {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: var(--chrome-background-color-blur) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }

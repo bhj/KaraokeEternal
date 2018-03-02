@@ -1,19 +1,24 @@
 :root {
   /* Defaults */
-  --background-color: #191F32;
+  --background-color: #111522;
   --text-color: #a9a9a9;
-  --link-color: #2A48BF;
+  --link-color: #2864CD;
   --border-radius: 5px;
   --container-padding: 10px;
 
-  --btn-inactive-color: var(--text-color);
-  --btn-active-color: #2e4fd1;
-  --action-warning-color: #BA3A95;
+  --btn-inactive-color: #808080;
+  --btn-active-color: var(--link-color);
+  --btn-danger-color: #BA3A95;
+
+  /* UI chrome (header/footer) */
+  --chrome-background-color: rgba(48, 49, 54, 1);
+  --chrome-background-color-blur: rgba(48, 49, 54, .25);
+  --chrome-border-color: #333;
 
   /* Account widgets */
-  --widget-background-color: #333;
+  --widget-background-color: #303030;
   --widget-title-color: var(--text-color);
-  --widget-title-background-color: #555;
+  --widget-title-background-color: #4d4d4d;
   --widget-title-size: 18px;
   --widget-title-padding: 8px;
 
@@ -32,11 +37,9 @@
   --alpha-picker-popover-background-color: var(--alpha-picker-color);
 
   /* PlaybackCtrl */
-  --transport-btn-color: #BA3A95;
-
-  /* UI chrome (header/footer) */
-  --chrome-background-color: rgba(248, 248, 248, 0.2);
-  --chrome-border-color: #333;
+  --transport-btn-color: var(--btn-danger-color);
+  --transport-volume-color: var(--btn-active-color);
+  --transport-volume-background-color: var(--background-color);
 
   /* Navigation */
   --nav-link-color: var(--btn-inactive-color);
