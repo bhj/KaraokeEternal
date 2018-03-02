@@ -64,9 +64,10 @@ export default class SongItem extends React.Component {
           style={{ width: this.state.expanded ? BTN_WIDTH * 3 + 'px' : BTN_WIDTH + 'px' }}
         >
           <div onClick={props.onSongStarClick} styleName='button'>
-            <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}
-            />
-            <div styleName={props.isStarred ? 'starCountStarred' : 'starCount'}>{props.numStars}</div>
+            <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'} />
+            <div styleName={props.isStarred ? 'starCountStarred' : 'starCount'}>
+              {props.numStars ? props.numStars : ''}
+            </div>
           </div>
           <div onClick={props.onSongStarClick} styleName='button'>
             <Icon size={44} icon='VISIBILITY_OFF' styleName='hide' />
