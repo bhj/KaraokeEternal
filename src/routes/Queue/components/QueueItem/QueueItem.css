@@ -25,6 +25,16 @@
 }
 
 .wait {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  font-size: 24px;
+  width: 20%;
+}
+
+.waitUnit {
+  font-size: 16px;
 }
 
 .user {

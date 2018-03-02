@@ -1,19 +1,21 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Icon from 'components/Icon'
-import secToTxt from 'lib/secToTxt'
 import './QueueItem.css'
 
 export const QueueItem = (props) => (
   <div styleName='container' style={{ ...props.style, backgroundSize: props.pctPlayed + '% 100%' }}>
     <div styleName='wait'>
       {props.isActive && 'now'}
-      {props.isUpcoming && secToTxt(props.wait)}
+      {props.isUpcoming &&
+        <div>{props.waitValue}<span styleName='waitUnit'>{props.waitUnit}</span></div>
+      }
     </div>
 
     <div styleName='primary'>
       <div styleName='user'>{props.username}</div>
-      <div styleName='title'>{props.artist} - {props.title}</div>
+      <div styleName='title'>{props.title}</div>
+      <div styleName='artist'>{props.artist}</div>
     </div>
 
     {props.hasErrors &&
@@ -38,7 +40,8 @@ QueueItem.propTypes = {
   title: PropTypes.string.isRequired,
   artist: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
-  wait: PropTypes.number.isRequired,
+  waitValue: PropTypes.number.isRequired,
+  waitUnit: PropTypes.string.isRequired,
   isActive: PropTypes.bool.isRequired,
   isUpcoming: PropTypes.bool.isRequired,
   pctPlayed: PropTypes.number.isRequired,
