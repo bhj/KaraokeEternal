@@ -8,7 +8,7 @@ const cycleSpeed = 50 // ms
 
 class ColorCycle extends React.Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
   }
 
   state = {
@@ -40,7 +40,7 @@ class ColorCycle extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.title !== this.props.title) {
+    if (prevProps.text !== this.props.text) {
       this.updateTitle()
     }
   }
@@ -61,7 +61,7 @@ class ColorCycle extends React.Component {
 
   updateTitle = () => {
     // array of chars
-    this.chars = this.props.title.split('')
+    this.chars = this.props.text.split('')
 
     // array of hex colors spread throughout colorNames
     this.colors = chroma.scale(colorNames)

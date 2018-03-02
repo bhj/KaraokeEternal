@@ -45,6 +45,16 @@ class PlayerController extends React.Component {
       return this.props.emitStatus({ position: 0 })
     }
 
+    // @todo: might be a better place for this
+    if (this.props.queueItem.queueId === -1) {
+      this.overlay.title('PRESS PLAY TO BEGIN')
+    }
+
+    // @todo: might be a better place for this
+    if (this.props.isAtQueueEnd) {
+      this.overlay.title('CAN HAZ MOAR SONGZ?')
+    }
+
     this.props.emitStatus()
   }
 
@@ -81,13 +91,6 @@ class PlayerController extends React.Component {
   render () {
     const { queueItem, isAtQueueEnd, isErrored } = this.props
     const enablePlayer = queueItem.queueId !== -1 && !isAtQueueEnd && !isErrored
-    // if (props.queueItem.queueId === -1) {
-    //   return <ColorCycle title='PRESS PLAY TO BEGIN' />
-    // }
-    //
-    // if (props.isAtQueueEnd) {
-    //   return <ColorCycle title='CAN HAZ MOAR SONGZ?' />
-    // }
 
     return (
       <div>

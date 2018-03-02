@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Fire from './Fire'
+import ColorCycle from './ColorCycle'
 import UpNow from './UpNow'
+import Fire from './Fire'
 import './PlayerTextOverlay.css'
 
 const Components = {
+  ColorCycle,
   Fire,
   UpNow,
 }
@@ -27,9 +29,16 @@ class PlayerTextOverlay extends React.Component {
     return this.shouldUpdate === true
   }
 
+  title = (text) => {
+    this.shouldUpdate = true
+    this.setState({
+      component: 'ColorCycle',
+      text,
+    })
+  }
+
   upNow = (name) => {
     this.shouldUpdate = true
-
     this.setState({
       component: 'UpNow',
       text: name,
