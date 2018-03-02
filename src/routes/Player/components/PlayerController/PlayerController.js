@@ -65,24 +65,24 @@ class PlayerController extends React.Component {
     }
   }
 
-  handleMediaError = (err) => {
-    this.props.emitError(this.props.queueItem.queueId, err)
+  handleMediaRequestError = (msg) => {
+    // stop loading spinner, etc.
+    this.props.mediaRequestError(msg)
+
+    // call generic error handler (stops playback, etc.)
+    this.handleError(msg)
+  }
+
+  handleError = (msg) => {
+    this.props.emitError(msg)
     this.overlay.error()
   }
 
   render () {
-    const { props } = this
-
+    const { queueItem, isAtQueueEnd, isErrored } = this.props
+    const enablePlayer = queueItem.queueId !== -1 && !isAtQueueEnd && !isErrored
     // if (props.queueItem.queueId === -1) {
     //   return <ColorCycle title='PRESS PLAY TO BEGIN' />
-    // }
-    //
-    // if (typeof Providers[props.queueItem.provider] === 'undefined') {
-    //   return <ColorCycle title={`Provider not found: ${props.queueItem.provider}`} />
-    // }
-    //
-    // if (props.isErrored) {
-    //   return <ColorCycle title='Something went wrong! (press Next to continue)' />
     // }
     //
     // if (props.isAtQueueEnd) {
@@ -91,23 +91,25 @@ class PlayerController extends React.Component {
 
     return (
       <div>
-        <Player
-          queueItem={props.queueItem}
-          volume={props.volume}
-          isPlaying={props.isPlaying}
-          mediaRequest={props.mediaRequest}
-          mediaRequestSuccess={props.mediaRequestSuccess}
-          mediaRequestError={props.mediaRequestError}
-          onStatus={props.emitStatus}
-          onMediaEnd={props.requestPlayNext}
-          onMediaError={this.handleMediaError}
-          width={props.width}
-          height={props.height}
-        />
+        {enablePlayer &&
+          <Player
+            queueItem={this.props.queueItem}
+            volume={this.props.volume}
+            isPlaying={this.props.isPlaying}
+            onMediaRequest={this.props.mediaRequest}
+            onMediaRequestSuccess={this.props.mediaRequestSuccess}
+            onMediaRequestError={this.handleMediaRequestError}
+            onStatus={this.props.emitStatus}
+            onMediaEnd={this.props.requestPlayNext}
+            onError={this.handleError}
+            width={this.props.width}
+            height={this.props.height}
+          />
+        }
         <PlayerTextOverlay
           ref={r => { this.overlay = r }}
-          width={props.width}
-          height={props.height}
+          width={this.props.width}
+          height={this.props.height}
         />
       </div>
     )

@@ -14,27 +14,6 @@ import {
   QUEUE_PUSH,
 } from 'constants/actions'
 
-export function mediaRequest (mediaId) {
-  return {
-    type: PLAYER_MEDIA_REQUEST,
-    payload: { mediaId },
-  }
-}
-
-export function mediaRequestSuccess (mediaId) {
-  return {
-    type: PLAYER_MEDIA_REQUEST_SUCCESS,
-    payload: { mediaId },
-  }
-}
-
-export function mediaRequestError (mediaId, error) {
-  return {
-    type: PLAYER_MEDIA_REQUEST_ERROR,
-    payload: { mediaId, error },
-  }
-}
-
 // have server emit player status to room
 export function emitStatus (status) {
   return (dispatch, getState) => {
@@ -59,7 +38,34 @@ export function emitStatus (status) {
   }
 }
 
-// cancel pending status emits
+// emit error to room and stop playback
+export function emitError (msg) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: EMIT_PLAYER_ERROR,
+      payload: {
+        queueId: getState().player.queueId,
+        msg,
+      },
+    })
+  }
+}
+
+// player entered room
+export function emitEnter () {
+  return {
+    type: EMIT_PLAYER_ENTER,
+  }
+}
+
+// player left room
+export function emitLeave () {
+  return {
+    type: EMIT_PLAYER_LEAVE,
+  }
+}
+
+// cancel any pending status emits
 export function cancelStatus () {
   return {
     type: CANCEL,
@@ -69,23 +75,26 @@ export function cancelStatus () {
   }
 }
 
-// have server emit error to room
-export function emitError (queueId, message) {
+export function mediaRequest () {
   return {
-    type: EMIT_PLAYER_ERROR,
-    payload: { queueId, message },
+    type: PLAYER_MEDIA_REQUEST,
   }
 }
 
-export function emitEnter () {
+export function mediaRequestSuccess () {
   return {
-    type: EMIT_PLAYER_ENTER,
+    type: PLAYER_MEDIA_REQUEST_SUCCESS,
   }
 }
 
-export function emitLeave () {
-  return {
-    type: EMIT_PLAYER_LEAVE,
+export function mediaRequestError (msg) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: PLAYER_MEDIA_REQUEST_ERROR,
+    })
+
+    // emit generic error and stop playback
+    emitError(msg)
   }
 }
 
@@ -142,6 +151,9 @@ const ACTION_HANDLERS = {
   [PLAYER_MEDIA_REQUEST_ERROR]: (state, { payload }) => ({
     ...state,
     isFetching: false,
+  }),
+  [EMIT_PLAYER_ERROR]: (state, { payload }) => ({
+    ...state,
     isPlaying: false,
   }),
 }

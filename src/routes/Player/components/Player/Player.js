@@ -10,18 +10,19 @@ class Player extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // events
+    onMediaRequest: PropTypes.func.isRequired,
+    onMediaRequestSuccess: PropTypes.func.isRequired,
+    onMediaRequestError: PropTypes.func.isRequired,
     onMediaEnd: PropTypes.func.isRequired,
-    mediaRequest: PropTypes.func.isRequired,
-    mediaRequestSuccess: PropTypes.func.isRequired,
-    mediaRequestError: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired,
     onStatus: PropTypes.func.isRequired,
-    onMediaError: PropTypes.func.isRequired,
   }
 
   render () {
     const { provider } = this.props.queueItem
 
     if (!Providers[provider] || !Providers[provider].playerComponent) {
+      this.props.onError(`Provider not found: ${provider}`)
       return null
     }
 

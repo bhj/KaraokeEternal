@@ -13,10 +13,10 @@ class CDGPlayer extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
-    mediaRequest: PropTypes.func.isRequired,
-    mediaRequestSuccess: PropTypes.func.isRequired,
-    mediaRequestError: PropTypes.func.isRequired,
-    onMediaError: PropTypes.func.isRequired,
+    onMediaRequest: PropTypes.func.isRequired,
+    onMediaRequestSuccess: PropTypes.func.isRequired,
+    onMediaRequestError: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired,
     onMediaEnd: PropTypes.func.isRequired,
     onStatus: PropTypes.func.isRequired,
   }
@@ -74,7 +74,7 @@ class CDGPlayer extends React.Component {
     const { mediaId } = this.props.queueItem
 
     // media request(s) started
-    this.props.mediaRequest(mediaId)
+    this.props.onMediaRequest()
 
     // start loading audio
     this.audio.src = `/api/provider/file/media?type=audio&mediaId=${mediaId}`
@@ -93,10 +93,7 @@ class CDGPlayer extends React.Component {
         this.handleCDGReady()
       }).catch(err => {
         // media request(s) failed
-        this.props.mediaRequestError(mediaId, err.message)
-
-        // emit error to room
-        this.props.onMediaError(err.message)
+        this.props.onMediaRequestError(err.message)
       })
   }
 
@@ -120,7 +117,7 @@ class CDGPlayer extends React.Component {
     // HAVE_ENOUGH_DATA?
     if (this.audio.readyState === 4) {
       // media request(s) finished (enough)
-      this.props.mediaRequestSuccess()
+      this.props.onMediaRequestSuccess()
       this.updateIsPlaying()
     }
   }
@@ -131,7 +128,7 @@ class CDGPlayer extends React.Component {
   handleAudioReady = () => {
     if (this.isCDGLoaded) {
       // media request(s) finished (enough)
-      this.props.mediaRequestSuccess()
+      this.props.onMediaRequestSuccess()
       this.updateIsPlaying()
     }
   }
@@ -149,11 +146,8 @@ class CDGPlayer extends React.Component {
   handleAudioError = (err) => {
     const msg = `Could not load audio (error ${err.target.error.code})`
 
-    // media request failed; stops playing
-    this.props.mediaRequestError(this.props.queueItem.mediaId, msg)
-
-    // emit error to room
-    this.props.onMediaError(msg)
+    // media request failed
+    this.props.onMediaRequestError(msg)
   }
 }
 

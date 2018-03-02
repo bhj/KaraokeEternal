@@ -27,7 +27,7 @@ class PlayerTextOverlay extends React.Component {
     return this.shouldUpdate === true
   }
 
-  upNow (name) {
+  upNow = (name) => {
     this.shouldUpdate = true
 
     this.setState({
@@ -36,7 +36,7 @@ class PlayerTextOverlay extends React.Component {
     }, () => { this.shouldUpdate = false })
   }
 
-  error () {
+  error = () => {
     this.shouldUpdate = true
     this.setState({
       component: 'Fire',

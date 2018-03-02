@@ -65,14 +65,14 @@ const ACTION_HANDLERS = {
     }
   },
   [PLAYER_ERROR]: (state, { payload }) => {
-    const { queueId, message } = payload
+    const { queueId, msg } = payload
 
     return {
       ...state,
       errors: {
         ...state.errors,
         // can be multiple errors for a media item
-        [queueId]: state.errors[queueId] ? state.errors[queueId].concat(message) : [message]
+        [queueId]: state.errors[queueId] ? state.errors[queueId].concat(msg) : [msg]
       }
     }
   },
