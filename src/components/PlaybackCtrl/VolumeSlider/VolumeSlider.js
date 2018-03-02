@@ -65,8 +65,6 @@ const handle = (props) => {
   const style = Object.assign({ left: `${props.offset}%` }, {
     position: 'absolute',
     transform: 'translate(-50%, -42%)',
-    opacity: 0.7,
-    // color: '#333',
     touchAction: 'pan-x',
   })
 
