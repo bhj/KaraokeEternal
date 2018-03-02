@@ -36,6 +36,8 @@
   --alpha-picker-popover-color: var(--text-color);
   --alpha-picker-popover-background-color: var(--alpha-picker-color);
 
+  --queued-item-glow-color: var(--btn-danger-color);
+
   /* PlaybackCtrl */
   --transport-btn-color: var(--btn-danger-color);
   --transport-volume-color: var(--btn-active-color);

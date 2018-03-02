@@ -10,7 +10,7 @@ const ArtistItem = (props) => {
 
   return (
     <div style={props.style}>
-      <div onClick={props.onArtistClick} styleName={'container' + (isChildQueued ? ' hasQueued' : '')}>
+      <div onClick={props.onArtistClick} styleName='container'>
         <div styleName='folderContainer'>
           <Icon icon='FOLDER' size={44} styleName='folderIcon' />
           {props.isExpanded &&
@@ -20,7 +20,7 @@ const ArtistItem = (props) => {
             <div styleName='count'>{props.artistSongIds.length}</div>
           }
         </div>
-        <div styleName='name'>
+        <div styleName='name' className={isChildQueued ? 'glow' : ''}>
           <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
         </div>
       </div>

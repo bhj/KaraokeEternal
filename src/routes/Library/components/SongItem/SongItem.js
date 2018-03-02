@@ -44,13 +44,13 @@ export default class SongItem extends React.Component {
         onSwipingRight={this.handleSwipingRight}
         preventDefaultTouchmoveEvent
         style={props.style}
-        styleName={'container' + (props.isQueued ? ' isQueued' : '')}
+        styleName='container'
       >
         <div styleName='duration'>
           {toMMSS(props.duration)}
         </div>
 
-        <div onClick={props.onSongClick} styleName='title'>
+        <div onClick={props.onSongClick} styleName='title' className={props.isQueued ? 'glow' : ''}>
           <div styleName='title'>
             <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
             {props.numMedia > 1 && <i>({props.numMedia})</i>}
