@@ -24,7 +24,7 @@
 
   /* Library */
   --artist-item-height: 44px;
-  --artist-folder-color: #3f4e7d;
+  --artist-folder-color: #193f80; /* darker --link-color */
   --artist-folder-text-color: white;
 
   --song-item-btn-height: 44px;
@@ -42,6 +42,10 @@
   --transport-btn-color: var(--btn-danger-color);
   --transport-volume-color: var(--btn-active-color);
   --transport-volume-background-color: var(--background-color);
+
+  /* Up Next header/banner */
+  --up-next-bg-color-from: #4e183e; /* darker */
+  --up-next-bg-color-to: var(--queued-item-glow-color);
 
   /* Navigation */
   --nav-link-color: var(--btn-inactive-color);

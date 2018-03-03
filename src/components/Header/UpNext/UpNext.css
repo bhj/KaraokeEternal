@@ -1,6 +1,16 @@
 .container {
   font-size: 16px;
-  background-color: #ffff8c;
+  color: white;
+  animation-duration: 1.5s;
+  animation-name: upnext-bg-animation;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-out;
+}
+
+@keyframes upnext-bg-animation {
+  0% { background-color: var(--up-next-bg-color-from); }
+  100% { background-color: var(--up-next-bg-color-to); }
 }
 
 .msg {
