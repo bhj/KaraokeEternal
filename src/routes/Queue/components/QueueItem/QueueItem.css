@@ -1,30 +1,11 @@
 .container {
   display: flex;
-  height: 64px;
+  height: 80px;
   background-image: linear-gradient(to right, #f3f3f3, #ddd);
   background-repeat: no-repeat;
 }
 
-.primary {
-  flex: 1;
-  overflow: auto;
-}
-
-.ellipsis {
-  text-overflow: ellipsis;
-  overflow:hidden;
-  white-space: nowrap;
-}
-
-.artist {
-  composes: ellipsis;
-}
-
-.title {
-  composes: ellipsis;
-}
-
-.wait {
+.waitContainer {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -37,8 +18,39 @@
   font-size: 16px;
 }
 
+.primary {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: auto;
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  overflow:hidden;
+  white-space: nowrap;
+}
+
 .user {
-  font-weight: bold;
+  font-size: 18px;
+}
+
+.title {
+  composes: ellipsis;
+  font-size: 16px;
+}
+
+.artist {
+  composes: ellipsis;
+  font-size: 14px;
+}
+
+.btnContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-right: var(--container-padding);
 }
 
 /* Actions */

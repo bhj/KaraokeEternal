@@ -6,7 +6,7 @@ import QueueItem from '../components/QueueItem'
 import NoRoom from './NoRoom'
 import secToTxt from 'lib/secToTxt'
 
-const QUEUE_ITEM_HEIGHT = 64
+const QUEUE_ITEM_HEIGHT = 80
 
 class QueueView extends React.Component {
   static propTypes = {

@@ -5,7 +5,7 @@ import './QueueItem.css'
 
 export const QueueItem = (props) => (
   <div styleName='container' style={{ ...props.style, backgroundSize: props.pctPlayed + '% 100%' }}>
-    <div styleName='wait'>
+    <div styleName='waitContainer'>
       {props.isActive && 'now'}
       {props.isUpcoming &&
         <div>{props.waitValue}<span styleName='waitUnit'>{props.waitUnit}</span></div>
@@ -18,21 +18,23 @@ export const QueueItem = (props) => (
       <div styleName='artist'>{props.artist}</div>
     </div>
 
-    {props.hasErrors &&
-      <div onClick={props.onErrorInfoClick}>
-        <Icon icon='INFO_OUTLINE' size={40} styleName='info' />
-      </div>
-    }
-    {props.canSkip &&
-      <div onClick={props.onSkipClick}>
-        <Icon icon='PLAY_NEXT' size={40} styleName='playNext' />
-      </div>
-    }
-    {props.canRemove &&
-      <div onClick={props.onRemoveClick}>
-        <Icon icon='CLEAR' size={40} styleName='remove' />
-      </div>
-    }
+    <div styleName='btnContainer'>
+      {props.hasErrors &&
+        <div onClick={props.onErrorInfoClick}>
+          <Icon icon='INFO_OUTLINE' size={40} styleName='info' />
+        </div>
+      }
+      {props.canSkip &&
+        <div onClick={props.onSkipClick}>
+          <Icon icon='PLAY_NEXT' size={40} styleName='playNext' />
+        </div>
+      }
+      {props.canRemove &&
+        <div onClick={props.onRemoveClick}>
+          <Icon icon='CLEAR' size={40} styleName='remove' />
+        </div>
+      }
+    </div>
   </div>
 )
 
