@@ -6,21 +6,25 @@ import './UpNext.css'
 const UpNext = props => {
   const { value, unit } = secToTime(props.wait)
 
-  return (
-    <div styleName='container'>
-      {props.isUpNow &&
+  if (props.isUpNow) {
+    return (
+      <div styleName='upNow'>
         <p styleName='msg'>
           You&rsquo;re up!
         </p>
-      }
+      </div>
+    )
+  }
 
-      {props.isUpNext && !props.isUpNow &&
+  if (props.isUpNext) {
+    return (
+      <div styleName='upNext'>
         <p styleName='msg'>
           You&rsquo;re next in {value}{unit}...
         </p>
-      }
-    </div>
-  )
+      </div>
+    )
+  }
 }
 
 UpNext.propTypes = {

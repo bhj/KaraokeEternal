@@ -44,8 +44,10 @@
   --transport-volume-background-color: var(--background-color);
 
   /* Up Next header/banner */
-  --up-next-bg-color-from: #4e183e; /* darker */
-  --up-next-bg-color-to: var(--queued-item-glow-color);
+  --up-next-bg-color-from: #112a55; /* darker */
+  --up-next-bg-color-to: var(--btn-active-color);
+  --up-now-bg-color-from: #4e183e; /* darker */
+  --up-now-bg-color-to: var(--queued-item-glow-color);
 
   /* Navigation */
   --nav-link-color: var(--btn-inactive-color);
