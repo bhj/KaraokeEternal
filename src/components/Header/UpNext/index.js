@@ -1,3 +1,3 @@
-import UpNextContainer from './UpNextContainer'
+import UpNext from './UpNext'
 
-export default UpNextContainer
+export default UpNext

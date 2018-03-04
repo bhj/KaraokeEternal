@@ -7,18 +7,20 @@ import UpNext from './UpNext'
 import './Header.css'
 
 const Header = (props) => {
+  const { isPlayer, isPlayerPresent, isUpNext, isUpNow, isAdmin } = props
+
   return (
     <Measure onMeasure={props.setHeaderHeight} whitelist={['height']}>
       <div styleName='container' className='bg-blur'>
-        {!props.isPlayer && props.isPlayerPresent &&
-          <UpNext />
+        {!isPlayer && isPlayerPresent && (isUpNow || isUpNext) &&
+          <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={props.wait} />
         }
 
-        {props.isAdmin &&
+        {isPlayerPresent && (isUpNow || isAdmin) &&
           <PlaybackCtrl />
         }
 
-        {props.isAdmin && props.isUpdating &&
+        {isAdmin && props.isUpdating &&
           <ProgressBar
             text={props.updateText}
             progress={props.updateProgress}
@@ -37,6 +39,9 @@ Header.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   isPlayer: PropTypes.bool.isRequired,
   isPlayerPresent: PropTypes.bool.isRequired,
+  isUpNext: PropTypes.bool.isRequired,
+  isUpNow: PropTypes.bool.isRequired,
+  wait: PropTypes.number.isRequired,
   isUpdating: PropTypes.bool.isRequired,
   updateText: PropTypes.string.isRequired,
   updateProgress: PropTypes.number.isRequired,
