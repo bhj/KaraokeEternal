@@ -10,7 +10,7 @@ const PlaybackCtrl = (props) => {
     return null
   }
 
-  if (!props.isPlayerPresent) {
+  if (props.isAdmin && !props.isPlayerPresent) {
     return <NoPlayer />
   }
 
@@ -43,6 +43,7 @@ const PlaybackCtrl = (props) => {
 }
 
 PlaybackCtrl.propTypes = {
+  isAdmin: PropTypes.bool.isRequired,
   isInRoom: PropTypes.bool.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   isAtQueueEnd: PropTypes.bool.isRequired,
