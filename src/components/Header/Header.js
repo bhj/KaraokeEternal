@@ -16,7 +16,7 @@ const Header = (props) => {
           <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={props.wait} />
         }
 
-        {isPlayerPresent && (isUpNow || isAdmin) &&
+        {(isUpNow || isAdmin) &&
           <PlaybackCtrl />
         }
 
