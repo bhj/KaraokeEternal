@@ -4,7 +4,7 @@ import Header from 'components/Header'
 import PaddedList from 'components/PaddedList'
 import QueueItem from '../components/QueueItem'
 import NoRoom from './NoRoom'
-import secToTxt from 'lib/secToTxt'
+import secToTime from 'lib/secToTime'
 
 const QUEUE_ITEM_HEIGHT = 80
 
@@ -70,10 +70,7 @@ class QueueView extends React.Component {
     const isActive = (queueId === this.props.curId) && !this.props.isAtQueueEnd
     const isUpcoming = queueId > this.props.curId
     const isOwner = item.userId === this.props.user.userId
-
-    const wait = secToTxt(this.props.waits[queueId])
-    const waitValue = wait.substr(0, wait.length - 1)
-    const waitUnit = wait.substr(-1)
+    const wait = secToTime(this.props.waits[queueId])
 
     return (
       <QueueItem {...item}
@@ -83,8 +80,8 @@ class QueueView extends React.Component {
         canRemove={isUpcoming && isOwner}
         hasErrors={typeof this.props.errors[queueId] !== 'undefined'}
         pctPlayed={isActive ? this.props.curPos / item.duration * 100 : 0}
-        waitValue={waitValue}
-        waitUnit={waitUnit}
+        waitValue={wait.value}
+        waitUnit={wait.unit}
         onRemoveClick={() => this.handleRemoveClick(queueId)}
         onSkipClick={this.props.requestPlayNext}
         onErrorInfoClick={() => this.handleErrorInfoClick(queueId)}

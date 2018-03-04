@@ -1,23 +1,27 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import secToTxt from 'lib/secToTxt'
+import secToTime from 'lib/secToTime'
 import './UpNext.css'
 
-const UpNext = props => (
-  <div styleName='container'>
-    {props.isUpNow &&
-      <p styleName='msg'>
-        You&rsquo;re up!
-      </p>
-    }
+const UpNext = props => {
+  const { value, unit } = secToTime(props.wait)
 
-    {props.isUpNext && !props.isUpNow &&
-      <p styleName='msg'>
-        You&rsquo;re up next{props.wait ? ` in ${secToTxt(props.wait)}` : ''}...
-      </p>
-    }
-  </div>
-)
+  return (
+    <div styleName='container'>
+      {props.isUpNow &&
+        <p styleName='msg'>
+          You&rsquo;re up!
+        </p>
+      }
+
+      {props.isUpNext && !props.isUpNow &&
+        <p styleName='msg'>
+          You&rsquo;re next in {value}{unit}...
+        </p>
+      }
+    </div>
+  )
+}
 
 UpNext.propTypes = {
   isUpNow: PropTypes.bool.isRequired,
