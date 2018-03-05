@@ -28,7 +28,7 @@ class Library {
         .field('media.mediaId, media.duration')
         .field('songs.artistId, songs.songId, songs.title')
         .field('MAX(media.isPreferred) AS isPreferred')
-        .field('COUNT(DISTINCT media.mediaId) AS numMedia')
+        .field('COUNT(media.mediaId) AS numMedia')
         .field('COUNT(DISTINCT stars.userId) AS numStars')
         .from('media')
         .join(squel.select()
