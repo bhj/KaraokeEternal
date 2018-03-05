@@ -4,7 +4,7 @@ const jwtVerify = require('jsonwebtoken').verify
 const UserSocket = require('./User/socket')
 const QueueSocket = require('./Queue/socket')
 const PlayerSocket = require('./Player/socket')
-const Media = require('./Media')
+const Library = require('./Library')
 const Queue = require('./Queue')
 const parseCookie = require('./lib/parseCookie')
 
@@ -123,7 +123,7 @@ module.exports = function (io) {
     try {
       io.to(sock.id).emit('action', {
         type: LIBRARY_PUSH,
-        payload: await Media.getLibrary(),
+        payload: await Library.get(),
       })
 
       io.to(sock.id).emit('action', {

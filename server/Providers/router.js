@@ -62,7 +62,7 @@ router.put('/enable', async (ctx, next) => {
     // emit library since enabled providers have changed
     ctx.io.emit('action', {
       type: LIBRARY_PUSH,
-      payload: await Media.getLibrary(),
+      payload: await Library.get(),
     })
   } catch (err) {
     ctx.status = 500

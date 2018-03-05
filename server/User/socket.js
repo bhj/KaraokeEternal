@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const Media = require('../Media')
+const Library = require('../Library')
 
 const {
   LIBRARY_PUSH,
@@ -60,7 +60,7 @@ const ACTION_HANDLERS = {
     try {
       sock.server.emit('action', {
         type: LIBRARY_PUSH,
-        payload: await Media.getLibrary(),
+        payload: await Library.get(),
       })
     } catch (err) {
       return Promise.reject(err)
