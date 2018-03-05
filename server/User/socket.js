@@ -43,14 +43,9 @@ const ACTION_HANDLERS = {
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
 
-      const starredSongs = []
-      rows.forEach(row => {
-        starredSongs.push(row.songId)
-      })
-
       acknowledge({
         type: SONG_TOGGLE_STARRED + '_SUCCESS',
-        payload: starredSongs,
+        payload: rows.map(row => row.songId),
       })
     } catch (err) {
       return Promise.reject(err)
