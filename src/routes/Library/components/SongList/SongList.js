@@ -12,6 +12,7 @@ const SongList = (props) => props.songIds.map(songId => (
     onSongInfoClick={() => props.showSongInfo(songId)}
     isQueued={props.queuedSongIds.includes(songId)}
     isStarred={props.starredSongs.includes(songId)}
+    isAdmin={props.isAdmin}
     filterKeywords={props.filterKeywords}
     artist={props.showArtist ? props.artists[props.songs[songId].artistId].name : ''}
     style={{ height: props.showArtist ? SONG_ARTIST_HEIGHT : SONG_HEIGHT }}

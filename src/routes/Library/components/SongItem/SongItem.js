@@ -18,6 +18,7 @@ export default class SongItem extends React.Component {
     onSongInfoClick: PropTypes.func.isRequired,
     isQueued: PropTypes.bool.isRequired,
     isStarred: PropTypes.bool.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
     numStars: PropTypes.number.isRequired,
     numMedia: PropTypes.number.isRequired,
     filterKeywords: PropTypes.array.isRequired,
@@ -37,6 +38,7 @@ export default class SongItem extends React.Component {
 
   render () {
     const { props } = this
+    const width = this.props.isAdmin && this.state.expanded ? BTN_WIDTH * 3 : BTN_WIDTH
 
     return (
       <Swipeable
@@ -53,16 +55,14 @@ export default class SongItem extends React.Component {
         <div onClick={props.onSongClick} styleName='title' className={props.isQueued ? 'glow' : ''}>
           <div styleName='title'>
             <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
-            {props.numMedia > 1 && <i>({props.numMedia})</i>}
+            {props.isAdmin && props.numMedia > 1 && <i> ({props.numMedia})</i>}
             {props.artist &&
               <div styleName='artist'>{props.artist}</div>
             }
           </div>
         </div>
 
-        <div styleName='btnContainer'
-          style={{ width: this.state.expanded ? BTN_WIDTH * 3 + 'px' : BTN_WIDTH + 'px' }}
-        >
+        <div styleName='btnContainer' style={{ width }}>
           <div onClick={props.onSongStarClick} styleName='button'>
             <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'} />
             <div styleName={props.isStarred ? 'starCountStarred' : 'starCount'}>

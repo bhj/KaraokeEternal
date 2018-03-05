@@ -17,6 +17,7 @@ const mapStateToProps = (state, props) => ({
   songs: state.songs.entities,
   queuedSongIds: getQueuedSongs(state),
   starredSongs: state.user.starredSongs,
+  isAdmin: state.user.isAdmin,
 })
 
 const mapActionCreators = {
