@@ -14,10 +14,11 @@ class AlphaPicker extends React.Component {
       <div
         styleName='container'
         style={this.props.style}
-        onClick={this.handleTouch}
         onTouchStart={this.handleTouch}
         onTouchMove={this.handleTouch}
         onTouchEnd={this.handleTouchEnd}
+        onMouseDown={this.handleTouch}
+        onMouseUp={this.handleTouchEnd}
         ref={this.handleRef}
       >
         {this.alphabet.map((char, i) => (
@@ -40,7 +41,7 @@ class AlphaPicker extends React.Component {
 
     const parent = this.ref.getBoundingClientRect()
     const charHeight = parent.height / this.alphabet.length
-    const y = e.targetTouches[0].clientY - parent.top
+    const y = (e.targetTouches ? e.targetTouches[0].clientY : e.clientY) - parent.top
     const char = this.alphabet[Math.floor(y / charHeight)]
 
     this.setState({
