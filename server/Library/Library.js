@@ -94,6 +94,47 @@ class Library {
 
     return { artists, songs }
   }
+
+  /**
+  * Returns a single song (with the preferred mediaId)
+  *
+  * @param  {[type]}  songId
+  * @return {Promise}        Song entity (same format as with get())
+  */
+  static async getSong (songId) {
+    try {
+      const q = squel.select()
+        .field('media.mediaId, media.duration')
+        .field('songs.artistId, songs.songId, songs.title')
+        .field('MAX(media.isPreferred) AS isPreferred')
+        .field('COUNT(media.mediaId) AS numMedia')
+        .field('COUNT(DISTINCT stars.userId) AS numStars')
+        .from('media')
+        .join(squel.select()
+          .from('providers')
+          .where('providers.isEnabled = 1')
+          .order('priority'),
+        'providers', 'media.provider = providers.name')
+        .join('songs USING (songId)')
+        .join('artists USING (artistId)')
+        .left_join('stars USING(songId)')
+        .group('songs.songId')
+        .where('songs.songId = ?', songId)
+
+      const { text, values } = q.toParam()
+      const row = await db.get(text, values)
+
+      // no need to send over the wire but we needed it
+      // in the query to show the correct mediaId
+      delete row.isPreferred
+
+      return {
+        [songId]: row,
+      }
+    } catch (err) {
+      return Promise.reject(err)
+    }
+  }
 }
 
 module.exports = Library

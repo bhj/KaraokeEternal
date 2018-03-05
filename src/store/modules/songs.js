@@ -1,5 +1,6 @@
 import {
   LIBRARY_PUSH,
+  LIBRARY_SONG_UPDATE_PUSH,
 } from 'constants/actions'
 
 // ------------------------------------
@@ -10,6 +11,13 @@ const ACTION_HANDLERS = {
     ...state,
     result: payload.songs.result,
     entities: payload.songs.entities,
+  }),
+  [LIBRARY_SONG_UPDATE_PUSH]: (state, { payload }) => ({
+    ...state,
+    entities: {
+      ...state.entities,
+      ...payload,
+    }
   }),
 }
 

@@ -1,9 +1,9 @@
 const db = require('sqlite')
 const squel = require('squel')
-const Library = require('../Library')
+const Library = require('./Library')
 
 const {
-  LIBRARY_PUSH,
+  LIBRARY_SONG_UPDATE_PUSH,
   SONG_TOGGLE_STARRED,
 } = require('../../constants/actions')
 
@@ -54,8 +54,8 @@ const ACTION_HANDLERS = {
     // emit updated star count
     try {
       sock.server.emit('action', {
-        type: LIBRARY_PUSH,
-        payload: await Library.get(),
+        type: LIBRARY_SONG_UPDATE_PUSH,
+        payload: await Library.getSong(payload.songId),
       })
     } catch (err) {
       return Promise.reject(err)

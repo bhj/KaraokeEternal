@@ -1,7 +1,7 @@
 const log = require('debug')(`app:server [${process.pid}]`)
 const jwtVerify = require('jsonwebtoken').verify
 
-const UserSocket = require('./User/socket')
+const LibrarySocket = require('./Library/socket')
 const QueueSocket = require('./Queue/socket')
 const PlayerSocket = require('./Player/socket')
 const Library = require('./Library')
@@ -18,7 +18,7 @@ const {
 } = require('../constants/actions')
 
 const handlers = {
-  ...UserSocket,
+  ...LibrarySocket,
   ...QueueSocket,
   ...PlayerSocket,
 }
