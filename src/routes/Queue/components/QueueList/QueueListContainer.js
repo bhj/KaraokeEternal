@@ -1,9 +1,9 @@
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import QueueView from './QueueView'
+import QueueList from './QueueList'
 import { showErrorMessage } from 'store/modules/ui'
 import { requestPlay, requestPause, requestPlayNext } from 'store/modules/status'
-import { queueSong, removeItem } from '../modules/queue'
+import { queueSong, removeItem } from '../../modules/queue'
 
 const getQueue = (state) => state.queue
 const getCurId = (state) => state.status.queueId
@@ -58,4 +58,4 @@ const mapActionCreators = {
   showErrorMessage,
 }
 
-export default connect(mapStateToProps, mapActionCreators)(QueueView)
+export default connect(mapStateToProps, mapActionCreators)(QueueList)
