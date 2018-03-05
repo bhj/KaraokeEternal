@@ -43,6 +43,7 @@ class AlphaPicker extends React.Component {
     const charHeight = parent.height / this.alphabet.length
     const y = (e.targetTouches ? e.targetTouches[0].clientY : e.clientY) - parent.top
     const char = this.alphabet[Math.floor(y / charHeight)]
+    if (typeof char === 'undefined') return
 
     this.setState({
       isPicking: typeof char !== 'undefined',

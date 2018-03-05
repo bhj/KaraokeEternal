@@ -13,6 +13,7 @@ class ArtistList extends React.Component {
     queuedSongIds: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     expandedArtists: PropTypes.array.isRequired,
+    alphaPickerMap: PropTypes.object.isRequired,
     filterKeywords: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
     ui: PropTypes.object.isRequired,
@@ -98,11 +99,8 @@ class ArtistList extends React.Component {
   }
 
   handleAlphaPick = (char) => {
-    for (let i = 0; i < this.props.artistsResult.length; i++) {
-      if (this.props.artists[this.props.artistsResult[i]].name.toUpperCase().startsWith(char)) {
-        return this.ref.scrollToRow(i > 0 ? i - 1 : i)
-      }
-    }
+    const row = this.props.alphaPickerMap[char]
+    this.ref.scrollToRow(row > 0 ? row - 1 : row)
   }
 
   setRef = (ref) => {

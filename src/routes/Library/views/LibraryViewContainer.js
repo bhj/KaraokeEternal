@@ -25,6 +25,26 @@ const getFilterKeywords = createSelector(
   (str) => str.split(' ')
 )
 
+const getAlphaPickerMap = createSelector(
+  [getArtists],
+  (artists) => {
+    const map = {}
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+    let c = 0
+
+    // prefill with zeros
+    chars.forEach(char => { map[char] = 0 })
+
+    artists.result.forEach((artistId, i) => {
+      if (artists.entities[artistId].name.toUpperCase().startsWith(chars[c])) {
+        map[chars[c]] = i
+        c++
+      }
+    })
+
+    return map
+  })
+
 // library filters
 // ---------------------
 
@@ -69,6 +89,7 @@ const mapStateToProps = (state) => {
     queuedSongIds: getQueuedSongs(state),
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,
+    alphaPickerMap: getAlphaPickerMap(state),
     scrollTop: state.library.scrollTop,
     isShowingSongInfo: !(state.library.songInfoSongId === null),
     // filters
