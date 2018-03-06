@@ -30,7 +30,7 @@
     "chroma-js": "^1.3.6",
     "debug": "^3.1.0",
     "iso8601-duration": "^1.1.1",
-    "jsonwebtoken": "^8.1.1",
+    "jsonwebtoken": "^8.2.0",
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.0",
     "koa-logger": "^3.1.0",
@@ -38,7 +38,7 @@
     "koa-router": "^7.4.0",
     "koa-static": "^4.0.2",
     "mp3-duration": "^1.1.0",
-    "node-fetch": "^2.0.0",
+    "node-fetch": "^2.1.1",
     "normalize.css": "^8.0.0",
     "prop-types": "^15.6.1",
     "rc-slider": "^8.6.1",
@@ -70,7 +70,7 @@
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
-    "babel-loader": "^7.1.3",
+    "babel-loader": "^7.1.4",
     "babel-plugin-istanbul": "^4.1.5",
     "babel-plugin-react-css-modules": "^3.3.3",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -85,7 +85,7 @@
     "cross-env": "^5.1.3",
     "css-loader": "^0.28.10",
     "enzyme": "^3.3.0",
-    "eslint": "^4.18.1",
+    "eslint": "^4.18.2",
     "eslint-config-standard": "^11.0.0",
     "eslint-config-standard-react": "^6.0.0",
     "eslint-plugin-babel": "^4.1.2",
@@ -95,7 +95,7 @@
     "eslint-plugin-react": "^7.7.0",
     "eslint-plugin-standard": "^3.0.0",
     "extract-text-webpack-plugin": "^3.0.2",
-    "file-loader": "^1.1.10",
+    "file-loader": "^1.1.11",
     "html-webpack-plugin": "^2.30.1",
     "karma": "^2.0.0",
     "karma-coverage": "^1.0.0",
@@ -104,7 +104,7 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-webpack-with-fast-source-maps": "^1.10.2",
     "koa-webpack": "^2.0.3",
-    "mocha": "^5.0.1",
+    "mocha": "^5.0.2",
     "nodemon": "^1.17.1",
     "phantomjs-prebuilt": "^2.1.16",
     "redbox-react": "^1.5.0",
@@ -114,6 +114,6 @@
     "url-loader": "^0.6.2",
     "webpack": "^3.11.0",
     "when": "^3.7.8",
-    "yargs": "^11.0.0"
+    "yargs": "^11.1.0"
   }
 }
