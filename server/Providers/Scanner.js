@@ -1,5 +1,5 @@
 const throttle = require('../lib/throttle')
-const Media = require('../Media')
+const Library = require('../Library')
 const {
   LIBRARY_PUSH,
   PROVIDER_SCAN_STATUS,
