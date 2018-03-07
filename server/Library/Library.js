@@ -6,9 +6,7 @@ const log = debug('app:media')
 class Library {
   /**
   * Get artists and songs in a format suitable for sending to clients
-  * as quickly as possible. Only lists one media item per song (the
-  * preferred item, if one is set) and does not include providerData
-  *
+  * as quickly as possible. Only lists one media item per song.
   * @return {Promise} Object with artist and media results
   */
   static async get () {
@@ -25,22 +23,24 @@ class Library {
     // query #1: songs
     try {
       const q = squel.select()
-        .field('media.mediaId, media.duration')
-        .field('songs.artistId, songs.songId, songs.title')
+        .field('media.mediaId AS mediaId')
+        .field('media.duration AS duration')
+        .field('songs.artistId AS artistId')
+        .field('songs.songId AS songId')
+        .field('songs.title AS title')
         .field('MAX(media.isPreferred) AS isPreferred')
         .field('COUNT(media.mediaId) AS numMedia')
         .field('COUNT(DISTINCT stars.userId) AS numStars')
         .from('media')
         .join(squel.select()
-          .from('providers')
-          .where('providers.isEnabled = 1')
-          .order('priority'),
-        'providers', 'media.provider = providers.name')
+          .from('paths'),
+        'paths', 'media.pathId = paths.pathId')
         .join('songs USING (songId)')
         .join('artists USING (artistId)')
         .left_join('stars USING(songId)')
         .group('songs.songId')
         .order('songs.title')
+        .order('paths.priority')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -78,6 +78,7 @@ class Library {
       for (const row of rows) {
         // don't include artists without any songs
         if (typeof SongIdsByArtist[row.artistId] === 'undefined') {
+          log('continue')
           continue
         }
 
@@ -104,22 +105,24 @@ class Library {
   static async getSong (songId) {
     try {
       const q = squel.select()
-        .field('media.mediaId, media.duration')
-        .field('songs.artistId, songs.songId, songs.title')
+        .field('media.mediaId AS mediaId')
+        .field('media.duration AS duration')
+        .field('songs.artistId AS artistId')
+        .field('songs.songId AS songId')
+        .field('songs.title AS title')
         .field('MAX(media.isPreferred) AS isPreferred')
-        .field('COUNT(media.mediaId) AS numMedia')
+        .field('COUNT(DISTINCT media.mediaId) AS numMedia')
         .field('COUNT(DISTINCT stars.userId) AS numStars')
         .from('media')
         .join(squel.select()
-          .from('providers')
-          .where('providers.isEnabled = 1')
-          .order('priority'),
-        'providers', 'media.provider = providers.name')
+          .from('paths'),
+        'paths', 'paths.pathId = media.pathId')
         .join('songs USING (songId)')
         .join('artists USING (artistId)')
         .left_join('stars USING(songId)')
         .group('songs.songId')
         .where('songs.songId = ?', songId)
+        .order('paths.priority')
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)

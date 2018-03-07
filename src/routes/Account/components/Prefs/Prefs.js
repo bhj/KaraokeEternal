@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import ProviderPrefs from './ProviderPrefs'
+import PathPrefs from './PathPrefs'
 import './Prefs.css'
 
 export default class Prefs extends React.Component {
@@ -9,17 +9,16 @@ export default class Prefs extends React.Component {
     fetchPrefs: PropTypes.func.isRequired,
   }
 
-  componentDidMount () {
-    this.props.fetchPrefs()
-  }
+  // componentDidMount () {
+  //   this.props.fetchPrefs()
+  // }
 
   render () {
     return (
       <div styleName='container'>
         <h1 styleName='title'>Preferences</h1>
         <div styleName='content'>
-          <h2 styleName='subheading'>Library</h2>
-          <ProviderPrefs />
+          <PathPrefs />
         </div>
       </div>
     )

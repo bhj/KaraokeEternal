@@ -3,7 +3,7 @@ import React from 'react'
 import CDGraphics from 'cdgraphics'
 import './CDGPlayer.css'
 import HttpApi from 'lib/HttpApi'
-const api = new HttpApi('provider/file')
+const api = new HttpApi('media')
 
 class CDGPlayer extends React.Component {
   static propTypes = {
@@ -77,14 +77,14 @@ class CDGPlayer extends React.Component {
     this.props.onMediaRequest()
 
     // start loading audio
-    this.audio.src = `/api/provider/file/media?type=audio&mediaId=${mediaId}`
+    this.audio.src = `/api/media/?type=audio&mediaId=${mediaId}`
     this.audio.load()
 
     // start loading .cdg
     this.cdgraphics.stop()
     this.isCDGLoaded = false
 
-    api('GET', `/media?type=cdg&mediaId=${mediaId}`)
+    api('GET', `/?type=cdg&mediaId=${mediaId}`)
       .then(res => res.arrayBuffer())
       .then(res => {
         // arrayBuffer to Uint8Array

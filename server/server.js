@@ -17,9 +17,9 @@ const KoaWebpack = require('koa-webpack')
 const KoaStatic = require('koa-static')
 const app = new Koa()
 
-const LibraryRouter = require('./Library/router')
+const libraryRouter = require('./Library/router')
+const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
-const providerRouters = require('./Providers/router')
 const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
 
@@ -56,14 +56,11 @@ module.exports = function () {
   })
 
   // http api (koa-router) endpoints
-  app.use(LibraryRouter.routes())
+  app.use(libraryRouter.routes())
+  app.use(mediaRouter.routes())
   app.use(prefsRouter.routes())
   app.use(roomsRouter.routes())
   app.use(userRouter.routes())
-
-  for (const router in providerRouters) {
-    app.use(providerRouters[router].routes())
-  }
 
   // Apply Webpack HMR Middleware
   // ------------------------------------

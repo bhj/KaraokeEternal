@@ -1,8 +1,8 @@
 const throttle = require('../lib/throttle')
-const Media = require('../Media')
+const Library = require('../Library')
 const {
   LIBRARY_PUSH,
-  PROVIDER_SCAN_STATUS,
+  PREFS_SCAN_STATUS,
 } = require('../../constants/actions')
 
 class Scanner {
@@ -23,7 +23,7 @@ class Scanner {
       // thunkify
       return Promise.resolve().then(() => {
         process.send({
-          type: PROVIDER_SCAN_STATUS,
+          type: PREFS_SCAN_STATUS,
           payload: { text, progress, isUpdating },
         })
       })

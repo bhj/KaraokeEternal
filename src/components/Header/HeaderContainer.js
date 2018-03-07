@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import Header from './Header'
 import { createSelector } from 'reselect'
 import { setHeaderHeight } from 'store/modules/ui'
-import { requestScanCancel } from 'store/modules/providers'
+import { requestScanCancel } from 'store/modules/prefs'
 
 const getQueue = (state) => state.queue
 const getCurId = (state) => state.status.queueId
@@ -32,9 +32,9 @@ const mapStateToProps = (state) => {
     isAdmin: state.user.isAdmin,
     isPlayer: state.location.pathname === '/player',
     isPlayerPresent: state.status.isPlayerPresent,
-    isUpdating: state.providers.isUpdating,
-    updateText: state.providers.updateText,
-    updateProgress: state.providers.updateProgress,
+    isUpdating: state.prefs.isUpdating,
+    updateText: state.prefs.updateText,
+    updateProgress: state.prefs.updateProgress,
   }
 }
 

@@ -14,23 +14,14 @@ export default class SongInfo extends Component {
     const { media } = this.props
     const mediaDetails = media.result.map((mediaId) => {
       const item = media.entities[mediaId]
-      const preferred = item.isPreferred === 1 ? 'Yes' : 'No'
-      let source
-
-      // @todo: providers should have a media info component
-      if (item.provider === 'file') {
-        source = item.providerData.basePath + item.providerData.relPath
-      } else if (item.provider === 'youtube') {
-        source = item.providerData.videoId
-      }
 
       return (
         <div key={item.mediaId} styleName='media'>
-          <strong styleName='capitalize'>{item.provider}</strong>: {source}
-          <br />
           <strong>Duration</strong>: {item.duration}
           <br />
-          <strong>Preferred</strong>: {preferred}
+          <strong>Preferred</strong>: {item.isPreferred === 1 ? 'Yes' : 'No'}
+          <br />
+          <strong>Path</strong>: {item.file}
         </div>
       )
     })

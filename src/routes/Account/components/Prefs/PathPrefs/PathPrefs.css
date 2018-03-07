@@ -1,15 +1,13 @@
-.provider {
+.container {
   background-color: #555;
   border-radius: var(--border-radius);
-  margin-bottom: var(--container-padding);
 }
 
-.provider-last {
-  composes: provider;
-  margin-bottom: 0;
+.content {
+  padding: var(--container-padding);
 }
 
-.provider-title {
+.title {
   display: flex;
   align-items: center;
   padding-left: var(--container-padding);

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Providers from 'providers'
+import CDGPlayer from './CDGPlayer'
 
 class Player extends React.Component {
   static propTypes = {
@@ -19,17 +19,12 @@ class Player extends React.Component {
   }
 
   render () {
-    const { provider } = this.props.queueItem
-
-    if (!Providers[provider] || !Providers[provider].playerComponent) {
-      this.props.onError(`Provider not found: ${provider}`)
-      return null
-    }
-
-    const ProviderPlayer = Providers[provider].playerComponent
-
+    // if (!Providers[provider] || !Providers[provider].playerComponent) {
+    //   this.props.onError(`Provider not found: ${provider}`)
+    //   return null
+    // }
     return (
-      <ProviderPlayer {...this.props} />
+      <CDGPlayer {...this.props} />
     )
   }
 }

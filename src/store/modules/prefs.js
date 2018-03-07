@@ -2,11 +2,15 @@ import {
   PREFS_REQUEST,
   PREFS_SET,
   PREFS_RECEIVE,
+  PREFS_REQUEST_SCAN,
+  PREFS_REQUEST_SCAN_CANCEL,
+  PREFS_SCAN_STATUS,
   _ERROR,
 } from 'constants/actions'
 
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('prefs')
+
 // ------------------------------------
 // Set prefs
 // ------------------------------------
@@ -70,6 +74,46 @@ export function receivePrefs (data) {
 }
 
 // ------------------------------------
+// request media scan
+// ------------------------------------
+export function requestScan () {
+  return (dispatch, getState) => {
+    // informational
+    dispatch({
+      type: PREFS_REQUEST_SCAN,
+    })
+
+    return api('GET', `/scan`)
+      .catch(err => {
+        dispatch({
+          type: PREFS_REQUEST_SCAN + '_ERROR',
+          meta: { error: err.message },
+        })
+      })
+  }
+}
+
+// ------------------------------------
+// request cancelation of media scan
+// ------------------------------------
+export function requestScanCancel () {
+  return (dispatch, getState) => {
+    // informational
+    dispatch({
+      type: PREFS_REQUEST_SCAN_CANCEL,
+    })
+
+    return api('GET', `/scan/cancel`)
+      .catch(err => {
+        dispatch({
+          type: PREFS_REQUEST_SCAN_CANCEL + '_ERROR',
+          meta: { error: err.message },
+        })
+      })
+  }
+}
+
+// ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
@@ -78,12 +122,23 @@ const ACTION_HANDLERS = {
     ...state,
     ...payload,
   }),
+  [PREFS_SCAN_STATUS]: (state, { payload }) => ({
+    ...state,
+    isUpdating: payload.isUpdating,
+    updateText: payload.text,
+    updateProgress: payload.progress,
+  }),
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-let initialState = {}
+let initialState = {
+  isUpdating: false,
+  updateText: '',
+  updateProgress: 0,
+  paths: { result: [], entities: {} }
+}
 
 export default function prefsReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

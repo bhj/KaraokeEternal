@@ -1,4 +1,5 @@
 .container {
+  top: var(--container-padding);
   background-color: var(--widget-background-color);
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -13,12 +14,4 @@
 
 .content {
   padding: var(--container-padding);
-}
-
-.subheading {
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  font-weight: normal;
-  border-bottom: 1px solid var(--widget-title-color);
 }

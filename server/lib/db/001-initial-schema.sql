@@ -10,13 +10,21 @@ CREATE TABLE IF NOT EXISTS "media" (
   "mediaId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "songId" integer NOT NULL,
   "duration" integer NOT NULL,
-  "provider" text NOT NULL,
-  "providerData" text NOT NULL,
+  "pathId" integer NOT NULL,
+  "file" text NOT NULL,
   "isPreferred" integer(1) NOT NULL DEFAULT(0),
-  "lastTimestamp" integer NOT NULL DEFAULT(0)
+  "timestamp" integer NOT NULL DEFAULT(0)
 );
 
 CREATE INDEX IF NOT EXISTS songId ON "media" ("songId" ASC);
+
+CREATE TABLE IF NOT EXISTS "paths" (
+  "pathId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  "path" text NOT NULL,
+  "priority" integer NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS pathId ON "paths" ("pathId" ASC);
 
 CREATE TABLE IF NOT EXISTS "prefs" (
   "key" text PRIMARY KEY NOT NULL,
@@ -24,18 +32,6 @@ CREATE TABLE IF NOT EXISTS "prefs" (
 );
 
 INSERT INTO prefs (key,data) VALUES ('isFirstRun','true');
-
-CREATE TABLE IF NOT EXISTS "providers" (
-  "name" text PRIMARY KEY NOT NULL,
-  "isEnabled" integer(1) NOT NULL DEFAULT(1),
-  "priority" integer NOT NULL DEFAULT(0),
-  "prefs" text
-);
-
-CREATE INDEX IF NOT EXISTS providerName ON "providers" ("name" ASC);
-
-INSERT INTO providers (name, prefs) VALUES ('file', '{"paths":[]}');
-INSERT INTO providers (name, prefs) VALUES ('youtube', '{"channels":[],"apiKey":""}');
 
 CREATE TABLE IF NOT EXISTS "queue" (
   "queueId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
