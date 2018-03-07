@@ -49,9 +49,9 @@ export function loginUser (data) {
     return api('POST', 'login', {
       body: data
     })
-      .then(res => {
+      .then(user => {
         // user object in response body
-        dispatch(receiveLogin(res))
+        dispatch(receiveLogin(user))
 
         // socket.io handshake happens over http so
         // our JWT will be sent in the cookie
@@ -66,6 +66,11 @@ export function loginUser (data) {
           if (query.redirect) {
             browserHistory.push(query.redirect)
           }
+        }
+
+        // update preferences
+        if (user.isAdmin) {
+          dispatch(fetchPrefs())
         }
       })
       .catch(err => {

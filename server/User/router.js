@@ -6,7 +6,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const debug = require('debug')
 const log = debug('app:user')
-const getPrefs = require('../lib/getPrefs')
+const Prefs = require('../Prefs')
 
 // login
 router.post('/login', async (ctx, next) => {
@@ -74,7 +74,7 @@ router.post('/account', async (ctx, next) => {
   }
 
   try {
-    const prefs = await getPrefs()
+    const prefs = await Prefs.get()
 
     if (prefs.isFirstRun === true) {
       // create default room

@@ -7,7 +7,6 @@ import artists from './modules/artists'
 import library from 'routes/Library/modules/library'
 import location from './modules/location'
 import prefs from './modules/prefs'
-import providers from './modules/providers'
 import queue from 'routes/Queue/modules/queue'
 import rooms from './modules/rooms'
 import songs from './modules/songs'
@@ -33,7 +32,6 @@ export const makeRootReducer = (asyncReducers) => {
     library,
     location,
     prefs,
-    providers,
     queue,
     rooms,
     songs,

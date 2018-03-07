@@ -12,6 +12,12 @@ router.get('/song/:songId', async (ctx, next) => {
     entities: {},
   }
 
+  // must be admin
+  if (!ctx.user.isAdmin) {
+    ctx.status = 401
+    return
+  }
+
   // required
   if (!ctx.params.songId) {
     ctx.status = 422
@@ -21,28 +27,23 @@ router.get('/song/:songId', async (ctx, next) => {
 
   try {
     const q = squel.select()
-      .field('media.mediaId, media.duration, media.provider, media.providerData, media.isPreferred')
+      .field('media.*')
       .field('songs.artistId, songs.songId, songs.title')
       .from('media')
       .where('songId = ?', ctx.params.songId)
       .join(squel.select()
-        .from('providers')
-        .where('providers.isEnabled = 1')
-        .order('priority'),
-      'providers', 'media.provider = providers.name')
+        .from('paths'),
+      'paths', 'paths.pathId = media.pathId')
       .join('songs USING (songId)')
       .join('artists USING (artistId)')
-      .order('media.lastTimestamp')
+      .order('paths.priority')
 
     const { text, values } = q.toParam()
     const rows = await db.all(text, values)
 
     rows.forEach(row => {
       media.result.push(row.mediaId)
-      media.entities[row.mediaId] = {
-        ...row,
-        providerData: JSON.parse(row.providerData),
-      }
+      media.entities[row.mediaId] = row
     })
 
     ctx.body = media

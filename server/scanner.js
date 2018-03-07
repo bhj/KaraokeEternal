@@ -1,20 +1,20 @@
 const db = require('sqlite')
 const log = require('debug')(`app:scanner [${process.pid}]`)
 const project = require('../project.config')
-const Providers = require('./Providers/Providers')
+const Prefs = require('./Prefs')
 const {
-  PROVIDER_REQUEST_SCAN,
-  PROVIDER_REQUEST_SCAN_CANCEL
+  PREFS_REQUEST_SCAN,
+  PREFS_REQUEST_SCAN_CANCEL
 } = require('../constants/actions')
 
 module.exports = function scanner () {
   log('Opening database file %s', project.database)
   db.open(project.database).then(() => {
     process.on('message', function ({ type, payload }) {
-      if (type === PROVIDER_REQUEST_SCAN) {
-        Providers.startScan(payload)
-      } else if (type === PROVIDER_REQUEST_SCAN_CANCEL) {
-        Providers.cancelScan()
+      if (type === PREFS_REQUEST_SCAN) {
+        Prefs.startScan()
+      } else if (type === PREFS_REQUEST_SCAN_CANCEL) {
+        Prefs.cancelScan()
       }
     })
 

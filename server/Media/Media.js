@@ -5,51 +5,31 @@ const log = debug('app:media')
 
 class Media {
   /**
-   * Get media items matching all search criteria
+   * Get media files matching all search criteria
    *
    * @param  {object}  fields Search criteria
    * @return {Promise}        Object with media results
    */
-  static async searchMedia (fields) {
+  static async search (fields = {}) {
     const media = {
       result: [],
       entities: {}
     }
 
     const q = squel.select()
-      .field('media.*')
       .from('media')
-      .join(squel.select()
-        .from('providers')
-        .where('providers.isEnabled = 1')
-        .order('priority'),
-      'providers', 'media.provider = providers.name')
 
     // filters
     Object.keys(fields).map(key => {
-      if (key === 'providerData') {
-        Object.keys(fields.providerData).map(pKey => {
-          const val = fields.providerData[pKey]
-
-          // handle arrays (do nothing if val is an empty array)
-          if (Array.isArray(val) && val.length) {
-            q.where(`json_extract(providerData, '$.${pKey}') IN ?`, val)
-          } else if (!Array.isArray(val)) {
-            q.where(`json_extract(providerData, '$.${pKey}') = ?`, val)
-          }
-        })
-      } else {
-        q.where(`${key} = ?`, fields[key])
-      }
+      q.where(`${key} = ?`, fields[key])
     })
 
     try {
       const { text, values } = q.toParam()
-      const res = await db.all(text, values)
+      const rows = await db.all(text, values)
 
-      for (const row of res) {
+      for (const row of rows) {
         media.result.push(row.mediaId)
-        row.providerData = JSON.parse(row.providerData)
         media.entities[row.mediaId] = row
       }
     } catch (err) {
@@ -60,27 +40,27 @@ class Media {
   }
 
   /**
-   * Add media item to the library, matching or adding artist
+   * Add media file to the library, matching or adding artist
    *
    * @param  {object}  media Media item
    * @return {Promise}       Newly added item's mediaId (number)
    */
-  static async add (meta) {
+  static async add (media) {
     let artistId, songId
 
-    if (!meta.artist || !meta.title || !meta.duration || !meta.provider) {
-      return Promise.reject(new Error('invalid metadata: ' + JSON.stringify(meta)))
+    if (!media.artist || !media.title || !media.duration) {
+      return Promise.reject(new Error('invalid media data: ' + JSON.stringify(media)))
     }
 
     // match/create artist
     // -------------------
-    const artists = [meta.artist]
+    const artists = [media.artist]
 
     // try with and without 'The'
-    if (/^the /i.test(meta.artist)) {
-      artists.push(meta.artist.replace(/^the /i, ''))
+    if (/^the /i.test(media.artist)) {
+      artists.push(media.artist.replace(/^the /i, ''))
     } else {
-      artists.push(`The ${meta.artist}`)
+      artists.push(`The ${media.artist}`)
     }
 
     try {
@@ -101,12 +81,12 @@ class Media {
 
     // new artist?
     if (typeof artistId === 'undefined') {
-      log('new artist: %s', meta.artist)
+      log('new artist: %s', media.artist)
 
       try {
         const q = squel.insert()
           .into('artists')
-          .set('name', meta.artist)
+          .set('name', media.artist)
 
         const { text, values } = q.toParam()
         const res = await db.run(text, values)
@@ -126,7 +106,7 @@ class Media {
       const q = squel.select()
         .from('songs')
         .where('artistId = ?', artistId)
-        .where('title = ? COLLATE NOCASE', meta.title)
+        .where('title = ? COLLATE NOCASE', media.title)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
@@ -141,13 +121,13 @@ class Media {
 
     // new song?
     if (typeof songId === 'undefined') {
-      log('new song: %s', meta.title)
+      log('new song: %s', media.title)
 
       try {
         const q = squel.insert()
           .into('songs')
           .set('artistId', artistId)
-          .set('title', meta.title)
+          .set('title', media.title)
 
         const { text, values } = q.toParam()
         const res = await db.run(text, values)
@@ -168,11 +148,10 @@ class Media {
       const q = squel.insert()
         .into('media')
         .set('songId', songId)
-        .set('duration', Math.round(meta.duration))
-        .set('provider', meta.provider)
-        .set('providerData', JSON.stringify(meta.providerData || {}))
-        // @todo
-        // .set('lastTimestamp', meta.timestamp)
+        .set('duration', Math.round(media.duration))
+        .set('pathId', media.pathId)
+        .set('file', media.file)
+        .set('timestamp', media.timestamp)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
@@ -190,7 +169,7 @@ class Media {
   }
 
   /**
-   * Removes mediaIds in sqlite-friendly batches
+   * Removes media from the db in sqlite-friendly batches
    *
    * @param  {array}  mediaIds
    * @return {Promise}

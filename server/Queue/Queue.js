@@ -15,7 +15,7 @@ class Queue {
     try {
       const q = squel.select()
         .field('queueId, mediaId, userId')
-        .field('media.duration, media.provider, media.providerData')
+        .field('media.duration')
         .field('artists.name AS artist')
         .field('songs.songId, songs.title')
         .field('users.name AS username')
@@ -32,7 +32,6 @@ class Queue {
 
       for (const row of rows) {
         result.push(row.queueId)
-        row.providerData = JSON.parse(row.providerData)
         entities[row.queueId] = row
       }
     } catch (err) {
