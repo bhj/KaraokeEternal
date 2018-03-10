@@ -104,4 +104,6 @@ button.primary {
   }
 }
 
+mark {
+  background-color: var(--mark-background-color);
 }

@@ -38,6 +38,10 @@
   --queued-item-glow-color: var(--btn-danger-color);
   --mark-background-color: #669eff;
 
+  /* Queue */
+  --current-item-from-background-color: #15346a;
+  --current-item-to-background-color: #15346a;
+
   /* Account widgets */
   --widget-background-color: #303030;
   --widget-title-color: var(--text-color);

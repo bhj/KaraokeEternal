@@ -1,7 +1,7 @@
 .container {
   display: flex;
   height: 80px;
-  background-image: linear-gradient(to right, #f3f3f3, #ddd);
+  background-image: linear-gradient(to right, var(--current-item-from-background-color), var(--current-item-to-background-color));
   background-repeat: no-repeat;
 }
 
