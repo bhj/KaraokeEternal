@@ -29,9 +29,9 @@
 
 .count {
   position: relative;
-  top: -28px;
+  top: -30px;
   text-align: center;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--artist-folder-text-color);
 }
 

@@ -1,7 +1,7 @@
 :root {
   /* Defaults */
   --background-color: #111522;
-  --text-color: #a9a9a9;
+  --text-color: #aaa;
   --link-color: #2864CD;
   --border-radius: 5px;
   --container-padding: 10px;
@@ -24,7 +24,7 @@
   /* Library */
   --artist-item-height: 44px;
   --artist-folder-color: #193f80; /* darker --link-color */
-  --artist-folder-text-color: white;
+  --artist-folder-text-color: var(--text-color);
 
   --song-item-btn-height: 44px;
   --song-item-btn-color: var(--btn-active-color);
