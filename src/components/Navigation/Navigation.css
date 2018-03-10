@@ -12,7 +12,8 @@
 
 .button {
   flex: 1;
-  padding: 5px 0;
+  padding-top: 4px;
+  padding-bottom: 8px;
   text-align: center;
   background-color: var(--nav-link-background-color);
 }
