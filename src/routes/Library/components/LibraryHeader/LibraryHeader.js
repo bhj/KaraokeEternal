@@ -34,21 +34,21 @@ class LibraryHeader extends React.Component {
     return (
       <Header>
         <div styleName='container'>
-          <Icon icon='MAGNIFIER' size={36} styleName={filterStr ? 'active' : 'inactive'} />
+          <Icon icon='MAGNIFIER' size={40} styleName={filterStr ? 'active' : 'inactive'} />
           <input type='search'
             styleName='searchInput'
-            placeholder='search library'
+            placeholder='search'
             value={this.state.value}
             onChange={this.handleChange}
           />
           {filterStr &&
             <div onClick={this.clearSearch}>
-              <Icon icon='CLEAR' size={36} styleName='clear' />
+              <Icon icon='CLEAR' size={40} styleName='clear' />
             </div>
           }
 
           <div onClick={this.props.toggleFilterStarred}>
-            <Icon icon='STAR_FULL' size={36} styleName={filterStarred ? 'active' : 'inactive'} />
+            <Icon icon='STAR_FULL' size={40} styleName={filterStarred ? 'active' : 'inactive'} />
           </div>
         </div>
       </Header>

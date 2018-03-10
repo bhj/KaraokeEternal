@@ -1,14 +1,12 @@
 .container {
   display: flex;
   align-items: center;
-  padding-left: var(--container-padding);
-  padding-right: var(--container-padding);
+  padding: 4px var(--container-padding) 4px 4px;
 }
 
 .searchInput {
   flex: 1;
-  height: 48px;
-  padding-left: 5px;
+  height: 44px;
   font-size: 18px;
   border: none;
   color: var(--text-color);

@@ -1,7 +1,7 @@
 .container {
   display: flex;
   align-items: center;
-  padding: 0 5px;
+  padding-right: 5px;
 }
 
 .isQueued {
@@ -9,18 +9,22 @@
 }
 
 .duration {
-  font-size: 14px;
+  font-size: 13px;
   text-align: right;
-  margin-right: 10px;
-  width: 46px;
+  margin-right: 14px;
+  width: 44px;
+}
+
+.primary {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .title {
-  flex: 1;
   font-size: 18px;
   text-overflow: ellipsis;
   overflow: hidden;
-  white-space: nowrap;
 }
 
 .artist {

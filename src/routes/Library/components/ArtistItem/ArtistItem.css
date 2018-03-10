@@ -3,7 +3,7 @@
   height: var(--artist-item-height);
   align-items: center;
   overflow: hidden;
-  padding: 0 5px;
+  padding: 0 4px;
 }
 
 .name {
