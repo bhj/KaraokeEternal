@@ -52,8 +52,8 @@ export default class SongItem extends React.Component {
           {toMMSS(props.duration)}
         </div>
 
-        <div onClick={props.onSongClick} styleName='title' className={props.isQueued ? 'glow' : ''}>
-          <div styleName='title'>
+        <div onClick={props.onSongClick} styleName='primary'>
+          <div styleName={props.isQueued ? 'title glow' : 'title'}>
             <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
             {props.isAdmin && props.numMedia > 1 && <i> ({props.numMedia})</i>}
             {props.artist &&

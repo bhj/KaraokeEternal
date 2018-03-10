@@ -104,15 +104,4 @@ button.primary {
   }
 }
 
-@keyframes glow {
-    /* from { text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 4px #ff0080, 0 0 6px #ff0080, 0 0 8px #ff0080, 0 0 11px #ff0080, 0 0 15px #ff0080; } */
-    from { text-shadow: 0 0 1px #fff, 0 0 4px var(--queued-item-glow-color), 0 0 6px var(--queued-item-glow-color), 0 0 8px var(--queued-item-glow-color), 0 0 11px var(--queued-item-glow-color); }
-}
-
-.glow {
-    animation-duration: 1.5s;
-    animation-name: glow;
-    animation-direction: alternate;
-    animation-iteration-count: infinite;
-    animation-timing-function: ease-in;
 }
