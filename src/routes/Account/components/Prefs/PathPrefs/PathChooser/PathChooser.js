@@ -43,18 +43,19 @@ export default class PathChooser extends React.Component {
         title='Add Folder'
         dialogStyles={{
           width: '90%',
-          height: '90%',
+          height: '85%',
           top: '5%',
           left: '5%',
           margin: 0,
+          paddingBottom: 0,
         }}
       >
-        <div style={{ height: '90%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ height: '85%', display: 'flex', flexDirection: 'column' }}>
           <div styleName='current'>
             {this.state.current}
           </div>
 
-          <div style={{ flex: '1', marginBottom: '1em', overflow: 'scroll', WebkitOverflowScrolling: 'touch' }}>
+          <div style={{ flex: '1', marginBottom: '1em', overflow: 'scroll' }}>
             {this.state.parent &&
               <strong><PathItem path={'..'} onSelect={() => this.getListing(this.state.parent)} /></strong>
             }
