@@ -1,32 +1,28 @@
 # Karaoke Forever
 
-A self-hosted, multi-room, multi-user karaoke party system built on open web technologies
-
-**NOTE: Karaoke Forever is alpha-quality software under active development.**
+Host awesome local karaoke parties where anyone can join using their phone. Supports most .cdg (CD+Graphics) and audio files. No Internet connection required.
 
 ## Overview
 
-Karaoke Forever lets you host awesome karaoke parties without requiring proprietary apps, 3rd-party services or even an internet connection. Everyone gets a simple email/password-based account on your (local) server and can use their phone's browser to search, queue and favorite songs. The player is also browser-based and currently supports most .cdg (CD+Graphics) lyrics files with audio as well as YouTube channels (experimental). It takes a few bits and pieces to make all this work:
-
 ### Server
 
-Runs on a Mac/Win/Linux/etc. system on your local network to serve the app/player and media. Also houses the database of songs, user accounts, rooms, queues, etc. Currently installed and run from the command line. Packaged installers are planned (possibly also embedding the app/player)
+Runs on the Mac/Windows/Linux/etc. system hosting your media.
 
-### App (Client)
+### App
 
-Everyone can use their phone's modern mobile browser to search by artist and title, queue and favorite songs, and see who's up next without installing anything.
+A browser-based mobile app lets everyone find, favorite and queue songs.
 
-### Player (Client)
+### Player
 
-Just another name for the app when it's in "player" mode, so also completely browser-based. Meant to run fullscreen on the system handling a room's audio/video (also see **Audio Input** below). A desktop-class browser is recommended here because support for the fullscreen API in mobile browsers is lacking. Since it's just another client, the player doesn't have to (but can) run on the same system as the server.
+Just another name for the app when it's in "player" mode. Designed for a browser to run in fullscreen, usually on the system handling audio/video (see **Audio Input** below). A desktop-class browser is recommended due to limitations in mobile browsers' fullscreen API support. The player doesn't have to run on the same system as the server.
 
 ### Rooms
 
-Rooms (*think: sessions*) help organize parties by space, time or both (spacetime?) Even if you only have one physical room, create a new KF room before each session so that you 1) start with an empty queue and 2) preserve a record of who sang what previously (this will be useful for generating fun statistics in the future)
+Karaoke Forever uses "rooms" to organize parties by space and time (spacetime?) Think *sessions*, so create a new KF room before each party so that you start with an empty queue.
 
 ### Audio Input
 
-Karaoke Forever does not currently handle audio *input* since there are a wide variety of microphone and audio interface configurations. It's recommended to use an audio interface with at least two microphone inputs and connect it to the system running the room's player (see **Player** above). This system's audio mixer is responsible for adding effects to voices (optional) and mixing them with the player output (music).
+Karaoke Forever does not handle audio *input* since there are a wide variety of configurations. Normally an audio interface with at least two microphone inputs would be connected to the system running the player (see **Player** above).
 
 ## Getting Started
 
@@ -47,29 +43,17 @@ Requires [Node.js 8](https://nodejs.org/en/) or later on Mac, Windows, Linux or 
 
 1. Browse to the **server URL** (include the port number, e.g. http://10.0.1.2:3000) and you should see the app prompting to create your first (admin) account
 2. Enter your user details and click Create Account
-3. You're now signed in as an admin to a default room ("Room 1"). At this point others can visit the server URL from their phone's browser and login or create an account, choosing Room 1 as they do so. Of course, we'll still need to get some songs added to the library. Onward!
+3. You're now signed in as an admin to your first room. At this point others can visit the server URL from their phone's browser and login or create an account.
 
-### Set up providers ###
+### Add media ###
 
-Each provider (*think: plugin*) handles songs of a particular format. Karaoke Forever currently includes two:
+In the Preferences widget (visible when you're an admin), tap Media Folders and add the folder(s) containing your .cdg and audio files. *Container and codec support can vary depending on the player browser.*
 
-**CD+Graphics (.cdg + audio)**
+### Start the player ###
 
-Supports CD+Graphics (.cdg) files with identically named audio (.mp3 or .mp4) files alongside. Add the folder(s) containing your .cdg + audio files and hit Refresh to start the scanner. *Container and codec support can vary depending on the browser running the player.*
+*If you're not on the system that will be running the player go there now and sign in via the server URL.*
 
-**YouTube (experimental)**
-
-Supports YouTube videos on a per-channel basis. This requires a [YouTube API Developer Key](https://developers.google.com/youtube/v3/getting-started) (free) because it's currently the only way to get a complete list of a channel's videos. Enter your YouTube API Developer Key, add YouTube channel names (usually usernames) and hit Refresh to retrieve the video lists. Some channels unfortunately restrict playback of their videos in 3rd-party apps. The following channels are known to work (Karaoke Forever is not affiliated with YouTube or these users/channels):
-
-- singkingkaraoke ([Patreon](https://www.patreon.com/singkingkaraoke), [YouTube](https://www.youtube.com/user/singkingkaraoke))
-
-### Start player ###
-
-*If you're not on the system that will be running the player (see **Player** in the Overview above) go there now and sign in via the server URL.*
-
-When you're an admin in a room without a player, you'll see a notice at the top with a **Start Player** link. Click it and you should now see the player, along with playback controls and a button to go fullscreen.
-
-The room's playback controls (play/pause, next and volume) are always available as an admin. In play mode, the player  plays as long as there are songs in the queue. It will stay in play mode even when out of songs so that the next time a song is queued it will start automatically.
+You've probably noticed a warning that there's no Player in the room. Let's fix that now - hit **Start Player**. The room's playback controls (play/pause/next and volume) will be visible to the current singer and always available to admins. In "play" mode, the player plays as long as there are songs in the queue, and after running out of songs the next one to be queued will start immediately.
 
 You're now ready to test your audio setup and start the party!
 
@@ -79,13 +63,14 @@ Coming soon
 
 ## Contributing
 
-Contributions are most welcome! This project is designed with ease of development as a primary goal.
+Contributions are most welcome!
 
 ## Acknowledgements
 
 - [David Zukowski](https://zuko.me): react-redux-starter-kit, which this project began as a fork of (all contributors up until it was detached to its own project are listed on the Contributors page)
-- [Luke Tucker](https://github.com/ltucker/): the JavaScript/HTML5 canvas CD+Graphics player
-- Stuart Albert: the name (a reference to Duke Nukem Forever given the development fits, (re)starts, and *almost* vaporware status)
+- [Luke Tucker](https://github.com/ltucker/): JavaScript/HTML5 canvas CD+Graphics player
+- Carter Corker: Technical things
+- Stuart Albert: The name (a reference to Duke Nukem Forever, given the *almost* vaporware status)
 
 ## License
 
