@@ -38,14 +38,16 @@ router.get('/scan/cancel', async (ctx, next) => {
 
 // get preferences and media paths
 router.get('/', async (ctx, next) => {
-  // must be admin
-  if (!ctx.user.isAdmin) {
-    ctx.status = 401
-    return
-  }
-
   try {
-    ctx.body = await Prefs.get()
+    const prefs = await Prefs.get()
+
+    // must be admin or it's firstrun
+    if (!ctx.user.isAdmin && !prefs.isFirstRun) {
+      ctx.status = 401
+      return
+    }
+
+    ctx.body = prefs
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message
