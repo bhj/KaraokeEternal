@@ -33,14 +33,16 @@ class Library {
         .field('COUNT(DISTINCT stars.userId) AS numStars')
         .from('media')
         .join(squel.select()
-          .from('paths'),
+          .from('paths')
+          .field('MIN(paths.priority) AS priority')
+          .field('pathId')
+          .group('pathId'),
         'paths', 'media.pathId = paths.pathId')
         .join('songs USING (songId)')
         .join('artists USING (artistId)')
         .left_join('stars USING(songId)')
         .group('songs.songId')
         .order('songs.title')
-        .order('paths.priority')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -115,14 +117,16 @@ class Library {
         .field('COUNT(DISTINCT stars.userId) AS numStars')
         .from('media')
         .join(squel.select()
-          .from('paths'),
-        'paths', 'paths.pathId = media.pathId')
+          .from('paths')
+          .field('MIN(paths.priority) AS priority')
+          .field('pathId')
+          .group('pathId'),
+        'paths', 'media.pathId = paths.pathId')
         .join('songs USING (songId)')
         .join('artists USING (artistId)')
         .left_join('stars USING(songId)')
         .group('songs.songId')
         .where('songs.songId = ?', songId)
-        .order('paths.priority')
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
