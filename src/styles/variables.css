@@ -36,6 +36,14 @@
   --alpha-picker-popover-background-color: var(--alpha-picker-color);
 
   --queued-item-glow-color: var(--btn-danger-color);
+  --mark-background-color: #669eff;
+
+  /* Account widgets */
+  --widget-background-color: #303030;
+  --widget-title-color: var(--text-color);
+  --widget-title-background-color: #4d4d4d;
+  --widget-title-size: 18px;
+  --widget-title-padding: 8px;
 
   /* PlaybackCtrl */
   --transport-btn-color: var(--btn-danger-color);
