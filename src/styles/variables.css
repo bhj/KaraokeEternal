@@ -11,16 +11,15 @@
   --btn-danger-color: #BA3A95;
 
   /* UI chrome (header/footer) */
-  --chrome-background-color: rgba(48, 49, 54, 1);
-  --chrome-background-color-blur: rgba(48, 49, 54, .25);
+  --chrome-background-color: rgba(48, 49, 54, .8);
+  --chrome-background-color-blur: rgba(0, 0, 0, 0);
   --chrome-border-color: #333;
 
-  /* Account widgets */
-  --widget-background-color: #303030;
-  --widget-title-color: var(--text-color);
-  --widget-title-background-color: #4d4d4d;
-  --widget-title-size: 18px;
-  --widget-title-padding: 8px;
+  /* Navigation */
+  --nav-link-color: var(--btn-inactive-color);
+  --nav-link-background-color: transparent;
+  --nav-active-color: var(--btn-active-color);
+  --nav-active-background-color: transparent;
 
   /* Library */
   --artist-item-height: 44px;
@@ -48,12 +47,6 @@
   --up-next-bg-color-to: var(--btn-active-color);
   --up-now-bg-color-from: #4e183e; /* darker */
   --up-now-bg-color-to: var(--queued-item-glow-color);
-
-  /* Navigation */
-  --nav-link-color: var(--btn-inactive-color);
-  --nav-link-background-color: transparent;
-  --nav-active-color: var(--btn-active-color);
-  --nav-active-background-color: transparent;
 
   /* <button> colors */
   --btn-default-color: #141414;
