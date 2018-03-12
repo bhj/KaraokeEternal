@@ -122,13 +122,13 @@ module.exports = function (io) {
     // send library and queue
     try {
       io.to(sock.id).emit('action', {
-        type: LIBRARY_PUSH,
-        payload: await Library.get(),
+        type: QUEUE_PUSH,
+        payload: await Queue.getQueue(sock.user.roomId),
       })
 
       io.to(sock.id).emit('action', {
-        type: QUEUE_PUSH,
-        payload: await Queue.getQueue(sock.user.roomId),
+        type: LIBRARY_PUSH,
+        payload: await Library.get(),
       })
     } catch (err) {
       log(err)
