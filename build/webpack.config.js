@@ -41,7 +41,6 @@ const config = {
     rules: [],
   },
   plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.DefinePlugin(Object.assign({
       'process.env': { NODE_ENV: JSON.stringify(project.env) },
       __DEV__,
@@ -176,26 +175,6 @@ config.plugins.push(new HtmlWebpackPlugin({
     collapseWhitespace: true,
   },
 }))
-
-// Development Tools
-// ------------------------------------
-if (__DEV__) {
-  config.plugins.push(
-    new webpack.NamedModulesPlugin()
-  )
-}
-
-// Bundle Splitting
-// ------------------------------------
-if (!__TEST__) {
-  const bundles = ['normalize', 'manifest']
-
-  if (project.vendors && project.vendors.length) {
-    bundles.unshift('vendor')
-    config.entry.vendor = project.vendors
-  }
-  config.plugins.push(new webpack.optimize.CommonsChunkPlugin({ names: bundles }))
-}
 
 // Production Optimizations
 // ------------------------------------
