@@ -30,10 +30,7 @@ export default class RoomSelect extends Component {
 
     return (
       <div>
-        <br />
-        <label>Select Room
-          <select ref='room' onChange={this.handleChange}>{roomOpts}</select>
-        </label>
+        <select ref='room' onChange={this.handleChange}>{roomOpts}</select>
       </div>
     )
   }

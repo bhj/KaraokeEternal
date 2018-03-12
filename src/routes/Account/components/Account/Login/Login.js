@@ -13,7 +13,7 @@ export default class Login extends Component {
         <input type='email' ref='email' placeholder='email' autoFocus />
         <input type='password' ref='password' placeholder='password' />
         <RoomSelect onRoomSelect={this.handleRoomSelect} />
-
+        <br />
         <button onClick={this.handleSubmit} className='primary'>
           Sign In
         </button>
