@@ -12,6 +12,7 @@ const __TEST__ = project.env === 'test'
 const __PROD__ = project.env === 'production'
 
 const config = {
+  mode: __PROD__ ? 'production' : 'development',
   entry: {
     main: [
       inProjectSrc(project.main),
