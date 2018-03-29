@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Navigation from 'components/Navigation'
-import { SkyLightStateless } from 'react-skylight'
-// global styles should be imported early to ensure
-// they appear before styles imported by components
+// global stylesheets should be imported before any
+// components that will import their own modular css
 import 'normalize.css'
 import '../../styles/global.css'
+import Navigation from 'components/Navigation'
+import { SkyLightStateless } from 'react-skylight'
 
 export const CoreLayout = (props) => {
   const ui = {
