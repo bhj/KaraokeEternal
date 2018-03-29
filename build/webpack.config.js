@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const project = require('../project.config')
 
 const inProject = (...args) => path.resolve(project.basePath, ...args)
@@ -47,7 +47,8 @@ const config = {
       __DEV__,
       __TEST__,
       __PROD__,
-    }, project.globals))
+    }, project.globals)),
+    new MiniCssExtractPlugin(),
   ],
 }
 
@@ -90,7 +91,7 @@ config.module.rules.push({
 config.module.rules.push({
   test : /(global)\.css$/,
   use  : [{
-    loader : 'style-loader'
+    loader : MiniCssExtractPlugin.loader,
   }, {
     loader  : 'css-loader',
     options : {
@@ -106,7 +107,7 @@ config.module.rules.push({
   test : /\.css$/,
   exclude : /(global)\.css$/,
   use  : [{
-    loader : 'style-loader'
+    loader : MiniCssExtractPlugin.loader,
   }, {
     loader  : 'css-loader',
     options : {
@@ -115,14 +116,6 @@ config.module.rules.push({
     }
   }],
 })
-
-config.plugins.push(
-  new ExtractTextPlugin({
-    filename  : '[name].[contenthash].css',
-    allChunks : true,
-    disable: __DEV__,
-  })
-)
 
 // Files
 /* eslint-disable */
