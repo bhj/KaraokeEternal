@@ -2,7 +2,7 @@
   /* Defaults */
   --background-color: #111522;
   --text-color: #aaa;
-  --link-color: #2864CD;
+  --link-color: #2968d6;
   --border-radius: 5px;
   --container-padding: 10px;
 
@@ -23,7 +23,7 @@
 
   /* Library */
   --artist-item-height: 44px;
-  --artist-folder-color: #193f80; /* darker --link-color */
+  --artist-folder-color: #173e82; /* darker --link-color */
   --artist-folder-text-color: var(--text-color);
 
   --song-item-btn-height: 44px;
