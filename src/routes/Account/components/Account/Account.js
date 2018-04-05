@@ -67,7 +67,7 @@ export default class Account extends Component {
           <div>
             <h1 styleName='title'>My Account</h1>
             <div styleName='content'>
-              <p>Signed in as <strong>{user.email}</strong></p>
+              <p>Signed in as <strong>{user.username}</strong></p>
               <AccountForm requireRoom={false} user={user} onSubmitClick={this.props.updateUser} />
               <br />
               <Logout onLogoutClick={this.props.logoutUser} />

@@ -10,7 +10,7 @@ export default class Login extends Component {
   render () {
     return (
       <form>
-        <input type='email' ref='email' placeholder='email' autoFocus />
+        <input type='text' ref='username' placeholder='email or username' autoFocus />
         <input type='password' ref='password' placeholder='password' />
         <RoomSelect onRoomSelect={this.handleRoomSelect} />
         <br />
@@ -28,7 +28,7 @@ export default class Login extends Component {
   handleSubmit = (event) => {
     event.preventDefault()
     const creds = {
-      email: this.refs.email.value,
+      username: this.refs.username.value.trim(),
       password: this.refs.password.value,
       roomId: this.roomId,
     }

@@ -68,13 +68,13 @@ CREATE INDEX IF NOT EXISTS userId ON "stars" ("userId" ASC);
 
 CREATE TABLE IF NOT EXISTS "users" (
   "userId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-  "email" text NOT NULL,
+  "username" text NOT NULL,
   "password" text NOT NULL,
   "name" text NOT NULL,
   "isAdmin" integer(1) NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS email ON "users" ("email" ASC);
+CREATE UNIQUE INDEX IF NOT EXISTS username ON "users" ("username" ASC);
 
 -- Down
 DROP TABLE artists;

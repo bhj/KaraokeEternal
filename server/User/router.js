@@ -28,36 +28,26 @@ router.get('/logout', async (ctx, next) => {
 
 // create
 router.post('/account', async (ctx, next) => {
-  let { name, email, newPassword, newPasswordConfirm, roomId } = ctx.request.body
-
-  name = name.trim()
-  email = email.trim().toLowerCase()
+  let { name, username, newPassword, newPasswordConfirm, roomId } = ctx.request.body
 
   // check presence of all fields
-  if (!name || !email || !newPassword || !newPasswordConfirm) {
+  if (!name || !username || !newPassword || !newPasswordConfirm) {
     ctx.status = 422
     ctx.body = 'All fields are required'
     return
   }
 
-  // validate email
-  if (!validateEmail(email)) {
-    ctx.status = 422
-    ctx.body = 'Invalid email address'
-    return
-  }
-
-  // check for duplicate email
+  // check for duplicate username
   try {
     const q = squel.select()
       .from('users')
-      .where('email = ? COLLATE NOCASE', email)
+      .where('username = ? COLLATE NOCASE', username.trim())
 
     const { text, values } = q.toParam()
 
     if (await db.get(text, values)) {
       ctx.status = 401
-      ctx.body = 'Email address is already taken'
+      ctx.body = 'Username already exists; please choose another'
       return
     }
   } catch (err) {
@@ -98,9 +88,9 @@ router.post('/account', async (ctx, next) => {
     // insert user
     const q = squel.insert()
       .into('users')
-      .set('email', email)
+      .set('username', username.trim())
       .set('password', hashedPwd)
-      .set('name', name)
+      .set('name', name.trim())
       .set('isAdmin', prefs.isFirstRun === true ? 1 : 0)
 
     const { text, values } = q.toParam()
@@ -134,7 +124,7 @@ router.post('/account', async (ctx, next) => {
 
   // log them in automatically
   try {
-    await _login(ctx, { email, password: newPassword, roomId })
+    await _login(ctx, { username, password: newPassword, roomId })
   } catch (err) {
     log(err)
     ctx.status = 500
@@ -172,15 +162,12 @@ router.put('/account', async (ctx, next) => {
     return
   }
 
-  let { name, email, password, newPassword, newPasswordConfirm } = ctx.request.body
-
-  name = name.trim()
-  email = email.trim().toLowerCase()
+  let { name, username, password, newPassword, newPasswordConfirm } = ctx.request.body
 
   // check presence of required fields
-  if (!name || !email || !password) {
+  if (!name || !username || !password) {
     ctx.status = 422
-    ctx.body = 'Name, email and current password are required'
+    ctx.body = 'Name, username and current password are required'
     return
   }
 
@@ -191,25 +178,18 @@ router.put('/account', async (ctx, next) => {
     return
   }
 
-  // validate email
-  if (!validateEmail(email)) {
-    ctx.status = 422
-    ctx.body = 'Invalid email address'
-    return
-  }
-
-  // check for duplicate email
+  // check for duplicate username
   try {
     const q = squel.select()
       .from('users')
       .where('userId != ?', ctx.user.userId)
-      .where('email = ? COLLATE NOCASE', email)
+      .where('username = ? COLLATE NOCASE', username.trim())
 
     const { text, values } = q.toParam()
 
     if (await db.get(text, values)) {
       ctx.status = 401
-      ctx.body = 'Email address is already registered'
+      ctx.body = 'Username already exists; please choose another'
       return
     }
   } catch (err) {
@@ -222,8 +202,8 @@ router.put('/account', async (ctx, next) => {
   const u = squel.update()
     .table('users')
     .where('userId = ?', ctx.user.userId)
-    .set('name', name)
-    .set('email', email)
+    .set('name', name.trim())
+    .set('username', username.trim())
 
   // changing password?
   if (newPassword) {
@@ -256,7 +236,7 @@ router.put('/account', async (ctx, next) => {
 
   // attempt re-login
   try {
-    await _login(ctx, { email, password, roomId: ctx.user.roomId })
+    await _login(ctx, { username, password, roomId: ctx.user.roomId })
   } catch (err) {
     log(err)
     ctx.status = 500
@@ -266,12 +246,12 @@ router.put('/account', async (ctx, next) => {
 module.exports = router
 
 async function _login (ctx, creds) {
-  const { email, password, roomId } = creds
+  const { username, password, roomId } = creds
   let user
 
-  if (!email || !password) {
+  if (!username || !password) {
     ctx.status = 422
-    ctx.body = 'Email and password are required'
+    ctx.body = 'Username/email and password are required'
     return
   }
 
@@ -279,7 +259,7 @@ async function _login (ctx, creds) {
   try {
     const q = squel.select()
       .from('users')
-      .where('email = ?', email.trim().toLowerCase())
+      .where('username = ? COLLATE NOCASE', username.trim())
 
     const { text, values } = q.toParam()
     user = await db.get(text, values)
@@ -362,18 +342,4 @@ async function _login (ctx, creds) {
   })
 
   ctx.body = user
-}
-
-// email validation helper from
-// http://www.moreofless.co.uk/validate-email-address-without-regex/
-function validateEmail (email) {
-  var at = email.indexOf('@')
-  var dot = email.lastIndexOf('.')
-  return email.length > 0 &&
-    at > 0 &&
-    dot > at + 1 &&
-    dot < email.length &&
-    email[at + 1] !== '.' &&
-    !email.includes(' ') &&
-    !email.includes('..')
 }

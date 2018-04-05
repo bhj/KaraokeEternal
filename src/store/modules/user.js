@@ -273,7 +273,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   userId: null,
-  email: null,
+  username: null,
   name: null,
   isAdmin: false,
   roomId: null,

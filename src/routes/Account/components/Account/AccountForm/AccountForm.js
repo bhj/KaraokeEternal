@@ -12,7 +12,7 @@ export default class AccountForm extends Component {
 
   state = {
     name: this.props.user ? this.props.user.name : '',
-    email: this.props.user ? this.props.user.email : '',
+    username: this.props.user ? this.props.user.username : '',
   }
 
   render () {
@@ -20,14 +20,14 @@ export default class AccountForm extends Component {
 
     return (
       <div>
-        <input type='text' ref='name' placeholder='name (visible to others)'
+        <input type='text' ref='name' placeholder='name (public)'
           value={this.state.name}
           onChange={this.handleNameChange}
           autoFocus={!user}
         />
-        <input type='email' ref='email' placeholder='email (private)'
-          value={this.state.email}
-          onChange={this.handleEmailChange}
+        <input type='text' ref='username' placeholder='email or username (private)'
+          value={this.state.username}
+          onChange={this.handleUsernameChange}
         />
         <input type='password' ref='newPassword'
           placeholder={user ? 'new password (optional)' : 'password'}
@@ -56,17 +56,17 @@ export default class AccountForm extends Component {
     this.setState({ [inputName]: event.target.value })
   }
   handleNameChange = this.handleChange.bind(this, 'name')
-  handleEmailChange = this.handleChange.bind(this, 'email')
+  handleUsernameChange = this.handleChange.bind(this, 'username')
   handleRoomSelect = (roomId) => {
     this.roomId = roomId
   }
 
   handleClick = (event) => {
     event.preventDefault()
-    const { name, email, newPassword, newPasswordConfirm, curPassword } = this.refs
+    const { name, username, newPassword, newPasswordConfirm, curPassword } = this.refs
     const data = {
       name: name.value.trim(),
-      email: email.value.trim(),
+      username: username.value.trim(),
       password: curPassword ? curPassword.value : null,
       newPassword: newPassword.value,
       newPasswordConfirm: newPasswordConfirm.value

@@ -45,7 +45,7 @@ module.exports = function () {
     } catch (err) {
       ctx.user = {
         userId: null,
-        email: null,
+        username: null,
         name: null,
         isAdmin: false,
         roomId: null,
