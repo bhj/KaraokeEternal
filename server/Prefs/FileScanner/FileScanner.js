@@ -5,6 +5,7 @@ const { promisify } = require('util')
 const fs = require('fs')
 const stat = promisify(fs.stat)
 const mp3duration = promisify(require('mp3-duration'))
+const mp4info = require('./lib/mp4info.js')
 const getFiles = require('./getFiles')
 const parseMeta = require('./parseMeta')
 const parseMetaCfg = require('./parseMetaCfg')
@@ -12,11 +13,8 @@ const getPerms = require('../../lib/getPermutations')
 const Scanner = require('../Scanner')
 const Media = require('../../Media')
 
-const mediaExts = ['.cdg', '.mp4', '.m4v']
-const mediaExtPerms = mediaExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
-
-const audioExts = ['.m4a', '.mp3']
-const audioExtPerms = audioExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
+const videoExts = ['.cdg', '.mp4'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
+const audioExts = ['.mp3', '.m4a'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
 class FileScanner extends Scanner {
   constructor (prefs) {
@@ -37,9 +35,9 @@ class FileScanner extends Scanner {
       try {
         log('Searching path: %s', this.paths.entities[pathId].path)
         let list = await getFiles(this.paths.entities[pathId].path)
-        list = list.filter(file => mediaExtPerms.includes(path.extname(file)))
+        list = list.filter(file => videoExts.includes(path.extname(file)))
 
-        log('  => found %s files with valid extensions (%s)', list.length, mediaExts.join(', '))
+        log('  => found %s files with valid extensions (cdg, mp4)', list.length)
         files = files.concat(list)
       } catch (err) {
         log(`  => ${err.message} (path offline)`)
@@ -155,7 +153,7 @@ class FileScanner extends Scanner {
     if (path.extname(file).toLowerCase() === '.cdg') {
       // look for all uppercase and lowercase permutations
       // since we may be on a case-sensitive fs
-      for (const ext of audioExtPerms) {
+      for (const ext of audioExts) {
         const audioFile = file.substr(0, file.length - path.extname(file).length) + ext
 
         try {
@@ -165,8 +163,9 @@ class FileScanner extends Scanner {
           log('  => found %s audio file', ext)
 
           if (ext.toLowerCase() === '.mp3') {
-            log('  => getting duration (mp3-duration)')
             media.duration = await mp3duration(audioFile)
+          } else if (ext.toLowerCase() === '.m4a') {
+            // @todo
           }
 
           // success
@@ -175,11 +174,21 @@ class FileScanner extends Scanner {
           // keep looking...
         }
       } // end for
+    } else if (path.extname(file).toLowerCase() === '.mp4') {
+      // get video duration
+      try {
+        const info = await mp4info(file)
+        media.duration = info.duration
+      } catch (err) {
+        log(err)
+      }
     }
 
     if (!media.duration) {
       return Promise.reject(new Error(`Couldn't determine media duration`))
     }
+
+    log(`  => duration: ${Math.floor(media.duration / 60)}:${Math.round(media.duration % 60, 10)}`)
 
     // add song
     try {
