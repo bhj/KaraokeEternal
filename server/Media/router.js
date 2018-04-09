@@ -9,8 +9,7 @@ const router = KoaRouter({ prefix: '/api/media' })
 const getPerms = require('../lib/getPermutations')
 const Media = require('./Media')
 
-const audioExts = ['.m4a', '.mp3']
-const audioExtPerms = audioExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
+const audioExts = ['.mp3', '.m4a'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
 // get media file
 router.get('/', async (ctx, next) => {
@@ -46,7 +45,7 @@ router.get('/', async (ctx, next) => {
   }
 
   if (type === 'audio') {
-    for (const ext of audioExtPerms) {
+    for (const ext of audioExts) {
       const audioFile = file.substr(0, file.length - path.extname(file).length) + ext
 
       try {

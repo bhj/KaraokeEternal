@@ -1,6 +1,12 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import CDGPlayer from './CDGPlayer'
+import MP4Player from './MP4Player'
+
+const players = {
+  CDGPlayer,
+  MP4Player,
+}
 
 class Player extends React.Component {
   static propTypes = {
@@ -19,12 +25,16 @@ class Player extends React.Component {
   }
 
   render () {
-    // if (!Providers[provider] || !Providers[provider].playerComponent) {
-    //   this.props.onError(`Provider not found: ${provider}`)
-    //   return null
-    // }
+    const { player } = this.props.queueItem
+    const PlayerComponent = players[player]
+
+    if (typeof PlayerComponent === 'undefined') {
+      this.props.onError(`Player component not found: ${player}`)
+      return null
+    }
+
     return (
-      <CDGPlayer {...this.props} />
+      <PlayerComponent {...this.props} />
     )
   }
 }
