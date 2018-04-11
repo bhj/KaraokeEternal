@@ -68,9 +68,7 @@ class Prefs {
       const { result, entities } = prefs.paths
 
       // is it a subfolder of an already-added folder?
-      if (result.some(pathId =>
-        dir.indexOf(entities[pathId].path + path.sep) === 0
-      )) {
+      if (result.some(pathId => (dir + path.sep).indexOf(entities[pathId].path + path.sep) === 0)) {
         throw new Error('Folder has already been added')
       }
 
