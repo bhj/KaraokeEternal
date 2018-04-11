@@ -67,9 +67,9 @@ export default class PathPrefs extends React.Component {
 
     return (
       <div styleName='container'>
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex' }} onClick={() => this.toggleExpanded()}>
           <div styleName='title'>Media Folders</div>
-          <div style={{ flex: 1, textAlign: 'right' }} onClick={() => this.toggleExpanded()}>
+          <div style={{ flex: 1, textAlign: 'right' }}>
             <div style={{ display: 'inline-block' }}>
               <Icon icon={isExpanded ? 'EXPAND_LESS' : 'EXPAND_MORE'} size={32} styleName='icon' />
             </div>
