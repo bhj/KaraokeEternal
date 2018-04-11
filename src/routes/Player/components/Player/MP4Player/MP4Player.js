@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import './MP4Player.css'
 
 class MP4Player extends React.Component {
   static propTypes = {
@@ -41,12 +42,10 @@ class MP4Player extends React.Component {
 
     return (
       <div style={{ width, height }}>
-        <video
+        <video styleName='video'
           preload='none'
           width={width}
           height={height}
-          objectPosition={'50% 50%'}
-          objectFit={'contain'}
           onCanPlayThrough={this.handleReady}
           onTimeUpdate={this.handleTimeUpdate}
           onEnded={this.props.onMediaEnd}
