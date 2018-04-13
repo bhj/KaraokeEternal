@@ -1,4 +1,4 @@
-.text {
+.container {
   flex: 1;
   text-align: center;
   margin: auto;
@@ -6,4 +6,21 @@
   letter-spacing: .20vw;
   font-size: 6vw;
   text-rendering: optimizeLegibility;
+}
+
+.char {
+  animation: color-cycle;
+  animation-duration: 10s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+
+@keyframes color-cycle {
+  0% {color: red;}
+  16% {color: orange;}
+  32% {color: yellow;}
+  49% {color: green;}
+  66% {color: blue;}
+  83% {color: indigo;}
+  100% {color: violet;}
 }

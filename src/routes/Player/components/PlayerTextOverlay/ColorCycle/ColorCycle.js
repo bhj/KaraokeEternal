@@ -1,72 +1,34 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import chroma from 'chroma-js'
 import './ColorCycle.css'
 
-const colorNames = ['red', 'purple', 'blue', 'green', 'yellow', 'orange', 'red']
-const cycleSpeed = 50 // ms
+const framerate = 33 // ms
 
 class ColorCycle extends React.Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
   }
 
-  state = {
-    offset: 0,
+  shouldComponentUpdate (prevProps) {
+    return prevProps.text !== this.props.text
   }
 
-  chars = []
-
   render () {
-    const text = this.chars.map((char, i) => {
-      i += this.state.offset
-
-      if (i >= this.colors.length) {
-        i -= this.colors.length
-      }
+    const text = this.props.text.split('').map((char, i) => {
+      const delay = (i - this.props.text.length + 1) * framerate
 
       return (
-        <span key={char + i} style={{ color: this.colors[i] }}>
+        <span key={char + i} styleName='char' style={{ animationDelay: `${delay}ms` }}>
           {char}
         </span>
       )
     })
 
     return (
-      <div styleName='text'>
+      <div styleName='container'>
         {text}
       </div>
     )
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.text !== this.props.text) {
-      this.updateTitle()
-    }
-  }
-
-  componentDidMount () {
-    this.updateTitle()
-
-    this.timer = setInterval(() => {
-      this.setState({
-        offset: this.state.offset < this.colors.length ? ++this.state.offset : 0
-      })
-    }, cycleSpeed)
-  }
-
-  componentWillUnmount () {
-    clearInterval(this.timer)
-  }
-
-  updateTitle = () => {
-    // array of chars
-    this.chars = this.props.text.split('')
-
-    // array of hex colors spread throughout colorNames
-    this.colors = chroma.scale(colorNames)
-      .mode('lab')
-      .colors(this.chars.length * 10)
   }
 }
 
