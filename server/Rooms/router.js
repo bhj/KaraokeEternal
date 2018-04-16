@@ -41,7 +41,7 @@ router.post('/rooms', async (ctx, next) => {
       q.set(key, room[key])
     })
 
-    q.set('dateCreated', new Date().toISOString())
+    q.set('dateCreated', Math.floor(Date.now() / 1000))
 
     const { text, values } = q.toParam()
     const res = await db.run(text, values)

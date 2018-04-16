@@ -68,6 +68,7 @@ export default class Rooms extends Component {
             <Column
               label='Created'
               dataKey='dateCreated'
+              cellRenderer={({ rowData }) => (new Date(rowData.dateCreated * 1000)).toISOString().substring(0, 10)}
               width={width * 0.30}
             />
             <Column
