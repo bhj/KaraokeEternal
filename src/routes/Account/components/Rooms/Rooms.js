@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import EditRoom from './EditRoom'
 import { Column, Table } from 'react-virtualized'
 import style from './Rooms.css'
-import tableStyle from 'react-virtualized/styles.css'
 
 export default class Rooms extends Component {
   static propTypes = {
@@ -43,8 +42,8 @@ export default class Rooms extends Component {
             rowHeight={30}
             rowCount={rooms.result.length}
             rowGetter={({ index }) => rooms.entities[rooms.result[index]]}
-            headerClassName={tableStyle.ReactVirtualized__Table__headerRow}
-            rowClassName={tableStyle.ReactVirtualized__Table__row}
+            headerClassName={style.tableHeader}
+            rowClassName={style.tableRow}
           >
             <Column
               label='Name'
@@ -55,15 +54,9 @@ export default class Rooms extends Component {
               )}
             />
             <Column
-              label='Open'
+              label='Status'
               dataKey='status'
               width={width * 0.20}
-              cellRenderer={({ rowData }) => (
-                <input type='checkbox'
-                  checked={rowData.status === 'open'}
-                  onChange={() => this.toggleStatus(rowData.roomId)}
-                />
-              )}
             />
             <Column
               label='Created'
