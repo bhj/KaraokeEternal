@@ -1,7 +1,7 @@
 {
   "name": "karaoke-forever",
   "version": "0.0.1",
-  "description": "Self-hosted, multi-room, multi-user karaoke party system built on open web technologies",
+  "description": "Karaoke LAN party system",
   "private:": true,
   "main": "main.js",
   "engines": {
