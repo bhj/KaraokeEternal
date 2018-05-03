@@ -1,6 +1,6 @@
 ## Overview
 
-Host awesome local karaoke parties where anyone can join using their phone. Supports CD+Graphics (cdg + mp3/m4a) and video (mp4) files.
+Host awesome local karaoke parties where anyone can join using their phone. Supports CD+Graphics (cdg+mp3/m4a) and video (mp4) files.
 
 ### Server
 

@@ -1,6 +1,6 @@
 # Karaoke Forever
 
-Host awesome local karaoke parties where anyone can join using their phone. Supports most .cdg (CD+Graphics) and audio files. No Internet connection required.
+Host awesome local karaoke parties where anyone can join using their phone. Supports CD+Graphics (cdg+mp3/m4a) and video (mp4) files.
 
 ## Overview
 
@@ -76,4 +76,4 @@ Contributions are most welcome!
 
 MIT License
 
-Copyright (c) 2017 Brandon H. Jones
+Copyright (c) 2018 Brandon H. Jones
