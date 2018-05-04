@@ -57,12 +57,12 @@ module.exports = function (io) {
       )
 
       // any players left in room?
-      if (sock._lastPlayerStatus && room.length) {
-        if (!Object.keys(room.sockets).some(id => !!io.sockets.sockets[id]._lastPlayerStatus)) {
-          io.to(sock.user.roomId).emit('action', {
-            type: PLAYER_LEAVE,
-          })
-        }
+      if (room.length && !Object.keys(room.sockets).some(id => !!io.sockets.sockets[id]._lastPlayerStatus)) {
+        io.to(sock.user.roomId).emit('action', {
+          type: PLAYER_LEAVE,
+        })
+
+        log('No more Players are present in room %s', sock.user.roomId)
       }
     })
 
@@ -108,10 +108,6 @@ module.exports = function (io) {
 
     const room = sock.adapter.rooms[sock.user.roomId]
 
-    log('%s (%s) joined room %s (%s in room)',
-      sock.user.name, sock.id, sock.user.roomId, room.length
-    )
-
     // if there's a player in room, emit its last known status
     const lastStatusSocket = Object.keys(room.sockets).find(id => !!io.sockets.sockets[id]._lastPlayerStatus)
 
@@ -121,6 +117,10 @@ module.exports = function (io) {
         payload: io.sockets.sockets[lastStatusSocket]._lastPlayerStatus,
       })
     }
+
+    log('%s (%s) joined room %s (%s in room)',
+      sock.user.name, sock.id, sock.user.roomId, room.length
+    )
 
     // send library and queue
     try {
