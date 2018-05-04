@@ -5,14 +5,14 @@
 
 #title h1 {
   font-size: 48px;
-  animation: neon1 1.5s ease-in-out infinite alternate;
+  animation: neon1 1.5s ease-in infinite alternate;
 }
 
 @keyframes neon1 {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #FF1177, 0 0 70px #FF1177, 0 0 80px #FF1177, 0 0 100px #FF1177, 0 0 150px #FF1177;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #BA3A95, 0 0 70px #BA3A95, 0 0 80px #BA3A95, 0 0 100px #BA3A95, 0 0 150px #BA3A95;
   }
   to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #FF1177, 0 0 35px #FF1177, 0 0 40px #FF1177, 0 0 50px #FF1177, 0 0 75px #FF1177;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #BA3A95, 0 0 35px #BA3A95, 0 0 40px #BA3A95, 0 0 50px #BA3A95, 0 0 75px #BA3A95;
   }
 }
