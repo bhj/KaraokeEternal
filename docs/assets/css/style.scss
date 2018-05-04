@@ -6,6 +6,9 @@
 #title h1 {
   font-size: 48px;
   animation: neon1 1.5s ease-in infinite alternate;
+  backdrop-filter: saturate(250%);
+  -backdrop-filter: saturate(250%);
+  -webkit-backdrop-filter: saturate(250%);
 }
 
 @keyframes neon1 {
