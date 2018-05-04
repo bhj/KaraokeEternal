@@ -27,7 +27,7 @@ export default function createSocketMiddleware (socket, prefix) {
       // that can optionally receive data when server
       // calls ctx.acknowledge(data)
       socket.emit('action', action, cbData => {
-        if (typeof cbData === 'object') {
+        if (typeof cbData === 'object' && typeof cbData.type !== 'undefined') {
           // assume it's an action
           next(cbData)
         }
