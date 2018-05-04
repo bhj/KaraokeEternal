@@ -3,6 +3,10 @@
 
 @import "{{ site.theme }}";
 
+body {
+  font: 15px/1.5 "OpenSansRegular", "Helvetica Neue", Helvetica, Arial, sans-serif;  
+}
+
 #title h1 {
   font-size: 48px;
   animation: neon1 1.5s ease-in infinite alternate;
@@ -11,11 +15,25 @@
   -webkit-backdrop-filter: saturate(250%);
 }
 
+#title .credits.left {
+  font-size: 14px;
+}
+
 @keyframes neon1 {
   from {
     text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #BA3A95, 0 0 70px #BA3A95, 0 0 80px #BA3A95, 0 0 100px #BA3A95, 0 0 150px #BA3A95;
   }
   to {
     text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #BA3A95, 0 0 35px #BA3A95, 0 0 40px #BA3A95, 0 0 50px #BA3A95, 0 0 75px #BA3A95;
+  }
+}
+
+a {
+  color: hsl(218, 100%, 60%);
+  font-weight: 400;
+  text-decoration:none;
+
+  &:hover {
+    color: hsl(218, 100%, 65%);
   }
 }
