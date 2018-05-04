@@ -9,7 +9,6 @@ import {
   PLAYER_VOLUME,
   EMIT_PLAYER_STATUS,
   EMIT_PLAYER_ERROR,
-  EMIT_PLAYER_ENTER,
   EMIT_PLAYER_LEAVE,
   QUEUE_PUSH,
 } from 'constants/actions'
@@ -48,13 +47,6 @@ export function emitError (msg) {
         msg,
       },
     })
-  }
-}
-
-// player entered room
-export function emitEnter () {
-  return {
-    type: EMIT_PLAYER_ENTER,
   }
 }
 

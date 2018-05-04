@@ -19,13 +19,12 @@ class PlayerController extends React.Component {
     mediaRequestError: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
     cancelStatus: PropTypes.func.isRequired,
-    emitEnter: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
     emitLeave: PropTypes.func.isRequired,
   }
 
   componentDidMount () {
-    this.props.emitEnter()
+    this.props.emitStatus()
   }
 
   componentWillUnmount () {

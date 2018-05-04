@@ -4,7 +4,6 @@ import { requestPlayNext } from 'store/modules/status'
 import {
   emitStatus,
   emitError,
-  emitEnter,
   emitLeave,
   cancelStatus,
   mediaRequest,
@@ -15,7 +14,6 @@ import {
 const mapActionCreators = {
   emitStatus,
   emitError,
-  emitEnter,
   emitLeave,
   cancelStatus,
   requestPlayNext,

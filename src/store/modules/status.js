@@ -5,7 +5,6 @@ import {
   REQUEST_PLAYER_VOLUME,
   PLAYER_STATUS,
   PLAYER_ERROR,
-  PLAYER_ENTER,
   PLAYER_LEAVE,
 } from 'constants/actions'
 
@@ -50,11 +49,6 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       ...payload,
-    }
-  },
-  [PLAYER_ENTER]: (state, { payload }) => {
-    return {
-      ...state,
       isPlayerPresent: true,
     }
   },

@@ -31,12 +31,10 @@ module.exports = {
   // player -> server -> clients
   PLAYER_STATUS: 'status/PLAYER_STATUS',
   PLAYER_ERROR: 'status/PLAYER_ERROR',
-  PLAYER_ENTER: 'status/PLAYER_ENTER',
   PLAYER_LEAVE: 'status/PLAYER_LEAVE',
   // to room (player -> server -> clients)
   EMIT_PLAYER_STATUS: 'server/EMIT_PLAYER_STATUS',
   EMIT_PLAYER_ERROR: 'server/EMIT_PLAYER_ERROR',
-  EMIT_PLAYER_ENTER:  'server/EMIT_PLAYER_ENTER',
   EMIT_PLAYER_LEAVE:  'server/EMIT_PLAYER_LEAVE',
   // player informational
   PLAYER_MEDIA_REQUEST: 'player/PLAYER_MEDIA_REQUEST',

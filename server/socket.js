@@ -11,7 +11,7 @@ const parseCookie = require('./lib/parseCookie')
 const {
   LIBRARY_PUSH,
   QUEUE_PUSH,
-  PLAYER_ENTER,
+  PLAYER_STATUS,
   PLAYER_LEAVE,
   SOCKET_AUTH_ERROR,
   _ERROR,
@@ -56,9 +56,9 @@ module.exports = function (io) {
         sock.user.name, sock.id, sock.user.roomId, reason, room.length
       )
 
-      if (sock._isPlayer && room.length) {
-        // any players left in room?
-        if (!Object.keys(room.sockets).some(id => io.sockets.sockets[id]._isPlayer)) {
+      // any players left in room?
+      if (sock._lastPlayerStatus && room.length) {
+        if (!Object.keys(room.sockets).some(id => !!io.sockets.sockets[id]._lastPlayerStatus)) {
           io.to(sock.user.roomId).emit('action', {
             type: PLAYER_LEAVE,
           })
@@ -112,10 +112,13 @@ module.exports = function (io) {
       sock.user.name, sock.id, sock.user.roomId, room.length
     )
 
-    // player in room?
-    if (Object.keys(room.sockets).some(id => io.sockets.sockets[id]._isPlayer)) {
-      io.to(sock.user.roomId).emit('action', {
-        type: PLAYER_ENTER,
+    // if there's a player in room, emit its last known status
+    const lastStatusSocket = Object.keys(room.sockets).find(id => !!io.sockets.sockets[id]._lastPlayerStatus)
+
+    if (lastStatusSocket) {
+      io.to(sock.id).emit('action', {
+        type: PLAYER_STATUS,
+        payload: io.sockets.sockets[lastStatusSocket]._lastPlayerStatus,
       })
     }
 

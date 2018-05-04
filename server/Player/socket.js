@@ -14,8 +14,6 @@ const {
   PLAYER_STATUS,
   EMIT_PLAYER_ERROR,
   PLAYER_ERROR,
-  EMIT_PLAYER_ENTER,
-  PLAYER_ENTER,
   EMIT_PLAYER_LEAVE,
   PLAYER_LEAVE,
 } = require('../../constants/actions')
@@ -49,6 +47,10 @@ const ACTION_HANDLERS = {
     })
   },
   [EMIT_PLAYER_STATUS]: async (sock, { payload }) => {
+    // so we can tell the room when players leave and
+    // relay last known player status on client join
+    sock._lastPlayerStatus = payload
+
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_STATUS,
       payload,
@@ -58,17 +60,6 @@ const ACTION_HANDLERS = {
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_ERROR,
       payload,
-    })
-  },
-  [EMIT_PLAYER_ENTER]: async (sock, { payload }) => {
-    // so we can tell the room when player leaves
-    sock._isPlayer = true
-
-    sock.server.to(sock.user.roomId).emit('action', {
-      type: PLAYER_ENTER,
-      payload: {
-        socketId: sock.id,
-      }
     })
   },
   [EMIT_PLAYER_LEAVE]: async (sock, { payload }) => {
