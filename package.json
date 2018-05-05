@@ -90,6 +90,6 @@
     "nodemon": "^1.17.3",
     "redbox-react": "^1.6.0",
     "url-loader": "^1.0.1",
-    "webpack": "^4.6.0"
+    "webpack": "^4.7.0"
   }
 }
