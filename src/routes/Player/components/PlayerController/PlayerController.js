@@ -34,9 +34,12 @@ class PlayerController extends React.Component {
   componentDidUpdate (prevProps) {
     const { queueItem, isPlaying } = this.props
 
+    // cancel any pending status emits having old info
+    this.props.cancelStatus()
+
     // playing for first time?
     if (isPlaying && queueItem.queueId === -1) {
-      return this.props.requestPlayNext()
+      this.props.requestPlayNext()
     }
 
     if (prevProps.queueItem.queueId !== queueItem.queueId) {
@@ -55,23 +58,6 @@ class PlayerController extends React.Component {
     }
 
     this.props.emitStatus()
-  }
-
-  componentWillUpdate (nextProps) {
-    const { queueItem, isPlaying } = this.props
-
-    if (queueItem.queueId !== nextProps.queueItem.queueId) {
-      // cancel any pending status emits having an old queueId
-      this.props.cancelStatus()
-
-      // push notification
-      this.overlay.upNow(nextProps.queueItem.username)
-    }
-
-    // improve play/pause feedback lag
-    if (isPlaying !== nextProps.isPlaying) {
-      this.props.cancelStatus()
-    }
   }
 
   handleMediaRequestError = (msg) => {
