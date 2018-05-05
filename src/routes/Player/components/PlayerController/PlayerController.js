@@ -74,26 +74,22 @@ class PlayerController extends React.Component {
   }
 
   render () {
-    const { queueItem, isAtQueueEnd, isErrored } = this.props
-    const enablePlayer = queueItem.queueId !== -1 && !isAtQueueEnd && !isErrored
-
     return (
       <div>
-        {enablePlayer &&
-          <Player
-            queueItem={this.props.queueItem}
-            volume={this.props.volume}
-            isPlaying={this.props.isPlaying}
-            onMediaRequest={this.props.mediaRequest}
-            onMediaRequestSuccess={this.props.mediaRequestSuccess}
-            onMediaRequestError={this.handleMediaRequestError}
-            onStatus={this.props.emitStatus}
-            onMediaEnd={this.props.requestPlayNext}
-            onError={this.handleError}
-            width={this.props.width}
-            height={this.props.height}
-          />
-        }
+        <Player
+          queueItem={this.props.queueItem}
+          volume={this.props.volume}
+          isPlaying={this.props.isPlaying}
+          isVisible={this.props.queueItem.queueId !== -1 && !this.props.isAtQueueEnd && !this.props.isErrored}
+          onMediaRequest={this.props.mediaRequest}
+          onMediaRequestSuccess={this.props.mediaRequestSuccess}
+          onMediaRequestError={this.handleMediaRequestError}
+          onStatus={this.props.emitStatus}
+          onMediaEnd={this.props.requestPlayNext}
+          onError={this.handleError}
+          width={this.props.width}
+          height={this.props.height}
+        />
         <PlayerTextOverlay
           ref={r => { this.overlay = r }}
           width={this.props.width}

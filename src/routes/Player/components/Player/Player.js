@@ -13,6 +13,7 @@ class Player extends React.Component {
     queueItem: PropTypes.object.isRequired,
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
+    isVisible: PropTypes.bool.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // events
@@ -27,6 +28,10 @@ class Player extends React.Component {
   render () {
     const { player } = this.props.queueItem
     const PlayerComponent = players[player]
+
+    if (!this.props.isVisible) {
+      return null
+    }
 
     if (typeof PlayerComponent === 'undefined') {
       this.props.onError(`Player component not found: ${player}`)
