@@ -3,7 +3,7 @@ const squel = require('squel')
 const Library = require('./Library')
 
 const {
-  LIBRARY_SONG_UPDATE_PUSH,
+  LIBRARY_PUSH_SONG,
   SONG_TOGGLE_STARRED,
 } = require('../../constants/actions')
 
@@ -54,7 +54,7 @@ const ACTION_HANDLERS = {
     // emit updated star count
     try {
       sock.server.emit('action', {
-        type: LIBRARY_SONG_UPDATE_PUSH,
+        type: LIBRARY_PUSH_SONG,
         payload: await Library.getSong(payload.songId),
       })
     } catch (err) {
