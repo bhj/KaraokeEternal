@@ -5,65 +5,53 @@ import UpNow from './UpNow'
 import Fire from './Fire'
 import './PlayerTextOverlay.css'
 
-const Components = {
-  ColorCycle,
-  Fire,
-  UpNow,
-}
-
 class PlayerTextOverlay extends React.Component {
   static propTypes = {
+    queueItem: PropTypes.object.isRequired,
+    isAtQueueEnd: PropTypes.bool.isRequired,
+    isErrored: PropTypes.bool.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
   }
 
-  state = {
-    component: null,
-    text: '',
-  }
-
   shouldComponentUpdate (nextProps, nextState) {
-    // @todo: this is a hacky way of preventing
-    // children from updating and re-triggering
-    // any of their animations
-    return this.shouldUpdate === true
-  }
+    if (this.props.queueItem !== nextProps.queueItem) {
+      return true
+    }
 
-  title = (text) => {
-    this.shouldUpdate = true
-    this.setState({
-      component: 'ColorCycle',
-      text,
-    })
-  }
+    if (this.props.isAtQueueEnd !== nextProps.isAtQueueEnd) {
+      return true
+    }
 
-  upNow = (name) => {
-    this.shouldUpdate = true
-    this.setState({
-      component: 'UpNow',
-      text: name,
-    }, () => { this.shouldUpdate = false })
-  }
+    if (this.props.isErrored !== nextProps.isErrored) {
+      return true
+    }
 
-  error = () => {
-    this.shouldUpdate = true
-    this.setState({
-      component: 'Fire',
-      text: 'CRAP',
-    })
+    if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
+      return true
+    }
+
+    return false
   }
 
   render () {
-    if (this.state.component === null) return null
-
     const { width, height } = this.props
-    const Component = Components[this.state.component]
+    let Component
+
+    if (this.props.queueItem.queueId === -1) {
+      Component = <ColorCycle text='PRESS PLAY TO BEGIN' />
+    } else if (this.props.isAtQueueEnd) {
+      Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' />
+    } else if (this.props.isErrored) {
+      Component = <Fire text='CRAP' />
+    } else {
+      Component = <UpNow text={this.props.queueItem.username} />
+    }
 
     return (
       <div style={{ width, height }} styleName='container'>
-        <Component text={this.state.text} />
+        {Component}
       </div>
-
     )
   }
 }

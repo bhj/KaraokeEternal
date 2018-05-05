@@ -47,16 +47,6 @@ class PlayerController extends React.Component {
       return this.props.emitStatus({ position: 0 })
     }
 
-    // @todo: might be a better place for this
-    if (this.props.queueItem.queueId === -1) {
-      this.overlay.title('PRESS PLAY TO BEGIN')
-    }
-
-    // @todo: might be a better place for this
-    if (this.props.isAtQueueEnd) {
-      this.overlay.title('CAN HAZ MOAR SONGZ?')
-    }
-
     this.props.emitStatus()
   }
 
@@ -70,7 +60,6 @@ class PlayerController extends React.Component {
 
   handleError = (msg) => {
     this.props.emitError(msg)
-    this.overlay.error()
   }
 
   render () {
@@ -92,6 +81,9 @@ class PlayerController extends React.Component {
         />
         <PlayerTextOverlay
           ref={r => { this.overlay = r }}
+          queueItem={this.props.queueItem}
+          isAtQueueEnd={this.props.isAtQueueEnd}
+          isErrored={this.props.isErrored}
           width={this.props.width}
           height={this.props.height}
         />
