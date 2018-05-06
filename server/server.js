@@ -1,8 +1,8 @@
-const db = require('sqlite')
+const sqlite = require('sqlite')
 const log = require('debug')(`app:server [${process.pid}]`)
 const path = require('path')
 const webpack = require('webpack')
-const webpackConfig = require('../build/webpack.config')
+const webpackConfig = require('../webpack.config')
 const project = require('../project.config')
 
 const http = require('http')
@@ -27,7 +27,15 @@ const SocketIO = require('socket.io')
 const socketActions = require('./socket')
 
 module.exports = function () {
-  let io
+  const dbFile = path.resolve(project.basePath, 'database.sqlite3')
+  log('Opening database file %s', dbFile)
+
+  Promise.resolve()
+    .then(() => sqlite.open(dbFile, { Promise }))
+    .then(db => db.migrate({
+      migrationsPath: path.resolve(project.serverDir, 'lib', 'db'),
+      // force: 'last' ,
+    }))
 
   app.use(KoaLogger())
   app.use(KoaRange)
@@ -72,7 +80,6 @@ module.exports = function () {
     app.use(KoaWebpack({
       compiler,
       dev: {
-        publicPath  : webpackConfig.output.publicPath,
         stats       : 'minimal',
       },
     }))
@@ -112,28 +119,18 @@ module.exports = function () {
     app.use(KoaStatic(path.resolve(project.basePath, project.outDir)))
   }
 
-  log('Opening database file %s', project.database)
+  // start koa and socket.io server
+  const server = http.createServer(app.callback())
+  const io = new SocketIO(server)
 
-  db.open(project.database).then(() => {
-    db.migrate({
-      migrationsPath: path.resolve(project.serverDir, 'lib', 'db'),
-      // force: 'last',
-    })
-  }).then(() => {
-    // start koa and socket.io server
-    const server = http.createServer(app.callback())
-    io = new SocketIO(server)
+  // attach socket.io event handlers
+  socketActions(io)
 
-    // attach socket.io event handlers
-    socketActions(io)
-
-    // emit messages from scanner over socket.io
-    process.on('message', function (action) {
-      io.emit('action', action)
-    })
-
-    server.listen(project.serverPort)
-
-    log(`Server listening on port ${project.serverPort}`)
+  // emit messages from scanner over socket.io
+  process.on('message', function (action) {
+    io.emit('action', action)
   })
+
+  server.listen(project.serverPort)
+  log(`Server listening on port ${project.serverPort}`)
 }
