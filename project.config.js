@@ -6,28 +6,14 @@ module.exports = {
   env: NODE_ENV,
   /** Full path to the project's root directory */
   basePath: __dirname,
+  /** path for all project assets (relative to the website root) */
+  publicPath: '/',
   /** Directory containing the server source code */
   serverDir: 'server',
   /** Port the http server listens on */
   serverPort: 3000,
-  /** Directory containing the client application source code */
-  srcDir: 'src',
-  /** Filename of the application's entry point */
-  main: 'main.js',
-  /** Path to SQLite database */
+  /** Full path to database file */
   database: path.resolve(__dirname, 'database.sqlite3'),
-  /** Directory in which to emit compiled assets */
-  outDir: 'dist',
-  /** Base path for all project assets (relative to the website root) */
-  publicPath: '/',
-  /** Whether to generate sourcemaps */
-  sourcemaps: true,
-  /** Hash map of keys that the compiler should treat as external to the project */
-  externals: {},
-  /** Hash map of variables and their values to expose globally */
-  globals: {},
-  /** Whether to enable verbose logging */
-  verbose: false,
   /** Modules to bundle separately from the core client application */
   vendors: [
     'react',

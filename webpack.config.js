@@ -2,10 +2,7 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const project = require('../project.config')
-
-const inProject = (...args) => path.resolve(project.basePath, ...args)
-const inProjectSrc = (file) => inProject(project.srcDir, file)
+const project = require('./project.config')
 
 const __DEV__ = project.env === 'development'
 const __TEST__ = project.env === 'test'
@@ -15,29 +12,23 @@ const config = {
   mode: __PROD__ ? 'production' : 'development',
   entry: {
     main: [
-      inProjectSrc(project.main),
+      './src/main.js'
     ],
   },
-  devtool: project.sourcemaps ? 'source-map' : false,
-  performance: {
-    hints: false,
-  },
   output: {
-    path: inProject(project.outDir),
-    filename: __DEV__ ? '[name].js' : '[name].[chunkhash].js',
+    path: path.resolve(__dirname, 'dist'),
     publicPath: project.publicPath,
   },
   resolve: {
     modules: [
-      inProject(project.srcDir),
+      './src',
       'node_modules',
     ],
     extensions: ['*', '.js', '.jsx', '.json'],
     alias: {
-      'constants': path.resolve(project.basePath, 'constants'),
+      'constants': path.resolve(__dirname, 'constants'),
     }
   },
-  externals: project.externals,
   module: {
     rules: [],
   },
@@ -163,11 +154,8 @@ config.module.rules.push(
 // HTML Template
 // ------------------------------------
 config.plugins.push(new HtmlWebpackPlugin({
-  template: inProjectSrc('index.html'),
+  template: './src/index.html',
   inject: true,
-  minify: {
-    collapseWhitespace: true,
-  },
 }))
 
 // Production Optimizations
