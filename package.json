@@ -10,7 +10,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && webpack --mode production",
+    "build": "npm run clean && webpack --env.NODE_ENV=production",
     "dev": "cross-env NODE_ENV=development DEBUG=app:* nodemon server/main.js --ignore dist --ignore coverage --ignore tests --ignore src",
     "serve": "cross-env NODE_ENV=production DEBUG=app:* node server/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
