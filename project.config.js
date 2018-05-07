@@ -6,7 +6,7 @@ module.exports = {
   env: NODE_ENV,
   /** Full path to the project's root directory */
   basePath: __dirname,
-  /** path for all project assets (relative to the website root) */
+  /** path for all project assets (relative to website public_html) */
   publicPath: '/',
   /** Port the http server listens on */
   serverPort: 3000,

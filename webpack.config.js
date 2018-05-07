@@ -16,22 +16,20 @@ const config = {
     ],
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.join(project.basePath, 'dist'),
     publicPath: project.publicPath,
   },
   resolve: {
     modules: [
-      './src',
+      path.join(project.basePath, 'src'),
       'node_modules',
     ],
     extensions: ['*', '.js', '.jsx', '.json'],
     alias: {
-      'constants': path.resolve(__dirname, 'constants'),
+      'constants': path.join(project.basePath, 'constants'),
     }
   },
-  module: {
-    rules: [],
-  },
+  module: { rules: [] },
   plugins: [
     new webpack.DefinePlugin(Object.assign({
       'process.env': { NODE_ENV: JSON.stringify(project.env) },
@@ -56,23 +54,19 @@ config.module.rules.push({
     query: {
       cacheDirectory: true,
       plugins: [
-        'babel-plugin-transform-class-properties',
-        'babel-plugin-transform-object-rest-spread',
-        'babel-plugin-transform-runtime',
+        '@babel/plugin-transform-runtime',
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-proposal-object-rest-spread',
         ['react-css-modules', {
-          webpackHotModuleReloading: true,
+          webpackHotModuleReloading: __DEV__,
           'generateScopedName' : '[name]__[local]___[hash:base64:5]',
         }]
       ],
       presets: [
-        'babel-preset-react',
-        ['babel-preset-env', {
-          targets: {
-            browsers: 'last 1 versions',
-            uglify: true,
-            modules: false,
-          },
+        ['@babel/preset-env', {
+          modules: false, // https://github.com/babel/babel-loader/issues/521
         }],
+        '@babel/preset-react',
       ]
     },
   }],
@@ -157,16 +151,5 @@ config.plugins.push(new HtmlWebpackPlugin({
   template: './src/index.html',
   inject: true,
 }))
-
-// Production Optimizations
-// ------------------------------------
-if (__PROD__) {
-  config.plugins.push(
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false,
-    }),
-  )
-}
 
 module.exports = config
