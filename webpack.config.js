@@ -2,6 +2,7 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const project = require('./project.config')
 
 const __DEV__ = project.env === 'development'
@@ -41,7 +42,20 @@ const config = {
   ],
 }
 
-// ------------------------------------
+// HTML Template
+config.plugins.push(new HtmlWebpackPlugin({
+  template: './src/index.html',
+  inject: true,
+}))
+
+// copy /public to /dist in production
+if (__PROD__) {
+  config.plugins.push(new CopyWebpackPlugin([{
+    from: path.join(project.basePath, 'public'),
+    to: path.join(project.basePath, 'dist'),
+  }], { /* options */ }))
+}
+
 // Loaders
 // ------------------------------------
 
@@ -144,12 +158,5 @@ config.module.rules.push(
   }
 )
 /* eslint-enable */
-
-// HTML Template
-// ------------------------------------
-config.plugins.push(new HtmlWebpackPlugin({
-  template: './src/index.html',
-  inject: true,
-}))
 
 module.exports = config
