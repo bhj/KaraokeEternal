@@ -10,9 +10,9 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "compile": "node build/scripts/compile",
-    "build": "cross-env NODE_ENV=production npm run clean && npm run compile",
+    "build": "webpack --mode production",
     "dev": "cross-env NODE_ENV=development DEBUG=app:* nodemon server/main.js --ignore dist --ignore coverage --ignore tests --ignore src",
+    "serve": "cross-env NODE_ENV=production DEBUG=app:* node server/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"
@@ -90,6 +90,7 @@
     "nodemon": "^1.17.4",
     "redbox-react": "^1.6.0",
     "url-loader": "^1.0.1",
-    "webpack": "^4.7.0"
+    "webpack": "^4.7.0",
+    "webpack-cli": "^2.1.3"
   }
 }

@@ -6,7 +6,8 @@ const webpackConfig = require('../webpack.config')
 const project = require('../project.config')
 
 const http = require('http')
-const readFile = require('./lib/readFile')
+const fs = require('fs')
+const { promisify } = require('util')
 const parseCookie = require('./lib/parseCookie')
 const jwtVerify = require('jsonwebtoken').verify
 const Koa = require('koa')
@@ -70,11 +71,10 @@ module.exports = function () {
   app.use(roomsRouter.routes())
   app.use(userRouter.routes())
 
-  // Apply Webpack HMR Middleware
-  // ------------------------------------
   if (project.env === 'development') {
-    const compiler = webpack(webpackConfig)
+    // development mode
 
+    const compiler = webpack(webpackConfig)
     log('Enabling webpack dev and HMR middleware')
 
     app.use(KoaWebpack({
@@ -84,39 +84,46 @@ module.exports = function () {
       },
     }))
 
-    // Serve static assets from ~/public since Webpack is unaware of
-    // these files. This middleware doesn't need to be enabled outside
-    // of development since this directory will be copied into ~/dist
-    // when the application is compiled.
+    // serve static assets from ~/public since Webpack is unaware of these
     app.use(KoaStatic(path.resolve(project.basePath, 'public')))
 
-    // This rewrites all routes requests to the root /index.html file
-    // (ignoring file requests). If you want to implement universal
-    // rendering, you'll want to remove this middleware.
+    // "rewrite" other requests to the root /index.html file
+    // (which webpack-dev-server will serve from a virtual ~/dist)
+    const indexFile = path.join(project.basePath, 'dist', 'index.html')
+
     app.use(async (ctx, next) => {
-      const filename = path.join(compiler.outputPath, 'index.html')
       try {
-        ctx.body = await readFile(compiler, filename)
+        ctx.body = await new Promise(function (resolve, reject) {
+          compiler.outputFileSystem.readFile(indexFile, (err, result) => {
+            if (err) { return reject(err) }
+            return resolve(result)
+          })
+        })
         ctx.set('content-type', 'text/html')
         ctx.status = 200
-        return Promise.resolve()
       } catch (err) {
         return Promise.reject(err)
       }
     })
   } else {
-    log(
-      'Server is being run outside of live development mode, meaning it will ' +
-      'only serve the compiled application bundle in ~/dist. Generally you ' +
-      'do not need an application server for this and can instead use a web ' +
-      'server such as nginx to serve your static files. See the "deployment" ' +
-      'section in the README for more information on deployment strategies.'
-    )
+    // production mode
 
-    // Serving ~/dist by default. Ideally these files should be served by
-    // the web server and not the app server, but this helps to demo the
-    // server in production.
-    app.use(KoaStatic(path.resolve(project.basePath, project.outDir)))
+    // serve files in ~/dist
+    app.use(KoaStatic(path.resolve(project.basePath, 'dist')))
+
+    // "rewrite" all other requests to the root /index.html file
+    const indexFile = path.join(project.basePath, 'dist', 'index.html')
+    const readFile = promisify(fs.readFile)
+
+    app.use(async (ctx, next) => {
+      try {
+        ctx.body = await readFile(indexFile)
+        ctx.set('content-type', 'text/html')
+        ctx.status = 200
+      } catch (err) {
+        return Promise.reject(err)
+      }
+    })
   }
 
   // start koa and socket.io server
