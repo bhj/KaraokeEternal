@@ -11,14 +11,5 @@ module.exports = {
   /** Port the http server listens on */
   serverPort: 3000,
   /** Full path to database file */
-  database: path.resolve(__dirname, 'database.sqlite3'),
-  /** Modules to bundle separately from the core client application */
-  vendors: [
-    'react',
-    'react-dom',
-    'redux',
-    'react-redux',
-    'redux-thunk',
-    'react-router',
-  ],
+  database: path.join(__dirname, 'database.sqlite3'),
 }
