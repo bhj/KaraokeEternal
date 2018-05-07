@@ -33,7 +33,7 @@ module.exports = function () {
   Promise.resolve()
     .then(() => sqlite.open(dbFile, { Promise }))
     .then(db => db.migrate({
-      migrationsPath: path.resolve(project.serverDir, 'lib', 'db'),
+      migrationsPath: path.resolve('server', 'lib', 'db'),
       // force: 'last' ,
     }))
 

@@ -8,8 +8,6 @@ module.exports = {
   basePath: __dirname,
   /** path for all project assets (relative to the website root) */
   publicPath: '/',
-  /** Directory containing the server source code */
-  serverDir: 'server',
   /** Port the http server listens on */
   serverPort: 3000,
   /** Full path to database file */
