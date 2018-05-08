@@ -5,7 +5,7 @@ import styles from './UpNow.css'
 
 class UpNow extends React.Component {
   static propTypes = {
-    text: PropTypes.string.isRequired,
+    queueItem: PropTypes.object.isRequired,
   }
 
   timeoutID = null
@@ -17,8 +17,10 @@ class UpNow extends React.Component {
     this.animate()
   }
 
-  componentWillReceiveProps () {
-    this.animate()
+  componentDidUpdate (prevProps, prevState) {
+    if (this.props.queueItem !== prevProps.queueItem) {
+      this.animate()
+    }
   }
 
   animate () {

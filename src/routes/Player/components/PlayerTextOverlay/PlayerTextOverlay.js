@@ -35,17 +35,17 @@ class PlayerTextOverlay extends React.Component {
   }
 
   render () {
-    const { width, height } = this.props
+    const { queueItem, width, height } = this.props
     let Component
 
-    if (this.props.queueItem.queueId === -1) {
+    if (queueItem.queueId === -1) {
       Component = <ColorCycle text='PRESS PLAY TO BEGIN' />
     } else if (this.props.isAtQueueEnd) {
       Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' />
     } else if (this.props.isErrored) {
       Component = <Fire text='CRAP' />
     } else {
-      Component = <UpNow text={this.props.queueItem.username} />
+      Component = <UpNow queueItem={queueItem} />
     }
 
     return (
