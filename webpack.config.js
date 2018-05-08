@@ -18,6 +18,7 @@ const config = {
   },
   output: {
     path: path.join(project.basePath, 'dist'),
+    filename: __DEV__ ? '[name].js' : '[name].[hash].js',
     publicPath: project.publicPath,
   },
   resolve: {
@@ -38,8 +39,19 @@ const config = {
       __TEST__,
       __PROD__,
     }, project.globals)),
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: __DEV__ ? '[name].css' : '[name].[hash].css',
+      chunkFilename: __DEV__ ? '[id].css' : '[id].[hash].css',
+    }),
   ],
+}
+
+// copy static assets in /public to /dist
+if (__PROD__) {
+  config.plugins.push(new CopyWebpackPlugin([{
+    from: path.join(project.basePath, 'public'),
+    to: path.join(project.basePath, 'dist'),
+  }], { /* options */ }))
 }
 
 // HTML Template
@@ -47,14 +59,6 @@ config.plugins.push(new HtmlWebpackPlugin({
   template: './src/index.html',
   inject: true,
 }))
-
-// copy /public to /dist in production
-if (__PROD__) {
-  config.plugins.push(new CopyWebpackPlugin([{
-    from: path.join(project.basePath, 'public'),
-    to: path.join(project.basePath, 'dist'),
-  }], { /* options */ }))
-}
 
 // Loaders
 // ------------------------------------
