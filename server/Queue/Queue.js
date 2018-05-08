@@ -19,7 +19,7 @@ class Queue {
         .field('media.file, media.duration')
         .field('artists.name AS artist')
         .field('songs.songId, songs.title')
-        .field('users.name AS username')
+        .field('users.name AS userDisplayName')
         .from('queue')
         .join('users USING(userId)')
         .join('media USING(mediaId)')

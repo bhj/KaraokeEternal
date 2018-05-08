@@ -48,7 +48,7 @@ class UpNow extends React.Component {
           exitActive: styles.fadeExitActive,
         }}>
         <div className='bg-blur' styleName='styles.textContainer'>
-          {this.props.text}
+          {this.props.queueItem.userDisplayName}
         </div>
       </CSSTransition>
     )
