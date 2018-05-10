@@ -5,17 +5,6 @@ import AppContainer from './containers/AppContainer'
 import { persistStore } from 'redux-persist'
 import io from 'socket.io-client'
 
-// hack to (try to) disable double-tap zooming in iOS 10, see:
-// http://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
-let lastTouchEnd = 0
-document.documentElement.addEventListener('touchend', event => {
-  var now = (new Date()).getTime()
-  if (now - lastTouchEnd <= 300) {
-    event.preventDefault()
-  }
-  lastTouchEnd = now
-}, false)
-
 // the "socket" side of the api requires authentication, so
 // we only want to attempt socket connection if we think we
 // have a valid session (via JWT in cookie). the socket.io
