@@ -29,8 +29,8 @@ const getAlphaPickerMap = createSelector(
   [getArtists],
   (artists) => {
     const map = {}
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-    let c = 0
+    const chars = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+    let c = 1 // skip '#' since it should always be 0 (top)
 
     // prefill with zeros
     chars.forEach(char => { map[char] = 0 })

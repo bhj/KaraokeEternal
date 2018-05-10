@@ -4,7 +4,7 @@ import BodyLock from './BodyLock'
 import './AlphaPicker.css'
 
 class AlphaPicker extends React.Component {
-  alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+  alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
   state = {
     isTouching: false,
     isScrollLocked: false,

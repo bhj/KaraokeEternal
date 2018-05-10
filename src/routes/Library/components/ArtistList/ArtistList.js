@@ -44,8 +44,8 @@ class ArtistList extends React.Component {
         <AlphaPicker
           onPick={this.handleAlphaPick}
           onTouch={this.handleAlphaTouch}
-          height={ui.viewportHeight - 30}
-          top={ui.headerHeight + 15}
+          height={ui.viewportHeight - 20}
+          top={ui.headerHeight + 10}
         />
       </div>
     )
