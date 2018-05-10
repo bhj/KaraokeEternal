@@ -5,7 +5,7 @@
   overflow: hidden;
 
   /* fixes widget disappearing in iOS 11 due to overflow: scroll on parent
-  container and -webkit-overflow-scrolling: touch in CoreLayout... sigh */
+  container and -webkit-overflow-scrolling: touch on parent */
   -webkit-transform: translate3d(0, 0, 0);
 }
 

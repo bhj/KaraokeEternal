@@ -1,19 +1,35 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Popover from './Popover'
+import BodyLock from './BodyLock'
 import './AlphaPicker.css'
 
 class AlphaPicker extends React.Component {
   alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
   state = {
-    isPicking: false,
+    isTouching: false,
+    isScrollLocked: false,
+    char: null,
+    y: null,
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    if (this.state.isTouching) {
+      clearTimeout(this.timerId)
+    }
+
+    if (prevState.isTouching && !this.state.isTouching) {
+      // delay scroll unlock
+      this.timerId = setTimeout(() => {
+        this.setState({ isScrollLocked: false })
+      }, 200)
+    }
   }
 
   render () {
     return (
       <div
         styleName='container'
-        style={this.props.style}
+        style={{ height: this.props.height, top: this.props.top }}
         onTouchStart={this.handleTouch}
         onTouchMove={this.handleTouch}
         onTouchEnd={this.handleTouchEnd}
@@ -21,6 +37,8 @@ class AlphaPicker extends React.Component {
         onMouseUp={this.handleTouchEnd}
         ref={this.handleRef}
       >
+        <BodyLock isLocked={this.state.isScrollLocked} />
+
         {this.alphabet.map((char, i) => (
           <div
             key={char}
@@ -29,9 +47,6 @@ class AlphaPicker extends React.Component {
             {char}
           </div>
         ))}
-        {this.state.isPicking &&
-          <Popover y={this.state.y} char={this.state.char} />
-        }
       </div>
     )
   }
@@ -39,24 +54,26 @@ class AlphaPicker extends React.Component {
   handleTouch = (e) => {
     e.preventDefault()
 
-    const parent = this.ref.getBoundingClientRect()
-    const charHeight = parent.height / this.alphabet.length
-    const y = (e.targetTouches ? e.targetTouches[0].clientY : e.clientY) - parent.top
-    const char = this.alphabet[Math.floor(y / charHeight)]
-    if (typeof char === 'undefined') return
+    const y = (e.targetTouches ? e.targetTouches[0].clientY : e.clientY)
+    const char = this.alphabet[Math.floor(((y - this.props.top) / this.props.height) * this.alphabet.length)]
 
     this.setState({
-      isPicking: typeof char !== 'undefined',
+      isTouching: true,
+      isScrollLocked: true,
       char,
-      y,
+      y: y - this.props.top,
     })
 
-    this.props.onPick(char)
+    // debounce
+    if (char !== this.state.char && typeof char !== 'undefined') {
+      this.props.onPick(char)
+    }
   }
 
   handleTouchEnd = (e) => {
     this.setState({
-      isPicking: false,
+      isTouching: false,
+      char: null,
     })
   }
 
@@ -67,7 +84,8 @@ class AlphaPicker extends React.Component {
 
 AlphaPicker.propTypes = {
   onPick: PropTypes.func.isRequired,
-  style: PropTypes.object,
+  height: PropTypes.number.isRequired,
+  top: PropTypes.number.isRequired,
 }
 
 export default AlphaPicker

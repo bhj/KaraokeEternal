@@ -40,14 +40,12 @@ class ArtistList extends React.Component {
           height={ui.browserHeight}
           scrollTop={this.props.scrollTop}
           scrollToAlignment='start'
-          style={{ paddingRight: '30px' }} // width of AlphaPicker
         />
         <AlphaPicker
           onPick={this.handleAlphaPick}
-          style={{
-            top: ui.headerHeight + 25,
-            height: ui.viewportHeight - 50,
-          }}
+          onTouch={this.handleAlphaTouch}
+          height={ui.viewportHeight - 30}
+          top={ui.headerHeight + 15}
         />
       </div>
     )
