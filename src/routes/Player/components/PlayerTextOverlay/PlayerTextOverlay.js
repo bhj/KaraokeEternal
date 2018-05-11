@@ -14,26 +14,6 @@ class PlayerTextOverlay extends React.Component {
     height: PropTypes.number.isRequired,
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    if (this.props.queueItem !== nextProps.queueItem) {
-      return true
-    }
-
-    if (this.props.isAtQueueEnd !== nextProps.isAtQueueEnd) {
-      return true
-    }
-
-    if (this.props.isErrored !== nextProps.isErrored) {
-      return true
-    }
-
-    if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
-      return true
-    }
-
-    return false
-  }
-
   render () {
     const { queueItem, width, height } = this.props
     let Component
@@ -45,7 +25,7 @@ class PlayerTextOverlay extends React.Component {
     } else if (this.props.isErrored) {
       Component = <Fire text='CRAP' />
     } else {
-      Component = <UpNow queueItem={queueItem} />
+      Component = <UpNow text={queueItem.userDisplayName} queueId={queueItem.queueId} />
     }
 
     return (

@@ -5,7 +5,8 @@ import styles from './UpNow.css'
 
 class UpNow extends React.Component {
   static propTypes = {
-    queueItem: PropTypes.object.isRequired,
+    text: PropTypes.string.isRequired,
+    queueId: PropTypes.object.isRequired,
   }
 
   timeoutID = null
@@ -18,7 +19,7 @@ class UpNow extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (this.props.queueItem !== prevProps.queueItem) {
+    if (this.props.queueId !== prevProps.queueId) {
       this.animate()
     }
   }
@@ -48,7 +49,7 @@ class UpNow extends React.Component {
           exitActive: styles.fadeExitActive,
         }}>
         <div className='bg-blur' styleName='styles.textContainer'>
-          {this.props.queueItem.userDisplayName}
+          {this.props.text}
         </div>
       </CSSTransition>
     )
