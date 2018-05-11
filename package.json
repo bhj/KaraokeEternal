@@ -73,7 +73,7 @@
     "babel-loader": "^8.0.0-beta.2",
     "babel-plugin-react-css-modules": "^3.4.0",
     "copy-webpack-plugin": "^4.5.1",
-    "cross-env": "^5.1.4",
+    "cross-env": "^5.1.5",
     "css-loader": "^0.28.11",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
@@ -91,7 +91,7 @@
     "nodemon": "^1.17.4",
     "redbox-react": "^1.6.0",
     "url-loader": "^1.0.1",
-    "webpack": "^4.8.0",
+    "webpack": "^4.8.1",
     "webpack-cli": "^2.1.3"
   }
 }
