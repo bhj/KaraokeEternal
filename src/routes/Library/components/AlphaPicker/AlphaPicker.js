@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import BodyLock from './BodyLock'
+import BodyLock from 'components/BodyLock'
 import './AlphaPicker.css'
 
 class AlphaPicker extends React.Component {

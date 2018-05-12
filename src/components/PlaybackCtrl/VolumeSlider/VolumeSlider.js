@@ -3,6 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Slider, { Handle } from 'rc-slider'
 import Icon from 'components/Icon'
+import BodyLock from 'components/BodyLock'
 import './VolumeSlider.css'
 // depends on styles/global/rc-slider
 
@@ -44,6 +45,7 @@ export default class VolumeSlider extends React.Component {
 
   render () {
     return (
+    <>
       <Slider
         min={0}
         max={1}
@@ -54,6 +56,8 @@ export default class VolumeSlider extends React.Component {
         handle={handle}
         styleName='slider'
       />
+      <BodyLock isLocked={this.state.isDragging} />
+    </>
     )
   }
 }
