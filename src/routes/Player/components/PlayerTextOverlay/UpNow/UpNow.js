@@ -6,7 +6,7 @@ import styles from './UpNow.css'
 class UpNow extends React.Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
-    queueId: PropTypes.object.isRequired,
+    queueId: PropTypes.number.isRequired,
   }
 
   timeoutID = null
