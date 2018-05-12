@@ -23,8 +23,6 @@ const {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [REQUEST_PLAYER_NEXT]: async (sock, { payload }) => {
-    // @todo: accept current queueId and pos so server
-    // can decide whether to increment song play count
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_NEXT,
       payload: await Queue.getQueue(sock.user.roomId),
