@@ -56,18 +56,20 @@ const ACTION_HANDLERS = {
       payload,
     })
   },
-  [EMIT_PLAYER_ERROR]: async (sock, { payload }) => {
-    sock.server.to(sock.user.roomId).emit('action', {
-      type: PLAYER_ERROR,
-      payload,
-    })
-  },
   [EMIT_PLAYER_LEAVE]: async (sock, { payload }) => {
+    sock._lastPlayerStatus = null
+
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_LEAVE,
       payload: {
         socketId: sock.id,
       }
+    })
+  },
+  [EMIT_PLAYER_ERROR]: async (sock, { payload }) => {
+    sock.server.to(sock.user.roomId).emit('action', {
+      type: PLAYER_ERROR,
+      payload,
     })
   },
 }
