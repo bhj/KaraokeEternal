@@ -28,6 +28,7 @@ class PlayerController extends React.Component {
   }
 
   componentWillUnmount () {
+    this.props.cancelStatus()
     this.props.emitLeave()
   }
 
