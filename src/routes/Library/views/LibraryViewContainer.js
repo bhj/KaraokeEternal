@@ -22,7 +22,7 @@ const getQueuedSongs = createSelector(
 
 const getFilterKeywords = createSelector(
   [getFilterStr],
-  (str) => str.split(' ')
+  (str) => str.length ? str.split(' ') : []
 )
 
 const getAlphaPickerMap = createSelector(
@@ -83,18 +83,18 @@ const getSongsByView = createSelector(
 const mapStateToProps = (state) => {
   return {
     artists: state.artists.entities,
-    artistsResult: getArtistsByView(state),
     songs: state.songs.entities,
-    songsResult: getSongsByView(state),
     queuedSongIds: getQueuedSongs(state),
     starredSongs: state.user.starredSongs,
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),
     scrollTop: state.library.scrollTop,
     isShowingSongInfo: !(state.library.songInfoSongId === null),
-    // filters
-    isFiltering: state.library.filterStr !== '' || state.library.filterStarred,
+    // SearchResults view
+    songsResult: getSongsByView(state),
+    artistsResult: getArtistsByView(state),
     filterKeywords: getFilterKeywords(state),
+    filterStarred: getFilterStarred(state),
     expandedArtistResults: state.library.expandedArtistResults,
   }
 }

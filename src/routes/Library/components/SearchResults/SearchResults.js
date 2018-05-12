@@ -19,6 +19,7 @@ class SearchResults extends React.Component {
     starredSongs: PropTypes.array.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
     filterKeywords: PropTypes.array.isRequired,
+    filterStarred: PropTypes.bool.isRequired,
     queuedSongIds: PropTypes.array.isRequired,
     ui: PropTypes.object.isRequired,
     // actions
@@ -48,13 +49,15 @@ class SearchResults extends React.Component {
   }
 
   rowRenderer = ({ index, key, style }) => {
-    const { artistsResult, songsResult } = this.props
+    const { artistsResult, songsResult, filterKeywords, filterStarred } = this.props
 
     // # artist results heading
     if (index === 0) {
       return (
         <div key={key} style={style} styleName='artistsHeading'>
-          {artistsResult.length} artists
+          {artistsResult.length} {filterStarred ? 'starred ' : ''}
+          {artistsResult.length === 1 ? 'artist' : 'artists'}
+          {filterKeywords.length ? ` matching '${filterKeywords.join(' ')}'` : ''}
         </div>
       )
     }
@@ -84,7 +87,9 @@ class SearchResults extends React.Component {
     if (index === artistsResult.length + 1) {
       return (
         <div key={key} style={style} styleName='songsHeading'>
-          {songsResult.length} songs
+          {songsResult.length} {filterStarred ? 'starred ' : ''}
+          {songsResult.length === 1 ? 'song' : 'songs'}
+          {filterKeywords.length ? ` matching '${filterKeywords.join(' ')}'` : ''}
         </div>
       )
     }

@@ -6,7 +6,7 @@ import SearchResults from '../components/SearchResults'
 import SongInfo from '../components/SongInfo'
 
 const LibraryView = (props) => {
-  const View = props.isFiltering ? SearchResults : ArtistList
+  const View = props.filterKeywords.length || props.filterStarred ? SearchResults : ArtistList
 
   return (
     <div>
@@ -22,7 +22,8 @@ const LibraryView = (props) => {
 }
 
 LibraryView.propTypes = {
-  isFiltering: PropTypes.bool.isRequired,
+  filterKeywords: PropTypes.array.isRequired,
+  filterStarred: PropTypes.bool.isRequired,
   isShowingSongInfo: PropTypes.bool.isRequired,
   ui: PropTypes.object.isRequired,
 }
