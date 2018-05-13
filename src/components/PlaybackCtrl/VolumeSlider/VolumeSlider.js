@@ -11,7 +11,6 @@ export default class VolumeSlider extends React.Component {
   static propTypes = {
     volume: PropTypes.number.isRequired,
     onVolumeChange: PropTypes.func.isRequired,
-    className: PropTypes.string.isRequired,
   }
 
   state = {
