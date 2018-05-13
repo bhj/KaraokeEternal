@@ -24,7 +24,7 @@ export default class VolumeSlider extends React.Component {
       isDragging: true,
     })
     this.props.onVolumeChange(vol)
-    this.ignoreStatus = 0
+    this.ignoreStatus = false
   }
 
   handleAfterChange = (vol) => {
@@ -33,12 +33,12 @@ export default class VolumeSlider extends React.Component {
       isDragging: false,
     })
     this.props.onVolumeChange(vol)
-    this.ignoreStatus = 2
+    this.ignoreStatus = true
   }
 
   componentDidUpdate (prevProps) {
     if (this.ignoreStatus && prevProps.volume !== this.props.volume) {
-      this.ignoreStatus--
+      this.ignoreStatus = false
     }
   }
 
