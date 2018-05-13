@@ -56,7 +56,7 @@ export default class VolumeSlider extends React.Component {
         handle={handle}
         styleName='slider'
       />
-      <BodyLock isLocked={this.state.isDragging} />
+      <BodyLock lock={this.state.isDragging} />
     </>
     )
   }

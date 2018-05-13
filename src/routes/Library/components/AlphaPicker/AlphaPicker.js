@@ -7,22 +7,8 @@ class AlphaPicker extends React.Component {
   alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
   state = {
     isTouching: false,
-    isScrollLocked: false,
     char: null,
     y: null,
-  }
-
-  componentDidUpdate (prevProps, prevState) {
-    if (this.state.isTouching) {
-      clearTimeout(this.timerId)
-    }
-
-    if (prevState.isTouching && !this.state.isTouching) {
-      // delay scroll unlock
-      this.timerId = setTimeout(() => {
-        this.setState({ isScrollLocked: false })
-      }, 200)
-    }
   }
 
   render () {
@@ -37,7 +23,7 @@ class AlphaPicker extends React.Component {
         onMouseUp={this.handleTouchEnd}
         ref={this.handleRef}
       >
-        <BodyLock isLocked={this.state.isScrollLocked} />
+        <BodyLock lock={this.state.isTouching} />
 
         {this.alphabet.map((char, i) => (
           <div
@@ -59,7 +45,6 @@ class AlphaPicker extends React.Component {
 
     this.setState({
       isTouching: true,
-      isScrollLocked: true,
       char,
       y: y - this.props.top,
     })
