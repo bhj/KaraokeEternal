@@ -122,7 +122,6 @@ config.module.rules.push({
 })
 
 // Files
-/* eslint-disable */
 config.module.rules.push(
   {
     test    : /\.woff(\?.*)?$/,
@@ -162,6 +161,5 @@ config.module.rules.push(
     }
   }
 )
-/* eslint-enable */
 
 module.exports = config
