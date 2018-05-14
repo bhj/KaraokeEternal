@@ -1,6 +1,12 @@
 .container {
   display: flex;
   align-items: center;
+  height: 44px;
+}
+
+.containerExpanded {
+  composes: container;
+  height: 60px;
 }
 
 .isQueued {
@@ -36,15 +42,21 @@
 .btnContainer {
   display: flex;
   overflow: hidden;
+  width: var(--song-item-btn-width);
   transition: width var(--spring-duration) var(--spring-function);
   margin-left: 20px;
   position: relative;
   left: -30px;
 }
 
+.btnContainerExpanded {
+  composes: btnContainer;
+  width: calc(var(--song-item-btn-width) * 2);
+}
+
 .button {
+  width: var(--song-item-btn-width);
   height: var(--song-item-btn-height);
-  width: var(--song-item-btn-height);
 }
 
 .star {

@@ -1,22 +1,19 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import SongItem from '../SongItem'
-const SONG_HEIGHT = 44
-const SONG_ARTIST_HEIGHT = 60
 
 const SongList = (props) => props.songIds.map(songId => (
   <SongItem
     {...props.songs[songId]}
-    onSongClick={() => props.queueSong(songId)}
-    onSongStar={() => props.starSong(songId)}
-    onSongUnstar={() => props.unstarSong(songId)}
-    onSongInfoClick={() => props.showSongInfo(songId)}
+    onSongQueue={props.queueSong}
+    onSongStar={props.starSong}
+    onSongUnstar={props.unstarSong}
+    onSongInfo={props.showSongInfo}
     isQueued={props.queuedSongIds.includes(songId)}
     isStarred={props.starredSongs.includes(songId)}
     isAdmin={props.isAdmin}
     filterKeywords={props.filterKeywords}
     artist={props.showArtist ? props.artists[props.songs[songId].artistId].name : ''}
-    style={{ height: props.showArtist ? SONG_ARTIST_HEIGHT : SONG_HEIGHT }}
     key={songId}
   />
 ))
