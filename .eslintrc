@@ -2,7 +2,7 @@
   "parser": "babel-eslint",
   "extends": [
     "standard",
-    "standard-react"
+    "plugin:react/recommended"
   ],
   "plugins": [
     "babel",
