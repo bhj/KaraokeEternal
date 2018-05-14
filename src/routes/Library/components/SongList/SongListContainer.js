@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import SongList from './SongList'
 import { queueSong } from 'routes/Queue/modules/queue'
-import { toggleSongStarred } from 'store/modules/user'
+import { starSong, unstarSong } from 'store/modules/user'
 import { showSongInfo } from '../../modules/library'
 
 const getQueue = (state) => state.queue
@@ -22,7 +22,8 @@ const mapStateToProps = (state, props) => ({
 
 const mapActionCreators = {
   queueSong,
-  toggleSongStarred,
+  starSong,
+  unstarSong,
   showSongInfo,
 }
 

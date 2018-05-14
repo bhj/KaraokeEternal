@@ -1,5 +1,6 @@
 import {
-  SONG_TOGGLE_STARRED,
+  USER_SONG_STAR,
+  USER_SONG_UNSTAR,
   SOCKET_AUTH_ERROR,
   LOGIN,
   LOGOUT,
@@ -231,11 +232,18 @@ export function updateUser (data) {
 }
 
 // ------------------------------------
-// Star songs
+// Star/unstar songs
 // ------------------------------------
-export function toggleSongStarred (songId) {
+export function starSong (songId) {
   return {
-    type: SONG_TOGGLE_STARRED,
+    type: USER_SONG_STAR,
+    payload: { songId },
+  }
+}
+
+export function unstarSong (songId) {
+  return {
+    type: USER_SONG_UNSTAR,
     payload: { songId },
   }
 }
@@ -262,10 +270,24 @@ const ACTION_HANDLERS = {
   [SOCKET_AUTH_ERROR]: (state, { payload }) => ({
     ...initialState,
   }),
-  [SONG_TOGGLE_STARRED + _SUCCESS]: (state, { payload }) => ({
-    ...state,
-    starredSongs: payload,
-  }),
+  [USER_SONG_STAR + _SUCCESS]: (state, { payload }) => {
+    const starredSongs = state.starredSongs.slice()
+    starredSongs.push(payload.songId)
+
+    return {
+      ...state,
+      starredSongs,
+    }
+  },
+  [USER_SONG_UNSTAR + _SUCCESS]: (state, { payload }) => {
+    const starredSongs = state.starredSongs.slice()
+    starredSongs.splice(starredSongs.indexOf(payload.songId), 1)
+
+    return {
+      ...state,
+      starredSongs,
+    }
+  },
 }
 
 // ------------------------------------

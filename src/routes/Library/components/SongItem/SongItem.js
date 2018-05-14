@@ -14,7 +14,8 @@ export default class SongItem extends React.Component {
     duration: PropTypes.number.isRequired,
     style: PropTypes.object,
     onSongClick: PropTypes.func.isRequired,
-    onSongStarClick: PropTypes.func.isRequired,
+    onSongStar: PropTypes.func.isRequired,
+    onSongUnstar: PropTypes.func.isRequired,
     onSongInfoClick: PropTypes.func.isRequired,
     isQueued: PropTypes.bool.isRequired,
     isStarred: PropTypes.bool.isRequired,
@@ -63,7 +64,7 @@ export default class SongItem extends React.Component {
         </div>
 
         <div styleName='btnContainer' style={{ width }}>
-          <div onClick={props.onSongStarClick} styleName='button'>
+          <div onClick={props.isStarred ? props.onSongUnstar : props.onSongStar} styleName='button'>
             <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'} />
             <div styleName={props.isStarred ? 'starCountStarred' : 'starCount'}>
               {props.numStars ? props.numStars : ''}
