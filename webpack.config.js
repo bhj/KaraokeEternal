@@ -94,7 +94,7 @@ config.module.rules.push({
 config.module.rules.push({
   test : /(global)\.css$/,
   use  : [{
-    loader : MiniCssExtractPlugin.loader,
+    loader : __PROD__ ? MiniCssExtractPlugin.loader : 'style-loader',
   }, {
     loader  : 'css-loader',
     options : {
@@ -110,7 +110,7 @@ config.module.rules.push({
   test : /\.css$/,
   exclude : /(global)\.css$/,
   use  : [{
-    loader : MiniCssExtractPlugin.loader,
+    loader : __PROD__ ? MiniCssExtractPlugin.loader : 'style-loader',
   }, {
     loader  : 'css-loader',
     options : {
