@@ -26,7 +26,6 @@ const config = {
       path.join(project.basePath, 'src'),
       'node_modules',
     ],
-    extensions: ['*', '.js', '.jsx', '.json'],
     alias: {
       'constants': path.join(project.basePath, 'constants'),
     }
