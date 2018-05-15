@@ -70,7 +70,7 @@ config.module.rules.push({
   use: [{
     loader: 'babel-loader',
     options: {
-      cacheDirectory: true,
+      cacheDirectory: __DEV__,
       plugins: [
         '@babel/plugin-transform-runtime',
         '@babel/plugin-proposal-class-properties',
