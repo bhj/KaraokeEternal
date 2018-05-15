@@ -38,19 +38,22 @@ const config = {
       __TEST__,
       __PROD__,
     }, project.globals)),
-    new MiniCssExtractPlugin({
-      filename: __DEV__ ? '[name].css' : '[name].[hash].css',
-      chunkFilename: __DEV__ ? '[id].css' : '[id].[hash].css',
-    }),
   ],
 }
 
-// copy static assets in /public to /dist
 if (__PROD__) {
+  // copy static assets in /public to /dist
   config.plugins.push(new CopyWebpackPlugin([{
     from: path.join(project.basePath, 'public'),
     to: path.join(project.basePath, 'dist'),
   }], { /* options */ }))
+
+  // @TODO: using style-loader in development until
+  // MiniCssExtractPlugin supports HMR
+  config.plugins.push(new MiniCssExtractPlugin({
+    filename: __DEV__ ? '[name].css' : '[name].[hash].css',
+    chunkFilename: __DEV__ ? '[id].css' : '[id].[hash].css',
+  }))
 }
 
 // HTML Template
