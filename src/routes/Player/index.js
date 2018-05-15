@@ -1,5 +1,5 @@
 import { injectReducer } from '../../store/reducers'
-import requireAuth from 'components/requireAuth'
+import RequireAuth from 'components/RequireAuth'
 
 export default (store) => ({
   path : 'player',
@@ -17,7 +17,7 @@ export default (store) => ({
       injectReducer(store, { key: 'player', reducer })
 
       /*  Return getComponent   */
-      cb(null, requireAuth(PlayerView))
+      cb(null, RequireAuth(PlayerView))
 
     /* Webpack named bundle   */
     }, 'player')
