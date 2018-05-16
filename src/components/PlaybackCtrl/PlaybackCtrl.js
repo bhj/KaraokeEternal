@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import screenfull from 'screenfull'
 import Icon from 'components/Icon'
 import VolumeSlider from './VolumeSlider'
 import NoPlayer from './NoPlayer'
@@ -10,7 +11,7 @@ const PlaybackCtrl = (props) => {
     return null
   }
 
-  if (props.isAdmin && !props.isPlayerPresent) {
+  if (props.isAdmin && !props.isPlayerPresent && screenfull.enabled) {
     return <NoPlayer />
   }
 
