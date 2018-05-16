@@ -1,20 +1,15 @@
-// We only need to import the modules necessary for initial render
 import CoreLayout from 'layouts/CoreLayout'
-import Home from './Home'
 import AccountRoute from './Account'
 import PlayerRoute from './Player'
 import LibraryRoute from './Library'
 import QueueRoute from './Queue'
-
-/*  Note: Instead of using JSX, we recommend using react-router
-    PlainRoute objects to build route definitions.   */
 
 export const createRoutes = (store) => ({
   path: '/',
   getComponent (nextState, cb) {
     cb(null, CoreLayout)
   },
-  indexRoute: Home,
+  indexRoute: { onEnter: (nextState, replace) => replace('/library') },
   childRoutes: [
     AccountRoute(store),
     PlayerRoute(store),
