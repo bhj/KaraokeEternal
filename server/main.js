@@ -2,6 +2,9 @@ const cluster = require('cluster')
 const log = require('debug')(`app:master [${process.pid}]`)
 const serverWorker = require('./server')
 const scannerWorker = require('./scanner')
+const {
+  SERVER_WORKER_STATUS,
+} = require('../constants/actions')
 
 // debug: log stack trace for unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
@@ -12,6 +15,10 @@ if (cluster.isMaster) {
   (function () {
     const refs = {}
 
+    if (process.versions['electron']) {
+      refs.electron = require('./electron.js')
+    }
+
     function watchDog () {
       checkServer()
       checkScanner()
@@ -19,33 +26,38 @@ if (cluster.isMaster) {
 
     function checkServer () {
       if (refs.server === undefined) {
-        log('starting web server')
+        log('Starting web server')
         refs.server = cluster.fork({ ROLE: 'server' })
 
         refs.server.on('exit', function () {
-          log('web server died :(')
+          log('Web server died :(')
           delete refs.server
         })
 
-        refs.server.on('message', function (action) {
-          // log('relaying to scanner: ' + JSON.stringify(action))
-          refs.scanner.send(action)
+        refs.server.on('message', function ({ type, payload }) {
+          // electron: show status in system tray
+          if (type === SERVER_WORKER_STATUS && refs.electron) {
+            return refs.electron.setStatus('url', payload.url)
+          }
+
+          // all actions relayed to scanner
+          refs.scanner.send({ type, payload })
         })
       }
     }
 
     function checkScanner () {
       if (refs.scanner === undefined) {
-        log('starting media scanner')
+        log('Starting media scanner')
         refs.scanner = cluster.fork({ ROLE: 'scanner' })
 
         refs.scanner.on('exit', function () {
-          log('media scanner died :(')
+          log('Media scanner died :(')
           delete refs.scanner
         })
 
         refs.scanner.on('message', function (action) {
-          // log('relaying to server: ' + JSON.stringify(action))
+          // all actions relayed to web server
           refs.server.send(action)
         })
       }

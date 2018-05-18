@@ -4,7 +4,7 @@ const path = require('path')
 const webpack = require('webpack')
 const webpackConfig = require('../webpack.config')
 const project = require('../project.config')
-
+const getIPAddress = require('./lib/getIPAddress')
 const http = require('http')
 const fs = require('fs')
 const { promisify } = require('util')
@@ -26,6 +26,10 @@ const userRouter = require('./User/router')
 
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
+
+const {
+  SERVER_WORKER_STATUS,
+} = require('../constants/actions')
 
 module.exports = function () {
   const dbFile = path.resolve(project.basePath, 'database.sqlite3')
@@ -138,6 +142,15 @@ module.exports = function () {
     io.emit('action', action)
   })
 
-  server.listen(project.serverPort)
-  log(`Server listening on port ${project.serverPort}`)
+  server.listen(project.serverPort, project.serverHost, err => {
+    if (err) throw err
+
+    const url = `http://${getIPAddress()}:${project.serverPort}`
+    log(`Web server running at ${url}`)
+
+    process.send({
+      'type': SERVER_WORKER_STATUS,
+      'payload': { url },
+    })
+  })
 }

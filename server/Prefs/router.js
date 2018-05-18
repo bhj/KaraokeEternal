@@ -8,8 +8,8 @@ const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
 const Prefs = require('./Prefs')
 const {
-  PREFS_REQUEST_SCAN,
-  PREFS_REQUEST_SCAN_CANCEL,
+  SCANNER_WORKER_SCAN,
+  SCANNER_WORKER_SCAN_CANCEL,
 } = require('../../constants/actions')
 
 // start media scan
@@ -21,7 +21,7 @@ router.get('/scan', async (ctx, next) => {
   }
 
   ctx.status = 200
-  process.send({ 'type': PREFS_REQUEST_SCAN })
+  process.send({ 'type': SCANNER_WORKER_SCAN })
 })
 
 // cancel media scan
@@ -33,7 +33,7 @@ router.get('/scan/cancel', async (ctx, next) => {
   }
 
   ctx.status = 200
-  process.send({ 'type': PREFS_REQUEST_SCAN_CANCEL })
+  process.send({ 'type': SCANNER_WORKER_SCAN_CANCEL })
 })
 
 // get preferences and media paths
@@ -124,7 +124,7 @@ router.post('/path', async (ctx, next) => {
     ctx.body = await Prefs.get()
 
     // update library
-    process.send({ 'type': PREFS_REQUEST_SCAN })
+    process.send({ 'type': SCANNER_WORKER_SCAN })
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message
@@ -156,7 +156,7 @@ router.delete('/path/:pathId', async (ctx, next) => {
     ctx.body = await Prefs.get()
 
     // update library
-    process.send({ 'type': PREFS_REQUEST_SCAN })
+    process.send({ 'type': SCANNER_WORKER_SCAN })
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message

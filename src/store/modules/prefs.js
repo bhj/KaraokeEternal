@@ -4,7 +4,7 @@ import {
   PREFS_RECEIVE,
   PREFS_REQUEST_SCAN,
   PREFS_REQUEST_SCAN_CANCEL,
-  PREFS_SCAN_STATUS,
+  SCANNER_WORKER_STATUS,
   _ERROR,
 } from 'constants/actions'
 
@@ -122,7 +122,7 @@ const ACTION_HANDLERS = {
     ...state,
     ...payload,
   }),
-  [PREFS_SCAN_STATUS]: (state, { payload }) => ({
+  [SCANNER_WORKER_STATUS]: (state, { payload }) => ({
     ...state,
     isUpdating: payload.isUpdating,
     updateText: payload.text,

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Karaoke LAN party system",
   "private:": true,
-  "main": "main.js",
+  "main": "./server/main.js",
   "engines": {
     "node": ">=8.0.0",
     "npm": "^5.0.0"
@@ -11,11 +11,13 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && cross-env NODE_ENV=production webpack",
-    "dev": "cross-env NODE_ENV=development DEBUG=app:* nodemon server/main.js --ignore dist --ignore coverage --ignore tests --ignore src",
-    "serve": "cross-env NODE_ENV=production DEBUG=app:* node server/main.js",
+    "dev": "cross-env NODE_ENV=development DEBUG=app:* nodemon --ignore dist --ignore coverage --ignore tests --ignore src",
+    "serve": "cross-env NODE_ENV=production DEBUG=app:* node .",
+    "start": "cross-env NODE_ENV=production DEBUG=app:* electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "postinstall": "install-app-deps"
   },
   "repository": {
     "type": "git",
@@ -76,6 +78,8 @@
     "copy-webpack-plugin": "^4.5.1",
     "cross-env": "^5.1.5",
     "css-loader": "^0.28.11",
+    "electron": "^2.0.1",
+    "electron-builder": "^20.14.2",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-babel": "^5.1.0",

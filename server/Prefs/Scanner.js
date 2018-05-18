@@ -2,7 +2,7 @@ const throttle = require('../lib/throttle')
 const Library = require('../Library')
 const {
   LIBRARY_PUSH,
-  PREFS_SCAN_STATUS,
+  SCANNER_WORKER_STATUS,
 } = require('../../constants/actions')
 
 class Scanner {
@@ -23,7 +23,7 @@ class Scanner {
       // thunkify
       return Promise.resolve().then(() => {
         process.send({
-          type: PREFS_SCAN_STATUS,
+          type: SCANNER_WORKER_STATUS,
           payload: { text, progress, isUpdating },
         })
       })

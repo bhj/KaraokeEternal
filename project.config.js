@@ -7,8 +7,10 @@ module.exports = {
   /** Full path to the project's root directory */
   basePath: __dirname,
   /** path for all project assets (relative to website public_html) */
-  publicPath: '/',
-  /** Port the http server listens on */
+  publicPath: './',
+  // http server host: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
+  serverHost: '0.0.0.0',
+  // http server port: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
   serverPort: 3000,
   /** Full path to database file */
   database: path.join(__dirname, 'database.sqlite3'),
