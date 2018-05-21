@@ -20,6 +20,7 @@ router.get('/scan', async (ctx, next) => {
     return
   }
 
+  log(`Media scan requested by user`)
   ctx.status = 200
   process.send({ 'type': SCANNER_WORKER_SCAN })
 })
@@ -32,6 +33,7 @@ router.get('/scan/cancel', async (ctx, next) => {
     return
   }
 
+  log(`Media scan canceled by user`)
   ctx.status = 200
   process.send({ 'type': SCANNER_WORKER_SCAN_CANCEL })
 })

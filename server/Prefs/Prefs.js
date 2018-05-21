@@ -3,12 +3,6 @@ const db = require('sqlite')
 const squel = require('squel')
 const debug = require('debug')
 const log = debug('app:prefs')
-const FileScanner = require('./FileScanner')
-
-let _Scanner
-let _isScanning = false
-let _isScanQueued = false
-let _isCanceling = false
 
 class Prefs {
   /**
@@ -109,65 +103,6 @@ class Prefs {
       await db.run(text, values)
     } catch (err) {
       return Promise.reject(err)
-    }
-  }
-
-  /**
-   * Start media scan
-   * @return {Promise}
-   */
-  static async startScan () {
-    log(`Media scan requested`)
-
-    if (_isScanning) {
-      if (_isScanQueued) {
-        log(`  => skipping (media scan already queued)`)
-      } else {
-        _isScanQueued = true
-        log(`  => media scan queued`)
-      }
-
-      return
-    }
-
-    _isScanning = true
-    _isScanQueued = true
-    _isCanceling = false
-
-    while (_isScanQueued) {
-      _isScanQueued = false
-
-      try {
-        log(`  => starting scan`)
-
-        const prefs = await Prefs.get()
-        _Scanner = new FileScanner(prefs)
-        await _Scanner.scan()
-
-        log('Media scan complete')
-      } catch (err) {
-        log(err)
-      }
-
-      if (_isCanceling) {
-        log('Media scan canceled by user')
-        break
-      }
-    } // end while
-
-    _Scanner.emitDone()
-    _Scanner.emitLibrary()
-
-    _Scanner = null
-    _isScanning = false
-    _isCanceling = false
-    _isScanQueued = false
-  }
-
-  static cancelScan () {
-    if (_Scanner) {
-      _isCanceling = true
-      _Scanner.cancel()
     }
   }
 }
