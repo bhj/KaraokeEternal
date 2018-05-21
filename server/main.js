@@ -7,6 +7,12 @@ const {
 
 log('NODE_ENV =', process.env.NODE_ENV)
 
+// these could hang around when quitting from electron
+process.on('exit', function () {
+  if (refs.server) refs.server.kill()
+  if (refs.scanner) refs.scanner.kill()
+})
+
 // debug: log stack trace for unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
   log('Unhandled Rejection at: Promise', p, 'reason:', reason)
