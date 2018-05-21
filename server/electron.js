@@ -1,5 +1,6 @@
 const { app, shell, clipboard, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
+const log = require('debug')(`app:master:electron [${process.pid}]`)
 const isDev = (process.defaultApp || /node_modules[\\/]electron[\\/]/.test(process.execPath))
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -14,6 +15,7 @@ const status = {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
+app.on('quit', (e, code) => { log(`quitting (exit code ${code})`) })
 
 function createWindow () {
   win = new BrowserWindow({
@@ -33,6 +35,7 @@ function createWindow () {
   // Emitted when the window is closed.
   win.on('closed', () => {
     win = null
+    tray = null
   })
 }
 
