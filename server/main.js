@@ -2,12 +2,14 @@ const log = require('debug')(`app:master [${process.pid}]`)
 const child_process = require('child_process')
 const refs = {}
 const {
+  SCANNER_WORKER_SCAN,
+  SCANNER_WORKER_SCAN_CANCEL,
   SERVER_WORKER_STATUS,
 } = require('../constants/actions')
 
 log('NODE_ENV =', process.env.NODE_ENV)
 
-// these could hang around when quitting from electron
+// these could hang around esp. when quitting via electron
 process.on('exit', function () {
   if (refs.server) refs.server.kill()
   if (refs.scanner) refs.scanner.kill()
@@ -30,59 +32,57 @@ if (process.versions['electron']) {
   }
 }
 
-function watchDog () {
-  checkServer()
-  checkScanner()
-}
+startServer()
 
-function checkServer () {
+function startServer () {
   if (refs.server === undefined) {
     log('Starting web server')
     refs.server = child_process.fork('./server/server.js')
 
     refs.server.on('exit', (code, signal) => {
       if (signal) {
-        log(`Web server killed by signal: ${signal}`)
-      } else if (code !== 0) {
-        log(`Web server exited with error code: ${code}`)
+        log(`Web server killed by ${signal}`)
+      } else {
+        log(`Web server exited with code: ${code}`)
       }
 
       delete refs.server
     })
 
     refs.server.on('message', function ({ type, payload }) {
+      if (refs.scanner) {
+        // all IPC messages are relayed to scanner
+        refs.scanner.send({ type, payload })
+      } else if (type === SCANNER_WORKER_SCAN) {
+        startScanner()
+      }
+
       // electron: show status in system tray
       if (type === SERVER_WORKER_STATUS && refs.electron) {
         return refs.electron.setStatus('url', payload.url)
       }
-
-      // all actions relayed to scanner
-      refs.scanner.send({ type, payload })
     })
   }
 }
 
-function checkScanner () {
+function startScanner () {
   if (refs.scanner === undefined) {
     log('Starting media scanner')
     refs.scanner = child_process.fork('./server/scanner.js')
 
     refs.scanner.on('exit', (code, signal) => {
       if (signal) {
-        log(`Media scanner killed by signal: ${signal}`)
-      } else if (code !== 0) {
-        log(`Media scanner exited with error code: ${code}`)
+        log(`Media scanner killed by ${signal}`)
+      } else {
+        log(`Media scanner exited with code: ${code}`)
       }
 
       delete refs.scanner
     })
 
     refs.scanner.on('message', function (action) {
-      // all actions relayed to web server
+      // all IPC messages are relayed to web server
       refs.server.send(action)
     })
   }
 }
-
-watchDog()
-setInterval(watchDog, 1000)
