@@ -80,7 +80,6 @@ class Library {
       for (const row of rows) {
         // don't include artists without any songs
         if (typeof SongIdsByArtist[row.artistId] === 'undefined') {
-          log('continue')
           continue
         }
 
