@@ -13,7 +13,7 @@
     "dev": "cross-env NODE_ENV=development DEBUG=app:* nodemon --ignore dist --ignore coverage --ignore tests --ignore src",
     "build": "npm run clean && cross-env NODE_ENV=production webpack",
     "serve": "cross-env NODE_ENV=production DEBUG=app:* node .",
-    "start": "cross-env NODE_ENV=development DEBUG=app:* ELECTRON_ENABLE_LOGGING=true electron .",
+    "start": "cross-env NODE_ENV=production DEBUG=app:* ELECTRON_ENABLE_LOGGING=true electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
@@ -22,11 +22,10 @@
     "pack": "electron-builder"
   },
   "build": {
-    "extraResources": [
-      {
-        "from": "public/icon-tray.png"
-      }
-    ],
+    "mac": {
+      "asar": false
+    },
+    "files": ["constants/**", "server/**", "dist/*", "project.config.js"],
     "appId": "com.karaoke-forever.app"
   },
   "repository": {
@@ -89,7 +88,7 @@
     "cross-env": "^5.1.5",
     "css-loader": "^0.28.11",
     "electron": "^2.0.1",
-    "electron-builder": "^20.14.4",
+    "electron-builder": "^20.14.5",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-babel": "^5.1.0",

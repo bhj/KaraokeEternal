@@ -1,6 +1,7 @@
 const { app, shell, clipboard, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
 const log = require('debug')(`app:master:electron [${process.pid}]`)
+const project = require('../project.config')
 const isDev = (process.defaultApp || /node_modules[\\/]electron[\\/]/.test(process.execPath))
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -28,7 +29,7 @@ function createWindow () {
     app.dock.hide()
   }
 
-  tray = new Tray(path.join(isDev ? 'public' : process.resourcesPath, 'icon-tray.png'))
+  tray = new Tray(path.join(project.basePath, isDev ? 'public' : 'dist', 'icon-tray.png'))
   tray.setToolTip('Karaoke Forever Server')
   updateMenu()
 

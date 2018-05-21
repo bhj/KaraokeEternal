@@ -109,7 +109,7 @@ if (project.env === 'development') {
   // production mode
 
   // serve files in ~/dist
-  app.use(KoaStatic(path.resolve(project.basePath, 'dist')))
+  app.use(KoaStatic(path.join(project.basePath, 'dist')))
 
   // "rewrite" all other requests to the root /index.html file
   const indexFile = path.join(project.basePath, 'dist', 'index.html')
