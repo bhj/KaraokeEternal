@@ -7,19 +7,17 @@ const {
   SCANNER_WORKER_SCAN_CANCEL
 } = require('../constants/actions')
 
-module.exports = function scanner () {
-  log('Opening database file %s', project.database)
+log('Opening database file %s', project.database)
 
-  Promise.resolve()
-    .then(() => sqlite.open(project.database, { Promise }))
+Promise.resolve()
+  .then(() => sqlite.open(project.database, { Promise }))
 
-  process.on('message', function ({ type, payload }) {
-    if (type === SCANNER_WORKER_SCAN) {
-      Prefs.startScan()
-    } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
-      Prefs.cancelScan()
-    }
-  })
+process.on('message', function ({ type, payload }) {
+  if (type === SCANNER_WORKER_SCAN) {
+    Prefs.startScan()
+  } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
+    Prefs.cancelScan()
+  }
+})
 
-  log('Media scanner ready')
-}
+log('Media scanner ready')
