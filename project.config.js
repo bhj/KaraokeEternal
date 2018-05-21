@@ -1,5 +1,6 @@
 const path = require('path')
 const NODE_ENV = process.env.NODE_ENV || 'development'
+const USER_DATA_PATH = process.env.USER_DATA_PATH || __dirname
 
 module.exports = {
   /** Environment to use when building the project */
@@ -13,5 +14,5 @@ module.exports = {
   // http server port: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
   serverPort: 3000,
   /** Full path to database file */
-  database: path.join(__dirname, 'database.sqlite3'),
+  database: path.join(USER_DATA_PATH, 'database.sqlite3'),
 }

@@ -23,13 +23,6 @@ process.on('unhandledRejection', (reason, p) => {
 // detect electron
 if (process.versions['electron']) {
   refs.electron = require('./electron.js')
-
-  // NODE_ENV will not pass through to forked processes;
-  // set it for them now based on electron dev/prod state
-  if (!process.env.NODE_ENV) {
-    process.env.NODE_ENV = (process.defaultApp ||
-      /node_modules[\\/]electron[\\/]/.test(process.execPath)) ? 'development' : 'production'
-  }
 }
 
 startServer()

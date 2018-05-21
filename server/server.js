@@ -27,11 +27,10 @@ const {
   SERVER_WORKER_STATUS,
 } = require('../constants/actions')
 
-const dbFile = path.resolve(project.basePath, 'database.sqlite3')
-log('Opening database file %s', dbFile)
+log('Opening database file %s', project.database)
 
 Promise.resolve()
-  .then(() => sqlite.open(dbFile, { Promise }))
+  .then(() => sqlite.open(project.database, { Promise }))
   .then(db => db.migrate({
     migrationsPath: path.resolve('server', 'lib', 'db'),
     // force: 'last' ,

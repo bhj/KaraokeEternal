@@ -12,9 +12,16 @@ const status = {
   url: '',
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// NODE_ENV won't automatically pass to (non-Electron) forked processes;
+// set it for them now based on detected dev/prod state
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = isDev ? 'development' : 'production'
+}
+
+// pass user data path to (non-Electron) forked processes
+process.env.USER_DATA_PATH = app.getPath('userData')
+
+// event handlers
 app.on('ready', createWindow)
 app.on('quit', (e, code) => { log(`quitting (exit code ${code})`) })
 
