@@ -22,9 +22,6 @@
     "pack": "electron-builder"
   },
   "build": {
-    "mac": {
-      "asar": false
-    },
     "files": ["constants/**", "server/**", "dist/*", "project.config.js"],
     "appId": "com.karaoke-forever.app"
   },
