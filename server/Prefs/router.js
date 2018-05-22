@@ -43,13 +43,15 @@ router.get('/', async (ctx, next) => {
   try {
     const prefs = await Prefs.get()
 
-    // must be admin or it's firstrun
-    if (!ctx.user.isAdmin && !prefs.isFirstRun) {
-      ctx.status = 401
+    // must be admin or firstrun
+    if (prefs.isFirstRun || ctx.user.isAdmin) {
+      ctx.body = prefs
       return
     }
 
-    ctx.body = prefs
+    // there are no non-admin prefs but we don't want to
+    // trigger a fetch error on the frontend
+    ctx.body = {}
   } catch (err) {
     ctx.status = 500
     ctx.body = err.message
