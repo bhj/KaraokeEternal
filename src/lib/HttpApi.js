@@ -21,13 +21,9 @@ export default class HttpApi {
 
     return fetch(`/api/${this.prefix}${url}`, opts)
       .then(res => {
-        if (res.status >= 200 && res.status < 300) {
-          // success
-          if (res.headers.get('Content-Type').includes('application/json')) {
-            return res.json()
-          } else {
-            return res
-          }
+        if (res.ok) {
+          const type = res.headers.get('Content-Type')
+          return (type && type.includes('application/json')) ? res.json() : res.text()
         }
 
         // error
