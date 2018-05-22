@@ -28,7 +28,11 @@
       "dist/*",
       "project.config.js"
     ],
-    "appId": "com.karaoke-forever.app"
+    "mac": {
+      "target": "dmg"
+    },
+    "appId": "com.karaoke-forever.app",
+    "productName": "Karaoke Forever"
   },
   "repository": {
     "type": "git",
