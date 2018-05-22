@@ -32,7 +32,7 @@ log('Opening database file %s', project.database)
 Promise.resolve()
   .then(() => sqlite.open(project.database, { Promise }))
   .then(db => db.migrate({
-    migrationsPath: path.resolve('server', 'lib', 'db'),
+    migrationsPath: path.join(project.basePath, 'server', 'lib', 'db'),
     // force: 'last' ,
   }))
 
