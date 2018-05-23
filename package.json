@@ -12,7 +12,7 @@
     "clean": "rimraf dist",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "postinstall": "install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development DEBUG=app:* nodemon --ignore dist --ignore coverage --ignore tests --ignore src",
     "compile": "npm run clean && cross-env NODE_ENV=production webpack",
