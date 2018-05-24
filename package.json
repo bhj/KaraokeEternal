@@ -12,14 +12,14 @@
     "clean": "rimraf dist",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "postinstall": "electron-builder install-app-deps",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development DEBUG=app:* nodemon --ignore dist --ignore coverage --ignore tests --ignore src",
     "compile": "npm run clean && cross-env NODE_ENV=production webpack",
     "serve": "cross-env NODE_ENV=production DEBUG=app:* node .",
     "start": "cross-env NODE_ENV=production DEBUG=app:* ELECTRON_ENABLE_LOGGING=true electron .",
     "dist": "npm run compile && cross-env DEBUG=electron-builder:* electron-builder",
-    "build": "npm run dist -- --dir"
+    "build": "npm run dist -- --dir",
+    "install-app-deps": "electron-builder install-app-deps"
   },
   "build": {
     "files": [
