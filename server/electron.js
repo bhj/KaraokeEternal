@@ -36,7 +36,7 @@ function createWindow () {
     app.dock.hide()
   }
 
-  tray = new Tray(path.join(project.basePath, isDev ? 'public' : 'dist', 'icon-tray.png'))
+  tray = new Tray(path.join(project.basePath, isDev ? 'public' : 'dist', 'mic.png'))
   tray.setToolTip('Karaoke Forever Server')
   updateMenu()
 

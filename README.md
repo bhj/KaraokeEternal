@@ -71,6 +71,7 @@ Contributions are most welcome!
 - [Luke Tucker](https://github.com/ltucker/): JavaScript/HTML5 canvas CD+Graphics player
 - Carter Corker: Technical things
 - Stuart Albert: The name (a reference to Duke Nukem Forever, given the *almost* vaporware status)
+- B&W mic icon by [Freepik](http://www.freepik.com/) from [flaticon.com](http://www.flaticon.com/)
 
 ## License
 
