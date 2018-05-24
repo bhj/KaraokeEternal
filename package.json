@@ -31,6 +31,9 @@
     "mac": {
       "target": "dmg"
     },
+    "win": {
+      "target": "msi"
+    },
     "appId": "com.karaoke-forever.app",
     "productName": "Karaoke Forever"
   },
