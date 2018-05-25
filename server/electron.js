@@ -47,6 +47,7 @@ function createWindow () {
   }
 
   tray.setToolTip('Karaoke Forever Server')
+  tray.on('double-click', launchBrowser)
   updateMenu()
 
   // Emitted when the window is closed.
@@ -54,6 +55,12 @@ function createWindow () {
     win = null
     tray = null
   })
+}
+
+function launchBrowser () {
+  if (status.url) {
+    shell.openExternal(status.url)
+  }
 }
 
 function setStatus (key, val) {
@@ -68,7 +75,7 @@ function updateMenu () {
     { label: `Karaoke Forever Server`, enabled: false },
     { label: status.url, enabled: false },
     { type: 'separator' },
-    { label: 'Open in browser', click: () => shell.openExternal(status.url) },
+    { label: 'Open in browser', click: launchBrowser },
     { label: 'Copy URL', click: () => clipboard.writeText(status.url) },
     { type: 'separator' },
     { label: 'Quit Karaoke Forever Server', role: 'quit' },
