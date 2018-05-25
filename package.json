@@ -21,22 +21,6 @@
     "build": "npm run dist -- --dir",
     "install-app-deps": "electron-builder install-app-deps"
   },
-  "build": {
-    "files": [
-      "constants/**",
-      "server/**",
-      "dist/*",
-      "project.config.js"
-    ],
-    "mac": {
-      "target": "dmg"
-    },
-    "win": {
-      "target": "msi"
-    },
-    "appId": "com.karaoke-forever.app",
-    "productName": "Karaoke Forever"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bhj/karaoke-forever.git"

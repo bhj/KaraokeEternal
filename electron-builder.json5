@@ -1,0 +1,18 @@
+{
+  "files": [
+    "constants/**",
+    "server/**",
+    "project.config.js",
+    // don't include subfolders; avoids bundling /mac, /win, etc. but
+    // assumes folder is flattened. May need to stop overloading dist
+    "dist/*",
+  ],
+  "mac": {
+    "target": "dmg",
+  },
+  "win": {
+    "target": "nsis",
+  },
+  "appId": "com.karaoke-forever.app",
+  "productName": "Karaoke Forever Server",
+}
