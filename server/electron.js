@@ -3,6 +3,7 @@ const path = require('path')
 const log = require('debug')(`app:master:electron [${process.pid}]`)
 const project = require('../project.config')
 const isDev = (process.defaultApp || /node_modules[\\/]electron[\\/]/.test(process.execPath))
+const ICON_PATH = path.join(project.basePath, isDev ? 'public' : 'dist')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -36,7 +37,15 @@ function createWindow () {
     app.dock.hide()
   }
 
-  tray = new Tray(path.join(project.basePath, isDev ? 'public' : 'dist', 'mic.png'))
+  if (process.platform === 'win32') {
+    // white 32x32
+    tray = new Tray(path.join(ICON_PATH, 'mic-white@2x.png'))
+  } else {
+    // blackish 32x32 (template works in light and dark macOS modes)
+    tray = new Tray(path.join(ICON_PATH, 'mic-blackTemplate.png'))
+    tray.setPressedImage(path.join(ICON_PATH, 'mic-white.png'))
+  }
+
   tray.setToolTip('Karaoke Forever Server')
   updateMenu()
 
