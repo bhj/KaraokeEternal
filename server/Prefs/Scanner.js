@@ -1,4 +1,4 @@
-const throttle = require('../lib/throttle')
+const throttle = require('@jcoreio/async-throttle')
 const Library = require('../Library')
 const {
   LIBRARY_PUSH,
