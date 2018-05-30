@@ -130,6 +130,10 @@ class Library {
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
 
+      if (typeof row !== 'object') {
+        throw new Error(`Song not found (songId=${songId})`)
+      }
+
       // no need to send over the wire but we needed it
       // in the query to show the correct mediaId
       delete row.isPreferred
