@@ -12,30 +12,30 @@ let _Scanner
 let _isScanning = false
 let _isScanQueued = false
 let _isCanceling = false
-let _isDbOpen = false
-
-// handle start/stop actions
-process.on('message', function ({ type, payload }) {
-  if (type === SCANNER_WORKER_SCAN && _isDbOpen) {
-    startScan()
-  } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
-    cancelScan()
-  }
-})
 
 log('Opening database file %s', project.database)
 
 Promise.resolve()
   .then(() => sqlite.open(project.database, { Promise }))
   .then(() => {
-    _isDbOpen = true
+    // setup start/stop handlers
+    process.on('message', function ({ type, payload }) {
+      if (type === SCANNER_WORKER_SCAN) {
+        startScan() // enqueue a re-scan
+      } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
+        cancelScan()
+      }
+    })
+
     return startScan()
   })
   .then(() => {
     if (!_isScanning) {
-      process.exit()
+      return _Scanner.emitDone()
     }
   })
+  .then(() => _Scanner.emitLibrary())
+  .then(() => process.exit())
 
 async function startScan () {
   if (_isScanning) {
@@ -68,10 +68,6 @@ async function startScan () {
     }
   } // end while
 
-  _Scanner.emitDone()
-  _Scanner.emitLibrary()
-
-  _Scanner = null
   _isScanning = false
   _isCanceling = false
   _isScanQueued = false
