@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import RoomSelect from '../RoomSelect'
+import './Login.css'
 
 export default class Login extends Component {
   static propTypes = {

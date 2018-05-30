@@ -25,6 +25,7 @@ body {
 a {
   color: var(--link-color);
   font-weight: bold;
+  cursor: pointer;
 }
 
 body {

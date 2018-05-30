@@ -1,0 +1,7 @@
+input {
+  margin-bottom: var(--input-margin-bottom);
+}
+
+.submit {
+  margin-bottom: var(--input-margin-bottom);
+}

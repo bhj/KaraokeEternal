@@ -91,9 +91,13 @@ export default class PathPrefs extends React.Component {
           )}
 
           <div style={{ display: 'flex' }}>
-            <button style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenChooser}>Add Folder</button>
+            <button className='primary' style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenChooser}>
+              Add Folder
+            </button>
             {paths.result.length > 0 &&
-              <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleRefresh}>Refresh</button>
+              <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={this.handleRefresh}>
+                Refresh
+              </button>
             }
           </div>
 

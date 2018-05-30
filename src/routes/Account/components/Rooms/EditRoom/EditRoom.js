@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { SkyLightStateless } from 'react-skylight'
+import './EditRoom.css'
 
 export default class EditRoom extends Component {
   static propTypes = {
@@ -37,19 +38,19 @@ export default class EditRoom extends Component {
         <br />
 
         {!room &&
-          <button onClick={this.handleCreateClick}>
+          <button onClick={this.handleCreateClick} className='primary' styleName='btn'>
             Create Room
           </button>
         }
 
         {room &&
-          <button onClick={this.handleUpdateClick}>
+          <button onClick={this.handleUpdateClick} className='primary' styleName='btn'>
             Update Room
           </button>
         }
 
         {room &&
-          <button onClick={this.handleRemoveClick}>
+          <button onClick={this.handleRemoveClick} styleName='btn'>
             Remove Room
           </button>
         }

@@ -3,3 +3,13 @@
   border: 1px solid #ccc;
   margin-bottom: 5px;
 }
+
+.submit {
+  flex: 1;
+  width: auto;
+}
+
+.cancel {
+  margin-left: 1em;
+  width: auto;
+}

@@ -66,14 +66,10 @@ export default class PathChooser extends React.Component {
           </div>
 
           <div style={{ display: 'flex' }}>
-            <button
-              style={{ flex: 1, width: 'auto' }}
-              onClick={() => this.props.onChoose(this.state.current)}>
+            <button styleName='submit' className='primary' onClick={() => this.props.onChoose(this.state.current)}>
                 Add Folder
             </button>
-            <button
-              style={{ marginLeft: '1em', width: 'auto' }}
-              onClick={this.props.onCancel}>
+            <button styleName='cancel' onClick={this.props.onCancel}>
               Cancel
             </button>
           </div>

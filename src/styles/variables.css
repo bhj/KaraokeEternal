@@ -9,6 +9,7 @@
   --input-text-color: #444;
   --input-placeholder-color: #aaa;
   --input-background-color: #efefef;
+  --input-margin-bottom: 5px;
 
   --btn-inactive-color: #808080;
   --btn-active-color: var(--link-color);
