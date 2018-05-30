@@ -43,6 +43,7 @@ body.scroll-lock {
   width: 100%;
 }
 
+/* Form elements */
 input[type="text"],
 input[type="password"],
 input[type="search"],
@@ -51,9 +52,15 @@ select {
   width: 100%;
   padding: 8px;
   font-size: 18px;
-  appearance: none;
-  box-shadow: none;
-  border-radius: var(-border-radius);
+  box-shadow: inset 1px 1px 3px 0px rgba(50, 50, 50, 0.75);
+  border: none;
+  border-radius: var(--border-radius);
+  color: var(--input-text-color);
+  background-color: var(--input-background-color);
+}
+
+::placeholder {
+  color: var(--input-placeholder-color);
 }
 
 input[type="text"]:focus,
@@ -64,6 +71,13 @@ select:focus{
 }
 
 input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="search"] {
+  appearance: none;
   -webkit-appearance: none;
 }
 

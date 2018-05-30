@@ -10,7 +10,7 @@ export default class Login extends Component {
   render () {
     return (
       <form>
-        <input type='text' ref='username' placeholder='email or username' autoFocus />
+        <input type='text' ref='username' placeholder='username or email' autoFocus />
         <input type='password' ref='password' placeholder='password' />
         <RoomSelect onRoomSelect={this.handleRoomSelect} />
         <br />

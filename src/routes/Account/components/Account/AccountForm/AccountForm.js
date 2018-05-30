@@ -25,7 +25,7 @@ export default class AccountForm extends Component {
           onChange={this.handleNameChange}
           autoFocus={!user}
         />
-        <input type='text' ref='username' placeholder='email or username (private)'
+        <input type='text' ref='username' placeholder='username or email (private)'
           value={this.state.username}
           onChange={this.handleUsernameChange}
         />

@@ -6,6 +6,10 @@
   --border-radius: 5px;
   --container-padding: 10px;
 
+  --input-text-color: #444;
+  --input-placeholder-color: #aaa;
+  --input-background-color: #efefef;
+
   --btn-inactive-color: #808080;
   --btn-active-color: var(--link-color);
   --btn-danger-color: #BA3A95;

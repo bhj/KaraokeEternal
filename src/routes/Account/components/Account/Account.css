@@ -19,3 +19,7 @@
 .content {
   padding: var(--container-padding);
 }
+
+.content p {
+  margin-top: 10px;
+}
