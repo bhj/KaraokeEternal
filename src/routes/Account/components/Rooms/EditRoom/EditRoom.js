@@ -23,7 +23,7 @@ export default class EditRoom extends Component {
         title={room ? 'Room' : 'Create Room'}
         dialogStyles={{
           width: '80%',
-          height: 'auto',
+          minHeight: '200px',
           left: '10%',
           marginLeft: '0' }}
       >

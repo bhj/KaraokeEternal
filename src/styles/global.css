@@ -74,8 +74,8 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 .skylight-dialog h2 {
-  font-size: 16px;
   font-weight: normal;
+  margin-top: 0;
 }
 
 /* Buttons */

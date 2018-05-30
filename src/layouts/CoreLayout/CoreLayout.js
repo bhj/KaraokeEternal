@@ -30,13 +30,13 @@ export const CoreLayout = (props) => {
         title='Oops'
         dialogStyles={{
           width: '80%',
-          height: 'auto',
+          minHeight: '200px',
           left: '10%',
           marginLeft: '0' }}
       >
         <p>{props.errorMessage}</p>
         <br /><br /><br />
-        <button onClick={props.clearErrorMessage}>Dismiss</button>
+        <button onClick={props.clearErrorMessage}>OK</button>
       </SkyLightStateless>
     </div>
   )
