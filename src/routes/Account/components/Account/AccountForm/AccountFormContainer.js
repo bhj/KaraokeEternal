@@ -1,9 +1,11 @@
 import { connect } from 'react-redux'
-import Account from './Account'
-import { loginUser } from 'store/modules/user'
+import AccountForm from './AccountForm'
+import { logoutUser, createUser, updateUser } from 'store/modules/user'
 
 const mapActionCreators = {
-  loginUser,
+  logoutUser,
+  createUser,
+  updateUser,
 }
 
 const mapStateToProps = (state) => {
@@ -14,4 +16,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapActionCreators)(Account)
+export default connect(mapStateToProps, mapActionCreators)(AccountForm)

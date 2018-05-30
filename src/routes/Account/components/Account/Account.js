@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import Login from './Login'
-import Logout from './Logout'
 import AccountForm from './AccountForm'
 import './Account.css'
 
@@ -12,9 +11,6 @@ export default class Account extends Component {
     isFirstRun: PropTypes.bool.isRequired,
     // actions
     loginUser: PropTypes.func.isRequired,
-    createUser: PropTypes.func.isRequired,
-    updateUser: PropTypes.func.isRequired,
-    logoutUser: PropTypes.func.isRequired,
   }
 
   state = {
@@ -46,7 +42,7 @@ export default class Account extends Component {
             <h1 styleName='title'>Karaoke Forever</h1>
             <div styleName='content'>
               <p>Create your <b>admin</b> account to get started.</p>
-              <AccountForm requireRoom={false} user={null} onSubmitClick={this.props.createUser} />
+              <AccountForm showRoom={false} />
             </div>
           </div>
         }
@@ -55,10 +51,9 @@ export default class Account extends Component {
           <div>
             <h1 styleName='title'>Karaoke Forever</h1>
             <div styleName='content'>
-              <p>Create an account to join the party.<br />
-                Already have an account? <a onClick={this.toggleMode}>Sign in</a>
+              <p>Create an account below. <a onClick={this.toggleMode}>Sign in</a> if you already have an account.
               </p>
-              <AccountForm requireRoom user={null} onSubmitClick={this.props.createUser} />
+              <AccountForm showRoom />
             </div>
           </div>
         }
@@ -68,9 +63,7 @@ export default class Account extends Component {
             <h1 styleName='title'>My Account</h1>
             <div styleName='content'>
               <p>Signed in as <strong>{user.username}</strong></p>
-              <AccountForm requireRoom={false} user={user} onSubmitClick={this.props.updateUser} />
-              <br />
-              <Logout onLogoutClick={this.props.logoutUser} />
+              <AccountForm showRoom={false} />
             </div>
           </div>
         }
