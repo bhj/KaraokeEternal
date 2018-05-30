@@ -23,7 +23,7 @@ export default class HttpApi {
       .then(res => {
         if (res.ok) {
           const type = res.headers.get('Content-Type')
-          return (type && type.includes('application/json')) ? res.json() : res.text()
+          return (type && type.includes('application/json')) ? res.json() : res
         }
 
         // error
