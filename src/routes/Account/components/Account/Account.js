@@ -27,46 +27,36 @@ export default class Account extends Component {
 
     return (
       <div styleName='container'>
-        {!isFirstRun && !isLoggedIn && mode === 'login' &&
-          <div>
-            <h1 styleName='title'>Karaoke Forever</h1>
-            <div styleName='content'>
-              <p>Sign in or <a onClick={this.toggleMode}>create an account</a> to join the party.</p>
-              <Login onSubmitClick={this.props.loginUser} />
-            </div>
-          </div>
-        }
+        <h1 styleName='title'>{isLoggedIn ? 'My Account' : 'Karaoke Forever'}</h1>
+        <div styleName='content'>
+          {!isFirstRun && !isLoggedIn && mode === 'login' &&
+          <>
+            <p>Sign in or <a onClick={this.toggleMode}>create an account</a> to join the party.</p>
+            <Login onSubmitClick={this.props.loginUser} />
+          </>
+          }
 
-        {isFirstRun &&
-          <div>
-            <h1 styleName='title'>Karaoke Forever</h1>
-            <div styleName='content'>
-              <p>Create your <b>admin</b> account to get started.</p>
-              <AccountForm showRoom={false} />
-            </div>
-          </div>
-        }
+          {isFirstRun &&
+          <>
+            <p>Create your <b>admin</b> account to get started.</p>
+            <AccountForm showRoom={false} />
+          </>
+          }
 
-        {!isFirstRun && !isLoggedIn && mode === 'create' &&
-          <div>
-            <h1 styleName='title'>Karaoke Forever</h1>
-            <div styleName='content'>
-              <p>Create an account below. <a onClick={this.toggleMode}>Sign in</a> if you already have an account.
-              </p>
-              <AccountForm showRoom />
-            </div>
-          </div>
-        }
+          {!isFirstRun && !isLoggedIn && mode === 'create' &&
+          <>
+            <p>Create an account below. <a onClick={this.toggleMode}>Sign in</a> if you already have an account.</p>
+            <AccountForm showRoom />
+          </>
+          }
 
-        {isLoggedIn &&
-          <div>
-            <h1 styleName='title'>My Account</h1>
-            <div styleName='content'>
-              <p>Signed in as <strong>{user.username}</strong></p>
-              <AccountForm showRoom={false} />
-            </div>
-          </div>
-        }
+          {isLoggedIn &&
+          <>
+            <p>Signed in as <strong>{user.username}</strong></p>
+            <AccountForm showRoom={false} />
+          </>
+          }
+        </div>
       </div>
     )
   }
