@@ -23,7 +23,7 @@ export default class AccountForm extends Component {
     const { isLoggedIn, showRoom } = this.props
 
     return (
-      <div>
+      <form>
         <input type='text' ref='name' placeholder='name (public)'
           value={this.state.name}
           onChange={this.handleNameChange}
@@ -49,7 +49,7 @@ export default class AccountForm extends Component {
         }
 
         <br />
-        <button onClick={this.handleClick} className='primary'>
+        <button onClick={this.handleSubmit} className='primary'>
           {isLoggedIn ? 'Update Account' : 'Create Account'}
         </button>
 
@@ -58,7 +58,7 @@ export default class AccountForm extends Component {
             Sign Out
           </button>
         }
-      </div>
+      </form>
     )
   }
 
@@ -71,7 +71,7 @@ export default class AccountForm extends Component {
     this.roomId = roomId
   }
 
-  handleClick = (event) => {
+  handleSubmit = (event) => {
     event.preventDefault()
     const { name, username, newPassword, newPasswordConfirm, curPassword } = this.refs
     const data = {
