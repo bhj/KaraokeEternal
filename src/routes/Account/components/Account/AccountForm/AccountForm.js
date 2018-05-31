@@ -24,28 +24,34 @@ export default class AccountForm extends Component {
 
     return (
       <form>
-        <input type='text' ref='name' placeholder='name (public)'
+        <input type='text' placeholder='name (public)'
           value={this.state.name}
           onChange={this.handleNameChange}
           autoFocus={!isLoggedIn}
+          ref={r => { this.name = r }}
         />
-        <input type='text' ref='username' placeholder='username or email (private)'
+        <input type='text' placeholder='username or email (private)'
           value={this.state.username}
           onChange={this.handleUsernameChange}
+          ref={r => { this.username = r }}
         />
-        <input type='password' ref='newPassword'
-          placeholder={isLoggedIn ? 'new password (optional)' : 'password'}
+        <input type='password' placeholder={isLoggedIn ? 'new password (optional)' : 'password'}
+          ref={r => { this.newPassword = r }}
         />
-        <input type='password' ref='newPasswordConfirm'
+        <input type='password'
           placeholder={isLoggedIn ? 'new password confirm' : 'confirm password'}
+          ref={r => { this.newPasswordConfirm = r }}
         />
 
         {isLoggedIn &&
-          <input type='password' ref='curPassword' placeholder='current password' style={{ marginBottom: 0 }}/>
+          <input type='password' placeholder='current password'
+            style={{ marginBottom: 0 }}
+            ref={r => { this.curPassword = r }}
+          />
         }
 
         {showRoom &&
-          <RoomSelect onRoomSelect={this.handleRoomSelect} />
+          <RoomSelect onSelect={this.handleRoomSelect} />
         }
 
         <br />
@@ -73,13 +79,12 @@ export default class AccountForm extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault()
-    const { name, username, newPassword, newPasswordConfirm, curPassword } = this.refs
     const data = {
-      name: name.value.trim(),
-      username: username.value.trim(),
-      password: curPassword ? curPassword.value : null,
-      newPassword: newPassword.value,
-      newPasswordConfirm: newPasswordConfirm.value
+      name: this.name.value.trim(),
+      username: this.username.value.trim(),
+      password: this.curPassword ? this.curPassword.value : null,
+      newPassword: this.newPassword.value,
+      newPasswordConfirm: this.newPasswordConfirm.value
     }
 
     if (this.props.showRoom) {

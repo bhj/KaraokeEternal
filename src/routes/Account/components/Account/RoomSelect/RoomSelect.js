@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 export default class RoomSelect extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
-    onRoomSelect: PropTypes.func.isRequired,
+    onSelect: PropTypes.func.isRequired,
     // actions
     fetchRooms: PropTypes.func.isRequired,
   }
@@ -17,7 +17,7 @@ export default class RoomSelect extends Component {
     this.handleChange()
   }
 
-  handleChange = () => this.props.onRoomSelect(parseInt(this.refs.room.value, 10))
+  handleChange = () => this.props.onSelect(parseInt(this.select.value, 10))
 
   render () {
     let roomOpts = this.props.rooms.result.map(roomId => {
@@ -29,9 +29,9 @@ export default class RoomSelect extends Component {
     })
 
     return (
-      <div>
-        <select ref='room' onChange={this.handleChange}>{roomOpts}</select>
-      </div>
+      <select onChange={this.handleChange} ref={r => { this.select = r }}>
+        {roomOpts}
+      </select>
     )
   }
 }

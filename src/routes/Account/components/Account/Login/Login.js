@@ -11,9 +11,15 @@ export default class Login extends Component {
   render () {
     return (
       <form>
-        <input type='text' ref='username' placeholder='username or email' autoFocus />
-        <input type='password' ref='password' placeholder='password' />
-        <RoomSelect onRoomSelect={this.handleRoomSelect} />
+        <input type='text' placeholder='username or email'
+          autoFocus
+          ref={r => { this.username = r }}
+        />
+        <input type='password' placeholder='password'
+          ref={r => { this.password = r }}
+        />
+        <RoomSelect onSelect={this.handleRoomSelect} />
+
         <br />
         <button onClick={this.handleSubmit} className='primary'>
           Sign In
@@ -29,8 +35,8 @@ export default class Login extends Component {
   handleSubmit = (event) => {
     event.preventDefault()
     const creds = {
-      username: this.refs.username.value.trim(),
-      password: this.refs.password.value,
+      username: this.username.value.trim(),
+      password: this.password.value,
       roomId: this.roomId,
     }
 

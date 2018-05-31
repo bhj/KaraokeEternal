@@ -29,7 +29,8 @@ export default class EditRoom extends Component {
           marginLeft: '0' }}
       >
 
-        <input type='text' ref='name' placeholder='room name'
+        <input type='text' placeholder='room name'
+          ref={r => { this.roomName = r }}
           defaultValue={room ? room.name : ''}
           onKeyPress={this.handleKeyPress}
           autoFocus={typeof room === 'undefined'}
@@ -62,14 +63,14 @@ export default class EditRoom extends Component {
 
   handleCreateClick = () => {
     this.props.createRoom({
-      name: this.refs.name.value,
+      name: this.roomName.value,
       status: 'open',
     })
   }
 
   handleUpdateClick = () => {
     this.props.updateRoom(this.props.room.roomId, {
-      name: this.refs.name.value,
+      name: this.roomName.value,
     })
   }
 
