@@ -1,7 +1,7 @@
 input {
-  margin-bottom: var(--input-margin-bottom);
+  margin-bottom: var(--input-margin);
 }
 
-.submit {
-  margin-bottom: var(--input-margin-bottom);
+.signOut {
+  margin-top: var(--input-margin);
 }

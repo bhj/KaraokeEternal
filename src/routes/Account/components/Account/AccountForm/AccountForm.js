@@ -49,12 +49,12 @@ export default class AccountForm extends Component {
         }
 
         <br />
-        <button onClick={this.handleClick} className='primary' styleName='submit'>
+        <button onClick={this.handleClick} className='primary'>
           {isLoggedIn ? 'Update Account' : 'Create Account'}
         </button>
 
         {isLoggedIn &&
-          <button onClick={this.props.logoutUser}>
+          <button onClick={this.props.logoutUser} styleName='signOut'>
             Sign Out
           </button>
         }

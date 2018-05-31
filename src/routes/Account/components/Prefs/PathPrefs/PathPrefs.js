@@ -78,7 +78,7 @@ export default class PathPrefs extends React.Component {
 
         <div styleName='content' style={{ display: isExpanded ? 'block' : 'none' }}>
           {paths.result.length === 0 &&
-            <p style={{ marginTop: 0 }}>Add media folders to get started.</p>
+            <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>
           }
 
           {paths.result.map(id =>
@@ -89,7 +89,7 @@ export default class PathPrefs extends React.Component {
               isRemovable
             />
           )}
-
+          <br />
           <div style={{ display: 'flex' }}>
             <button className='primary' style={{ flex: 1, width: 'auto' }} onClick={this.handleOpenChooser}>
               Add Folder
