@@ -38,9 +38,6 @@
   --song-item-btn-inactive-color: #222a44;
 
   --alpha-picker-color: var(--artist-folder-color);
-  --alpha-picker-popover-color: var(--text-color);
-  --alpha-picker-popover-background-color: var(--alpha-picker-color);
-
   --queued-item-glow-color: var(--btn-danger-color);
   --mark-background-color: #669eff;
 
