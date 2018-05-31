@@ -3,15 +3,19 @@
     "constants/**",
     "server/**",
     "project.config.js",
-    // don't include subfolders; avoids bundling /mac, /win, etc. but
-    // assumes folder is flattened. May need to stop overloading dist
+    // use webpack output path but exclude subfolders (ignore /mac, /win, etc.)
     "dist/*",
   ],
   "mac": {
     "target": "dmg",
+    "icon": "public/app.png",
   },
   "win": {
     "target": "nsis",
+    "icon": "public/app.png",
+  },
+  "nsis": {
+    "oneClick": false,
   },
   "appId": "com.karaoke-forever.app",
   "productName": "Karaoke Forever Server",
