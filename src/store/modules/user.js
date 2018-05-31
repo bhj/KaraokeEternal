@@ -54,25 +54,28 @@ export function loginUser (data) {
         // user object in response body
         dispatch(receiveLogin(user))
 
-        // socket.io handshake happens over http so
-        // our JWT will be sent in the cookie
-        window._socket.open()
-
-        // check for redirect in query string
-        let loc = getState().location
-
-        if (loc && loc.search) {
-          let query = parseQuery(loc.search)
-
-          if (query.redirect) {
-            browserHistory.push(query.redirect)
-          }
-        }
-
         // update preferences
         if (user.isAdmin) {
           dispatch(fetchPrefs())
         }
+
+        // socket.io handshake happens over http so
+        // our JWT will be sent in the cookie
+        window._socket.open()
+
+        // redirect in query string
+        const loc = getState().location
+
+        if (loc && loc.search) {
+          const query = parseQuery(loc.search)
+
+          if (query.redirect) {
+            return browserHistory.push(query.redirect)
+          }
+        }
+
+        // default redirect
+        browserHistory.push('/library')
       })
       .catch(err => {
         dispatch(loginError(err.message))
