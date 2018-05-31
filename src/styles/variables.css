@@ -7,11 +7,11 @@
   --container-padding: 10px;
 
   --input-text-color: #444;
-  --input-placeholder-color: #aaa;
-  --input-background-color: #efefef;
-  --input-margin-bottom: 5px;
+  --input-placeholder-color: #888;
+  --input-background-color: #eee;
+  --input-margin-bottom: 7px;
 
-  --btn-inactive-color: #808080;
+  --btn-inactive-color: #888;
   --btn-active-color: var(--link-color);
   --btn-danger-color: #BA3A95;
 

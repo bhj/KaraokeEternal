@@ -1,16 +1,16 @@
 .container {
   display: flex;
   align-items: center;
-  padding: 4px var(--container-padding) 4px 4px;
+  padding: 6px var(--container-padding);
 }
 
 .searchInput {
   flex: 1;
-  height: 44px;
-  font-size: 18px;
-  border: none;
-  color: var(--text-color);
-  background-color: inherit;
+  margin: 0;
+  border: none !important;
+  color: var(--btn-inactive-color) !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .clear {
