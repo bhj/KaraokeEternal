@@ -224,6 +224,7 @@ export function updateUser (data) {
     })
       .then(user => {
         dispatch(receiveUpdate(user))
+        alert('Account updated successfully.')
       })
       .catch(err => {
         dispatch(updateError(err.message))
