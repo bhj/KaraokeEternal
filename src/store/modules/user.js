@@ -185,6 +185,9 @@ export function createUser (user) {
         if (user.isAdmin) {
           dispatch(fetchPrefs())
         }
+
+        // default redirect
+        browserHistory.push('/library')
       })
       .catch(err => {
         dispatch(createError(err.message))
