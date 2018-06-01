@@ -1,3 +1,6 @@
+const { promisify } = require('util')
+const drivelist = require('drivelist')
+const getDrives = promisify(drivelist.list)
 const path = require('path')
 const db = require('sqlite')
 const squel = require('squel')
@@ -177,25 +180,44 @@ router.get('/path/ls', async (ctx, next) => {
 
   try {
     const dir = decodeURIComponent(ctx.query.dir)
-    const current = path.resolve(dir)
-    const parent = path.resolve(dir, '../')
 
-    const list = await getFolders(dir)
-    const children = list.map(d => {
-      return {
-        path: d,
-        displayPath: d.replace(current + path.sep, '')
+    if (dir) {
+      const current = path.resolve(dir)
+      const parent = path.resolve(dir, '../')
+      const list = await getFolders(dir)
+      log('%s listed path: %s', ctx.user.name, current)
+
+      ctx.body = {
+        current,
+        // if at root, parent and current are the same
+        parent: parent === current ? '' : parent,
+        children: list.map(d => ({
+          path: d,
+          displayPath: d.replace(current + path.sep, '')
+        }))
+          // don't show hidden folders
+          .filter(c => !c.displayPath.startsWith('.'))
       }
-    })
+    } else {
+      // top level: show drives/mountpoints
+      const drives = await getDrives()
+      log('%s listed all drives/mountpoints', ctx.user.name)
+      const children = []
 
-    log('%s listed folder %s', ctx.user.name, current)
+      drives.forEach(d => {
+        d.mountpoints.forEach(m => {
+          children.push({
+            path: m.path,
+            displayPath: m.label,
+          })
+        })
+      })
 
-    ctx.body = {
-      current,
-      // if at root, parent and current are the same
-      parent: parent === current ? false : parent,
-      // don't show hidden folders
-      children: children.filter(c => !c.displayPath.startsWith('.')),
+      ctx.body = {
+        current: '',
+        parent: false,
+        children,
+      }
     }
   } catch (err) {
     ctx.status = 500

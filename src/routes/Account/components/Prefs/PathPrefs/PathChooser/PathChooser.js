@@ -52,11 +52,11 @@ export default class PathChooser extends React.Component {
       >
         <div style={{ height: '85%', display: 'flex', flexDirection: 'column' }}>
           <div styleName='current'>
-            {this.state.current}
+            {this.state.current || '\u00a0'}
           </div>
 
           <div style={{ flex: '1', marginBottom: '1em', overflow: 'scroll' }}>
-            {this.state.parent &&
+            {this.state.parent !== false &&
               <strong><PathItem path={'..'} onSelect={() => this.getListing(this.state.parent)} /></strong>
             }
 
