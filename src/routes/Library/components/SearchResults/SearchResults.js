@@ -27,10 +27,10 @@ class SearchResults extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (!this.ref) return
+    if (!this.list) return
     // nuclear option
-    this.ref.recomputeRowHeights()
-    this.ref.forceUpdate()
+    this.list.recomputeRowHeights()
+    this.list.forceUpdate()
   }
 
   render () {
@@ -130,7 +130,7 @@ class SearchResults extends React.Component {
   }
 
   setRef = (ref) => {
-    this.ref = ref
+    this.list = ref
   }
 }
 

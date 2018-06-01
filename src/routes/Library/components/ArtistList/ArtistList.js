@@ -38,7 +38,6 @@ class ArtistList extends React.Component {
           paddingBottom={ui.footerHeight}
           width={ui.browserWidth}
           height={ui.browserHeight}
-          scrollTop={this.props.scrollTop}
           scrollToAlignment='start'
         />
         <AlphaPicker
@@ -51,14 +50,14 @@ class ArtistList extends React.Component {
     )
   }
 
-  componentDidUpdate (prevProps) {
-    if (!this.ref) return
-    this.ref.recomputeRowHeights()
-    this.ref.forceUpdate()
-  }
-
   componentWillUnmount () {
     this.props.scrollArtists(this.lastScrollTop || this.props.scrollTop)
+  }
+
+  componentDidUpdate (prevProps) {
+    if (!this.list) return
+    this.list.recomputeRowHeights()
+    this.list.forceUpdate()
   }
 
   rowRenderer = ({ index, key, style }) => {
@@ -98,11 +97,12 @@ class ArtistList extends React.Component {
 
   handleAlphaPick = (char) => {
     const row = this.props.alphaPickerMap[char]
-    this.ref.scrollToRow(row > 0 ? row - 1 : row)
+    this.list.scrollToRow(row > 0 ? row - 1 : row)
   }
 
   setRef = (ref) => {
-    this.ref = ref
+    this.list = ref
+    this.list.scrollToPosition(this.props.scrollTop)
   }
 }
 
