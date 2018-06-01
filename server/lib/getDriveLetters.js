@@ -8,8 +8,8 @@ module.exports = function () {
         return reject(err)
       }
 
-      const rows = stdout.split(/\r?\n/)
-      resolve(rows)
+      const rows = stdout.split(/\r?\n/).filter(row => row.trim().endsWith(':'))
+      resolve(rows.map(r => r.trim()))
     })
   })
 }
