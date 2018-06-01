@@ -208,7 +208,7 @@ router.get('/path/ls', async (ctx, next) => {
         children: list.map(p => ({
           path: p,
           label: p.replace(current + path.sep, '')
-        })).filter(c => !c.label.startsWith('.') && !c.label.startsWith('/.'))
+        })).filter(c => !(c.label.startsWith('.') || c.label.startsWith('/.')))
       }
     } catch (err) {
       ctx.status = 500
