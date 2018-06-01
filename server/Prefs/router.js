@@ -208,7 +208,7 @@ router.get('/path/ls', async (ctx, next) => {
         d.mountpoints.forEach(m => {
           children.push({
             path: m.path,
-            displayPath: m.label,
+            displayPath: m.label ? m.label : m.path,
           })
         })
       })
