@@ -33,7 +33,6 @@
     "bcrypt": "^2.0.1",
     "cdgraphics": "^1.0.2",
     "debug": "^3.1.0",
-    "drivelist": "^6.2.2",
     "jsonwebtoken": "^8.2.2",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",

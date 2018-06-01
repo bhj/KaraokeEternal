@@ -1,6 +1,3 @@
-const { promisify } = require('util')
-const drivelist = require('drivelist')
-const getDrives = promisify(drivelist.list)
 const path = require('path')
 const db = require('sqlite')
 const squel = require('squel')
@@ -9,6 +6,7 @@ const log = debug('app:prefs')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
+const getDriveLetters = require('../lib/getDriveLetters')
 const Prefs = require('./Prefs')
 const {
   SCANNER_WORKER_SCAN,
@@ -178,50 +176,48 @@ router.get('/path/ls', async (ctx, next) => {
     return
   }
 
-  try {
-    const dir = decodeURIComponent(ctx.query.dir)
+  const dir = decodeURIComponent(ctx.query.dir)
 
-    if (dir) {
-      const current = path.resolve(dir)
-      const parent = path.resolve(dir, '../')
-      const list = await getFolders(dir)
-      log('%s listed path: %s', ctx.user.name, current)
-
-      ctx.body = {
-        current,
-        // if at root, parent and current are the same
-        parent: parent === current ? '' : parent,
-        children: list.map(d => ({
-          path: d,
-          displayPath: d.replace(current + path.sep, '')
-        }))
-          // don't show hidden folders
-          .filter(c => !c.displayPath.startsWith('.'))
-      }
-    } else {
-      // top level: show drives/mountpoints
-      const drives = await getDrives()
-      log('%s listed all drives/mountpoints', ctx.user.name)
-      const children = []
-
-      drives.forEach(d => {
-        d.mountpoints.forEach(m => {
-          children.push({
-            path: m.path,
-            displayPath: m.label ? m.label : m.path,
-          })
-        })
-      })
+  // windows is a special snowflake and gets an
+  // extra top level of available drive letters
+  if (dir === '' && process.platform === 'win32') {
+    try {
+      const drives = await getDriveLetters()
 
       ctx.body = {
         current: '',
         parent: false,
-        children,
+        children: drives.map(d => ({
+          path: d + '\\',
+          label: d,
+        }))
       }
+    } catch (err) {
+      ctx.status = 500
+      ctx.body = err.message
     }
-  } catch (err) {
-    ctx.status = 500
-    ctx.body = err.message
+  } else {
+    const current = path.resolve(dir)
+    const parent = path.resolve(dir, '../')
+
+    try {
+      // don't show hidden folders
+      const list = await getFolders(dir, d => !d.startsWith('.'))
+      log('%s listed path: %s', ctx.user.name, current)
+
+      ctx.body = {
+        current,
+        // if at root, windows gets a special top level
+        parent: parent === current ? (process.platform === 'win32' ? '' : false) : parent,
+        children: list.map(d => ({
+          path: d,
+          label: d.replace(current + path.sep, '')
+        }))
+      }
+    } catch (err) {
+      ctx.status = 500
+      ctx.body = err.message
+    }
   }
 })
 

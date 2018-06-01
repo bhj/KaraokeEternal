@@ -61,7 +61,7 @@ export default class PathChooser extends React.Component {
             }
 
             {this.state.children.map((item, i) =>
-              <PathItem key={i} path={item.displayPath} onSelect={() => this.getListing(item.path)} />
+              <PathItem key={i} path={item.label} onSelect={() => this.getListing(item.path)} />
             )}
           </div>
 
