@@ -57,7 +57,7 @@ class ArtistList extends React.Component {
   componentDidUpdate (prevProps) {
     if (!this.list) return
     this.list.recomputeRowHeights()
-    this.list.forceUpdate()
+    // this.list.forceUpdate()
   }
 
   rowRenderer = ({ index, key, style }) => {

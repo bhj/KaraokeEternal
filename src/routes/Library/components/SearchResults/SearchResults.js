@@ -30,7 +30,7 @@ class SearchResults extends React.Component {
     if (!this.list) return
     // nuclear option
     this.list.recomputeRowHeights()
-    this.list.forceUpdate()
+    // this.list.forceUpdate()
   }
 
   render () {
