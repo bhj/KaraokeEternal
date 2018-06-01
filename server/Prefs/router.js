@@ -198,18 +198,17 @@ router.get('/path/ls', async (ctx, next) => {
     const parent = path.resolve(dir, '../')
 
     try {
-      // don't show hidden folders
-      const list = await getFolders(dir, d => !d.startsWith('.'))
+      const list = await getFolders(dir)
       log('%s listed path: %s', ctx.user.name, current)
 
       ctx.body = {
         current,
         // if at root, windows gets a special top level
         parent: parent === current ? (process.platform === 'win32' ? '' : false) : parent,
-        children: list.map(d => ({
-          path: d,
-          label: d.replace(current + path.sep, '')
-        }))
+        children: list.map(p => ({
+          path: p,
+          label: p.replace(current + path.sep, '')
+        })).filter(c => !c.label.startsWith('.') && !c.label.startsWith('/.'))
       }
     } catch (err) {
       ctx.status = 500
