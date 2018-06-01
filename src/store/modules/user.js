@@ -182,12 +182,13 @@ export function createUser (user) {
         // our JWT will be sent in the cookie
         window._socket.open()
 
-        if (user.isAdmin) {
-          dispatch(fetchPrefs())
+        if (!user.isAdmin) {
+          // default redirect
+          browserHistory.push('/library')
+          return
         }
 
-        // default redirect
-        browserHistory.push('/library')
+        dispatch(fetchPrefs())
       })
       .catch(err => {
         dispatch(createError(err.message))
