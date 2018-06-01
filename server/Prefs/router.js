@@ -6,7 +6,7 @@ const log = debug('app:prefs')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
-const getDriveLetters = require('../lib/getDriveLetters')
+const getWindowsDrives = require('../lib/getWindowsDrives')
 const Prefs = require('./Prefs')
 const {
   SCANNER_WORKER_SCAN,
@@ -182,15 +182,12 @@ router.get('/path/ls', async (ctx, next) => {
   // extra top level of available drive letters
   if (dir === '' && process.platform === 'win32') {
     try {
-      const drives = await getDriveLetters()
+      const drives = await getWindowsDrives()
 
       ctx.body = {
         current: '',
         parent: false,
-        children: drives.map(d => ({
-          path: d + '\\',
-          label: d,
-        }))
+        children: drives,
       }
     } catch (err) {
       ctx.status = 500
