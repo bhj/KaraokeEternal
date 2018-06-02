@@ -20,7 +20,7 @@ if (!process.env.NODE_ENV) {
 }
 
 // pass user data path to (non-Electron) forked processes
-process.env.USER_DATA_PATH = app.getPath('appData')
+process.env.USER_DATA_PATH = app.getPath('userData')
 
 // event handlers
 app.on('ready', createWindow)
