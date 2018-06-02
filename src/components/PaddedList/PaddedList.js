@@ -9,11 +9,15 @@ class PaddedList extends React.Component {
     rowHeight: PropTypes.func.isRequired,
     onScroll: PropTypes.func,
     onRef: PropTypes.func,
-    scrollTop: PropTypes.number,
     paddingTop: PropTypes.number.isRequired,
+    paddingRight: PropTypes.number,
     paddingBottom: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+  }
+
+  state = {
+    scrollBarSize: 0,
   }
 
   componentDidMount () {
@@ -24,17 +28,20 @@ class PaddedList extends React.Component {
 
   render () {
     return (
-      <List
-        {...this.props}
-        rowCount={this.props.rowCount + 2} // top & bottom spacer
-        overscanRowCount={10}
-        onScroll={this.props.onScroll}
-        scrollTop={this.props.scrollTop} // initial list pos
-        ref={this.setRef}
-        // facades
-        rowHeight={this.rowHeight}
-        rowRenderer={this.rowRenderer}
-      />
+      <div style={{ width: this.props.width, overflow: 'hidden' }}>
+        <List
+          {...this.props}
+          width={this.props.width + this.state.scrollBarSize} // clips scrollbar offscreen
+          rowCount={this.props.rowCount + 2} // top & bottom spacer
+          overscanRowCount={10}
+          onScroll={this.props.onScroll}
+          onScrollbarPresenceChange={this.handleScrollBar}
+          ref={this.setRef}
+          // facades
+          rowHeight={this.rowHeight}
+          rowRenderer={this.rowRenderer}
+        />
+      </div>
     )
   }
 
@@ -51,11 +58,13 @@ class PaddedList extends React.Component {
       return (
         <div key={key} style={style} />
       )
-    } else {
-      index--
     }
 
-    return this.props.rowRenderer({ index, key, style })
+    return this.props.rowRenderer({
+      index: --index,
+      key,
+      style: { ...style, paddingRight: this.props.paddingRight }
+    })
   }
 
   rowHeight = ({ index }) => {
@@ -69,6 +78,10 @@ class PaddedList extends React.Component {
     }
 
     return this.props.rowHeight({ index })
+  }
+
+  handleScrollBar = ({ size }) => {
+    this.setState({ scrollBarSize: size })
   }
 
   setRef = (ref) => {

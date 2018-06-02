@@ -35,6 +35,7 @@ class ArtistList extends React.Component {
           onScroll={this.handleScroll}
           onRef={this.setRef}
           paddingTop={ui.headerHeight}
+          paddingRight={30} // width of AlphaPicker
           paddingBottom={ui.footerHeight}
           width={ui.browserWidth}
           height={ui.browserHeight}
