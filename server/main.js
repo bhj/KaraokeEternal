@@ -1,6 +1,6 @@
 const log = require('debug')(`app:master [${process.pid}]`)
 const path = require('path')
-const child_process = require('child_process')
+const childProcess = require('child_process')
 const refs = {}
 const {
   SCANNER_WORKER_SCAN,
@@ -30,7 +30,7 @@ startServer()
 function startServer () {
   if (refs.server === undefined) {
     log('Starting web server')
-    refs.server = child_process.fork(path.join(__dirname, 'server.js'))
+    refs.server = childProcess.fork(path.join(__dirname, 'server.js'))
 
     refs.server.on('exit', (code, signal) => {
       if (signal) {
@@ -61,7 +61,7 @@ function startServer () {
 function startScanner () {
   if (refs.scanner === undefined) {
     log('Starting media scanner')
-    refs.scanner = child_process.fork(path.join(__dirname, 'scanner.js'))
+    refs.scanner = childProcess.fork(path.join(__dirname, 'scanner.js'))
 
     refs.scanner.on('exit', (code, signal) => {
       if (signal) {

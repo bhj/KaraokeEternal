@@ -25,11 +25,11 @@ const handlers = {
 
 module.exports = function (io) {
   io.on('connection', async (sock) => {
-    const { id_token } = parseCookie(sock.handshake.headers.cookie)
+    const { kfToken } = parseCookie(sock.handshake.headers.cookie)
 
     // authenticate using cookie from socket handshake
     try {
-      sock.user = jwtVerify(id_token, 'shared-secret')
+      sock.user = jwtVerify(kfToken, 'shared-secret')
     } catch (err) {
       io.to(sock.id).emit('action', {
         type: SOCKET_AUTH_ERROR,

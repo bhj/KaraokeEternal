@@ -46,10 +46,10 @@ Promise.resolve()
       ctx.io = io
 
       // make JWT data available on ctx
-      const { id_token } = parseCookie(ctx.request.header.cookie)
+      const { kfToken } = parseCookie(ctx.request.header.cookie)
 
       try {
-        ctx.user = jwtVerify(id_token, 'shared-secret')
+        ctx.user = jwtVerify(kfToken, 'shared-secret')
       } catch (err) {
         ctx.user = {
           userId: null,

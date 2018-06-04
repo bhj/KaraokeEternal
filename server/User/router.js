@@ -21,7 +21,7 @@ router.post('/login', async (ctx, next) => {
 // logout
 router.get('/logout', async (ctx, next) => {
   // @todo force socket room leave
-  ctx.cookies.set('id_token', '')
+  ctx.cookies.set('kfToken', '')
   ctx.status = 200
   ctx.body = {}
 })
@@ -328,7 +328,6 @@ async function _login (ctx, creds) {
   user.isAdmin = (user.isAdmin === 1)
 
   // encrypt JWT based on subset of user object
-  // @todo use async version
   const token = jwtSign({
     userId: user.userId,
     isAdmin: user.isAdmin === true,
@@ -337,7 +336,7 @@ async function _login (ctx, creds) {
   }, 'shared-secret')
 
   // set httpOnly cookie containing JWT
-  ctx.cookies.set('id_token', token, {
+  ctx.cookies.set('kfToken', token, {
     httpOnly: true,
   })
 
