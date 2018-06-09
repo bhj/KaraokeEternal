@@ -14,7 +14,14 @@ A browser-based mobile app lets everyone find, favorite and queue songs.
 
 ### Player
 
-Just another name for the app when it's in "player" mode. Designed for a browser to run in fullscreen, usually on the system handling audio/video (see **Audio Input** below). A desktop-class browser is recommended due to limitations in mobile browsers' fullscreen API support. The player doesn't have to run on the same system as the server.
+Just another name for the app in "player" mode. It's designed to run fullscreen in a desktop-class browser, usually on the system handling a room's audio/video (see **Audio Input** below). The Player works on the current versions of these (desktop) browsers:
+
+- Chrome
+- Firefox
+- Safari
+- Edge
+
+Internet Explorer is not supported.
 
 ### Rooms
 
