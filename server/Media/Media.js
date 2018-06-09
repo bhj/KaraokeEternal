@@ -237,4 +237,11 @@ class Media {
   }
 }
 
+Media.mimeTypes = {
+  mp3: 'audio/mpeg',
+  m4a: 'audio/mp4',
+  mp4: 'video/mp4',
+  cdg: 'application/octet-stream',
+}
+
 module.exports = Media

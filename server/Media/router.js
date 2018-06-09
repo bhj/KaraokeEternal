@@ -9,7 +9,7 @@ const router = KoaRouter({ prefix: '/api/media' })
 const getPerms = require('../lib/getPermutations')
 const Media = require('./Media')
 
-const audioExts = ['.mp3', '.m4a'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
+const audioExts = ['mp3', 'm4a'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
 // get media file
 router.get('/', async (ctx, next) => {
@@ -20,7 +20,7 @@ router.get('/', async (ctx, next) => {
   }
 
   const { type, mediaId } = ctx.query
-  let file
+  let file, fileExt
 
   if (!type || !mediaId) {
     ctx.status = 422
@@ -39,6 +39,7 @@ router.get('/', async (ctx, next) => {
     }
 
     file = res.entities[mediaId].file
+    fileExt = path.extname(file).replace('.', '').toLowerCase()
   } catch (err) {
     log(err)
     return Promise.reject(err)
@@ -46,7 +47,7 @@ router.get('/', async (ctx, next) => {
 
   if (type === 'audio') {
     for (const ext of audioExts) {
-      const audioFile = file.substr(0, file.length - path.extname(file).length) + ext
+      const audioFile = file.substr(0, file.length - fileExt.length) + ext
 
       try {
         await stat(audioFile)
@@ -65,9 +66,11 @@ router.get('/', async (ctx, next) => {
   try {
     const stats = await stat(file)
 
-    // stream it!
-    log('streaming file (%s bytes): %s', stats.size, file)
+    ctx.type = Media.mimeTypes[path.extname(file).replace('.', '').toLowerCase()]
     ctx.length = stats.size
+    log('streaming %s (%sMB): %s', ctx.type, (stats.size / 1000000).toFixed(2), file)
+
+    // stream it!
     ctx.body = fs.createReadStream(file)
   } catch (err) {
     log(err)
