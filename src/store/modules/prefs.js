@@ -8,6 +8,7 @@ import {
   _ERROR,
 } from 'constants/actions'
 
+import { logoutUser } from './user'
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('prefs')
 
@@ -50,6 +51,11 @@ export function fetchPrefs () {
     return api('GET', '')
       .then(prefs => {
         dispatch(receivePrefs(prefs))
+
+        // sign out if we see isFirstRun flag
+        if (prefs.isFirstRun && getState().user.userId !== null) {
+          dispatch(logoutUser())
+        }
       })
       .catch(err => {
         dispatch({
