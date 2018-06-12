@@ -63,7 +63,7 @@ export function loginUser (data) {
         // our JWT will be sent in the cookie
         window._socket.open()
 
-        // redirect in query string
+        // redirect in query string?
         const loc = getState().location
 
         if (loc && loc.search) {
