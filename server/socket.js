@@ -69,7 +69,6 @@ module.exports = function (io) {
     // attach action handler
     sock.on('action', async (action, acknowledge) => {
       const { type } = action
-      let called = false
 
       if (!sock.user) {
         return acknowledge({
@@ -80,26 +79,22 @@ module.exports = function (io) {
         })
       }
 
-      if (typeof handlers[type] === 'function') {
-        called = true
-
-        try {
-          await handlers[type](sock, action, acknowledge)
-        } catch (err) {
-          log(err)
-          const error = `Error in handler ${type}: ${err.message}`
-
-          return acknowledge({
-            type: type + _ERROR,
-            meta: {
-              error,
-            }
-          })
-        }
+      if (typeof handlers[type] !== 'function') {
+        log('warning: no handler for action type: %s', type)
+        return
       }
 
-      if (!called) {
-        log('warning: no handler for action type: %s', type)
+      try {
+        await handlers[type](sock, action, acknowledge)
+      } catch (err) {
+        log(err)
+
+        return acknowledge({
+          type: type + _ERROR,
+          meta: {
+            error: `Error in handler ${type}: ${err.message}`,
+          }
+        })
       }
     })
 
