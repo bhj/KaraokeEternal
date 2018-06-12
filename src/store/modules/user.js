@@ -168,11 +168,13 @@ function createError (message) {
   }
 }
 
-export function createUser (user) {
-  return dispatch => {
+export function createUser (user, isFirstRun) {
+  return (dispatch, getState) => {
     dispatch(requestCreate(user))
 
-    return api('POST', 'account', {
+    const isFirstRun = !!getState().prefs.isFirstRun
+
+    return api('POST', isFirstRun ? 'setup' : 'account', {
       body: user
     })
       .then(user => {

@@ -28,7 +28,7 @@ router.get('/logout', async (ctx, next) => {
 
 // create
 router.post('/account', async (ctx, next) => {
-  let { name, username, newPassword, newPasswordConfirm, roomId } = ctx.request.body
+  const { name, username, newPassword, newPasswordConfirm, roomId } = ctx.request.body
 
   // check presence of all fields
   if (!name || !username || !newPassword || !newPasswordConfirm) {
@@ -64,24 +64,6 @@ router.post('/account', async (ctx, next) => {
   }
 
   try {
-    const prefs = await Prefs.get()
-
-    if (prefs.isFirstRun === true) {
-      // create default room
-      const q = squel.insert()
-        .into('rooms')
-        .set('name', 'Room 1')
-        .set('status', 'open')
-        .set('dateCreated', Math.floor(Date.now() / 1000))
-
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
-
-      roomId = res.stmt.lastID
-    } else {
-      // @todo: validate roomId
-    }
-
     // hash new password
     const hashedPwd = await bcrypt.hash(newPassword, 12)
 
@@ -91,30 +73,31 @@ router.post('/account', async (ctx, next) => {
       .set('username', username.trim())
       .set('password', hashedPwd)
       .set('name', name.trim())
-      .set('isAdmin', prefs.isFirstRun === true ? 1 : 0)
+      .set('isAdmin', 0)
 
     const { text, values } = q.toParam()
-    const res = await db.run(text, values)
+    await db.run(text, values)
 
-    if (res.stmt.changes !== 1) {
-      throw new Error('insert failed')
-    }
+    // log them in automatically
+    await _login(ctx, { username, password: newPassword, roomId })
+  } catch (err) {
+    log(err)
+    ctx.status = 500
+  }
+})
 
-    // remove isFirstRun flag if necessary
-    if (prefs.isFirstRun === true) {
-      const q = squel.update()
-        .table('prefs')
-        .where('key = ?', 'isFirstRun')
-        .set('data', squel.select()
-          .field(`json('false')`)
-        )
+// first-time setup
+router.post('/setup', async (ctx, next) => {
+  const { name, username, newPassword, newPasswordConfirm } = ctx.request.body
+  let roomId
 
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
+  // must be first run
+  try {
+    const prefs = await Prefs.get()
 
-      if (res.stmt.changes !== 1) {
-        throw new Error('could not set isFirstRun = false')
-      }
+    if (prefs.isFirstRun !== true) {
+      ctx.status = 403
+      return
     }
   } catch (err) {
     log(err)
@@ -122,13 +105,72 @@ router.post('/account', async (ctx, next) => {
     return
   }
 
-  // log them in automatically
+  // check presence of all fields
+  if (!name || !username || !newPassword || !newPasswordConfirm) {
+    ctx.status = 422
+    ctx.body = 'All fields are required'
+    return
+  }
+
+  // check that passwords match
+  if (newPassword !== newPasswordConfirm) {
+    ctx.status = 422
+    ctx.body = 'Password fields do not match'
+    return
+  }
+
+  // create admin user
   try {
-    await _login(ctx, { username, password: newPassword, roomId })
+    const q = squel.insert()
+      .into('users')
+      .set('username', username.trim())
+      .set('password', await bcrypt.hash(newPassword, 12))
+      .set('name', name.trim())
+      .set('isAdmin', 1)
+
+    const { text, values } = q.toParam()
+    await db.run(text, values)
   } catch (err) {
     log(err)
     ctx.status = 500
+    return
   }
+
+  // create default room
+  try {
+    const q = squel.insert()
+      .into('rooms')
+      .set('name', 'Room 1')
+      .set('status', 'open')
+      .set('dateCreated', Math.floor(Date.now() / 1000))
+    const { text, values } = q.toParam()
+    const res = await db.run(text, values)
+
+    // sign in to this room
+    roomId = res.stmt.lastID
+  } catch (err) {
+    log(err)
+    ctx.status = 500
+    return
+  }
+
+  // unset isFirstRun
+  try {
+    const q = squel.update()
+      .table('prefs')
+      .where('key = ?', 'isFirstRun')
+      .set('data', squel.select().field(`json('false')`))
+
+    const { text, values } = q.toParam()
+    await db.run(text, values)
+  } catch (err) {
+    log(err)
+    ctx.status = 500
+    return
+  }
+
+  // log them in automatically
+  await _login(ctx, { username, password: newPassword, roomId })
 })
 
 // update account
