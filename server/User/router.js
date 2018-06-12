@@ -333,7 +333,7 @@ async function _login (ctx, creds) {
     isAdmin: user.isAdmin === true,
     name: user.name,
     roomId: user.roomId,
-  }, 'shared-secret')
+  }, ctx.jwtKey)
 
   // set httpOnly cookie containing JWT
   ctx.cookies.set('kfToken', token, {

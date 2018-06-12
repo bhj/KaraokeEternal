@@ -23,13 +23,13 @@ const handlers = {
   ...PlayerSocket,
 }
 
-module.exports = function (io) {
+module.exports = function (io, jwtKey) {
   io.on('connection', async (sock) => {
     const { kfToken } = parseCookie(sock.handshake.headers.cookie)
 
-    // authenticate using cookie from socket handshake
+    // decode JWT in cookie sent with socket handshake
     try {
-      sock.user = jwtVerify(kfToken, 'shared-secret')
+      sock.user = jwtVerify(kfToken, jwtKey)
     } catch (err) {
       io.to(sock.id).emit('action', {
         type: SOCKET_AUTH_ERROR,

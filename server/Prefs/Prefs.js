@@ -1,6 +1,7 @@
 const path = require('path')
 const db = require('sqlite')
 const squel = require('squel')
+const crypto = require('crypto')
 const debug = require('debug')
 const log = debug('app:prefs')
 
@@ -103,6 +104,45 @@ class Prefs {
       await db.run(text, values)
     } catch (err) {
       return Promise.reject(err)
+    }
+  }
+
+  /**
+   * Create or rotate JWT secret key
+   * @return {Promise}  jwtKey (string)
+   */
+  static async jwtKeyRefresh () {
+    const jwtKey = crypto.randomBytes(48).toString('base64') // 64 char
+    log('Rotating JWT secret key (length=%s)', jwtKey.length)
+
+    // try to UPDATE
+    try {
+      const q = squel.update()
+        .table('prefs')
+        .set('data', JSON.stringify(jwtKey))
+        .where("key = 'jwtKey'")
+
+      const { text, values } = q.toParam()
+      const res = await db.run(text, values)
+      if (res.stmt.changes) return jwtKey
+    } catch (err) {
+      log(err)
+      throw err
+    }
+
+    // need to INSERT
+    try {
+      const q = squel.insert()
+        .into('prefs')
+        .set('key', 'jwtKey')
+        .set('data', JSON.stringify(jwtKey))
+
+      const { text, values } = q.toParam()
+      await db.run(text, values)
+      return jwtKey
+    } catch (err) {
+      log(err)
+      throw err
     }
   }
 }

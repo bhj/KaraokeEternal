@@ -15,6 +15,7 @@ const KoaLogger = require('koa-logger')
 const KoaStatic = require('koa-static')
 const app = new Koa()
 
+const Prefs = require('./Prefs')
 const libraryRouter = require('./Library/router')
 const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
@@ -35,7 +36,9 @@ Promise.resolve()
     migrationsPath: path.join(project.basePath, 'server', 'lib', 'db'),
     // force: 'last' ,
   }))
-  .then(() => {
+  .then(() => Prefs.get())
+  .then(prefs => prefs.jwtKey || Prefs.jwtKeyRefresh())
+  .then(jwtKey => {
     // basic middleware
     app.use(KoaLogger())
     app.use(KoaRange)
@@ -44,12 +47,12 @@ Promise.resolve()
     // all http (koa) requests
     app.use(async (ctx, next) => {
       ctx.io = io
+      ctx.jwtKey = jwtKey
 
-      // make JWT data available on ctx
-      const { kfToken } = parseCookie(ctx.request.header.cookie)
-
+      // verify jwt
       try {
-        ctx.user = jwtVerify(kfToken, 'shared-secret')
+        const { kfToken } = parseCookie(ctx.request.header.cookie)
+        ctx.user = jwtVerify(kfToken, jwtKey)
       } catch (err) {
         ctx.user = {
           userId: null,
@@ -130,7 +133,7 @@ Promise.resolve()
     const io = new SocketIO(server)
 
     // attach socket.io event handlers
-    socketActions(io)
+    socketActions(io, jwtKey)
 
     // emit messages from scanner over socket.io
     process.on('message', function (action) {
