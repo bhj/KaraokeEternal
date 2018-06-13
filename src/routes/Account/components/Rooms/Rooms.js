@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import EditRoom from './EditRoom'
 import { Column, Table } from 'react-virtualized'
+import formatRelative from 'date-fns/formatRelative'
 import style from './Rooms.css'
 
 export default class Rooms extends Component {
@@ -57,17 +58,13 @@ export default class Rooms extends Component {
               label='Status'
               dataKey='status'
               width={width * 0.20}
+              cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
             />
             <Column
               label='Created'
               dataKey='dateCreated'
-              cellRenderer={({ rowData }) => (new Date(rowData.dateCreated * 1000)).toISOString().substring(0, 10)}
-              width={width * 0.30}
-            />
-            <Column
-              label='# in'
-              dataKey='numUsers'
-              width={width * 0.10}
+              cellRenderer={({ rowData }) => formatRelative(new Date(rowData.dateCreated * 1000), Date.now())}
+              width={width * 0.40}
             />
           </Table>
 
