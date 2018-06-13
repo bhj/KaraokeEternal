@@ -98,7 +98,10 @@ module.exports = function (io, jwtKey) {
       }
     })
 
-    // add user to the room on their jwt
+    // it's possible for an admin to not be in a room
+    if (typeof sock.user.roomId !== 'number') return
+
+    // add user to room
     sock.join(sock.user.roomId)
 
     const room = sock.adapter.rooms[sock.user.roomId]
