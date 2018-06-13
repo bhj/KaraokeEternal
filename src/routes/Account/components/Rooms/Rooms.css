@@ -28,3 +28,7 @@
   flex-direction: row;
   align-items: center;
 }
+
+.tableCol {
+  white-space: nowrap;
+}

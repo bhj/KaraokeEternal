@@ -50,6 +50,7 @@ export default class Rooms extends Component {
               label='Name'
               dataKey='name'
               width={width * 0.40}
+              styleName='style.tableCol'
               cellRenderer={({ rowData }) => (
                 <a onClick={() => this.props.openRoomEditor(rowData.roomId)}>{rowData.name}</a>
               )}
@@ -58,13 +59,15 @@ export default class Rooms extends Component {
               label='Status'
               dataKey='status'
               width={width * 0.20}
+              styleName='style.tableCol'
               cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
             />
             <Column
               label='Created'
               dataKey='dateCreated'
-              cellRenderer={({ rowData }) => formatRelative(new Date(rowData.dateCreated * 1000), Date.now())}
               width={width * 0.40}
+              styleName='style.tableCol'
+              cellRenderer={({ rowData }) => formatRelative(new Date(rowData.dateCreated * 1000), Date.now())}
             />
           </Table>
 
