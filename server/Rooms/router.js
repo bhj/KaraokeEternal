@@ -162,6 +162,7 @@ async function getRooms (ctx) {
   try {
     const q = squel.select()
       .from('rooms')
+      .order('dateCreated', 'desc')
 
     if (!ctx.user.isAdmin) {
       q.where('status = ?', 'open')
