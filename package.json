@@ -28,7 +28,7 @@
   "author": "Brandon H. Jones (http://karaoke-forever.com)",
   "license": "MIT",
   "dependencies": {
-    "@babel/runtime": "^7.0.0-beta.49",
+    "@babel/runtime": "^7.0.0-beta.51",
     "@jcoreio/async-throttle": "^1.1.2",
     "bcrypt": "^2.0.1",
     "cdgraphics": "^1.0.2",
@@ -45,8 +45,8 @@
     "normalize.css": "^8.0.0",
     "prop-types": "^15.6.1",
     "rc-slider": "^8.6.1",
-    "react": "^16.4.0",
-    "react-dom": "^16.4.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "react-highlight-words": "^0.11.0",
     "react-measure": "^1.4.7",
     "react-redux": "^5.0.7",
@@ -69,18 +69,18 @@
     "squel": "^5.12.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.49",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.49",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.49",
-    "@babel/plugin-transform-runtime": "^7.0.0-beta.49",
-    "@babel/preset-env": "^7.0.0-beta.49",
-    "@babel/preset-react": "^7.0.0-beta.49",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.51",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.51",
+    "@babel/plugin-transform-runtime": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "@babel/preset-react": "^7.0.0-beta.51",
     "babel-eslint": "^8.2.3",
     "babel-loader": "^8.0.0-beta.3",
     "babel-plugin-react-css-modules": "^3.4.2",
     "case-sensitive-paths-webpack-plugin": "^2.1.2",
     "copy-webpack-plugin": "^4.5.1",
-    "cross-env": "^5.1.6",
+    "cross-env": "^5.2.0",
     "css-loader": "^0.28.11",
     "electron": "^2.0.2",
     "electron-builder": "^20.15.3",
@@ -101,6 +101,6 @@
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
     "webpack": "^4.12.0",
-    "webpack-cli": "^3.0.4"
+    "webpack-cli": "^3.0.6"
   }
 }
