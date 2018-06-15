@@ -90,6 +90,7 @@ const mapStateToProps = (state) => {
     alphaPickerMap: getAlphaPickerMap(state),
     scrollTop: state.library.scrollTop,
     isShowingSongInfo: !(state.library.songInfoSongId === null),
+    ui: state.ui,
     // SearchResults view
     songsResult: getSongsByView(state),
     artistsResult: getArtistsByView(state),

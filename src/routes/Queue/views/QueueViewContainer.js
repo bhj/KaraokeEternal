@@ -4,6 +4,7 @@ import QueueView from './QueueView'
 const mapStateToProps = (state) => {
   return {
     user: state.user,
+    ui: state.ui,
   }
 }
 
