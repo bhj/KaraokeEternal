@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Measure from 'react-measure'
-import PlaybackCtrl from 'components/PlaybackCtrl'
-import ProgressBar from 'components/ProgressBar'
+import PlaybackCtrl from './PlaybackCtrl'
+import ProgressBar from './ProgressBar'
 import UpNext from './UpNext'
 import './Header.css'
 
