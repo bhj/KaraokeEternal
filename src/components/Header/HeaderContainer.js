@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import Header from './Header'
 import { createSelector } from 'reselect'
-import { setHeaderHeight } from 'store/modules/ui'
+import { headerHeightChange } from 'store/modules/ui'
 import { requestScanCancel } from 'store/modules/prefs'
 
 const getQueue = (state) => state.queue
@@ -39,7 +39,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapActionCreators = {
-  setHeaderHeight,
+  headerHeightChange,
   requestScanCancel,
 }
 

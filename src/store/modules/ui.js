@@ -24,7 +24,7 @@ export function showErrorMessage (error) {
   }
 }
 
-export function setHeaderHeight ({ height }) {
+export function headerHeightChange ({ height }) {
   return (dispatch, getState) => {
     if (getState().ui.headerHeight === height) return
 
