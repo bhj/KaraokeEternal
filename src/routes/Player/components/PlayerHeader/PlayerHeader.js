@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Header from 'components/Header'
+import HeaderPortal from 'components/HeaderPortal'
 import Icon from 'components/Icon'
 import './PlayerHeader.css'
 
 const PlayerHeader = (props) => (
-  <Header>
+  <HeaderPortal>
     <div styleName='container'>
       <div onClick={props.requestFullscreen}>
         <Icon icon='FULLSCREEN' size={48} styleName='fullscreen' />
       </div>
     </div>
-  </Header>
+  </HeaderPortal>
 )
 
 PlayerHeader.propTypes = {

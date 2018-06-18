@@ -28,7 +28,7 @@ const Header = (props) => {
           />
         }
 
-        {props.children}
+        <div id='custom-header-container'/>
       </div>
     </Measure>
   )

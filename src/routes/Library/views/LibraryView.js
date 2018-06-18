@@ -9,7 +9,7 @@ const LibraryView = (props) => {
   const View = props.filterKeywords.length || props.filterStarred ? SearchResults : ArtistList
 
   return (
-    <div>
+    <>
       <LibraryHeader />
 
       <View {...props} />
@@ -17,7 +17,7 @@ const LibraryView = (props) => {
       {props.isShowingSongInfo &&
         <SongInfo />
       }
-    </div>
+    </>
   )
 }
 

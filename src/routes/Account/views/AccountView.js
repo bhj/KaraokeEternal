@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import Header from 'components/Header'
 import Rooms from '../components/Rooms'
 import Prefs from '../components/Prefs'
 import Account from '../components/Account'
@@ -22,8 +21,6 @@ export default class AccountView extends Component {
         width: ui.browserWidth,
         height: ui.browserHeight,
       }}>
-        <Header />
-
         {isAdmin &&
           <Rooms />
         }

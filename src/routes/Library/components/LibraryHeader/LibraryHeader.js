@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Header from 'components/Header'
 import Icon from 'components/Icon'
+import HeaderPortal from 'components/HeaderPortal'
 import './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
@@ -32,7 +32,7 @@ class LibraryHeader extends React.Component {
     const { filterStr, filterStarred } = this.props
 
     return (
-      <Header>
+      <HeaderPortal>
         <div styleName='container'>
           <Icon icon='MAGNIFIER' size={40} styleName={filterStr ? 'active' : 'inactive'} />
           <input type='search'
@@ -51,7 +51,7 @@ class LibraryHeader extends React.Component {
             <Icon icon='STAR_FULL' size={40} styleName={filterStarred ? 'active' : 'inactive'} />
           </div>
         </div>
-      </Header>
+      </HeaderPortal>
     )
   }
 }

@@ -4,15 +4,18 @@ import React from 'react'
 // components that will import their own modular css
 import 'normalize.css'
 import '../../styles/global.css'
+import Header from 'components/Header'
 import Navigation from 'components/Navigation'
 import { SkyLightStateless } from 'react-skylight'
 
 export const CoreLayout = (props) => {
   return (
-    <div>
+    <>
+      <Header/>
+
       {props.children}
 
-      <Navigation />
+      <Navigation/>
 
       <SkyLightStateless
         isVisible={props.errorMessage !== null}
@@ -29,7 +32,7 @@ export const CoreLayout = (props) => {
         <br /><br /><br />
         <button onClick={props.clearErrorMessage}>OK</button>
       </SkyLightStateless>
-    </div>
+    </>
   )
 }
 
