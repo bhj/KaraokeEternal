@@ -35,6 +35,7 @@ const mapStateToProps = (state) => {
     isUpdating: state.prefs.isUpdating,
     updateText: state.prefs.updateText,
     updateProgress: state.prefs.updateProgress,
+    loc: state.location.pathname,
   }
 }
 

@@ -10,8 +10,6 @@ const LibraryView = (props) => {
 
   return (
     <>
-      <LibraryHeader />
-
       <View {...props} />
 
       {props.isShowingSongInfo &&
