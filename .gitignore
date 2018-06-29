@@ -4,4 +4,4 @@ node_modules/
 
 .DS_Store
 *.log
-database.sqlite3
+database.sqlite3*
