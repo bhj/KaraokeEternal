@@ -10,12 +10,7 @@ const Prefs = require('../Prefs')
 
 // login
 router.post('/login', async (ctx, next) => {
-  try {
-    await _login(ctx, ctx.request.body)
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-  }
+  await _login(ctx, ctx.request.body)
 })
 
 // logout
@@ -32,13 +27,11 @@ router.post('/account', async (ctx, next) => {
 
   // check presence of all fields
   if (!name || !username || !newPassword || !newPasswordConfirm) {
-    ctx.status = 422
-    ctx.body = 'All fields are required'
-    return
+    ctx.throw(422, 'All fields are required')
   }
 
-  // check for duplicate username
-  try {
+  {
+    // check for duplicate username
     const q = squel.select()
       .from('users')
       .where('username = ? COLLATE NOCASE', username.trim())
@@ -46,27 +39,19 @@ router.post('/account', async (ctx, next) => {
     const { text, values } = q.toParam()
 
     if (await db.get(text, values)) {
-      ctx.status = 401
-      ctx.body = 'Username already exists; please choose another'
-      return
+      ctx.throw(401, 'Username already exists')
     }
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
   }
 
   // check that passwords match
   if (newPassword !== newPasswordConfirm) {
-    ctx.status = 422
-    ctx.body = 'Password fields do not match'
-    return
+    ctx.throw(422, 'Passwords do not match')
   }
 
-  try {
-    // hash new password
-    const hashedPwd = await bcrypt.hash(newPassword, 12)
+  // hash new password
+  const hashedPwd = await bcrypt.hash(newPassword, 12)
 
+  {
     // insert user
     const q = squel.insert()
       .into('users')
@@ -77,13 +62,10 @@ router.post('/account', async (ctx, next) => {
 
     const { text, values } = q.toParam()
     await db.run(text, values)
-
-    // log them in automatically
-    await _login(ctx, { username, password: newPassword, roomId })
-  } catch (err) {
-    log(err)
-    ctx.status = 500
   }
+
+  // log them in automatically
+  await _login(ctx, { username, password: newPassword, roomId })
 })
 
 // first-time setup
@@ -92,35 +74,24 @@ router.post('/setup', async (ctx, next) => {
   let roomId
 
   // must be first run
-  try {
-    const prefs = await Prefs.get()
+  const prefs = await Prefs.get()
 
-    if (prefs.isFirstRun !== true) {
-      ctx.status = 403
-      return
-    }
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
+  if (prefs.isFirstRun !== true) {
+    ctx.throw(403)
   }
 
   // check presence of all fields
   if (!name || !username || !newPassword || !newPasswordConfirm) {
-    ctx.status = 422
-    ctx.body = 'All fields are required'
-    return
+    ctx.throw(422, 'All fields are required')
   }
 
   // check that passwords match
   if (newPassword !== newPasswordConfirm) {
-    ctx.status = 422
-    ctx.body = 'Password fields do not match'
-    return
+    ctx.throw(422, 'Passwords do not match')
   }
 
   // create admin user
-  try {
+  {
     const q = squel.insert()
       .into('users')
       .set('username', username.trim())
@@ -130,32 +101,25 @@ router.post('/setup', async (ctx, next) => {
 
     const { text, values } = q.toParam()
     await db.run(text, values)
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
   }
 
   // create default room
-  try {
+  {
     const q = squel.insert()
       .into('rooms')
       .set('name', 'Room 1')
       .set('status', 'open')
       .set('dateCreated', Math.floor(Date.now() / 1000))
+
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
 
-    // sign in to this room
+    // sign in to room
     roomId = res.stmt.lastID
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
   }
 
   // unset isFirstRun
-  try {
+  {
     const q = squel.update()
       .table('prefs')
       .where('key = ?', 'isFirstRun')
@@ -163,13 +127,8 @@ router.post('/setup', async (ctx, next) => {
 
     const { text, values } = q.toParam()
     await db.run(text, values)
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
   }
 
-  // log them in automatically
   await _login(ctx, { username, password: newPassword, roomId })
 })
 
@@ -177,51 +136,38 @@ router.post('/setup', async (ctx, next) => {
 router.put('/account', async (ctx, next) => {
   let user
 
-  // must be admin
-  if (!ctx.user) {
-    ctx.status = 401
-    ctx.body = 'Invalid token'
-    return
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
   }
 
   // find user by id (from token)
-  try {
+  {
     const q = squel.select()
       .from('users')
       .where('userId = ?', ctx.user.userId)
 
     const { text, values } = q.toParam()
     user = await db.get(text, values)
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
   }
 
   if (!user) {
-    ctx.status = 401
-    ctx.body = 'Invalid user id'
-    return
+    ctx.throw(401)
   }
 
   let { name, username, password, newPassword, newPasswordConfirm } = ctx.request.body
 
   // check presence of required fields
   if (!name || !username || !password) {
-    ctx.status = 422
-    ctx.body = 'Name, username and current password are required'
-    return
+    ctx.throw(422, 'Name, username and current password are required')
   }
 
   // validate current password
   if (!await bcrypt.compare(password, user.password)) {
-    ctx.status = 401
-    ctx.body = 'Current password is incorrect'
-    return
+    ctx.throw(401, 'Current password is incorrect')
   }
 
   // check for duplicate username
-  try {
+  {
     const q = squel.select()
       .from('users')
       .where('userId != ?', ctx.user.userId)
@@ -230,18 +176,12 @@ router.put('/account', async (ctx, next) => {
     const { text, values } = q.toParam()
 
     if (await db.get(text, values)) {
-      ctx.status = 401
-      ctx.body = 'Username already exists; please choose another'
-      return
+      ctx.throw(401, 'Username already exists')
     }
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
   }
 
-  // begin query
-  const u = squel.update()
+  // begin update query
+  const q = squel.update()
     .table('users')
     .where('userId = ?', ctx.user.userId)
     .set('name', name.trim())
@@ -250,108 +190,68 @@ router.put('/account', async (ctx, next) => {
   // changing password?
   if (newPassword) {
     if (newPassword !== newPasswordConfirm) {
-      ctx.status = 422
-      ctx.body = 'New passwords do not match'
-      return
+      ctx.throw(422, 'New passwords do not match')
     }
 
-    try {
-      u.set('password', await bcrypt.hash(newPassword, 10))
-    } catch (err) {
-      log(err)
-      ctx.status = 500
-      return
-    }
+    q.set('password', await bcrypt.hash(newPassword, 10))
 
     password = newPassword
   }
 
-  // do update!
-  try {
-    const { text, values } = u.toParam()
-    await db.run(text, values)
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-    return
-  }
+  // do update
+  const { text, values } = q.toParam()
+  await db.run(text, values)
 
-  // attempt re-login
-  try {
-    await _login(ctx, { username, password, roomId: ctx.user.roomId })
-  } catch (err) {
-    log(err)
-    ctx.status = 500
-  }
+  // login again
+  await _login(ctx, { username, password, roomId: ctx.user.roomId })
 })
 
 module.exports = router
 
 async function _login (ctx, creds) {
   const { username, password, roomId } = creds
-  let user
 
   if (!username || !password) {
-    ctx.status = 422
-    ctx.body = 'Username/email and password are required'
-    return
+    ctx.throw(422, 'Username/email and password are required')
   }
 
   // get user
-  try {
-    const q = squel.select()
-      .from('users')
-      .where('username = ? COLLATE NOCASE', username.trim())
+  const q = squel.select()
+    .from('users')
+    .where('username = ? COLLATE NOCASE', username.trim())
 
-    const { text, values } = q.toParam()
-    user = await db.get(text, values)
+  const { text, values } = q.toParam()
+  const user = await db.get(text, values)
 
-    if (!user) {
-      ctx.status = 401
-      return
-    }
-  } catch (err) {
-    return Promise.reject(err)
+  if (!user) {
+    ctx.throw(401)
   }
 
   // validate password
-  try {
-    if (!await bcrypt.compare(password, user.password)) {
-      ctx.status = 401
-      return
-    }
-  } catch (err) {
-    return Promise.reject(err)
+  if (!await bcrypt.compare(password, user.password)) {
+    ctx.throw(401)
   }
 
   // validate roomId (if not an admin)
   if (!user.isAdmin) {
     if (typeof roomId === 'undefined') {
-      ctx.status = 422
-      ctx.body = 'RoomId is required'
-      return
+      ctx.throw(422, 'RoomId is required')
     }
 
-    try {
-      const q = squel.select()
-        .from('rooms')
-        .where('roomId = ?', roomId)
+    const q = squel.select()
+      .from('rooms')
+      .where('roomId = ?', roomId)
 
-      const { text, values } = q.toParam()
-      const row = await db.get(text, values)
+    const { text, values } = q.toParam()
+    const row = await db.get(text, values)
 
-      if (!row || row.status !== 'open') {
-        ctx.status = 401
-        ctx.body = 'Invalid Room'
-        return
-      }
-    } catch (err) {
-      return Promise.reject(err)
+    if (!row || row.status !== 'open') {
+      ctx.throw(401, 'Invalid Room')
     }
   }
 
   // get starred songs
-  try {
+  {
     const q = squel.select()
       .from('stars')
       .field('songId')
@@ -361,8 +261,6 @@ async function _login (ctx, creds) {
     const rows = await db.all(text, values)
 
     user.starredSongs = rows.map(row => row.songId)
-  } catch (err) {
-    return Promise.reject(err)
   }
 
   delete user.password

@@ -11,72 +11,63 @@ const Media = require('./Media')
 
 const audioExts = ['mp3', 'm4a'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
-// get media file
+// stream a media file
 router.get('/', async (ctx, next) => {
-  // must be admin
-  if (!ctx.user.isAdmin) {
-    ctx.status = 401
-    return
-  }
-
   const { type, mediaId } = ctx.query
   let file, fileExt
 
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
   if (!type || !mediaId) {
-    ctx.status = 422
-    ctx.body = "Missing 'type' or 'mediaId'"
-    return
+    ctx.throw(422, "Missing 'type' or 'mediaId'")
   }
 
   // get media info
-  try {
-    const res = await Media.search({ mediaId })
+  const res = await Media.search({ mediaId })
 
-    if (!res.result.length) {
-      ctx.status = 404
-      ctx.body = `mediaId not found: ${mediaId}`
-      return
-    }
-
-    file = res.entities[mediaId].file
-    fileExt = path.extname(file).replace('.', '').toLowerCase()
-  } catch (err) {
-    log(err)
-    return Promise.reject(err)
+  if (!res.result.length) {
+    ctx.throw(404, `mediaId not found: ${mediaId}`)
   }
+
+  file = res.entities[mediaId].file
+  fileExt = path.extname(file).replace('.', '').toLowerCase()
 
   if (type === 'audio') {
     for (const ext of audioExts) {
       const audioFile = file.substr(0, file.length - fileExt.length) + ext
 
       try {
-        await stat(audioFile)
-
-        // success
+        const stats = await stat(audioFile)
         log('  => found %s audio file', ext)
+
         file = audioFile
+        fileExt = ext
+        ctx.length = stats.size
         break
       } catch (err) {
-        // keep looking...
+        file = null
+        // keep looking for audio files...
       }
     } // end for
-  } // end if
 
-  // get file size (and does it exist?)
-  try {
+    if (!file) {
+      ctx.throw(404, `No audio file found for mediaId: ${mediaId}`)
+    }
+  } else {
     const stats = await stat(file)
-
-    ctx.type = Media.mimeTypes[path.extname(file).replace('.', '').toLowerCase()]
     ctx.length = stats.size
-    log('streaming %s (%sMB): %s', ctx.type, (stats.size / 1000000).toFixed(2), file)
-
-    // stream it!
-    ctx.body = fs.createReadStream(file)
-  } catch (err) {
-    log(err)
-    ctx.status = 404
-    ctx.body = `File not found: ${file}`
   }
+
+  if (typeof Media.mimeTypes[fileExt] === 'undefined') {
+    ctx.throw(404, `Unknown mime type for extension: ${fileExt}`)
+  }
+
+  log('streaming %s (%sMB): %s', ctx.type, (ctx.length / 1000000).toFixed(2), file)
+
+  ctx.type = Media.mimeTypes[fileExt]
+  ctx.body = fs.createReadStream(file)
 })
 
 module.exports = router

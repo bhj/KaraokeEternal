@@ -25,32 +25,27 @@ router.get('/song/:songId', async (ctx, next) => {
     return
   }
 
-  try {
-    const q = squel.select()
-      .field('media.*')
-      .field('songs.artistId, songs.songId, songs.title')
-      .from('media')
-      .where('songId = ?', ctx.params.songId)
-      .join(squel.select()
-        .from('paths'),
-      'paths', 'paths.pathId = media.pathId')
-      .join('songs USING (songId)')
-      .join('artists USING (artistId)')
-      .order('paths.priority')
+  const q = squel.select()
+    .field('media.*')
+    .field('songs.artistId, songs.songId, songs.title')
+    .from('media')
+    .where('songId = ?', ctx.params.songId)
+    .join(squel.select()
+      .from('paths'),
+    'paths', 'paths.pathId = media.pathId')
+    .join('songs USING (songId)')
+    .join('artists USING (artistId)')
+    .order('paths.priority')
 
-    const { text, values } = q.toParam()
-    const rows = await db.all(text, values)
+  const { text, values } = q.toParam()
+  const rows = await db.all(text, values)
 
-    rows.forEach(row => {
-      media.result.push(row.mediaId)
-      media.entities[row.mediaId] = row
-    })
+  rows.forEach(row => {
+    media.result.push(row.mediaId)
+    media.entities[row.mediaId] = row
+  })
 
-    ctx.body = media
-  } catch (err) {
-    ctx.status = 500
-    ctx.body = err.message
-  }
+  ctx.body = media
 })
 
 module.exports = router

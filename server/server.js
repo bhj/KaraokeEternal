@@ -28,6 +28,21 @@ const {
   SERVER_WORKER_STATUS,
 } = require('../constants/actions')
 
+// Koa error handling
+app.use(async (ctx, next) => {
+  try {
+    await next()
+  } catch (err) {
+    ctx.status = err.status || 500
+    ctx.body = err.message
+    ctx.app.emit('error', err, ctx)
+  }
+})
+
+app.on('error', (err, ctx) => {
+  log(err)
+})
+
 log('Opening database file %s', project.database)
 
 Promise.resolve()
@@ -93,18 +108,14 @@ Promise.resolve()
           const indexFile = path.join(project.basePath, 'dist', 'index.html')
 
           app.use(async (ctx, next) => {
-            try {
-              ctx.body = await new Promise(function (resolve, reject) {
-                compiler.outputFileSystem.readFile(indexFile, (err, result) => {
-                  if (err) { return reject(err) }
-                  return resolve(result)
-                })
+            ctx.body = await new Promise(function (resolve, reject) {
+              compiler.outputFileSystem.readFile(indexFile, (err, result) => {
+                if (err) { return reject(err) }
+                return resolve(result)
               })
-              ctx.set('content-type', 'text/html')
-              ctx.status = 200
-            } catch (err) {
-              return Promise.reject(err)
-            }
+            })
+            ctx.set('content-type', 'text/html')
+            ctx.status = 200
           })
         })
     } else {
@@ -118,13 +129,9 @@ Promise.resolve()
       const readFile = promisify(fs.readFile)
 
       app.use(async (ctx, next) => {
-        try {
-          ctx.body = await readFile(indexFile)
-          ctx.set('content-type', 'text/html')
-          ctx.status = 200
-        } catch (err) {
-          return Promise.reject(err)
-        }
+        ctx.body = await readFile(indexFile)
+        ctx.set('content-type', 'text/html')
+        ctx.status = 200
       })
     }
 
