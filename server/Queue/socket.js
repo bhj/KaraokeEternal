@@ -15,21 +15,17 @@ const {
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: async (sock, { payload }, acknowledge) => {
     // is room open?
-    try {
-      if (!await _isRoomOpen(sock.user.roomId)) {
-        return acknowledge({
-          type: QUEUE_ADD + '_ERROR',
-          meta: {
-            error: 'Room is no longer open'
-          }
-        })
-      }
-    } catch (err) {
-      return Promise.reject(err)
+    if (!await _isRoomOpen(sock.user.roomId)) {
+      return acknowledge({
+        type: QUEUE_ADD + '_ERROR',
+        meta: {
+          error: 'Room is no longer open'
+        }
+      })
     }
 
     // verify media exists
-    try {
+    {
       const q = squel.select()
         .from('media')
         .where('mediaId = ?', payload.mediaId)
@@ -45,12 +41,10 @@ const ACTION_HANDLERS = {
           }
         })
       }
-    } catch (err) {
-      return Promise.reject(err)
     }
 
     // insert queue item
-    try {
+    {
       const q = squel.insert()
         .into('queue')
         .set('roomId', sock.user.roomId)
@@ -63,8 +57,6 @@ const ACTION_HANDLERS = {
       if (res.stmt.changes !== 1) {
         throw new Error('Could not add media item to queue')
       }
-    } catch (err) {
-      return Promise.reject(err)
     }
 
     // to all in room

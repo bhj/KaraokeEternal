@@ -11,67 +11,59 @@ const {
 
 const ACTION_HANDLERS = {
   [USER_SONG_STAR]: async (sock, { payload }, acknowledge) => {
-    try {
-      // @TODO use upsert
-      // already starred?
-      const q = squel.select()
-        .from('stars')
-        .where('userId = ?', sock.user.userId)
-        .where('songId = ?', payload.songId)
+    // @TODO use upsert
+    // already starred?
+    const q = squel.select()
+      .from('stars')
+      .where('userId = ?', sock.user.userId)
+      .where('songId = ?', payload.songId)
+
+    const { text, values } = q.toParam()
+    const res = await db.get(text, values)
+
+    // not starred? then we need to!
+    if (!res) {
+      const q = squel.insert()
+        .into('stars')
+        .set('userId', sock.user.userId)
+        .set('songId', payload.songId)
 
       const { text, values } = q.toParam()
-      const res = await db.get(text, values)
-
-      // not starred? then we need to!
-      if (!res) {
-        const q = squel.insert()
-          .into('stars')
-          .set('userId', sock.user.userId)
-          .set('songId', payload.songId)
-
-        const { text, values } = q.toParam()
-        await db.run(text, values)
-      }
-
-      // success
-      acknowledge({
-        type: USER_SONG_STAR + _SUCCESS,
-        payload: { songId: payload.songId },
-      })
-
-      // emit updated star count
-      sock.server.emit('action', {
-        type: LIBRARY_PUSH_SONG,
-        payload: await Library.getSong(payload.songId),
-      })
-    } catch (err) {
-      return Promise.reject(err)
+      await db.run(text, values)
     }
+
+    // success
+    acknowledge({
+      type: USER_SONG_STAR + _SUCCESS,
+      payload: { songId: payload.songId },
+    })
+
+    // emit updated star count
+    sock.server.emit('action', {
+      type: LIBRARY_PUSH_SONG,
+      payload: await Library.getSong(payload.songId),
+    })
   },
   [USER_SONG_UNSTAR]: async (sock, { payload }, acknowledge) => {
-    try {
-      const q = squel.delete()
-        .from('stars')
-        .where('userId = ?', sock.user.userId)
-        .where('songId = ?', payload.songId)
+    const q = squel.delete()
+      .from('stars')
+      .where('userId = ?', sock.user.userId)
+      .where('songId = ?', payload.songId)
 
-      const { text, values } = q.toParam()
-      await db.get(text, values)
+    const { text, values } = q.toParam()
+    await db.get(text, values)
 
-      // success
-      acknowledge({
-        type: USER_SONG_UNSTAR + _SUCCESS,
-        payload: { songId: payload.songId },
-      })
+    // success
+    acknowledge({
+      type: USER_SONG_UNSTAR + _SUCCESS,
+      payload: { songId: payload.songId },
+    })
 
-      // emit updated star count
-      sock.server.emit('action', {
-        type: LIBRARY_PUSH_SONG,
-        payload: await Library.getSong(payload.songId),
-      })
-    } catch (err) {
-      return Promise.reject(err)
-    }
+    // emit updated star count
+    sock.server.emit('action', {
+      type: LIBRARY_PUSH_SONG,
+      payload: await Library.getSong(payload.songId),
+    })
   }
 }
 
