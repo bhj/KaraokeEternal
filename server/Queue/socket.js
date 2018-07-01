@@ -67,110 +67,34 @@ const ACTION_HANDLERS = {
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
     const { queueId } = payload
-    let item, nextItem
 
     // is room open?
-    try {
-      if (!await _isRoomOpen(sock.user.roomId)) {
-        return acknowledge({
-          type: QUEUE_REMOVE + '_ERROR',
-          meta: {
-            error: 'Room is no longer open'
-          }
-        })
-      }
-    } catch (err) {
-      return Promise.reject(err)
-    }
-
-    // verify item exists
-    try {
-      const q = squel.select()
-        .from('queue')
-        .where('queueId = ?', queueId)
-
-      const { text, values } = q.toParam()
-      item = await db.get(text, values)
-    } catch (err) {
-      return Promise.reject(err)
-    }
-
-    if (!item) {
+    if (!await _isRoomOpen(sock.user.roomId)) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         meta: {
-          error: 'queueId not found: ' + queueId
-        }
-      })
-    }
-
-    // is it in the user's room?
-    if (item.roomId !== sock.user.roomId) {
-      return acknowledge({
-        type: QUEUE_REMOVE + '_ERROR',
-        meta: {
-          error: 'queueId is not in your room: ' + queueId
-        }
-      })
-    }
-
-    // is it the user's item?
-    if (item.userId !== sock.user.userId) {
-      return acknowledge({
-        type: QUEUE_REMOVE + '_ERROR',
-        meta: {
-          error: 'Item is NOT YOURS: ' + queueId
+          error: 'Room is no longer open'
         }
       })
     }
 
     // delete item
-    try {
-      const q = squel.delete()
-        .from('queue')
-        .where('queueId = ?', queueId)
+    const q = squel.delete()
+      .from('queue')
+      .where('queueId = ?', queueId)
+      .where('roomId = ?', sock.user.roomId)
+      .where('userId = ?', sock.user.userId)
 
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
+    const { text, values } = q.toParam()
+    const res = await db.run(text, values)
 
-      if (res.stmt.changes !== 1) {
-        throw new Error('Could not remove queue item')
-      }
-    } catch (err) {
-      return Promise.reject(err)
-    }
-
-    // does user have another item we could try to replace it with?
-    try {
-      const q = squel.select()
-        .field('queueId')
-        .from('queue')
-        .where('queueId > ?', queueId)
-        .where('userId = ?', item.userId)
-        .limit(1)
-
-      const { text, values } = q.toParam()
-      nextItem = await db.get(text, values)
-    } catch (err) {
-      return Promise.reject(err)
-    }
-
-    if (nextItem) {
-      try {
-        const q = squel.update()
-          .table('queue')
-          .set('queueId = ?', queueId)
-          .where('queueId = ?', nextItem.queueId)
-
-        const { text, values } = q.toParam()
-        const res = await db.run(text, values)
-
-        if (res.stmt.changes !== 1) {
-          throw new Error('Could not update queue item id')
+    if (!res.stmt.changes) {
+      return acknowledge({
+        type: QUEUE_REMOVE + '_ERROR',
+        meta: {
+          error: 'Could not remove queueId: ' + queueId
         }
-      } catch (err) {
-        // well, we tryed...
-      }
+      })
     }
 
     // tell room
@@ -182,19 +106,14 @@ const ACTION_HANDLERS = {
 }
 
 async function _isRoomOpen (roomId) {
-  try {
-    const q = squel.select()
-      .from('rooms')
-      .where('roomId = ?', roomId)
+  const q = squel.select()
+    .from('rooms')
+    .where('roomId = ?', roomId)
 
-    const { text, values } = q.toParam()
-    const room = await db.get(text, values)
+  const { text, values } = q.toParam()
+  const room = await db.get(text, values)
 
-    return (room && room.status === 'open')
-  } catch (err) {
-    log(err)
-    return Promise.reject(err)
-  }
+  return (room && room.status === 'open')
 }
 
 module.exports = ACTION_HANDLERS
