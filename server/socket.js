@@ -33,9 +33,6 @@ module.exports = function (io, jwtKey) {
     } catch (err) {
       io.to(sock.id).emit('action', {
         type: SOCKET_AUTH_ERROR,
-        meta: {
-          error: `${err.message} (try signing in again)`
-        }
       })
 
       sock.user = null
@@ -73,14 +70,11 @@ module.exports = function (io, jwtKey) {
       if (!sock.user) {
         return acknowledge({
           type: SOCKET_AUTH_ERROR,
-          meta: {
-            error: 'Invalid token (try signing in again)'
-          }
         })
       }
 
       if (typeof handlers[type] !== 'function') {
-        log('warning: no handler for action type: %s', type)
+        log('No handler for socket action type: %s', type)
         return
       }
 
@@ -120,7 +114,7 @@ module.exports = function (io, jwtKey) {
       sock.user.name, sock.id, sock.user.roomId, room.length
     )
 
-    // send library and queue
+    // send library and room's queue
     try {
       io.to(sock.id).emit('action', {
         type: QUEUE_PUSH,
