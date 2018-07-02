@@ -13,6 +13,7 @@ class LibraryHeader extends React.Component {
     toggleFilterStarred: PropTypes.func.isRequired,
   }
 
+  searchInput = React.createRef()
   state = {
     value: this.props.filterStr,
   }
@@ -20,6 +21,10 @@ class LibraryHeader extends React.Component {
   handleChange = (event) => {
     this.setState({ value: event.target.value })
     this.props.setFilterStr(event.target.value)
+  }
+
+  handleMagnifierClick = () => {
+    this.state.value.trim() ? this.clearSearch() : this.searchInput.current.focus()
   }
 
   clearSearch = () => {
@@ -32,12 +37,17 @@ class LibraryHeader extends React.Component {
 
     return (
       <div styleName='container'>
-        <Icon icon='MAGNIFIER' size={40} styleName={filterStr ? 'active' : 'inactive'} />
+        <Icon icon='MAGNIFIER'
+          size={40}
+          styleName={filterStr ? 'active' : 'inactive'}
+          onClick={this.handleMagnifierClick}
+        />
         <input type='search'
           styleName='searchInput'
           placeholder='search'
           value={this.state.value}
           onChange={this.handleChange}
+          ref={this.searchInput}
         />
         {filterStr &&
           <div onClick={this.clearSearch}>

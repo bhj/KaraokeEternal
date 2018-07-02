@@ -3,6 +3,8 @@ import React from 'react'
 import icons from './icons'
 
 const Icon = props => {
+  const { size, icon, ...restProps } = props
+
   const styles = {
     svg: {
       display: 'block',
@@ -16,9 +18,10 @@ const Icon = props => {
   return (
     <svg
       style={styles.svg}
-      width={`${props.size}px`}
-      height={`${props.size}px`}
-      viewBox={icons[props.icon].viewBox}
+      width={`${size}px`}
+      height={`${size}px`}
+      viewBox={icons[icon].viewBox}
+      {...restProps}
     >
       <path
         style={styles.path}
