@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import PlayerController from '../components/PlayerController'
+import PlayerHeader from '../components/PlayerHeader'
 import screenfull from 'screenfull'
 import './PlayerView.css'
 
@@ -15,19 +16,22 @@ class PlayerView extends React.Component {
     const height = isFullscreen ? ui.browserHeight : ui.viewportHeight
 
     return (
-      <div style={{ overflow: 'hidden' }}>
-        <div
-          id='player-fs-container'
-          styleName='container'
-          style={{
-            top: isFullscreen ? 0 : ui.headerHeight,
-            width: ui.browserWidth,
-            height,
-          }}
-        >
-          <PlayerController width={ui.browserWidth} height={height} />
+      <>
+        <PlayerHeader />
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            id='player-fs-container'
+            styleName='container'
+            style={{
+              top: isFullscreen ? 0 : ui.headerHeight,
+              width: ui.browserWidth,
+              height,
+            }}
+          >
+            <PlayerController width={ui.browserWidth} height={height} />
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 }

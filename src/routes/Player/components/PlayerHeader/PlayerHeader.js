@@ -1,14 +1,17 @@
 import React from 'react'
 import Icon from 'components/Icon'
 import screenfull from 'screenfull'
+import Header from 'components/Header'
 import './PlayerHeader.css'
 
 const PlayerHeader = (props) => (
-  <div styleName='container'>
-    <div onClick={handleFullscreen}>
-      <Icon icon='FULLSCREEN' size={48} styleName='fullscreen' />
+  <Header>
+    <div styleName='container'>
+      <div onClick={handleFullscreen}>
+        <Icon icon='FULLSCREEN' size={48} styleName='fullscreen' />
+      </div>
     </div>
-  </div>
+  </Header>
 )
 
 const handleFullscreen = () => {

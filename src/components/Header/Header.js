@@ -4,12 +4,10 @@ import Measure from 'react-measure'
 import PlaybackCtrl from './PlaybackCtrl'
 import ProgressBar from './ProgressBar'
 import UpNext from './UpNext'
-import LibraryHeader from 'routes/Library/components/LibraryHeader'
-import PlayerHeader from 'routes/Player/components/PlayerHeader'
 import './Header.css'
 
 const Header = (props) => {
-  const { isPlayer, isPlayerPresent, isUpNext, isUpNow, isAdmin, loc } = props
+  const { isPlayer, isPlayerPresent, isUpNext, isUpNow, isAdmin } = props
 
   return (
     <Measure onMeasure={props.headerHeightChange} whitelist={['height']}>
@@ -30,8 +28,7 @@ const Header = (props) => {
           />
         }
 
-        {/^\/library/.test(loc) && <LibraryHeader/>}
-        {/^\/player/.test(loc) && <PlayerHeader/>}
+        {props.children}
       </div>
     </Measure>
   )
@@ -48,7 +45,6 @@ Header.propTypes = {
   isUpdating: PropTypes.bool.isRequired,
   updateText: PropTypes.string.isRequired,
   updateProgress: PropTypes.number.isRequired,
-  loc: PropTypes.string.isRequired,
   // actions
   headerHeightChange: PropTypes.func.isRequired,
   requestScanCancel: PropTypes.func.isRequired,
