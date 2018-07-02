@@ -3,8 +3,9 @@ import QueueView from './QueueView'
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user,
     ui: state.ui,
+    isInRoom: !!state.user.roomId,
+    isQueueEmpty: state.queue.result.length === 0,
   }
 }
 

@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Link } from 'react-router'
-import './NoRoom.css'
+import './QueueTextOverlay.css'
 
-export const NoRoom = ({ ui }) => (
+export const QueueTextOverlay = ({ children, ui }) => (
   <div styleName='container' style={{
     paddingTop: ui.headerHeight,
     paddingBottom: ui.footerHeight,
@@ -11,14 +10,14 @@ export const NoRoom = ({ ui }) => (
     height: ui.browserHeight,
   }}>
     <div styleName='text'>
-      <h1>Get a Room!</h1>
-      <p><Link to='/account'>Sign in to a room</Link> to start queueing songs.</p>
+      {children}
     </div>
   </div>
 )
 
-export default NoRoom
+export default QueueTextOverlay
 
-NoRoom.propTypes = {
+QueueTextOverlay.propTypes = {
+  children: PropTypes.node.isRequired,
   ui: PropTypes.object.isRequired,
 }
