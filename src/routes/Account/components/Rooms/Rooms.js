@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { formatDateTime } from 'lib/dateTime'
 import EditRoom from './EditRoom'
 import { Column, Table } from 'react-virtualized'
-import formatRelative from 'date-fns/formatRelative'
 import style from './Rooms.css'
 
 export default class Rooms extends Component {
@@ -67,7 +67,7 @@ export default class Rooms extends Component {
               dataKey='dateCreated'
               width={width * 0.40}
               styleName='style.tableCol'
-              cellRenderer={({ rowData }) => formatRelative(new Date(rowData.dateCreated * 1000), Date.now())}
+              cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
             />
           </Table>
 
