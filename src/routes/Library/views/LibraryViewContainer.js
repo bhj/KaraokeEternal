@@ -89,6 +89,8 @@ const mapStateToProps = (state) => {
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),
     scrollTop: state.library.scrollTop,
+    isSearching: !!getFilterKeywords(state).length || getFilterStarred(state),
+    isLibraryEmpty: state.songs.result.length === 0,
     isShowingSongInfo: !(state.library.songInfoSongId === null),
     ui: state.ui,
     // SearchResults view

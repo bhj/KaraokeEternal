@@ -3,7 +3,7 @@ import React from 'react'
 import { Link } from 'react-router'
 import Header from 'components/Header'
 import QueueList from '../components/QueueList'
-import QueueTextOverlay from '../components/QueueTextOverlay'
+import TextOverlay from 'components/TextOverlay'
 
 const QueueView = (props) => {
   return (
@@ -11,17 +11,17 @@ const QueueView = (props) => {
       <Header />
 
       {!props.isInRoom &&
-        <QueueTextOverlay ui={props.ui}>
+        <TextOverlay ui={props.ui}>
           <h1>Get a Room!</h1>
           <p><Link to='/account'>Sign in to a room</Link> to start queueing songs.</p>
-        </QueueTextOverlay>
+        </TextOverlay>
       }
 
       {props.isQueueEmpty &&
-        <QueueTextOverlay ui={props.ui}>
+        <TextOverlay ui={props.ui}>
           <h1>Queue Empty</h1>
           <p>Tap a song in the <Link to='/library'>library</Link> to queue it.</p>
-        </QueueTextOverlay>
+        </TextOverlay>
       }
 
       <QueueList {...props} />

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import './QueueTextOverlay.css'
+import './TextOverlay.css'
 
-export const QueueTextOverlay = ({ children, ui }) => (
+export const TextOverlay = ({ children, ui }) => (
   <div styleName='container' style={{
     paddingTop: ui.headerHeight,
     paddingBottom: ui.footerHeight,
@@ -15,9 +15,9 @@ export const QueueTextOverlay = ({ children, ui }) => (
   </div>
 )
 
-export default QueueTextOverlay
+export default TextOverlay
 
-QueueTextOverlay.propTypes = {
+TextOverlay.propTypes = {
   children: PropTypes.node.isRequired,
   ui: PropTypes.object.isRequired,
 }

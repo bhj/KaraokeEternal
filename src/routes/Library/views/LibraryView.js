@@ -4,17 +4,30 @@ import LibraryHeader from '../components/LibraryHeader'
 import ArtistList from '../components/ArtistList'
 import SearchResults from '../components/SearchResults'
 import SongInfo from '../components/SongInfo'
+import TextOverlay from 'components/TextOverlay'
 
 const LibraryView = (props) => {
-  const View = props.filterKeywords.length || props.filterStarred ? SearchResults : ArtistList
+  const { isSearching, isLibraryEmpty, isShowingSongInfo } = props
 
   return (
     <>
       <LibraryHeader />
 
-      <View {...props} />
+      {isSearching &&
+        <SearchResults {...props} />
+      }
 
-      {props.isShowingSongInfo &&
+      {!isSearching &&
+        <ArtistList {...props} />
+      }
+
+      {isLibraryEmpty &&
+        <TextOverlay ui={props.ui}>
+          <h1>Library Empty</h1>
+        </TextOverlay>
+      }
+
+      {isShowingSongInfo &&
         <SongInfo />
       }
     </>
@@ -24,6 +37,8 @@ const LibraryView = (props) => {
 LibraryView.propTypes = {
   filterKeywords: PropTypes.array.isRequired,
   filterStarred: PropTypes.bool.isRequired,
+  isSearching: PropTypes.bool.isRequired,
+  isLibraryEmpty: PropTypes.bool.isRequired,
   isShowingSongInfo: PropTypes.bool.isRequired,
   ui: PropTypes.object.isRequired,
 }
