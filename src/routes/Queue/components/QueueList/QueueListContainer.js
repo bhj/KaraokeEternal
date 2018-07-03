@@ -44,8 +44,8 @@ const mapStateToProps = (state) => {
     errors: state.status.errors,
     artists: state.library.artists,
     songs: state.library.songs,
-    // user
     user: state.user,
+    ui: state.ui,
   }
 }
 

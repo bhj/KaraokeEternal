@@ -11,14 +11,14 @@ const QueueView = (props) => {
       <Header />
 
       {!props.isInRoom &&
-        <TextOverlay ui={props.ui}>
+        <TextOverlay>
           <h1>Get a Room!</h1>
           <p><Link to='/account'>Sign in to a room</Link> to start queueing songs.</p>
         </TextOverlay>
       }
 
       {props.isQueueEmpty &&
-        <TextOverlay ui={props.ui}>
+        <TextOverlay>
           <h1>Queue Empty</h1>
           <p>Tap a song in the <Link to='/library'>library</Link> to queue it.</p>
         </TextOverlay>
@@ -30,7 +30,6 @@ const QueueView = (props) => {
 }
 
 QueueView.propTypes = {
-  ui: PropTypes.object.isRequired,
   isInRoom: PropTypes.bool.isRequired,
   isQueueEmpty: PropTypes.bool.isRequired,
 }

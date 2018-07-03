@@ -13,16 +13,16 @@ const LibraryView = (props) => {
     <>
       <LibraryHeader />
 
-      {isSearching &&
-        <SearchResults {...props} />
-      }
-
       {!isSearching &&
         <ArtistList {...props} />
       }
 
+      {isSearching &&
+        <SearchResults {...props} />
+      }
+
       {isLibraryEmpty &&
-        <TextOverlay ui={props.ui}>
+        <TextOverlay>
           <h1>Library Empty</h1>
         </TextOverlay>
       }
@@ -35,12 +35,9 @@ const LibraryView = (props) => {
 }
 
 LibraryView.propTypes = {
-  filterKeywords: PropTypes.array.isRequired,
-  filterStarred: PropTypes.bool.isRequired,
   isSearching: PropTypes.bool.isRequired,
   isLibraryEmpty: PropTypes.bool.isRequired,
   isShowingSongInfo: PropTypes.bool.isRequired,
-  ui: PropTypes.object.isRequired,
 }
 
 export default LibraryView
