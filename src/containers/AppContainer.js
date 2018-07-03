@@ -20,9 +20,7 @@ class AppContainer extends Component {
           loading={null}
           persistor={persistor}
         >
-          <div style={{ height: '100%' }}>
-            <Router history={browserHistory} children={routes} />
-          </div>
+          <Router history={browserHistory} children={routes} />
         </PersistGate>
       </Provider>
     )
