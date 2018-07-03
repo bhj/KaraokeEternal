@@ -23,13 +23,16 @@ class QueueList extends React.Component {
   }
 
   componentDidMount () {
-    // ensure current song is visible
-    const idx = this.props.queue.result.indexOf(this.props.curId)
-    this.list.scrollToRow(idx)
+    if (this.list) {
+      // ensure current song is visible
+      const idx = this.props.queue.result.indexOf(this.props.curId)
+      this.list.scrollToRow(idx)
+    }
   }
 
   render () {
     const props = this.props
+    if (props.queue.result.length === 0) return null
 
     return (
       <PaddedList
