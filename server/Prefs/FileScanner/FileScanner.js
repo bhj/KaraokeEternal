@@ -69,7 +69,7 @@ class FileScanner extends Scanner {
         validMedia.push(mediaId)
       } catch (err) {
         log(err)
-        // just try the next file...
+        // try the next file
       }
 
       if (this.isCanceling) {
@@ -80,7 +80,7 @@ class FileScanner extends Scanner {
     // cleanup
     log('Looking for orphaned media entries')
 
-    try {
+    {
       const invalidMedia = []
       const res = await Media.search()
 
@@ -105,11 +105,7 @@ class FileScanner extends Scanner {
       if (invalidMedia.length) {
         await Media.remove(invalidMedia)
       }
-    } catch (err) {
-      log(err)
     }
-
-    // done
   }
 
   async processFile ({ file, pathId }) {
@@ -119,20 +115,18 @@ class FileScanner extends Scanner {
       file,
     }
 
-    try {
+    {
       // already in database with the same path?
       const res = await Media.search(media)
       log('  => %s result(s) for existing media', res.result.length)
 
       if (res.result.length) {
         log('  => found media in library (same path)')
-        return Promise.resolve(res.result[0])
+        return res.result[0]
       }
 
       // needs further inspection...
       stats = await stat(file)
-    } catch (err) {
-      return Promise.reject(err)
     }
 
     // new media
@@ -142,7 +136,7 @@ class FileScanner extends Scanner {
     const { artist, title } = parseMeta(path.parse(file).name, parseMetaCfg)
 
     if (!artist || !title) {
-      return Promise.reject(new Error(`Couldn't determine artist or title`))
+      throw new Error(`Couldn't determine artist or title`)
     }
 
     media.artist = artist
@@ -176,12 +170,8 @@ class FileScanner extends Scanner {
       } // end for
     } else if (path.extname(file).toLowerCase() === '.mp4') {
       // get video duration
-      try {
-        const info = await mp4info(file)
-        media.duration = info.duration
-      } catch (err) {
-        log(err)
-      }
+      const info = await mp4info(file)
+      media.duration = info.duration
     }
 
     if (!media.duration) {
@@ -191,19 +181,14 @@ class FileScanner extends Scanner {
     log(`  => duration: ${Math.floor(media.duration / 60)}:${Math.round(media.duration % 60, 10)}`)
 
     // add song
-    try {
-      const mediaId = await Media.add(media)
+    const mediaId = await Media.add(media)
 
-      if (!Number.isInteger(mediaId)) {
-        throw new Error('got invalid lastID')
-      }
-
-      this.emitLibrary()
-
-      return Promise.resolve(mediaId)
-    } catch (err) {
-      return Promise.reject(err)
+    if (!Number.isInteger(mediaId)) {
+      throw new Error('got invalid lastID')
     }
+
+    this.emitLibrary()
+    return mediaId
   }
 }
 

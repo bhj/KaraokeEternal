@@ -21,7 +21,7 @@ class Library {
     }
 
     // query #1: songs
-    try {
+    {
       const q = squel.select()
         .field('media.mediaId AS mediaId')
         .field('media.duration AS duration')
@@ -63,13 +63,14 @@ class Library {
 
         SongIdsByArtist[row.artistId].push(row.songId)
       }
-    } catch (err) {
-      return Promise.reject(err)
     }
+
+    // @todo see if this can be done in one query now that
+    // we are all file-nased
 
     // query #2: artists (we do this after songs so we can ignore
     // artists having no songs, e.g. when a provider is disabled)
-    try {
+    {
       const q = squel.select()
         .from('artists')
         .order('name')
@@ -90,8 +91,6 @@ class Library {
           songIds: SongIdsByArtist[row.artistId],
         }
       }
-    } catch (err) {
-      return Promise.reject(err)
     }
 
     return { artists, songs }
@@ -104,45 +103,41 @@ class Library {
   * @return {Promise}        Song entity (same format as with get())
   */
   static async getSong (songId) {
-    try {
-      const q = squel.select()
-        .field('media.mediaId AS mediaId')
-        .field('media.duration AS duration')
-        .field('songs.artistId AS artistId')
-        .field('songs.songId AS songId')
-        .field('songs.title AS title')
-        .field('MAX(media.isPreferred) AS isPreferred')
-        .field('COUNT(DISTINCT media.mediaId) AS numMedia')
-        .field('COUNT(DISTINCT stars.userId) AS numStars')
-        .from('media')
-        .join(squel.select()
-          .from('paths')
-          .field('MIN(paths.priority) AS priority')
-          .field('pathId')
-          .group('pathId'),
-        'paths', 'media.pathId = paths.pathId')
-        .join('songs USING (songId)')
-        .join('artists USING (artistId)')
-        .left_join('stars USING(songId)')
-        .group('songs.songId')
-        .where('songs.songId = ?', songId)
+    const q = squel.select()
+      .field('media.mediaId AS mediaId')
+      .field('media.duration AS duration')
+      .field('songs.artistId AS artistId')
+      .field('songs.songId AS songId')
+      .field('songs.title AS title')
+      .field('MAX(media.isPreferred) AS isPreferred')
+      .field('COUNT(DISTINCT media.mediaId) AS numMedia')
+      .field('COUNT(DISTINCT stars.userId) AS numStars')
+      .from('media')
+      .join(squel.select()
+        .from('paths')
+        .field('MIN(paths.priority) AS priority')
+        .field('pathId')
+        .group('pathId'),
+      'paths', 'media.pathId = paths.pathId')
+      .join('songs USING (songId)')
+      .join('artists USING (artistId)')
+      .left_join('stars USING(songId)')
+      .group('songs.songId')
+      .where('songs.songId = ?', songId)
 
-      const { text, values } = q.toParam()
-      const row = await db.get(text, values)
+    const { text, values } = q.toParam()
+    const row = await db.get(text, values)
 
-      if (typeof row !== 'object') {
-        throw new Error(`Song not found (songId=${songId})`)
-      }
+    if (typeof row !== 'object') {
+      throw new Error(`Song not found (songId=${songId})`)
+    }
 
-      // no need to send over the wire but we needed it
-      // in the query to show the correct mediaId
-      delete row.isPreferred
+    // no need to send over the wire but we needed it
+    // in the query to show the correct mediaId
+    delete row.isPreferred
 
-      return {
-        [songId]: row,
-      }
-    } catch (err) {
-      return Promise.reject(err)
+    return {
+      [songId]: row,
     }
   }
 }

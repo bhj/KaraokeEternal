@@ -55,35 +55,30 @@ class Prefs {
    * @return {Promise}     pathId (Number) of newly-added path
    */
   static async addPath (dir) {
-    try {
-      const prefs = await Prefs.get()
-      const { result, entities } = prefs.paths
+    const prefs = await Prefs.get()
+    const { result, entities } = prefs.paths
 
-      // is it a subfolder of an already-added folder?
-      if (result.some(pathId => (dir + path.sep).indexOf(entities[pathId].path + path.sep) === 0)) {
-        throw new Error('Folder has already been added')
-      }
-
-      // insert path
-      const q = squel.insert()
-        .into('paths')
-        .set('path', dir)
-        // priority defaults to one higher than current highest
-        .set('priority', result.length ? entities[result[result.length - 1]].priority + 1 : 0)
-
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
-
-      if (!Number.isInteger(res.stmt.lastID)) {
-        throw new Error('invalid lastID from path insert')
-      }
-
-      // return pathId
-      return res.stmt.lastID
-    } catch (err) {
-      log(err)
-      return Promise.reject(err)
+    // is it a subfolder of an already-added folder?
+    if (result.some(pathId => (dir + path.sep).indexOf(entities[pathId].path + path.sep) === 0)) {
+      throw new Error('Folder has already been added')
     }
+
+    // insert path
+    const q = squel.insert()
+      .into('paths')
+      .set('path', dir)
+      // priority defaults to one higher than current highest
+      .set('priority', result.length ? entities[result[result.length - 1]].priority + 1 : 0)
+
+    const { text, values } = q.toParam()
+    const res = await db.run(text, values)
+
+    if (!Number.isInteger(res.stmt.lastID)) {
+      throw new Error('invalid lastID from path insert')
+    }
+
+    // return pathId
+    return res.stmt.lastID
   }
 
   /**
@@ -92,16 +87,12 @@ class Prefs {
    * @return {Promise}
    */
   static async removePath (pathId) {
-    try {
-      const q = squel.delete()
-        .from('paths')
-        .where('pathId = ?', pathId)
+    const q = squel.delete()
+      .from('paths')
+      .where('pathId = ?', pathId)
 
-      const { text, values } = q.toParam()
-      await db.run(text, values)
-    } catch (err) {
-      return Promise.reject(err)
-    }
+    const { text, values } = q.toParam()
+    await db.run(text, values)
   }
 
   /**
