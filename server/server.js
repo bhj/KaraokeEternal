@@ -51,8 +51,7 @@ Promise.resolve()
     migrationsPath: path.join(project.basePath, 'server', 'lib', 'db'),
     // force: 'last' ,
   }))
-  .then(() => Prefs.get())
-  .then(prefs => prefs.jwtKey || Prefs.jwtKeyRefresh())
+  .then(() => Prefs.getJwtKey())
   .then(jwtKey => {
     // basic middleware
     app.use(KoaLogger())

@@ -15,7 +15,7 @@ class Prefs {
       paths: { result: [], entities: {} }
     }
 
-    try {
+    {
       const q = squel.select()
         .from('prefs')
 
@@ -26,13 +26,10 @@ class Prefs {
       rows.forEach(row => {
         prefs[row.key] = JSON.parse(row.data)
       })
-    } catch (err) {
-      log(err)
-      return Promise.reject(err)
     }
 
     // include media paths
-    try {
+    {
       const q = squel.select()
         .from('paths')
         .order('priority')
@@ -44,10 +41,10 @@ class Prefs {
         prefs.paths.entities[row.pathId] = row
         prefs.paths.result.push(row.pathId)
       }
-    } catch (err) {
-      log(err)
-      return Promise.reject(err)
     }
+
+    // should never send to client
+    delete prefs.jwtKey
 
     return prefs
   }
@@ -108,6 +105,29 @@ class Prefs {
   }
 
   /**
+   * Get JWT secret key from db
+   * @return {Promise}  jwtKey (string)
+   */
+  static async getJwtKey () {
+    const q = squel.select()
+      .from('prefs')
+      .where("key = 'jwtKey'")
+
+    const { text, values } = q.toParam()
+    const row = await db.get(text, values)
+
+    if (row && row.data) {
+      const jwtKey = JSON.parse(row.data)
+
+      if (jwtKey.length === 64) {
+        return jwtKey
+      }
+    }
+
+    return this.jwtKeyRefresh()
+  }
+
+  /**
    * Create or rotate JWT secret key
    * @return {Promise}  jwtKey (string)
    */
@@ -115,8 +135,9 @@ class Prefs {
     const jwtKey = crypto.randomBytes(48).toString('base64') // 64 char
     log('Rotating JWT secret key (length=%s)', jwtKey.length)
 
-    // try to UPDATE
-    try {
+    // try UPDATE
+    // @todo use upsert
+    {
       const q = squel.update()
         .table('prefs')
         .set('data', JSON.stringify(jwtKey))
@@ -124,14 +145,12 @@ class Prefs {
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
+
       if (res.stmt.changes) return jwtKey
-    } catch (err) {
-      log(err)
-      throw err
     }
 
     // need to INSERT
-    try {
+    {
       const q = squel.insert()
         .into('prefs')
         .set('key', 'jwtKey')
@@ -140,9 +159,6 @@ class Prefs {
       const { text, values } = q.toParam()
       await db.run(text, values)
       return jwtKey
-    } catch (err) {
-      log(err)
-      throw err
     }
   }
 }
