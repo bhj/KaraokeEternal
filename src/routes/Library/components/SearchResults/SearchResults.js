@@ -101,6 +101,7 @@ class SearchResults extends React.Component {
           songIds={songsResult}
           showArtist
           filterKeywords={this.props.filterKeywords}
+          queuedSongIds={this.props.queuedSongIds}
         />
       </div>
     )
