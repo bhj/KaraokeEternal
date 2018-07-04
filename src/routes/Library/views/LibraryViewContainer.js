@@ -14,10 +14,14 @@ const getFilterStarred = (state) => state.library.filterStarred
 const getStarredArtists = (state) => state.user.starredArtists
 const getStarredSongs = (state) => state.user.starredSongs
 const getQueue = (state) => state.queue
+const getCurrentQueueId = (state) => state.status.queueId
 
 const getQueuedSongs = createSelector(
-  [getQueue],
-  (queue) => queue.result.map(queueId => queue.entities[queueId].songId)
+  [getQueue, getCurrentQueueId],
+  (queue, curId) => {
+    const curPos = queue.result.indexOf(curId)
+    return queue.result.slice(curPos + 1).map(queueId => queue.entities[queueId].songId)
+  }
 )
 
 const getFilterKeywords = createSelector(

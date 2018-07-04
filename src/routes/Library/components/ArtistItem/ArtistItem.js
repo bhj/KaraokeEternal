@@ -29,6 +29,7 @@ const ArtistItem = (props) => {
           songIds={props.artistSongIds}
           showArtist={false}
           filterKeywords={props.filterKeywords}
+          queuedSongIds={props.queuedSongIds}
         />
       }
     </div>
