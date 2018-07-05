@@ -33,8 +33,9 @@ const mapStateToProps = (state) => {
 
   return {
     queueItem: queue.entities[player.queueId] || defaultQueueItem,
-    isAtQueueEnd: player.isAtQueueEnd,
     volume: player.volume,
+    isAtQueueEnd: player.isAtQueueEnd,
+    isQueueEmpty: queue.result.length === 0,
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
     isErrored: typeof status.errors[status.queueId] !== 'undefined',
