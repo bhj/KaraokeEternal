@@ -3,7 +3,7 @@
   align-items: center;
   height: 40px;
   width: 100%;
-  background-image: linear-gradient(to right, #ccc, #fff);
+  background-image: linear-gradient(to right, var(--current-item-from-background-color), var(--current-item-to-background-color));
   background-repeat: no-repeat;
 }
 
@@ -14,7 +14,6 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  mix-blend-mode: difference;
   color: var(--text-color);
 }
 
