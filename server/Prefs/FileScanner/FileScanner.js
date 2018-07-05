@@ -4,7 +4,7 @@ const log = debug('app:prefs:fileScanner')
 const { promisify } = require('util')
 const fs = require('fs')
 const stat = promisify(fs.stat)
-const mp3duration = promisify(require('mp3-duration'))
+const musicMeta = require('music-metadata')
 const mp4info = require('./lib/mp4info.js')
 const getFiles = require('./getFiles')
 const parseMeta = require('./parseMeta')
@@ -14,7 +14,7 @@ const Scanner = require('../Scanner')
 const Media = require('../../Media')
 
 const videoExts = ['.cdg', '.mp4'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
-const audioExts = ['.mp3', '.m4a'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
+const audioTypes = ['m4a', 'mp3']
 
 class FileScanner extends Scanner {
   constructor (prefs) {
@@ -121,7 +121,7 @@ class FileScanner extends Scanner {
       log('  => %s result(s) for existing media', res.result.length)
 
       if (res.result.length) {
-        log('  => found media in library (same path)')
+        log('  => media is in library')
         return res.result[0]
       }
 
@@ -136,7 +136,7 @@ class FileScanner extends Scanner {
     const { artist, title } = parseMeta(path.parse(file).name, parseMetaCfg)
 
     if (!artist || !title) {
-      throw new Error(`Couldn't determine artist or title`)
+      throw new Error(`  => could not determine artist or title`)
     }
 
     media.artist = artist
@@ -145,29 +145,41 @@ class FileScanner extends Scanner {
 
     // need to look for an audio file?
     if (path.extname(file).toLowerCase() === '.cdg') {
-      // look for all uppercase and lowercase permutations
-      // since we may be on a case-sensitive fs
-      for (const ext of audioExts) {
-        const audioFile = file.substr(0, file.length - path.extname(file).length) + ext
+      let audioFile
 
-        try {
-          await stat(audioFile)
+      // look for all uppercase and lowercase permutations of each
+      // file extension since we may be on a case-sensitive fs
+      for (const type of audioTypes) {
+        for (const ext of getPerms(type)) {
+          audioFile = file.substr(0, file.lastIndexOf('.') + 1) + ext
 
-          // success
-          log('  => found %s audio file', ext)
-
-          if (ext.toLowerCase() === '.mp3') {
-            media.duration = await mp3duration(audioFile)
-          } else if (ext.toLowerCase() === '.m4a') {
-            // @todo
+          // does file exist?
+          try {
+            await stat(audioFile)
+            log('  => found %s audio', type)
+            break
+          } catch (err) {
+            // try another permutation
+            audioFile = null
           }
+        } // end for
 
-          // success
-          break
-        } catch (err) {
-          // keep looking...
+        if (audioFile) {
+          try {
+            const meta = await musicMeta.parseFile(audioFile, { duration: true })
+            media.duration = meta.format.duration
+            break
+          } catch (err) {
+            // try another type
+            audioFile = null
+            log(err)
+          }
         }
       } // end for
+
+      if (!audioFile) {
+        throw new Error(`  => no valid audio file`)
+      }
     } else if (path.extname(file).toLowerCase() === '.mp4') {
       // get video duration
       const info = await mp4info(file)
@@ -175,7 +187,7 @@ class FileScanner extends Scanner {
     }
 
     if (!media.duration) {
-      return Promise.reject(new Error(`Couldn't determine media duration`))
+      throw new Error(`  => could not determine duration`)
     }
 
     log(`  => duration: ${Math.floor(media.duration / 60)}:${Math.round(media.duration % 60, 10)}`)
