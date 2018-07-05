@@ -6,9 +6,10 @@ import PlayerTextOverlay from '../PlayerTextOverlay'
 class PlayerController extends React.Component {
   static propTypes = {
     queueItem: PropTypes.object.isRequired,
-    isAtQueueEnd: PropTypes.bool.isRequired,
     volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
+    isAtQueueEnd: PropTypes.bool.isRequired,
+    isQueueEmpty: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -83,6 +84,7 @@ class PlayerController extends React.Component {
         <PlayerTextOverlay
           queueItem={this.props.queueItem}
           isAtQueueEnd={this.props.isAtQueueEnd}
+          isQueueEmpty={this.props.isQueueEmpty}
           isErrored={this.props.isErrored}
           width={this.props.width}
           height={this.props.height}

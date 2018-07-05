@@ -9,6 +9,7 @@ class PlayerTextOverlay extends React.Component {
   static propTypes = {
     queueItem: PropTypes.object.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
+    isQueueEmpty: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -18,10 +19,10 @@ class PlayerTextOverlay extends React.Component {
     const { queueItem, width, height } = this.props
     let Component
 
-    if (queueItem.queueId === -1) {
-      Component = <ColorCycle text='PRESS PLAY TO BEGIN' />
-    } else if (this.props.isAtQueueEnd) {
+    if (this.props.isQueueEmpty || this.props.isAtQueueEnd) {
       Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' />
+    } else if (queueItem.queueId === -1) {
+      Component = <ColorCycle text='PRESS PLAY TO BEGIN' />
     } else if (this.props.isErrored) {
       Component = <Fire text='CRAP' />
     } else {
