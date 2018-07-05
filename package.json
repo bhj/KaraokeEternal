@@ -81,8 +81,8 @@
     "copy-webpack-plugin": "^4.5.2",
     "cross-env": "^5.2.0",
     "css-loader": "^0.28.11",
-    "electron": "^2.0.3",
-    "electron-builder": "^20.18.0",
+    "electron": "^2.0.4",
+    "electron-builder": "^20.19.1",
     "eslint": "^5.0.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-babel": "^5.1.0",
@@ -99,7 +99,7 @@
     "redbox-react": "^1.6.0",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
-    "webpack": "^4.14.0",
+    "webpack": "^4.15.1",
     "webpack-cli": "^3.0.8"
   }
 }
