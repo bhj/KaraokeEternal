@@ -18,7 +18,7 @@ class ColorCycle extends React.Component {
       const delay = (i - this.props.text.length + 1) * framerate
 
       return (
-        <span key={char + i} styleName='char' style={{ animationDelay: `${delay}ms` }}>
+        <span key={this.props.text + i} styleName='char' style={{ animationDelay: `${delay}ms` }}>
           {char}
         </span>
       )
