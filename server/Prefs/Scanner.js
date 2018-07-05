@@ -27,7 +27,7 @@ class Scanner {
           payload: { text, progress, isUpdating },
         })
       })
-    }, 500)
+    }, 1000)
   }
 
   getMediaEmitter () {
@@ -36,7 +36,7 @@ class Scanner {
         type: LIBRARY_PUSH,
         payload: await Library.get(),
       })
-    }, 2000)
+    }, 5000)
   }
 }
 
