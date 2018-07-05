@@ -81,7 +81,6 @@ class PlayerController extends React.Component {
           height={this.props.height}
         />
         <PlayerTextOverlay
-          ref={r => { this.overlay = r }}
           queueItem={this.props.queueItem}
           isAtQueueEnd={this.props.isAtQueueEnd}
           isErrored={this.props.isErrored}
