@@ -102,7 +102,6 @@ config.module.rules.push({
   }, {
     loader  : 'css-loader',
     options : {
-      minimize  : __PROD__,
       modules   : false,
       sourceMap : false,
     }
@@ -118,7 +117,6 @@ config.module.rules.push({
   }, {
     loader  : 'css-loader',
     options : {
-      minimize  : __PROD__,
       modules   : true,
       localIdentName: '[name]__[local]___[hash:base64:5]',
     }
