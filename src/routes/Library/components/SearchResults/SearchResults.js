@@ -28,9 +28,7 @@ class SearchResults extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (!this.list) return
-    // nuclear option
     this.list.recomputeRowHeights()
-    // this.list.forceUpdate()
   }
 
   render () {
