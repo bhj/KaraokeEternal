@@ -53,23 +53,47 @@ const getAlphaPickerMap = createSelector(
 // ---------------------
 
 // #1: keyword filters
-const getArtistsWithKeyword = createSelector(
+const getArtistsByKeyword = createSelector(
   [getArtists, getFilterStr, getFilterKeywords],
   (artists, str, keywords) => {
     if (!str) return artists.result
-    return artists.result.filter(id => keywords.every(word => artists.entities[id].name.toLowerCase().includes(word)))
+
+    return artists.result.map(id => {
+      const item = artists.entities[id].name.toLowerCase()
+      const itemScore = keywords.reduce((total, word, i) => {
+        const pos = item.indexOf(word)
+        const score = pos === -1 ? 0 : 1 - (pos / item.length)
+        return total + (score / keywords.length)
+      }, 0)
+
+      return { artistId: id, score: itemScore }
+    })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(score => score.artistId)
   })
 
-const getSongsWithKeyword = createSelector(
+const getSongsByKeyword = createSelector(
   [getSongs, getFilterStr, getFilterKeywords],
   (songs, str, keywords) => {
-    if (!str) return songs.result
-    return songs.result.filter(id => keywords.every(word => songs.entities[id].title.toLowerCase().includes(word)))
+    return songs.result.map(id => {
+      const item = songs.entities[id].title.toLowerCase()
+      const itemScore = keywords.reduce((total, word, i) => {
+        const pos = item.indexOf(word)
+        const score = pos === -1 ? 0 : 1 - (pos / item.length)
+        return total + (score / keywords.length)
+      }, 0)
+
+      return { songId: id, score: itemScore }
+    })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(score => score.songId)
   })
 
 // #2: starred/hidden filters
 const getArtistsByView = createSelector(
-  [getArtistsWithKeyword, getFilterStarred, getStarredArtists],
+  [getArtistsByKeyword, getFilterStarred, getStarredArtists],
   (artistsWithKeyword, filterStarred, starredArtists) =>
     artistsWithKeyword.filter(artistId => {
       return filterStarred ? starredArtists.includes(artistId) : true
@@ -77,7 +101,7 @@ const getArtistsByView = createSelector(
 )
 
 const getSongsByView = createSelector(
-  [getSongsWithKeyword, getFilterStarred, getStarredSongs],
+  [getSongsByKeyword, getFilterStarred, getStarredSongs],
   (songsWithKeyword, filterStarred, starredSongs) =>
     songsWithKeyword.filter(songId => {
       return filterStarred ? starredSongs.includes(songId) : true
