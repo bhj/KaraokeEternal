@@ -33,6 +33,7 @@
     "bcrypt": "^2.0.1",
     "cdgraphics": "^1.0.2",
     "debug": "^3.1.0",
+    "fast-fuzzy": "^1.5.0",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",

@@ -41,7 +41,7 @@ export function setFilterStr (str) {
     payload: { str },
     meta: {
       throttle: {
-        wait: 300,
+        wait: 350,
         leading: false,
       }
     },

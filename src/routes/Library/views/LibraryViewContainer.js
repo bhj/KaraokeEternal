@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
+import { Searcher } from 'fast-fuzzy'
 import LibraryView from './LibraryView'
 import {
   scrollArtists,
@@ -52,43 +53,41 @@ const getAlphaPickerMap = createSelector(
 // library filters
 // ---------------------
 
+const getArtistSearcher = createSelector(
+  [getArtists],
+  (artists) => new Searcher(artists.result, {
+    keySelector: artistId => artists.entities[artistId].name,
+    threshold: 0.8,
+  })
+)
+
+const getSongSearcher = createSelector(
+  [getSongs],
+  (songs) => new Searcher(songs.result, {
+    keySelector: songId => songs.entities[songId].title,
+    threshold: 0.8,
+  })
+)
+
 // #1: keyword filters
 const getArtistsByKeyword = createSelector(
-  [getArtists, getFilterStr, getFilterKeywords],
-  (artists, str, keywords) => {
+  [getArtists, getFilterStr, getArtistSearcher],
+  (artists, str, searcher) => {
     if (!str) return artists.result
 
-    return artists.result.map(id => {
-      const item = artists.entities[id].name.toLowerCase()
-      const itemScore = keywords.reduce((total, word, i) => {
-        const pos = item.indexOf(word)
-        const score = pos === -1 ? 0 : 1 - (pos / item.length)
-        return total + (score / keywords.length)
-      }, 0)
-
-      return { artistId: id, score: itemScore }
-    })
-      .filter(({ score }) => score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map(score => score.artistId)
+    return searcher.search(str, {
+      returnMatchData: true,
+    }).map(match => match.item)
   })
 
 const getSongsByKeyword = createSelector(
-  [getSongs, getFilterStr, getFilterKeywords],
-  (songs, str, keywords) => {
-    return songs.result.map(id => {
-      const item = songs.entities[id].title.toLowerCase()
-      const itemScore = keywords.reduce((total, word, i) => {
-        const pos = item.indexOf(word)
-        const score = pos === -1 ? 0 : 1 - (pos / item.length)
-        return total + (score / keywords.length)
-      }, 0)
+  [getSongs, getFilterStr, getSongSearcher],
+  (songs, str, searcher) => {
+    if (!str) return songs.result
 
-      return { songId: id, score: itemScore }
-    })
-      .filter(({ score }) => score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map(score => score.songId)
+    return searcher.search(str, {
+      returnMatchData: true,
+    }).map(match => match.item)
   })
 
 // #2: starred/hidden filters
