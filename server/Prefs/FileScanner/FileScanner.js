@@ -190,7 +190,10 @@ class FileScanner extends Scanner {
       throw new Error(`  => could not determine duration`)
     }
 
-    log(`  => duration: ${Math.floor(media.duration / 60)}:${Math.round(media.duration % 60, 10)}`)
+    log('  => duration: %s:%s',
+      Math.floor(media.duration / 60),
+      Math.round(media.duration % 60, 10).toString().padStart(2, '0')
+    )
 
     // add song
     const mediaId = await Media.add(media)
