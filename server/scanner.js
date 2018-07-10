@@ -2,7 +2,7 @@ const project = require('../project.config')
 const sqlite = require('sqlite')
 const log = require('debug')(`app:scanner [${process.pid}]`)
 const Prefs = require('./Prefs')
-const FileScanner = require('./Prefs/FileScanner')
+const FileScanner = require('./Media/FileScanner')
 const {
   SCANNER_WORKER_SCAN,
   SCANNER_WORKER_SCAN_CANCEL,
