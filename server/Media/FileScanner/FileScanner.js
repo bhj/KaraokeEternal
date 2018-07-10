@@ -1,6 +1,6 @@
 const path = require('path')
 const debug = require('debug')
-const log = debug('app:prefs:fileScanner')
+const log = debug('app:media:fileScanner')
 const { promisify } = require('util')
 const fs = require('fs')
 const stat = promisify(fs.stat)
@@ -27,11 +27,12 @@ class FileScanner extends Scanner {
     const validMedia = [] // mediaIds
     let files = []
 
-    // emit start
-    this.emitStatus('Gathering file list', 0)
-
     // count files to scan from all paths
-    for (const pathId of this.paths.result) {
+    for (let i = 0; i < this.paths.result.length; i++) {
+      const pathId = this.paths.result[i]
+
+      this.emitStatus(`Listing folders (${i + 1} of ${this.paths.result.length})`, 0)
+
       try {
         log('Searching path: %s', this.paths.entities[pathId].path)
         let list = await getFiles(this.paths.entities[pathId].path)
@@ -60,7 +61,7 @@ class FileScanner extends Scanner {
 
       // emit progress
       log('[%s/%s] %s', i + 1, files.length, file)
-      this.emitStatus(`Scanning media files (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
+      this.emitStatus(`Scanning media (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
 
       try {
         const mediaId = await this.processFile({ file, pathId })

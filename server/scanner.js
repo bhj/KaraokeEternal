@@ -9,9 +9,7 @@ const {
 } = require('../constants/actions')
 
 let _Scanner
-let _isScanning = false
-let _isScanQueued = false
-let _isCanceling = false
+let _isScanQueued = true
 
 log('Opening database file %s', project.database)
 
@@ -21,61 +19,43 @@ Promise.resolve()
     // setup start/stop handlers
     process.on('message', function ({ type, payload }) {
       if (type === SCANNER_WORKER_SCAN) {
-        startScan() // enqueue a re-scan
+        log(`  => restarting media scan`)
+        _isScanQueued = true
+        cancelScan()
       } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
+        log(`  => stopping media scan (user requested)`)
+        _isScanQueued = false
         cancelScan()
       }
     })
 
     return startScan()
   })
-  .then(() => {
-    if (!_isScanning) {
-      return _Scanner.emitDone()
-    }
-  })
-  .then(() => _Scanner.emitLibrary())
-  .then(() => process.exit())
 
 async function startScan () {
-  if (_isScanning) {
-    if (_isScanQueued) {
-      log(`  => skipping request (media scan already queued)`)
-    } else {
-      _isScanQueued = true
-      log(`  => media scan queued`)
-    }
-
-    return
-  }
-
-  log(`  => starting scan`)
-  _isScanning = true
-  _isScanQueued = true
-  _isCanceling = false
-
-  while (_isScanQueued && !_isCanceling) {
+  while (_isScanQueued) {
     _isScanQueued = false
+    log(`  => starting scan`)
 
-    try {
-      // paths may have changed
-      const prefs = await Prefs.get()
+    const prefs = await Prefs.get()
+    _Scanner = new FileScanner(prefs)
 
-      _Scanner = new FileScanner(prefs)
-      await _Scanner.scan()
-    } catch (err) {
-      log(err)
+    await _Scanner.scan()
+    log(`  => finished scan`)
+
+    if (!_isScanQueued) {
+      await _Scanner.emitDone()
     }
+
+    await _Scanner.emitLibrary()
+    log(`  => pushed library`)
   } // end while
 
-  _isScanning = false
-  _isCanceling = false
-  _isScanQueued = false
+  process.exit()
 }
 
 function cancelScan () {
   if (_Scanner) {
-    _isCanceling = true
     _Scanner.cancel()
   }
 }
