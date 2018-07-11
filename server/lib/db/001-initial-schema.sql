@@ -9,9 +9,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS name ON "artists" ("name" ASC);
 CREATE TABLE IF NOT EXISTS "media" (
   "mediaId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "songId" integer NOT NULL,
-  "duration" integer NOT NULL,
   "pathId" integer NOT NULL,
   "file" text NOT NULL,
+  "audioExt" text,
+  "duration" integer NOT NULL,
   "isPreferred" integer(1) NOT NULL DEFAULT(0),
   "timestamp" integer NOT NULL DEFAULT(0)
 );

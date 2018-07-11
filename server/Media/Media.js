@@ -136,6 +136,10 @@ class Media {
         .set('file', media.file)
         .set('timestamp', media.timestamp)
 
+      if (media.audioExt) {
+        q.set('audioExt', media.audioExt)
+      }
+
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
 

@@ -6,15 +6,11 @@ const debug = require('debug')
 const log = debug('app:Media')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/media' })
-const getPerms = require('../lib/getPermutations')
 const Media = require('./Media')
-
-const audioExts = ['mp3', 'm4a'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
 // stream a media file
 router.get('/', async (ctx, next) => {
   const { type, mediaId } = ctx.query
-  let file, fileExt
 
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
@@ -31,42 +27,22 @@ router.get('/', async (ctx, next) => {
     ctx.throw(404, `mediaId not found: ${mediaId}`)
   }
 
-  file = res.entities[mediaId].file
-  fileExt = path.extname(file).replace('.', '').toLowerCase()
+  let { file, audioExt } = res.entities[mediaId]
 
   if (type === 'audio') {
-    for (const ext of audioExts) {
-      const audioFile = file.substr(0, file.length - fileExt.length) + ext
-
-      try {
-        const stats = await stat(audioFile)
-        log('  => found %s audio file', ext)
-
-        file = audioFile
-        fileExt = ext
-        ctx.length = stats.size
-        break
-      } catch (err) {
-        file = null
-        // keep looking for audio files...
-      }
-    } // end for
-
-    if (!file) {
-      ctx.throw(404, `No audio file found for mediaId: ${mediaId}`)
-    }
-  } else {
-    const stats = await stat(file)
-    ctx.length = stats.size
+    file = file.substr(0, file.lastIndexOf('.') + 1) + audioExt
   }
 
-  if (typeof Media.mimeTypes[fileExt] === 'undefined') {
-    ctx.throw(404, `Unknown mime type for extension: ${fileExt}`)
+  const stats = await stat(file)
+  ctx.length = stats.size
+  ctx.type = Media.mimeTypes[path.extname(file).replace('.', '').toLowerCase()]
+
+  if (typeof ctx.type === 'undefined') {
+    ctx.throw(404, `Unknown mime type for extension: ${path.extname(file)}`)
   }
 
   log('streaming %s (%sMB): %s', ctx.type, (ctx.length / 1000000).toFixed(2), file)
 
-  ctx.type = Media.mimeTypes[fileExt]
   ctx.body = fs.createReadStream(file)
 })
 

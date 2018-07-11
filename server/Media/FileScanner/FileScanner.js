@@ -169,6 +169,7 @@ class FileScanner extends Scanner {
           try {
             const meta = await musicMeta.parseFile(audioFile, { duration: true })
             media.duration = meta.format.duration
+            media.audioExt = path.extname(audioFile).replace('.', '')
             break
           } catch (err) {
             // try another type
