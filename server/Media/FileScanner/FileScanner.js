@@ -110,7 +110,6 @@ class FileScanner extends Scanner {
   }
 
   async processFile ({ file, pathId }) {
-    let stats
     const media = {
       pathId,
       file: file.substr(this.paths.entities[pathId].path.length + 1),
@@ -118,20 +117,25 @@ class FileScanner extends Scanner {
 
     {
       // already in database with the same path?
-      const res = await Media.search(media)
+      const res = await Media.search({
+        pathId,
+        // try both slashes to be POSIX/Win agnostic
+        file: [media.file.replace('/', '\\'), media.file.replace('\\', '/')],
+      })
+
       log('  => %s result(s) for existing media', res.result.length)
 
       if (res.result.length) {
         log('  => media is in library')
         return res.result[0]
       }
-
-      // needs further inspection...
-      stats = await stat(file)
     }
 
     // new media
     // -------------------------------
+
+    // needs further inspection...
+    const stats = await stat(file)
 
     // try getting artist and title from filename
     const { artist, title } = parseMeta(path.parse(file).name, parseMetaCfg)
