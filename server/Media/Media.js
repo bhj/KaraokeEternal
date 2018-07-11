@@ -21,7 +21,11 @@ class Media {
 
     // filters
     Object.keys(fields).map(key => {
-      q.where(`${key} = ?`, fields[key])
+      if (Array.isArray(fields[key])) {
+        q.where(`${key} IN ?`, fields[key])
+      } else {
+        q.where(`${key} = ?`, fields[key])
+      }
     })
 
     const { text, values } = q.toParam()
