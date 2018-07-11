@@ -113,7 +113,7 @@ class FileScanner extends Scanner {
     let stats
     const media = {
       pathId,
-      file,
+      file: file.substr(this.paths.entities[pathId].path.length + 1),
     }
 
     {
