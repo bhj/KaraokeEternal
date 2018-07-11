@@ -30,7 +30,7 @@
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.52",
     "@jcoreio/async-throttle": "^1.1.2",
-    "bcrypt": "^2.0.1",
+    "bcrypt": "^3.0.0",
     "cdgraphics": "^1.0.2",
     "debug": "^3.1.0",
     "fast-fuzzy": "^1.5.0",
@@ -41,7 +41,7 @@
     "koa-range": "^0.3.0",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
-    "music-metadata": "^2.3.1",
+    "music-metadata": "^2.3.2",
     "normalize.css": "^8.0.0",
     "prop-types": "^15.6.2",
     "rc-slider": "^8.6.1",
@@ -66,7 +66,7 @@
     "screenfull": "^3.3.2",
     "socket.io": "^2.1.1",
     "sqlite": "^2.9.2",
-    "squel": "^5.12.1"
+    "squel": "^5.12.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.52",
@@ -84,7 +84,7 @@
     "css-loader": "^1.0.0",
     "electron": "^2.0.4",
     "electron-builder": "^20.19.2",
-    "eslint": "^5.0.1",
+    "eslint": "^5.1.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-babel": "^5.1.0",
     "eslint-plugin-import": "^2.13.0",
@@ -94,9 +94,9 @@
     "eslint-plugin-standard": "^3.1.0",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
-    "koa-webpack": "^5.0.2",
+    "koa-webpack": "^5.1.0",
     "mini-css-extract-plugin": "^0.4.1",
-    "nodemon": "^1.17.5",
+    "nodemon": "^1.18.0",
     "redbox-react": "^1.6.0",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
