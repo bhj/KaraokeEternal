@@ -11,6 +11,7 @@ module.exports = {
   ],
   postMiddleware: [
     repl(/[([{](?=[^([{]*$).*karaoke.*[)\]}]/i), // remove text having 'karaoke' between (), [], or {}
+    repl(/^['|"](.*)['|"]$/, '$1'), // remove any surrounding quotes
     repl(/(.*)(, The)$/i, 'The $1'), // correct for "..., The"
     repl(/(.*)(, A)$/i, 'A $1'), // correct for "..., A"
     replArtist(/^(\w+), (\w+ ?\w+)$/ig, '$2 $1'), // Last, First [Middle] -> First [Middle] Last
