@@ -7,11 +7,10 @@ const stat = promisify(fs.stat)
 const musicMeta = require('music-metadata')
 const mp4info = require('../../lib/mp4info.js')
 const getFiles = require('./getFiles')
-const parseMeta = require('./parseMeta')
-const parseMetaCfg = require('./parseMetaCfg')
 const getPerms = require('../../lib/getPermutations')
 const Scanner = require('../Scanner')
 const Media = require('../Media')
+const MetaParser = require('../MetaParser')
 
 const videoExts = ['.cdg', '.mp4'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 const audioTypes = ['m4a', 'mp3']
@@ -20,6 +19,7 @@ class FileScanner extends Scanner {
   constructor (prefs) {
     super()
     this.paths = prefs.paths
+    this.lastDir = ''
   }
 
   async scan () {
@@ -48,16 +48,24 @@ class FileScanner extends Scanner {
       if (this.isCanceling) {
         return
       }
-    }
+    } // end for
 
     log('Processing %s total files', files.length)
 
     // process files
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
+      const curDir = path.parse(file).dir
       const pathId = this.paths.result.find(pathId =>
         file.indexOf(this.paths.entities[pathId].path) === 0
       )
+
+      // (re)init parser with this folder's config, if any
+      if (this.lastDir !== curDir) {
+        this.lastDir = curDir
+        const cfg = await getCfg(path.normalize(path.dirname(file)), path.normalize(this.paths.entities[pathId].path))
+        this.parser = MetaParser(cfg)
+      }
 
       // emit progress
       log('[%s/%s] %s', i + 1, files.length, file)
@@ -110,9 +118,10 @@ class FileScanner extends Scanner {
   }
 
   async processFile ({ file, pathId }) {
+    const basePath = this.paths.entities[pathId].path
     const media = {
       pathId,
-      file: file.substr(this.paths.entities[pathId].path.length + 1),
+      file: file.substr(basePath.length + 1),
     }
 
     {
@@ -133,16 +142,8 @@ class FileScanner extends Scanner {
 
     // new media
     // -------------------------------
-
-    // needs further inspection...
     const stats = await stat(file)
-
-    // try getting artist and title from filename
-    const { artist, title } = parseMeta(path.parse(file).name, parseMetaCfg)
-
-    if (!artist || !title) {
-      throw new Error(`  => could not determine artist or title`)
-    }
+    const { artist, title } = this.parser(path.parse(file).name)
 
     media.artist = artist
     media.title = title
@@ -211,6 +212,26 @@ class FileScanner extends Scanner {
     this.emitLibrary()
     return mediaId
   }
+}
+
+// search each parent dir (up to baseDir)
+async function getCfg (dir, baseDir) {
+  const file = path.resolve(dir, 'kfconfig.js')
+
+  try {
+    await stat(file)
+    log('Using config %s', file)
+    return require(file)
+  } catch (err) {
+    log('No config found at %s', file)
+  }
+
+  if (dir === baseDir) {
+    return
+  }
+
+  // try parent dir
+  return getCfg(path.resolve(dir, '..'), baseDir)
 }
 
 // if (typeof song !== 'object') {
