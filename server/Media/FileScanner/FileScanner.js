@@ -205,10 +205,6 @@ class FileScanner extends Scanner {
     // add song
     const mediaId = await Media.add(media)
 
-    if (!Number.isInteger(mediaId)) {
-      throw new Error('got invalid lastID')
-    }
-
     this.emitLibrary()
     return mediaId
   }
