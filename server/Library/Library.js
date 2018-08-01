@@ -1,7 +1,7 @@
 const db = require('sqlite')
 const squel = require('squel')
 const debug = require('debug')
-const log = debug('app:media')
+const log = debug('app:library')
 
 class Library {
   /**
@@ -139,6 +139,96 @@ class Library {
     return {
       [songId]: row,
     }
+  }
+
+  /**
+   * Matches or creates artist and song for a given artist and title
+   * @param  {object}  media  { artist, title }
+   * @return {object}         { artistId, songId }
+   */
+  static async matchSong (artist, title) {
+    let artistId, songId
+
+    // match artist
+    const search = [artist]
+
+    // try with and without 'The'
+    if (/^the /i.test(artist)) {
+      search.push(artist.replace(/^the /i, ''))
+    } else {
+      search.push(`The ${artist}`)
+    }
+
+    {
+      const q = squel.select()
+        .from('artists')
+        .where('name IN ? COLLATE NOCASE', search)
+
+      const { text, values } = q.toParam()
+      const row = await db.get(text, values)
+
+      if (row) {
+        // log('matched artist: %s', row.name)
+        artistId = row.artistId
+        artist = row.name
+      }
+    }
+
+    // new artist?
+    if (typeof artistId === 'undefined') {
+      log('new artist: %s', artist)
+
+      const q = squel.insert()
+        .into('artists')
+        .set('name', artist)
+
+      const { text, values } = q.toParam()
+      const res = await db.run(text, values)
+
+      if (!Number.isInteger(res.stmt.lastID)) {
+        throw new Error('invalid artistId after insert')
+      }
+
+      artistId = res.stmt.lastID
+    }
+
+    // match title
+    {
+      const q = squel.select()
+        .from('songs')
+        .where('artistId = ?', artistId)
+        .where('title = ? COLLATE NOCASE', title)
+
+      const { text, values } = q.toParam()
+      const row = await db.get(text, values)
+
+      if (row) {
+        // log('matched song: %s', row.title)
+        songId = row.songId
+        title = row.title
+      }
+    }
+
+    // new song?
+    if (typeof songId === 'undefined') {
+      log('new song: %s', title)
+
+      const q = squel.insert()
+        .into('songs')
+        .set('artistId', artistId)
+        .set('title', title)
+
+      const { text, values } = q.toParam()
+      const res = await db.run(text, values)
+
+      if (!Number.isInteger(res.stmt.lastID)) {
+        throw new Error('invalid songId after insert')
+      }
+
+      songId = res.stmt.lastID
+    }
+
+    return { artistId, artist, songId, title }
   }
 }
 

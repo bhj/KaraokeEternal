@@ -15,7 +15,7 @@ class Queue {
 
     const q = squel.select()
       .field('queueId, mediaId, userId')
-      .field('media.file, media.duration')
+      .field('media.relPath, media.duration')
       .field('artists.name AS artist')
       .field('songs.songId, songs.title')
       .field('users.name AS userDisplayName')
@@ -32,9 +32,9 @@ class Queue {
 
     for (const row of rows) {
       // determine player component
-      const ext = path.extname(row.file).substr(1).toUpperCase()
+      const ext = path.extname(row.relPath).substr(1).toUpperCase()
       row.player = `${ext}Player`
-      delete row.file
+      delete row.relPath
 
       // normalize
       result.push(row.queueId)

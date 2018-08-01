@@ -67,7 +67,8 @@
     "screenfull": "^3.3.2",
     "socket.io": "^2.1.1",
     "sqlite": "^2.9.2",
-    "squel": "^5.12.2"
+    "squel": "^5.12.2",
+    "vm2": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.55",

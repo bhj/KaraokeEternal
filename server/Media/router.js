@@ -3,7 +3,7 @@ const fs = require('fs')
 const stat = promisify(fs.stat)
 const path = require('path')
 const debug = require('debug')
-const log = debug('app:Media')
+const log = debug('app:media')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/media' })
 const Media = require('./Media')
@@ -28,16 +28,16 @@ router.get('/', async (ctx, next) => {
     ctx.throw(404, `mediaId not found: ${mediaId}`)
   }
 
-  let { file, pathId, audioExt } = res.entities[mediaId]
+  let { pathId, relPath, audioExt } = res.entities[mediaId]
 
   if (type === 'audio') {
-    file = file.substr(0, file.lastIndexOf('.') + 1) + audioExt
+    relPath = relPath.substr(0, relPath.lastIndexOf('.') + 1) + audioExt
   }
 
   // get base path
   const { paths } = await Prefs.get()
   const basePath = paths.entities[pathId].path
-  file = path.join(basePath, file)
+  const file = path.join(basePath, relPath)
 
   // get file info
   const stats = await stat(file)

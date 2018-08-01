@@ -5,7 +5,7 @@ const log = debug('app:media')
 
 class Media {
   /**
-   * Get media files matching all search criteria
+   * Get media matching all search criteria
    *
    * @param  {object}  fields Search criteria
    * @return {Promise}        Object with media results
@@ -17,7 +17,10 @@ class Media {
     }
 
     const q = squel.select()
+      .field('media.*, songs.*, artists.artistId, artists.name AS artist')
       .from('media')
+      .join('songs USING (songId)')
+      .join('artists USING (artistId)')
 
     // filters
     Object.keys(fields).map(key => {
@@ -40,109 +43,25 @@ class Media {
   }
 
   /**
-   * Add media file to the library, matching or adding artist
-   *
-   * @param  {object}  media Media item
-   * @return {Promise}       Newly added item's mediaId (number)
+   * Add media file to the library
+   * @param  {object}  media Media object
+   * @return {number}        New media's mediaId
    */
   static async add (media) {
-    let artistId, songId
-
-    if (!media.artist || !media.title || !media.duration) {
-      return Promise.reject(new Error('invalid media data: ' + JSON.stringify(media)))
-    }
-
-    // match/create artist
-    // -------------------
-    const artists = [media.artist]
-
-    // try with and without 'The'
-    if (/^the /i.test(media.artist)) {
-      artists.push(media.artist.replace(/^the /i, ''))
-    } else {
-      artists.push(`The ${media.artist}`)
-    }
-
-    {
-      const q = squel.select()
-        .from('artists')
-        .where('name IN ? COLLATE NOCASE', artists)
-
-      const { text, values } = q.toParam()
-      const row = await db.get(text, values)
-
-      if (row) {
-        log('matched artist: %s', row.name)
-        artistId = row.artistId
-      }
-    }
-
-    // new artist?
-    if (typeof artistId === 'undefined') {
-      log('new artist: %s', media.artist)
-
-      const q = squel.insert()
-        .into('artists')
-        .set('name', media.artist)
-
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
-
-      if (!Number.isInteger(res.stmt.lastID)) {
-        throw new Error('invalid lastID from artist insert')
-      }
-
-      artistId = res.stmt.lastID
-    }
-
-    // match/create song
-    {
-      const q = squel.select()
-        .from('songs')
-        .where('artistId = ?', artistId)
-        .where('title = ? COLLATE NOCASE', media.title)
-
-      const { text, values } = q.toParam()
-      const row = await db.get(text, values)
-
-      if (row) {
-        log('matched song: %s', row.title)
-        songId = row.songId
-      }
-    }
-
-    // new song?
-    if (typeof songId === 'undefined') {
-      log('new song: %s', media.title)
-
-      const q = squel.insert()
-        .into('songs')
-        .set('artistId', artistId)
-        .set('title', media.title)
-
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
-
-      if (!Number.isInteger(res.stmt.lastID)) {
-        throw new Error('invalid lastID from song insert')
-      }
-
-      songId = res.stmt.lastID
-    }
+    if (!Number.isInteger(media.songId) ||
+        !Number.isInteger(media.duration) ||
+        !Number.isInteger(media.pathId) ||
+        !media.relPath
+    ) throw new Error('invalid media data: ' + JSON.stringify(media))
 
     // create media entry
     {
       const q = squel.insert()
         .into('media')
-        .set('songId', songId)
-        .set('duration', Math.round(media.duration))
-        .set('pathId', media.pathId)
-        .set('file', media.file)
-        .set('timestamp', media.timestamp)
 
-      if (media.audioExt) {
-        q.set('audioExt', media.audioExt)
-      }
+      Object.keys(media).map(key => {
+        q.set(key, media[key])
+      })
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
@@ -157,16 +76,35 @@ class Media {
   }
 
   /**
+   * Update media item
+   * @param  {number}  mediaId
+   * @param  {object}  fields
+   * @return {Promise}
+   */
+  static async update (mediaId, fields) {
+    if (!Number.isInteger(mediaId)) {
+      throw new Error(`invalid mediaId: ${mediaId}`)
+    }
+
+    const q = squel.update()
+      .table('media')
+      .where('mediaId = ?', mediaId)
+
+    Object.keys(fields).map(key => {
+      q.set(key, fields[key])
+    })
+
+    const { text, values } = q.toParam()
+    await db.run(text, values)
+  }
+
+  /**
    * Removes media from the db in sqlite-friendly batches
-   *
    * @param  {array}  mediaIds
    * @return {Promise}
    */
   static async remove (mediaIds) {
     const batchSize = 999
-    let res
-
-    log(`removing ${mediaIds.length} media entries`)
 
     while (mediaIds.length) {
       const q = squel.delete()
@@ -174,11 +112,20 @@ class Media {
         .where('mediaId IN ?', mediaIds.splice(0, batchSize))
 
       const { text, values } = q.toParam()
-      res = await db.run(text, values)
-      log(`  => deleted ${res.stmt.changes} rows`)
+      await db.run(text, values)
     }
 
-    // cleanup
+    await this.cleanup()
+  }
+
+  /**
+   * Tidy up unlinked items
+   * @return {Promise}
+   */
+  static async cleanup () {
+    let res
+    let changes = 0
+
     // remove songs without associated media
     res = await db.run(`
       DELETE FROM songs WHERE songId IN (
@@ -186,6 +133,7 @@ class Media {
       )
     `)
     log(`cleanup: removed ${res.stmt.changes} songs with no associated media`)
+    changes += res.stmt.changes
 
     // remove artists without associated songs
     res = await db.run(`
@@ -194,6 +142,7 @@ class Media {
       )
     `)
     log(`cleanup: removed ${res.stmt.changes} artists with no associated songs`)
+    changes += res.stmt.changes
 
     // remove stars for nonexistent songs
     res = await db.run(`
@@ -202,6 +151,7 @@ class Media {
       )
     `)
     log(`cleanup: removed ${res.stmt.changes} stars for nonexistent songs`)
+    changes += res.stmt.changes
 
     // remove nonexistent media from the queue
     res = await db.run(`
@@ -210,10 +160,12 @@ class Media {
       )
     `)
     log(`cleanup: removed ${res.stmt.changes} queue entries for nonexistent media`)
+    changes += res.stmt.changes
 
-    // VACUUM
-    log(`cleanup: vacuuming database`)
-    await db.run('VACUUM')
+    if (changes) {
+      log(`cleanup: vacuuming database`)
+      await db.run('VACUUM')
+    }
   }
 }
 

@@ -8,9 +8,11 @@ const musicMeta = require('music-metadata')
 const mp4info = require('../../lib/mp4info.js')
 const getFiles = require('./getFiles')
 const getPerms = require('../../lib/getPermutations')
-const Scanner = require('../Scanner')
+const Library = require('../../Library')
 const Media = require('../Media')
 const MetaParser = require('../MetaParser')
+const Scanner = require('../Scanner')
+const { NodeVM } = require('vm2')
 
 const videoExts = ['.cdg', '.mp4'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 const audioTypes = ['m4a', 'mp3']
@@ -19,13 +21,13 @@ class FileScanner extends Scanner {
   constructor (prefs) {
     super()
     this.paths = prefs.paths
-    this.lastDir = ''
   }
 
   async scan () {
     const offlinePaths = [] // pathIds
     const validMedia = [] // mediaIds
     let files = []
+    let lastDir
 
     // count files to scan from all paths
     for (let i = 0; i < this.paths.result.length; i++) {
@@ -59,11 +61,13 @@ class FileScanner extends Scanner {
       const pathId = this.paths.result.find(pathId =>
         file.indexOf(this.paths.entities[pathId].path) === 0
       )
+      const basePath = this.paths.entities[pathId].path
 
-      // (re)init parser with this folder's config, if any
-      if (this.lastDir !== curDir) {
-        this.lastDir = curDir
-        const cfg = await getCfg(path.normalize(path.dirname(file)), path.normalize(this.paths.entities[pathId].path))
+      if (lastDir !== curDir) {
+        // (re)init parser with this folder's config, if any
+        lastDir = curDir
+
+        const cfg = getCfg(path.dirname(file), basePath)
         this.parser = MetaParser(cfg)
       }
 
@@ -72,13 +76,10 @@ class FileScanner extends Scanner {
       this.emitStatus(`Scanning media (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
 
       try {
-        const mediaId = await this.processFile({ file, pathId })
-
-        // successfuly processed
-        validMedia.push(mediaId)
+        const mediaId = await this.processFile({ file, pathId, basePath })
+        validMedia.push(mediaId) // successfuly processed
       } catch (err) {
-        log(err)
-        // try the next file
+        log(err) // try the next file
       }
 
       if (this.isCanceling) {
@@ -86,9 +87,9 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    // cleanup
-    log('Looking for orphaned media entries')
+    log('Scan finished with %s valid songs', validMedia.length)
 
+    // cleanup
     {
       const invalidMedia = []
       const res = await Media.search()
@@ -106,91 +107,107 @@ class FileScanner extends Scanner {
 
         // looks like we need to remove it
         invalidMedia.push(mediaId)
-        log(`  => ${res.entities[mediaId].file}`)
       })
 
-      log(`Found ${invalidMedia.length} orphaned media entries`)
-
       if (invalidMedia.length) {
+        log(`Removing ${invalidMedia.length} entries for files that no longer exist `)
         await Media.remove(invalidMedia)
       }
     }
   }
 
-  async processFile ({ file, pathId }) {
-    const basePath = this.paths.entities[pathId].path
-    const media = {
-      pathId,
-      file: file.substr(basePath.length + 1),
-    }
+  async processFile ({ file, pathId, basePath }) {
+    const relPath = file.substr(basePath.length + 1)
 
     {
       // already in database with the same path?
       const res = await Media.search({
         pathId,
         // try both slashes to be POSIX/Win agnostic
-        file: [media.file.replace('/', '\\'), media.file.replace('\\', '/')],
+        relPath: [relPath.replace('/', '\\'), relPath.replace('\\', '/')],
       })
 
-      log('  => %s result(s) for existing media', res.result.length)
+      log('  => %s result(s)', res.result.length)
 
       if (res.result.length) {
-        log('  => media is in library')
-        return res.result[0]
-      }
+        log('  => checking metadata')
+        const cur = res.entities[res.result[0]]
+        const { artist, title } = this.parser(path.parse(file).name)
+
+        // did artistId or songId change?
+        const match = await Library.matchSong(artist, title)
+
+        if (cur.artistId !== match.artistId || cur.songId !== match.songId) {
+          log('  => old: %s', JSON.stringify({ artist: cur.artist, title: cur.title }))
+          log('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
+
+          await Media.update(cur.mediaId, {
+            songId: match.songId,
+            dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
+          })
+        } else {
+          log('  => ok')
+        }
+
+        return cur.mediaId
+      } // end if
     }
 
     // new media
     // -------------------------------
-    const stats = await stat(file)
     const { artist, title } = this.parser(path.parse(file).name)
+    const match = await Library.matchSong(artist, title)
+    const media = {
+      pathId,
+      relPath,
+      songId: match.songId,
+      dateAdded: Math.round(new Date().getTime() / 1000), // seconds
+    }
 
-    media.artist = artist
-    media.title = title
-    media.timestamp = new Date(stats.mtime).getTime()
+    log('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
 
     // need to look for an audio file?
     if (path.extname(file).toLowerCase() === '.cdg') {
-      let audioFile
+      let audio
 
       // look for all uppercase and lowercase permutations of each
       // file extension since we may be on a case-sensitive fs
       for (const type of audioTypes) {
         for (const ext of getPerms(type)) {
-          audioFile = file.substr(0, file.lastIndexOf('.') + 1) + ext
+          audio = file.substr(0, file.lastIndexOf('.') + 1) + ext
 
           // does file exist?
           try {
-            await stat(audioFile)
+            await stat(audio)
             log('  => found %s audio', type)
             break
           } catch (err) {
             // try another permutation
-            audioFile = null
+            audio = null
           }
         } // end for
 
-        if (audioFile) {
+        if (audio) {
           try {
-            const meta = await musicMeta.parseFile(audioFile, { duration: true })
-            media.duration = meta.format.duration
-            media.audioExt = path.extname(audioFile).replace('.', '')
+            const meta = await musicMeta.parseFile(audio, { duration: true })
+            media.duration = Math.round(meta.format.duration)
+            media.audioExt = path.extname(audio).replace('.', '')
             break
           } catch (err) {
             // try another type
-            audioFile = null
+            audio = null
             log(err)
           }
         }
       } // end for
 
-      if (!audioFile) {
+      if (!audio) {
         throw new Error(`  => no valid audio file`)
       }
     } else if (path.extname(file).toLowerCase() === '.mp4') {
       // get video duration
       const info = await mp4info(file)
-      media.duration = info.duration
+      media.duration = Math.round(info.duration)
     }
 
     if (!media.duration) {
@@ -202,24 +219,29 @@ class FileScanner extends Scanner {
       Math.round(media.duration % 60, 10).toString().padStart(2, '0')
     )
 
-    // add song
-    const mediaId = await Media.add(media)
-
-    this.emitLibrary()
-    return mediaId
+    // resolves to a mediaId
+    return Media.add(media)
   }
 }
 
 // search each parent dir (up to baseDir)
-async function getCfg (dir, baseDir) {
+function getCfg (dir, baseDir) {
+  dir = path.normalize(dir)
+  baseDir = path.normalize(baseDir)
   const file = path.resolve(dir, 'kfconfig.js')
 
   try {
-    await stat(file)
-    log('Using config %s', file)
-    return require(file)
+    const userScript = fs.readFileSync(file, 'utf-8')
+    log('Found config at %s', file)
+
+    try {
+      const vm = new NodeVM({ wrapper: 'none' })
+      return vm.run(userScript)
+    } catch (err) {
+      log(err)
+    }
   } catch (err) {
-    log('No config found at %s', file)
+    log('No config at %s', file)
   }
 
   if (dir === baseDir) {
