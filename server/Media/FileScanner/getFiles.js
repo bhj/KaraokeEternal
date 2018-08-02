@@ -1,3 +1,5 @@
+const debug = require('debug')
+const log = debug('app:media:fileScanner:getFiles')
 const { promisify } = require('util')
 const { resolve } = require('path')
 const fs = require('fs')
@@ -5,17 +7,17 @@ const readdir = promisify(fs.readdir)
 const stat = promisify(fs.stat)
 
 async function getFiles (dir, extra) {
-  let subdirs
+  let list = []
 
   try {
-    subdirs = await readdir(dir)
+    list = await readdir(dir)
   } catch (err) {
-    subdirs = []
+    log(err)
   }
 
-  const files = await Promise.all(subdirs.map(async (subdir) => {
-    const res = resolve(dir, subdir)
-    return (await stat(res)).isDirectory() ? getFiles(res, extra) : { file: res, ...extra }
+  const files = await Promise.all(list.map(async (item) => {
+    const file = resolve(dir, item)
+    return (await stat(file)).isDirectory() ? getFiles(file, extra) : { file, ...extra }
   }))
 
   return files.reduce((a, f) => a.concat(f), [])
