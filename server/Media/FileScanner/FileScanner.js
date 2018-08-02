@@ -32,13 +32,14 @@ class FileScanner extends Scanner {
     // count files to scan from all paths
     for (let i = 0; i < this.paths.result.length; i++) {
       const pathId = this.paths.result[i]
+      const basePath = this.paths.entities[pathId].path
 
       this.emitStatus(`Listing folders (${i + 1} of ${this.paths.result.length})`, 0)
 
       try {
-        log('Searching path: %s', this.paths.entities[pathId].path)
-        let list = await getFiles(this.paths.entities[pathId].path)
-        list = list.filter(file => videoExts.includes(path.extname(file)))
+        log('Searching path: %s', basePath)
+        let list = await getFiles(basePath, { pathId, basePath })
+        list = list.filter(({ file }) => videoExts.includes(path.extname(file)))
 
         log('  => found %s files with valid extensions (cdg, mp4)', list.length)
         files = files.concat(list)
@@ -56,18 +57,14 @@ class FileScanner extends Scanner {
 
     // process files
     for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const curDir = path.parse(file).dir
-      const pathId = this.paths.result.find(pathId =>
-        file.indexOf(this.paths.entities[pathId].path) === 0
-      )
-      const basePath = this.paths.entities[pathId].path
+      const { file, basePath } = files[i]
+      const dir = path.dirname(file)
 
-      if (lastDir !== curDir) {
+      if (lastDir !== dir) {
+        lastDir = dir
+
         // (re)init parser with this folder's config, if any
-        lastDir = curDir
-
-        const cfg = getCfg(path.dirname(file), basePath)
+        const cfg = getCfg(dir, basePath)
         this.parser = MetaParser(cfg)
       }
 
@@ -76,7 +73,7 @@ class FileScanner extends Scanner {
       this.emitStatus(`Scanning media (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
 
       try {
-        const mediaId = await this.processFile({ file, pathId, basePath })
+        const mediaId = await this.processFile(files[i])
         validMedia.push(mediaId) // successfuly processed
       } catch (err) {
         log(err) // try the next file
