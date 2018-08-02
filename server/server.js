@@ -16,6 +16,7 @@ const KoaStatic = require('koa-static')
 const app = new Koa()
 
 const Prefs = require('./Prefs')
+const Library = require('./Library')
 const libraryRouter = require('./Library/router')
 const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
@@ -25,6 +26,8 @@ const userRouter = require('./User/router')
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
 const {
+  LIBRARY_PUSH,
+  SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
 } = require('../constants/actions')
 
@@ -142,8 +145,16 @@ Promise.resolve()
     socketActions(io, jwtKey)
 
     // emit messages from scanner over socket.io
-    process.on('message', function (action) {
+    process.on('message', async function (action) {
       io.emit('action', action)
+
+      // emit library when scanner finishes/exits
+      if (action.type === SCANNER_WORKER_DONE) {
+        io.emit('action', {
+          type: LIBRARY_PUSH,
+          payload: await Library.get(),
+        })
+      }
     })
 
     server.listen(project.serverPort, project.serverHost, err => {

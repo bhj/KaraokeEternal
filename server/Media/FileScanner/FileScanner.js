@@ -84,7 +84,7 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log('Scan finished with %s valid songs', validMedia.length)
+    log('Finished processing; found %s valid songs', validMedia.length)
 
     // cleanup
     {

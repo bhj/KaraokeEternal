@@ -19,11 +19,11 @@ Promise.resolve()
     // setup start/stop handlers
     process.on('message', function ({ type, payload }) {
       if (type === SCANNER_WORKER_SCAN) {
-        log(`  => restarting media scan`)
+        log(`Media scan requested (restarting)`)
         _isScanQueued = true
         cancelScan()
       } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
-        log(`  => stopping media scan (user requested)`)
+        log(`Stopping media scan (user requested)`)
         _isScanQueued = false
         cancelScan()
       }
@@ -33,24 +33,17 @@ Promise.resolve()
   })
 
 async function startScan () {
+  log(`Starting media scan`)
+
   while (_isScanQueued) {
     _isScanQueued = false
-    log(`  => starting scan`)
 
     const prefs = await Prefs.get()
     _Scanner = new FileScanner(prefs)
-
     await _Scanner.scan()
-    log(`  => finished scan`)
-
-    if (!_isScanQueued) {
-      await _Scanner.emitDone()
-    }
-
-    await _Scanner.emitLibrary()
-    log(`  => pushed library`)
   } // end while
 
+  log(`Finished media scan; exiting`)
   process.exit()
 }
 

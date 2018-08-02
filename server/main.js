@@ -4,6 +4,7 @@ const childProcess = require('child_process')
 const refs = {}
 const {
   SCANNER_WORKER_SCAN,
+  SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
 } = require('../constants/actions')
 
@@ -33,12 +34,7 @@ function startServer () {
     refs.server = childProcess.fork(path.join(__dirname, 'server.js'))
 
     refs.server.on('exit', (code, signal) => {
-      if (signal) {
-        log(`Web server killed by ${signal}`)
-      } else {
-        log(`Web server exited with code: ${code}`)
-      }
-
+      log(`Web server exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
       delete refs.server
     })
 
@@ -64,12 +60,9 @@ function startScanner () {
     refs.scanner = childProcess.fork(path.join(__dirname, 'scanner.js'))
 
     refs.scanner.on('exit', (code, signal) => {
-      if (signal) {
-        log(`Media scanner killed by ${signal}`)
-      } else {
-        log(`Media scanner exited with code: ${code}`)
-      }
+      log(`Media scanner exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
 
+      refs.server.send({ type: SCANNER_WORKER_DONE })
       delete refs.scanner
     })
 

@@ -69,5 +69,6 @@ module.exports = {
   // IPC messages
   SCANNER_WORKER_SCAN: 'scannerWorker/SCAN',
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
+  SCANNER_WORKER_DONE: 'scannerWorker/DONE',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
 }
