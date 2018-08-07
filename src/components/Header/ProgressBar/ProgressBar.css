@@ -17,6 +17,10 @@
   color: var(--text-color);
 }
 
-.clear {
+.cancel {
+  padding-right: 10px;
+}
+
+.cancelIcon {
   fill: var(--btn-danger-color);
 }
