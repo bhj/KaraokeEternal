@@ -225,7 +225,7 @@ class FileScanner extends Scanner {
 function getCfg (dir, baseDir) {
   dir = path.normalize(dir)
   baseDir = path.normalize(baseDir)
-  const file = path.resolve(dir, 'kfconfig.js')
+  const file = path.resolve(dir, '_kfconfig.js')
 
   try {
     const userScript = fs.readFileSync(file, 'utf-8')
