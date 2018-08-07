@@ -65,7 +65,7 @@ class FileScanner extends Scanner {
 
         // (re)init parser with this folder's config, if any
         const cfg = getCfg(dir, basePath)
-        this.parser = MetaParser(cfg)
+        this.parser = new MetaParser(cfg)
       }
 
       // emit progress
