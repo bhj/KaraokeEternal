@@ -1,10 +1,11 @@
 import { connect } from 'react-redux'
+import { ensureState } from 'redux-optimistic-ui'
 import Header from './Header'
 import { createSelector } from 'reselect'
 import { headerHeightChange } from 'store/modules/ui'
 import { requestScanCancel } from 'store/modules/prefs'
 
-const getQueue = (state) => state.queue
+const getQueue = (state) => ensureState(state.queue)
 const getCurId = (state) => state.status.queueId
 const getCurPos = (state) => state.status.position
 const getIsAtQueueEnd = (state) => state.status.isAtQueueEnd

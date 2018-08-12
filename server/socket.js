@@ -85,9 +85,7 @@ module.exports = function (io, jwtKey) {
 
         return acknowledge({
           type: type + _ERROR,
-          meta: {
-            error: `Error in handler ${type}: ${err.message}`,
-          }
+          error: `Error in ${type}: ${err.message}`,
         })
       }
     })

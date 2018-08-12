@@ -1,11 +1,12 @@
 import { connect } from 'react-redux'
+import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from 'reselect'
 import QueueList from './QueueList'
 import { showErrorMessage } from 'store/modules/ui'
 import { requestPlay, requestPause, requestPlayNext } from 'store/modules/status'
 import { queueSong, removeItem } from '../../modules/queue'
 
-const getQueue = (state) => state.queue
+const getQueue = (state) => ensureState(state.queue)
 const getCurId = (state) => state.status.queueId
 const getCurPos = (state) => state.status.position
 
@@ -36,7 +37,7 @@ const getWaits = createSelector(
 
 const mapStateToProps = (state) => {
   return {
-    queue: state.queue,
+    queue: ensureState(state.queue),
     curId: state.status.queueId,
     curPos: state.status.position,
     isAtQueueEnd: state.status.isAtQueueEnd,

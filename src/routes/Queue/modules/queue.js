@@ -9,8 +9,10 @@ export function queueSong (songId) {
   return (dispatch, getState) => {
     dispatch({
       type: QUEUE_ADD,
+      meta: { isOptimistic: true },
       payload: {
-        mediaId: getState().songs.entities[songId].mediaId
+        mediaId: getState().songs.entities[songId].mediaId,
+        songId,
       },
     })
   }
@@ -20,6 +22,7 @@ export function queueSong (songId) {
 export function removeItem (queueId) {
   return {
     type: QUEUE_REMOVE,
+    meta: { isOptimistic: true },
     payload: { queueId },
   }
 }
@@ -28,8 +31,29 @@ export function removeItem (queueId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [QUEUE_ADD]: (state, { payload }) => {
+    // optimistic
+    const fakeQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 0
+
+    return {
+      result: [...state.result, fakeQueueId],
+      entities: {
+        ...state.entities,
+        [fakeQueueId]: { songId: payload.songId, isOptimistic: true },
+      }
+    }
+  },
+  [QUEUE_REMOVE]: (state, { payload }) => {
+    // optimistic
+    const result = state.result.slice()
+    result.splice(result.indexOf(payload.queueId), 1)
+
+    return {
+      ...state,
+      result,
+    }
+  },
   [QUEUE_PUSH]: (state, { payload }) => ({
-    ...state,
     result: payload.result,
     entities: payload.entities,
   }),

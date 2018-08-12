@@ -58,6 +58,9 @@ class QueueList extends React.Component {
     const item = this.props.queue.entities[this.props.queue.result[index]]
     const queueId = item.queueId
 
+    // @todo render placeholder for pending/optimistic items?
+    if (item.isOptimistic) return
+
     const isActive = (queueId === this.props.curId) && !this.props.isAtQueueEnd
     const isUpcoming = queueId > this.props.curId
     const isOwner = item.userId === this.props.user.userId

@@ -1,3 +1,4 @@
+import { optimistic } from 'redux-optimistic-ui'
 import { persistCombineReducers } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { createResponsiveStateReducer } from 'redux-responsive'
@@ -27,7 +28,7 @@ export const makeRootReducer = (asyncReducers) => {
     library,
     location,
     prefs,
-    queue,
+    queue: optimistic(queue),
     rooms,
     songs,
     status,

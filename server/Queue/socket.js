@@ -18,9 +18,7 @@ const ACTION_HANDLERS = {
     if (!await _isRoomOpen(sock.user.roomId)) {
       return acknowledge({
         type: QUEUE_ADD + '_ERROR',
-        meta: {
-          error: 'Room is no longer open'
-        }
+        error: 'Room is no longer open',
       })
     }
 
@@ -36,9 +34,7 @@ const ACTION_HANDLERS = {
       if (!row) {
         return acknowledge({
           type: QUEUE_ADD + '_ERROR',
-          meta: {
-            error: 'mediaId not found: ' + payload.mediaId
-          }
+          error: 'mediaId not found: ' + payload.mediaId,
         })
       }
     }
@@ -59,6 +55,9 @@ const ACTION_HANDLERS = {
       }
     }
 
+    // success
+    acknowledge({ type: QUEUE_ADD + '_SUCCESS' })
+
     // to all in room
     sock.server.to(sock.user.roomId).emit('action', {
       type: QUEUE_PUSH,
@@ -72,9 +71,7 @@ const ACTION_HANDLERS = {
     if (!await _isRoomOpen(sock.user.roomId)) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
-        meta: {
-          error: 'Room is no longer open'
-        }
+        error: 'Room is no longer open',
       })
     }
 
@@ -91,11 +88,12 @@ const ACTION_HANDLERS = {
     if (!res.stmt.changes) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
-        meta: {
-          error: 'Could not remove queueId: ' + queueId
-        }
+        error: 'Could not remove queueId: ' + queueId,
       })
     }
+
+    // success
+    acknowledge({ type: QUEUE_REMOVE + '_SUCCESS' })
 
     // tell room
     sock.server.to(sock.user.roomId).emit('action', {

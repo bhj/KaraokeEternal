@@ -18,9 +18,7 @@ export function clearErrorMessage () {
 export function showErrorMessage (error) {
   return {
     type: SHOW_ERROR_MESSAGE,
-    meta: {
-      error,
-    }
+    error,
   }
 }
 
@@ -69,7 +67,7 @@ const ACTION_HANDLERS = {
   }),
   [SHOW_ERROR_MESSAGE]: (state, action) => ({
     ...state,
-    errorMessage: action.meta.error,
+    errorMessage: action.error,
   }),
   [CLEAR_ERROR_MESSAGE]: (state, { payload }) => ({
     ...state,

@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from 'reselect'
 import { Searcher } from 'fast-fuzzy'
 import LibraryView from './LibraryView'
@@ -14,7 +15,7 @@ const getFilterStr = (state) => state.library.filterStr.trim().toLowerCase()
 const getFilterStarred = (state) => state.library.filterStarred
 const getStarredArtists = (state) => state.user.starredArtists
 const getStarredSongs = (state) => state.user.starredSongs
-const getQueue = (state) => state.queue
+const getQueue = (state) => ensureState(state.queue)
 const getCurrentQueueId = (state) => state.status.queueId
 
 const getQueuedSongs = createSelector(
