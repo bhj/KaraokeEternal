@@ -55,7 +55,6 @@ class SearchResults extends React.Component {
         <div key={key} style={style} styleName='artistsHeading'>
           {artistsResult.length} {filterStarred ? 'starred ' : ''}
           {artistsResult.length === 1 ? 'artist' : 'artists'}
-          {filterKeywords.length ? ` like "${filterKeywords.join(' ')}"` : ''}
         </div>
       )
     }
@@ -87,7 +86,6 @@ class SearchResults extends React.Component {
         <div key={key} style={style} styleName='songsHeading'>
           {songsResult.length} {filterStarred ? 'starred ' : ''}
           {songsResult.length === 1 ? 'song' : 'songs'}
-          {filterKeywords.length ? ` like "${filterKeywords.join(' ')}"` : ''}
         </div>
       )
     }
