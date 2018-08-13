@@ -11,9 +11,11 @@ import {
 } from 'constants/actions'
 import { fetchPrefs } from './prefs'
 import { browserHistory } from 'react-router'
-
 import HttpApi from 'lib/HttpApi'
+import { optimistic } from 'redux-optimistic-ui'
+
 const api = new HttpApi('')
+const optimisticStarredSongs = optimistic(starredSongsReducer)
 
 // ------------------------------------
 // Login
@@ -247,6 +249,7 @@ export function updateUser (data) {
 export function starSong (songId) {
   return {
     type: USER_SONG_STAR,
+    meta: { isOptimistic: true },
     payload: { songId },
   }
 }
@@ -254,6 +257,7 @@ export function starSong (songId) {
 export function unstarSong (songId) {
   return {
     type: USER_SONG_UNSTAR,
+    meta: { isOptimistic: true },
     payload: { songId },
   }
 }
@@ -262,13 +266,15 @@ export function unstarSong (songId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LOGIN + _SUCCESS]: (state, { payload }) => ({
+  [LOGIN + _SUCCESS]: (state, action) => ({
     ...state,
-    ...payload,
+    ...action.payload,
+    starredSongs: optimisticStarredSongs(action.payload.starredSongs, action),
   }),
-  [UPDATE + _SUCCESS]: (state, { payload }) => ({
+  [UPDATE + _SUCCESS]: (state, action) => ({
     ...state,
-    ...payload,
+    ...action.payload,
+    starredSongs: optimisticStarredSongs(action.payload.starredSongs, action),
   }),
   [CREATE + _SUCCESS]: (state, { payload }) => ({
     ...state,
@@ -280,24 +286,14 @@ const ACTION_HANDLERS = {
   [SOCKET_AUTH_ERROR]: (state, { payload }) => ({
     ...initialState,
   }),
-  [USER_SONG_STAR + _SUCCESS]: (state, { payload }) => {
-    const starredSongs = state.starredSongs.slice()
-    starredSongs.push(payload.songId)
-
-    return {
-      ...state,
-      starredSongs,
-    }
-  },
-  [USER_SONG_UNSTAR + _SUCCESS]: (state, { payload }) => {
-    const starredSongs = state.starredSongs.slice()
-    starredSongs.splice(starredSongs.indexOf(payload.songId), 1)
-
-    return {
-      ...state,
-      starredSongs,
-    }
-  },
+  [USER_SONG_STAR]: (state, action) => ({
+    ...state,
+    starredSongs: optimisticStarredSongs(state.starredSongs, action),
+  }),
+  [USER_SONG_UNSTAR]: (state, action) => ({
+    ...state,
+    starredSongs: optimisticStarredSongs(state.starredSongs, action),
+  }),
 }
 
 // ------------------------------------
@@ -317,4 +313,19 @@ export default function userReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state
+}
+
+function starredSongsReducer (state = [], action) {
+  const songs = state.slice() // copy
+
+  switch (action.type) {
+    case USER_SONG_STAR:
+      songs.push(action.payload.songId)
+      return songs
+    case USER_SONG_UNSTAR:
+      songs.splice(songs.indexOf(action.payload.songId), 1)
+      return songs
+    default:
+      return state
+  }
 }

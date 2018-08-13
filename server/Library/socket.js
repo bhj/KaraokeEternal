@@ -33,10 +33,7 @@ const ACTION_HANDLERS = {
     }
 
     // success
-    acknowledge({
-      type: USER_SONG_STAR + _SUCCESS,
-      payload: { songId: payload.songId },
-    })
+    acknowledge({ type: USER_SONG_STAR + _SUCCESS })
 
     // emit updated star count
     sock.server.emit('action', {
@@ -54,10 +51,7 @@ const ACTION_HANDLERS = {
     await db.get(text, values)
 
     // success
-    acknowledge({
-      type: USER_SONG_UNSTAR + _SUCCESS,
-      payload: { songId: payload.songId },
-    })
+    acknowledge({ type: USER_SONG_UNSTAR + _SUCCESS })
 
     // emit updated star count
     sock.server.emit('action', {
