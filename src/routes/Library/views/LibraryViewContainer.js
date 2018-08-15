@@ -13,8 +13,8 @@ const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs
 const getFilterStr = (state) => state.library.filterStr.trim().toLowerCase()
 const getFilterStarred = (state) => state.library.filterStarred
-const getStarredArtists = (state) => state.user.starredArtists
-const getStarredSongs = (state) => state.user.starredSongs
+const getStarredArtists = (state) => ensureState(state.user.starredArtists)
+const getStarredSongs = (state) => ensureState(state.user.starredSongs)
 const getQueue = (state) => ensureState(state.queue)
 const getCurrentQueueId = (state) => state.status.queueId
 
@@ -113,7 +113,7 @@ const mapStateToProps = (state) => {
     artists: state.artists.entities,
     songs: state.songs.entities,
     queuedSongIds: getQueuedSongs(state),
-    starredSongs: state.user.starredSongs,
+    starredSongs: getStarredSongs(state),
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),
     scrollTop: state.library.scrollTop,
