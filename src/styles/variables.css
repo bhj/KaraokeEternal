@@ -73,4 +73,18 @@
   /* Animation */
   --spring-duration: .5s;
   --spring-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --animation-bounce: bounce .3s ease-out;
+  --animation-glow: glow 1.5s ease-out infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: scale3d(1, 1, 1); }
+  5% { transform: scale3d(1.5, 1.5, 1.5); }
+  80% { transform: scale3d(.9, .9, .9); }
+  to { transform: scale3d(1, 1, 1); }
+}
+
+@keyframes glow {
+  /* from { text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 4px #ff0080, 0 0 6px #ff0080, 0 0 8px #ff0080, 0 0 11px #ff0080, 0 0 15px #ff0080; } */
+  from { text-shadow: 0 0 1px #fff, 0 0 4px var(--queued-item-glow-color), 0 0 6px var(--queued-item-glow-color), 0 0 8px var(--queued-item-glow-color), 0 0 11px var(--queued-item-glow-color); }
 }

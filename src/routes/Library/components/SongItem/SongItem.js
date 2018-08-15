@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Swipeable from 'react-swipeable'
 import Icon from 'components/Icon'
+import ToggleAnimation from 'components/ToggleAnimation'
 import Highlighter from 'react-highlight-words'
 import './SongItem.css'
 
@@ -36,7 +37,7 @@ export default class SongItem extends React.Component {
   handleInfo = () => this.props.onSongInfo(this.props.songId)
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     return (
       <Swipeable
@@ -51,21 +52,23 @@ export default class SongItem extends React.Component {
         </div>
 
         <div onClick={this.handleQueue} styleName='primary'>
-          <div styleName={props.isQueued ? 'title glow' : 'title'}>
+          <div styleName={props.isQueued ? 'title isQueued' : 'title'}>
             <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
             {props.isAdmin && props.numMedia > 1 && <i> ({props.numMedia})</i>}
             {props.artist && <div styleName='artist'>{props.artist}</div>}
           </div>
         </div>
 
-        <div styleName={this.state.isExpanded ? 'btnContainerExpanded' : 'btnContainer'}>
+        <div styleName={state.isExpanded ? 'btnContainerExpanded' : 'btnContainer'}>
           <div onClick={props.isStarred ? this.handleUnstar : this.handleStar} styleName='button'>
-            <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'} />
+            <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
+              <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>
+            </ToggleAnimation>
             <div styleName={props.isStarred ? 'starCountStarred' : 'starCount'}>
               {props.numStars ? props.numStars : ''}
             </div>
           </div>
-          <div onClick={this.handleInfo} styleName='button'>
+          <div onClick={this.handleInfo} styleName={state.isExpanded ? 'button' : 'hiddenButton'}>
             <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
           </div>
         </div>

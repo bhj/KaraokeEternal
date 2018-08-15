@@ -20,10 +20,11 @@ const ArtistItem = (props) => {
             <div styleName='count'>{props.artistSongIds.length}</div>
           }
         </div>
-        <div styleName={isChildQueued ? 'name glow' : 'name'}>
+        <div styleName={isChildQueued ? 'name hasQueued' : 'name'}>
           <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
         </div>
       </div>
+
       {props.isExpanded &&
         <SongList
           songIds={props.artistSongIds}

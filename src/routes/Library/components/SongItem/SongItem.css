@@ -9,10 +9,6 @@
   height: 60px;
 }
 
-.isQueued {
-  background: #ffff8c;
-}
-
 .duration {
   font-size: 13px;
   text-align: right;
@@ -32,6 +28,10 @@
   overflow: hidden;
 }
 
+.isQueued {
+  animation: var(--animation-glow);
+}
+
 .artist {
   font-size: 14px;
   text-overflow: ellipsis;
@@ -41,7 +41,6 @@
 
 .btnContainer {
   display: flex;
-  overflow: hidden;
   width: var(--song-item-btn-width);
   transition: width var(--spring-duration) var(--spring-function);
   margin-left: 20px;
@@ -55,6 +54,12 @@
 .button {
   width: var(--song-item-btn-width);
   height: var(--song-item-btn-height);
+  transition: opacity .3s;
+}
+
+.hiddenButton {
+  composes: button;
+  opacity: 0;
 }
 
 .star {
@@ -78,23 +83,10 @@
   color: var(--text-color);
 }
 
-.hide {
-  fill: var(--song-item-btn-inactive-color);
+.animateStar {
+  animation: var(--animation-bounce);
 }
 
 .info {
   fill: var(--song-item-btn-color);
-}
-
-@keyframes glow {
-    /* from { text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 4px #ff0080, 0 0 6px #ff0080, 0 0 8px #ff0080, 0 0 11px #ff0080, 0 0 15px #ff0080; } */
-    from { text-shadow: 0 0 1px #fff, 0 0 4px var(--queued-item-glow-color), 0 0 6px var(--queued-item-glow-color), 0 0 8px var(--queued-item-glow-color), 0 0 11px var(--queued-item-glow-color); }
-}
-
-.glow {
-    animation-duration: 1.5s;
-    animation-name: glow;
-    animation-direction: alternate;
-    animation-iteration-count: infinite;
-    animation-timing-function: ease-in;
 }

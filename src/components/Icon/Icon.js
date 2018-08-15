@@ -3,31 +3,20 @@ import React from 'react'
 import icons from './icons'
 
 const Icon = props => {
-  const { size, icon, ...restProps } = props
-
-  const styles = {
-    svg: {
-      display: 'block',
-      margin: 'auto',
-    },
-    path: {
-      fill: props.color,
-    },
-  }
+  const { size, icon, className, ...restProps } = props
 
   return (
     <svg
-      style={styles.svg}
+      style={{
+        display: 'block',
+        margin: 'auto',
+      }}
       width={`${size}px`}
       height={`${size}px`}
       viewBox={icons[icon].viewBox}
       {...restProps}
     >
-      <path
-        style={styles.path}
-        className={props.className}
-        d={icons[props.icon].d}
-      />
+      <path className={className} d={icons[icon].d}/>
     </svg>
   )
 }
@@ -35,12 +24,7 @@ const Icon = props => {
 Icon.propTypes = {
   icon: PropTypes.string.isRequired,
   size: PropTypes.number,
-  color: PropTypes.string,
   className: PropTypes.string,
-}
-
-Icon.defaultProps = {
-  size: 32,
 }
 
 export default Icon
