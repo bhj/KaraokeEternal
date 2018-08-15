@@ -306,7 +306,7 @@ let initialState = {
   isAdmin: false,
   roomId: null,
   starredArtists: [],
-  starredSongs: [],
+  starredSongs: optimisticStarredSongs(undefined, {}),
 }
 
 export default function userReducer (state = initialState, action) {
