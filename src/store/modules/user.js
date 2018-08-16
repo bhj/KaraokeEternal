@@ -1,3 +1,10 @@
+import { fetchPrefs } from './prefs'
+import { browserHistory } from 'react-router'
+import HttpApi from 'lib/HttpApi'
+import { optimistic, ensureState } from 'redux-optimistic-ui'
+import { persistReducer, createTransform } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import hardSet from 'redux-persist/lib/stateReconciler/hardSet'
 import {
   USER_SONG_STAR,
   USER_SONG_UNSTAR,
@@ -9,10 +16,6 @@ import {
   _SUCCESS,
   _ERROR,
 } from 'constants/actions'
-import { fetchPrefs } from './prefs'
-import { browserHistory } from 'react-router'
-import HttpApi from 'lib/HttpApi'
-import { optimistic } from 'redux-optimistic-ui'
 
 const api = new HttpApi('')
 const optimisticStarredSongs = optimistic(starredSongsReducer)
@@ -266,15 +269,13 @@ export function unstarSong (songId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [LOGIN + _SUCCESS]: (state, action) => ({
+  [LOGIN + _SUCCESS]: (state, { payload }) => ({
     ...state,
-    ...action.payload,
-    starredSongs: optimisticStarredSongs(action.payload.starredSongs, action),
+    ...payload,
   }),
-  [UPDATE + _SUCCESS]: (state, action) => ({
+  [UPDATE + _SUCCESS]: (state, { payload }) => ({
     ...state,
-    ...action.payload,
-    starredSongs: optimisticStarredSongs(action.payload.starredSongs, action),
+    ...payload,
   }),
   [CREATE + _SUCCESS]: (state, { payload }) => ({
     ...state,
@@ -286,18 +287,10 @@ const ACTION_HANDLERS = {
   [SOCKET_AUTH_ERROR]: (state, { payload }) => ({
     ...initialState,
   }),
-  [USER_SONG_STAR]: (state, action) => ({
-    ...state,
-    starredSongs: optimisticStarredSongs(state.starredSongs, action),
-  }),
-  [USER_SONG_UNSTAR]: (state, action) => ({
-    ...state,
-    starredSongs: optimisticStarredSongs(state.starredSongs, action),
-  }),
 }
 
 // ------------------------------------
-// Reducer
+// Reducers
 // ------------------------------------
 let initialState = {
   userId: null,
@@ -306,15 +299,18 @@ let initialState = {
   isAdmin: false,
   roomId: null,
   starredArtists: [],
-  starredSongs: optimisticStarredSongs(undefined, {}),
 }
 
-export default function userReducer (state = initialState, action) {
+function userReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
-  return handler ? handler(state, action) : state
+  return {
+    ...(handler ? handler(state, action) : state),
+    starredSongs: optimisticStarredSongs(state.starredSongs, action),
+  }
 }
 
+// nested reducer, wrapped in optimism
 function starredSongsReducer (state = [], action) {
   const songs = state.slice() // copy
 
@@ -325,7 +321,27 @@ function starredSongsReducer (state = [], action) {
     case USER_SONG_UNSTAR:
       songs.splice(songs.indexOf(action.payload.songId), 1)
       return songs
+    case LOGIN + _SUCCESS:
+    case UPDATE + _SUCCESS:
+      return action.payload.starredSongs
     default:
       return state
   }
 }
+
+// convert the optimistic structure to/from arrays for persistence
+const starredSongsTransform = createTransform(
+  // state is being serialized and persisted
+  (inboundState, key) => ensureState(inboundState),
+  // state is being rehydrated; match optimistic-ui shape
+  (outboundState, key) => ({ beforeState: undefined, history: [], current: outboundState }),
+  // keys this transform gets called on
+  { whitelist: ['starredSongs'] }
+)
+
+export default persistReducer({
+  key: 'primary',
+  transforms: [starredSongsTransform],
+  stateReconciler: hardSet,
+  storage,
+}, userReducer)

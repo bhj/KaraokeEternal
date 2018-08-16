@@ -1,6 +1,5 @@
+import { combineReducers } from 'redux'
 import { optimistic } from 'redux-optimistic-ui'
-import { persistCombineReducers } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
 import { createResponsiveStateReducer } from 'redux-responsive'
 
 // reducers
@@ -15,14 +14,8 @@ import status from './modules/status'
 import ui from './modules/ui'
 import user from './modules/user'
 
-const persistConfig = {
-  key: 'primary',
-  whitelist: ['user'],
-  storage,
-}
-
 export const makeRootReducer = (asyncReducers) => {
-  return persistCombineReducers(persistConfig, {
+  return combineReducers({
     artists,
     browser: createResponsiveStateReducer(),
     library,
