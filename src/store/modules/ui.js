@@ -93,7 +93,10 @@ export default function uiReducer (state = initialState, action) {
   const newState = handler ? handler(state, action) : state
 
   if (action.error) {
-    newState.errorMessage = action.error
+    return {
+      ...newState,
+      errorMessage: action.error,
+    }
   }
 
   return newState
