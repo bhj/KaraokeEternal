@@ -89,8 +89,12 @@ const initialState = {
 }
 
 export default function uiReducer (state = initialState, action) {
-  const handler = action.meta && action.meta.error
-    ? ACTION_HANDLERS[SHOW_ERROR_MESSAGE] : ACTION_HANDLERS[action.type]
+  const handler = ACTION_HANDLERS[action.type]
+  const newState = handler ? handler(state, action) : state
 
-  return handler ? handler(state, action) : state
+  if (action.error) {
+    newState.errorMessage = action.error
+  }
+
+  return newState
 }

@@ -33,7 +33,7 @@ export function setPrefs (domain, data) {
       .catch(err => {
         dispatch({
           type: PREFS_SET + _ERROR,
-          meta: { error: err.message },
+          error: err.message,
         })
       })
   }
@@ -61,7 +61,7 @@ export function fetchPrefs () {
       .catch(err => {
         dispatch({
           type: PREFS_REQUEST + _ERROR,
-          meta: { error: err.message },
+          error: err.message,
         })
       })
   }
@@ -91,7 +91,7 @@ export function requestScan () {
       .catch(err => {
         dispatch({
           type: PREFS_REQUEST_SCAN + '_ERROR',
-          meta: { error: err.message },
+          error: err.message,
         })
       })
   }
@@ -111,7 +111,7 @@ export function requestScanCancel () {
       .catch(err => {
         dispatch({
           type: PREFS_REQUEST_SCAN_CANCEL + '_ERROR',
-          meta: { error: err.message },
+          error: err.message,
         })
       })
   }

@@ -40,9 +40,7 @@ function receiveLogin (response) {
 function loginError (message) {
   return {
     type: LOGIN + _ERROR,
-    meta: {
-      error: message + ' (incorrect login)',
-    }
+    error: message + ' (incorrect login)',
   }
 }
 
@@ -118,9 +116,7 @@ function receiveLogout () {
 function logoutError (message) {
   return {
     type: LOGOUT + _ERROR,
-    meta: {
-      error: message,
-    }
+    error: message,
   }
 }
 
@@ -167,9 +163,7 @@ function receiveCreate (user) {
 function createError (message) {
   return {
     type: CREATE + _ERROR,
-    meta: {
-      error: message,
-    }
+    error: message,
   }
 }
 
@@ -223,9 +217,7 @@ function receiveUpdate (response) {
 function updateError (message) {
   return {
     type: UPDATE + _ERROR,
-    meta: {
-      error: message,
-    }
+    error: message,
   }
 }
 

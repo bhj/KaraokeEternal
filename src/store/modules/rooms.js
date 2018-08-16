@@ -32,9 +32,7 @@ function receiveRooms (response) {
 function roomsError (message) {
   return {
     type: GET_ROOMS + _ERROR,
-    meta: {
-      error: message,
-    }
+    error: message,
   }
 }
 
@@ -73,7 +71,7 @@ export function createRoom (data) {
       .catch(err => {
         dispatch({
           type: ROOM_CREATE + _ERROR,
-          meta: { error: err.message },
+          error: err.message,
         })
       })
   }
@@ -100,7 +98,7 @@ export function updateRoom (roomId, data) {
       .catch(err => {
         dispatch({
           type: ROOM_UPDATE + _ERROR,
-          meta: { error: err.message },
+          error: err.message,
         })
       })
   }
@@ -125,7 +123,7 @@ export function removeRoom (roomId) {
       .catch(err => {
         dispatch({
           type: ROOM_REMOVE + _ERROR,
-          meta: { error: err.message },
+          error: err.message,
         })
       })
   }
