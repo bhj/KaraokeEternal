@@ -34,7 +34,7 @@ router.post('/account', async (ctx, next) => {
     // check for duplicate username
     const q = squel.select()
       .from('users')
-      .where('username = ? COLLATE NOCASE', username.trim())
+      .where('username = ?', username.trim())
 
     const { text, values } = q.toParam()
 
@@ -48,15 +48,12 @@ router.post('/account', async (ctx, next) => {
     ctx.throw(422, 'Passwords do not match')
   }
 
-  // hash new password
-  const hashedPwd = await bcrypt.hash(newPassword, 12)
-
   {
     // insert user
     const q = squel.insert()
       .into('users')
       .set('username', username.trim())
-      .set('password', hashedPwd)
+      .set('password', await bcrypt.hash(newPassword, 12))
       .set('name', name.trim())
       .set('isAdmin', 0)
 
@@ -171,7 +168,7 @@ router.put('/account', async (ctx, next) => {
     const q = squel.select()
       .from('users')
       .where('userId != ?', ctx.user.userId)
-      .where('username = ? COLLATE NOCASE', username.trim())
+      .where('username = ?', username.trim())
 
     const { text, values } = q.toParam()
 
@@ -194,11 +191,9 @@ router.put('/account', async (ctx, next) => {
     }
 
     q.set('password', await bcrypt.hash(newPassword, 10))
-
     password = newPassword
   }
 
-  // do update
   const { text, values } = q.toParam()
   await db.run(text, values)
 
@@ -218,7 +213,7 @@ async function _login (ctx, creds) {
   // get user
   const q = squel.select()
     .from('users')
-    .where('username = ? COLLATE NOCASE', username.trim())
+    .where('username = ?', username.trim())
 
   const { text, values } = q.toParam()
   const user = await db.get(text, values)
