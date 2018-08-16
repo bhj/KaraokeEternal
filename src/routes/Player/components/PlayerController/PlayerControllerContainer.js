@@ -1,5 +1,6 @@
 import PlayerController from './PlayerController'
 import { connect } from 'react-redux'
+import { ensureState } from 'redux-optimistic-ui'
 import { requestPlayNext } from 'store/modules/status'
 import {
   emitStatus,
@@ -29,7 +30,8 @@ const defaultQueueItem = {
 }
 
 const mapStateToProps = (state) => {
-  const { player, queue, status } = state
+  const { player, status } = state
+  const queue = ensureState(state.queue)
 
   return {
     queueItem: queue.entities[player.queueId] || defaultQueueItem,
