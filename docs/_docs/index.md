@@ -9,16 +9,16 @@ permalink: /docs/index.html
   - [Library](#library)
   - [Queue](#queue)
   - [Account](#account)
-    - [Rooms](#rooms) (admin only)
-    - [Preferences](#preferences) (admin only)
+    - [Rooms](#rooms-admin-only) (admin only)
+    - [Preferences](#preferences-admin-only) (admin only)
     - [My Account](#my-account)
-  - [Player](#player) (admin only)
+  - [Player](#player-admin-only) (admin only)
 - [Karaoke Forever Server](#karaoke-forever-server)
   - [Installation](#installation)
   - [Supported Media Files](#supported-media-files)
   - [The Meta Parser](#the-meta-parser)
     - [Configuring the Parser](#configuring-the-parser)
-    - [Augmenting or Replacing the Parser (Advanced)](#augmenting-or-replacing-the-parser)
+    - [Augmenting or Replacing the Parser (Advanced)](#augmenting-or-replacing-the-parser-advanced)
 
 ## Overview
 
