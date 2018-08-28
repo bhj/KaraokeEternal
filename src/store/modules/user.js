@@ -77,8 +77,10 @@ export function loginUser (data) {
           }
         }
 
-        // default redirect
-        browserHistory.push('/library')
+        // default redirect if not an admin
+        if (!user.isAdmin) {
+          browserHistory.push('/library')
+        }
       })
       .catch(err => {
         dispatch(loginError(err.message))
