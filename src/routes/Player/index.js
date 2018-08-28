@@ -1,4 +1,5 @@
-import { injectReducer } from '../../store/reducers'
+import { injectReducer } from 'store/reducers'
+import { browserHistory } from 'react-router'
 import RequireAuth from 'components/RequireAuth'
 
 export default (store) => ({
@@ -8,6 +9,10 @@ export default (store) => ({
     /*  Webpack - use 'require.ensure' to create a split point
         and embed an async module loader (jsonp) when bundling   */
     require.ensure([], (require) => {
+      if (!store.getState().user.isAdmin) {
+        return browserHistory.push('/account')
+      }
+
       /*  Webpack - use require callback to define
           dependencies for bundling   */
       const PlayerView = require('./views/PlayerViewContainer').default
