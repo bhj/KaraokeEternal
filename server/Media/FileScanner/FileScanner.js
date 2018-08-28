@@ -249,14 +249,4 @@ function getCfg (dir, baseDir) {
   return getCfg(path.resolve(dir, '..'), baseDir)
 }
 
-// if (typeof song !== 'object') {
-//   // try parent folder?
-//   log(`  => couldn't parse artist/title from filename; trying parent folder name`)
-//   song = parseMeta(cdgPathInfo.dir.split(cdgPathInfo.sep).pop())
-//
-//   if (typeof song !== 'object') {
-//     return Promise.reject(new Error(`couldn't parse artist/title`))
-//   }
-// }
-
 module.exports = FileScanner
