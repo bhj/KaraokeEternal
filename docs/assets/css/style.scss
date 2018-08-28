@@ -20,6 +20,10 @@ ul {
   list-style-image: none;
 }
 
+#header {
+  display: none;
+}
+
 #title h1 {
   font-size: 48px;
   animation: neon1 1.5s ease-in infinite alternate;
