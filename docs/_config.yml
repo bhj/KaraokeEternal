@@ -5,3 +5,9 @@ collections:
   docs:
     output: true
     permalink: /:collection/:name/
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: default
