@@ -4,7 +4,16 @@
 @import "{{ site.theme }}";
 
 body {
-  font: 15px/1.5 "OpenSansRegular", "Helvetica Neue", Helvetica, Arial, sans-serif;  
+  font: 16px/1.5 "OpenSansRegular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.wrapper,
+section {
+  max-width: 900px;
+}
+
+ul {
+  list-style-image: none;
 }
 
 #title h1 {
