@@ -17,24 +17,24 @@ module.exports = {
   QUEUE_ADD: 'server/QUEUE_ADD',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
   QUEUE_PUSH: 'queue/QUEUE_PUSH',
-  // player command requests (clients -> server)
+  // player commands
   REQUEST_PLAYER_PLAY: 'server/REQUEST_PLAYER_PLAY',
   REQUEST_PLAYER_PAUSE: 'server/REQUEST_PLAYER_PAUSE',
   REQUEST_PLAYER_NEXT: 'server/REQUEST_PLAYER_NEXT',
   REQUEST_PLAYER_VOLUME: 'server/REQUEST_PLAYER_VOLUME',
-  // player commands (server -> player)
+  // from server to player
   PLAYER_NEXT: 'player/NEXT',
   PLAYER_PAUSE: 'player/PAUSE',
   PLAYER_PLAY: 'player/PLAY',
   PLAYER_VOLUME: 'player/VOLUME',
-  // player -> server -> clients
-  PLAYER_STATUS: 'status/PLAYER_STATUS',
-  PLAYER_ERROR: 'status/PLAYER_ERROR',
-  PLAYER_LEAVE: 'status/PLAYER_LEAVE',
-  // to room (player -> server -> clients)
+  // from player to server
   EMIT_PLAYER_STATUS: 'server/EMIT_PLAYER_STATUS',
   EMIT_PLAYER_ERROR: 'server/EMIT_PLAYER_ERROR',
   EMIT_PLAYER_LEAVE:  'server/EMIT_PLAYER_LEAVE',
+  // from server to clients
+  PLAYER_STATUS: 'status/PLAYER_STATUS',
+  PLAYER_ERROR: 'status/PLAYER_ERROR',
+  PLAYER_LEAVE: 'status/PLAYER_LEAVE',
   // player informational
   PLAYER_MEDIA_REQUEST: 'player/MEDIA_REQUEST',
   PLAYER_MEDIA_REQUEST_SUCCESS: 'player/MEDIA_REQUEST_SUCCESS',
