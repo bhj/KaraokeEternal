@@ -36,7 +36,7 @@ module.exports = function (cfg) {
 
 function splitToParts (ctx, next) {
   // split, trim and remove empty parts
-  ctx.parts = ctx.str.split(ctx.cfg.separator)
+  ctx.parts = ctx.file.split(ctx.cfg.separator)
     .map(part => part.trim())
     .filter(part => part.length)
 
@@ -67,7 +67,7 @@ function scrubParts (patterns) {
 
 function detectSeparator (cfg = {}) {
   return function (ctx, next) {
-    const matches = ctx.str.match(/ in the style of /i)
+    const matches = ctx.file.match(/ in the style of /i)
 
     ctx.cfg = {
       separator: matches ? matches[0] : '-',
@@ -94,7 +94,7 @@ function titleCase (ctx, next) {
 // global replace
 function repl (pattern, replacement = '') {
   return function (ctx, next) {
-    ctx.str = ctx.str.replace(pattern, replacement).trim()
+    ctx.file = ctx.file.replace(pattern, replacement).trim()
     if (ctx.artist) ctx.artist = ctx.artist.replace(pattern, replacement).trim()
     if (ctx.title) ctx.title = ctx.title.replace(pattern, replacement).trim()
     next()

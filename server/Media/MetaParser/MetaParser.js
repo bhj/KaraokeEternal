@@ -18,8 +18,8 @@ class MetaParser {
       ? cfg({ composeSync, getDefaultMiddleware, getDefaultParser })
       : getDefaultParser(cfg)
 
-    return str => {
-      const ctx = { str, cfg }
+    return file => {
+      const ctx = { file, cfg }
       parser(ctx)
 
       if (!ctx.artist || !ctx.title) {
