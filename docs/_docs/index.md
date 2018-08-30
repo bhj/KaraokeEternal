@@ -86,7 +86,7 @@ Users choose an open room when signing in, and can only be signed in to one room
 
 The Preferences panel allows admins to configure Karaoke Forever. These settings are global (there are currently no per-user settings).
 
-- **Media Folders:** Add folders with [supported media files](#supported-media-files) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in this list will be used. Karaoke Forever does not automatically detect changes to media folders; click Refresh to re-scan.
+- **Media Folders:** Add folders with [supported media files](#supported-media-files) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in this list will be used. Karaoke Forever Server does not automatically detect changes to media folders; click Refresh to re-scan.
 
 #### My Account
 
@@ -94,9 +94,9 @@ This panel lets users change their name, username or password and sign out.
 
 ### Player (admin only)
 
-The player is just another page of the web app, but is designed to run fullscreen in a browser, usually on the system handling audio/video for a room.
+The player is just another page of the web app that's designed to run in fullscreen mode, usually on the system handling audio/video for a room.
 
-When an admin signs in to a [room](#rooms-admin-only) that does not yet have a player running, a notice will appear with a handy link to (unsurprisingly) `/player`. If no notice appears it means the current browser does not support fullscreen mode.
+When an admin signs in to a [room](#rooms-admin-only) that does not yet have a player running, a notice will appear with a handy link to `/player`. If no notice appears it means the browser does not support fullscreen mode.
 
 The player has been tested on the current versions of these (desktop) browsers:
 
