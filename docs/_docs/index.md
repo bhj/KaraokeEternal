@@ -140,7 +140,7 @@ The following file formats are supported:
 
 Karaoke Forever expects media filenames to be in the format "Artist - Title" by default. To customize the parser's behavior, see [The Meta Parser](#the-meta-parser).
 
-**Note:** Since mp4/m4a files are only containers, codec support can vary depending on the browser running the [player](#player).
+**Note:** Since mp4/m4a files are only containers, codec support can vary depending on the browser running the [player](#player-admin-only).
 
 ### The Meta Parser
 
