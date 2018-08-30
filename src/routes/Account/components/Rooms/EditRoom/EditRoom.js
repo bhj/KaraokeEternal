@@ -13,15 +13,20 @@ export default class EditRoom extends Component {
     removeRoom: PropTypes.func.isRequired,
   }
 
+  constructor (props) {
+    super(props)
+    this.text = React.createRef()
+    this.checkbox = React.createRef()
+  }
+
   render () {
     const { room } = this.props
 
     return (
-      <SkyLightStateless
-        isVisible
+      <SkyLightStateless isVisible
         onCloseClicked={this.props.closeRoomEditor}
         onOverlayClicked={this.props.closeRoomEditor}
-        title={room ? 'Room' : 'Create Room'}
+        title={room ? 'Edit Room' : 'Create Room'}
         dialogStyles={{
           width: '80%',
           minHeight: '200px',
@@ -29,13 +34,22 @@ export default class EditRoom extends Component {
           marginLeft: '0' }}
       >
 
-        <input type='text' placeholder='room name'
-          ref={r => { this.roomName = r }}
+        <input type='text'
+          placeholder='room name'
+          ref={this.text}
           defaultValue={room ? room.name : ''}
           onKeyPress={this.handleKeyPress}
           autoFocus={typeof room === 'undefined'}
         />
 
+        <label>
+          <input type='checkbox'
+            defaultChecked={!room || room.status === 'open'}
+            ref={this.checkbox}
+          /> Open
+        </label>
+
+        <br />
         <br />
 
         {!room &&
@@ -63,14 +77,15 @@ export default class EditRoom extends Component {
 
   handleCreateClick = () => {
     this.props.createRoom({
-      name: this.roomName.value,
+      name: this.text.current.value,
       status: 'open',
     })
   }
 
   handleUpdateClick = () => {
     this.props.updateRoom(this.props.room.roomId, {
-      name: this.roomName.value,
+      name: this.text.current.value,
+      status: this.checkbox.current.checked ? 'open' : 'closed',
     })
   }
 
