@@ -1,6 +1,6 @@
 theme: jekyll-theme-midnight
 title: Karaoke Forever
-description: Karaoke LAN party system
+description: Open karaoke party system
 collections:
   docs:
     output: true
