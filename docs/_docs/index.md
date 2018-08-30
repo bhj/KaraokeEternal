@@ -44,9 +44,9 @@ Karaoke Forever has a few parts:
 
 4. In the Preferences panel, tap Media Folders and add folder(s) containing supported media. Songs will appear in the library when the scan is complete.
 
-5. If you are not on the system that will be the player (handling audio/video) go there now, browse to the server URL and sign in with your admin account.
+5. If you are not on the system that will be the [player](#player-admin-only) (handling audio/video) go there now, browse to the server URL and sign in with your admin account.
 
-6. You should see a notice that no players are present in the room, so tap the Start Player link. (If you don't see a notice it means the browser does not support fullscreen mode; you can still navigate to `/player` manually for this walkthrough)
+6. You should see a notice that no players are present in the [room](#rooms-admin-only), so tap the Start Player link. (If you don't see a notice it means the browser does not support fullscreen mode; you can still navigate to `/player` manually for this walkthrough)
 
 7. Now that a player is running, use another device (or browser tab) to queue some songs and press play to begin. The player will play as long as there are songs in the queue, and after running out of songs the next one to be queued will start immediately.
 
@@ -58,7 +58,7 @@ You are now ready to test your audio setup and start the party!
 
 The library page lists available songs organized by artist, and allows searching both artists and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
 
-If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Preferences](#preferences)).
+If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Preferences](#preference-admin-only)).
 
 Admins can reveal additional options for each song by swiping left. Currently the only additional option is Get Info, which shows the song's underlying media file(s).
 
