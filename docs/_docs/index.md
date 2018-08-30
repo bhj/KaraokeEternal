@@ -22,17 +22,17 @@ permalink: /docs/index.html
 
 ## Overview
 
-Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser. Supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required.
+Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser. Supports songs in [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required.
 
 Karaoke Forever has a few parts:
 
-- **[Server:](#karaoke-forever-server)** Runs on the macOS/Windows/Linux/etc. system with your media files. Serves the web app on your local network.
+- **[Server:](#karaoke-forever-server)** Runs on the macOS/Windows/Linux/etc. system with your [supported media files](#supported-media-files). Serves the web app on your local network.
 
 - **[Web app:](#karaoke-forever-the-web-app)** Designed from the ground up for mobile browsers, anyone can easily join using their phone.
 
-- **[Player:](#player-admin-only)** Runs fullscreen in a browser on the system handling audio/video for the room.
+- **[Player:](#player-admin-only)** Just another name for the the web app when it's running fullscreen on the system handling audio/video for the room.
 
-**Note:** Karaoke Forever does not handle audio *input* since there are a wide variety of possible audio interface and microphone configurations. It is assumed that the Player's output will be mixed with the microphone input(s) by the system.
+**Note:** Karaoke Forever does not handle audio *input* since there are a wide variety of possible audio interface and microphone configurations. It is assumed that the player's output will be mixed with the microphone input(s) by the system.
 
 ## Quick Start
 
@@ -46,11 +46,11 @@ Karaoke Forever has a few parts:
 
 4. In the Preferences panel, tap Media Folders and add folder(s) containing supported media. Songs will appear in the library when the scan is complete.
 
-5. If you are not on the system that will be the Player (handling audio/video) go there now, browse to the server URL and sign in with your admin account.
+5. If you are not on the system that will be the player (handling audio/video) go there now, browse to the server URL and sign in with your admin account.
 
-6. You should see a notice that no Players are present in the room, so tap the Start Player link. (If you don't see a notice it means the browser does not support fullscreen mode; you can still navigate to `/player` manually)
+6. You should see a notice that no players are present in the room, so tap the Start Player link. (If you don't see a notice it means the browser does not support fullscreen mode; you can still navigate to `/player` manually for this walkthrough)
 
-7. Now that a Player is running, use another device (or browser tab) to queue some songs and press play to begin. The Player will play as long as there are songs in the queue, and after running out of songs the next one to be queued will start immediately.
+7. Now that a player is running, use another device (or browser tab) to queue some songs and press play to begin. The player will play as long as there are songs in the queue, and after running out of songs the next one to be queued will start immediately.
 
 You are now ready to test your audio setup and start the party!
 
@@ -58,7 +58,7 @@ You are now ready to test your audio setup and start the party!
 
 ### Library
 
-Lists available songs organized by artist, and allows searching both artists and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
+The library page lists available songs organized by artist, and allows searching both artists and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
 
 If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Media Folder Preferences](#media-folders)).
 
@@ -66,11 +66,13 @@ Admins can reveal additional options for each song by swiping left. Currently th
 
 ### Queue
 
-The queue shows the current, upcoming and previously played songs. Users can remove any of their upcoming songs and will see a notice (on all pages) when they're up next.
+The queue page shows the current, upcoming and previously played songs. Users can remove any of their upcoming songs and will see a notice (on all pages) when they're up next.
 
 While a user is up they temporarily have access to the playback controls, including pause, play, next and volume. Admins always have access to these controls.
 
 ### Account
+
+The account page lets users update their account, and will have a few additional panels for admins.
 
 #### Rooms (Admin Only)
 
@@ -86,11 +88,7 @@ Users choose an open room when signing in, and can only be signed in to one room
 
 The Preferences panel allows admins to configure Karaoke Forever. These settings are global (there are currently no per-user settings).
 
-##### Media Folders
-
-Add folders with [supported media files](#supported-media-files) to scan them into the library.
-
-When multiple folders contain a version of the same song, the version in the folder highest in this list will be used. Karaoke Forever does not automatically detect changes to media folders, so click Refresh to re-scan the folders.
+- **Media Folders:** Add folders with [supported media files](#supported-media-files) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in this list will be used. Karaoke Forever does not automatically detect changes to media folders; click Refresh to re-scan.
 
 #### My Account
 
@@ -98,9 +96,11 @@ This panel lets users change their name, username or password and sign out.
 
 ### Player (admin only)
 
-Just another name for the app in "Player" mode. Designed to run fullscreen in a browser, usually on the system handling audio/video for a room. Only admins can access the Player page.
+The player is just another page of the web app, but is designed to run fullscreen in a browser, usually on the system handling audio/video for a room.
 
-The Player has been tested on the current versions of these (desktop) browsers:
+When an admin signs in to a [room](#rooms-admin-only) that does not yet have a player running, a notice will appear with a handy link to (unsurprisingly) `/player`. If no notice appears it means the current browser does not support fullscreen mode.
+
+The player has been tested on the current versions of these (desktop) browsers:
 
 - Chrome
 - Firefox
@@ -111,10 +111,7 @@ Internet Explorer is not supported.
 
 **Note:** A desktop-class browser is recommended due to limitations in the fullscreen support of some mobile browsers.
 
-**Tip:** Most browsers will mute or prevent playback of media on a page that hasn't been interacted with yet. Pressing play on the Player page is usually sufficient, or you can whitelist the Player page in your browser.
-
-When an admin signs in to a room that does not yet have a Player running, a notice will appear with a handy link to (unsurprisingly) `/player`. If no notice appears it means the current browser does not support fullscreen mode.
-
+**Tip:** Most browsers will mute or prevent playback of media on a page that hasn't been interacted with yet. Pressing play on the player page is usually sufficient, or you can whitelist the player page in your browser.
 
 ## Karaoke Forever Server
 
@@ -145,7 +142,7 @@ The following file formats are supported:
 
 Karaoke Forever expects media filenames to be in the format "Artist - Title" by default. To customize the parser's behavior, see [The Meta Parser](#the-meta-parser).
 
-**Note:** Since mp4/m4a files are only containers, codec support can vary depending on the browser running the [Player](#player).
+**Note:** Since mp4/m4a files are only containers, codec support can vary depending on the browser running the [player](#player).
 
 ### The Meta Parser
 
