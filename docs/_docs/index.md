@@ -58,7 +58,7 @@ You are now ready to test your audio setup and start the party!
 
 The library page lists available songs organized by artist, and allows searching both artists and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
 
-If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Media Folder Preferences](#media-folders)).
+If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Preferences](#preferences)).
 
 Admins can reveal additional options for each song by swiping left. Currently the only additional option is Get Info, which shows the song's underlying media file(s).
 
@@ -119,7 +119,7 @@ The server is bundled as a macOS and Windows application for convenience.
 
 **Important:** The server app is not currently signed, so macOS and Windows SmartScreen will complain by default. *Do not disable Gatekeeper* on macOS - simply right-click the file and choose Open.
 
-Once running, click the Karaoke Forever Server menubar icon (macOS) or right-click the tray icon (Windows) to show the server URL. You can click *Open in browser* or browse to the server URL (including port) from any device on the network. Note that the web app is primarily designed for mobile browsers.
+Once running, click the Karaoke Forever Server menubar icon (macOS) or right-click the tray icon (Windows) to show the server URL. You can click *Open in browser* or browse to the server URL (be sure to include the port) from any device on the network. Note that the web app is primarily designed for mobile browsers.
 
 You can also run the server on most any platform with Node.js 10 or later:
 
