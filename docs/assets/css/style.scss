@@ -21,6 +21,10 @@ ul {
   list-style-image: none;
 }
 
+li > ul {
+  margin-bottom: 0;
+}
+
 #header {
   display: none;
 }
