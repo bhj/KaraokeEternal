@@ -148,7 +148,7 @@ Karaoke Forever expects media filenames to be in the format "Artist - Title" by 
 
 #### Configuring the Parser
 
-The default parser normally looks for a hyphen (-) in the filename and assumes the artist's name is on the left. To tell Karaoke Forever that a folder contains filenames having the position swapped, for example, add a `_kfconfig.js` file that returns a configuration object:
+The default parser normally looks for a hyphen (-) in the filename and assumes the artist's name is on the left, and song title on the right. If a folder has media filenames having the positions reversed, for example, add a `_kfconfig.js` file that returns a configuration object:
 
 ```
 return {
@@ -189,7 +189,7 @@ Your parser creator should accept an object with the following functions:
 
 - `getDefaultParser`: Returns the default parser. Optionally accepts a configuration object (see [Configuring the Parser](#configuring-the-parser)). In the example above our parser is doing a bit of pre-cleaning using `customMiddleware`, then running the default parser to handle the rest. The default parser can itself be used as middleware, with custom middleware run before and/or after.
 
-- `getDefaultMiddleware`: Returns an object whose properties (`pre`, `parse`, `post`) correspond to the default parsing stages. Each property is an array of middleware, allowing more granular control over how to (re)compose the default parser.
+- `getDefaultMiddleware`: Returns an object whose properties (`pre`, `parse`, `post`) correspond to the default parsing stages. Each property is an array of middleware, allowing more granular control over how to (re)compose the default parser. Optionally accepts a configuration object (see [Configuring the Parser](#configuring-the-parser)).
 
 The following code is functionally identical to the previous example, but uses each stage from `getDefaultMiddleware` explicitly. This allows inserting custom middleware between stages, or removing a stage altogether if you do not include it.
 
