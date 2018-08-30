@@ -4,6 +4,8 @@
 @import "{{ site.theme }}";
 
 body {
+  color: #b6b6b6;
+  background-color: #333;
   font: 16px/1.5 "OpenSansRegular", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -12,8 +14,8 @@ section {
   max-width: 900px;
 }
 
-h2 { font-size: 28px; margin-top: 3rem; }
-h3 { font-size: 24px; margin-top: 2rem; }
+h2 { font-size: 28px; margin-top: 3rem; margin-bottom: 2rem; }
+h3 { font-size: 24px; margin-top: 2rem; margin-bottom: 1rem; }
 h4 { font-size: 18px; margin-top: 1rem; }
 
 ul {
@@ -26,23 +28,11 @@ ul {
 
 #title h1 {
   font-size: 48px;
-  animation: neon1 1.5s ease-in infinite alternate;
-  backdrop-filter: saturate(250%);
-  -backdrop-filter: saturate(250%);
-  -webkit-backdrop-filter: saturate(250%);
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #BA3A95, 0 0 30px #BA3A95, 0 0 40px #BA3A95, 0 0 55px #BA3A95, 0 0 75px #BA3A95;
 }
 
 #title .credits.left {
   font-size: 14px;
-}
-
-@keyframes neon1 {
-  from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #BA3A95, 0 0 70px #BA3A95, 0 0 80px #BA3A95, 0 0 100px #BA3A95, 0 0 150px #BA3A95;
-  }
-  to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #BA3A95, 0 0 35px #BA3A95, 0 0 40px #BA3A95, 0 0 50px #BA3A95, 0 0 75px #BA3A95;
-  }
 }
 
 a {
