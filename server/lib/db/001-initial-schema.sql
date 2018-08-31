@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS "rooms" (
   "roomId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "name" text NOT NULL,
   "status" text NOT NULL,
+  "password" text,
   "dateCreated" text NOT NULL
 );
 
