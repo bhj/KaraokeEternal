@@ -5,11 +5,17 @@
   overflow: hidden;
 }
 
-.title {
-  margin: 0;
-  font-size: var(--panel-title-size);
+.titleContainer {
+  display: flex;
   padding: var(--panel-title-padding);
   background-color: var(--panel-title-background-color);
+}
+
+.title {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  font-size: var(--panel-title-size);
 }
 
 .content {

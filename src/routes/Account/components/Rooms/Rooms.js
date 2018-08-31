@@ -20,34 +20,50 @@ export default class Rooms extends Component {
     updateRoom: PropTypes.func.isRequired,
   }
 
+  constructor (props) {
+    super(props)
+    this.state = { showClosed: false }
+    this.table = React.createRef()
+  }
+
   componentDidMount () {
     this.props.fetchRooms()
   }
 
-  toggleStatus (roomId) {
-    this.props.updateRoom(roomId, {
-      status: this.props.rooms.entities[roomId].status === 'open' ? 'closed' : 'open',
-    })
+  componentDidUpdate (prevProps, prevState) {
+    if (prevState.showClosed !== this.state.showClosed) {
+      this.table.current.recomputeRowHeights()
+    }
   }
 
   render () {
     const { rooms, isAdmin, width } = this.props
+    const { showClosed } = this.state
 
     if (!isAdmin || typeof width === 'undefined') return null
 
     return (
       <div styleName='style.container'>
-        <h1 styleName='style.title'>Rooms</h1>
+        <div styleName='style.titleContainer'>
+          <h1 styleName='style.title'>Rooms</h1>
+          <label>
+            <input type='checkbox'
+              checked={!this.state.showClosed}
+              onChange={this.handleToggle}
+            /> Hide closed
+          </label>
+        </div>
         <div styleName='style.content'>
           <Table
             width={width}
-            height={rooms.result.length * 30 + 20}
+            height={rooms.result.filter(i => rooms.entities[i].status === 'open' || showClosed).length * 30 + 20}
             headerHeight={20}
-            rowHeight={30}
+            rowHeight={this.getRowHeight}
             rowCount={rooms.result.length}
-            rowGetter={({ index }) => rooms.entities[rooms.result[index]]}
+            rowGetter={this.getRow}
             headerClassName={style.tableHeader}
             rowClassName={style.tableRow}
+            ref={this.table}
           >
             <Column
               label='Name'
@@ -98,4 +114,15 @@ export default class Rooms extends Component {
       </div>
     )
   }
+
+  handleToggle = (e) => {
+    this.setState({ showClosed: !this.state.showClosed })
+  }
+
+  getRowHeight = ({ index }) => {
+    const { status } = this.props.rooms.entities[this.props.rooms.result[index]]
+    return status === 'open' || this.state.showClosed ? 30 : 0
+  }
+
+  getRow = ({ index }) => this.props.rooms.entities[this.props.rooms.result[index]]
 }
