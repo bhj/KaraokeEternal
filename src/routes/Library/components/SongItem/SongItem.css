@@ -29,7 +29,7 @@
 }
 
 .isQueued {
-  animation: var(--animation-glow);
+  text-shadow: var(--glow-text-shadow);
 }
 
 .artist {
