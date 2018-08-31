@@ -156,12 +156,12 @@ const ACTION_HANDLERS = {
   }),
   [ROOM_EDITOR_OPEN]: (state, { payload }) => ({
     ...state,
-    isEditing: true,
+    isEditorOpen: true,
     editingRoomId: payload,
   }),
   [ROOM_EDITOR_CLOSE]: (state, { payload }) => ({
     ...state,
-    isEditing: false,
+    isEditorOpen: false,
     editingRoomId: null,
   }),
 }
@@ -172,7 +172,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   result: [],
   entities: {},
-  isEditing: false,
+  isEditorOpen: false,
   editingRoomId: null,
 }
 

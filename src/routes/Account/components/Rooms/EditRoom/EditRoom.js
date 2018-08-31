@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { SkyLightStateless } from 'react-skylight'
 import './EditRoom.css'
 
 export default class EditRoom extends Component {
   static propTypes = {
     room: PropTypes.object,
-    isVisible: PropTypes.bool.isRequired,
     // actions
     closeRoomEditor: PropTypes.func.isRequired,
     createRoom: PropTypes.func.isRequired,
@@ -21,21 +19,10 @@ export default class EditRoom extends Component {
   }
 
   render () {
-    const { room, isVisible, closeRoomEditor } = this.props
+    const { room, closeRoomEditor } = this.props
 
     return (
-      <SkyLightStateless
-        isVisible={isVisible}
-        onCloseClicked={closeRoomEditor}
-        onOverlayClicked={closeRoomEditor}
-        title={room ? 'Edit Room' : 'Create Room'}
-        dialogStyles={{
-          width: '80%',
-          minHeight: '200px',
-          left: '10%',
-          marginLeft: '0' }}
-      >
-
+      <>
         <input type='text'
           placeholder='room name'
           ref={this.text}
@@ -72,8 +59,8 @@ export default class EditRoom extends Component {
           </button>
         }
 
-        <button onClick={this.props.closeRoomEditor}>Cancel</button>
-      </SkyLightStateless>
+        <button onClick={closeRoomEditor}>Cancel</button>
+      </>
     )
   }
 

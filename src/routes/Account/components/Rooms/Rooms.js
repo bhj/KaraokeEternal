@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { formatDateTime } from 'lib/dateTime'
+import { SkyLightStateless } from 'react-skylight'
 import EditRoom from './EditRoom'
 import { Column, Table } from 'react-virtualized'
 import style from './Rooms.css'
@@ -8,11 +9,13 @@ import style from './Rooms.css'
 export default class Rooms extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
-    isEditing: PropTypes.bool.isRequired,
+    isEditorOpen: PropTypes.bool.isRequired,
+    editingRoom: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
     width: PropTypes.number,
     // Actions
     openRoomEditor: PropTypes.func.isRequired,
+    closeRoomEditor: PropTypes.func.isRequired,
     fetchRooms: PropTypes.func.isRequired,
     updateRoom: PropTypes.func.isRequired,
   }
@@ -76,7 +79,21 @@ export default class Rooms extends Component {
             Create Room
           </button>
 
-          <EditRoom isVisible={this.props.isEditing }/>
+          <SkyLightStateless
+            isVisible={this.props.isEditorOpen}
+            onCloseClicked={this.props.closeRoomEditor}
+            onOverlayClicked={this.props.closeRoomEditor}
+            title={this.props.editingRoom ? 'Edit Room' : 'Create Room'}
+            dialogStyles={{
+              width: '80%',
+              minHeight: '200px',
+              left: '10%',
+              marginLeft: '0' }}
+          >
+            {this.props.isEditorOpen &&
+              <EditRoom room={this.props.editingRoom }/>
+            }
+          </SkyLightStateless>
         </div>
       </div>
     )
