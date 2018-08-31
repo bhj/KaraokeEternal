@@ -76,9 +76,7 @@ export default class Rooms extends Component {
             Create Room
           </button>
 
-          {this.props.isEditing &&
-            <EditRoom />
-          }
+          <EditRoom isVisible={this.props.isEditing }/>
         </div>
       </div>
     )

@@ -6,6 +6,7 @@ import './EditRoom.css'
 export default class EditRoom extends Component {
   static propTypes = {
     room: PropTypes.object,
+    isVisible: PropTypes.bool.isRequired,
     // actions
     closeRoomEditor: PropTypes.func.isRequired,
     createRoom: PropTypes.func.isRequired,
@@ -20,12 +21,13 @@ export default class EditRoom extends Component {
   }
 
   render () {
-    const { room } = this.props
+    const { room, isVisible, closeRoomEditor } = this.props
 
     return (
-      <SkyLightStateless isVisible
-        onCloseClicked={this.props.closeRoomEditor}
-        onOverlayClicked={this.props.closeRoomEditor}
+      <SkyLightStateless
+        isVisible={isVisible}
+        onCloseClicked={closeRoomEditor}
+        onOverlayClicked={closeRoomEditor}
         title={room ? 'Edit Room' : 'Create Room'}
         dialogStyles={{
           width: '80%',
