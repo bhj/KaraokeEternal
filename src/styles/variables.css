@@ -45,12 +45,12 @@
   --current-item-from-background-color: #15346a;
   --current-item-to-background-color: #15346a;
 
-  /* Account widgets */
-  --widget-background-color: #303030;
-  --widget-title-color: var(--text-color);
-  --widget-title-background-color: #4d4d4d;
-  --widget-title-size: 18px;
-  --widget-title-padding: 8px;
+  /* Account panels */
+  --panel-background-color: #303030;
+  --panel-title-color: var(--text-color);
+  --panel-title-background-color: #4d4d4d;
+  --panel-title-size: 20px;
+  --panel-title-padding: 6px;
 
   /* PlaybackCtrl */
   --transport-btn-color: var(--btn-danger-color);

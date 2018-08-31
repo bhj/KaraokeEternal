@@ -7,14 +7,14 @@ const PathItem = (props) => {
   return (
     <div styleName='container' onClick={props.onSelect}>
       <div>
-        <Icon icon='FOLDER' size={32} styleName='folder' />
+        <Icon icon='FOLDER' size={28} styleName='folder' />
       </div>
       <div styleName='path'>
         {props.path}
       </div>
       {props.isRemovable &&
         <div onClick={props.onRemoveClick}>
-          <Icon icon='CLEAR' size={40} styleName='clear' />
+          <Icon icon='CLEAR' size={32} styleName='clear' />
         </div>
       }
     </div>

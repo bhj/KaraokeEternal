@@ -11,6 +11,8 @@
   display: flex;
   align-items: center;
   padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+  font-weight: bold;
 }
 
 .icon {
