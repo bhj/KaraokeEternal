@@ -73,7 +73,7 @@
   /* Animation */
   --spring-duration: .5s;
   --spring-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --animation-bounce: bounce .3s ease-out;
+  --animation-bounce: bounce .25s ease-out;
 
   /* Glow */
   --glow-text-shadow: 0 0 2px #BA3A95, 0 0 5px #BA3A95, 0 0 10px #BA3A95;
@@ -81,7 +81,7 @@
 
 @keyframes bounce {
   from { transform: scale3d(1, 1, 1); }
-  5% { transform: scale3d(1.5, 1.5, 1.5); }
-  80% { transform: scale3d(.9, .9, .9); }
+  3% { transform: scale3d(1.75, 1.75, 1.75); }
+  95% { transform: scale3d(.9, .9, .9); }
   to { transform: scale3d(1, 1, 1); }
 }
