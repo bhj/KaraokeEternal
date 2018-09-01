@@ -2,8 +2,7 @@ const db = require('sqlite')
 const squel = require('squel')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/library' })
-const debug = require('debug')
-const log = debug('app:library')
+const path = require('path')
 
 // get song's media info
 router.get('/song/:songId', async (ctx, next) => {
@@ -27,6 +26,7 @@ router.get('/song/:songId', async (ctx, next) => {
 
   const q = squel.select()
     .field('media.*')
+    .field('paths.path')
     .field('songs.artistId, songs.songId, songs.title')
     .from('media')
     .where('songId = ?', ctx.params.songId)
@@ -42,6 +42,8 @@ router.get('/song/:songId', async (ctx, next) => {
 
   rows.forEach(row => {
     media.result.push(row.mediaId)
+
+    row.file = row.path + path.sep + row.relPath
     media.entities[row.mediaId] = row
   })
 

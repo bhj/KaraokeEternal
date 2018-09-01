@@ -18,11 +18,11 @@ export default class SongInfo extends Component {
 
       return (
         <div key={item.mediaId} styleName='media'>
-          <strong>Duration</strong>: {formatSeconds(item.duration)}
+          <strong>File:</strong> {item.file}
           <br />
-          <strong>Preferred</strong>: {item.isPreferred === 1 ? 'Yes' : 'No'}
+          <strong>Duration:</strong> {formatSeconds(item.duration)}
           <br />
-          <strong>Path</strong>: {item.file}
+          <strong>Preferred:</strong> {item.isPreferred === 1 ? 'Yes' : 'No'}
         </div>
       )
     })
@@ -42,7 +42,7 @@ export default class SongInfo extends Component {
           overflow: 'auto',
         }}
       >
-        <h2>Media ({media.result.length})</h2>
+        <h3>Media ({media.result.length})</h3>
         {mediaDetails}
         <button onClick={this.props.closeSongInfo}>Done</button>
       </SkyLightStateless>
