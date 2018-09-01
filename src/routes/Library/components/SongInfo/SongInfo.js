@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { SkyLightStateless } from 'react-skylight'
+import { formatSeconds } from 'lib/dateTime'
 import './SongInfo.css'
 
 export default class SongInfo extends Component {
@@ -17,7 +18,7 @@ export default class SongInfo extends Component {
 
       return (
         <div key={item.mediaId} styleName='media'>
-          <strong>Duration</strong>: {item.duration}
+          <strong>Duration</strong>: {formatSeconds(item.duration)}
           <br />
           <strong>Preferred</strong>: {item.isPreferred === 1 ? 'Yes' : 'No'}
           <br />

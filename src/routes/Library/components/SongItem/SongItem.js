@@ -3,6 +3,7 @@ import React from 'react'
 import Swipeable from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
+import { formatSeconds } from 'lib/dateTime'
 import Highlighter from 'react-highlight-words'
 import './SongItem.css'
 
@@ -48,7 +49,7 @@ export default class SongItem extends React.Component {
         styleName={props.artist ? 'containerExpanded' : 'container'}
       >
         <div styleName='duration'>
-          {toMMSS(props.duration)}
+          {formatSeconds(props.duration)}
         </div>
 
         <div onClick={this.handleQueue} styleName='primary'>
@@ -75,11 +76,4 @@ export default class SongItem extends React.Component {
       </Swipeable>
     )
   }
-}
-
-// convert seconds to mm:ss
-function toMMSS (duration) {
-  const min = Math.floor(duration / 60)
-  const sec = duration - (min * 60)
-  return min + ':' + (sec < 10 ? '0' + sec : sec)
 }
