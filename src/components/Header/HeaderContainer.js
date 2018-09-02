@@ -22,7 +22,7 @@ const getStatusProps = createSelector(
     return {
       isUpNext,
       isUpNow: curItem ? !isAtQueueEnd && curItem.userId === userId : false,
-      wait: isUpNext && curItem ? curItem.duration - curPos : 0
+      wait: isUpNext && curItem ? Math.round(curItem.duration - curPos) : 0
     }
   }
 )

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import PaddedList from 'components/PaddedList'
 import QueueItem from '../../components/QueueItem'
-import { parseSeconds } from 'lib/dateTime'
+import { formatSecondsFuzzy } from 'lib/dateTime'
 
 const QUEUE_ITEM_HEIGHT = 80
 
@@ -64,7 +64,7 @@ class QueueList extends React.Component {
     const isActive = (queueId === this.props.curId) && !this.props.isAtQueueEnd
     const isUpcoming = queueId > this.props.curId
     const isOwner = item.userId === this.props.user.userId
-    const wait = parseSeconds(this.props.waits[queueId])
+    const wait = formatSecondsFuzzy(this.props.waits[queueId])
 
     return (
       <QueueItem {...item}
