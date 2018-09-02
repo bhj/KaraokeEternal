@@ -7,6 +7,7 @@ import {
   scrollArtists,
   toggleArtistExpanded,
   toggleArtistResultExpanded,
+  closeSongInfo,
 } from '../modules/library'
 
 const getArtists = (state) => state.artists
@@ -134,6 +135,7 @@ const mapActionCreators = {
   toggleArtistExpanded,
   toggleArtistResultExpanded,
   scrollArtists,
+  closeSongInfo,
 }
 
 export default connect(mapStateToProps, mapActionCreators)(LibraryView)
