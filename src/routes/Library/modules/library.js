@@ -147,7 +147,8 @@ const ACTION_HANDLERS = {
   },
   [LIBRARY_SONG_INFO_REQUEST]: (state, { payload }) => ({
     ...state,
-    songInfoSongId: payload.songId,
+    isSongInfoOpen: true,
+    songInfoMedia: { result: [], entities: {} },
   }),
   [LIBRARY_SONG_INFO_REQUEST + _SUCCESS]: (state, { payload }) => ({
     ...state,
@@ -155,11 +156,11 @@ const ACTION_HANDLERS = {
   }),
   [LIBRARY_SONG_INFO_REQUEST + _ERROR]: (state, { payload }) => ({
     ...state,
-    songInfoSongId: null,
+    isSongInfoOpen: false,
   }),
   [LIBRARY_SONG_INFO_CLOSE]: (state, { payload }) => ({
     ...state,
-    songInfoSongId: null,
+    isSongInfoOpen: false,
   }),
 }
 
@@ -173,7 +174,7 @@ let initialState = {
   expandedArtists: [],
   expandedArtistResults: [],
   // song info modal
-  songInfoSongId: null,
+  isSongInfoOpen: false,
   songInfoMedia: { result: [], entities: {} },
 }
 

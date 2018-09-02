@@ -7,7 +7,7 @@ import SongInfo from '../components/SongInfo'
 import TextOverlay from 'components/TextOverlay'
 
 const LibraryView = (props) => {
-  const { isSearching, isLibraryEmpty, isShowingSongInfo } = props
+  const { isSearching, isLibraryEmpty, isSongInfoOpen } = props
 
   return (
     <>
@@ -27,7 +27,7 @@ const LibraryView = (props) => {
         </TextOverlay>
       }
 
-      {isShowingSongInfo &&
+      {isSongInfoOpen &&
         <SongInfo />
       }
     </>
@@ -37,7 +37,7 @@ const LibraryView = (props) => {
 LibraryView.propTypes = {
   isSearching: PropTypes.bool.isRequired,
   isLibraryEmpty: PropTypes.bool.isRequired,
-  isShowingSongInfo: PropTypes.bool.isRequired,
+  isSongInfoOpen: PropTypes.bool.isRequired,
 }
 
 export default LibraryView

@@ -119,7 +119,7 @@ const mapStateToProps = (state) => {
     scrollTop: state.library.scrollTop,
     isSearching: !!getFilterKeywords(state).length || getFilterStarred(state),
     isLibraryEmpty: state.songs.result.length === 0,
-    isShowingSongInfo: !(state.library.songInfoSongId === null),
+    isSongInfoOpen: state.library.isSongInfoOpen,
     ui: state.ui,
     // SearchResults view
     songsResult: getSongsByView(state),
