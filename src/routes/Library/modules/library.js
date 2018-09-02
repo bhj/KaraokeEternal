@@ -93,9 +93,7 @@ function receiveSongInfo (res) {
 function songInfoError (err) {
   return {
     type: LIBRARY_SONG_INFO_REQUEST + _ERROR,
-    meta: {
-      error: err.message,
-    }
+    error: err.message,
   }
 }
 
