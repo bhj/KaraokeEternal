@@ -36,13 +36,13 @@ Karaoke Forever has a few parts:
 
 ## Quick Start
 
-1. Install and run Karaoke Forever Server on the system that will locally serve the media files and web app. **Important:** The server app is not currently signed, so macOS and Windows SmartScreen will complain by default. *Do not disable Gatekeeper* on macOS - simply right-click the file and choose Open.
+1. Install and run Karaoke Forever Server on the system that will serve the media files and web app on your local network. **Important:** The server app is not currently signed, so macOS and Windows SmartScreen will complain by default. *Do not disable Gatekeeper* on macOS - simply right-click the file and choose Open.
 
 2. Click the Karaoke Forever Server menubar icon (macOS) or right-click the tray icon (Windows) to show the server URL. You can click *Open in browser* or browse to the server URL (including port) from any device on the network. The web app is primarily designed for mobile browsers.
 
 3. Enter your user details and click Create Account to create your admin account.
 
-4. In the Preferences panel, tap Media Folders and add folder(s) containing supported media. Songs will appear in the library when the scan is complete.
+4. In the Preferences panel, tap Media Folders and add folder(s) with your [supported media](#supported-media-files). Songs will appear in the library when the scan is complete.
 
 5. If you are not on the system that will be the [player](#player-admin-only) (handling audio/video) go there now, browse to the server URL and sign in with your admin account.
 
