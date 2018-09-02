@@ -30,7 +30,7 @@ Karaoke Forever has a few parts:
 
 - **[Web app:](#karaoke-forever-the-web-app)** Designed from the ground up for mobile browsers, anyone can easily join using their phone.
 
-- **[Player:](#player-admin-only)** Just another name for the the web app when it's running fullscreen on the system handling audio/video for the room.
+- **[Player:](#player-admin-only)** Just another part of the web app, it's designed to play media on the system handling audio/video for the room.
 
 **Note:** Karaoke Forever does not handle audio *input* since there are a wide variety of possible audio interface and microphone configurations. It is assumed that the player's output will be mixed with the microphone input(s) by the system.
 
