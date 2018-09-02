@@ -58,7 +58,7 @@ You are now ready to test your audio setup and start the party!
 
 The library page lists available songs organized by artist, and allows searching both artists and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
 
-If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Preferences](#preference-admin-only)).
+If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Preferences](#preferences-admin-only)).
 
 Admins can reveal additional options for each song by swiping left. Currently the only additional option is Get Info, which shows the song's underlying media file(s).
 
