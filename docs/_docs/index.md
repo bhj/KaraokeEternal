@@ -22,7 +22,7 @@ permalink: /docs/index.html
 
 ## Overview
 
-Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser. Supports songs in [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required.
+Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser. Supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required.
 
 Karaoke Forever has a few parts:
 
@@ -32,7 +32,7 @@ Karaoke Forever has a few parts:
 
 - **[Player:](#player-admin-only)** Just another part of the web app, it's designed to play media on the system handling audio/video for the room.
 
-**Note:** Karaoke Forever does not handle audio *input* since there are a wide variety of possible audio interface and microphone configurations. It is assumed that the player's output will be mixed with the microphone input(s) by the system.
+**Note:** Karaoke Forever does not handle audio *input* since there is a wide variety of possible setups. It's recommended to use a low-latency audio interface with at least two microphones that will be mixed with Karaoke Forever's output.
 
 ## Quick Start
 
