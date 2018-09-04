@@ -248,7 +248,7 @@ async function _login (ctx, creds) {
   // get starred songs
   {
     const q = squel.select()
-      .from('stars')
+      .from('starredSongs')
       .field('songId')
       .where('userId = ?', user.userId)
 

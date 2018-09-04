@@ -14,7 +14,7 @@ const ACTION_HANDLERS = {
     // @TODO use upsert
     // already starred?
     const q = squel.select()
-      .from('stars')
+      .from('starredSongs')
       .where('userId = ?', sock.user.userId)
       .where('songId = ?', payload.songId)
 
@@ -24,7 +24,7 @@ const ACTION_HANDLERS = {
     // not starred? then we need to!
     if (!res) {
       const q = squel.insert()
-        .into('stars')
+        .into('starredSongs')
         .set('userId', sock.user.userId)
         .set('songId', payload.songId)
 
@@ -43,7 +43,7 @@ const ACTION_HANDLERS = {
   },
   [USER_SONG_UNSTAR]: async (sock, { payload }, acknowledge) => {
     const q = squel.delete()
-      .from('stars')
+      .from('starredSongs')
       .where('userId = ?', sock.user.userId)
       .where('songId = ?', payload.songId)
 

@@ -146,8 +146,8 @@ class Media {
 
     // remove stars for nonexistent songs
     res = await db.run(`
-      DELETE FROM stars WHERE songId IN (
-        SELECT stars.songId FROM stars LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
+      DELETE FROM starredSongs WHERE songId IN (
+        SELECT starredSongs.songId FROM starredSongs LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
       )
     `)
     log(`cleanup: removed ${res.stmt.changes} stars for nonexistent songs`)

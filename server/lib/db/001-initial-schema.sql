@@ -62,12 +62,19 @@ CREATE TABLE IF NOT EXISTS "songs" (
 
 CREATE INDEX IF NOT EXISTS title ON "songs" ("title" ASC);
 
-CREATE TABLE IF NOT EXISTS "stars" (
+CREATE TABLE IF NOT EXISTS "starredArtists" (
+  "userId" integer NOT NULL,
+  "artistId" integer NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS userId ON "starredArtists" ("userId" ASC);
+
+CREATE TABLE IF NOT EXISTS "starredSongs" (
   "userId" integer NOT NULL,
   "songId" integer NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS userId ON "stars" ("userId" ASC);
+CREATE INDEX IF NOT EXISTS userId ON "starredSongs" ("userId" ASC);
 
 CREATE TABLE IF NOT EXISTS "users" (
   "userId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -87,5 +94,6 @@ DROP TABLE providers;
 DROP TABLE queue;
 DROP TABLE rooms;
 DROP TABLE songs;
-DROP TABLE stars;
+DROP TABLE starredArtists;
+DROP TABLE starredSongs;
 DROP TABLE users;
