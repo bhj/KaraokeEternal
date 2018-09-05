@@ -1,0 +1,23 @@
+.fadeEnter {
+  transform: scale3d(0, 0, 0);
+  opacity: 0;
+}
+
+.fadeEnterActive {
+  transform: scale3d(1, 1, 1);
+  opacity: 1;
+  transition: all 500ms var(--function-ease-out-expo);
+}
+
+.itemExit {
+  transform: scale3d(1, 1, 1);
+  opacity: 1;
+  height: 80px;
+  transition: transform 500ms var(--function-ease-out-expo), opacity 500ms, height 500ms var(--function-ease-out-expo) 250ms;
+}
+
+.itemExitActive {
+  transform: scale3d(0, 0, 0);
+  opacity: 0;
+  height: 0;
+}

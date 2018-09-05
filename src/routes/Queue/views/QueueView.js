@@ -4,34 +4,39 @@ import { Link } from 'react-router'
 import Header from 'components/Header'
 import QueueList from '../components/QueueList'
 import TextOverlay from 'components/TextOverlay'
+import './QueueView.css'
 
-const QueueView = (props) => {
-  return (
-    <>
-      <Header />
+const QueueView = (props) => (
+  <div styleName='container' style={{
+    paddingTop: props.ui.headerHeight,
+    paddingBottom: props.ui.footerHeight,
+    width: props.ui.browserWidth,
+    height: props.ui.browserHeight,
+  }}>
+    <Header />
 
-      {!props.isInRoom &&
-        <TextOverlay>
-          <h1>Get a Room!</h1>
-          <p><Link to='/account'>Sign in to a room</Link> to start queueing songs.</p>
-        </TextOverlay>
-      }
+    {!props.isInRoom &&
+      <TextOverlay>
+        <h1>Get a Room!</h1>
+        <p><Link to='/account'>Sign in to a room</Link> to start queueing songs.</p>
+      </TextOverlay>
+    }
 
-      {props.isQueueEmpty &&
-        <TextOverlay>
-          <h1>Queue Empty</h1>
-          <p>Tap a song in the <Link to='/library'>library</Link> to queue it</p>
-        </TextOverlay>
-      }
+    {props.isQueueEmpty &&
+      <TextOverlay>
+        <h1>Queue Empty</h1>
+        <p>Tap a song in the <Link to='/library'>library</Link> to queue it</p>
+      </TextOverlay>
+    }
 
-      <QueueList {...props} />
-    </>
-  )
-}
+    <QueueList />
+  </div>
+)
 
 QueueView.propTypes = {
   isInRoom: PropTypes.bool.isRequired,
   isQueueEmpty: PropTypes.bool.isRequired,
+  ui: PropTypes.object.isRequired,
 }
 
 export default QueueView

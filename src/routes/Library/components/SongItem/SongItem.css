@@ -43,7 +43,7 @@
 .btnContainer {
   display: flex;
   width: var(--song-item-btn-width);
-  transition: width var(--spring-duration) var(--spring-function);
+  transition: width var(--spring-duration) var(--function-spring);
 }
 
 .btnContainerExpanded {

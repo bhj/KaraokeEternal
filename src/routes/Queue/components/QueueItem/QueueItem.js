@@ -4,7 +4,7 @@ import Icon from 'components/Icon'
 import './QueueItem.css'
 
 export const QueueItem = (props) => (
-  <div styleName='container' style={{ ...props.style, backgroundSize: props.pctPlayed + '% 100%' }}>
+  <div styleName='container' style={{ backgroundSize: props.pctPlayed + '% 100%' }}>
     <div styleName='waitContainer'>
       {props.isActive && 'now'}
       {props.isUpcoming &&
@@ -53,7 +53,6 @@ QueueItem.propTypes = {
   canRemove: PropTypes.bool.isRequired,
   onRemoveClick: PropTypes.func.isRequired,
   onErrorInfoClick: PropTypes.func.isRequired,
-  style: PropTypes.object.isRequired,
 }
 
 export default QueueItem

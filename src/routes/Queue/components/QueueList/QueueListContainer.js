@@ -46,7 +46,6 @@ const mapStateToProps = (state) => {
     artists: state.library.artists,
     songs: state.library.songs,
     user: state.user,
-    ui: state.ui,
   }
 }
 
