@@ -13,7 +13,7 @@
   transform: scale3d(1, 1, 1);
   opacity: 1;
   height: 80px;
-  transition: transform 500ms var(--function-ease-out-expo), opacity 500ms, height 500ms var(--function-ease-out-expo) 250ms;
+  transition: transform 300ms, opacity 300ms, height 500ms var(--function-ease-out-expo) 300ms;
 }
 
 .itemExitActive {
