@@ -28,7 +28,7 @@ const config = {
       'node_modules',
     ],
     alias: {
-      'constants': path.join(project.basePath, 'constants'),
+      'shared': path.join(project.basePath, 'shared'),
     }
   },
   module: { rules: [] },

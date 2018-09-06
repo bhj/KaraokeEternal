@@ -11,7 +11,7 @@ const Prefs = require('./Prefs')
 const {
   SCANNER_WORKER_SCAN,
   SCANNER_WORKER_SCAN_CANCEL,
-} = require('../../constants/actions')
+} = require('../../shared/actions')
 
 // start media scan
 router.get('/scan', async (ctx, next) => {

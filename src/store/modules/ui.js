@@ -4,7 +4,7 @@ import {
   FOOTER_HEIGHT_CHANGE,
   SHOW_ERROR_MESSAGE,
   CLEAR_ERROR_MESSAGE,
-} from 'constants/actions'
+} from 'shared/actions'
 
 // ------------------------------------
 // Actions

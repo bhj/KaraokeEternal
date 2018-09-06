@@ -7,7 +7,7 @@ const {
   USER_SONG_STAR,
   USER_SONG_UNSTAR,
   _SUCCESS,
-} = require('../../constants/actions')
+} = require('../../shared/actions')
 
 const ACTION_HANDLERS = {
   [USER_SONG_STAR]: async (sock, { payload }, acknowledge) => {

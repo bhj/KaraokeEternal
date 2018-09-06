@@ -7,7 +7,7 @@ import {
   ROOM_REMOVE,
   _SUCCESS,
   _ERROR,
-} from 'constants/actions'
+} from 'shared/actions'
 
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('rooms')

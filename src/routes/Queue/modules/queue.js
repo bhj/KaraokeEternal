@@ -2,7 +2,7 @@ import {
   QUEUE_ADD,
   QUEUE_PUSH,
   QUEUE_REMOVE,
-} from 'constants/actions'
+} from 'shared/actions'
 
 // add to queue
 export function queueSong (songId) {

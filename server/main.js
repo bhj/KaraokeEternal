@@ -6,7 +6,7 @@ const {
   SCANNER_WORKER_SCAN,
   SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
-} = require('../constants/actions')
+} = require('../shared/actions')
 
 log('NODE_ENV =', process.env.NODE_ENV)
 

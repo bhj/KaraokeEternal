@@ -6,7 +6,7 @@ import {
   PLAYER_STATUS,
   PLAYER_ERROR,
   PLAYER_LEAVE,
-} from 'constants/actions'
+} from 'shared/actions'
 
 // ------------------------------------
 // Actions

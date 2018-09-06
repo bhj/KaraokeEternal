@@ -1,6 +1,6 @@
 {
   "files": [
-    "constants/**",
+    "shared/**",
     "server/**",
     "project.config.js",
     // use webpack output path but exclude subfolders (ignore /mac, /win, etc.)

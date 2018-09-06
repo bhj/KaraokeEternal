@@ -15,7 +15,7 @@ import {
   UPDATE,
   _SUCCESS,
   _ERROR,
-} from 'constants/actions'
+} from 'shared/actions'
 
 const api = new HttpApi('')
 const optimisticStarredSongs = optimistic(starredSongsReducer)

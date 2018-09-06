@@ -10,7 +10,7 @@ import {
   SCROLL_ARTISTS,
   _SUCCESS,
   _ERROR,
-} from 'constants/actions'
+} from 'shared/actions'
 
 const api = new HttpApi('library')
 

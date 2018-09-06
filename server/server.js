@@ -29,7 +29,7 @@ const {
   LIBRARY_PUSH,
   SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
-} = require('../constants/actions')
+} = require('../shared/actions')
 
 // Koa error handling
 app.use(async (ctx, next) => {

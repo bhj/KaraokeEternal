@@ -1,6 +1,6 @@
 import {
   LIBRARY_PUSH,
-} from 'constants/actions'
+} from 'shared/actions'
 
 // ------------------------------------
 // Action Handlers
