@@ -51,7 +51,7 @@ class QueueList extends React.Component {
       return (
         <CSSTransition
           key={queueId}
-          timeout={750}
+          timeout={800}
           unmountOnExit={false}
           classNames={{
             appear: '',
