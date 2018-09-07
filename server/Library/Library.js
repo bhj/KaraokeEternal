@@ -29,7 +29,7 @@ class Library {
         .field('songs.songId AS songId')
         .field('songs.title AS title')
         .field('MAX(media.isPreferred) AS isPreferred')
-        .field('COUNT(media.mediaId) AS numMedia')
+        .field('COUNT(DISTINCT media.mediaId) AS numMedia')
         .field('COUNT(DISTINCT starredSongs.userId) AS numStars')
         .from('media')
         .join(squel.select()
