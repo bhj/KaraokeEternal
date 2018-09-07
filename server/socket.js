@@ -11,6 +11,7 @@ const parseCookie = require('./lib/parseCookie')
 const {
   LIBRARY_PUSH,
   QUEUE_PUSH,
+  STARS_PUSH,
   PLAYER_STATUS,
   PLAYER_LEAVE,
   SOCKET_AUTH_ERROR,
@@ -42,7 +43,7 @@ module.exports = function (io, jwtKey) {
     }
 
     // attach disconnect handler
-    sock.on('disconnect', (reason) => {
+    sock.on('disconnect', reason => {
       if (!sock.user || !sock.user.roomId) {
         return
       }
@@ -59,7 +60,7 @@ module.exports = function (io, jwtKey) {
           type: PLAYER_LEAVE,
         })
 
-        log('No more Players are present in room %s', sock.user.roomId)
+        log('No Players remaining in room %s', sock.user.roomId)
       }
     })
 
@@ -74,7 +75,7 @@ module.exports = function (io, jwtKey) {
       }
 
       if (typeof handlers[type] !== 'function') {
-        log('No handler for socket action type: %s', type)
+        log('No handler for socket action: %s', type)
         return
       }
 
@@ -122,6 +123,11 @@ module.exports = function (io, jwtKey) {
       io.to(sock.id).emit('action', {
         type: LIBRARY_PUSH,
         payload: await Library.get(),
+      })
+
+      io.to(sock.id).emit('action', {
+        type: STARS_PUSH,
+        payload: await Library.getStars(sock.user.userId),
       })
     } catch (err) {
       log(err)

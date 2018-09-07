@@ -1,6 +1,8 @@
 import {
   LIBRARY_PUSH,
   LIBRARY_PUSH_SONG,
+  SONG_STARRED,
+  SONG_UNSTARRED,
 } from 'shared/actions'
 
 // ------------------------------------
@@ -19,6 +21,34 @@ const ACTION_HANDLERS = {
       ...payload,
     }
   }),
+  [SONG_STARRED]: (state, { payload }) => {
+    if (!state.entities[payload.songId]) return state
+
+    return {
+      ...state,
+      entities: {
+        ...state.entities,
+        [payload.songId]: {
+          ...state.entities[payload.songId],
+          numStars: ++state.entities[payload.songId].numStars,
+        },
+      }
+    }
+  },
+  [SONG_UNSTARRED]: (state, { payload }) => {
+    if (!state.entities[payload.songId]) return state
+
+    return {
+      ...state,
+      entities: {
+        ...state.entities,
+        [payload.songId]: {
+          ...state.entities[payload.songId],
+          numStars: --state.entities[payload.songId].numStars,
+        },
+      }
+    }
+  },
 }
 
 // ------------------------------------

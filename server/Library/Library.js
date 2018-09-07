@@ -65,11 +65,9 @@ class Library {
       }
     }
 
-    // @todo see if this can be done in one query now that
-    // we are all file-nased
-
     // query #2: artists (we do this after songs so we can ignore
     // artists having no songs, e.g. when a provider is disabled)
+    // @todo see if this can be done in one query now
     {
       const q = squel.select()
         .from('artists')
@@ -99,7 +97,7 @@ class Library {
   /**
   * Returns a single song (with the preferred mediaId)
   *
-  * @param  {[type]}  songId
+  * @param  {Number}  songId
   * @return {Promise}        Song entity (same format as with get())
   */
   static async getSong (songId) {
@@ -229,6 +227,44 @@ class Library {
     }
 
     return { artistId, artist, songId, title }
+  }
+
+  /**
+  * Gets a user's starred artists and songs
+  *
+  * @param  {Number}  userId
+  * @return {Object}
+  */
+  static async getStars (userId) {
+    let starredArtists, starredSongs
+
+    // get starred artists
+    {
+      const q = squel.select()
+        .from('starredArtists')
+        .field('artistId')
+        .where('userId = ?', userId)
+
+      const { text, values } = q.toParam()
+      const rows = await db.all(text, values)
+
+      starredArtists = rows.map(row => row.artistId)
+    }
+
+    // get starred songs
+    {
+      const q = squel.select()
+        .from('starredSongs')
+        .field('songId')
+        .where('userId = ?', userId)
+
+      const { text, values } = q.toParam()
+      const rows = await db.all(text, values)
+
+      starredSongs = rows.map(row => row.songId)
+    }
+
+    return { starredArtists, starredSongs }
   }
 }
 

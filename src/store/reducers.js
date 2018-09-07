@@ -13,6 +13,7 @@ import songs from 'routes/Library/modules/songs'
 import status from './modules/status'
 import ui from './modules/ui'
 import user from './modules/user'
+import userStars from './modules/userStars'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
@@ -27,6 +28,7 @@ export const makeRootReducer = (asyncReducers) => {
     status,
     ui,
     user,
+    userStars: optimistic(userStars),
     ...asyncReducers,
   })
 }

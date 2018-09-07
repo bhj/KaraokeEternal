@@ -14,8 +14,8 @@ const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs
 const getFilterStr = (state) => state.library.filterStr.trim().toLowerCase()
 const getFilterStarred = (state) => state.library.filterStarred
-const getStarredArtists = (state) => ensureState(state.user.starredArtists)
-const getStarredSongs = (state) => ensureState(state.user.starredSongs)
+const getStarredArtists = (state) => ensureState(state.userStars).starredArtists
+const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
 const getQueue = (state) => ensureState(state.queue)
 const getCurrentQueueId = (state) => state.status.queueId
 

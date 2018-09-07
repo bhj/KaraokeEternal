@@ -1,16 +1,16 @@
 const db = require('sqlite')
 const squel = require('squel')
-const Library = require('./Library')
 
 const {
-  LIBRARY_PUSH_SONG,
-  USER_SONG_STAR,
-  USER_SONG_UNSTAR,
+  STAR_SONG,
+  SONG_STARRED,
+  UNSTAR_SONG,
+  SONG_UNSTARRED,
   _SUCCESS,
 } = require('../../shared/actions')
 
 const ACTION_HANDLERS = {
-  [USER_SONG_STAR]: async (sock, { payload }, acknowledge) => {
+  [STAR_SONG]: async (sock, { payload }, acknowledge) => {
     // @TODO use upsert
     const q = squel.insert()
       .into('starredSongs')
@@ -21,15 +21,18 @@ const ACTION_HANDLERS = {
     await db.run(text, values)
 
     // success
-    acknowledge({ type: USER_SONG_STAR + _SUCCESS })
+    acknowledge({ type: STAR_SONG + _SUCCESS })
 
-    // emit updated star count
-    sock.server.emit('action', {
-      type: LIBRARY_PUSH_SONG,
-      payload: await Library.getSong(payload.songId),
+    // tell room
+    sock.server.to(sock.user.roomId).emit('action', {
+      type: SONG_STARRED,
+      payload: {
+        userId: sock.user.userId,
+        songId: payload.songId,
+      },
     })
   },
-  [USER_SONG_UNSTAR]: async (sock, { payload }, acknowledge) => {
+  [UNSTAR_SONG]: async (sock, { payload }, acknowledge) => {
     const q = squel.delete()
       .from('starredSongs')
       .where('userId = ?', sock.user.userId)
@@ -39,12 +42,15 @@ const ACTION_HANDLERS = {
     await db.get(text, values)
 
     // success
-    acknowledge({ type: USER_SONG_UNSTAR + _SUCCESS })
+    acknowledge({ type: UNSTAR_SONG + _SUCCESS })
 
-    // emit updated star count
-    sock.server.emit('action', {
-      type: LIBRARY_PUSH_SONG,
-      payload: await Library.getSong(payload.songId),
+    // tell room
+    sock.server.to(sock.user.roomId).emit('action', {
+      type: SONG_UNSTARRED,
+      payload: {
+        userId: sock.user.userId,
+        songId: payload.songId,
+      },
     })
   }
 }

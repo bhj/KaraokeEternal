@@ -10,6 +10,8 @@ module.exports = {
   SCROLL_ARTISTS: 'library/SCROLL_ARTISTS',
   LIBRARY_SONG_INFO_REQUEST: 'library/SONG_INFO_REQUEST',
   LIBRARY_SONG_INFO_CLOSE: 'library/SONG_INFO_CLOSE',
+  SONG_STARRED: 'library/SONG_STARRED',
+  SONG_UNSTARRED: 'library/SONG_UNSTARRED',
   // media
   LIBRARY_PUSH: 'library/PUSH',
   LIBRARY_PUSH_SONG: 'library/PUSH_SONG',
@@ -50,8 +52,9 @@ module.exports = {
   ROOM_REMOVE: 'room/REMOVE',
   ROOM_EDITOR_OPEN: 'room/EDITOR_OPEN',
   ROOM_EDITOR_CLOSE: 'room/EDITOR_CLOSE',
-  USER_SONG_STAR: 'server/SONG_STAR',
-  USER_SONG_UNSTAR: 'server/SONG_UNSTAR',
+  STAR_SONG: 'server/STAR_SONG',
+  UNSTAR_SONG: 'server/UNSTAR_SONG',
+  STARS_PUSH: 'user/STARS_PUSH',
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',

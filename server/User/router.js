@@ -245,19 +245,6 @@ async function _login (ctx, creds) {
     }
   }
 
-  // get starred songs
-  {
-    const q = squel.select()
-      .from('starredSongs')
-      .field('songId')
-      .where('userId = ?', user.userId)
-
-    const { text, values } = q.toParam()
-    const rows = await db.all(text, values)
-
-    user.starredSongs = rows.map(row => row.songId)
-  }
-
   delete user.password
   user.roomId = roomId
   user.isAdmin = (user.isAdmin === 1)
