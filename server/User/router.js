@@ -133,10 +133,6 @@ router.post('/setup', async (ctx, next) => {
 router.put('/account', async (ctx, next) => {
   let user
 
-  if (!ctx.user.isAdmin) {
-    ctx.throw(401)
-  }
-
   // find user by id (from token)
   {
     const q = squel.select()
