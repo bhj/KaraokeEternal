@@ -37,6 +37,10 @@
   font-size: 18px;
 }
 
+.isOwner {
+  font-weight: bold;
+}
+
 .title {
   composes: ellipsis;
   font-size: 16px;

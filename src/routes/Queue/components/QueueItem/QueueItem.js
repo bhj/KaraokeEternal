@@ -8,12 +8,16 @@ export const QueueItem = (props) => (
     <div styleName='waitContainer'>
       {props.isActive && 'now'}
       {props.isUpcoming &&
-        <div>{props.waitValue}<span styleName='waitUnit'>{props.waitUnit}</span></div>
+        <div>{props.waitValue}
+          <span styleName={props.isOwner ? 'waitUnit isOwner' : 'waitUnit'}>
+            {props.waitUnit}
+          </span>
+        </div>
       }
     </div>
 
     <div styleName='primary'>
-      <div styleName='user'>{props.userDisplayName}</div>
+      <div styleName={props.isOwner ? 'user isOwner' : 'user'}>{props.userDisplayName}</div>
       <div styleName='title'>{props.title}</div>
       <div styleName='artist'>{props.artist}</div>
     </div>
@@ -44,6 +48,7 @@ QueueItem.propTypes = {
   userDisplayName: PropTypes.string.isRequired,
   waitValue: PropTypes.number.isRequired,
   waitUnit: PropTypes.string.isRequired,
+  isOwner: PropTypes.bool.isRequired,
   isActive: PropTypes.bool.isRequired,
   isUpcoming: PropTypes.bool.isRequired,
   pctPlayed: PropTypes.number.isRequired,

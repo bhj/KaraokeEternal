@@ -65,6 +65,7 @@ class QueueList extends React.Component {
           <QueueItem {...item}
             isActive={isActive}
             isUpcoming={isUpcoming}
+            isOwner={isOwner}
             isSkippable={isActive && isOwner}
             isRemovable={isUpcoming && isOwner}
             isErrored={typeof props.errors[queueId] !== 'undefined'}
