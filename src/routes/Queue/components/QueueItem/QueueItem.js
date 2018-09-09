@@ -19,17 +19,17 @@ export const QueueItem = (props) => (
     </div>
 
     <div styleName='btnContainer'>
-      {props.hasErrors &&
+      {props.isErrored &&
         <div onClick={props.onErrorInfoClick}>
           <Icon icon='INFO_OUTLINE' size={40} styleName='info' />
         </div>
       }
-      {props.canSkip &&
+      {props.isSkippable &&
         <div onClick={props.onSkipClick}>
           <Icon icon='PLAY_NEXT' size={40} styleName='playNext' />
         </div>
       }
-      {props.canRemove &&
+      {props.isRemovable &&
         <div onClick={props.onRemoveClick}>
           <Icon icon='CLEAR' size={40} styleName='remove' />
         </div>
@@ -47,10 +47,10 @@ QueueItem.propTypes = {
   isActive: PropTypes.bool.isRequired,
   isUpcoming: PropTypes.bool.isRequired,
   pctPlayed: PropTypes.number.isRequired,
-  hasErrors: PropTypes.bool.isRequired,
-  canSkip: PropTypes.bool.isRequired,
+  isErrored: PropTypes.bool.isRequired,
+  isSkippable: PropTypes.bool.isRequired,
   onSkipClick: PropTypes.func.isRequired,
-  canRemove: PropTypes.bool.isRequired,
+  isRemovable: PropTypes.bool.isRequired,
   onRemoveClick: PropTypes.func.isRequired,
   onErrorInfoClick: PropTypes.func.isRequired,
 }

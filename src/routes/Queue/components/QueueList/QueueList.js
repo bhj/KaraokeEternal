@@ -65,9 +65,9 @@ class QueueList extends React.Component {
           <QueueItem {...item}
             isActive={isActive}
             isUpcoming={isUpcoming}
-            canSkip={isActive && isOwner}
-            canRemove={isUpcoming && isOwner}
-            hasErrors={typeof props.errors[queueId] !== 'undefined'}
+            isSkippable={isActive && isOwner}
+            isRemovable={isUpcoming && isOwner}
+            isErrored={typeof props.errors[queueId] !== 'undefined'}
             pctPlayed={isActive ? props.curPos / item.duration * 100 : 0}
             waitValue={wait.value}
             waitUnit={wait.unit}

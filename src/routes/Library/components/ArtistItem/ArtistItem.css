@@ -14,7 +14,7 @@
   white-space: nowrap;
 }
 
-.hasQueued {
+.isChildQueued {
   text-shadow: var(--glow-text-shadow);
 }
 
