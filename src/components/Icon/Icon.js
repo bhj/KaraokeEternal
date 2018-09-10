@@ -11,12 +11,13 @@ const Icon = props => {
         display: 'block',
         margin: 'auto',
       }}
+      className={className}
       width={`${size}px`}
       height={`${size}px`}
       viewBox={icons[icon].viewBox}
       {...restProps}
     >
-      <path className={className} d={icons[icon].d}/>
+      <path d={icons[icon].d}/>
     </svg>
   )
 }
