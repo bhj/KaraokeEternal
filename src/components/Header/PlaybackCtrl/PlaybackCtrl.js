@@ -31,7 +31,6 @@ const PlaybackCtrl = (props) => {
       </div>
 
       <VolumeSlider
-        styleName='volume'
         volume={props.volume}
         onVolumeChange={props.requestVolume}
       />
