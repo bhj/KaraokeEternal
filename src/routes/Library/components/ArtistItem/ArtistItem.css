@@ -15,7 +15,8 @@
 }
 
 .isChildQueued {
-  text-shadow: var(--glow-text-shadow);
+  color: var(--queued-item-color);
+  text-shadow: var(--queued-item-text-shadow);
 }
 
 .folderContainer {
@@ -24,7 +25,7 @@
 }
 
 .folderIcon {
-  fill: var(--artist-folder-color);
+  fill: var(--artist-folder-bg-color);
 }
 
 .count {
@@ -32,12 +33,12 @@
   top: -30px;
   text-align: center;
   font-size: 15px;
-  color: var(--artist-folder-text-color);
+  color: var(--artist-folder-color);
 }
 
 .expandedIcon {
   position: relative;
   top: -32px;
   text-align: center;
-  fill: var(--artist-folder-text-color);
+  fill: var(--artist-folder-color);
 }

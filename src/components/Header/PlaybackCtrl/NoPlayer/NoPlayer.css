@@ -1,6 +1,7 @@
 .container {
   font-size: 16px;
-  background-color: #ffff8c;
+  color: var(--header-notice-color);
+  background-color: var(--header-notice-bg-color);
 }
 
 .msg {

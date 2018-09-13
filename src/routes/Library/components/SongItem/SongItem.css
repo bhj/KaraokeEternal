@@ -30,7 +30,8 @@
 }
 
 .isQueued {
-  text-shadow: var(--glow-text-shadow);
+  color: var(--queued-item-color);
+  text-shadow: var(--queued-item-text-shadow);
 }
 
 .artist {
@@ -63,11 +64,12 @@
 }
 
 .star {
-  fill: var(--song-item-btn-inactive-color);
+  fill: var(--song-item-btn-bg-color);
 }
 
 .starStarred {
-  fill: var(--song-item-btn-active-color);
+  fill: var(--song-item-btn-active-bg-color);
+  filter: var(--song-item-btn-active-filter);
 }
 
 .starCount {
@@ -80,7 +82,7 @@
 
 .starCountStarred {
   composes: starCount;
-  color: var(--text-color);
+  color: var(--song-item-btn-active-color);
 }
 
 .animateStar {
@@ -88,5 +90,5 @@
 }
 
 .info {
-  fill: var(--song-item-btn-color);
+  fill: var(--song-item-btn-bg-color);
 }

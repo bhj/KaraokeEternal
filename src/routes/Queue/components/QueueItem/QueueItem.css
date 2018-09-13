@@ -1,7 +1,7 @@
 .container {
   display: flex;
   height: 80px;
-  background-image: linear-gradient(to right, var(--current-item-from-background-color), var(--current-item-to-background-color));
+  background-image: linear-gradient(to right, var(--current-item-from-bg-color), var(--current-item-to-bg-color));
   background-repeat: no-repeat;
 }
 
@@ -60,7 +60,8 @@
 
 /* Actions */
 .button {
-  fill: var(--btn-danger-color);
+  fill: var(--btn-danger-bg-color);
+  filter: var(--btn-danger-filter);
 }
 
 .playNext, .remove, .star, .info {

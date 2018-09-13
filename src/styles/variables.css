@@ -1,74 +1,83 @@
 :root {
   /* Defaults */
-  --background-color: #111522;
-  --text-color: #aaa;
-  --link-color: #2968d6;
+  --bg-color: #020f1b;
+  --text-color: #bbb;
+  --link-color: #68b1f9;
   --border-radius: 5px;
   --container-padding: 10px;
 
-  --input-text-color: #444;
-  --input-placeholder-color: #888;
-  --input-background-color: #eee;
+  --input-color: #444;
+  --input-placeholder-color: var(--btn-bg-color);
+  --input-bg-color: #eee;
   --input-margin: 7px;
 
-  --btn-inactive-color: #888;
-  --btn-active-color: var(--link-color);
-  --btn-danger-color: #BA3A95;
+  --btn-bg-color: #404D5A;
+  --btn-active-bg-color: var(--link-color);
+  --btn-active-filter: drop-shadow(0 0 5px rgba(170, 213, 255, .5));
+  --btn-danger-bg-color: var(--base-pink);
+  --btn-danger-filter: drop-shadow(0 0 5px rgba(249, 164, 255, .5));
 
   /* UI chrome (header/footer) */
-  --chrome-background-color: rgba(48, 49, 54, .8);
-  --chrome-background-color-blur: rgba(0, 0, 0, 0);
-  --chrome-border-color: #333;
+  --chrome-bg-color: rgba(2, 15, 27, .8);
+  --chrome-border-color: rgba(51, 71, 84, .5);
+  --header-notice-color: var(--text-color);
+  --header-notice-bg-color: #00488D;
 
   /* Navigation */
-  --nav-link-color: var(--btn-inactive-color);
-  --nav-link-background-color: transparent;
-  --nav-active-color: var(--btn-active-color);
-  --nav-active-background-color: transparent;
+  --nav-link-color: var(--btn-bg-color);
+  --nav-active-color: var(--link-color);
+  --nav-active-filter: var(--btn-active-filter);
 
   /* Library */
   --artist-item-height: 44px;
-  --artist-folder-color: #173e82; /* darker --link-color */
-  --artist-folder-text-color: var(--text-color);
+  --artist-folder-color: var(--text-color);
+  --artist-folder-bg-color: #053664;
 
   --song-item-btn-width: 44px;
   --song-item-btn-height: 44px;
-  --song-item-btn-color: var(--btn-active-color);
-  --song-item-btn-active-color: var(--btn-active-color);
-  --song-item-btn-inactive-color: #222a44;
+  --song-item-btn-bg-color: #052544;
+  --song-item-btn-active-color: #333;
+  --song-item-btn-active-bg-color: var(--btn-active-bg-color);
+  --song-item-btn-active-filter: var(--btn-active-filter);
 
-  --alpha-picker-color: var(--artist-folder-color);
-  --queued-item-glow-color: var(--btn-danger-color);
-  --mark-background-color: #669eff;
+  --alpha-picker-color: var(--artist-folder-bg-color);
+  --queued-item-color: #F5CBF3;
+  --queued-item-text-shadow: var(--glow-text-shadow);
+  --mark-bg-color: #00488D;
 
   /* Queue */
-  --current-item-from-background-color: #15346a;
-  --current-item-to-background-color: #15346a;
+  --current-item-from-bg-color: var(--header-notice-bg-color);
+  --current-item-to-bg-color: var(--header-notice-bg-color);
 
   /* Account panels */
-  --panel-background-color: #303030;
+  --panel-bg-color: #303030;
   --panel-title-color: var(--text-color);
-  --panel-title-background-color: #4d4d4d;
+  --panel-title-bg-color: #4d4d4d;
   --panel-title-size: 20px;
   --panel-title-padding: 6px;
 
   /* PlaybackCtrl */
-  --transport-btn-color: var(--btn-danger-color);
-  --transport-volume-color: var(--btn-active-color);
-  --transport-volume-background-color: var(--background-color);
+  --transport-btn-bg-color: var(--btn-danger-bg-color);
+  --transport-btn-filter: var(--btn-danger-filter);
+  --transport-volume-track-color: var(--btn-bg-color);
+  --transport-volume-track-active-color: var(--btn-active-bg-color);
+  --transport-volume-track-active-filter: var(--btn-active-filter);
 
   /* Up Next header/banner */
-  --up-next-bg-color-from: #112a55; /* darker */
-  --up-next-bg-color-to: var(--btn-active-color);
-  --up-now-bg-color-from: #4e183e; /* darker */
-  --up-now-bg-color-to: var(--queued-item-glow-color);
+  --up-next-bg-color-from: #00488D;
+  --up-next-bg-color-to: var(--base-blue);
+  --up-next-filter: var(--btn-active-filter);
+
+  --up-now-bg-color-from: #66006D;
+  --up-now-bg-color-to: var(--base-pink);
+  --up-now-filter: var(--btn-danger-filter);
 
   /* <button> colors */
-  --btn-default-color: #141414;
-  --btn-default-background-color: var(--btn-inactive-color);
+  --btn-default-color: #333;
+  --btn-default-bg-color: var(--text-color);
 
-  --btn-primary-color: #ccc;
-  --btn-primary-background-color: var(--btn-active-color);
+  --btn-primary-color: #333;
+  --btn-primary-bg-color: var(--btn-active-bg-color);
 
   /* Animation */
   --spring-duration: .5s;
@@ -77,7 +86,11 @@
   --animation-bounce: bounce .25s ease-out;
 
   /* Glow */
-  --glow-text-shadow: 0 0 2px #BA3A95, 0 0 5px #BA3A95, 0 0 10px #BA3A95;
+  --glow-text-shadow: 0 0 1px var(--base-pink), 0 0 5px var(--base-pink), 0 0 10px var(--base-pink);
+
+  /* Base colors */
+  --base-blue: #138BFF;
+  --base-pink: #EF02FF;
 }
 
 @keyframes bounce {

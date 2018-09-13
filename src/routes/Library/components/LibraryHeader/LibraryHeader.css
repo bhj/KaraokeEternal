@@ -8,19 +8,25 @@
   flex: 1;
   margin: 0;
   border: none !important;
-  color: var(--btn-inactive-color) !important;
+  color: var(--text-color) !important;
   background-color: transparent !important;
   box-shadow: none !important;
 }
 
+.searchInput::placeholder {
+  color: var(--input-placeholder-color) !important;
+}
+
 .clear {
-  fill: var(--btn-active-color);
+  fill: var(--btn-active-bg-color);
+  filter: var(--btn-active-filter);
 }
 
 .inactive {
-  fill: var(--btn-inactive-color);
+  fill: var(--btn-bg-color);
 }
 
 .active {
-  fill: var(--btn-active-color);
+  fill: var(--btn-active-bg-color);
+  filter: var(--btn-active-filter);
 }

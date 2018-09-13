@@ -29,7 +29,7 @@ a {
 }
 
 body {
-  background-color: var(--background-color);
+  background-color: var(--bg-color);
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -56,8 +56,8 @@ select {
   box-shadow: inset 1px 1px 3px 0px rgba(50, 50, 50, 0.75);
   border: none;
   border-radius: var(--border-radius);
-  color: var(--input-text-color);
-  background-color: var(--input-background-color);
+  color: var(--input-color);
+  background-color: var(--input-bg-color);
 }
 
 ::placeholder {
@@ -84,7 +84,7 @@ input[type="search"] {
 
 /* Modal dialog */
 .skylight-dialog {
-  background-color: var(--background-color) !important;
+  background-color: var(--bg-color) !important;
   border-radius: var(--border-radius) !important;
 }
 
@@ -98,7 +98,7 @@ button {
   display: inline-block;
   padding: 16px;
   border-radius: var(--border-radius);
-  background-color: var(--btn-default-background-color);
+  background-color: var(--btn-default-bg-color);
   color: var(--btn-default-color);
   font-size: 16px;
   font-weight: lighter;
@@ -108,18 +108,19 @@ button {
 }
 
 button.primary {
-  background-color: var(--btn-primary-background-color);
+  background-color: var(--btn-primary-bg-color);
   color: var(--btn-primary-color);
 }
 
 @supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
   .bg-blur {
-    background-color: var(--chrome-background-color-blur) !important;
-    -backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    background-color: transparent !important;
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    -backdrop-filter: blur(20px) saturate(200%);
   }
 }
 
 mark {
-  background-color: var(--mark-background-color);
+  color: inherit;
+  background-color: var(--mark-bg-color);
 }

@@ -15,7 +15,7 @@
 }
 
 .clear {
-  fill: var(--btn-danger-color);
+  fill: var(--btn-danger-bg-color);
 }
 
 .folder {

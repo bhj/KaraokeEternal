@@ -1,7 +1,7 @@
 .artistsHeading,
 .songsHeading {
   color: var(--text-color);
-  background: var(--chrome-background-color);
+  background: var(--chrome-bg-color);
   font-size: 18px;
   text-align: center;
 }

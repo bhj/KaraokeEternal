@@ -6,19 +6,18 @@
 }
 
 .play {
-  fill: var(--transport-btn-color);
+  fill: var(--transport-btn-bg-color);
+  filter: var(--transport-btn-filter);
 }
 
 .pause {
-  fill: var(--transport-btn-color);
+  fill: var(--transport-btn-bg-color);
+  filter: var(--transport-btn-filter);
 }
 
 .next {
-  fill: var(--transport-btn-color);
-}
-
-.volume {
-  fill: var(--transport-btn-color);
+  fill: var(--transport-btn-bg-color);
+  filter: var(--transport-btn-filter);
 }
 
 .disabled {

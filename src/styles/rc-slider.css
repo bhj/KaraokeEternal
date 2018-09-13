@@ -12,7 +12,7 @@
 .rc-slider-rail {
   position: absolute;
   width: 100%;
-  background-color: var(--transport-volume-background-color);
+  background-color: var(--transport-volume-track-color);
   height: 6px;
   border-radius: 6px;
 }
@@ -22,5 +22,6 @@
   left: 0;
   height: 6px;
   border-radius: 6px;
-  background-color: var(--transport-volume-color);
+  background-color: var(--transport-volume-track-active-color);
+  filter: var(--transport-volume-track-active-filter);
 }

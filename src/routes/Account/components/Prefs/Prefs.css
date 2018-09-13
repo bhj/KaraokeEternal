@@ -1,6 +1,6 @@
 .container {
   top: var(--container-padding);
-  background-color: var(--panel-background-color);
+  background-color: var(--panel-bg-color);
   border-radius: var(--border-radius);
   overflow: hidden;
 }
@@ -9,7 +9,7 @@
   margin: 0;
   font-size: var(--panel-title-size);
   padding: var(--panel-title-padding);
-  background-color: var(--panel-title-background-color);
+  background-color: var(--panel-title-bg-color);
 }
 
 .content {

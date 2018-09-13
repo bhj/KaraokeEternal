@@ -1,5 +1,5 @@
 .textContainer {
-  background-color: var(--chrome-background-color);
+  background-color: var(--chrome-bg-color);
   border-radius: var(--border-radius);
   color: white;
   font-size: 8vh;

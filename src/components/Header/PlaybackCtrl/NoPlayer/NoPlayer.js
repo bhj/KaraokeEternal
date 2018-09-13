@@ -5,7 +5,7 @@ import './NoPlayer.css'
 export const NoPlayer = (props) => (
   <div styleName='container'>
     <p styleName='msg'>
-      Player not found in room (<Link to='/player'>Start Player</Link>)
+      No player in room (<Link to='/player'>Start Player</Link>)
     </p>
   </div>
 )

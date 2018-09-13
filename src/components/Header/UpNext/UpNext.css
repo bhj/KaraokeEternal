@@ -10,6 +10,7 @@
 .upNext {
   composes: container;
   animation-name: up-next-bg-animation;
+  filter: var(--up-next-filter);
 }
 
 @keyframes up-next-bg-animation {
@@ -20,6 +21,7 @@
 .upNow {
   composes: container;
   animation-name: up-now-bg-animation;
+  filter: var(--up-now-filter);
 }
 
 @keyframes up-now-bg-animation {

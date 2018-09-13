@@ -3,7 +3,7 @@
   align-items: center;
   height: 40px;
   width: 100%;
-  background-image: linear-gradient(to right, var(--current-item-from-background-color), var(--current-item-to-background-color));
+  background-image: linear-gradient(to right, var(--current-item-from-bg-color), var(--current-item-to-bg-color));
   background-repeat: no-repeat;
 }
 
@@ -22,5 +22,6 @@
 }
 
 .cancelIcon {
-  fill: var(--btn-danger-color);
+  fill: var(--btn-danger-bg-color);
+  filter: var(--btn-danger-filter);
 }
