@@ -48,37 +48,6 @@ router.get('/', async (ctx, next) => {
   ctx.body = {}
 })
 
-// set preferences
-router.put('/', async (ctx, next) => {
-  const data = ctx.request.body
-
-  if (!ctx.user.isAdmin) {
-    ctx.throw(401)
-  }
-
-  if (typeof data !== 'object' || !Object.keys(data).length) {
-    ctx.throw(422, 'Invalid data')
-  }
-
-  const q = squel.update()
-    .table('prefs')
-
-  // Object.keys(data).forEach(key => {
-  //   q.set(key, ctx.request.body[key])
-  // })
-
-  // console.log(q.toString())
-  const { text, values } = q.toParam()
-  const res = await db.run(text, values)
-
-  if (res.stmt.changes) {
-    log('%s updated prefs: %s', ctx.user.name, Object.keys(data))
-  }
-
-  // respond with updated prefs
-  ctx.body = await Prefs.get()
-})
-
 // add media file path
 router.post('/path', async (ctx, next) => {
   const dir = decodeURIComponent(ctx.query.dir)
