@@ -32,14 +32,14 @@ startServer()
 
 function startServer () {
   if (refs.server === undefined) {
-    log.info('Starting web server')
+    log.info('Starting server process')
     refs.server = childProcess.fork(path.join(__dirname, 'server.js'), [], {
       env: childEnv,
     })
 
     refs.server.on('exit', (code, signal) => {
-      log.info(`Web server exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
-      delete refs.server
+      log.info(`Server exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
+      process.exit()
     })
 
     refs.server.on('message', function ({ type, payload }) {
@@ -60,7 +60,7 @@ function startServer () {
 
 function startScanner () {
   if (refs.scanner === undefined) {
-    log.info('Starting media scanner')
+    log.info('Starting media scanner process')
     refs.scanner = childProcess.fork(path.join(__dirname, 'scanner.js'), [], {
       env: childEnv,
     })
