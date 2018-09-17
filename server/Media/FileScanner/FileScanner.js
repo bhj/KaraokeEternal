@@ -1,6 +1,5 @@
 const path = require('path')
-const debug = require('debug')
-const log = debug('app:media:fileScanner')
+const log = require('../../lib/logger')('fileScanner')
 const { promisify } = require('util')
 const fs = require('fs')
 const stat = promisify(fs.stat)
@@ -37,14 +36,14 @@ class FileScanner extends Scanner {
       this.emitStatus(`Listing folders (${i + 1} of ${this.paths.result.length})`, 0)
 
       try {
-        log('Searching path: %s', basePath)
+        log.info('Searching path: %s', basePath)
         let list = await getFiles(basePath, { pathId, basePath })
         list = list.filter(({ file }) => videoExts.includes(path.extname(file)))
 
-        log('  => found %s files with valid extensions (cdg, mp4)', list.length)
+        log.info('  => found %s files with valid extensions (cdg, mp4)', list.length)
         files = files.concat(list)
       } catch (err) {
-        log(`  => ${err.message} (path offline)`)
+        log.error(`  => ${err.message} (path offline)`)
         offlinePaths.push(pathId)
       }
 
@@ -53,10 +52,12 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log('Processing %s total files', files.length)
+    log.info('Processing %s total files', files.length)
 
     // process files
     for (let i = 0; i < files.length; i++) {
+      this.emitStatus(`Scanning media (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
+
       const { file, basePath } = files[i]
       const dir = path.dirname(file)
 
@@ -69,14 +70,13 @@ class FileScanner extends Scanner {
       }
 
       // emit progress
-      log('[%s/%s] %s', i + 1, files.length, file)
-      this.emitStatus(`Scanning media (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
+      log.info('[%s/%s] %s', i + 1, files.length, file)
 
       try {
         const mediaId = await this.processFile(files[i])
         validMedia.push(mediaId) // successfuly processed
       } catch (err) {
-        log(err) // try the next file
+        log.warn(err.message + ': ' + file) // try the next file
       }
 
       if (this.isCanceling) {
@@ -84,7 +84,7 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log('Finished processing; found %s valid songs', validMedia.length)
+    log.info('Finished; %s songs in library', validMedia.length)
 
     // cleanup
     {
@@ -107,7 +107,7 @@ class FileScanner extends Scanner {
       })
 
       if (invalidMedia.length) {
-        log(`Removing ${invalidMedia.length} entries for files that no longer exist `)
+        log.info(`Removing ${invalidMedia.length} entries for files that no longer exist `)
         await Media.remove(invalidMedia)
       }
     }
@@ -124,10 +124,10 @@ class FileScanner extends Scanner {
         relPath: [relPath.replace('/', '\\'), relPath.replace('\\', '/')],
       })
 
-      log('  => %s result(s)', res.result.length)
+      log.info('  => %s result(s)', res.result.length)
 
       if (res.result.length) {
-        log('  => checking metadata')
+        // run meta parser and compare to metadata in db
         const cur = res.entities[res.result[0]]
         const { artist, title } = this.parser(path.parse(file).name)
 
@@ -135,15 +135,15 @@ class FileScanner extends Scanner {
         const match = await Library.matchSong(artist, title)
 
         if (cur.artistId !== match.artistId || cur.songId !== match.songId) {
-          log('  => old: %s', JSON.stringify({ artist: cur.artist, title: cur.title }))
-          log('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
+          log.info('  => old: %s', JSON.stringify({ artist: cur.artist, title: cur.title }))
+          log.info('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
 
           await Media.update(cur.mediaId, {
             songId: match.songId,
             dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
           })
         } else {
-          log('  => ok')
+          log.info('  => ok')
         }
 
         return cur.mediaId
@@ -161,7 +161,7 @@ class FileScanner extends Scanner {
       dateAdded: Math.round(new Date().getTime() / 1000), // seconds
     }
 
-    log('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
+    log.info('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
 
     // need to look for an audio file?
     if (path.extname(file).toLowerCase() === '.cdg') {
@@ -176,7 +176,7 @@ class FileScanner extends Scanner {
           // does file exist?
           try {
             await stat(audio)
-            log('  => found %s audio', type)
+            log.info('  => found %s audio', type)
             break
           } catch (err) {
             // try another permutation
@@ -193,7 +193,7 @@ class FileScanner extends Scanner {
           } catch (err) {
             // try another type
             audio = null
-            log(err)
+            log.error(err)
           }
         }
       } // end for
@@ -211,7 +211,7 @@ class FileScanner extends Scanner {
       throw new Error(`  => could not determine duration`)
     }
 
-    log('  => duration: %s:%s',
+    log.info('  => duration: %s:%s',
       Math.floor(media.duration / 60),
       Math.round(media.duration % 60, 10).toString().padStart(2, '0')
     )
@@ -229,16 +229,16 @@ function getCfg (dir, baseDir) {
 
   try {
     const userScript = fs.readFileSync(file, 'utf-8')
-    log('Found config at %s', file)
+    log.info('Found config at %s', file)
 
     try {
       const vm = new NodeVM({ wrapper: 'none' })
       return vm.run(userScript)
     } catch (err) {
-      log(err)
+      log.error(err)
     }
   } catch (err) {
-    log('No config at %s', file)
+    log.info('No config at %s', file)
   }
 
   if (dir === baseDir) {

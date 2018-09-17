@@ -1,4 +1,4 @@
-const log = require('debug')(`app:server [${process.pid}]`)
+const log = require('./lib/logger')(`server[${process.pid}]`)
 const jwtVerify = require('jsonwebtoken').verify
 
 const LibrarySocket = require('./Library/socket')
@@ -38,7 +38,7 @@ module.exports = function (io, jwtKey) {
 
       sock.user = null
       sock.disconnect()
-      log(err)
+      log.info(err)
       return
     }
 
@@ -50,7 +50,7 @@ module.exports = function (io, jwtKey) {
 
       const room = sock.adapter.rooms[sock.user.roomId] || []
 
-      log('%s (%s) left room %s (%s; %s in room)',
+      log.info('%s (%s) left room %s (%s; %s in room)',
         sock.user.name, sock.id, sock.user.roomId, reason, room.length
       )
 
@@ -59,8 +59,6 @@ module.exports = function (io, jwtKey) {
         io.to(sock.user.roomId).emit('action', {
           type: PLAYER_LEAVE,
         })
-
-        log('No Players remaining in room %s', sock.user.roomId)
       }
     })
 
@@ -75,14 +73,14 @@ module.exports = function (io, jwtKey) {
       }
 
       if (typeof handlers[type] !== 'function') {
-        log('No handler for socket action: %s', type)
+        log.error('No handler for socket action: %s', type)
         return
       }
 
       try {
         await handlers[type](sock, action, acknowledge)
       } catch (err) {
-        log(err)
+        log.error(err)
 
         return acknowledge({
           type: type + _ERROR,
@@ -109,7 +107,7 @@ module.exports = function (io, jwtKey) {
       })
     }
 
-    log('%s (%s) joined room %s (%s in room)',
+    log.info('%s (%s) joined room %s (%s in room)',
       sock.user.name, sock.id, sock.user.roomId, room.length
     )
 
@@ -130,7 +128,7 @@ module.exports = function (io, jwtKey) {
         payload: await Library.getStars(sock.user.userId),
       })
     } catch (err) {
-      log(err)
+      log.error(err)
     }
   })
 }

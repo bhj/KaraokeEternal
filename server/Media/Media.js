@@ -1,7 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const debug = require('debug')
-const log = debug('app:media')
+const log = require('../lib/logger')('media')
 
 class Media {
   /**
@@ -132,7 +131,7 @@ class Media {
         SELECT songs.songId FROM songs LEFT JOIN media USING(songId) WHERE media.mediaId IS NULL
       )
     `)
-    log(`cleanup: removed ${res.stmt.changes} songs with no associated media`)
+    log.info(`cleanup: removed ${res.stmt.changes} songs with no associated media`)
     changes += res.stmt.changes
 
     // remove artists without associated songs
@@ -141,7 +140,7 @@ class Media {
         SELECT artists.artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.songId IS NULL
       )
     `)
-    log(`cleanup: removed ${res.stmt.changes} artists with no associated songs`)
+    log.info(`cleanup: removed ${res.stmt.changes} artists with no associated songs`)
     changes += res.stmt.changes
 
     // remove stars for nonexistent songs
@@ -150,7 +149,7 @@ class Media {
         SELECT starredSongs.songId FROM starredSongs LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
       )
     `)
-    log(`cleanup: removed ${res.stmt.changes} stars for nonexistent songs`)
+    log.info(`cleanup: removed ${res.stmt.changes} stars for nonexistent songs`)
     changes += res.stmt.changes
 
     // remove nonexistent media from the queue
@@ -159,11 +158,11 @@ class Media {
         SELECT queue.mediaId FROM queue LEFT JOIN media USING(mediaId) WHERE media.mediaId IS NULL
       )
     `)
-    log(`cleanup: removed ${res.stmt.changes} queue entries for nonexistent media`)
+    log.info(`cleanup: removed ${res.stmt.changes} queue entries for nonexistent media`)
     changes += res.stmt.changes
 
     if (changes) {
-      log(`cleanup: vacuuming database`)
+      log.info(`cleanup: vacuuming database`)
       await db.run('VACUUM')
     }
   }

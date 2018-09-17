@@ -4,8 +4,6 @@ const jwtSign = require('jsonwebtoken').sign
 const bcrypt = require('../lib/bcrypt')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
-const debug = require('debug')
-const log = debug('app:user')
 const Prefs = require('../Prefs')
 
 // login

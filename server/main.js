@@ -1,4 +1,5 @@
-const log = require('debug')(`app:master [${process.pid}]`)
+const childEnv = require('./lib/cli')()
+const log = require('./lib/logger')(`master[${process.pid}]`)
 const path = require('path')
 const childProcess = require('child_process')
 const refs = {}
@@ -8,9 +9,9 @@ const {
   SERVER_WORKER_STATUS,
 } = require('../shared/actions')
 
-log('NODE_ENV =', process.env.NODE_ENV)
+Object.keys(childEnv).forEach(key => log.verbose(`${key} = ${childEnv[key]}`))
 
-// these could hang around esp. when quitting via electron
+// make sure child processes don't hang around
 process.on('exit', function () {
   if (refs.server) refs.server.kill()
   if (refs.scanner) refs.scanner.kill()
@@ -18,23 +19,26 @@ process.on('exit', function () {
 
 // debug: log stack trace for unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
-  log('Unhandled Rejection at: Promise', p, 'reason:', reason)
+  log.error('Unhandled Rejection at: Promise', p, 'reason:', reason)
 })
 
 // detect electron
 if (process.versions['electron']) {
   refs.electron = require('./electron.js')
+  childEnv.KF_USER_PATH = refs.electron.app.getPath('userData')
 }
 
 startServer()
 
 function startServer () {
   if (refs.server === undefined) {
-    log('Starting web server')
-    refs.server = childProcess.fork(path.join(__dirname, 'server.js'))
+    log.info('Starting web server')
+    refs.server = childProcess.fork(path.join(__dirname, 'server.js'), [], {
+      env: childEnv,
+    })
 
     refs.server.on('exit', (code, signal) => {
-      log(`Web server exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
+      log.info(`Web server exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
       delete refs.server
     })
 
@@ -56,11 +60,13 @@ function startServer () {
 
 function startScanner () {
   if (refs.scanner === undefined) {
-    log('Starting media scanner')
-    refs.scanner = childProcess.fork(path.join(__dirname, 'scanner.js'))
+    log.info('Starting media scanner')
+    refs.scanner = childProcess.fork(path.join(__dirname, 'scanner.js'), [], {
+      env: childEnv,
+    })
 
     refs.scanner.on('exit', (code, signal) => {
-      log(`Media scanner exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
+      log.info(`Media scanner exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
 
       refs.server.send({ type: SCANNER_WORKER_DONE })
       delete refs.scanner

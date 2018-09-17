@@ -2,8 +2,7 @@ const db = require('sqlite')
 const squel = require('squel')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
-const debug = require('debug')
-const log = debug('app:rooms')
+const log = require('../lib/logger')('rooms')
 
 // list available rooms
 router.get('/rooms', async (ctx, next) => {
@@ -41,7 +40,7 @@ router.post('/rooms', async (ctx, next) => {
   const res = await db.run(text, values)
 
   if (res.stmt.changes) {
-    log('%s created room "%s" (roomId: %s)', ctx.user.name, room.name, res.stmt.lastID)
+    log.info('%s created room "%s" (roomId: %s)', ctx.user.name, room.name, res.stmt.lastID)
   }
 
   // send updated room list
@@ -73,7 +72,7 @@ router.put('/rooms/:roomId', async (ctx, next) => {
   const res = await db.run(text, values)
 
   if (res.stmt.changes) {
-    log('%s updated roomId %s', ctx.user.name, ctx.params.roomId)
+    log.info('%s updated roomId %s', ctx.user.name, ctx.params.roomId)
   }
 
   // send updated room list
@@ -99,7 +98,7 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   const res = await db.run(text, values)
 
   if (res.stmt.changes) {
-    log('%s deleted roomId %s', ctx.user.name, ctx.params.roomId)
+    log.info('%s deleted roomId %s', ctx.user.name, ctx.params.roomId)
   }
 
   // send updated room list

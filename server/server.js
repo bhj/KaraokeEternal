@@ -1,7 +1,7 @@
 const sqlite = require('sqlite')
-const log = require('debug')(`app:server [${process.pid}]`)
+const log = require('./lib/logger')(`server[${process.pid}]`)
 const path = require('path')
-const project = require('../project.config')
+const config = require('../project.config')
 const getIPAddress = require('./lib/getIPAddress')
 const http = require('http')
 const fs = require('fs')
@@ -43,21 +43,35 @@ app.use(async (ctx, next) => {
 })
 
 app.on('error', (err, ctx) => {
-  log(err)
+  if (err.code === 'EPIPE') {
+    // these are common since browsers make multiple requests for media files
+    log.verbose(err.message)
+    return
+  }
+
+  log.error(err.message)
 })
 
-log('Opening database file %s', project.database)
+log.info('Opening database file %s', config.database)
 
 Promise.resolve()
-  .then(() => sqlite.open(project.database, { Promise }))
+  .then(() => sqlite.open(config.database, { Promise }))
   .then(db => db.migrate({
-    migrationsPath: path.join(project.basePath, 'server', 'lib', 'schemas'),
+    migrationsPath: path.join(config.basePath, 'server', 'lib', 'schemas'),
     // force: 'last' ,
   }))
   .then(() => Prefs.getJwtKey())
   .then(jwtKey => {
-    // basic middleware
-    app.use(KoaLogger())
+    // koa request/response logging
+    app.use(KoaLogger((str, args) => {
+      if (args.length === 6 && args[3] >= 500) {
+        // 5xx status response
+        log.error(str)
+      } else {
+        log.verbose(str)
+      }
+    }))
+
     app.use(KoaRange)
     app.use(KoaBodyparser())
 
@@ -90,8 +104,8 @@ Promise.resolve()
     app.use(roomsRouter.routes())
     app.use(userRouter.routes())
 
-    if (project.env === 'development') {
-      log('Enabling webpack dev and HMR middleware')
+    if (config.env === 'development') {
+      log.info('Enabling webpack dev and HMR middleware')
       const webpack = require('webpack')
       const webpackConfig = require('../webpack.config')
       const compiler = webpack(webpackConfig)
@@ -103,11 +117,11 @@ Promise.resolve()
           app.use(middleware)
 
           // serve static assets from ~/public since Webpack is unaware of these
-          app.use(KoaStatic(path.resolve(project.basePath, 'public')))
+          app.use(KoaStatic(path.resolve(config.basePath, 'public')))
 
           // "rewrite" other requests to the root /index.html file
           // (which webpack-dev-server will serve from a virtual ~/dist)
-          const indexFile = path.join(project.basePath, 'dist', 'index.html')
+          const indexFile = path.join(config.basePath, 'dist', 'index.html')
 
           app.use(async (ctx, next) => {
             ctx.body = await new Promise(function (resolve, reject) {
@@ -124,10 +138,10 @@ Promise.resolve()
       // production mode
 
       // serve files in ~/dist
-      app.use(KoaStatic(path.join(project.basePath, 'dist')))
+      app.use(KoaStatic(path.join(config.basePath, 'dist')))
 
       // "rewrite" all other requests to the root /index.html file
-      const indexFile = path.join(project.basePath, 'dist', 'index.html')
+      const indexFile = path.join(config.basePath, 'dist', 'index.html')
       const readFile = promisify(fs.readFile)
 
       app.use(async (ctx, next) => {
@@ -157,11 +171,11 @@ Promise.resolve()
       }
     })
 
-    server.listen(project.serverPort, project.serverHost, err => {
+    server.listen(config.serverPort, config.serverHost, err => {
       if (err) throw err
 
-      const url = `http://${getIPAddress()}:${project.serverPort}`
-      log(`Web server running at ${url}`)
+      const url = `http://${getIPAddress()}:${config.serverPort}`
+      log.info(`Web server running at ${url}`)
 
       process.send({
         'type': SERVER_WORKER_STATUS,

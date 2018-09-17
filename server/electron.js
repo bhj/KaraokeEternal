@@ -1,9 +1,8 @@
 const { app, shell, clipboard, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
-const log = require('debug')(`app:master:electron [${process.pid}]`)
-const project = require('../project.config')
-const isDev = (process.defaultApp || /node_modules[\\/]electron[\\/]/.test(process.execPath))
-const ICON_PATH = path.join(project.basePath, isDev ? 'public' : 'dist')
+const log = require('./lib/logger')(`master:electron [${process.pid}]`)
+const config = require('../project.config')
+const ICON_PATH = path.join(config.basePath, config.env === 'development' ? 'public' : 'dist')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -13,18 +12,9 @@ const status = {
   url: '',
 }
 
-// NODE_ENV won't automatically pass to (non-Electron) forked processes;
-// set it for them now based on detected dev/prod state
-if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = isDev ? 'development' : 'production'
-}
-
-// pass user data path to (non-Electron) forked processes
-process.env.USER_DATA_PATH = app.getPath('userData')
-
 // event handlers
 app.on('ready', createWindow)
-app.on('quit', (e, code) => { log(`quitting (exit code ${code})`) })
+app.on('quit', (e, code) => { log.info(`quitting (exit code ${code})`) })
 
 function createWindow () {
   win = new BrowserWindow({
@@ -84,4 +74,4 @@ function updateMenu () {
   tray.setContextMenu(Menu.buildFromTemplate(menu))
 }
 
-module.exports = { setStatus }
+module.exports = { app, setStatus }

@@ -2,8 +2,7 @@ const { promisify } = require('util')
 const fs = require('fs')
 const stat = promisify(fs.stat)
 const path = require('path')
-const debug = require('debug')
-const log = debug('app:media')
+const log = require('../lib/logger')('media')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/media' })
 const Media = require('./Media')
@@ -48,7 +47,7 @@ router.get('/', async (ctx, next) => {
     ctx.throw(404, `Unknown mime type for extension: ${path.extname(file)}`)
   }
 
-  log('streaming %s (%sMB): %s', ctx.type, (ctx.length / 1000000).toFixed(2), file)
+  log.verbose('streaming %s (%sMB): %s', ctx.type, (ctx.length / 1000000).toFixed(2), file)
   ctx.body = fs.createReadStream(file)
 })
 

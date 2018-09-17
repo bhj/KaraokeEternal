@@ -1,8 +1,5 @@
 const path = require('path')
-const db = require('sqlite')
-const squel = require('squel')
-const debug = require('debug')
-const log = debug('app:prefs')
+const log = require('../lib/logger')('prefs')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
@@ -114,7 +111,7 @@ router.get('/path/ls', async (ctx, next) => {
     const parent = path.resolve(dir, '../')
 
     const list = await getFolders(dir)
-    log('%s listed path: %s', ctx.user.name, current)
+    log.info('%s listed path: %s', ctx.user.name, current)
 
     ctx.body = {
       current,

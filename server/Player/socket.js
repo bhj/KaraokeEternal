@@ -1,4 +1,3 @@
-const log = require('debug')('app:socket:player')
 const Queue = require('../Queue')
 
 const {

@@ -1,6 +1,6 @@
-const project = require('../project.config')
+const config = require('../project.config')
 const sqlite = require('sqlite')
-const log = require('debug')(`app:scanner [${process.pid}]`)
+const log = require('./lib/logger')(`scanner[${process.pid}]`)
 const Prefs = require('./Prefs')
 const FileScanner = require('./Media/FileScanner')
 const {
@@ -11,19 +11,19 @@ const {
 let _Scanner
 let _isScanQueued = true
 
-log('Opening database file %s', project.database)
+log.info('Opening database file %s', config.database)
 
 Promise.resolve()
-  .then(() => sqlite.open(project.database, { Promise }))
+  .then(() => sqlite.open(config.database, { Promise }))
   .then(() => {
     // setup start/stop handlers
     process.on('message', function ({ type, payload }) {
       if (type === SCANNER_WORKER_SCAN) {
-        log(`Media scan requested (restarting)`)
+        log.info(`Media scan requested (restarting)`)
         _isScanQueued = true
         cancelScan()
       } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
-        log(`Stopping media scan (user requested)`)
+        log.info(`Stopping media scan (user requested)`)
         _isScanQueued = false
         cancelScan()
       }
@@ -33,7 +33,7 @@ Promise.resolve()
   })
 
 async function startScan () {
-  log(`Starting media scan`)
+  log.info(`Starting media scan`)
 
   while (_isScanQueued) {
     _isScanQueued = false
@@ -43,7 +43,6 @@ async function startScan () {
     await _Scanner.scan()
   } // end while
 
-  log(`Finished media scan; exiting`)
   process.exit()
 }
 

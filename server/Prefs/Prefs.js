@@ -2,8 +2,7 @@ const path = require('path')
 const db = require('sqlite')
 const squel = require('squel')
 const crypto = require('crypto')
-const debug = require('debug')
-const log = debug('app:prefs')
+const log = require('../lib/logger')('prefs')
 
 class Prefs {
   /**
@@ -124,7 +123,7 @@ class Prefs {
    */
   static async jwtKeyRefresh () {
     const jwtKey = crypto.randomBytes(48).toString('base64') // 64 char
-    log('Rotating JWT secret key (length=%s)', jwtKey.length)
+    log.info('Rotating JWT secret key (length=%s)', jwtKey.length)
 
     // try UPDATE
     // @todo use upsert

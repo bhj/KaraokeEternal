@@ -1,7 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
 const Queue = require('./Queue')
-const log = require('debug')('app:socket:queue')
 
 const {
   QUEUE_ADD,

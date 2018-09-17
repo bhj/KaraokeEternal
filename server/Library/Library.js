@@ -1,7 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const debug = require('debug')
-const log = debug('app:library')
+const log = require('../lib/logger')('library')
 
 class Library {
   /**
@@ -166,7 +165,7 @@ class Library {
       const row = await db.get(text, values)
 
       if (row) {
-        // log('matched artist: %s', row.name)
+        // log.info('matched artist: %s', row.name)
         artistId = row.artistId
         artist = row.name
       }
@@ -174,7 +173,7 @@ class Library {
 
     // new artist?
     if (typeof artistId === 'undefined') {
-      log('new artist: %s', artist)
+      log.info('new artist: %s', artist)
 
       const q = squel.insert()
         .into('artists')
@@ -201,7 +200,7 @@ class Library {
       const row = await db.get(text, values)
 
       if (row) {
-        // log('matched song: %s', row.title)
+        // log.info('matched song: %s', row.title)
         songId = row.songId
         title = row.title
       }
@@ -209,7 +208,7 @@ class Library {
 
     // new song?
     if (typeof songId === 'undefined') {
-      log('new song: %s', title)
+      log.info('new song: %s', title)
 
       const q = squel.insert()
         .into('songs')
