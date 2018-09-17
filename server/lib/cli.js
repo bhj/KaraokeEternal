@@ -1,12 +1,18 @@
 const program = require('commander')
-const env = { NODE_ENV: process.env.NODE_ENV }
-const appVer = (process.versions['electron'] && env === 'production')
+const appVer = process.versions['electron'] && process.env.NODE_ENV !== 'development'
   ? require('electron').app.getVersion() : process.env.npm_package_version
+
+// fix for https://github.com/electron/electron/issues/4690
+if (process.defaultApp !== true) {
+  process.argv.unshift(null)
+}
 
 // prep environment variables to pass to child processes based on the
 // CLI options and env vars set for the current process. An option
 // passed by CLI will override the equivalent environment variable.
 function computeEnv () {
+  const env = { NODE_ENV: process.env.NODE_ENV }
+
   // parse cli args
   program
     .version(appVer)
