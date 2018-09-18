@@ -74,4 +74,5 @@ module.exports = {
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
   SCANNER_WORKER_DONE: 'scannerWorker/DONE',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
+  SERVER_WORKER_ERROR: 'serverWorker/ERROR',
 }

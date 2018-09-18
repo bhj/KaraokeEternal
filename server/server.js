@@ -29,6 +29,7 @@ const {
   LIBRARY_PUSH,
   SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
+  SERVER_WORKER_ERROR,
 } = require('../shared/actions')
 
 // Koa error handling
@@ -151,11 +152,24 @@ Promise.resolve()
       })
     }
 
-    // start koa and socket.io server
+    // create http and socket.io server
     const server = http.createServer(app.callback())
     const io = new SocketIO(server)
 
-    // attach socket.io event handlers
+    // http server error handler
+    server.on('error', function (err) {
+      log.error(err)
+
+      process.send({
+        'type': SERVER_WORKER_ERROR,
+        'error': err.message,
+      })
+
+      // not much we can do without a working server
+      process.exit(1)
+    })
+
+    // socket.io event handlers
     socketActions(io, jwtKey)
 
     // emit messages from scanner over socket.io
@@ -173,9 +187,8 @@ Promise.resolve()
 
     log.info(`Starting web server (host=${config.serverHost}; port=${config.serverPort})`)
 
-    server.listen(config.serverPort, config.serverHost, err => {
-      if (err) throw err
-
+    // success callback is added as a listener for the 'listening' event
+    server.listen(config.serverPort, config.serverHost, () => {
       const url = `http://${getIPAddress()}:${config.serverPort}`
       log.info(`Web server running at ${url}`)
 

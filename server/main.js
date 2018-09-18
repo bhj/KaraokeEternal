@@ -7,6 +7,7 @@ const {
   SCANNER_WORKER_SCAN,
   SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
+  SERVER_WORKER_ERROR,
 } = require('../shared/actions')
 
 Object.keys(childEnv).forEach(key => log.verbose(`${key} = ${childEnv[key]}`))
@@ -42,17 +43,21 @@ function startServer () {
       process.exit()
     })
 
-    refs.server.on('message', function ({ type, payload }) {
+    refs.server.on('message', function (action) {
       if (refs.scanner) {
         // all IPC messages are relayed to scanner
-        refs.scanner.send({ type, payload })
-      } else if (type === SCANNER_WORKER_SCAN) {
+        refs.scanner.send(action)
+      } else if (action.type === SCANNER_WORKER_SCAN) {
         startScanner()
       }
 
-      // electron: show status in system tray
-      if (type === SERVER_WORKER_STATUS && refs.electron) {
-        return refs.electron.setStatus('url', payload.url)
+      // @todo make generic action handler for electron
+      if (refs.electron) {
+        if (action.type === SERVER_WORKER_STATUS) {
+          return refs.electron.setStatus('url', action.payload.url)
+        } else if (action.type === SERVER_WORKER_ERROR) {
+          return refs.electron.setError(action.error)
+        }
       }
     })
   }

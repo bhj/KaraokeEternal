@@ -1,4 +1,4 @@
-const { app, shell, clipboard, BrowserWindow, Tray, Menu } = require('electron')
+const { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
 const isDev = (process.defaultApp || /node_modules[\\/]electron[\\/]/.test(process.execPath))
 const log = require('./lib/logger')(`master:electron[${process.pid}]`)
@@ -54,6 +54,10 @@ function launchBrowser () {
   }
 }
 
+function setError (msg) {
+  dialog.showErrorBox('Karaoke Forever Server', `Error: ${msg}`)
+}
+
 function setStatus (key, val) {
   status[key] = val
   updateMenu()
@@ -75,4 +79,4 @@ function updateMenu () {
   tray.setContextMenu(Menu.buildFromTemplate(menu))
 }
 
-module.exports = { app, setStatus }
+module.exports = { app, setStatus, setError }
