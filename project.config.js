@@ -1,5 +1,5 @@
 const path = require('path')
-const NODE_ENV = process.env.NODE_ENV || 'development'
+const NODE_ENV = process.env.NODE_ENV || 'production'
 const KF_USER_PATH = process.env.KF_USER_PATH || __dirname
 const KF_SERVER_PORT = parseInt(process.env.KF_SERVER_PORT, 10)
 const KF_LOG_LEVEL = parseInt(process.env.KF_LOG_LEVEL, 10)
