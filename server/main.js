@@ -38,7 +38,7 @@ function startServer () {
     })
 
     refs.server.on('exit', (code, signal) => {
-      log.info(`Server exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
+      log.info(`Server exited (${signal || code})`)
       process.exit()
     })
 
@@ -66,7 +66,7 @@ function startScanner () {
     })
 
     refs.scanner.on('exit', (code, signal) => {
-      log.info(`Media scanner exited (${signal ? 'killed by ' + signal : 'code ' + code})`)
+      log.info(`Media scanner exited (${signal || code})`)
 
       refs.server.send({ type: SCANNER_WORKER_DONE })
       delete refs.scanner
