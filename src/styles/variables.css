@@ -69,11 +69,11 @@
   /* Up Next header/banner */
   --up-next-bg-color-from: #00488D;
   --up-next-bg-color-to: var(--base-blue);
-  --up-next-filter: var(--btn-active-filter);
+  --up-next-filter: none;
 
-  --up-now-bg-color-from: #66006D;
-  --up-now-bg-color-to: var(--base-pink);
-  --up-now-filter: var(--btn-danger-filter);
+  --up-now-bg-color-from: #6C006C;
+  --up-now-bg-color-to: #9C02A7;
+  --up-now-filter: none;
 
   /* <button> colors */
   --btn-default-color: #333;
@@ -89,7 +89,7 @@
   --animation-bounce: bounce .25s ease-out;
 
   /* Glow */
-  --glow-text-shadow: 0 0 1px var(--base-pink), 0 0 5px var(--base-pink), 0 0 10px var(--base-pink);
+  --glow-text-shadow: 0 0 5px var(--base-pink), 0 0 10px var(--base-pink);
 
   /* Base colors */
   --base-blue: #138BFF;
