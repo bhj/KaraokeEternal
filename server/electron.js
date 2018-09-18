@@ -1,7 +1,7 @@
 const { app, shell, clipboard, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
 const isDev = (process.defaultApp || /node_modules[\\/]electron[\\/]/.test(process.execPath))
-const log = require('./lib/logger')(`master:electron [${process.pid}]`)
+const log = require('./lib/logger')(`master:electron[${process.pid}]`)
 const config = require('../project.config')
 const ICON_PATH = path.join(config.basePath, isDev ? 'public' : 'dist')
 
@@ -15,7 +15,7 @@ const status = {
 
 // event handlers
 app.on('ready', createWindow)
-app.on('quit', (e, code) => { log.info(`quitting (exit code ${code})`) })
+app.on('quit', (e, code) => { log.info(`exiting (${code})`) })
 
 function createWindow () {
   win = new BrowserWindow({
