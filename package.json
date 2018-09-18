@@ -26,7 +26,7 @@
     "type": "git",
     "url": "git+https://github.com/bhj/karaoke-forever.git"
   },
-  "author": "Brandon H. Jones (https://karaoke-forever.com)",
+  "author": "Brandon H. Jones (https://www.karaoke-forever.com)",
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.0.0",
