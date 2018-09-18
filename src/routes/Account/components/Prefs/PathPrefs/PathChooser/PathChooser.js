@@ -19,6 +19,7 @@ export default class PathChooser extends React.Component {
   }
 
   api = new HttpApi('prefs/path')
+  list = React.createRef()
 
   getListing = (dir) => {
     this.api('GET', `/ls?dir=${encodeURIComponent(dir)}`)
@@ -31,6 +32,10 @@ export default class PathChooser extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     if (this.props.isVisible && !prevProps.isVisible) {
       this.getListing(this.state.current || '.')
+    }
+
+    if (this.state.current !== prevState.current) {
+      this.list.current.scrollTop = 0
     }
   }
 
@@ -55,7 +60,7 @@ export default class PathChooser extends React.Component {
             {this.state.current || '\u00a0'}
           </div>
 
-          <div style={{ flex: '1', marginBottom: '1em', overflow: 'scroll' }}>
+          <div style={{ flex: '1', marginBottom: '1em', overflow: 'scroll' }} ref={this.list}>
             {this.state.parent !== false &&
               <strong><PathItem path={'..'} onSelect={() => this.getListing(this.state.parent)} /></strong>
             }
