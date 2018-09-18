@@ -14,7 +14,7 @@ module.exports = {
   // http server host: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
   serverHost: '0.0.0.0',
   // http server port: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
-  serverPort: isNaN(KF_SERVER_PORT) ? 0 : KF_SERVER_PORT,
+  serverPort: NODE_ENV === 'development' ? 3000 : isNaN(KF_SERVER_PORT) ? 0 : KF_SERVER_PORT,
   // full path to database file
   database: path.join(KF_USER_PATH, 'database.sqlite3'),
   // log file level (0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug)
