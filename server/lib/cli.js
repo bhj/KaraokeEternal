@@ -1,15 +1,18 @@
 const program = require('commander')
 const appVer = process.versions['electron'] && process.env.NODE_ENV !== 'development'
   ? require('electron').app.getVersion() : process.env.npm_package_version
+const options = {
+  port: 'KF_SERVER_PORT',
+  logLevel: 'KF_LOG_LEVEL',
+}
 
 // fix for https://github.com/electron/electron/issues/4690
 if (process.defaultApp !== true) {
   process.argv.unshift(null)
 }
 
-// prep environment variables to pass to child processes based on the
-// CLI options and env vars set for the current process. An option
-// passed by CLI will override the equivalent environment variable.
+// Sets environment variables for the current process based on CLI args.
+// Returns an object of env vars ready to hand to child_process.fork()
 function computeEnv () {
   const env = { NODE_ENV: process.env.NODE_ENV }
 
@@ -21,31 +24,15 @@ function computeEnv () {
     .option('-l --log-level <number>', 'Log file level (0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug)')
     .parse(process.argv)
 
-  // KF_SERVER_PORT
-  if (program.port) {
-    if (!Number.parseInt(program.port, 10)) {
-      console.error('Error: invalid server port: ' + program.port)
-      process.exit()
+  // an option set via CLI takes precendence over the environment variable
+  Object.keys(options).forEach(key => {
+    if (program[key]) {
+      env[options[key]] = program[key]
+      process.env[options[key]] = program[key]
+    } else if (process.env[options[key]]) {
+      env[options[key]] = process.env[options[key]]
     }
-
-    env.KF_SERVER_PORT = program.port
-  } else if (process.env.KF_SERVER_PORT) {
-    env.KF_SERVER_PORT = process.env.KF_SERVER_PORT
-  }
-
-  // KF_LOG_LEVEL
-  if (program.logLevel) {
-    const int = Number.parseInt(program.logLevel, 10)
-
-    if (typeof int !== 'number' || int < 0 || int > 5) {
-      console.error('Error: invalid log level: ' + program.logLevel)
-      process.exit()
-    }
-
-    env.KF_LOG_LEVEL = program.logLevel
-  } else if (process.env.KF_LOG_LEVEL) {
-    env.KF_LOG_LEVEL = process.env.KF_LOG_LEVEL
-  }
+  })
 
   return env
 }
