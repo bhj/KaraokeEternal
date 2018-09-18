@@ -189,7 +189,8 @@ Promise.resolve()
 
     // success callback is added as a listener for the 'listening' event
     server.listen(config.serverPort, config.serverHost, () => {
-      const url = `http://${getIPAddress()}:${config.serverPort}`
+      const port = server.address().port
+      const url = `http://${getIPAddress()}` + (port === 80 ? '' : ':' + port)
       log.info(`Web server running at ${url}`)
 
       process.send({
