@@ -171,6 +171,8 @@ Promise.resolve()
       }
     })
 
+    log.info(`Starting web server (host=${config.serverHost}; port=${config.serverPort})`)
+
     server.listen(config.serverPort, config.serverHost, err => {
       if (err) throw err
 
