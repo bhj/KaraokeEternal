@@ -43,6 +43,9 @@
   --alpha-picker-color: var(--artist-folder-bg-color);
   --queued-item-color: #F5CBF3;
   --queued-item-text-shadow: var(--glow-text-shadow);
+
+  --search-results-heading-color: var(--text-color);
+  --search-results-heading-bg-color: var(--artist-folder-bg-color);
   --mark-bg-color: #00488D;
 
   /* Queue */
