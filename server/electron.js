@@ -37,7 +37,7 @@ function createWindow () {
     tray.setPressedImage(path.join(ICON_PATH, 'mic-white.png'))
   }
 
-  tray.setToolTip('Karaoke Forever Server')
+  tray.setToolTip('Karaoke Forever Server v' + app.getVersion())
   tray.on('double-click', launchBrowser)
   updateMenu()
 
@@ -67,7 +67,7 @@ function updateMenu () {
   if (!tray) return
 
   const menu = [
-    { label: `Karaoke Forever Server`, enabled: false },
+    { label: 'Karaoke Forever Server v' + app.getVersion(), enabled: false },
     { label: status.url, enabled: false },
     { type: 'separator' },
     { label: 'Open in browser', click: launchBrowser },
