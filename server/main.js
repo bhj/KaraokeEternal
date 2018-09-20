@@ -40,7 +40,7 @@ function startServer () {
 
     refs.server.on('exit', (code, signal) => {
       log.info(`Server exited (${signal || code})`)
-      process.exit()
+      process.exit(code)
     })
 
     refs.server.on('message', function (action) {
