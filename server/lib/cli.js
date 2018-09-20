@@ -24,7 +24,7 @@ function computeEnv () {
   program
     .version(appVer, '-v, --version')
     .usage('[options]')
-    .option('-p, --port <number>', 'Server port (default=0/auto)')
+    .option('-p, --port <number>', 'Web server port (default=0/auto)')
     .option('-l, --log-level <number>',
       'Log file level (0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug) (default=2)')
     .parse(process.argv)
