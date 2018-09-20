@@ -19,6 +19,8 @@ permalink: /docs/index.html
   - [The Meta Parser](#the-meta-parser)
     - [Configuring the Parser](#configuring-the-parser)
     - [Augmenting or Replacing the Parser (Advanced)](#augmenting-or-replacing-the-parser-advanced)
+  - [Command Line Options](#command-line-options)
+  - [File Locations](#file-locations)
 
 ## Overview
 
@@ -138,9 +140,11 @@ The following file formats are supported:
 
 - MP4 (video with audio)
 
-Karaoke Forever expects media filenames to be in the format "Artist - Title" by default. To customize the parser's behavior, see [The Meta Parser](#the-meta-parser).
+  Note that since mp4/m4a files are only containers, codec support can vary depending on the browser running the [player](#player-admin-only).
 
-**Note:** Since mp4/m4a files are only containers, codec support can vary depending on the browser running the [player](#player-admin-only).
+Media folders can be added via the [Preferences](#preferences-admin-only) section of the web app (when signed in as an admin). Media files that can't be scanned will not appear in the library, and are [logged to a file](#file-locations) by default. To change the level of logging, see [Command Line Options](#command-line-options).
+
+Karaoke Forever expects media filenames to be in the format "Artist - Title" by default. To customize the filename parser's behavior, see [The Meta Parser](#the-meta-parser).
 
 ### The Meta Parser
 
@@ -211,3 +215,31 @@ return ({ composeSync, getDefaultParser, getDefaultMiddleware}) => {
 }
 
 ```
+
+### Command Line Options
+
+Karaoke Forever Server supports the following command line options:
+
+| Command | Description | Default |
+| --- | --- | --- |
+| `-l, --log-level <number>` | Log file level (**0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug) | 2 (warn) |
+| `-p, --port <number>` | Web server port. To use ports below 1024 (such as 80, so users don't have to include the port in the URL) the server usually must be run with administrative privileges. | 0 (auto) |
+| `-v, --version` | Output the Karaoke Forever Server version and exit | |
+
+For example, to start the server on port 80 in macOS:
+
+```
+$ sudo /Applications/Karaoke\ Forever\ Server.app/Contents/MacOS/Karaoke\ Forever\ Server -p 80
+```
+
+### File Locations
+
+#### macOS
+
+ - Database: `~/Library/Application Support/Karaoke Forever Server/database.sqlite3`
+ - Log: `~/Library/Logs/Karaoke Forever Server/log.log`
+
+#### Windows
+
+- Database: `%APPDATA%\Karaoke Forever Server\database.sqlite3`
+- Log: `%APPDATA%\Karaoke Forever Server\log.log`
