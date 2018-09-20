@@ -31,7 +31,7 @@ li > ul {
 
 #title h1 {
   font-size: 48px;
-  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #BA3A95, 0 0 30px #BA3A95, 0 0 40px #BA3A95, 0 0 55px #BA3A95, 0 0 75px #BA3A95;
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #EF02FF, 0 0 30px #EF02FF, 0 0 40px #EF02FF, 0 0 55px #EF02FF, 0 0 75px #EF02FF;
 }
 
 #title .credits.left {
@@ -39,11 +39,11 @@ li > ul {
 }
 
 a {
-  color: hsl(218, 100%, 60%);
+  color: #138BFF;
   font-weight: 400;
   text-decoration:none;
 
   &:hover {
-    color: hsl(218, 100%, 65%);
+    color: #7BBEFF;
   }
 }
