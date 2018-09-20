@@ -19,7 +19,7 @@
     "serve": "node .",
     "start": "electron .",
     "dist": "npm run compile && cross-env DEBUG=electron-builder:* electron-builder",
-    "build": "npm run dist -- --dir",
+    "build": "npm run dist",
     "install-app-deps": "electron-builder install-app-deps"
   },
   "repository": {
