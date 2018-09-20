@@ -220,11 +220,11 @@ return ({ composeSync, getDefaultParser, getDefaultMiddleware}) => {
 
 Karaoke Forever Server supports the following command line options:
 
-| Command | Description | Default |
+| Option | Description | Default |
 | --- | --- | --- |
-| `-l, --log-level <number>` | Log file level (**0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug) | 2 (warn) |
-| `-p, --port <number>` | Web server port. To use ports below 1024 (such as 80, so users don't have to include the port in the URL) the server usually must be run with administrative privileges. | 0 (auto) |
-| `-v, --version` | Output the Karaoke Forever Server version and exit | |
+| <div style="white-space: nowrap;">`-l, --log-level <number>`</div> | Log file level (**0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug) | 2 |
+| <div style="white-space: nowrap;">`-p, --port <number>`</div> | Web server port. To use low ports such as 80 (so users don't have to include the port) the server usually must be run with administrative privileges. | 0 (auto) |
+| <div style="white-space: nowrap;">`-v, --version`</div> | Output the Karaoke Forever Server version and exit. | |
 
 For example, to start the server on port 80 in macOS:
 
