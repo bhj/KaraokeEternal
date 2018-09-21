@@ -154,7 +154,7 @@ Karaoke Forever expects media filenames to be in the format "Artist - Title" by 
 
 The default parser normally looks for a hyphen (-) in the filename and assumes the artist's name is on the left, and song title on the right. If a folder has media filenames having the positions reversed, for example, add a `_kfconfig.js` file that returns a configuration object:
 
-```
+```js
 return {
   artistOnLeft: false, // default: true
   separator: '-',      // default: '-'
@@ -171,7 +171,7 @@ Karaoke Forever uses a simple middleware-based parser. Here *middleware* refers 
 
 Your parser creator has access to the default middleware and parser so it's easy to add a bit of string manipulation without reinventing the wheel. For example, this will create a parser that removes the word 'junk' from the input filename:
 
-```
+```js
 return ({ composeSync, getDefaultParser, getDefaultMiddleware}) => {
   function customMiddleware (ctx, next) {
     ctx.file = ctx.file.replace('junk', '')
@@ -197,7 +197,7 @@ Your parser creator should accept an object with the following functions:
 
 The following code is functionally identical to the previous example, but uses each stage from `getDefaultMiddleware` explicitly. This allows inserting custom middleware between stages, or removing a stage altogether if you do not include it.
 
-```
+```js
 return ({ composeSync, getDefaultParser, getDefaultMiddleware}) => {
   const defaultMiddleware = getDefaultMiddleware()
 
