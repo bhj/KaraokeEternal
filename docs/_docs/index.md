@@ -28,7 +28,7 @@ Host awesome karaoke parties where everyone can find and queue songs from their 
 
 Karaoke Forever has a few parts:
 
-- **[Server:](#karaoke-forever-server)** Runs on the macOS/Windows/Linux/etc. system with your [supported media files](#supported-media-files). Serves the web app on your local network.
+- **[Server:](#karaoke-forever-server)** Runs on the macOS/Windows/Linux/etc. system with your [supported media files](#supported-media-files) and serves the web app on your local network.
 
 - **[Web app:](#karaoke-forever-the-web-app)** Designed from the ground up for mobile browsers, anyone can easily join using their phone.
 
@@ -172,7 +172,7 @@ Karaoke Forever uses a simple middleware-based parser. Here *middleware* refers 
 Your parser creator has access to the default middleware and parser so it's easy to add a bit of string manipulation without reinventing the wheel. For example, this will create a parser that removes the word 'junk' from the input filename:
 
 ```js
-return ({ composeSync, getDefaultParser, getDefaultMiddleware}) => {
+return ({ composeSync, getDefaultParser, getDefaultMiddleware }) => {
   function customMiddleware (ctx, next) {
     ctx.file = ctx.file.replace('junk', '')
     next()
@@ -198,7 +198,7 @@ Your parser creator should accept an object with the following functions:
 The following code is functionally identical to the previous example, but uses each stage from `getDefaultMiddleware` explicitly. This allows inserting custom middleware between stages, or removing a stage altogether if you do not include it.
 
 ```js
-return ({ composeSync, getDefaultParser, getDefaultMiddleware}) => {
+return ({ composeSync, getDefaultParser, getDefaultMiddleware }) => {
   const defaultMiddleware = getDefaultMiddleware()
 
   function customMiddleware (ctx, next) {
