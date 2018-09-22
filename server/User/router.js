@@ -221,10 +221,16 @@ async function _login (ctx, creds) {
     ctx.throw(401)
   }
 
+  // client expects boolean
+  user.isAdmin = user.isAdmin === 1
+
+  // don't want this in the response
+  delete user.password
+
   // validate roomId (if not an admin)
   if (!user.isAdmin) {
-    if (typeof roomId === 'undefined') {
-      ctx.throw(422, 'RoomId is required')
+    if (!roomId) {
+      ctx.throw(422, 'Please select a room')
     }
 
     const q = squel.select()
@@ -234,24 +240,21 @@ async function _login (ctx, creds) {
     const { text, values } = q.toParam()
     const row = await db.get(text, values)
 
-    if (!row || row.status !== 'open') {
-      ctx.throw(401, 'Invalid Room')
-    }
-  }
+    if (!row) ctx.throw(401, 'Invalid roomId')
+    if (row.status !== 'open') ctx.throw(401, 'Room is no longer open')
 
-  delete user.password
-  user.roomId = roomId
-  user.isAdmin = (user.isAdmin === 1)
+    user.roomId = row.roomId
+  }
 
   // encrypt JWT based on subset of user object
   const token = jwtSign({
     userId: user.userId,
-    isAdmin: user.isAdmin === true,
+    isAdmin: user.isAdmin, // used by client for display purposes only
     name: user.name,
     roomId: user.roomId,
   }, ctx.jwtKey)
 
-  // set httpOnly cookie containing JWT
+  // set JWT as an httpOnly cookie
   ctx.cookies.set('kfToken', token, {
     httpOnly: true,
   })
