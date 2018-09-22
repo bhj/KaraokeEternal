@@ -36,10 +36,10 @@ export default class RoomSelect extends Component {
       )
     })
 
-    roomOpts.unshift(<option key='choose' value='' selected disabled>select room...</option>)
+    roomOpts.unshift(<option key='choose' value='' disabled>select room...</option>)
 
     return (
-      <select ref={this.handleRef}>
+      <select ref={this.handleRef} defaultValue=''>
         {roomOpts}
       </select>
     )
