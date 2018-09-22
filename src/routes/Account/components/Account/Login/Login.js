@@ -18,7 +18,7 @@ export default class Login extends Component {
         <input type='password' placeholder='password'
           ref={r => { this.password = r }}
         />
-        <RoomSelect onSelect={this.handleRoomSelect} />
+        <RoomSelect onRef={this.handleRoomSelectRef} />
 
         <br />
         <button onClick={this.handleSubmit} className='primary'>
@@ -28,18 +28,17 @@ export default class Login extends Component {
     )
   }
 
-  handleRoomSelect = (roomId) => {
-    this.roomId = roomId
+  handleRoomSelectRef = r => {
+    this.roomSelect = r
   }
 
-  handleSubmit = (event) => {
-    event.preventDefault()
-    const creds = {
+  handleSubmit = (e) => {
+    e.preventDefault()
+
+    this.props.onSubmitClick({
       username: this.username.value.trim(),
       password: this.password.value,
-      roomId: this.roomId,
-    }
-
-    this.props.onSubmitClick(creds)
+      roomId: this.roomSelect.value,
+    })
   }
 }

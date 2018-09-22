@@ -51,7 +51,7 @@ export default class AccountForm extends Component {
         }
 
         {showRoom &&
-          <RoomSelect onSelect={this.handleRoomSelect} />
+          <RoomSelect onRef={this.handleRoomSelectRef} />
         }
 
         <br />
@@ -73,12 +73,13 @@ export default class AccountForm extends Component {
   }
   handleNameChange = this.handleChange.bind(this, 'name')
   handleUsernameChange = this.handleChange.bind(this, 'username')
-  handleRoomSelect = (roomId) => {
-    this.roomId = roomId
+  handleRoomSelectRef = r => {
+    this.roomSelect = r
   }
 
   handleSubmit = (event) => {
     event.preventDefault()
+
     const data = {
       name: this.name.value.trim(),
       username: this.username.value.trim(),
@@ -88,7 +89,7 @@ export default class AccountForm extends Component {
     }
 
     if (this.props.showRoom) {
-      data.roomId = this.roomId
+      data.roomId = this.roomSelect.value
     }
 
     this.props.isLoggedIn ? this.props.updateUser(data) : this.props.createUser(data)

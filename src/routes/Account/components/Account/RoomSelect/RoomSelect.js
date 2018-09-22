@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 export default class RoomSelect extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
-    onSelect: PropTypes.func.isRequired,
+    onRef: PropTypes.func.isRequired,
     // actions
     fetchRooms: PropTypes.func.isRequired,
   }
@@ -13,14 +13,22 @@ export default class RoomSelect extends Component {
     this.props.fetchRooms()
   }
 
-  componentDidUpdate () {
-    this.handleChange()
+  componentDidUpdate (prevProps, prevState) {
+    const { rooms } = this.props
+
+    // if there's only one open room, select it by default
+    if (rooms !== prevProps.rooms && rooms.result.length === 1) {
+      this.select.value = rooms.result[0]
+    }
   }
 
-  handleChange = () => this.props.onSelect(parseInt(this.select.value, 10))
+  handleRef = r => {
+    this.select = r
+    this.props.onRef(r)
+  }
 
   render () {
-    let roomOpts = this.props.rooms.result.map(roomId => {
+    const roomOpts = this.props.rooms.result.map(roomId => {
       const room = this.props.rooms.entities[roomId]
 
       return (
@@ -28,8 +36,10 @@ export default class RoomSelect extends Component {
       )
     })
 
+    roomOpts.unshift(<option key='choose' value='' selected disabled>select room...</option>)
+
     return (
-      <select onChange={this.handleChange} ref={r => { this.select = r }}>
+      <select ref={this.handleRef}>
         {roomOpts}
       </select>
     )
