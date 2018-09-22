@@ -31,7 +31,7 @@ export default class Account extends Component {
         <div styleName='content'>
           {!isFirstRun && !isLoggedIn && mode === 'login' &&
           <>
-            <p>Sign in or <a onClick={this.toggleMode}>create an account</a> to join the party.</p>
+            <p>Sign in below. <a onClick={this.toggleMode}>Don&rsquo;t have an account?</a></p>
             <Login onSubmitClick={this.props.loginUser} />
           </>
           }
@@ -45,7 +45,7 @@ export default class Account extends Component {
 
           {!isFirstRun && !isLoggedIn && mode === 'create' &&
           <>
-            <p>Create an account below. <a onClick={this.toggleMode}>Sign in</a> if you already have an account.</p>
+            <p>Create an account below. <a onClick={this.toggleMode}>Already have an account?</a></p>
             <AccountForm showRoom />
           </>
           }
