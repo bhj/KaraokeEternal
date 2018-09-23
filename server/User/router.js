@@ -227,12 +227,13 @@ async function _login (ctx, creds) {
   // don't want this in the response
   delete user.password
 
-  // validate roomId (if not an admin)
-  if (!user.isAdmin) {
-    if (!roomId) {
-      ctx.throw(422, 'Please select a room')
-    }
+  // roomId is required if not an admin
+  if (!roomId && !user.isAdmin) {
+    ctx.throw(422, 'Please select a room')
+  }
 
+  // validate roomId
+  if (roomId) {
     const q = squel.select()
       .from('rooms')
       .where('roomId = ?', roomId)
