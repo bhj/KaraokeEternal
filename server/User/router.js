@@ -149,7 +149,7 @@ router.put('/account', async (ctx, next) => {
 
   // check presence of required fields
   if (!name || !username || !password) {
-    ctx.throw(422, 'Name, username and current password are required')
+    ctx.throw(422, 'Username/email, name and current password are required')
   }
 
   // validate current password
