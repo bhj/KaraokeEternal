@@ -6,6 +6,7 @@ const mapActionCreators = {
 
 const mapStateToProps = (state) => {
   return {
+    isLoggedIn: state.user.userId !== null,
     isAdmin: state.user.isAdmin,
     ui: state.ui,
   }

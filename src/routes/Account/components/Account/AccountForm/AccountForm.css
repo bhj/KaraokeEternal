@@ -1,7 +1,3 @@
 input {
   margin-bottom: var(--input-margin);
 }
-
-.signOut {
-  margin-top: var(--input-margin);
-}

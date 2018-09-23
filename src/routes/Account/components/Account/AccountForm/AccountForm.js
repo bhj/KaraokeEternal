@@ -6,75 +6,59 @@ import './AccountForm.css'
 export default class AccountForm extends Component {
   static propTypes = {
     user: PropTypes.any,
-    isLoggedIn: PropTypes.bool.isRequired,
     showRoom: PropTypes.bool.isRequired,
-    // actions
-    createUser: PropTypes.func.isRequired,
-    updateUser: PropTypes.func.isRequired,
-    logoutUser: PropTypes.func.isRequired,
+    onSubmitClick: PropTypes.func.isRequired,
   }
 
-  state = {
-    name: this.props.isLoggedIn ? this.props.user.name : '',
-    username: this.props.isLoggedIn ? this.props.user.username : '',
-  }
+  handleRoomSelectRef = r => { this.roomSelect = r }
 
   render () {
-    const { isLoggedIn, showRoom } = this.props
+    const { user, showRoom } = this.props
 
     return (
       <form>
-        <input type='text' placeholder='name (public)'
-          value={this.state.name}
-          onChange={this.handleNameChange}
-          autoFocus={!isLoggedIn}
-          ref={r => { this.name = r }}
-        />
-        <input type='text' placeholder='username or email (private)'
-          value={this.state.username}
-          onChange={this.handleUsernameChange}
+        <input type='text'
+          autoFocus={!user}
+          defaultValue={user ? user.username : ''}
+          placeholder={user ? 'new username or email' : 'username or email'}
           ref={r => { this.username = r }}
         />
-        <input type='password' placeholder={isLoggedIn ? 'new password (optional)' : 'password'}
+        <input type='password'
+          placeholder={user ? 'new password (optional)' : 'password'}
           ref={r => { this.newPassword = r }}
         />
         <input type='password'
-          placeholder={isLoggedIn ? 'new password confirm' : 'confirm password'}
+          placeholder={user ? 'new password confirm' : 'confirm password'}
           ref={r => { this.newPasswordConfirm = r }}
         />
 
-        {isLoggedIn &&
-          <input type='password' placeholder='current password'
-            style={{ marginBottom: 0 }}
+        {user &&
+          <input type='password'
+            placeholder='current password'
             ref={r => { this.curPassword = r }}
+            style={{ marginBottom: 0 }}
           />
         }
+
+        <br />
+
+        <input type='text'
+          defaultValue={user ? user.name : ''}
+          placeholder='name (public)'
+          ref={r => { this.name = r }}
+        />
 
         {showRoom &&
           <RoomSelect onRef={this.handleRoomSelectRef} />
         }
 
         <br />
-        <button onClick={this.handleSubmit} className='primary'>
-          {isLoggedIn ? 'Update Account' : 'Create Account'}
-        </button>
 
-        {isLoggedIn &&
-          <button onClick={this.props.logoutUser} styleName='signOut'>
-            Sign Out
-          </button>
-        }
+        <button onClick={this.handleSubmit} className='primary'>
+          {user ? 'Update Account' : 'Create Account'}
+        </button>
       </form>
     )
-  }
-
-  handleChange = (inputName, event) => {
-    this.setState({ [inputName]: event.target.value })
-  }
-  handleNameChange = this.handleChange.bind(this, 'name')
-  handleUsernameChange = this.handleChange.bind(this, 'username')
-  handleRoomSelectRef = r => {
-    this.roomSelect = r
   }
 
   handleSubmit = (event) => {
@@ -88,10 +72,10 @@ export default class AccountForm extends Component {
       newPasswordConfirm: this.newPasswordConfirm.value
     }
 
-    if (this.props.showRoom) {
+    if (this.roomSelect) {
       data.roomId = this.roomSelect.value
     }
 
-    this.props.isLoggedIn ? this.props.updateUser(data) : this.props.createUser(data)
+    this.props.onSubmitClick(data)
   }
 }

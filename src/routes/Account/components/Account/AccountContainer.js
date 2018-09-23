@@ -1,16 +1,15 @@
 import { connect } from 'react-redux'
 import Account from './Account'
-import { loginUser } from 'store/modules/user'
+import { updateUser, logoutUser } from 'store/modules/user'
 
 const mapActionCreators = {
-  loginUser,
+  updateUser,
+  logoutUser,
 }
 
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    isLoggedIn: state.user.userId !== null,
-    isFirstRun: state.prefs.isFirstRun === true,
   }
 }
 

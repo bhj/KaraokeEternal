@@ -20,10 +20,6 @@
   padding: var(--container-padding);
 }
 
-.content p {
-  margin-top: 10px;
-}
-
-.signOut {
-  margin-top: var(--input-margin);
+input {
+  margin-bottom: var(--input-margin);
 }
