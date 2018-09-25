@@ -33,7 +33,7 @@ class ArtistList extends React.Component {
           rowHeight={this.rowHeight}
           rowRenderer={this.rowRenderer}
           onScroll={this.handleScroll}
-          onRef={this.setRef}
+          onRef={this.handleRef}
           paddingTop={ui.headerHeight}
           paddingRight={30} // width of AlphaPicker
           paddingBottom={ui.footerHeight}
@@ -97,11 +97,14 @@ class ArtistList extends React.Component {
 
   handleAlphaPick = (char) => {
     const row = this.props.alphaPickerMap[char]
-    this.list.scrollToRow(row > 0 ? row - 1 : row)
+
+    if (typeof row !== 'undefined') {
+      this.list.scrollToRow(row > 0 ? row - 1 : row)
+    }
   }
 
-  setRef = (ref) => {
-    this.list = ref
+  handleRef = r => {
+    this.list = r
     this.list.scrollToPosition(this.props.scrollTop)
   }
 }

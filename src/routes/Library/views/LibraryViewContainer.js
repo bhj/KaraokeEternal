@@ -35,15 +35,16 @@ const getFilterKeywords = createSelector(
 const getAlphaPickerMap = createSelector(
   [getArtists],
   (artists) => {
-    const map = {}
-    const chars = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-    let c = 1 // skip '#' since it should always be 0 (top)
-
-    // prefill with zeros
-    chars.forEach(char => { map[char] = 0 })
+    const map = { '#': 0 } // letters to row numbers
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+    let c = 0
 
     artists.result.forEach((artistId, i) => {
-      if (artists.entities[artistId].name.toUpperCase().startsWith(chars[c])) {
+      const char = artists.entities[artistId].name[0].toUpperCase()
+      const distance = chars.indexOf(char) - c
+
+      if (distance >= 0) {
+        c += distance
         map[chars[c]] = i
         c++
       }
