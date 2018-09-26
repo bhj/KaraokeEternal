@@ -7,6 +7,7 @@ const framerate = 33 // ms
 class ColorCycle extends React.Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
+    offset: PropTypes.number,
   }
 
   shouldComponentUpdate (prevProps) {
@@ -14,11 +15,17 @@ class ColorCycle extends React.Component {
   }
 
   render () {
+    // randomly offset the starting color
+    // 10,000ms animation @ 33ms per frame is about 300 total frames
+    const offset = this.props.offset || Math.random() * -300
+
     const text = this.props.text.split('').map((char, i) => {
-      const delay = (i - this.props.text.length + 1) * framerate
+      const delay = (i - this.props.text.length + offset) * framerate
 
       return (
-        <span key={this.props.text + i} styleName='char' style={{ animationDelay: `${delay}ms` }}>
+        <span key={this.props.text + i}
+          styleName='char'
+          style={{ animationDelay: `${delay}ms` }}>
           {char}
         </span>
       )
