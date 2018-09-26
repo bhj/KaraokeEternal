@@ -1,7 +1,4 @@
 .container {
-  flex: 1;
-  text-align: center;
-  margin: auto;
   text-transform: uppercase;
   letter-spacing: .20vw;
   font-size: 6vw;

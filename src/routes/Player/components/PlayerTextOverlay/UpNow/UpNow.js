@@ -5,7 +5,7 @@ import styles from './UpNow.css'
 
 class UpNow extends React.Component {
   static propTypes = {
-    text: PropTypes.string.isRequired,
+    children: PropTypes.any,
     queueId: PropTypes.number.isRequired,
   }
 
@@ -36,22 +36,24 @@ class UpNow extends React.Component {
 
   render () {
     return (
-      <CSSTransition
-        unmountOnExit
-        in={this.state.show}
-        timeout={1000}
-        classNames={{
-          appear: '',
-          appearActive: '',
-          enter: styles.fadeEnter,
-          enterActive: styles.fadeEnterActive,
-          exit: styles.fadeExit,
-          exitActive: styles.fadeExitActive,
-        }}>
-        <div className='bg-blur' styleName='styles.textContainer'>
-          {this.props.text}
-        </div>
-      </CSSTransition>
+      <div styleName='styles.container'>
+        <CSSTransition
+          unmountOnExit
+          in={this.state.show}
+          timeout={1000}
+          classNames={{
+            appear: '',
+            appearActive: '',
+            enter: styles.fadeEnter,
+            enterActive: styles.fadeEnterActive,
+            exit: styles.fadeExit,
+            exitActive: styles.fadeExitActive,
+          }}>
+          <div className='bg-blur' styleName='styles.textContainer'>
+            {this.props.children}
+          </div>
+        </CSSTransition>
+      </div>
     )
   }
 }

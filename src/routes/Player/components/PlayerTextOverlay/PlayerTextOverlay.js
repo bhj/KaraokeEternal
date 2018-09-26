@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import ColorCycle from './ColorCycle'
 import UpNow from './UpNow'
-import Fire from './Fire'
 import './PlayerTextOverlay.css'
 
 class PlayerTextOverlay extends React.Component {
@@ -24,9 +23,16 @@ class PlayerTextOverlay extends React.Component {
     } else if (queueItem.queueId === -1) {
       Component = <ColorCycle text='PRESS PLAY TO BEGIN' />
     } else if (this.props.isErrored) {
-      Component = <Fire text='CRAP' />
+      const offset = Math.random() * -300
+      Component = <>
+        <ColorCycle text='OOPS...' offset={offset} />
+        <ColorCycle text='PRESS NEXT TO CONTINUE' offset={offset} />
+      </>
     } else {
-      Component = <UpNow text={queueItem.userDisplayName} queueId={queueItem.queueId} />
+      Component =
+        <UpNow queueId={queueItem.queueId}>
+          <ColorCycle text={queueItem.userDisplayName} />
+        </UpNow>
     }
 
     return (

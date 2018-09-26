@@ -1,8 +1,12 @@
+.container {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
 .textContainer {
   background-color: var(--chrome-bg-color);
-  border-radius: var(--border-radius);
-  color: white;
-  font-size: 8vh;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
   padding: 30px 60px;
 }
 
