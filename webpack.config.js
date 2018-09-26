@@ -41,6 +41,11 @@ const config = {
     }, project.globals)),
     new CaseSensitivePathsPlugin(),
   ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
 }
 
 if (__PROD__) {
