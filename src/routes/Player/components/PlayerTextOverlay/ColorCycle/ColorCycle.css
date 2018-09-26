@@ -1,6 +1,4 @@
 .container {
-  text-transform: uppercase;
-  letter-spacing: .20vw;
   font-size: 6vw;
   text-rendering: optimizeLegibility;
 }
