@@ -8,11 +8,11 @@
   ],
   "mac": {
     "target": "dmg",
-    "icon": "public/app.png",
+    "icon": "assets/app.png",
   },
   "win": {
     "target": "nsis",
-    "icon": "public/app.png",
+    "icon": "assets/app.png",
   },
   "nsis": {
     "oneClick": false,

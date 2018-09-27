@@ -49,9 +49,9 @@ const config = {
 }
 
 if (__PROD__) {
-  // copy static assets in /public to /dist
+  // copy static assets in /assets to /dist
   config.plugins.push(new CopyWebpackPlugin([{
-    from: path.join(project.basePath, 'public'),
+    from: path.join(project.basePath, 'assets'),
     to: path.join(project.basePath, 'dist'),
   }], { /* options */ }))
 

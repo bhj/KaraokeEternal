@@ -117,8 +117,8 @@ Promise.resolve()
           // webpack-dev-middleware and webpack-hot-client
           app.use(middleware)
 
-          // serve static assets from ~/public since Webpack is unaware of these
-          app.use(KoaStatic(path.resolve(config.basePath, 'public')))
+          // serve static assets from ~/assets since Webpack is unaware of these
+          app.use(KoaStatic(path.resolve(config.basePath, 'assets')))
 
           // "rewrite" other requests to the root /index.html file
           // (which webpack-dev-server will serve from a virtual ~/dist)
