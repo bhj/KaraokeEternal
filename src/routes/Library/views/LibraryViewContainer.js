@@ -120,7 +120,8 @@ const mapStateToProps = (state) => {
     alphaPickerMap: getAlphaPickerMap(state),
     scrollTop: state.library.scrollTop,
     isSearching: !!getFilterKeywords(state).length || getFilterStarred(state),
-    isLibraryEmpty: state.songs.result.length === 0,
+    isLoading: state.library.isLoading,
+    isEmpty: state.songs.result.length === 0,
     isSongInfoOpen: state.library.isSongInfoOpen,
     ui: state.ui,
     // SearchResults view

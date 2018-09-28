@@ -5,10 +5,11 @@ import ArtistList from '../components/ArtistList'
 import SearchResults from '../components/SearchResults'
 import SongInfo from '../components/SongInfo'
 import TextOverlay from 'components/TextOverlay'
+import Spinner from 'components/Spinner'
 import { SkyLightStateless } from 'react-skylight'
 
 const LibraryView = (props) => {
-  const { isSearching, isLibraryEmpty } = props
+  const { isSearching, isLoading, isEmpty } = props
 
   return (
     <>
@@ -22,7 +23,11 @@ const LibraryView = (props) => {
         <SearchResults {...props} />
       }
 
-      {isLibraryEmpty &&
+      {isLoading &&
+        <Spinner />
+      }
+
+      {isEmpty &&
         <TextOverlay>
           <h1>Library Empty</h1>
         </TextOverlay>
@@ -49,8 +54,9 @@ const LibraryView = (props) => {
 }
 
 LibraryView.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
   isSearching: PropTypes.bool.isRequired,
-  isLibraryEmpty: PropTypes.bool.isRequired,
+  isEmpty: PropTypes.bool.isRequired,
   isSongInfoOpen: PropTypes.bool.isRequired,
   // actions
   closeSongInfo: PropTypes.func.isRequired,

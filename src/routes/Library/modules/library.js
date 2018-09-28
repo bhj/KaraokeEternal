@@ -5,6 +5,7 @@ import {
   LIBRARY_FILTER_TOGGLE_STARRED,
   LIBRARY_SONG_INFO_REQUEST,
   LIBRARY_SONG_INFO_CLOSE,
+  LIBRARY_PUSH,
   TOGGLE_ARTIST_EXPANDED,
   TOGGLE_ARTIST_RESULT_EXPANDED,
   SCROLL_ARTISTS,
@@ -160,12 +161,17 @@ const ACTION_HANDLERS = {
     ...state,
     isSongInfoOpen: false,
   }),
+  [LIBRARY_PUSH]: (state, { payload }) => ({
+    ...state,
+    isLoading: false,
+  }),
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 let initialState = {
+  isLoading: true,
   filterStr: '',
   filterStarred: false,
   scrollTop: 0,

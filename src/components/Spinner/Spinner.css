@@ -1,0 +1,44 @@
+/* adapted from https://github.com/tobiasahlin/SpinKit */
+.container {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  background-color: var(--btn-bg-color);
+  height: 40px;
+  width: 6px;
+  animation: sk-stretchdelay 0.8s infinite ease-in-out;
+  margin: 0 5px;
+}
+
+.rect2 {
+  animation-delay: -0.7s;
+}
+
+.rect3 {
+  animation-delay: -0.6s;
+}
+
+.rect4 {
+  animation-delay: -0.5s;
+}
+
+.rect5 {
+  animation-delay: -0.4s;
+}
+
+@-webkit-keyframes sk-stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+  20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes sk-stretchdelay {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+  }  20% {
+    transform: scaleY(1.0);
+  }
+}
