@@ -16,7 +16,7 @@ log.info('Opening database file %s', config.database)
 Promise.resolve()
   .then(() => sqlite.open(config.database, { Promise }))
   .then(() => {
-    // setup start/stop handlers
+    // attach start/stop handlers
     process.on('message', function ({ type, payload }) {
       if (type === SCANNER_WORKER_SCAN) {
         log.info(`Media scan requested (restarting)`)
