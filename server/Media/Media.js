@@ -80,17 +80,19 @@ class Media {
    * @param  {object}  fields
    * @return {Promise}
    */
-  static async update (mediaId, fields) {
-    if (!Number.isInteger(mediaId)) {
-      throw new Error(`invalid mediaId: ${mediaId}`)
+  static async update (media) {
+    if (!Number.isInteger(media.mediaId)) {
+      throw new Error(`invalid mediaId: ${media.mediaId}`)
     }
 
     const q = squel.update()
       .table('media')
-      .where('mediaId = ?', mediaId)
+      .where('mediaId = ?', media.mediaId)
 
-    Object.keys(fields).map(key => {
-      q.set(key, fields[key])
+    delete media.mediaId
+
+    Object.keys(media).map(key => {
+      q.set(key, media[key])
     })
 
     const { text, values } = q.toParam()
@@ -118,7 +120,7 @@ class Media {
   }
 
   /**
-   * Tidy up unlinked items
+   * Remove unlinked media, songs and artists
    * @return {Promise}
    */
   static async cleanup () {

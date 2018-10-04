@@ -75,4 +75,7 @@ module.exports = {
   SCANNER_WORKER_DONE: 'scannerWorker/DONE',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
   SERVER_WORKER_ERROR: 'serverWorker/ERROR',
+  MEDIA_ADD: 'scannerWorker/MEDIA_ADD',
+  MEDIA_UPDATE: 'scannerWorker/MEDIA_UPDATE',
+  MEDIA_REMOVE: 'scannerWorker/MEDIA_REMOVE',
 }

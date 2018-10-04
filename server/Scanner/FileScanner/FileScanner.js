@@ -8,7 +8,8 @@ const mp4info = require('../../lib/mp4info.js')
 const getFiles = require('./getFiles')
 const getPerms = require('../../lib/getPermutations')
 const Library = require('../../Library')
-const Media = require('../Media')
+const Media = require('../../Media')
+const IPCMedia = require('../IPCMedia')
 const MetaParser = require('../MetaParser')
 const Scanner = require('../Scanner')
 const { NodeVM } = require('vm2')
@@ -84,7 +85,7 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Finished; %s songs in library', validMedia.length)
+    log.info('Scan finished with %s songs in library', validMedia.length)
 
     // cleanup
     {
@@ -107,8 +108,8 @@ class FileScanner extends Scanner {
       })
 
       if (invalidMedia.length) {
-        log.info(`Removing ${invalidMedia.length} entries for files that no longer exist `)
-        await Media.remove(invalidMedia)
+        log.info(`Removing ${invalidMedia.length} invalid media entries`)
+        await IPCMedia.remove(invalidMedia)
       }
     }
   }
@@ -138,7 +139,8 @@ class FileScanner extends Scanner {
           log.info('  => old: %s', JSON.stringify({ artist: cur.artist, title: cur.title }))
           log.info('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
 
-          await Media.update(cur.mediaId, {
+          await IPCMedia.update({
+            mediaId: cur.mediaId,
             songId: match.songId,
             dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
           })
@@ -217,7 +219,7 @@ class FileScanner extends Scanner {
     )
 
     // resolves to a mediaId
-    return Media.add(media)
+    return IPCMedia.add(media)
   }
 }
 

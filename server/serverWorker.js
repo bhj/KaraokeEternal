@@ -16,18 +16,17 @@ const KoaStatic = require('koa-static')
 const app = new Koa()
 
 const Prefs = require('./Prefs')
-const Library = require('./Library')
 const libraryRouter = require('./Library/router')
 const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
 const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
-
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
+const IPCMediaActions = require('./Media/ipc')
+const IPCPrefsActions = require('./Prefs/ipc')
+
 const {
-  LIBRARY_PUSH,
-  SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
   SERVER_WORKER_ERROR,
 } = require('../shared/actions')
@@ -150,11 +149,10 @@ Promise.resolve()
         ctx.set('content-type', 'text/html')
         ctx.status = 200
       })
-    }
+    } // end if
 
-    // create http and socket.io server
+    // create http server
     const server = http.createServer(app.callback())
-    const io = new SocketIO(server)
 
     // http server error handler
     server.on('error', function (err) {
@@ -169,21 +167,13 @@ Promise.resolve()
       process.exit(1)
     })
 
-    // socket.io event handlers
+    // create socket.io server and attach handlers
+    const io = new SocketIO(server)
     socketActions(io, jwtKey)
 
-    // emit messages from scanner over socket.io
-    process.on('message', async function (action) {
-      io.emit('action', action)
-
-      // emit library when scanner finishes/exits
-      if (action.type === SCANNER_WORKER_DONE) {
-        io.emit('action', {
-          type: LIBRARY_PUSH,
-          payload: await Library.get(),
-        })
-      }
-    })
+    // attach IPC action handlers
+    IPCMediaActions(io)
+    IPCPrefsActions(io)
 
     log.info(`Starting web server (host=${config.serverHost}; port=${config.serverPort})`)
 

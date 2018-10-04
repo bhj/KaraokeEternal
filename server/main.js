@@ -1,7 +1,7 @@
+const childProcess = require('child_process')
 const childEnv = require('./lib/cli')()
 const log = require('./lib/logger')(`master[${process.pid}]`)
 const path = require('path')
-const childProcess = require('child_process')
 const refs = {}
 const {
   SCANNER_WORKER_SCAN,
@@ -34,7 +34,7 @@ startServer()
 function startServer () {
   if (refs.server === undefined) {
     log.info('Starting server process')
-    refs.server = childProcess.fork(path.join(__dirname, 'server.js'), [], {
+    refs.server = childProcess.fork(path.join(__dirname, 'serverWorker.js'), [], {
       env: childEnv,
     })
 
@@ -66,7 +66,7 @@ function startServer () {
 function startScanner () {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
-    refs.scanner = childProcess.fork(path.join(__dirname, 'scanner.js'), [], {
+    refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
       env: childEnv,
     })
 

@@ -1,8 +1,8 @@
 const config = require('../project.config')
-const sqlite = require('sqlite')
 const log = require('./lib/logger')(`scanner[${process.pid}]`)
+const sqlite = require('sqlite')
 const Prefs = require('./Prefs')
-const FileScanner = require('./Media/FileScanner')
+const FileScanner = require('./Scanner/FileScanner')
 const {
   SCANNER_WORKER_SCAN,
   SCANNER_WORKER_SCAN_CANCEL,
