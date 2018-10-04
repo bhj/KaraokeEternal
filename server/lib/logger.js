@@ -8,6 +8,7 @@ const colors = {
   warn: '\x1b[1;33m', // yellow
   info: '\x1b[1;34m', // blue
   verbose: '',
+  debug: '',
   reset: '\x1b[0m',
 }
 
@@ -36,6 +37,7 @@ function getLogger (prefix) {
     warn: (txt, ...args) => log.warn(prefix + ': ' + txt, ...args),
     info: (txt, ...args) => log.info(prefix + ': ' + txt, ...args),
     verbose: (txt, ...args) => log.verbose(prefix + ': ' + txt, ...args),
+    debug: (txt, ...args) => log.debug(prefix + ': ' + txt, ...args),
     levels,
   }
 }
