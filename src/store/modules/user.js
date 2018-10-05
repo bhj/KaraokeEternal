@@ -10,6 +10,7 @@ import {
   UPDATE,
   _SUCCESS,
   _ERROR,
+  SOCKET_REQUEST_CONNECT,
   SOCKET_AUTH_ERROR,
 } from 'shared/actions'
 
@@ -51,15 +52,13 @@ export function loginUser (data) {
       .then(user => {
         // user object in response body
         dispatch(receiveLogin(user))
+        dispatch(connectSocket())
+        window._socket.open()
 
         // update preferences
         if (user.isAdmin) {
           dispatch(fetchPrefs())
         }
-
-        // socket.io handshake happens over http so
-        // our JWT will be sent in the cookie
-        window._socket.open()
 
         // redirect in query string?
         const loc = getState().location
@@ -175,9 +174,7 @@ export function createUser (user, isFirstRun) {
     })
       .then(user => {
         dispatch(receiveCreate(user))
-
-        // socket.io handshake happens over http so
-        // our JWT will be sent in the cookie
+        dispatch(connectSocket())
         window._socket.open()
 
         if (!user.isAdmin) {
@@ -232,6 +229,25 @@ export function updateUser (data) {
       .catch(err => {
         dispatch(updateError(err.message))
       })
+  }
+}
+
+// ------------------------------------
+// Socket actions
+// ------------------------------------
+function requestSocketConnect (query) {
+  return {
+    type: SOCKET_REQUEST_CONNECT,
+    payload: { query }
+  }
+}
+
+export function connectSocket () {
+  return (dispatch, getState) => {
+    const libraryTimestamp = getState().library.timestamp
+
+    dispatch(requestSocketConnect({ libraryTimestamp }))
+    window._socket.io.opts.query = { libraryTimestamp }
   }
 }
 

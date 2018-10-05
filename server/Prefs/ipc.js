@@ -8,14 +8,16 @@ const {
 // handle a few IPC messages from scanner
 module.exports = function (io) {
   process.on('message', async function (action) {
+    // broadcast scanner status updates
     if (action.type === SCANNER_WORKER_STATUS ||
       action.type === SCANNER_WORKER_DONE) {
-      // broadcast to all clients
       io.emit('action', action)
     }
 
-    // emit library when scanner finishes
     if (action.type === SCANNER_WORKER_DONE) {
+      Library.setLastUpdate()
+
+      // broadcast library
       io.emit('action', {
         type: LIBRARY_PUSH,
         payload: await Library.get(),

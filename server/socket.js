@@ -27,6 +27,7 @@ const handlers = {
 module.exports = function (io, jwtKey) {
   io.on('connection', async (sock) => {
     const { kfToken } = parseCookie(sock.handshake.headers.cookie)
+    const clientLibraryTimestamp = sock.handshake.query.libraryTimestamp
 
     // decode JWT in cookie sent with socket handshake
     try {
@@ -38,13 +39,22 @@ module.exports = function (io, jwtKey) {
 
       sock.user = null
       sock.disconnect()
-      log.info(err)
+      log.info('disconnected %s (%s)', sock.handshake.address, err.message)
       return
     }
 
+    log.verbose('%s (%s) connected from %s',
+      sock.user.name, sock.id, sock.handshake.address
+    )
+
     // attach disconnect handler
     sock.on('disconnect', reason => {
-      if (!sock.user || !sock.user.roomId) {
+      log.verbose('%s (%s) disconnected (%s)',
+        sock.user.name, sock.id, reason
+      )
+
+      // beyond this point assumes there is a room
+      if (typeof sock.user.roomId === 'undefined') {
         return
       }
 
@@ -89,8 +99,31 @@ module.exports = function (io, jwtKey) {
       }
     })
 
+    try {
+      // only push library if client's is outdated
+      if (clientLibraryTimestamp < Library.getLastUpdate()) {
+        log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
+          sock.user.name, sock.id, clientLibraryTimestamp, Library.getLastUpdate())
+
+        io.to(sock.id).emit('action', {
+          type: LIBRARY_PUSH,
+          payload: await Library.get(),
+        })
+      }
+
+      // push stars
+      io.to(sock.id).emit('action', {
+        type: STARS_PUSH,
+        payload: await Library.getStars(sock.user.userId),
+      })
+    } catch (err) {
+      log.error(err)
+    }
+
     // it's possible for an admin to not be in a room
     if (typeof sock.user.roomId !== 'number') return
+
+    // beyond this point assumes there is a room
 
     // add user to room
     sock.join(sock.user.roomId)
@@ -98,7 +131,8 @@ module.exports = function (io, jwtKey) {
     const room = sock.adapter.rooms[sock.user.roomId]
 
     // if there's a player in room, emit its last known status
-    const lastStatusSocket = Object.keys(room.sockets).find(id => !!io.sockets.sockets[id]._lastPlayerStatus)
+    const lastStatusSocket = Object.keys(room.sockets)
+      .find(id => !!io.sockets.sockets[id]._lastPlayerStatus)
 
     if (lastStatusSocket) {
       io.to(sock.id).emit('action', {
@@ -111,21 +145,11 @@ module.exports = function (io, jwtKey) {
       sock.user.name, sock.id, sock.user.roomId, room.length
     )
 
-    // send library and room's queue
+    // send room's queue
     try {
       io.to(sock.id).emit('action', {
         type: QUEUE_PUSH,
         payload: await Queue.getQueue(sock.user.roomId),
-      })
-
-      io.to(sock.id).emit('action', {
-        type: LIBRARY_PUSH,
-        payload: await Library.get(),
-      })
-
-      io.to(sock.id).emit('action', {
-        type: STARS_PUSH,
-        payload: await Library.getStars(sock.user.userId),
       })
     } catch (err) {
       log.error(err)

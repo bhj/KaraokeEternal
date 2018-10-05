@@ -1,6 +1,7 @@
 const db = require('sqlite')
 const squel = require('squel')
 const log = require('../lib/logger')('library')
+let _lastUpdate = Date.now()
 
 class Library {
   /**
@@ -90,7 +91,11 @@ class Library {
       }
     }
 
-    return { artists, songs }
+    return {
+      artists,
+      songs,
+      timestamp: _lastUpdate,
+    }
   }
 
   /**
@@ -265,6 +270,9 @@ class Library {
 
     return { starredArtists, starredSongs }
   }
+
+  static getLastUpdate () { return _lastUpdate }
+  static setLastUpdate () { _lastUpdate = Date.now() }
 }
 
 module.exports = Library
