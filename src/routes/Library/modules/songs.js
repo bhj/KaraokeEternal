@@ -30,7 +30,7 @@ const ACTION_HANDLERS = {
         ...state.entities,
         [payload.songId]: {
           ...state.entities[payload.songId],
-          numStars: ++state.entities[payload.songId].numStars,
+          numStars: ++state.entities[payload.songId].numStars || 0,
         },
       }
     }
@@ -44,7 +44,7 @@ const ACTION_HANDLERS = {
         ...state.entities,
         [payload.songId]: {
           ...state.entities[payload.songId],
-          numStars: --state.entities[payload.songId].numStars,
+          numStars: --state.entities[payload.songId].numStars || 0,
         },
       }
     }
