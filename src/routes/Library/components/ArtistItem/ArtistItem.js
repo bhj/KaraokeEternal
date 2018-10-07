@@ -14,7 +14,7 @@ const ArtistItem = (props) => {
         <div styleName='folderContainer'>
           <Icon icon='FOLDER' size={44} styleName='folderIcon' />
           {props.isExpanded &&
-            <div styleName='expandedIcon'><Icon icon='EXPAND_LESS' size={24} /></div>
+            <div styleName='expandedIcon'><Icon icon='EXPAND_MORE' size={24} /></div>
           }
           {!props.isExpanded &&
             <div styleName='count'>{props.artistSongIds.length}</div>
