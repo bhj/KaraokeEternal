@@ -44,6 +44,10 @@ body.scroll-lock {
   width: 100%;
 }
 
+h1 {
+  font-weight: normal;
+}
+
 /* Form elements */
 input[type="text"],
 input[type="password"],
