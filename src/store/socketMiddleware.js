@@ -41,7 +41,7 @@ export default function createSocketMiddleware (socket, prefix) {
         })
       } else next(action)
 
-      // emit to server, which responds with an action in the ack callback (3rd arg)
+      // server can respond with an action in the ack callback (3rd arg)
       socket.emit('action', action, cbAction => {
         // make sure callback response is an action
         if (typeof cbAction !== 'object' || typeof cbAction.type !== 'string') {
