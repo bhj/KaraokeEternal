@@ -1,21 +1,21 @@
 export default class HttpApi {
   constructor (prefix = '') {
     this.prefix = prefix
-    this.opts = {
+    this.options = {
       credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      })
     }
 
     return this.callApi
   }
 
-  callApi = (method, url, opts = {}) => {
-    opts = Object.assign({}, this.opts, opts)
-    opts.method = method
+  callApi = (method, url, options = {}) => {
+    const opts = {
+      ...this.options,
+      ...options,
+      method,
+    }
 
-    if (typeof opts.body === 'object') {
+    if (typeof opts.body === 'object' && !(opts.body instanceof FormData)) {
       opts.body = JSON.stringify(opts.body)
     }
 
