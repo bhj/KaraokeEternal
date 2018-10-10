@@ -15,7 +15,12 @@ export default class HttpApi {
       method,
     }
 
+    // assume we're sending JSON if not multipart form data
     if (typeof opts.body === 'object' && !(opts.body instanceof FormData)) {
+      opts.headers = new Headers({
+        'Content-Type': 'application/json',
+      })
+
       opts.body = JSON.stringify(opts.body)
     }
 
