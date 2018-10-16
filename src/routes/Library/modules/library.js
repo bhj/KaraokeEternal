@@ -164,7 +164,7 @@ const ACTION_HANDLERS = {
   [LIBRARY_PUSH]: (state, { payload }) => ({
     ...state,
     isLoading: false,
-    timestamp: payload.timestamp,
+    version: payload.version,
   }),
 }
 
@@ -173,7 +173,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 let initialState = {
   isLoading: true,
-  timestamp: 0,
+  version: 0,
   filterStr: '',
   filterStarred: false,
   scrollTop: 0,

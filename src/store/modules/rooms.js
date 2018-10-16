@@ -1,5 +1,5 @@
 import {
-  GET_ROOMS,
+  REQUEST_ROOMS,
   ROOM_EDITOR_OPEN,
   ROOM_EDITOR_CLOSE,
   ROOM_UPDATE,
@@ -17,21 +17,21 @@ const api = new HttpApi('rooms')
 // ------------------------------------
 function requestRooms () {
   return {
-    type: GET_ROOMS,
+    type: REQUEST_ROOMS,
     payload: null
   }
 }
 
 function receiveRooms (response) {
   return {
-    type: GET_ROOMS + _SUCCESS,
+    type: REQUEST_ROOMS + _SUCCESS,
     payload: response
   }
 }
 
 function roomsError (message) {
   return {
-    type: GET_ROOMS + _ERROR,
+    type: REQUEST_ROOMS + _ERROR,
     error: message,
   }
 }
@@ -150,7 +150,7 @@ export function closeRoomEditor () {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [GET_ROOMS + _SUCCESS]: (state, { payload }) => ({
+  [REQUEST_ROOMS + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),

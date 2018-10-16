@@ -5,6 +5,7 @@ export default class RoomSelect extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
     onRef: PropTypes.func.isRequired,
+    className: PropTypes.string,
     // actions
     fetchRooms: PropTypes.func.isRequired,
   }
@@ -39,7 +40,7 @@ export default class RoomSelect extends Component {
     roomOpts.unshift(<option key='choose' value='' disabled>select room...</option>)
 
     return (
-      <select ref={this.handleRef} defaultValue=''>
+      <select ref={this.handleRef} defaultValue='' className={this.props.className}>
         {roomOpts}
       </select>
     )

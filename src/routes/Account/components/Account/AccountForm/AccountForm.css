@@ -1,3 +1,21 @@
-input {
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.userDisplayContainer {
+  display: flex;
   margin-bottom: var(--input-margin);
+}
+
+.field {
+  margin-bottom: var(--input-margin);
+}
+
+.name {
+  margin: 0 0 0 var(--input-margin);
+}
+
+.roomId {
+  height: 36px;
 }

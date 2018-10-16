@@ -1,0 +1,4 @@
+.placeholder {
+  fill: var(--btn-bg-color);
+  filter: var(--drop-shadow-filter);
+}

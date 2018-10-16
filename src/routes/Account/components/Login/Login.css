@@ -19,7 +19,3 @@
 .content {
   padding: var(--container-padding);
 }
-
-input {
-  margin-bottom: var(--input-margin);
-}

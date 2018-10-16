@@ -9,7 +9,7 @@ const { promisify } = require('util')
 const parseCookie = require('./lib/parseCookie')
 const jwtVerify = require('jsonwebtoken').verify
 const Koa = require('koa')
-const KoaBodyparser = require('koa-bodyparser')
+const KoaBody = require('koa-body')
 const KoaRange = require('koa-range')
 const KoaLogger = require('koa-logger')
 const KoaStatic = require('koa-static')
@@ -73,7 +73,7 @@ Promise.resolve()
     }))
 
     app.use(KoaRange)
-    app.use(KoaBodyparser())
+    app.use(KoaBody({ multipart: true }))
 
     // all http (koa) requests
     app.use(async (ctx, next) => {

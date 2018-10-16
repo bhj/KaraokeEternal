@@ -79,7 +79,10 @@ CREATE TABLE IF NOT EXISTS "users" (
   "username" text NOT NULL,
   "password" text NOT NULL,
   "name" text NOT NULL,
-  "isAdmin" integer(1) NOT NULL
+  "isAdmin" integer(1) NOT NULL,
+  "image" blob,
+  "dateCreated" integer NOT NULL DEFAULT(0),
+  "dateUpdated" integer NOT NULL DEFAULT(0)
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idxUsername ON "users" ("username" ASC);

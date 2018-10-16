@@ -2,12 +2,14 @@ import { browserHistory } from 'react-router'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { fetchPrefs } from './prefs'
+import parseQueryStr from 'lib/parseQueryStr'
 import HttpApi from 'lib/HttpApi'
 import {
   LOGIN,
   LOGOUT,
-  CREATE,
-  UPDATE,
+  CREATE_ACCOUNT,
+  UPDATE_ACCOUNT,
+  REQUEST_ACCOUNT,
   _SUCCESS,
   _ERROR,
   SOCKET_REQUEST_CONNECT,
@@ -33,16 +35,16 @@ function receiveLogin (response) {
   }
 }
 
-function loginError (message) {
+function loginError (err) {
   return {
     type: LOGIN + _ERROR,
-    error: message + ' (incorrect login)',
+    error: err.message + ' (incorrect login)',
   }
 }
 
 // calls api endpoint that should set an httpOnly cookie with
 // our JWT, then establish the sockiet.io connection
-export function loginUser (data) {
+export function login (data) {
   return (dispatch, getState) => {
     dispatch(requestLogin(data))
 
@@ -64,10 +66,10 @@ export function loginUser (data) {
         const loc = getState().location
 
         if (loc && loc.search) {
-          const query = parseQuery(loc.search)
+          const { redirect } = parseQueryStr(loc.search)
 
-          if (query.redirect) {
-            return browserHistory.push(query.redirect)
+          if (redirect) {
+            return browserHistory.push(redirect)
           }
         }
 
@@ -77,19 +79,9 @@ export function loginUser (data) {
         }
       })
       .catch(err => {
-        dispatch(loginError(err.message))
+        dispatch(loginError(err))
       })
   }
-}
-
-function parseQuery (qstr) {
-  var query = {}
-  var a = qstr.substr(1).split('&')
-  for (var i = 0; i < a.length; i++) {
-    var b = a[i].split('=')
-    query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '')
-  }
-  return query
 }
 
 // ------------------------------------
@@ -109,15 +101,15 @@ function receiveLogout () {
   }
 }
 
-function logoutError (message) {
+function logoutError (err) {
   return {
     type: LOGOUT + _ERROR,
-    error: message,
+    error: err.message,
   }
 }
 
 // Logs the user out
-export function logoutUser () {
+export function logout () {
   return (dispatch, getState) => {
     dispatch(requestLogout())
 
@@ -127,7 +119,7 @@ export function logoutUser () {
         dispatch(receiveLogout())
       })
       .catch(err => {
-        dispatch(logoutError(err.message))
+        dispatch(logoutError(err))
       })
       .then(() => {
         // regardless of server response; we tried!
@@ -144,26 +136,26 @@ export function logoutUser () {
 // ------------------------------------
 function requestCreate (user) {
   return {
-    type: CREATE,
+    type: CREATE_ACCOUNT,
     payload: user
   }
 }
 
 function receiveCreate (user) {
   return {
-    type: CREATE + _SUCCESS,
+    type: CREATE_ACCOUNT + _SUCCESS,
     payload: user
   }
 }
 
-function createError (message) {
+function createError (err) {
   return {
-    type: CREATE + _ERROR,
-    error: message,
+    type: CREATE_ACCOUNT + _ERROR,
+    error: err.message,
   }
 }
 
-export function createUser (user, isFirstRun) {
+export function createAccount (user, isFirstRun) {
   return (dispatch, getState) => {
     dispatch(requestCreate(user))
 
@@ -186,7 +178,7 @@ export function createUser (user, isFirstRun) {
         dispatch(fetchPrefs())
       })
       .catch(err => {
-        dispatch(createError(err.message))
+        dispatch(createError(err))
       })
   }
 }
@@ -196,26 +188,26 @@ export function createUser (user, isFirstRun) {
 // ------------------------------------
 function requestUpdate (user) {
   return {
-    type: UPDATE,
+    type: UPDATE_ACCOUNT,
     payload: user
   }
 }
 
 function receiveUpdate (response) {
   return {
-    type: UPDATE + _SUCCESS,
+    type: UPDATE_ACCOUNT + _SUCCESS,
     payload: response
   }
 }
 
-function updateError (message) {
+function updateError (err) {
   return {
-    type: UPDATE + _ERROR,
-    error: message,
+    type: UPDATE_ACCOUNT + _ERROR,
+    error: err.message,
   }
 }
 
-export function updateUser (data) {
+export function updateAccount (data) {
   return (dispatch, getState) => {
     dispatch(requestUpdate(data))
 
@@ -227,7 +219,44 @@ export function updateUser (data) {
         alert('Account updated successfully.')
       })
       .catch(err => {
-        dispatch(updateError(err.message))
+        dispatch(updateError(err))
+      })
+  }
+}
+
+// ------------------------------------
+// Request account (does not refresh JWT)
+// ------------------------------------
+function requestAccount () {
+  return {
+    type: REQUEST_ACCOUNT,
+  }
+}
+
+function receiveAccount (response) {
+  return {
+    type: REQUEST_ACCOUNT + _SUCCESS,
+    payload: response
+  }
+}
+
+function requestAccountError (err) {
+  return {
+    type: REQUEST_ACCOUNT + _ERROR,
+    payload: err.message, // silent (don't set error property)
+  }
+}
+
+export function fetchAccount () {
+  return (dispatch, getState) => {
+    dispatch(requestAccount())
+
+    return api('GET', 'user')
+      .then(user => {
+        dispatch(receiveAccount(user))
+      })
+      .catch(err => {
+        dispatch(requestAccountError(err))
       })
   }
 }
@@ -244,10 +273,10 @@ function requestSocketConnect (query) {
 
 export function connectSocket () {
   return (dispatch, getState) => {
-    const libraryTimestamp = getState().library.timestamp
+    const v = getState().library.version
 
-    dispatch(requestSocketConnect({ libraryTimestamp }))
-    window._socket.io.opts.query = { libraryTimestamp }
+    dispatch(requestSocketConnect({ v }))
+    window._socket.io.opts.query = { v }
   }
 }
 
@@ -259,11 +288,15 @@ const ACTION_HANDLERS = {
     ...state,
     ...payload,
   }),
-  [UPDATE + _SUCCESS]: (state, { payload }) => ({
+  [UPDATE_ACCOUNT + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),
-  [CREATE + _SUCCESS]: (state, { payload }) => ({
+  [CREATE_ACCOUNT + _SUCCESS]: (state, { payload }) => ({
+    ...state,
+    ...payload,
+  }),
+  [REQUEST_ACCOUNT + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),
@@ -282,8 +315,10 @@ let initialState = {
   userId: null,
   username: null,
   name: null,
-  isAdmin: false,
   roomId: null,
+  isAdmin: false,
+  dateCreated: 0,
+  dateUpdated: 0,
 }
 
 function userReducer (state = initialState, action) {

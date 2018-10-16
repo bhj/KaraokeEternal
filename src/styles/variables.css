@@ -3,8 +3,11 @@
   --bg-color: #020f1b;
   --text-color: #bbb;
   --link-color: #68b1f9;
-  --border-radius: 5px;
+  --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+  --drop-shadow-filter: drop-shadow(0 2px 5px #222);
   --container-padding: 10px;
+  --border-radius: 5px;
 
   --input-color: #444;
   --input-placeholder-color: var(--btn-bg-color);

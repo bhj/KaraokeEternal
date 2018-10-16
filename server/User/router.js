@@ -1,3 +1,7 @@
+const { promisify } = require('util')
+const fs = require('fs')
+const readFile = promisify(fs.readFile)
+const deleteFile = promisify(fs.unlink)
 const db = require('sqlite')
 const squel = require('squel')
 const jwtSign = require('jsonwebtoken').sign
@@ -5,6 +9,14 @@ const bcrypt = require('../lib/bcrypt')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const Prefs = require('../Prefs')
+const Queue = require('../Queue')
+const User = require('../User')
+const {
+  QUEUE_PUSH,
+} = require('../../shared/actions')
+
+// user images are stored as binary blobs
+squel.registerValueHandler(Buffer, buffer => buffer)
 
 // login
 router.post('/login', async (ctx, next) => {
@@ -23,20 +35,16 @@ router.get('/logout', async (ctx, next) => {
 router.post('/account', async (ctx, next) => {
   const { name, username, newPassword, newPasswordConfirm, roomId } = ctx.request.body
 
-  // check presence of all fields
+  // required fields
   if (!name || !username || !newPassword || !newPasswordConfirm) {
     ctx.throw(422, 'All fields are required')
   }
 
   {
     // check for duplicate username
-    const q = squel.select()
-      .from('users')
-      .where('username = ?', username.trim())
+    const user = await User.getByUsername(username.trim())
 
-    const { text, values } = q.toParam()
-
-    if (await db.get(text, values)) {
+    if (user) {
       ctx.throw(401, 'Username already exists')
     }
   }
@@ -54,6 +62,13 @@ router.post('/account', async (ctx, next) => {
       .set('password', await bcrypt.hash(newPassword, 12))
       .set('name', name.trim())
       .set('isAdmin', 0)
+      .set('dateCreated', Math.floor(Date.now() / 1000))
+
+    // user image?
+    if (ctx.request.files.image) {
+      q.set('image', await readFile(ctx.request.files.image.path))
+      await deleteFile(ctx.request.files.image.path)
+    }
 
     const { text, values } = q.toParam()
     await db.run(text, values)
@@ -93,6 +108,7 @@ router.post('/setup', async (ctx, next) => {
       .set('password', await bcrypt.hash(newPassword, 12))
       .set('name', name.trim())
       .set('isAdmin', 1)
+      .set('dateCreated', Math.floor(Date.now() / 1000))
 
     const { text, values } = q.toParam()
     await db.run(text, values)
@@ -129,17 +145,7 @@ router.post('/setup', async (ctx, next) => {
 
 // update account
 router.put('/account', async (ctx, next) => {
-  let user
-
-  // find user by id (from token)
-  {
-    const q = squel.select()
-      .from('users')
-      .where('userId = ?', ctx.user.userId)
-
-    const { text, values } = q.toParam()
-    user = await db.get(text, values)
-  }
+  const user = await User.getById(ctx.user.userId, true)
 
   if (!user) {
     ctx.throw(401)
@@ -147,39 +153,42 @@ router.put('/account', async (ctx, next) => {
 
   let { name, username, password, newPassword, newPasswordConfirm } = ctx.request.body
 
-  // check presence of required fields
-  if (!name || !username || !password) {
-    ctx.throw(422, 'Username/email, name and current password are required')
+  // validate current password
+  if (!password) {
+    ctx.throw(422, 'Current password is required')
   }
 
-  // validate current password
   if (!await bcrypt.compare(password, user.password)) {
     ctx.throw(401, 'Current password is incorrect')
   }
 
-  // check for duplicate username
-  {
-    const q = squel.select()
-      .from('users')
-      .where('userId != ?', ctx.user.userId)
-      .where('username = ?', username.trim())
-
-    const { text, values } = q.toParam()
-
-    if (await db.get(text, values)) {
-      ctx.throw(401, 'Username already exists')
-    }
-  }
-
-  // begin update query
+  // begin query
   const q = squel.update()
     .table('users')
     .where('userId = ?', ctx.user.userId)
-    .set('name', name.trim())
-    .set('username', username.trim())
+
+  if (name && name.trim()) {
+    // @todo check length
+    q.set('name', name.trim())
+  }
+
+  // changing username?
+  if (username && username.trim()) {
+    // check for duplicate
+    if (await User.getByUsername(username.trim())) {
+      ctx.throw(401, 'Username or email is not available')
+    }
+
+    // @todo check length
+    q.set('username', username.trim())
+  } else {
+    // use current username to log in
+    username = user.username
+  }
 
   // changing password?
   if (newPassword) {
+    // @todo check length
     if (newPassword !== newPasswordConfirm) {
       ctx.throw(422, 'New passwords do not match')
     }
@@ -188,11 +197,65 @@ router.put('/account', async (ctx, next) => {
     password = newPassword
   }
 
+  // changing user image?
+  if (ctx.request.files.image) {
+    q.set('image', await readFile(ctx.request.files.image.path))
+    await deleteFile(ctx.request.files.image.path)
+  } else if (ctx.request.body.image === 'null') {
+    q.set('image', null)
+  }
+
+  q.set('dateUpdated', Math.floor(Date.now() / 1000))
+
   const { text, values } = q.toParam()
   await db.run(text, values)
 
-  // login again
+  // notify room?
+  if (ctx.user.roomId) {
+    ctx.io.to(ctx.user.roomId).emit('action', {
+      type: QUEUE_PUSH,
+      payload: await Queue.getQueue(ctx.user.roomId)
+    })
+  }
+
+  // get updated token
   await _login(ctx, { username, password, roomId: ctx.user.roomId })
+})
+
+// get own account (helps sync account changes across devices)
+router.get('/user', async (ctx, next) => {
+  if (typeof ctx.user.userId !== 'number') {
+    ctx.throw(401)
+  }
+
+  const user = await User.getById(ctx.user.userId)
+
+  if (!user) {
+    ctx.throw(404)
+  }
+
+  // no need to include in response
+  delete user.image
+
+  ctx.body = user
+})
+
+// get a user's image
+router.get('/user/image/:userId', async (ctx, next) => {
+  const userId = parseInt(ctx.params.userId, 10)
+  const user = await User.getById(userId)
+
+  if (!user || !user.image) {
+    ctx.throw(404)
+  }
+
+  if (typeof ctx.query.v !== 'undefined') {
+    // client can cache a versioned image forever
+    ctx.set('Cache-Control', 'max-age=31536000') // 1 year
+  }
+
+  ctx.type = 'image/jpeg'
+  ctx.body = user.image
 })
 
 module.exports = router
@@ -204,13 +267,7 @@ async function _login (ctx, creds) {
     ctx.throw(422, 'Username/email and password are required')
   }
 
-  // get user
-  const q = squel.select()
-    .from('users')
-    .where('username = ?', username.trim())
-
-  const { text, values } = q.toParam()
-  const user = await db.get(text, values)
+  const user = await User.getByUsername(username, true)
 
   if (!user) {
     ctx.throw(401)
@@ -221,11 +278,9 @@ async function _login (ctx, creds) {
     ctx.throw(401)
   }
 
-  // client expects boolean
-  user.isAdmin = user.isAdmin === 1
-
-  // don't want this in the response
+  // don't want these in the response
   delete user.password
+  delete user.image
 
   // roomId is required if not an admin
   if (!roomId && !user.isAdmin) {
@@ -250,7 +305,7 @@ async function _login (ctx, creds) {
   // encrypt JWT based on subset of user object
   const token = jwtSign({
     userId: user.userId,
-    isAdmin: user.isAdmin, // used by client for display purposes only
+    isAdmin: user.isAdmin,
     name: user.name,
     roomId: user.roomId,
   }, ctx.jwtKey)

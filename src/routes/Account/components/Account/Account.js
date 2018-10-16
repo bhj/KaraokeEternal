@@ -5,10 +5,15 @@ import './Account.css'
 
 export default class Account extends Component {
   static propTypes = {
-    user: PropTypes.object,
+    user: PropTypes.object.isRequired,
     // actions
-    updateUser: PropTypes.func.isRequired,
-    logoutUser: PropTypes.func.isRequired,
+    fetchAccount: PropTypes.func.isRequired,
+    updateAccount: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired,
+  }
+
+  componentDidMount () {
+    this.props.fetchAccount()
   }
 
   render () {
@@ -20,9 +25,9 @@ export default class Account extends Component {
         <div styleName='content'>
           <p>Signed in as <strong>{user.username}</strong></p>
 
-          <AccountForm user={user} onSubmitClick={this.props.updateUser} showRoom={false} />
+          <AccountForm user={user} onSubmitClick={this.props.updateAccount} showRoom={false} />
 
-          <button onClick={this.props.logoutUser} styleName='signOut'>
+          <button onClick={this.props.logout} styleName='signOut'>
             Sign Out
           </button>
         </div>

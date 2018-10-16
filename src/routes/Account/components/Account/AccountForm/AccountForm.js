@@ -1,75 +1,90 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import RoomSelect from '../RoomSelect'
+import UserImage from './UserImage'
 import './AccountForm.css'
 
 export default class AccountForm extends Component {
   static propTypes = {
-    user: PropTypes.any,
+    user: PropTypes.object.isRequired,
     showRoom: PropTypes.bool.isRequired,
     onSubmitClick: PropTypes.func.isRequired,
   }
 
   state = {
-    showConfirmPassword: !this.props.user,
-    showCurrentPassword: false,
+    isDirty: false,
+    isChangingPassword: this.props.user.userId === null,
+    userImage: undefined,
   }
 
-  handleRoomSelectRef = r => { this.roomSelect = r }
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.user.dateUpdated !== this.props.user.dateUpdated) {
+      this.setState({ isDirty: false })
+    }
+  }
 
   render () {
-    const { user, showRoom } = this.props
+    const isUser = this.props.user.userId !== null
 
     return (
-      <form>
+      <form styleName='container'>
         <input type='text'
-          autoFocus={!user}
-          defaultValue={user ? user.username : ''}
+          autoFocus={!isUser}
           onChange={this.updateVisible}
-          placeholder={user ? 'new username or email' : 'username or email'}
+          placeholder={isUser ? 'change username (optional)' : 'username or email'}
           ref={r => { this.username = r }}
+          styleName='field'
         />
 
         <input type='password'
           onChange={this.updateVisible}
-          placeholder={user ? 'new password (optional)' : 'password'}
+          placeholder={isUser ? 'change password (optional)' : 'password'}
           ref={r => { this.newPassword = r }}
+          styleName='field'
         />
 
-        {this.state.showConfirmPassword &&
+        {this.state.isChangingPassword &&
           <input type='password'
-            placeholder={user ? 'new password confirm' : 'confirm password'}
+            placeholder={isUser ? 'new password confirm' : 'confirm password'}
             ref={r => { this.newPasswordConfirm = r }}
+            styleName='field'
           />
         }
 
-        <br />
-        <input type='text'
-          defaultValue={user ? user.name : ''}
-          onChange={this.updateVisible}
-          placeholder='name (public)'
-          ref={r => { this.name = r }}
-        />
+        <div styleName='userDisplayContainer' style={{ order: isUser ? -1 : 0 }}>
+          <UserImage
+            user={this.props.user}
+            onSelect={this.handleUserImageChange}
+          />
+          <input type='text'
+            defaultValue={isUser ? this.props.user.name : ''}
+            onChange={this.updateVisible}
+            placeholder='name (public)'
+            ref={r => { this.name = r }}
+            styleName='field name'
+          />
+        </div>
 
-        {this.state.showCurrentPassword &&
+        {this.state.isDirty && isUser &&
           <>
             <br />
             <input type='password'
               placeholder='current password'
               ref={r => { this.curPassword = r }}
-              style={{ marginBottom: 0 }}
+              styleName='field'
             />
           </>
         }
 
-        {showRoom &&
-          <RoomSelect onRef={this.handleRoomSelectRef} />
+        {this.props.showRoom &&
+          <RoomSelect onRef={this.handleRoomSelectRef} styleName='field roomId' />
         }
 
-        <br />
-        <button onClick={this.handleSubmit} className='primary'>
-          {user ? 'Update Account' : 'Create Account'}
-        </button>
+        {(this.state.isDirty || !isUser) &&
+          <button onClick={this.handleSubmit} className='primary'>
+            {isUser ? 'Update Account' : 'Create Account'}
+          </button>
+        }
       </form>
     )
   }
@@ -77,29 +92,58 @@ export default class AccountForm extends Component {
   handleSubmit = (event) => {
     event.preventDefault()
 
-    const data = {
-      name: this.name.value.trim(),
-      username: this.username.value.trim(),
-      password: this.curPassword ? this.curPassword.value : null,
-      newPassword: this.newPassword ? this.newPassword.value : null,
-      newPasswordConfirm: this.newPasswordConfirm ? this.newPasswordConfirm.value : null,
+    const data = new FormData()
+
+    if (this.curPassword) {
+      if (!this.curPassword.value) {
+        alert('Please enter your current password to make changes.')
+        this.curPassword.focus()
+        return
+      }
+
+      data.append('password', this.curPassword.value)
+    }
+
+    if (this.name.value.trim()) {
+      data.append('name', this.name.value.trim())
+    }
+
+    if (this.username.value.trim()) {
+      data.append('username', this.username.value.trim())
+    }
+
+    if (this.state.isChangingPassword) {
+      data.append('newPassword', this.newPassword.value)
+      data.append('newPasswordConfirm', this.newPasswordConfirm.value)
+    }
+
+    if (typeof this.state.userImage !== 'undefined') {
+      data.append('image', this.state.userImage)
     }
 
     if (this.roomSelect) {
-      data.roomId = this.roomSelect.value
+      data.append('roomId', this.roomSelect.value)
     }
 
     this.props.onSubmitClick(data)
   }
 
+  handleUserImageChange = (blob) => {
+    this.setState({
+      userImage: blob,
+      isDirty: true,
+    })
+  }
+
+  handleRoomSelectRef = r => { this.roomSelect = r }
+
   updateVisible = () => {
-    if (!this.props.user) return
+    if (this.props.user.userId === null) return
 
     this.setState({
-      showConfirmPassword: !!this.newPassword.value,
-      showCurrentPassword: !!this.newPassword.value ||
-        this.username.value !== this.props.user.username ||
+      isDirty: !!this.username.value || !!this.newPassword.value ||
         this.name.value !== this.props.user.name,
+      isChangingPassword: !!this.newPassword.value,
     })
   }
 }

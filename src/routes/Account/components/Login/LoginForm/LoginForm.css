@@ -1,7 +1,11 @@
-input {
+.field {
   margin-bottom: var(--input-margin);
 }
 
-.signOut {
+.roomId {
+  height: 36px;
+}
+
+.signIn {
   margin-top: var(--input-margin);
 }

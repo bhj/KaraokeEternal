@@ -27,7 +27,7 @@ const handlers = {
 module.exports = function (io, jwtKey) {
   io.on('connection', async (sock) => {
     const { kfToken } = parseCookie(sock.handshake.headers.cookie)
-    const clientLibraryTimestamp = sock.handshake.query.libraryTimestamp
+    const clientLibraryVersion = parseInt(sock.handshake.query.v, 10)
 
     // decode JWT in cookie sent with socket handshake
     try {
@@ -101,9 +101,9 @@ module.exports = function (io, jwtKey) {
 
     try {
       // only push library if client's is outdated
-      if (clientLibraryTimestamp < Library.getLastUpdate()) {
+      if (clientLibraryVersion < Library.getVersion()) {
         log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
-          sock.user.name, sock.id, clientLibraryTimestamp, Library.getLastUpdate())
+          sock.user.name, sock.id, clientLibraryVersion, Library.getVersion())
 
         io.to(sock.id).emit('action', {
           type: LIBRARY_PUSH,

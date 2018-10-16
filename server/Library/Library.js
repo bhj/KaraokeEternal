@@ -94,7 +94,7 @@ class Library {
     return {
       artists,
       songs,
-      timestamp: _lastUpdate,
+      version: Library.getVersion(),
     }
   }
 
@@ -271,8 +271,8 @@ class Library {
     return { starredArtists, starredSongs }
   }
 
-  static getLastUpdate () { return _lastUpdate }
-  static setLastUpdate () { _lastUpdate = Date.now() }
+  static getVersion () { return _lastUpdate }
+  static setVersion () { _lastUpdate = Date.now() }
 }
 
 module.exports = Library

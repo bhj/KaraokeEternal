@@ -19,16 +19,16 @@ export default class LoginForm extends Component {
           placeholder='username or email'
           autoFocus
           ref={this.username}
+          styleName='field'
         />
         <input type='password'
           placeholder='password'
           ref={this.password}
+          styleName='field'
         />
-        <RoomSelect onRef={this.handleRoomSelectRef} />
+        <RoomSelect onRef={this.handleRoomSelectRef} styleName='field roomId'/>
 
-        <br />
-
-        <button onClick={this.handleSubmit} className='primary'>
+        <button onClick={this.handleSubmit} className='primary' styleName='signIn'>
           Sign in
         </button>
       </form>

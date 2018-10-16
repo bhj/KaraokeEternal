@@ -6,10 +6,11 @@ import './Login.css'
 
 export default class Login extends Component {
   static propTypes = {
+    user: PropTypes.object.isRequired,
     isFirstRun: PropTypes.bool.isRequired,
     // actions
-    loginUser: PropTypes.func.isRequired,
-    createUser: PropTypes.func.isRequired,
+    login: PropTypes.func.isRequired,
+    createAccount: PropTypes.func.isRequired,
   }
 
   state = {
@@ -21,7 +22,7 @@ export default class Login extends Component {
   })
 
   render () {
-    const { isFirstRun } = this.props
+    const { isFirstRun, user } = this.props
     const { view } = this.state
 
     return (
@@ -31,21 +32,21 @@ export default class Login extends Component {
           {!isFirstRun && view === 'login' &&
           <>
             <p>Sign in below. <a onClick={this.toggleMode}>Don&rsquo;t have an account?</a></p>
-            <LoginForm onSubmitClick={this.props.loginUser} />
+            <LoginForm onSubmitClick={this.props.login} />
           </>
           }
 
           {!isFirstRun && view === 'create' &&
           <>
             <p>Create an account below. <a onClick={this.toggleMode}>Already have an account?</a></p>
-            <AccountForm user={false} onSubmitClick={this.props.createUser} showRoom />
+            <AccountForm user={user} onSubmitClick={this.props.createAccount} showRoom />
           </>
           }
 
           {isFirstRun &&
           <>
             <p>Create an admin account to get started.</p>
-            <AccountForm user={false} onSubmitClick={this.props.createUser} showRoom={false} />
+            <AccountForm user={user} onSubmitClick={this.props.createAccount} showRoom={false} />
           </>
           }
         </div>

@@ -9,13 +9,12 @@ const {
 module.exports = function (io) {
   process.on('message', async function (action) {
     // broadcast scanner status updates
-    if (action.type === SCANNER_WORKER_STATUS ||
-      action.type === SCANNER_WORKER_DONE) {
+    if (action.type === SCANNER_WORKER_STATUS || action.type === SCANNER_WORKER_DONE) {
       io.emit('action', action)
     }
 
     if (action.type === SCANNER_WORKER_DONE) {
-      Library.setLastUpdate()
+      Library.setVersion()
 
       // broadcast library
       io.emit('action', {
