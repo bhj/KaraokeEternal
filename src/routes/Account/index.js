@@ -1,6 +1,5 @@
 import AccountViewContainer from './views/AccountViewContainer'
 import { fetchPrefs } from 'store/modules/prefs'
-import { fetchAccount } from 'store/modules/user'
 
 // route definition
 export default function (store) {

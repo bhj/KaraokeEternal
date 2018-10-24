@@ -47,7 +47,7 @@ class SearchResults extends React.Component {
   }
 
   rowRenderer = ({ index, key, style }) => {
-    const { artistsResult, songsResult, filterKeywords, filterStarred } = this.props
+    const { artistsResult, songsResult, filterStarred } = this.props
 
     // # artist results heading
     if (index === 0) {

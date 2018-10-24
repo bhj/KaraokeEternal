@@ -80,13 +80,17 @@ function detectSeparator (cfg = {}) {
 }
 
 function titleCase (ctx, next) {
-  if (ctx.artist) ctx.artist = ctx.artist.replace(/\w\S*/g, function (word) {
-    return word.charAt(0).toUpperCase() + word.substr(1)
-  })
+  if (ctx.artist) {
+    ctx.artist = ctx.artist.replace(/\w\S*/g, function (word) {
+      return word.charAt(0).toUpperCase() + word.substr(1)
+    })
+  }
 
-  if (ctx.title) ctx.title = ctx.title.replace(/\w\S*/g, function (word) {
-    return word.charAt(0).toUpperCase() + word.substr(1)
-  })
+  if (ctx.title) {
+    ctx.title = ctx.title.replace(/\w\S*/g, function (word) {
+      return word.charAt(0).toUpperCase() + word.substr(1)
+    })
+  }
 
   next()
 }
