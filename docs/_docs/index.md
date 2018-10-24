@@ -148,11 +148,11 @@ Karaoke Forever expects media filenames to be in the format "Artist - Title" by 
 
 ### The Meta Parser
 
-Karaoke Forever expects media filenames to be in the format "Artist - Title" by default. You can change the parser behavior on a per-folder basis using a `_kfconfig.js` file. When a `_kfconfig.js` file is encountered in a folder it applies to all files and subfolders within. If any subfolders also have their own `_kfconfig.js` files, those take precedence.
+Karaoke Forever expects media filenames to be in the format "Artist - Title" by default. You can change the parser behavior on a per-folder basis using a `_kfconfig.js` file. When a `_kfconfig.js` file is encountered in a folder it applies to all files and subfolders within. If any subfolders have their own `_kfconfig.js` files, those take precedence.
 
 #### Configuring the Parser
 
-The default parser normally looks for a hyphen (-) in the filename and assumes the artist's name is on the left, and song title on the right. If a folder has media filenames having the positions reversed, for example, add a `_kfconfig.js` file that returns a configuration object:
+The default parser normally looks for a hyphen (-) in the filename and assumes the artist's name is on the left and song title is on the right. If a folder has files with the positions reversed, for example, add a `_kfconfig.js` file that returns a configuration object:
 
 ```js
 return {
@@ -165,11 +165,11 @@ return {
 
 #### Augmenting or Replacing the Parser (Advanced)
 
-Instead of a configuration object (as shown above), you can return a function that will be used to create a new parser, allowing you to augment or even replace the default parser. This is useful if you have many oddly-named files that could use some batch string processing to appear nicely in the library.
+Instead of a configuration object (as shown above), you can return a function that will be used to create a new parser, allowing anything from slightly tweaking to completely replacing the default one. This is especially useful if you have many oddly-named files that need extra processing to appear nicely in the library.
 
-Karaoke Forever uses a simple middleware-based parser. Here *middleware* refers to an individual function, and *parser* refers to a stack of middleware that will run in series when called (it is also a function). Your `_kfconfig.js` should return a *parser creator*, in other words, a function that Karaoke Forever will call to get the parser for the current folder.
+Karaoke Forever uses a simple middleware-based filename parser. Here *middleware* refers to an individual function, and *parser* refers to a [stack of middleware](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) that will run in series when called (it is itself a function). Your `_kfconfig.js` should return a *parser creator*, in other words, a function that Karaoke Forever will call to get the parser for the current folder.
 
-Your parser creator has access to the default middleware and parser so it's easy to add a bit of string manipulation without reinventing the wheel. For example, this will create a parser that removes the word 'junk' from the input filename:
+Your parser creator has access to the [default middleware stack](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) so it's easy to add a bit of string manipulation without reinventing the wheel. For example, this will create a parser that removes the word 'junk' from the input filename:
 
 ```js
 return ({ composeSync, getDefaultParser, getDefaultMiddleware }) => {
@@ -185,11 +185,11 @@ return ({ composeSync, getDefaultParser, getDefaultMiddleware }) => {
 }
 
 ```
-When Karaoke Forever scans a media file, it calls the parser with an object having the filename (without extension) as the property `file` (string). At the end of the middleware chain, this object is expected to have the properties `artist` and `title` (strings). What happens in between is up to the parser. It's important that each middleware calls `next` unless you don't want the chain to continue (for instance, if you've set `artist` and `title` absolutely and want to use them as-is).
+When Karaoke Forever scans a media file, it calls the parser with an object having the filename in the `file` property (string, without file extension). At the end of the middleware chain, this object is expected to have the properties `artist` and `title` (strings). What happens in between is up to the parser. It's important that each middleware calls `next` unless you don't want the chain to continue (for instance, if you've set `artist` and `title` absolutely and want to use them as-is).
 
 Your parser creator should accept an object with the following functions:
 
-- `composeSync`: Takes an array of middleware and returns them as a composed function that can be used as a parser. It currently requires a flat array, but there's nothing preventing array items from being composed functions themselves. As the name implies, the middleware stack is currently run synchronously.
+- `composeSync`: Takes an array of middleware and returns them as a composed function that can be used as a parser. It currently requires a flat array, but there's nothing preventing array items from being composed functions themselves. As the name implies, the middleware stack runs synchronously.
 
 - `getDefaultParser`: Returns the default parser. Optionally accepts a configuration object (see [Configuring the Parser](#configuring-the-parser)). In the example above our parser is doing a bit of pre-cleaning using `customMiddleware`, then running the default parser to handle the rest. The default parser can itself be used as middleware, with custom middleware run before and/or after.
 
