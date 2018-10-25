@@ -29,6 +29,7 @@ export default class EditRoom extends Component {
           defaultValue={room ? room.name : ''}
           onKeyPress={this.handleKeyPress}
           autoFocus={typeof room === 'undefined'}
+          styleName='field'
         />
 
         <label>
