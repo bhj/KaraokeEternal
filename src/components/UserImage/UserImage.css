@@ -1,0 +1,9 @@
+.image {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.placeholder {
+  fill: var(--btn-bg-color);
+  filter: var(--drop-shadow-filter);
+}

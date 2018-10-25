@@ -8,6 +8,7 @@
   background-color: var(--chrome-bg-color);
   border-radius: var(--border-radius) var(--border-radius) 0 0;
   padding: 30px 60px;
+  text-align: center;
 }
 
 .fadeEnter {

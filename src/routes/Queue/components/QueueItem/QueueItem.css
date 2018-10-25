@@ -26,8 +26,6 @@
 .image {
   max-width: 80px;
   max-height: 60px;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
 }
 
 .waitContainer {

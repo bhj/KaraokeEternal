@@ -3,7 +3,7 @@ import React from 'react'
 import Swipeable from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
-import QueueItemImage from './QueueItemImage'
+import UserImage from 'components/UserImage'
 import './QueueItem.css'
 const BTN_WIDTH = 50 // larger than the icon
 
@@ -59,7 +59,7 @@ class QueueItem extends React.Component {
       >
         <div styleName='innerContainer'>
           <div styleName='imageContainer'>
-            <QueueItemImage userId={props.userId} dateUpdated={props.dateUpdated} styleName='image'/>
+            <UserImage userId={props.userId} dateUpdated={props.dateUpdated} styleName='image'/>
             <div styleName='waitContainer'>
               {props.isUpcoming &&
                 <div styleName='wait'>{props.waitValue}{props.waitUnit}</div>
