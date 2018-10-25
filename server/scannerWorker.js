@@ -14,7 +14,10 @@ let _isScanQueued = true
 log.info('Opening database file %s', config.database)
 
 Promise.resolve()
-  .then(() => sqlite.open(config.database, { Promise }))
+  .then(() => sqlite.open(config.database, {
+    Promise,
+    mode: 1, // read only
+  }))
   .then(() => {
     // attach start/stop handlers
     process.on('message', function ({ type, payload }) {
