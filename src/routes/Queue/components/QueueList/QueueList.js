@@ -14,12 +14,14 @@ class QueueList extends React.Component {
     curId: PropTypes.number,
     curPos: PropTypes.number,
     isAtQueueEnd: PropTypes.bool.isRequired,
+    starredSongs: PropTypes.array.isRequired,
     waits: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
     showErrorMessage: PropTypes.func.isRequired,
+    toggleSongStarred: PropTypes.func.isRequired,
   }
 
   containerRef = React.createRef()
@@ -63,18 +65,21 @@ class QueueList extends React.Component {
           }}
         >
           <QueueItem {...item}
+            errors={props.errors[queueId]}
             isActive={isActive}
-            isUpcoming={isUpcoming}
-            isOwner={isOwner}
-            isSkippable={isActive && isOwner}
-            isRemovable={isUpcoming && isOwner}
             isErrored={typeof props.errors[queueId] !== 'undefined'}
+            isOwner={isOwner}
+            isRemovable={isUpcoming && isOwner}
+            isSkippable={isActive && isOwner}
+            isStarred={props.starredSongs.includes(item.songId)}
+            isUpcoming={isUpcoming}
             pctPlayed={isActive ? props.curPos / item.duration * 100 : 0}
             waitValue={wait.value}
             waitUnit={wait.unit}
-            onRemoveClick={() => this.handleRemoveClick(queueId)}
+            onErrorInfoClick={props.showErrorMessage}
+            onRemoveClick={props.removeItem}
             onSkipClick={props.requestPlayNext}
-            onErrorInfoClick={() => this.handleErrorInfoClick(queueId)}
+            onStarClick={props.toggleSongStarred}
           />
         </CSSTransition>
       )
@@ -87,14 +92,6 @@ class QueueList extends React.Component {
         </TransitionGroup>
       </div>
     )
-  }
-
-  handleRemoveClick = (queueId) => {
-    this.props.removeItem(queueId)
-  }
-
-  handleErrorInfoClick = (queueId) => {
-    this.props.showErrorMessage(this.props.errors[queueId].join('\n\n'))
   }
 }
 

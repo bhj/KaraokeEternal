@@ -5,10 +5,12 @@ import QueueList from './QueueList'
 import { showErrorMessage } from 'store/modules/ui'
 import { requestPlay, requestPause, requestPlayNext } from 'store/modules/status'
 import { queueSong, removeItem } from '../../modules/queue'
+import { toggleSongStarred } from 'store/modules/userStars'
 
 const getQueue = (state) => ensureState(state.queue)
 const getCurId = (state) => state.status.queueId
 const getCurPos = (state) => state.status.position
+const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
 
 const getWaits = createSelector(
   [getQueue, getCurId, getCurPos],
@@ -45,6 +47,7 @@ const mapStateToProps = (state) => {
     errors: state.status.errors,
     artists: state.library.artists,
     songs: state.library.songs,
+    starredSongs: getStarredSongs(state),
     user: state.user,
   }
 }
@@ -56,6 +59,7 @@ const mapActionCreators = {
   requestPlayNext,
   requestPause,
   showErrorMessage,
+  toggleSongStarred,
 }
 
 export default connect(mapStateToProps, mapActionCreators)(QueueList)

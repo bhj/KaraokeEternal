@@ -15,8 +15,7 @@ export default class SongItem extends React.Component {
     duration: PropTypes.number.isRequired,
     style: PropTypes.object,
     onSongQueue: PropTypes.func.isRequired,
-    onSongStar: PropTypes.func.isRequired,
-    onSongUnstar: PropTypes.func.isRequired,
+    onSongStarClick: PropTypes.func.isRequired,
     onSongInfo: PropTypes.func.isRequired,
     isQueued: PropTypes.bool.isRequired,
     isStarred: PropTypes.bool.isRequired,
@@ -31,8 +30,7 @@ export default class SongItem extends React.Component {
   }
 
   handleQueue = () => this.props.onSongQueue(this.props.songId)
-  handleStar = () => this.props.onSongStar(this.props.songId)
-  handleUnstar = () => this.props.onSongUnstar(this.props.songId)
+  handleStarClick = () => this.props.onSongStarClick(this.props.songId)
   handleSwipeLeft = (e, delta) => this.setState({ isExpanded: this.props.isAdmin })
   handleSwipeRight = (e, delta) => this.setState({ isExpanded: false })
   handleInfo = () => this.props.onSongInfo(this.props.songId)
@@ -61,7 +59,7 @@ export default class SongItem extends React.Component {
         </div>
 
         <div styleName={state.isExpanded ? 'btnContainerExpanded' : 'btnContainer'}>
-          <div onClick={props.isStarred ? this.handleUnstar : this.handleStar} styleName='button'>
+          <div onClick={this.handleStarClick} styleName='button'>
             <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
               <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>
             </ToggleAnimation>

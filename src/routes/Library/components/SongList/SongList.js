@@ -6,8 +6,7 @@ const SongList = (props) => props.songIds.map(songId => (
   <SongItem
     {...props.songs[songId]}
     onSongQueue={props.queueSong}
-    onSongStar={props.starSong}
-    onSongUnstar={props.unstarSong}
+    onSongStarClick={props.toggleSongStarred}
     onSongInfo={props.showSongInfo}
     isQueued={props.queuedSongIds.includes(songId)}
     isStarred={props.starredSongs.includes(songId)}
@@ -28,9 +27,8 @@ SongList.propTypes = {
   showArtist: PropTypes.bool.isRequired,
   // actions
   queueSong: PropTypes.func.isRequired,
-  starSong: PropTypes.func.isRequired,
-  unstarSong: PropTypes.func.isRequired,
   showSongInfo: PropTypes.func.isRequired,
+  toggleSongStarred: PropTypes.func.isRequired,
 }
 
 export default SongList

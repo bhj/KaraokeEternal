@@ -88,17 +88,36 @@
 
 .btnContainer {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  padding-right: 5px;
+  transition: width var(--spring-duration) var(--function-spring);
 }
 
 /* Actions */
-.button {
+.btn {
+  padding-right: var(--container-padding);
   fill: var(--btn-danger-bg-color);
+  transition: opacity .3s;
+}
+
+.playNext, .remove, .info {
+  composes: btn;
   filter: var(--btn-danger-filter);
 }
 
-.playNext, .remove, .star, .info {
-  composes: button;
+.btnHidden {
+  composes: btn;
+  opacity: 0;
+}
+
+.star {
+  fill: var(--song-item-btn-bg-color);
+}
+
+.starStarred {
+  fill: var(--song-item-btn-active-bg-color);
+  filter: var(--song-item-btn-active-filter);
+}
+
+.animateStar {
+  animation: var(--animation-bounce);
 }

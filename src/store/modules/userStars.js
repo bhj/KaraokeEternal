@@ -1,4 +1,5 @@
 import { REHYDRATE } from 'redux-persist'
+import { ensureState } from 'redux-optimistic-ui'
 import {
   STAR_SONG,
   UNSTAR_SONG,
@@ -15,7 +16,14 @@ import {
 // ------------------------------------
 // Action creators
 // ------------------------------------
-export function starSong (songId) {
+export function toggleSongStarred (songId) {
+  return (dispatch, getState) => {
+    const starredSongs = ensureState(getState().userStars).starredSongs
+    dispatch(starredSongs.includes(songId) ? unstarSong(songId) : starSong(songId))
+  }
+}
+
+function starSong (songId) {
   return {
     type: STAR_SONG,
     meta: { isOptimistic: true },
@@ -23,7 +31,7 @@ export function starSong (songId) {
   }
 }
 
-export function unstarSong (songId) {
+function unstarSong (songId) {
   return {
     type: UNSTAR_SONG,
     meta: { isOptimistic: true },
