@@ -59,7 +59,7 @@ class QueueItem extends React.Component {
       >
         <div styleName='innerContainer'>
           <div styleName='imageContainer'>
-            <UserImage userId={props.userId} dateUpdated={props.dateUpdated} styleName='image'/>
+            <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={60} styleName='image'/>
             <div styleName='waitContainer'>
               {props.isUpcoming &&
                 <div styleName='wait'>{props.waitValue}{props.waitUnit}</div>
