@@ -11,7 +11,7 @@ const PlaybackCtrl = (props) => {
     return (props.isAdmin && props.isInRoom && screenfull.enabled) ? <NoPlayer /> : null
   }
 
-  const { isPlaying, isAtQueueEnd } = props
+  const { isPlaying } = props
 
   return (
     <div styleName='container'>
@@ -27,7 +27,7 @@ const PlaybackCtrl = (props) => {
       }
 
       <div onClick={props.requestPlayNext}>
-        <Icon icon='PLAY_NEXT' size={48} styleName={'next ' + (isAtQueueEnd ? ' disabled' : '')} />
+        <Icon icon='PLAY_NEXT' size={48} styleName='next'/>
       </div>
 
       <VolumeSlider

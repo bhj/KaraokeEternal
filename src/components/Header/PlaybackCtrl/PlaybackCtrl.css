@@ -19,7 +19,3 @@
   fill: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
 }
-
-.disabled {
-  color: #ccc;
-}
