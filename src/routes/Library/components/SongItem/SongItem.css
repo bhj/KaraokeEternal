@@ -75,7 +75,7 @@
 .starCount {
   position: relative;
   font-size: 12px;
-  top: -26px;
+  top: -30px;
   text-align: center;
   color: var(--text-color);
 }
