@@ -5,7 +5,7 @@
   --link-color: #68b1f9;
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-  --drop-shadow-filter: drop-shadow(0 2px 5px #222);
+  --drop-shadow-filter: none;
   --container-padding: 10px;
   --border-radius: 5px;
 
@@ -16,9 +16,9 @@
 
   --btn-bg-color: #404D5A;
   --btn-active-bg-color: var(--link-color);
-  --btn-active-filter: drop-shadow(0 0 5px rgba(170, 213, 255, .5));
+  --btn-active-filter: none;
   --btn-danger-bg-color: var(--base-pink);
-  --btn-danger-filter: drop-shadow(0 0 5px rgba(249, 164, 255, .5));
+  --btn-danger-filter: none;
 
   /* UI chrome (header/footer) */
   --chrome-bg-color: rgba(2, 15, 27, .8);
