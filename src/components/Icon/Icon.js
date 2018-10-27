@@ -3,15 +3,10 @@ import React from 'react'
 import icons from './icons'
 
 const Icon = props => {
-  const { size, icon, className, ...restProps } = props
+  const { size, icon, ...restProps } = props
 
   return (
     <svg
-      style={{
-        display: 'block',
-        margin: 'auto',
-      }}
-      className={className}
       width={`${size}px`}
       height={`${size}px`}
       viewBox={icons[icon].viewBox}
