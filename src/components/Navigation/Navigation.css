@@ -10,21 +10,15 @@
   z-index: 1;
 }
 
-.button {
+.btn {
   flex: 1;
   padding-top: 4px;
   padding-bottom: 8px;
   text-align: center;
-}
-
-.activeButton {
-}
-
-.icon {
   fill: var(--nav-link-color);
 }
 
-.activeIcon {
+.btnActive {
   fill: var(--nav-active-color);
   filter: var(--nav-active-filter);
 }

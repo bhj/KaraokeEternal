@@ -8,14 +8,14 @@ import styles from './Navigation.css'
 export const Navigation = (props) => (
   <Measure onMeasure={props.setFooterHeight} whitelist={['height']}>
     <div styleName='container' className='bg-blur'>
-      <Link to='/library' styleName='styles.button' activeClassName={styles.activeButton}>
-        <Icon icon='NAV_LIBRARY' size={42} styleName={props.loc === '/library' ? 'activeIcon' : 'icon'} />
+      <Link to='/library' styleName='styles.btn' activeClassName={styles.btnActive}>
+        <Icon icon='NAV_LIBRARY' size={42}/>
       </Link>
-      <Link to='/queue' styleName='styles.button' activeClassName={styles.activeButton}>
-        <Icon icon='NAV_SUBSCRIPTIONS' size={42} styleName={props.loc === '/queue' ? 'activeIcon' : 'icon'} />
+      <Link to='/queue' styleName='styles.btn' activeClassName={styles.btnActive}>
+        <Icon icon='NAV_SUBSCRIPTIONS' size={42}/>
       </Link>
-      <Link to='/account' styleName='styles.button' activeClassName={styles.activeButton}>
-        <Icon icon='NAV_ACCOUNT' size={42} styleName={props.loc === '/account' ? 'activeIcon' : 'icon'} />
+      <Link to='/account' styleName='styles.btn' activeClassName={styles.btnActive}>
+        <Icon icon='NAV_ACCOUNT' size={42}/>
       </Link>
     </div>
   </Measure>
