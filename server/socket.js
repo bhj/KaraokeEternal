@@ -65,7 +65,9 @@ module.exports = function (io, jwtKey) {
       )
 
       // any players left in room?
-      if (room.length && !Object.keys(room.sockets).some(id => !!io.sockets.sockets[id]._lastPlayerStatus)) {
+      if (room.length && !Object
+        .keys(room.sockets)
+        .some(id => io.sockets.sockets[id] && !!io.sockets.sockets[id]._lastPlayerStatus)) {
         io.to(sock.user.roomId).emit('action', {
           type: PLAYER_LEAVE,
         })
