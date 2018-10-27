@@ -19,8 +19,7 @@ const Icon = props => {
 
 Icon.propTypes = {
   icon: PropTypes.string.isRequired,
-  size: PropTypes.number,
-  className: PropTypes.string,
+  size: PropTypes.number.isRequired,
 }
 
 export default Icon
