@@ -7,7 +7,6 @@
 .containerExpanded {
   composes: container;
   height: 60px;
-  padding-right: 10px;
 }
 
 .duration {

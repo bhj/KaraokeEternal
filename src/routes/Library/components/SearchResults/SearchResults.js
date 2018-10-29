@@ -39,6 +39,7 @@ class SearchResults extends React.Component {
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         paddingTop={this.props.ui.headerHeight}
+        paddingRight={10}
         paddingBottom={this.props.ui.footerHeight}
         width={this.props.ui.browserWidth}
         height={this.props.ui.browserHeight}
