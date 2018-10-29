@@ -26,8 +26,8 @@ const ACTION_HANDLERS = {
     // update star count version
     Library.setStarCountsVersion()
 
-    // tell room
-    sock.server.to(sock.user.roomId).emit('action', {
+    // tell all clients (some users may be in multiple rooms)
+    sock.server.emit('action', {
       type: SONG_STARRED,
       payload: {
         userId: sock.user.userId,
@@ -51,8 +51,8 @@ const ACTION_HANDLERS = {
     // update star count version
     Library.setStarCountsVersion()
 
-    // tell room
-    sock.server.to(sock.user.roomId).emit('action', {
+    // tell all clients (some users may be in multiple rooms)
+    sock.server.emit('action', {
       type: SONG_UNSTARRED,
       payload: {
         userId: sock.user.userId,
