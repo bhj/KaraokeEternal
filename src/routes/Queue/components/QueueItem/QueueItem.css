@@ -92,7 +92,7 @@
 
 /* Actions */
 .btn {
-  margin-right: var(--container-padding);
+  margin-right: var(--btn-margin);
   fill: var(--btn-danger-bg-color);
   transition: opacity .3s;
 }

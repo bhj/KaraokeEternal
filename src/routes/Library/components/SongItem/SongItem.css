@@ -49,17 +49,18 @@
 
 .btnContainerExpanded {
   composes: btnContainer;
-  width: calc(var(--song-item-btn-width) * 2);
+  width: calc((var(--song-item-btn-width) * 2) + var(--btn-margin));
 }
 
-.button {
+.btn {
   width: var(--song-item-btn-width);
   height: var(--song-item-btn-height);
   transition: opacity .3s;
+  margin-right: var(--btn-margin);
 }
 
-.hiddenButton {
-  composes: button;
+.btnHidden {
+  composes: btn;
   opacity: 0;
 }
 
