@@ -17,6 +17,7 @@ class SearchResults extends React.Component {
     songs: PropTypes.object.isRequired,
     songsResult: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
+    starredArtistCounts: PropTypes.object.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
     filterKeywords: PropTypes.array.isRequired,
     filterStarred: PropTypes.bool.isRequired,
@@ -68,6 +69,7 @@ class SearchResults extends React.Component {
         <ArtistItem
           songs={this.props.songs}
           name={artist.name}
+          numStars={this.props.starredArtistCounts[artistId] || 0}
           artistSongIds={artist.songIds} // "children"
           queuedSongIds={this.props.queuedSongIds}
           starredSongs={this.props.starredSongs}
