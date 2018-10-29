@@ -39,10 +39,11 @@ const ArtistItem = (props) => {
 
 ArtistItem.propTypes = {
   artistSongIds: PropTypes.array.isRequired,
-  queuedSongIds: PropTypes.array.isRequired,
-  name: PropTypes.string.isRequired,
-  isExpanded: PropTypes.bool.isRequired,
   filterKeywords: PropTypes.array.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  name: PropTypes.string.isRequired,
+  numStars: PropTypes.number.isRequired,
+  queuedSongIds: PropTypes.array.isRequired,
   style: PropTypes.object,
   // actions
   onArtistClick: PropTypes.func.isRequired,

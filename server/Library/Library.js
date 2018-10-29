@@ -1,7 +1,8 @@
 const db = require('sqlite')
 const squel = require('squel')
 const log = require('../lib/logger')('library')
-let _lastUpdate = Date.now()
+let _libraryVersion = Date.now()
+let _starCountsVersion = Date.now()
 
 class Library {
   /**
@@ -30,7 +31,6 @@ class Library {
         .field('songs.title AS title')
         .field('MAX(media.isPreferred) AS isPreferred')
         .field('COUNT(DISTINCT media.mediaId) AS numMedia')
-        .field('COUNT(DISTINCT starredSongs.userId) AS numStars')
         .from('media')
         .join(squel.select()
           .from('paths')
@@ -40,7 +40,6 @@ class Library {
         'paths', 'media.pathId = paths.pathId')
         .join('songs USING (songId)')
         .join('artists USING (artistId)')
-        .left_join('starredSongs USING(songId)')
         .group('songs.songId')
         .order('songs.title')
 
@@ -94,7 +93,7 @@ class Library {
     return {
       artists,
       songs,
-      version: Library.getVersion(),
+      version: Library.getLibraryVersion(),
     }
   }
 
@@ -113,7 +112,7 @@ class Library {
       .field('songs.title AS title')
       .field('MAX(media.isPreferred) AS isPreferred')
       .field('COUNT(DISTINCT media.mediaId) AS numMedia')
-      .field('COUNT(DISTINCT starredSongs.userId) AS numStars')
+      .field('COUNT(DISTINCT songStars.userId) AS numStars')
       .from('media')
       .join(squel.select()
         .from('paths')
@@ -123,7 +122,7 @@ class Library {
       'paths', 'media.pathId = paths.pathId')
       .join('songs USING (songId)')
       .join('artists USING (artistId)')
-      .left_join('starredSongs USING(songId)')
+      .left_join('songStars USING(songId)')
       .group('songs.songId')
       .where('songs.songId = ?', songId)
 
@@ -245,7 +244,7 @@ class Library {
     // get starred artists
     {
       const q = squel.select()
-        .from('starredArtists')
+        .from('artistStars')
         .field('artistId')
         .where('userId = ?', userId)
 
@@ -258,7 +257,7 @@ class Library {
     // get starred songs
     {
       const q = squel.select()
-        .from('starredSongs')
+        .from('songStars')
         .field('songId')
         .where('userId = ?', userId)
 
@@ -271,8 +270,54 @@ class Library {
     return { starredArtists, starredSongs }
   }
 
-  static getVersion () { return _lastUpdate }
-  static setVersion () { _lastUpdate = Date.now() }
+  /**
+  * Gets artist and song star counts
+  *
+  * @return {Object}
+  */
+  static async getStarCounts () {
+    const artists = {}
+    const songs = {}
+
+    // get artist star counts
+    {
+      const q = squel.select()
+        .from('artistStars')
+        .field('artistId')
+        .field('COUNT(userId) AS count')
+        .group('artistId')
+
+      const { text, values } = q.toParam()
+      const rows = await db.all(text, values)
+
+      rows.forEach(row => { artists[row.artistId] = row.count })
+    }
+
+    // get song star counts
+    {
+      const q = squel.select()
+        .from('songStars')
+        .field('songId')
+        .field('COUNT(userId) AS count')
+        .group('songId')
+
+      const { text, values } = q.toParam()
+      const rows = await db.all(text, values)
+
+      rows.forEach(row => { songs[row.songId] = row.count })
+    }
+
+    return {
+      artists,
+      songs,
+      version: Library.getStarCountsVersion(),
+    }
+  }
+
+  static getLibraryVersion () { return _libraryVersion }
+  static setLibraryVersion () { _libraryVersion = Date.now() }
+  static getStarCountsVersion () { return _starCountsVersion }
+  static setStarCountsVersion () { _starCountsVersion = Date.now() }
 }
 
 module.exports = Library

@@ -14,7 +14,7 @@ module.exports = function (io) {
     }
 
     if (action.type === SCANNER_WORKER_DONE) {
-      Library.setVersion()
+      Library.setLibraryVersion()
 
       // broadcast library
       io.emit('action', {

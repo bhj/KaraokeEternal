@@ -12,6 +12,7 @@ const {
   LIBRARY_PUSH,
   QUEUE_PUSH,
   STARS_PUSH,
+  STAR_COUNTS_PUSH,
   PLAYER_STATUS,
   PLAYER_LEAVE,
   SOCKET_AUTH_ERROR,
@@ -27,7 +28,8 @@ const handlers = {
 module.exports = function (io, jwtKey) {
   io.on('connection', async (sock) => {
     const { kfToken } = parseCookie(sock.handshake.headers.cookie)
-    const clientLibraryVersion = parseInt(sock.handshake.query.v, 10)
+    const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
+    const clientStarsVersion = parseInt(sock.handshake.query.starCounts, 10)
 
     // decode JWT in cookie sent with socket handshake
     try {
@@ -102,10 +104,10 @@ module.exports = function (io, jwtKey) {
     })
 
     try {
-      // only push library if client's is outdated
-      if (clientLibraryVersion < Library.getVersion()) {
+      // push library (only if client's is outdated)
+      if (clientLibraryVersion < Library.getLibraryVersion()) {
         log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
-          sock.user.name, sock.id, clientLibraryVersion, Library.getVersion())
+          sock.user.name, sock.id, clientLibraryVersion, Library.getLibraryVersion())
 
         io.to(sock.id).emit('action', {
           type: LIBRARY_PUSH,
@@ -113,11 +115,22 @@ module.exports = function (io, jwtKey) {
         })
       }
 
-      // push stars
+      // push user's stars
       io.to(sock.id).emit('action', {
         type: STARS_PUSH,
         payload: await Library.getStars(sock.user.userId),
       })
+
+      // push star counts (only if client's is outdated)
+      if (clientStarsVersion < Library.getStarCountsVersion()) {
+        log.verbose('pushing star counts to %s (%s) (client=%s, server=%s)',
+          sock.user.name, sock.id, clientStarsVersion, Library.getStarCountsVersion())
+
+        io.to(sock.id).emit('action', {
+          type: STAR_COUNTS_PUSH,
+          payload: await Library.getStarCounts(),
+        })
+      }
     } catch (err) {
       log.error(err)
     }

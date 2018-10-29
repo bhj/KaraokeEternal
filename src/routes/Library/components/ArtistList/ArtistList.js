@@ -12,6 +12,7 @@ class ArtistList extends React.Component {
     songs: PropTypes.object.isRequired, // entities
     queuedSongIds: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
+    starredArtistCounts: PropTypes.object.isRequired,
     expandedArtists: PropTypes.array.isRequired,
     alphaPickerMap: PropTypes.object.isRequired,
     filterKeywords: PropTypes.array.isRequired,
@@ -66,15 +67,16 @@ class ArtistList extends React.Component {
 
     return (
       <ArtistItem
-        songs={this.props.songs}
         artistSongIds={artist.songIds} // "children"
-        queuedSongIds={this.props.queuedSongIds}
-        starredSongs={this.props.starredSongs}
-        name={artist.name}
-        isExpanded={expandedArtists.includes(artist.artistId)}
         filterKeywords={this.props.filterKeywords}
-        onArtistClick={() => this.props.toggleArtistExpanded(artist.artistId)}
+        isExpanded={expandedArtists.includes(artist.artistId)}
         key={key}
+        name={artist.name}
+        numStars={this.props.starredArtistCounts[artist.artistId] || 0}
+        onArtistClick={() => this.props.toggleArtistExpanded(artist.artistId)}
+        queuedSongIds={this.props.queuedSongIds}
+        songs={this.props.songs}
+        starredSongs={this.props.starredSongs}
         style={style}
       />
     )

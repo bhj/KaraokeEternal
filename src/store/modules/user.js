@@ -273,10 +273,13 @@ function requestSocketConnect (query) {
 
 export function connectSocket () {
   return (dispatch, getState) => {
-    const v = getState().library.version
+    const versions = {
+      library: getState().library.version,
+      starCounts: getState().starCounts.version,
+    }
 
-    dispatch(requestSocketConnect({ v }))
-    window._socket.io.opts.query = { v }
+    dispatch(requestSocketConnect(versions))
+    window._socket.io.opts.query = versions
   }
 }
 

@@ -13,7 +13,7 @@ module.exports = {
   LIBRARY_SONG_INFO_CLOSE: 'library/SONG_INFO_CLOSE',
   SONG_STARRED: 'library/SONG_STARRED',
   SONG_UNSTARRED: 'library/SONG_UNSTARRED',
-  // media
+  STAR_COUNTS_PUSH: 'library/STAR_COUNTS_PUSH',
   LIBRARY_PUSH: 'library/PUSH',
   LIBRARY_PUSH_SONG: 'library/PUSH_SONG',
   // queue

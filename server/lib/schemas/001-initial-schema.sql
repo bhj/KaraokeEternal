@@ -60,19 +60,19 @@ CREATE TABLE IF NOT EXISTS "songs" (
 
 CREATE INDEX IF NOT EXISTS idxTitle ON "songs" ("title" ASC);
 
-CREATE TABLE IF NOT EXISTS "starredArtists" (
+CREATE TABLE IF NOT EXISTS "artistStars" (
   "userId" integer NOT NULL,
   "artistId" integer NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idxUserArtist ON "starredArtists" ("userId" ASC, "artistId" ASC);
+CREATE UNIQUE INDEX IF NOT EXISTS idxUserArtist ON "artistStars" ("userId" ASC, "artistId" ASC);
 
-CREATE TABLE IF NOT EXISTS "starredSongs" (
+CREATE TABLE IF NOT EXISTS "songStars" (
   "userId" integer NOT NULL,
   "songId" integer NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idxUserSong ON "starredSongs" ("userId" ASC, "songId" ASC);
+CREATE UNIQUE INDEX IF NOT EXISTS idxUserSong ON "songStars" ("userId" ASC, "songId" ASC);
 
 CREATE TABLE IF NOT EXISTS "users" (
   "userId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -95,6 +95,6 @@ DROP TABLE providers;
 DROP TABLE queue;
 DROP TABLE rooms;
 DROP TABLE songs;
-DROP TABLE starredArtists;
-DROP TABLE starredSongs;
+DROP TABLE artistStars;
+DROP TABLE songStars;
 DROP TABLE users;

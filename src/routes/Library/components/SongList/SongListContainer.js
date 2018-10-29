@@ -10,6 +10,7 @@ const mapStateToProps = (state, props) => ({
   isAdmin: state.user.isAdmin,
   songs: state.songs.entities,
   starredSongs: ensureState(state.userStars).starredSongs,
+  starredSongCounts: state.starCounts.songs,
 })
 
 const mapActionCreators = {
