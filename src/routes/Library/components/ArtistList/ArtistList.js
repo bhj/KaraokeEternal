@@ -67,13 +67,14 @@ class ArtistList extends React.Component {
 
     return (
       <ArtistItem
+        artistId={artist.artistId}
         artistSongIds={artist.songIds} // "children"
         filterKeywords={this.props.filterKeywords}
         isExpanded={expandedArtists.includes(artist.artistId)}
         key={key}
         name={artist.name}
         numStars={this.props.starredArtistCounts[artist.artistId] || 0}
-        onArtistClick={() => this.props.toggleArtistExpanded(artist.artistId)}
+        onArtistClick={this.props.toggleArtistExpanded}
         queuedSongIds={this.props.queuedSongIds}
         songs={this.props.songs}
         starredSongs={this.props.starredSongs}
