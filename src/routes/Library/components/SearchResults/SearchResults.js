@@ -28,8 +28,9 @@ class SearchResults extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (!this.list) return
-    this.list.recomputeRowHeights()
+    if (this.list) {
+      this.list.recomputeRowHeights()
+    }
   }
 
   render () {
@@ -68,6 +69,7 @@ class SearchResults extends React.Component {
 
       return (
         <ArtistItem
+          artistId={artistId}
           songs={this.props.songs}
           name={artist.name}
           numStars={this.props.starredArtistCounts[artistId] || 0}
