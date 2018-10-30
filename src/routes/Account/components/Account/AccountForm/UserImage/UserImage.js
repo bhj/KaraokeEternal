@@ -41,7 +41,7 @@ export default class AccountForm extends Component {
             <Icon icon='CLEAR' size={28} onClick={this.handleImgClear} styleName='btnClear'/>
         }
 
-        <input type='file' accept='image/*' onChange={this.handleChoose} styleName='fileInput'/>
+        <input type='file' accept='image/*' onChange={this.handleChoose} styleName='fileInput' tabIndex='-1'/>
       </div>
     )
   }
