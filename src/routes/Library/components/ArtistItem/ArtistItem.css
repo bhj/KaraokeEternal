@@ -3,7 +3,6 @@
   height: var(--artist-item-height);
   align-items: center;
   overflow: hidden;
-  padding: 0 4px;
 }
 
 .name {
@@ -21,7 +20,7 @@
 
 .folderContainer {
   height: var(--artist-item-height);
-  margin-right: 3px;
+  margin: 0 3px;
 }
 
 .folderIcon {
@@ -30,7 +29,7 @@
 
 .count {
   position: relative;
-  top: -30px;
+  top: -32px;
   text-align: center;
   font-size: 15px;
   color: var(--artist-folder-color);
@@ -38,7 +37,7 @@
 
 .expandedIcon {
   position: relative;
-  top: -32px;
+  top: -34px;
   text-align: center;
   fill: var(--artist-folder-color);
 }
