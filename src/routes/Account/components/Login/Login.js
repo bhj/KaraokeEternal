@@ -45,7 +45,8 @@ export default class Login extends Component {
 
           {isFirstRun &&
           <>
-            <p>Create an admin account to get started.</p>
+            <p>Welcome! Create your <b>admin</b> account below to get started.
+            All accounts are stored locally on your server.</p>
             <AccountForm user={user} onSubmitClick={this.props.createAccount} showRoom={false} />
           </>
           }
