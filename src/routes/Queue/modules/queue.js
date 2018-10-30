@@ -36,6 +36,7 @@ const ACTION_HANDLERS = {
     const fakeQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 0
 
     return {
+      ...state,
       result: [...state.result, fakeQueueId],
       entities: {
         ...state.entities,
@@ -54,6 +55,7 @@ const ACTION_HANDLERS = {
     }
   },
   [QUEUE_PUSH]: (state, { payload }) => ({
+    isLoading: false,
     result: payload.result,
     entities: payload.entities,
   }),
@@ -63,6 +65,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  isLoading: true,
   result: [], // queueIds
   entities: {}, // keyed by queueId
 }

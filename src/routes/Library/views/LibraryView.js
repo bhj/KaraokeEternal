@@ -27,7 +27,7 @@ const LibraryView = (props) => {
         <Spinner />
       }
 
-      {isEmpty &&
+      {!isLoading && isEmpty &&
         <TextOverlay>
           <h1>Library Empty</h1>
         </TextOverlay>

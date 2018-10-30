@@ -3,6 +3,7 @@ import React from 'react'
 import { Link } from 'react-router'
 import Header from 'components/Header'
 import QueueList from '../components/QueueList'
+import Spinner from 'components/Spinner'
 import TextOverlay from 'components/TextOverlay'
 import './QueueView.css'
 
@@ -22,7 +23,11 @@ const QueueView = (props) => (
       </TextOverlay>
     }
 
-    {props.isQueueEmpty &&
+    {props.isLoading &&
+      <Spinner />
+    }
+
+    {!props.isLoading && props.isQueueEmpty &&
       <TextOverlay>
         <h1>Queue Empty</h1>
         <p>Tap a song in the <Link to='/library'>library</Link> to queue it</p>
@@ -35,6 +40,7 @@ const QueueView = (props) => (
 
 QueueView.propTypes = {
   isInRoom: PropTypes.bool.isRequired,
+  isLoading: PropTypes.bool.isRequired,
   isQueueEmpty: PropTypes.bool.isRequired,
   ui: PropTypes.object.isRequired,
 }
