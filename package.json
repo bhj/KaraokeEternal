@@ -70,7 +70,6 @@
     "screenfull": "^3.3.3",
     "socket.io": "^2.1.1",
     "sqlite": "^3.0.0",
-    "sqlite3": "^4.0.3",
     "squel": "^5.12.2",
     "strip-ansi": "^5.0.0",
     "vm2": "^3.6.4"
