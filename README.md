@@ -19,13 +19,9 @@ The packaged builds of Karaoke Forever Server use Electron. If you want to play 
 - `npm run install-app-deps`
 - `npm start`
 
-(on Windows you may want to do this first from an admin shell:)
+On Windows, you may want to do this first from an admin prompt:
 
-- `npm i --global --production --vs2015 windows-build-tools`
-
-To get back to non-Electron world you may need to:
-
-- `npm rebuild --build-from-source`
+- `npm i --global --production windows-build-tools`
 
 ## Contributing
 
