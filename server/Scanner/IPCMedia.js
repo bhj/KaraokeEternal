@@ -5,8 +5,9 @@
 const log = require('../lib/logger')(`scanner[${process.pid}]`)
 const {
   MEDIA_ADD,
-  MEDIA_UPDATE,
+  MEDIA_CLEANUP,
   MEDIA_REMOVE,
+  MEDIA_UPDATE,
 } = require('../../shared/actions')
 
 const refs = {}
@@ -50,6 +51,7 @@ function sendAction (type, payload) {
 
 module.exports = {
   add: sendAction.bind(null, MEDIA_ADD),
-  update: sendAction.bind(null, MEDIA_UPDATE),
+  cleanup: sendAction.bind(null, MEDIA_CLEANUP),
   remove: sendAction.bind(null, MEDIA_REMOVE),
+  update: sendAction.bind(null, MEDIA_UPDATE),
 }

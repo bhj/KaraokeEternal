@@ -85,7 +85,7 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Scan finished; found %s valid songs', validMedia.length)
+    log.info('Scan finished with %s valid media files', validMedia.length)
 
     // cleanup
     {
@@ -107,10 +107,13 @@ class FileScanner extends Scanner {
         invalidMedia.push(mediaId)
       })
 
+      log.info(`Found ${invalidMedia.length} invalid media files`)
+
       if (invalidMedia.length) {
-        log.info(`Removing ${invalidMedia.length} invalid media entries`)
         await IPCMedia.remove(invalidMedia)
       }
+
+      await IPCMedia.cleanup()
     }
   }
 

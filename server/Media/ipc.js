@@ -2,16 +2,18 @@ const log = require('../lib/logger')('media')
 const Media = require('./Media')
 const {
   MEDIA_ADD,
-  MEDIA_UPDATE,
+  MEDIA_CLEANUP,
   MEDIA_REMOVE,
+  MEDIA_UPDATE,
   _SUCCESS,
   _ERROR,
 } = require('../../shared/actions')
 
 const ACTION_HANDLERS = {
   [MEDIA_ADD]: async ({ payload }) => Media.add(payload),
-  [MEDIA_UPDATE]: async ({ payload }) => Media.update(payload),
+  [MEDIA_CLEANUP]: Media.cleanup,
   [MEDIA_REMOVE]: async ({ payload }) => Media.remove(payload),
+  [MEDIA_UPDATE]: async ({ payload }) => Media.update(payload),
 }
 
 /**

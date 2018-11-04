@@ -113,10 +113,10 @@ class Media {
         .where('mediaId IN ?', mediaIds.splice(0, batchSize))
 
       const { text, values } = q.toParam()
-      await db.run(text, values)
-    }
+      const res = await db.run(text, values)
 
-    await this.cleanup()
+      log.info(`removed ${res.stmt.changes} media entries`)
+    }
   }
 
   /**
