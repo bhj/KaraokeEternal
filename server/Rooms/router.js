@@ -2,7 +2,7 @@ const db = require('sqlite')
 const squel = require('squel')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
-const log = require('../lib/logger')('rooms')
+const log = require('../lib/logger')('Rooms')
 
 // list available rooms
 router.get('/rooms', async (ctx, next) => {

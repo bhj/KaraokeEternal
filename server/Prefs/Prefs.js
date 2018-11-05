@@ -2,7 +2,7 @@ const path = require('path')
 const db = require('sqlite')
 const squel = require('squel')
 const crypto = require('crypto')
-const log = require('../lib/logger')('prefs')
+const log = require('../lib/logger')('Prefs')
 
 class Prefs {
   /**

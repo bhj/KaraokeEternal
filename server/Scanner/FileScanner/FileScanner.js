@@ -1,5 +1,5 @@
 const path = require('path')
-const log = require('../../lib/logger')('fileScanner')
+const log = require('../../lib/logger')('FileScanner')
 const { promisify } = require('util')
 const fs = require('fs')
 const stat = promisify(fs.stat)

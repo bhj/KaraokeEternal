@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const log = require('../lib/logger')('library')
+const log = require('../lib/logger')('Library')
 let _libraryVersion = Date.now()
 let _starCountsVersion = Date.now()
 

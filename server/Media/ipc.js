@@ -1,4 +1,4 @@
-const log = require('../lib/logger')('media')
+const log = require('../lib/logger')('Media:IPC')
 const Media = require('./Media')
 const {
   MEDIA_ADD,

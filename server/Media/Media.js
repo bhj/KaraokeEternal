@@ -1,6 +1,6 @@
 const db = require('sqlite')
 const squel = require('squel')
-const log = require('../lib/logger')('media')
+const log = require('../lib/logger')('Media')
 
 class Media {
   /**
