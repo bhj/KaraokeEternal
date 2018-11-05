@@ -33,7 +33,6 @@
     "bcrypt": "^3.0.2",
     "blueimp-load-image": "^2.19.0",
     "cdgraphics": "^1.0.2",
-    "commander": "^2.19.0",
     "ctx-compose": "^3.0.0",
     "electron-log": "^2.2.17",
     "fast-fuzzy": "^1.5.0",
@@ -72,7 +71,8 @@
     "sqlite": "^3.0.0",
     "squel": "^5.12.2",
     "strip-ansi": "^5.0.0",
-    "vm2": "^3.6.4"
+    "vm2": "^3.6.4",
+    "yargs": "^12.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
