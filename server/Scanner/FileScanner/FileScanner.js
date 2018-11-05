@@ -119,6 +119,8 @@ class FileScanner extends Scanner {
 
   async processFile ({ file, pathId, basePath }) {
     const relPath = file.substr(basePath.length + 1)
+    const parsed = this.parser(path.parse(file).name)
+    const match = await Library.matchSong(parsed)
 
     {
       // already in database with the same path?
@@ -131,16 +133,19 @@ class FileScanner extends Scanner {
       log.info('  => %s result(s)', res.result.length)
 
       if (res.result.length) {
-        // run meta parser and compare to metadata in db
         const cur = res.entities[res.result[0]]
-        const { artist, title } = this.parser(path.parse(file).name)
 
         // did artistId or songId change?
-        const match = await Library.matchSong(artist, title)
-
         if (cur.artistId !== match.artistId || cur.songId !== match.songId) {
-          log.info('  => old: %s', JSON.stringify({ artist: cur.artist, title: cur.title }))
-          log.info('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
+          log.info('  => old: %s', JSON.stringify({
+            artistId: cur.artistId,
+            artist: cur.artist,
+            artistNormalized: cur.artistNormalized,
+            songId: cur.songId,
+            title: cur.title,
+            titleNormalized: cur.titleNormalized,
+          }))
+          log.info('  => new: %s', JSON.stringify(match))
 
           await IPCMedia.update({
             mediaId: cur.mediaId,
@@ -157,8 +162,6 @@ class FileScanner extends Scanner {
 
     // new media
     // -------------------------------
-    const { artist, title } = this.parser(path.parse(file).name)
-    const match = await Library.matchSong(artist, title)
     const media = {
       pathId,
       relPath,
@@ -166,7 +169,7 @@ class FileScanner extends Scanner {
       dateAdded: Math.round(new Date().getTime() / 1000), // seconds
     }
 
-    log.info('  => new: %s', JSON.stringify({ artist: match.artist, title: match.title }))
+    log.info('  => new: %s', JSON.stringify(parsed))
 
     // need to look for an audio file?
     if (path.extname(file).toLowerCase() === '.cdg') {
@@ -234,7 +237,7 @@ function getCfg (dir, baseDir) {
 
   try {
     const userScript = fs.readFileSync(file, 'utf-8')
-    log.info('Found config at %s', file)
+    log.info('Using config file %s', file)
 
     try {
       const vm = new NodeVM({ wrapper: 'none' })
@@ -243,7 +246,7 @@ function getCfg (dir, baseDir) {
       log.error(err)
     }
   } catch (err) {
-    log.info('No config at %s', file)
+    log.info('No config found in folder %s', dir)
   }
 
   if (dir === baseDir) {

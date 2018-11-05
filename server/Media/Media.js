@@ -16,7 +16,7 @@ class Media {
     }
 
     const q = squel.select()
-      .field('media.*, songs.*, artists.artistId, artists.name AS artist')
+      .field('media.*, songs.*, artists.artistId, artists.name AS artist, artists.nameNormalized AS artistNormalized')
       .from('media')
       .join('songs USING (songId)')
       .join('artists USING (artistId)')

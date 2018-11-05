@@ -41,7 +41,7 @@ class Library {
         .join('songs USING (songId)')
         .join('artists USING (artistId)')
         .group('songs.songId')
-        .order('songs.title')
+        .order('songs.titleNormalized')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -70,7 +70,7 @@ class Library {
     {
       const q = squel.select()
         .from('artists')
-        .order('name')
+        .order('nameNormalized')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -143,93 +143,86 @@ class Library {
   }
 
   /**
-   * Matches or creates artist and song for a given artist and title
-   * @param  {object}  media  { artist, title }
-   * @return {object}         { artistId, songId }
-   */
-  static async matchSong (artist, title) {
-    let artistId, songId
+  * Matches or creates artist and song
+  * @param  {object}  parsed  The object returned from MetaParser
+  * @return {object}          { artistId, songId }
+  */
+  static async matchSong (parsed) {
+    const match = {}
 
     // match artist
-    const search = [artist]
-
-    // try with and without 'The'
-    if (/^the /i.test(artist)) {
-      search.push(artist.replace(/^the /i, ''))
-    } else {
-      search.push(`The ${artist}`)
-    }
-
     {
       const q = squel.select()
         .from('artists')
-        .where('name IN ? COLLATE NOCASE', search)
+        .where('nameNormalized = ?', parsed.artistNormalized)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
 
       if (row) {
         // log.info('matched artist: %s', row.name)
-        artistId = row.artistId
-        artist = row.name
+        match.artistId = row.artistId
+        match.artist = row.name
+        match.artistNormalized = row.nameNormalized
+      } else {
+        log.info('new artist: %s', parsed.artist)
+
+        const q = squel.insert()
+          .into('artists')
+          .set('name', parsed.artist)
+          .set('nameNormalized', parsed.artistNormalized)
+
+        const { text, values } = q.toParam()
+        const res = await db.run(text, values)
+
+        if (!Number.isInteger(res.stmt.lastID)) {
+          throw new Error('invalid artistId after insert')
+        }
+
+        match.artistId = res.stmt.lastID
+        match.artist = parsed.artist
+        match.artistNormalized = parsed.artistNormalized
       }
-    }
-
-    // new artist?
-    if (typeof artistId === 'undefined') {
-      log.info('new artist: %s', artist)
-
-      const q = squel.insert()
-        .into('artists')
-        .set('name', artist)
-
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
-
-      if (!Number.isInteger(res.stmt.lastID)) {
-        throw new Error('invalid artistId after insert')
-      }
-
-      artistId = res.stmt.lastID
     }
 
     // match title
     {
       const q = squel.select()
         .from('songs')
-        .where('artistId = ?', artistId)
-        .where('title = ? COLLATE NOCASE', title)
+        .where('artistId = ?', match.artistId)
+        .where('titleNormalized = ?', parsed.titleNormalized)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
 
       if (row) {
         // log.info('matched song: %s', row.title)
-        songId = row.songId
-        title = row.title
+        match.songId = row.songId
+        match.title = row.title
+        match.titleNormalized = row.titleNormalized
+      } else {
+        log.info('new song: %s', parsed.title)
+
+        const q = squel.insert()
+          .into('songs')
+          .set('artistId', match.artistId)
+          .set('title', parsed.title)
+          .set('titleNormalized', parsed.titleNormalized)
+
+        const { text, values } = q.toParam()
+        const res = await db.run(text, values)
+
+        if (!Number.isInteger(res.stmt.lastID)) {
+          throw new Error('invalid songId after insert')
+        }
+
+        match.songId = res.stmt.lastID
+        match.title = parsed.title
+        match.titleNormalized = parsed.titleNormalized
       }
     }
 
-    // new song?
-    if (typeof songId === 'undefined') {
-      log.info('new song: %s', title)
-
-      const q = squel.insert()
-        .into('songs')
-        .set('artistId', artistId)
-        .set('title', title)
-
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
-
-      if (!Number.isInteger(res.stmt.lastID)) {
-        throw new Error('invalid songId after insert')
-      }
-
-      songId = res.stmt.lastID
-    }
-
-    return { artistId, artist, songId, title }
+    return match
   }
 
   /**
