@@ -17,7 +17,7 @@ const ACTION_HANDLERS = {
     if (!await _isRoomOpen(sock.user.roomId)) {
       return acknowledge({
         type: QUEUE_ADD + '_ERROR',
-        error: 'Room is no longer open',
+        error: 'Sorry, the room is no longer open',
       })
     }
 
@@ -64,20 +64,10 @@ const ACTION_HANDLERS = {
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
-    const { queueId } = payload
-
-    // is room open?
-    if (!await _isRoomOpen(sock.user.roomId)) {
-      return acknowledge({
-        type: QUEUE_REMOVE + '_ERROR',
-        error: 'Room is no longer open',
-      })
-    }
-
     // delete item
     const q = squel.delete()
       .from('queue')
-      .where('queueId = ?', queueId)
+      .where('queueId = ?', payload.queueId)
       .where('roomId = ?', sock.user.roomId)
       .where('userId = ?', sock.user.userId)
 
@@ -87,7 +77,7 @@ const ACTION_HANDLERS = {
     if (!res.stmt.changes) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
-        error: 'Could not remove queueId: ' + queueId,
+        error: 'Could not remove queueId: ' + payload.queueId,
       })
     }
 
