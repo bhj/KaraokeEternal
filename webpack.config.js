@@ -4,6 +4,7 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const { LicenseWebpackPlugin } = require('license-webpack-plugin')
 const project = require('./project.config')
 
 const __DEV__ = project.env === 'development'
@@ -60,6 +61,11 @@ if (__PROD__) {
   config.plugins.push(new MiniCssExtractPlugin({
     filename: __DEV__ ? '[name].css' : '[name].[hash].css',
     chunkFilename: __DEV__ ? '[id].css' : '[id].[hash].css',
+  }))
+
+  config.plugins.push(new LicenseWebpackPlugin({
+    outputFilename: 'licenses.txt',
+    perChunkOutput: false,
   }))
 }
 
