@@ -6,6 +6,10 @@ html {
   touch-action: manipulation;
 }
 
+svg {
+  vertical-align: bottom;
+}
+
 *,
 *:before,
 *:after {
