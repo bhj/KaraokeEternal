@@ -1,8 +1,6 @@
 .container {
   display: flex;
-  line-height: 1;
   align-items: center;
-  padding: 0 10px;
 }
 
 .play {
@@ -18,4 +16,8 @@
 .next {
   fill: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
+}
+
+.fullscreen {
+  fill: var(--nav-link-color);
 }

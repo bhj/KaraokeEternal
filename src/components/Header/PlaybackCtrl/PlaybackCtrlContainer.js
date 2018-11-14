@@ -14,6 +14,7 @@ const mapStateToProps = (state) => {
   return {
     isAdmin: state.user.isAdmin,
     isInRoom: state.user.roomId !== null,
+    isPlayer: state.location.pathname === '/player',
     isPlaying: state.status.isPlaying,
     isAtQueueEnd: state.status.isAtQueueEnd,
     volume: state.status.volume,

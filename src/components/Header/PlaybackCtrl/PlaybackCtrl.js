@@ -34,17 +34,24 @@ const PlaybackCtrl = (props) => {
         volume={props.volume}
         onVolumeChange={props.requestVolume}
       />
+
+      {props.isPlayer && screenfull.enabled &&
+        <div onClick={handleFullscreen}>
+          <Icon icon='FULLSCREEN' size={48} styleName='fullscreen' />
+        </div>
+      }
     </div>
   )
 }
 
 PlaybackCtrl.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
-  isInRoom: PropTypes.bool.isRequired,
-  isPlaying: PropTypes.bool.isRequired,
   isAtQueueEnd: PropTypes.bool.isRequired,
-  volume: PropTypes.number.isRequired,
+  isInRoom: PropTypes.bool.isRequired,
+  isPlayer: PropTypes.bool.isRequired,
   isPlayerPresent: PropTypes.bool.isRequired,
+  isPlaying: PropTypes.bool.isRequired,
+  volume: PropTypes.number.isRequired,
   // actions
   requestPlay: PropTypes.func.isRequired,
   requestPlayNext: PropTypes.func.isRequired,
@@ -53,3 +60,10 @@ PlaybackCtrl.propTypes = {
 }
 
 export default PlaybackCtrl
+
+const handleFullscreen = () => {
+  if (screenfull.enabled) {
+    const el = document.getElementById('player-fs-container')
+    screenfull.request(el)
+  }
+}

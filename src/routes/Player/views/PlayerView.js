@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import PlayerController from '../components/PlayerController'
-import PlayerHeader from '../components/PlayerHeader'
+import Header from 'components/Header'
 import screenfull from 'screenfull'
 import './PlayerView.css'
 
@@ -17,7 +17,7 @@ class PlayerView extends React.Component {
 
     return (
       <>
-        <PlayerHeader />
+        <Header />
         <div style={{ overflow: 'hidden' }}>
           <div
             id='player-fs-container'
