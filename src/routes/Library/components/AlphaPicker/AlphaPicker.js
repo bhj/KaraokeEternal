@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import BodyLock from 'components/BodyLock'
+import { lockScrolling } from 'store/modules/ui'
 import './AlphaPicker.css'
 
 class AlphaPicker extends React.Component {
@@ -24,8 +24,6 @@ class AlphaPicker extends React.Component {
         onMouseUp={this.handleTouchEnd}
         ref={this.handleRef}
       >
-        <BodyLock lock={this.state.isTouching} />
-
         {this.alphabet.map((char, i) => (
           <div
             key={char}
@@ -39,6 +37,8 @@ class AlphaPicker extends React.Component {
   }
 
   handleTouchStart = (e) => {
+    lockScrolling(true)
+
     this.setState({
       isTouchCapable: true,
       isTouching: true,
@@ -69,6 +69,8 @@ class AlphaPicker extends React.Component {
   }
 
   handleTouchEnd = (e) => {
+    lockScrolling(false)
+
     this.setState({
       isTouching: false,
       char: null,

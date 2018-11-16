@@ -1,0 +1,8 @@
+.slider {
+  margin: 0 30px;
+}
+
+.icon {
+  fill: var(--transport-btn-bg-color);
+  filter: var(--transport-btn-filter);
+}

@@ -6,6 +6,8 @@ import {
   CLEAR_ERROR_MESSAGE,
 } from 'shared/actions'
 
+let scrollLockTimer
+
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -41,6 +43,20 @@ export function setFooterHeight ({ height }) {
       type: FOOTER_HEIGHT_CHANGE,
       payload: height,
     })
+  }
+}
+
+// does not dispatch anything (only affects the DOM)
+export function lockScrolling (lock) {
+  if (lock) {
+    clearTimeout(scrollLockTimer)
+    scrollLockTimer = null
+    document.body.classList.add('scroll-lock')
+  } else if (!scrollLockTimer) {
+    scrollLockTimer = setTimeout(() => {
+      scrollLockTimer = null
+      document.body.classList.remove('scroll-lock')
+    }, 200)
   }
 }
 
