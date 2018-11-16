@@ -27,10 +27,8 @@
   left: 0;
   fill: var(--btn-danger-bg-color);
   z-index: 99;
-  filter: var(--drop-shadow-filter);
 }
 
 .placeholder {
-  fill: var(--btn-bg-color);
-  filter: var(--drop-shadow-filter);
+  fill: var(--btn-active-bg-color);
 }
