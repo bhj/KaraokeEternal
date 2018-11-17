@@ -9,6 +9,7 @@ class PlayerVisualizer extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     presetKey: PropTypes.string.isRequired,
     queueItem: PropTypes.object,
+    sensitivity: PropTypes.number.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -43,11 +44,11 @@ class PlayerVisualizer extends React.Component {
       this.updateAudioSource()
     }
 
-    if (this.gainNode && props.volume !== prevProps.volume) {
+    if (this.gainNode && (props.volume !== prevProps.volume || props.sensitivity !== prevProps.sensitivity)) {
       // apply makeup gain to the visualizer's source so it
       // maintains intensity even with "real" output volume lowered
       const makeup = props.volume ? 1 / props.volume : 0
-      this.gainNode.gain.setValueAtTime(makeup, window._audioCtx.currentTime)
+      this.gainNode.gain.setValueAtTime(makeup * props.sensitivity, window._audioCtx.currentTime)
     }
 
     if (props.isPlaying !== prevProps.isPlaying) {

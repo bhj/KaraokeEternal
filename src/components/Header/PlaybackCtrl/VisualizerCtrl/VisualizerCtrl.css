@@ -17,13 +17,18 @@
 .btnPreset {
   width: 30%;
   display: block;
+  padding: 0;
 }
 
 .btnDone {
   background-color: var(--btn-active-bg-color);
 }
 
+.btnIcon {
+  fill: var(--btn-bg-color);
+}
+
 .field {
   display: block;
-  margin: 2em 0 1em 0;
+  margin: 1.5em 0 1em 0;
 }

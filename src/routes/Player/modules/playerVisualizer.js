@@ -50,7 +50,7 @@ const initialState = {
   isSupported: false,
   presetKey: null,
   presetName: '',
-  // sensitivity: 1,
+  sensitivity: 1,
 }
 
 export default function playerVisualizer (state = initialState, action) {

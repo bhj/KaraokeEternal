@@ -14,6 +14,7 @@ export default class VisualizerCtrl extends React.Component {
     isEnabled: PropTypes.bool.isRequired,
     isSupported: PropTypes.bool.isRequired,
     presetName: PropTypes.string.isRequired,
+    sensitivity: PropTypes.number.isRequired,
     // actions
     onBackgroundAlphaChange: PropTypes.func.isRequired,
     onChangePreset: PropTypes.func.isRequired,
@@ -23,10 +24,6 @@ export default class VisualizerCtrl extends React.Component {
 
   checkbox = React.createRef()
 
-  handleBackgroundAlpha = val => {
-    this.props.onBackgroundAlphaChange(val)
-  }
-
   handleToggleEnabled = () => {
     this.props.onChange({ isEnabled: !this.props.isEnabled })
   }
@@ -35,24 +32,32 @@ export default class VisualizerCtrl extends React.Component {
   handlePresetPrev = () => { this.props.onChangePreset('prev') }
   handlePresetRand = () => { this.props.onChangePreset('rand') }
 
+  handleChangeSensitivity = val => {
+    this.props.onChange({ sensitivity: val })
+  }
+
+  handleBackgroundAlpha = val => {
+    this.props.onBackgroundAlphaChange(val)
+  }
+
   render () {
     return (
       <SkyLightStateless
         isVisible={this.props.isVisible}
         onCloseClicked={this.props.onClose}
         onOverlayClicked={this.props.onClose}
-        title='Player Settings'
+        title='Display'
         dialogStyles={{
           width: '90%',
           // height: '85%',
           top: '5%',
           left: '5%',
           margin: 0,
-          paddingBottom: 0,
+          padding: '0 30px',
         }}
       >
         <div className='container'>
-          <label styleName='field'>
+          <label>
             <input type='checkbox'
               checked={this.props.isEnabled}
               onChange={this.handleToggleEnabled}
@@ -62,17 +67,29 @@ export default class VisualizerCtrl extends React.Component {
 
           <div styleName='presetBtnContainer'>
             <button styleName='btnPreset' onClick={this.handlePresetPrev}>
-              Previous
+              <Icon icon='CHEVRON_LEFT' size={42} styleName='btnIcon' />
             </button>
             <button styleName='btnPreset' onClick={this.handlePresetRand}>
-              Random
+              <Icon icon='DICE' size={48} styleName='btnIcon' />
             </button>
             <button styleName='btnPreset' onClick={this.handlePresetNext}>
-              Next
+              <Icon icon='CHEVRON_RIGHT' size={42} styleName='btnIcon' />
             </button>
           </div>
 
           <label>{this.props.presetName}</label>
+
+          <label styleName='field'>Sensitivity</label>
+          <OptimisticSlider
+            min={0}
+            max={1}
+            step={0.01}
+            value={this.props.sensitivity}
+            onChange={this.handleChangeSensitivity}
+            handle={handle}
+            styleName='slider'
+          />
+          <br/>
 
           <label styleName='field'>Lyrics Background</label>
           <OptimisticSlider
@@ -85,7 +102,7 @@ export default class VisualizerCtrl extends React.Component {
             styleName='slider'
           />
           <br/>
-          <br/>
+
           <div styleName='field'>
             <button styleName='btnDone' onClick={this.props.onClose}>
               Done
@@ -109,7 +126,7 @@ const handle = (props) => {
 
   return (
     <div style={style}>
-      <Icon icon={'CIRCLE'} size={36} styleName='handle' />
+      <Icon icon='CIRCLE' size={36} styleName='handle' />
       <Handle {...restProps} />
     </div>
   )

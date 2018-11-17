@@ -49,6 +49,12 @@ export function requestVisualizer (payload) {
   return {
     type: PLAYER_VISUALIZER_REQUEST,
     payload,
+    meta: {
+      throttle: {
+        wait: 200,
+        leading: false,
+      }
+    },
   }
 }
 
