@@ -75,7 +75,7 @@
 .starCount {
   position: relative;
   font-size: 12px;
-  top: -30px;
+  top: -26px;
   text-align: center;
   color: var(--text-color);
 }
@@ -90,5 +90,5 @@
 }
 
 .info {
-  fill: var(--song-item-btn-bg-color);
+  fill: var(--song-item-btn-active-bg-color);
 }

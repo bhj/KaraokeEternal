@@ -30,5 +30,5 @@
 }
 
 .placeholder {
-  fill: var(--btn-active-bg-color);
+  fill: var(--btn-bg-color);
 }
