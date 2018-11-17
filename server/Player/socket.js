@@ -1,19 +1,25 @@
 const Queue = require('../Queue')
 
 const {
-  REQUEST_PLAYER_NEXT,
+  PLAYER_BG_ALPHA,
+  PLAYER_BG_ALPHA_REQUEST,
   PLAYER_NEXT,
-  REQUEST_PLAYER_PLAY,
+  PLAYER_NEXT_REQUEST,
   PLAYER_PLAY,
-  REQUEST_PLAYER_PAUSE,
+  PLAYER_PLAY_REQUEST,
   PLAYER_PAUSE,
-  REQUEST_PLAYER_VOLUME,
+  PLAYER_PAUSE_REQUEST,
+  PLAYER_VISUALIZER,
+  PLAYER_VISUALIZER_REQUEST,
+  PLAYER_VISUALIZER_PRESET,
+  PLAYER_VISUALIZER_PRESET_REQUEST,
   PLAYER_VOLUME,
-  EMIT_PLAYER_STATUS,
+  PLAYER_VOLUME_REQUEST,
   PLAYER_STATUS,
-  EMIT_PLAYER_ERROR,
+  PLAYER_STATUS_REQUEST,
   PLAYER_ERROR,
-  EMIT_PLAYER_LEAVE,
+  PLAYER_ERROR_REQUEST,
+  PLAYER_LEAVE_REQUEST,
   PLAYER_LEAVE,
 } = require('../../shared/actions')
 
@@ -21,29 +27,47 @@ const {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [REQUEST_PLAYER_NEXT]: async (sock, { payload }) => {
+  [PLAYER_BG_ALPHA_REQUEST]: async (sock, { payload }) => {
+    sock.server.to(sock.user.roomId).emit('action', {
+      type: PLAYER_BG_ALPHA,
+      payload
+    })
+  },
+  [PLAYER_NEXT_REQUEST]: async (sock, { payload }) => {
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_NEXT,
       payload: await Queue.getQueue(sock.user.roomId),
     })
   },
-  [REQUEST_PLAYER_PLAY]: async (sock, { payload }) => {
+  [PLAYER_PLAY_REQUEST]: async (sock, { payload }) => {
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_PLAY,
     })
   },
-  [REQUEST_PLAYER_PAUSE]: async (sock, { payload }) => {
+  [PLAYER_PAUSE_REQUEST]: async (sock, { payload }) => {
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_PAUSE,
     })
   },
-  [REQUEST_PLAYER_VOLUME]: async (sock, { payload }) => {
+  [PLAYER_VISUALIZER_REQUEST]: async (sock, { payload }) => {
+    sock.server.to(sock.user.roomId).emit('action', {
+      type: PLAYER_VISUALIZER,
+      payload
+    })
+  },
+  [PLAYER_VISUALIZER_PRESET_REQUEST]: async (sock, { payload }) => {
+    sock.server.to(sock.user.roomId).emit('action', {
+      type: PLAYER_VISUALIZER_PRESET,
+      payload,
+    })
+  },
+  [PLAYER_VOLUME_REQUEST]: async (sock, { payload }) => {
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_VOLUME,
       payload
     })
   },
-  [EMIT_PLAYER_STATUS]: async (sock, { payload }) => {
+  [PLAYER_STATUS_REQUEST]: async (sock, { payload }) => {
     // so we can tell the room when players leave and
     // relay last known player status on client join
     sock._lastPlayerStatus = payload
@@ -53,7 +77,7 @@ const ACTION_HANDLERS = {
       payload,
     })
   },
-  [EMIT_PLAYER_LEAVE]: async (sock, { payload }) => {
+  [PLAYER_LEAVE_REQUEST]: async (sock, { payload }) => {
     sock._lastPlayerStatus = null
 
     sock.server.to(sock.user.roomId).emit('action', {
@@ -63,7 +87,7 @@ const ACTION_HANDLERS = {
       }
     })
   },
-  [EMIT_PLAYER_ERROR]: async (sock, { payload }) => {
+  [PLAYER_ERROR_REQUEST]: async (sock, { payload }) => {
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_ERROR,
       payload,

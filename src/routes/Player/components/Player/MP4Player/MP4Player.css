@@ -1,3 +1,7 @@
+.container {
+  position: absolute;
+}
+
 .video {
   object-position: 50% 50%;
   object-fit: contain;

@@ -1,14 +1,14 @@
 .container {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .textContainer {
   background-color: var(--chrome-bg-color);
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  padding: 30px 60px;
+  border-radius: 0 0 0 var(--border-radius);
   text-align: center;
+  padding: 20px;
 }
 
 .fadeEnter {

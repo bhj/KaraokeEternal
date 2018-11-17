@@ -7,6 +7,7 @@ import {
   emitError,
   emitLeave,
   cancelStatus,
+  mediaChange,
   mediaRequest,
   mediaRequestSuccess,
   mediaRequestError,
@@ -18,6 +19,7 @@ const mapActionCreators = {
   emitLeave,
   cancelStatus,
   requestPlayNext,
+  mediaChange,
   mediaRequest,
   mediaRequestSuccess,
   mediaRequestError,
@@ -30,10 +32,11 @@ const defaultQueueItem = {
 }
 
 const mapStateToProps = (state) => {
-  const { player, status } = state
+  const { player, playerVisualizer, status } = state
   const queue = ensureState(state.queue)
 
   return {
+    bgAlpha: player.bgAlpha,
     queueItem: queue.entities[player.queueId] || defaultQueueItem,
     volume: player.volume,
     isAtQueueEnd: player.isAtQueueEnd,
@@ -41,6 +44,7 @@ const mapStateToProps = (state) => {
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
     isErrored: typeof status.errors[status.queueId] !== 'undefined',
+    visualizer: playerVisualizer,
     // timestamp pass-through triggers status emission for each received command
     lastCommandAt: player.lastCommandAt,
   }

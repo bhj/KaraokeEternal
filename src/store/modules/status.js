@@ -1,8 +1,11 @@
 import {
-  REQUEST_PLAYER_PLAY,
-  REQUEST_PLAYER_PAUSE,
-  REQUEST_PLAYER_NEXT,
-  REQUEST_PLAYER_VOLUME,
+  PLAYER_BG_ALPHA_REQUEST,
+  PLAYER_PLAY_REQUEST,
+  PLAYER_PAUSE_REQUEST,
+  PLAYER_NEXT_REQUEST,
+  PLAYER_VISUALIZER_REQUEST,
+  PLAYER_VISUALIZER_PRESET_REQUEST,
+  PLAYER_VOLUME_REQUEST,
   PLAYER_STATUS,
   PLAYER_ERROR,
   PLAYER_LEAVE,
@@ -13,24 +16,52 @@ import {
 // ------------------------------------
 export function requestPlay () {
   return {
-    type: REQUEST_PLAYER_PLAY,
+    type: PLAYER_PLAY_REQUEST,
   }
 }
 
 export function requestPause () {
   return {
-    type: REQUEST_PLAYER_PAUSE,
+    type: PLAYER_PAUSE_REQUEST,
   }
 }
 
 export function requestPlayNext () {
   return {
-    type: REQUEST_PLAYER_NEXT,
+    type: PLAYER_NEXT_REQUEST,
   }
 }
+
+export function requestBackgroundAlpha (val) {
+  return {
+    type: PLAYER_BG_ALPHA_REQUEST,
+    payload: val,
+    meta: {
+      throttle: {
+        wait: 200,
+        leading: false,
+      }
+    },
+  }
+}
+
+export function requestVisualizer (payload) {
+  return {
+    type: PLAYER_VISUALIZER_REQUEST,
+    payload,
+  }
+}
+
+export function requestVisualizerPreset (mode) {
+  return {
+    type: PLAYER_VISUALIZER_PRESET_REQUEST,
+    payload: { mode },
+  }
+}
+
 export function requestVolume (vol) {
   return {
-    type: REQUEST_PLAYER_VOLUME,
+    type: PLAYER_VOLUME_REQUEST,
     payload: vol,
     meta: {
       throttle: {
@@ -76,13 +107,15 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  bgAlpha: 1,
   queueId: -1,
   position: 0,
   volume: 1,
   isPlaying: false,
   isAtQueueEnd: false,
   isPlayerPresent: false,
-  errors: {}, // object of arrays keyed by queueId
+  visualizer: {},
+  errors: {}, // arrays, keyed by queueId
 }
 
 export default function status (state = initialState, action) {

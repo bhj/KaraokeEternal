@@ -7,12 +7,14 @@ const api = new HttpApi('media')
 
 class CDGPlayer extends React.Component {
   static propTypes = {
+    bgAlpha: PropTypes.number.isRequired,
     queueItem: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
+    onMediaElement: PropTypes.func.isRequired,
     onMediaRequest: PropTypes.func.isRequired,
     onMediaRequestSuccess: PropTypes.func.isRequired,
     onMediaRequestError: PropTypes.func.isRequired,
@@ -21,9 +23,18 @@ class CDGPlayer extends React.Component {
     onStatus: PropTypes.func.isRequired,
   }
 
+  canvas = React.createRef()
+  audio = React.createRef()
+  state = { CDGBackgroundColor: null }
+
   componentDidMount () {
-    this.cdgraphics = new CDGraphics(this.canvas)
+    this.cdg = new CDGraphics(this.canvas.current, {
+      forceTransparent: true,
+      onBackgroundChange: this.handleCDGBackgroundChange,
+    })
+
     this.setVolume(this.props.volume)
+    this.props.onMediaElement(this.audio.current, { isAlphaSupported: true })
     this.updateSources()
   }
 
@@ -42,20 +53,28 @@ class CDGPlayer extends React.Component {
   }
 
   render () {
-    const { width, height } = this.props
-    let canvasScale = Math.floor(width / 300)
+    const { bgAlpha, width, height } = this.props
+    let style = {
+      backgroundColor: 'transparent',
+    }
 
-    // make sure height would fit the viewport's
-    while (height < canvasScale * 300 * 0.72) {
-      canvasScale -= 1
+    if (this.state.CDGBackgroundColor) {
+      const [r, g, b, a] = this.state.CDGBackgroundColor
+      style.backgroundColor = `rgba(${r},${g},${b},${bgAlpha})`
+    }
+
+    // scale and make sure height would fit the viewport's
+    let scale = Math.floor(width / 300)
+    while (height < scale * 300 * 0.72) {
+      scale -= 1
     }
 
     return (
-      <div style={{ width, height }} styleName='container'>
+      <div styleName='container' style={style}>
         <canvas
-          width={canvasScale * 300}
-          height={canvasScale * 300 * 0.72}
-          ref={(c) => { this.canvas = c }}
+          width={scale * 300}
+          height={scale * 300 * 0.72}
+          ref={this.canvas}
         />
         <br />
         <audio
@@ -64,7 +83,7 @@ class CDGPlayer extends React.Component {
           onTimeUpdate={this.handleAudioTimeUpdate}
           onEnded={this.props.onMediaEnd}
           onError={this.handleAudioError}
-          ref={(c) => { this.audio = c }}
+          ref={this.audio}
         />
       </div>
     )
@@ -74,21 +93,21 @@ class CDGPlayer extends React.Component {
     const { mediaId } = this.props.queueItem
 
     // media request(s) started
-    this.props.onMediaRequest()
+    this.props.onMediaRequest({ isAlphaSupported: true })
 
     // start loading audio
-    this.audio.src = `/api/media/?type=audio&mediaId=${mediaId}`
-    this.audio.load()
+    this.audio.current.src = `/api/media/?type=audio&mediaId=${mediaId}`
+    this.audio.current.load()
 
     // start loading .cdg
-    this.cdgraphics.stop()
+    this.cdg.stop()
     this.isCDGLoaded = false
 
     api('GET', `/?type=cdg&mediaId=${mediaId}`)
       .then(res => res.arrayBuffer())
       .then(res => {
         // arrayBuffer to Uint8Array
-        this.cdgraphics.load(new Uint8Array(res))
+        this.cdg.load(new Uint8Array(res))
 
         this.handleCDGReady()
       }).catch(err => {
@@ -98,16 +117,16 @@ class CDGPlayer extends React.Component {
   }
 
   setVolume (vol) {
-    this.audio.volume = vol
+    this.audio.current.volume = vol
   }
 
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
-      this.audio.play()
-      this.cdgraphics.play()
+      this.audio.current.play()
+      this.cdg.play()
     } else {
-      this.audio.pause()
-      this.cdgraphics.stop()
+      this.audio.current.pause()
+      this.cdg.stop()
     }
   }
 
@@ -115,11 +134,15 @@ class CDGPlayer extends React.Component {
     this.isCDGLoaded = true
 
     // HAVE_ENOUGH_DATA?
-    if (this.audio.readyState === 4) {
+    if (this.audio.current.readyState === 4) {
       // media request(s) finished (enough)
       this.props.onMediaRequestSuccess()
       this.updateIsPlaying()
     }
+  }
+
+  handleCDGBackgroundChange = color => {
+    this.setState({ CDGBackgroundColor: color })
   }
 
   /**
@@ -134,12 +157,12 @@ class CDGPlayer extends React.Component {
   }
 
   handleAudioTimeUpdate = () => {
-    this.cdgraphics.sync(this.audio.currentTime * 1000)
+    this.cdg.sync(this.audio.current.currentTime * 1000)
 
     // emit player status
     this.props.onStatus({
-      position: this.audio.currentTime,
-      volume: this.audio.volume,
+      position: this.audio.current.currentTime,
+      volume: this.audio.current.volume,
     })
   }
 

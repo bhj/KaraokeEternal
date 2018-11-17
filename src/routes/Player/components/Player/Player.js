@@ -17,6 +17,7 @@ class Player extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // events
+    onMediaElement: PropTypes.func.isRequired,
     onMediaRequest: PropTypes.func.isRequired,
     onMediaRequestSuccess: PropTypes.func.isRequired,
     onMediaRequestError: PropTypes.func.isRequired,

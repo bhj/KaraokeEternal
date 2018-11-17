@@ -2,26 +2,36 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Player from '../Player'
 import PlayerTextOverlay from '../PlayerTextOverlay'
+import PlayerVisualizer from '../PlayerVisualizer'
+
+window._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 
 class PlayerController extends React.Component {
   static propTypes = {
+    bgAlpha: PropTypes.number.isRequired,
     queueItem: PropTypes.object.isRequired,
-    volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
+    visualizer: PropTypes.object.isRequired,
+    volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
-    requestPlayNext: PropTypes.func.isRequired,
-    mediaRequest: PropTypes.func.isRequired,
-    mediaRequestSuccess: PropTypes.func.isRequired,
-    mediaRequestError: PropTypes.func.isRequired,
-    emitStatus: PropTypes.func.isRequired,
     cancelStatus: PropTypes.func.isRequired,
     emitError: PropTypes.func.isRequired,
     emitLeave: PropTypes.func.isRequired,
+    emitStatus: PropTypes.func.isRequired,
+    mediaChange: PropTypes.func.isRequired,
+    mediaRequest: PropTypes.func.isRequired,
+    mediaRequestSuccess: PropTypes.func.isRequired,
+    mediaRequestError: PropTypes.func.isRequired,
+    requestPlayNext: PropTypes.func.isRequired,
+  }
+
+  state = {
+    audioSourceNode: null,
   }
 
   componentDidMount () {
@@ -52,7 +62,17 @@ class PlayerController extends React.Component {
     this.props.emitStatus()
   }
 
-  handleMediaRequestError = (msg) => {
+  handleMediaElement = (el, mediaInfo) => {
+    this.setState({ audioSourceNode: window._audioCtx.createMediaElementSource(el) }, () => {
+      // route it back to the output, otherwise, silence
+      this.state.audioSourceNode.connect(window._audioCtx.destination)
+    })
+
+    // isAlphaSupported, etc.
+    this.props.mediaChange(mediaInfo)
+  }
+
+  handleMediaRequestError = msg => {
     // stop loading spinner, etc.
     this.props.mediaRequestError(msg)
 
@@ -60,36 +80,51 @@ class PlayerController extends React.Component {
     this.handleError(msg)
   }
 
-  handleError = (msg) => {
+  handleError = msg => {
     this.props.emitError(msg)
   }
 
   render () {
+    const { props, state } = this
+
     return (
-      <div>
+      <>
+        {state.audioSourceNode && props.visualizer.isSupported && props.visualizer.isEnabled &&
+          <PlayerVisualizer
+            audioSourceNode={state.audioSourceNode}
+            isPlaying={props.isPlaying}
+            presetKey={props.visualizer.presetKey}
+            queueItem={props.queueItem}
+            width={props.width}
+            height={props.height}
+            volume={props.volume}
+          />
+        }
         <Player
-          queueItem={this.props.queueItem}
-          volume={this.props.volume}
-          isPlaying={this.props.isPlaying}
-          isVisible={this.props.queueItem.queueId !== -1 && !this.props.isAtQueueEnd && !this.props.isErrored}
-          onMediaRequest={this.props.mediaRequest}
-          onMediaRequestSuccess={this.props.mediaRequestSuccess}
+          bgAlpha={props.bgAlpha}
+          queueItem={props.queueItem}
+          volume={props.volume}
+          isPlaying={props.isPlaying}
+          isVisible={props.queueItem.queueId !== -1 && !props.isAtQueueEnd && !props.isErrored}
+          onMediaElement={this.handleMediaElement}
+          onMediaRequest={props.mediaRequest}
+          onMediaRequestSuccess={props.mediaRequestSuccess}
           onMediaRequestError={this.handleMediaRequestError}
-          onStatus={this.props.emitStatus}
-          onMediaEnd={this.props.requestPlayNext}
+          onStatus={props.emitStatus}
+          onMediaEnd={props.requestPlayNext}
           onError={this.handleError}
-          width={this.props.width}
-          height={this.props.height}
+          width={props.width}
+          height={props.height}
         />
         <PlayerTextOverlay
-          queueItem={this.props.queueItem}
-          isAtQueueEnd={this.props.isAtQueueEnd}
-          isQueueEmpty={this.props.isQueueEmpty}
-          isErrored={this.props.isErrored}
-          width={this.props.width}
-          height={this.props.height}
+          queueItem={props.queueItem}
+          isAtQueueEnd={props.isAtQueueEnd}
+          isQueueEmpty={props.isQueueEmpty}
+          isErrored={props.isErrored}
+          width={props.width}
+          height={props.height}
         />
-      </div>
+      </>
     )
   }
 }

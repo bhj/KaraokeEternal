@@ -1,6 +1,7 @@
 .container {
   display: flex;
   align-items: center;
+  padding: 0 6px;
 }
 
 .play {
@@ -18,6 +19,11 @@
   filter: var(--transport-btn-filter);
 }
 
+.visualizer {
+  fill: var(--btn-active-bg-color);
+  margin-right: var(--btn-margin);
+}
+
 .fullscreen {
-  fill: var(--nav-link-color);
+  fill: var(--btn-active-bg-color);
 }

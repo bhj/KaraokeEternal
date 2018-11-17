@@ -10,6 +10,7 @@ class MP4Player extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
+    onMediaElement: PropTypes.func.isRequired,
     onMediaRequest: PropTypes.func.isRequired,
     onMediaRequestSuccess: PropTypes.func.isRequired,
     onMediaRequestError: PropTypes.func.isRequired,
@@ -18,7 +19,10 @@ class MP4Player extends React.Component {
     onStatus: PropTypes.func.isRequired,
   }
 
+  video = React.createRef()
+
   componentDidMount () {
+    this.props.onMediaElement(this.video.current, { isAlphaSupported: false })
     this.setVolume(this.props.volume)
     this.updateSources()
   }
@@ -41,7 +45,7 @@ class MP4Player extends React.Component {
     const { width, height } = this.props
 
     return (
-      <div style={{ width, height }}>
+      <div styleName='container'>
         <video styleName='video'
           preload='none'
           width={width}
@@ -50,7 +54,7 @@ class MP4Player extends React.Component {
           onTimeUpdate={this.handleTimeUpdate}
           onEnded={this.props.onMediaEnd}
           onError={this.handleError}
-          ref={(c) => { this.video = c }}
+          ref={this.video}
         />
       </div>
     )
@@ -63,16 +67,16 @@ class MP4Player extends React.Component {
     this.props.onMediaRequest()
 
     // start loading video
-    this.video.src = `/api/media/?type=video&mediaId=${mediaId}`
-    this.video.load()
+    this.video.current.src = `/api/media/?type=video&mediaId=${mediaId}`
+    this.video.current.load()
   }
 
   setVolume (vol) {
-    this.video.volume = vol
+    this.video.current.volume = vol
   }
 
   updateIsPlaying = () => {
-    this.props.isPlaying ? this.video.play() : this.video.pause()
+    this.props.isPlaying ? this.video.current.play() : this.video.current.pause()
   }
 
   handleReady = () => {
@@ -83,8 +87,8 @@ class MP4Player extends React.Component {
   handleTimeUpdate = () => {
     // emit player status
     this.props.onStatus({
-      position: this.video.currentTime,
-      volume: this.video.volume,
+      position: this.video.current.currentTime,
+      volume: this.video.current.volume,
     })
   }
 

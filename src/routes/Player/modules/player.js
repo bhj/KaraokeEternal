@@ -1,31 +1,36 @@
 import { CANCEL } from 'redux-throttle'
 import {
+  PLAYER_MEDIA_CHANGE,
   PLAYER_MEDIA_REQUEST,
   PLAYER_MEDIA_REQUEST_SUCCESS,
   PLAYER_MEDIA_REQUEST_ERROR,
+  PLAYER_BG_ALPHA,
   PLAYER_PLAY,
   PLAYER_PAUSE,
   PLAYER_NEXT,
   PLAYER_VOLUME,
-  EMIT_PLAYER_STATUS,
-  EMIT_PLAYER_ERROR,
-  EMIT_PLAYER_LEAVE,
+  PLAYER_STATUS_REQUEST,
+  PLAYER_ERROR_REQUEST,
+  PLAYER_LEAVE_REQUEST,
   QUEUE_PUSH,
 } from 'shared/actions'
 
 // have server emit player status to room
-export function emitStatus (status) {
+export function emitStatus (overrides) {
   return (dispatch, getState) => {
     const player = getState().player
+    const visualizer = getState().playerVisualizer
 
     dispatch({
-      type: EMIT_PLAYER_STATUS,
+      type: PLAYER_STATUS_REQUEST,
       payload: {
+        bgAlpha: player.bgAlpha,
         queueId: player.queueId,
         isPlaying: player.isPlaying,
         isAtQueueEnd: player.isAtQueueEnd,
+        visualizer,
         volume: player.volume,
-        ...status,
+        ...overrides,
       },
       meta: {
         throttle: {
@@ -41,7 +46,7 @@ export function emitStatus (status) {
 export function emitError (msg) {
   return (dispatch, getState) => {
     dispatch({
-      type: EMIT_PLAYER_ERROR,
+      type: PLAYER_ERROR_REQUEST,
       payload: {
         queueId: getState().player.queueId,
         msg,
@@ -53,7 +58,7 @@ export function emitError (msg) {
 // player left room
 export function emitLeave () {
   return {
-    type: EMIT_PLAYER_LEAVE,
+    type: PLAYER_LEAVE_REQUEST,
   }
 }
 
@@ -62,8 +67,15 @@ export function cancelStatus () {
   return {
     type: CANCEL,
     payload: {
-      type: EMIT_PLAYER_STATUS
+      type: PLAYER_STATUS_REQUEST
     }
+  }
+}
+
+export function mediaChange (payload) {
+  return {
+    type: PLAYER_MEDIA_CHANGE,
+    payload,
   }
 }
 
@@ -94,6 +106,10 @@ export function mediaRequestError (msg) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [PLAYER_BG_ALPHA]: (state, { payload }) => ({
+    ...state,
+    bgAlpha: payload,
+  }),
   [PLAYER_PAUSE]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
@@ -144,7 +160,7 @@ const ACTION_HANDLERS = {
     ...state,
     isFetching: false,
   }),
-  [EMIT_PLAYER_ERROR]: (state, { payload }) => ({
+  [PLAYER_ERROR_REQUEST]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
   }),
@@ -154,12 +170,13 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  bgAlpha: 0.5,
   queueId: -1,
-  volume: 1,
   isPlaying: false,
   isFetching: false,
   isAtQueueEnd: false,
   lastCommandAt: null,
+  volume: 1,
 }
 
 export default function playerReducer (state = initialState, action) {

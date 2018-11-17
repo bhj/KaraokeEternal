@@ -1,0 +1,29 @@
+.container {
+}
+
+.slider {
+}
+
+.handle {
+  fill: var(--btn-active-bg-color);
+}
+
+.presetBtnContainer {
+  display: flex;
+  margin: 1em 0;
+  justify-content: space-between;
+}
+
+.btnPreset {
+  width: 30%;
+  display: block;
+}
+
+.btnDone {
+  background-color: var(--btn-active-bg-color);
+}
+
+.field {
+  display: block;
+  margin: 2em 0 1em 0;
+}
