@@ -37,7 +37,7 @@
 }
 
 .wait {
-  font-size: 14px;
+  font-size: 15px;
   padding-top: 1px;
   padding-left: 3px;
 }
@@ -68,7 +68,7 @@
 
 .title {
   composes: ellipsis;
-  font-size: 20px;
+  font-size: 19px;
 }
 
 .artist {
@@ -77,7 +77,7 @@
 }
 
 .user {
-  font-size: 14px;
+  font-size: 15px;
   /*  for some reason composes: ellipsis; isn't working here */
   text-overflow: ellipsis;
   overflow:hidden;
