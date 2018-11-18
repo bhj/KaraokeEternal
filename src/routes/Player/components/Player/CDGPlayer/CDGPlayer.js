@@ -63,17 +63,16 @@ class CDGPlayer extends React.Component {
       style.backgroundColor = `rgba(${r},${g},${b},${bgAlpha})`
     }
 
-    // scale and make sure height would fit the viewport's
-    let scale = Math.floor(width / 300)
-    while (height < scale * 300 * 0.72) {
-      scale -= 1
-    }
+    // cd graphics are chunky; scale to a max of 80% viewport height
+    const vMaxScale = Math.floor((height * 0.8) / 216)
+    const hMaxScale = Math.floor(width / 300)
+    const scale = Math.min(vMaxScale, hMaxScale)
 
     return (
       <div styleName='container' style={style}>
         <canvas
           width={scale * 300}
-          height={scale * 300 * 0.72}
+          height={scale * 216}
           ref={this.canvas}
         />
         <br />
