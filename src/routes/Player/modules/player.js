@@ -1,6 +1,6 @@
 import { CANCEL } from 'redux-throttle'
 import {
-  PLAYER_MEDIA_CHANGE,
+  PLAYER_MEDIA_ELEMENT_CHANGE,
   PLAYER_MEDIA_REQUEST,
   PLAYER_MEDIA_REQUEST_SUCCESS,
   PLAYER_MEDIA_REQUEST_ERROR,
@@ -74,7 +74,7 @@ export function cancelStatus () {
 
 export function mediaChange (payload) {
   return {
-    type: PLAYER_MEDIA_CHANGE,
+    type: PLAYER_MEDIA_ELEMENT_CHANGE,
     payload,
   }
 }

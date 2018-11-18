@@ -93,7 +93,7 @@ class CDGPlayer extends React.Component {
     const { mediaId } = this.props.queueItem
 
     // media request(s) started
-    this.props.onMediaRequest({ isAlphaSupported: true })
+    this.props.onMediaRequest()
 
     // start loading audio
     this.audio.current.src = `/api/media/?type=audio&mediaId=${mediaId}`
