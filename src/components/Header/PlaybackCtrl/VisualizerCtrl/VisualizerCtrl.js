@@ -53,7 +53,8 @@ export default class VisualizerCtrl extends React.Component {
           top: '5%',
           left: '5%',
           margin: 0,
-          padding: '0 30px',
+          paddingLeft: '30px',
+          paddingRight: '30px',
         }}
       >
         <div className='container'>
