@@ -35,8 +35,8 @@ const ACTION_HANDLERS = {
     }
 
     const curIdx = presetKeys.indexOf(state.presetKey)
-    const nextIdx = curIdx < presetKeys.length ? curIdx + 1 : 0 // wrap around
-    const prevIdx = curIdx > 0 ? curIdx - 1 : presetKeys.length // wrap around
+    const nextIdx = curIdx === presetKeys.length - 1 ? 0 : curIdx + 1 // wrap around
+    const prevIdx = curIdx === 0 ? presetKeys.length - 1 : curIdx - 1 // wrap around
 
     return {
       ...state,
