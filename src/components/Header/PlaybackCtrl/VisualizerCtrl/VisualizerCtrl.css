@@ -18,14 +18,11 @@
   width: 30%;
   display: block;
   padding: 0;
-}
-
-.btnDone {
   background-color: var(--btn-active-bg-color);
 }
 
 .btnIcon {
-  fill: var(--btn-bg-color);
+  fill: var(--btn-base-blue);
 }
 
 .field {

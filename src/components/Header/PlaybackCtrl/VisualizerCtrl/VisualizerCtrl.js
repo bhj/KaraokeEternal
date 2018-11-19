@@ -105,7 +105,7 @@ export default class VisualizerCtrl extends React.Component {
           <br/>
 
           <div styleName='field'>
-            <button styleName='btnDone' onClick={this.props.onClose}>
+            <button onClick={this.props.onClose}>
               Done
             </button>
           </div>
