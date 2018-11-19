@@ -62,10 +62,10 @@ export default function playerVisualizer (state = initialState, action) {
   return handler ? handler(state, action) : state
 }
 
-function getPresetKeyAndName (index) {
+function getPresetKeyAndName (i) {
   return {
-    presetKey: presetKeys[index],
-    presetName: presetKeys[index],
+    presetKey: presetKeys[i],
+    presetName: `[${i + 1}/${presetKeys.length}] ` + presetKeys[i],
   }
 }
 
