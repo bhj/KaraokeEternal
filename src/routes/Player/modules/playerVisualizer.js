@@ -18,7 +18,7 @@ const ACTION_HANDLERS = {
   }),
   [PLAYER_NEXT]: (state, { payload }) => ({
     ...state,
-    ...randomPresetKeyAndName(),
+    ...getPresetKeyAndName(getRandomIntInclusive(0, presetKeys.length - 1)),
   }),
   [PLAYER_VISUALIZER]: (state, { payload }) => ({
     ...state,
@@ -30,7 +30,7 @@ const ACTION_HANDLERS = {
     if (mode === 'rand') {
       return {
         ...state,
-        ...randomPresetKeyAndName(),
+        ...getPresetKeyAndName(getRandomIntInclusive(0, presetKeys.length - 1)),
       }
     }
 
@@ -40,8 +40,7 @@ const ACTION_HANDLERS = {
 
     return {
       ...state,
-      presetKey: mode === 'prev' ? presetKeys[prevIdx] : presetKeys[nextIdx],
-      presetName: mode === 'prev' ? presetKeys[prevIdx] : presetKeys[nextIdx],
+      ...getPresetKeyAndName(mode === 'prev' ? prevIdx : nextIdx),
     }
   },
 }
@@ -63,11 +62,10 @@ export default function playerVisualizer (state = initialState, action) {
   return handler ? handler(state, action) : state
 }
 
-function randomPresetKeyAndName () {
-  const key = presetKeys[getRandomIntInclusive(0, presetKeys.length - 1)]
+function getPresetKeyAndName (index) {
   return {
-    presetKey: key,
-    presetName: key,
+    presetKey: presetKeys[index],
+    presetName: presetKeys[index],
   }
 }
 
