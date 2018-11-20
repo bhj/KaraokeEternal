@@ -7,7 +7,6 @@ import {
   PLAYER_VISUALIZER_PRESET_REQUEST,
   PLAYER_VOLUME_REQUEST,
   PLAYER_STATUS,
-  PLAYER_ERROR,
   PLAYER_LEAVE,
 } from 'shared/actions'
 
@@ -82,31 +81,15 @@ export function requestVolume (vol) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_STATUS]: (state, { payload }) => {
-    return {
-      ...state,
-      ...payload,
-      isPlayerPresent: true,
-    }
-  },
-  [PLAYER_LEAVE]: (state, { payload }) => {
-    return {
-      ...state,
-      isPlayerPresent: false,
-    }
-  },
-  [PLAYER_ERROR]: (state, { payload }) => {
-    const { queueId, msg } = payload
-
-    return {
-      ...state,
-      errors: {
-        ...state.errors,
-        // can be multiple errors for a media item
-        [queueId]: state.errors[queueId] ? state.errors[queueId].concat(msg) : [msg]
-      }
-    }
-  },
+  [PLAYER_LEAVE]: (state, { payload }) => ({
+    ...state,
+    isPlayerPresent: false,
+  }),
+  [PLAYER_STATUS]: (state, { payload }) => ({
+    ...state,
+    ...payload,
+    isPlayerPresent: true,
+  }),
 }
 
 // ------------------------------------
@@ -114,14 +97,15 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   bgAlpha: 1,
-  queueId: -1,
-  position: 0,
-  volume: 1,
-  isPlaying: false,
+  errorMessage: '',
   isAtQueueEnd: false,
+  isErrored: false,
   isPlayerPresent: false,
+  isPlaying: false,
+  position: 0,
+  queueId: -1,
   visualizer: {},
-  errors: {}, // arrays, keyed by queueId
+  volume: 1,
 }
 
 export default function status (state = initialState, action) {

@@ -39,16 +39,17 @@ const getWaits = createSelector(
 
 const mapStateToProps = (state) => {
   return {
-    queue: ensureState(state.queue),
+    artists: state.library.artists,
     curId: state.status.queueId,
     curPos: state.status.position,
+    errorMessage: state.status.errorMessage,
     isAtQueueEnd: state.status.isAtQueueEnd,
-    waits: getWaits(state),
-    errors: state.status.errors,
-    artists: state.library.artists,
+    isErrored: state.status.isErrored,
+    queue: ensureState(state.queue),
     songs: state.library.songs,
     starredSongs: getStarredSongs(state),
     user: state.user,
+    waits: getWaits(state),
   }
 }
 

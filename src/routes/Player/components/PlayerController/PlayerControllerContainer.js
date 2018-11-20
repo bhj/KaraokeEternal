@@ -4,7 +4,7 @@ import { ensureState } from 'redux-optimistic-ui'
 import { requestPlayNext } from 'store/modules/status'
 import {
   emitStatus,
-  emitError,
+  playerError,
   emitLeave,
   cancelStatus,
   mediaChange,
@@ -15,7 +15,7 @@ import {
 
 const mapActionCreators = {
   emitStatus,
-  emitError,
+  playerError,
   emitLeave,
   cancelStatus,
   requestPlayNext,
@@ -32,7 +32,7 @@ const defaultQueueItem = {
 }
 
 const mapStateToProps = (state) => {
-  const { player, playerVisualizer, status } = state
+  const { player, playerVisualizer } = state
   const queue = ensureState(state.queue)
 
   return {
@@ -43,7 +43,7 @@ const mapStateToProps = (state) => {
     isQueueEmpty: queue.result.length === 0,
     isPlaying: player.isPlaying,
     isFetching: player.isFetching,
-    isErrored: typeof status.errors[status.queueId] !== 'undefined',
+    isErrored: player.isErrored,
     visualizer: playerVisualizer,
     // timestamp pass-through triggers status emission for each received command
     lastCommandAt: player.lastCommandAt,

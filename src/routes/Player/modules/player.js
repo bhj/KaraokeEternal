@@ -10,7 +10,7 @@ import {
   PLAYER_NEXT,
   PLAYER_VOLUME,
   PLAYER_STATUS_REQUEST,
-  PLAYER_ERROR_REQUEST,
+  PLAYER_ERROR,
   PLAYER_LEAVE_REQUEST,
   QUEUE_PUSH,
 } from 'shared/actions'
@@ -25,9 +25,11 @@ export function emitStatus (overrides) {
       type: PLAYER_STATUS_REQUEST,
       payload: {
         bgAlpha: player.bgAlpha,
-        queueId: player.queueId,
-        isPlaying: player.isPlaying,
+        errorMessage: player.errorMessage,
         isAtQueueEnd: player.isAtQueueEnd,
+        isErrored: player.isErrored,
+        isPlaying: player.isPlaying,
+        queueId: player.queueId,
         visualizer,
         volume: player.volume,
         ...overrides,
@@ -42,16 +44,11 @@ export function emitStatus (overrides) {
   }
 }
 
-// emit error to room and stop playback
-export function emitError (msg) {
-  return (dispatch, getState) => {
-    dispatch({
-      type: PLAYER_ERROR_REQUEST,
-      payload: {
-        queueId: getState().player.queueId,
-        msg,
-      },
-    })
+// generic player error
+export function playerError (message) {
+  return {
+    type: PLAYER_ERROR,
+    payload: { message },
   }
 }
 
@@ -91,14 +88,15 @@ export function mediaRequestSuccess () {
   }
 }
 
-export function mediaRequestError (msg) {
+export function mediaRequestError (message) {
   return (dispatch, getState) => {
     dispatch({
       type: PLAYER_MEDIA_REQUEST_ERROR,
+      payload: { message }
     })
 
-    // emit generic error and stop playback
-    emitError(msg)
+    // generic error action (stops playback)
+    dispatch(playerError(message))
   }
 }
 
@@ -109,6 +107,25 @@ const ACTION_HANDLERS = {
   [PLAYER_BG_ALPHA]: (state, { payload }) => ({
     ...state,
     bgAlpha: payload,
+  }),
+  [PLAYER_ERROR]: (state, { payload }) => ({
+    ...state,
+    isPlaying: false,
+    isErrored: true,
+    errorMessage: payload.message,
+  }),
+  [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
+    ...state,
+    isFetching: true,
+    isErrored: false,
+  }),
+  [PLAYER_MEDIA_REQUEST_SUCCESS]: (state, { payload }) => ({
+    ...state,
+    isFetching: false,
+  }),
+  [PLAYER_MEDIA_REQUEST_ERROR]: (state, { payload }) => ({
+    ...state,
+    isFetching: false,
   }),
   [PLAYER_PAUSE]: (state, { payload }) => ({
     ...state,
@@ -148,22 +165,6 @@ const ACTION_HANDLERS = {
       isAtQueueEnd: (state.isAtQueueEnd && !isAtQueueEnd) ? false : state.isAtQueueEnd,
     }
   },
-  [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
-    ...state,
-    isFetching: true,
-  }),
-  [PLAYER_MEDIA_REQUEST_SUCCESS]: (state, { payload }) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [PLAYER_MEDIA_REQUEST_ERROR]: (state, { payload }) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [PLAYER_ERROR_REQUEST]: (state, { payload }) => ({
-    ...state,
-    isPlaying: false,
-  }),
 }
 
 // ------------------------------------
@@ -171,11 +172,13 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   bgAlpha: 0.5,
-  queueId: -1,
-  isPlaying: false,
-  isFetching: false,
+  errorMessage: '',
   isAtQueueEnd: false,
+  isErrored: false,
+  isFetching: false,
+  isPlaying: false,
   lastCommandAt: null,
+  queueId: -1,
   volume: 1,
 }
 

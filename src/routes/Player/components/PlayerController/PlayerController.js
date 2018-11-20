@@ -20,7 +20,7 @@ class PlayerController extends React.Component {
     height: PropTypes.number.isRequired,
     // actions
     cancelStatus: PropTypes.func.isRequired,
-    emitError: PropTypes.func.isRequired,
+    playerError: PropTypes.func.isRequired,
     emitLeave: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
     mediaChange: PropTypes.func.isRequired,
@@ -51,7 +51,7 @@ class PlayerController extends React.Component {
 
     // playing for first time?
     if (isPlaying && queueItem.queueId === -1) {
-      this.props.requestPlayNext()
+      return this.props.requestPlayNext()
     }
 
     if (prevProps.queueItem.queueId !== queueItem.queueId) {
@@ -73,15 +73,11 @@ class PlayerController extends React.Component {
   }
 
   handleMediaRequestError = msg => {
-    // stop loading spinner, etc.
     this.props.mediaRequestError(msg)
-
-    // call generic error handler (stops playback, etc.)
-    this.handleError(msg)
   }
 
   handleError = msg => {
-    this.props.emitError(msg)
+    this.props.playerError(msg)
   }
 
   render () {
@@ -105,8 +101,9 @@ class PlayerController extends React.Component {
           bgAlpha={props.bgAlpha}
           queueItem={props.queueItem}
           volume={props.volume}
+          isErrored={props.isErrored}
           isPlaying={props.isPlaying}
-          isVisible={props.queueItem.queueId !== -1 && !props.isAtQueueEnd && !props.isErrored}
+          isVisible={props.queueItem.queueId !== -1 && !props.isAtQueueEnd}
           onMediaElement={this.handleMediaElement}
           onMediaRequest={props.mediaRequest}
           onMediaRequestSuccess={props.mediaRequestSuccess}

@@ -9,14 +9,15 @@ const QUEUE_ITEM_HEIGHT = 80
 
 class QueueList extends React.Component {
   static propTypes = {
-    queue: PropTypes.object.isRequired,
-    errors: PropTypes.object,
     curId: PropTypes.number,
     curPos: PropTypes.number,
+    errorMessage: PropTypes.string.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
+    isErrored: PropTypes.bool.isRequired,
+    queue: PropTypes.object.isRequired,
     starredSongs: PropTypes.array.isRequired,
-    waits: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
+    waits: PropTypes.object.isRequired,
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
@@ -65,17 +66,18 @@ class QueueList extends React.Component {
           }}
         >
           <QueueItem {...item}
-            errors={props.errors[queueId]}
+            errorMessage={isActive && props.errorMessage ? props.errorMessage : ''}
             isActive={isActive}
-            isErrored={typeof props.errors[queueId] !== 'undefined'}
+            isErrored={isActive && props.isErrored}
             isOwner={isOwner}
             isRemovable={isUpcoming && isOwner}
             isSkippable={isActive && isOwner}
             isStarred={props.starredSongs.includes(item.songId)}
             isUpcoming={isUpcoming}
             pctPlayed={isActive ? props.curPos / item.duration * 100 : 0}
-            waitValue={wait.value}
             waitUnit={wait.unit}
+            waitValue={wait.value}
+            // actions
             onErrorInfoClick={props.showErrorMessage}
             onRemoveClick={props.removeItem}
             onSkipClick={props.requestPlayNext}

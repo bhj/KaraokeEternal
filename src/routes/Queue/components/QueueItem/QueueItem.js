@@ -11,7 +11,7 @@ class QueueItem extends React.Component {
   static propTypes = {
     artist: PropTypes.string.isRequired,
     dateUpdated: PropTypes.number.isRequired,
-    errors: PropTypes.array,
+    errorMessage: PropTypes.string.isRequired,
     isActive: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
     isOwner: PropTypes.bool.isRequired,
@@ -19,10 +19,6 @@ class QueueItem extends React.Component {
     isSkippable: PropTypes.bool.isRequired,
     isStarred: PropTypes.bool.isRequired,
     isUpcoming: PropTypes.bool.isRequired,
-    onErrorInfoClick: PropTypes.func.isRequired,
-    onRemoveClick: PropTypes.func.isRequired,
-    onSkipClick: PropTypes.func.isRequired,
-    onStarClick: PropTypes.func.isRequired,
     pctPlayed: PropTypes.number.isRequired,
     queueId: PropTypes.number.isRequired,
     songId: PropTypes.number.isRequired,
@@ -31,6 +27,11 @@ class QueueItem extends React.Component {
     userDisplayName: PropTypes.string.isRequired,
     waitValue: PropTypes.number.isRequired,
     waitUnit: PropTypes.string.isRequired,
+    // actions
+    onErrorInfoClick: PropTypes.func.isRequired,
+    onRemoveClick: PropTypes.func.isRequired,
+    onSkipClick: PropTypes.func.isRequired,
+    onStarClick: PropTypes.func.isRequired,
   }
 
   state = {
@@ -111,7 +112,7 @@ class QueueItem extends React.Component {
   }
 
   handleErrorInfoClick = () => {
-    this.props.onErrorInfoClick(this.props.errors.join('\n\n'))
+    this.props.onErrorInfoClick(this.props.errorMessage)
   }
 }
 

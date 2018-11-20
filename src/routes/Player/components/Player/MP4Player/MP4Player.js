@@ -4,8 +4,9 @@ import './MP4Player.css'
 
 class MP4Player extends React.Component {
   static propTypes = {
-    queueItem: PropTypes.object.isRequired,
+    isErrored: PropTypes.bool.isRequired,
     isPlaying: PropTypes.bool.isRequired,
+    queueItem: PropTypes.object.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -14,7 +15,6 @@ class MP4Player extends React.Component {
     onMediaRequest: PropTypes.func.isRequired,
     onMediaRequestSuccess: PropTypes.func.isRequired,
     onMediaRequestError: PropTypes.func.isRequired,
-    onError: PropTypes.func.isRequired,
     onMediaEnd: PropTypes.func.isRequired,
     onStatus: PropTypes.func.isRequired,
   }
@@ -28,9 +28,11 @@ class MP4Player extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, isPlaying, volume } = this.props
+    const { queueItem, isErrored, isPlaying, volume } = this.props
 
-    if (prevProps.queueItem.queueId !== queueItem.queueId) {
+    // item changed or re-trying errored?
+    if (prevProps.queueItem.queueId !== queueItem.queueId ||
+       (isErrored && !prevProps.isPlaying && isPlaying)) {
       this.updateSources()
     }
 
@@ -76,7 +78,17 @@ class MP4Player extends React.Component {
   }
 
   updateIsPlaying = () => {
-    this.props.isPlaying ? this.video.current.play() : this.video.current.pause()
+    if (this.props.isPlaying) {
+      const promise = this.video.current.play()
+
+      if (typeof promise !== 'undefined') {
+        promise.catch(err => {
+          this.props.onMediaRequestError(err.message)
+        })
+      }
+    } else {
+      this.video.current.pause()
+    }
   }
 
   handleReady = () => {
