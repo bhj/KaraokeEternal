@@ -80,7 +80,7 @@ class CDGPlayer extends React.Component {
         <br />
         <audio
           preload='none'
-          onCanPlayThrough={this.handleAudioReady}
+          onCanPlayThrough={this.updateIsPlaying}
           onTimeUpdate={this.handleAudioTimeUpdate}
           onEnded={this.props.onMediaEnd}
           onError={this.handleAudioError}
@@ -124,6 +124,7 @@ class CDGPlayer extends React.Component {
       if (typeof promise !== 'undefined') {
         promise.then(() => {
           this.cdg.play()
+          this.props.onMediaRequestSuccess()
         }).catch(err => {
           this.props.onMediaRequestError(err.message)
         })
@@ -141,10 +142,6 @@ class CDGPlayer extends React.Component {
   /**
  * <audio> event handlers
  */
-  handleAudioReady = () => {
-    this.props.onMediaRequestSuccess()
-    this.updateIsPlaying()
-  }
 
   handleAudioTimeUpdate = () => {
     this.cdg.sync(this.audio.current.currentTime * 1000)

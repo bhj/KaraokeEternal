@@ -52,7 +52,7 @@ class MP4Player extends React.Component {
           preload='none'
           width={width}
           height={height}
-          onCanPlayThrough={this.handleReady}
+          onCanPlayThrough={this.updateIsPlaying}
           onTimeUpdate={this.handleTimeUpdate}
           onEnded={this.props.onMediaEnd}
           onError={this.handleError}
@@ -82,18 +82,15 @@ class MP4Player extends React.Component {
       const promise = this.video.current.play()
 
       if (typeof promise !== 'undefined') {
-        promise.catch(err => {
+        promise.then(() => {
+          this.props.onMediaRequestSuccess()
+        }).catch(err => {
           this.props.onMediaRequestError(err.message)
         })
       }
     } else {
       this.video.current.pause()
     }
-  }
-
-  handleReady = () => {
-    this.props.onMediaRequestSuccess()
-    this.updateIsPlaying()
   }
 
   handleTimeUpdate = () => {
