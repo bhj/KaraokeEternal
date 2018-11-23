@@ -1,7 +1,7 @@
 import butterchurnPresets from 'butterchurn-presets'
 import {
   PLAYER_MEDIA_ELEMENT_CHANGE,
-  PLAYER_MEDIA_REQUEST_SUCCESS,
+  PLAYER_NEXT,
   PLAYER_VISUALIZER,
   PLAYER_VISUALIZER_PRESET,
 } from 'shared/actions'
@@ -16,7 +16,7 @@ const ACTION_HANDLERS = {
     ...state,
     isSupported: payload.isAlphaSupported,
   }),
-  [PLAYER_MEDIA_REQUEST_SUCCESS]: (state, { payload }) => ({
+  [PLAYER_NEXT]: (state, { payload }) => ({
     ...state,
     ...getPresetKeyAndName(getRandomIntInclusive(0, presetKeys.length - 1)),
   }),
@@ -51,8 +51,9 @@ const ACTION_HANDLERS = {
 const initialState = {
   isEnabled: true,
   isSupported: false,
+  presetKey: null,
+  presetName: '',
   sensitivity: 1,
-  ...getPresetKeyAndName(getRandomIntInclusive(0, presetKeys.length - 1)),
 }
 
 export default function playerVisualizer (state = initialState, action) {
