@@ -29,6 +29,7 @@ export function emitStatus (status) {
         isAtQueueEnd: player.isAtQueueEnd,
         isErrored: player.isErrored,
         isPlaying: player.isPlaying,
+        position: player.position,
         queueId: player.queueId,
         visualizer,
         ...status,
@@ -136,6 +137,10 @@ const ACTION_HANDLERS = {
     isPlaying: true,
     lastCommandAt: Date.now(),
   }),
+  [PLAYER_STATUS_REQUEST]: (state, { payload }) => ({
+    ...state,
+    position: payload.position,
+  }),
   [PLAYER_VOLUME]: (state, { payload }) => ({
     ...state,
     volume: payload,
@@ -147,6 +152,7 @@ const ACTION_HANDLERS = {
 
     return {
       ...state,
+      position: 0,
       queueId: isAtQueueEnd ? state.queueId : payload.result[curIdx + 1],
       isPlaying: true,
       isAtQueueEnd,
@@ -177,6 +183,7 @@ const initialState = {
   isFetching: false,
   isPlaying: false,
   lastCommandAt: null,
+  position: 0,
   queueId: -1,
   volume: 1,
 }

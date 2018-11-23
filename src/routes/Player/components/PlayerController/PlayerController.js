@@ -44,19 +44,18 @@ class PlayerController extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, isPlaying } = this.props
-
-    // cancel any pending status emits having old info
-    this.props.cancelStatus()
+    const { isPlaying, queueItem, visualizer } = this.props
 
     // playing for first time?
     if (isPlaying && queueItem.queueId === -1) {
-      return this.props.requestPlayNext()
+      this.props.requestPlayNext()
     }
 
-    if (prevProps.queueItem.queueId !== queueItem.queueId) {
-      // otherwise we'll emit new item with old's progress
-      return this.props.emitStatus({ position: 0 })
+    // cancel pending emits with old info; improves ui responsiveness
+    if (prevProps.queueItem.queueId !== queueItem.queueId ||
+        prevProps.isPlaying !== isPlaying ||
+        prevProps.visualizer.isEnabled !== visualizer.isEnabled) {
+      this.props.cancelStatus()
     }
 
     this.props.emitStatus()
