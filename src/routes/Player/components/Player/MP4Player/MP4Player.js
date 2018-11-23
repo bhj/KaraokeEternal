@@ -73,7 +73,7 @@ class MP4Player extends React.Component {
     this.video.current.load()
   }
 
-  setVolume (vol) {
+  setVolume = (vol) => {
     this.video.current.volume = vol
   }
 

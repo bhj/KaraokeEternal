@@ -113,7 +113,7 @@ class CDGPlayer extends React.Component {
       })
   }
 
-  setVolume (vol) {
+  setVolume = (vol) => {
     this.audio.current.volume = vol
   }
 
