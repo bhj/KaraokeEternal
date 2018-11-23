@@ -69,7 +69,7 @@ export function cancelStatus () {
   }
 }
 
-export function mediaChange (payload) {
+export function mediaElementChange (payload) {
   return {
     type: PLAYER_MEDIA_ELEMENT_CHANGE,
     payload,

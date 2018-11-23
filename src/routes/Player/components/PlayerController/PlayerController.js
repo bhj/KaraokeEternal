@@ -23,7 +23,7 @@ class PlayerController extends React.Component {
     playerError: PropTypes.func.isRequired,
     emitLeave: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
-    mediaChange: PropTypes.func.isRequired,
+    mediaElementChange: PropTypes.func.isRequired,
     mediaRequest: PropTypes.func.isRequired,
     mediaRequestSuccess: PropTypes.func.isRequired,
     mediaRequestError: PropTypes.func.isRequired,
