@@ -69,7 +69,7 @@ class PlayerController extends React.Component {
     })
 
     // isAlphaSupported, etc.
-    this.props.mediaChange(mediaInfo)
+    this.props.mediaElementChange(mediaInfo)
   }
 
   handleMediaRequestError = msg => {
