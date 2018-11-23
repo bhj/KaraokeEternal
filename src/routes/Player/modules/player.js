@@ -16,7 +16,7 @@ import {
 } from 'shared/actions'
 
 // have server emit player status to room
-export function emitStatus (overrides) {
+export function emitStatus (status) {
   return (dispatch, getState) => {
     const player = getState().player
     const visualizer = getState().playerVisualizer
@@ -31,8 +31,7 @@ export function emitStatus (overrides) {
         isPlaying: player.isPlaying,
         queueId: player.queueId,
         visualizer,
-        volume: player.volume,
-        ...overrides,
+        ...status,
       },
       meta: {
         throttle: {
