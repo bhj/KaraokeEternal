@@ -28,8 +28,8 @@ class MetaParser {
       ? cfg({ compose, getDefaultParser, defaultMiddleware })
       : getDefaultParser(cfg)
 
-    return file => {
-      const ctx = { file, cfg }
+    return input => {
+      const ctx = { ...input, cfg }
       parser(ctx)
 
       if (!ctx.artist || !ctx.title) {

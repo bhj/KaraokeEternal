@@ -7,17 +7,18 @@ CREATE TABLE IF NOT EXISTS "artists" (
 
 CREATE UNIQUE INDEX IF NOT EXISTS idxName ON "artists" ("name" ASC);
 
-CREATE TABLE IF NOT EXISTS "media" (
-  "mediaId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-  "songId" integer NOT NULL,
-  "pathId" integer NOT NULL,
-  "relPath" text NOT NULL,
-  "audioExt" text,
-  "duration" integer NOT NULL,
-  "isPreferred" integer(1) NOT NULL DEFAULT(0),
-  "dateAdded" integer NOT NULL DEFAULT(0),
-  "dateUpdated" integer NOT NULL DEFAULT(0)
+CREATE TABLE IF NOT EXISTS media (
+  mediaId integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  songId integer NOT NULL,
+  pathId integer NOT NULL,
+  relPath text NOT NULL,
+  player text NOT NULL,
+  duration integer NOT NULL,
+  isPreferred integer(1) NOT NULL DEFAULT(0),
+  dateAdded integer NOT NULL DEFAULT(0),
+  dateUpdated integer NOT NULL DEFAULT(0)
 );
+
 
 CREATE INDEX IF NOT EXISTS idxSong ON "media" ("songId" ASC);
 

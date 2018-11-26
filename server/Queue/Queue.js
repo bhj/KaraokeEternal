@@ -1,6 +1,5 @@
 const db = require('sqlite')
 const squel = require('squel')
-const path = require('path')
 
 class Queue {
   /**
@@ -15,7 +14,7 @@ class Queue {
 
     const q = squel.select()
       .field('queueId, mediaId, userId')
-      .field('media.relPath, media.duration')
+      .field('media.player, media.duration')
       .field('artists.name AS artist')
       .field('songs.songId, songs.title')
       .field('users.name AS userDisplayName, users.dateUpdated')
@@ -31,11 +30,6 @@ class Queue {
     const rows = await db.all(text, values)
 
     for (const row of rows) {
-      // determine player component
-      const ext = path.extname(row.relPath).substr(1).toUpperCase()
-      row.player = `${ext}Player`
-      delete row.relPath
-
       // normalize
       result.push(row.queueId)
       entities[row.queueId] = row

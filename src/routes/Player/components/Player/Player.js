@@ -28,11 +28,12 @@ class Player extends React.Component {
 
   render () {
     const { player } = this.props.queueItem
-    const PlayerComponent = players[player]
 
-    if (!this.props.isVisible) {
+    if (!this.props.isVisible || !player) {
       return null
     }
+
+    const PlayerComponent = players[player.toUpperCase() + 'Player']
 
     if (typeof PlayerComponent === 'undefined') {
       this.props.onError(`Player component not found: ${player}`)

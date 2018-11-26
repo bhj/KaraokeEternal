@@ -3,6 +3,7 @@ const fs = require('fs')
 const stat = promisify(fs.stat)
 const path = require('path')
 const log = require('../lib/logger')('Media')
+const getCdgName = require('../lib/getCdgName')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/media' })
 const Media = require('./Media')
@@ -27,16 +28,21 @@ router.get('/', async (ctx, next) => {
     ctx.throw(404, `mediaId not found: ${mediaId}`)
   }
 
-  let { pathId, relPath, audioExt } = res.entities[mediaId]
-
-  if (type === 'audio') {
-    relPath = relPath.substr(0, relPath.lastIndexOf('.') + 1) + audioExt
-  }
+  const { pathId, relPath } = res.entities[mediaId]
 
   // get base path
   const { paths } = await Prefs.get()
   const basePath = paths.entities[pathId].path
-  const file = path.join(basePath, relPath)
+
+  let file = path.join(basePath, relPath)
+
+  if (type === 'cdg') {
+    file = await getCdgName(file)
+
+    if (!file) {
+      ctx.throw(404, `No cdg file found`)
+    }
+  }
 
   // get file info
   const stats = await stat(file)

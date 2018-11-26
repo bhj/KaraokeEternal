@@ -1,12 +1,10 @@
 const path = require('path')
 const log = require('../../lib/logger')('FileScanner')
-const { promisify } = require('util')
 const fs = require('fs')
-const stat = promisify(fs.stat)
 const musicMeta = require('music-metadata')
-const mp4info = require('../../lib/mp4info.js')
 const getFiles = require('./getFiles')
 const getPerms = require('../../lib/getPermutations')
+const getCdgName = require('../../lib/getCdgName')
 const Library = require('../../Library')
 const Media = require('../../Media')
 const IPCMedia = require('../IPCMedia')
@@ -14,8 +12,8 @@ const MetaParser = require('../MetaParser')
 const Scanner = require('../Scanner')
 const { NodeVM } = require('vm2')
 
-const videoExts = ['.cdg', '.mp4'].reduce((perms, ext) => perms.concat(getPerms(ext)), [])
-const audioTypes = ['m4a', 'mp3']
+const searchExts = ['mp4', 'm4a', 'mp3']
+const searchExtPerms = searchExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
 class FileScanner extends Scanner {
   constructor (prefs) {
@@ -35,17 +33,17 @@ class FileScanner extends Scanner {
       const basePath = this.paths.entities[pathId].path
 
       this.emitStatus(`Listing folders (${i + 1} of ${this.paths.result.length})`, 0)
+      log.info('Searching path: %s', basePath)
 
       try {
-        log.info('Searching path: %s', basePath)
-        let list = await getFiles(basePath, { pathId, basePath })
-        list = list.filter(({ file }) => videoExts.includes(path.extname(file)))
+        let list = await getFiles(basePath, { pathId })
 
-        log.info('  => found %s files with valid extensions (cdg, mp4)', list.length)
+        list = list.filter(({ file }) => searchExtPerms.some(ext => file.endsWith('.' + ext)))
         files = files.concat(list)
+        log.info('  => found %s files with valid extensions %s', list.length, JSON.stringify(searchExts))
       } catch (err) {
-        log.error(`  => ${err.message} (path offline)`)
         offlinePaths.push(pathId)
+        log.error(`  => ${err.message} (path offline)`)
       }
 
       if (this.isCanceling) {
@@ -53,20 +51,20 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Processing %s total files', files.length)
+    log.info('Processing %s files', files.length)
 
     // process files
     for (let i = 0; i < files.length; i++) {
       this.emitStatus(`Scanning media (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
 
-      const { file, basePath } = files[i]
+      const { file, pathId } = files[i]
       const dir = path.dirname(file)
 
       if (lastDir !== dir) {
         lastDir = dir
 
         // (re)init parser with this folder's config, if any
-        const cfg = getCfg(dir, basePath)
+        const cfg = getCfg(dir, this.paths.entities[pathId].path)
         this.parser = new MetaParser(cfg)
       }
 
@@ -85,7 +83,7 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Scan finished with %s valid media files', validMedia.length)
+    log.info('Scan finished with %s valid media', validMedia.length)
 
     // cleanup
     {
@@ -107,7 +105,7 @@ class FileScanner extends Scanner {
         invalidMedia.push(mediaId)
       })
 
-      log.info(`Found ${invalidMedia.length} invalid media files`)
+      log.info(`${invalidMedia.length} media unaccounted for in database`)
 
       if (invalidMedia.length) {
         await IPCMedia.remove(invalidMedia)
@@ -117,112 +115,86 @@ class FileScanner extends Scanner {
     }
   }
 
-  async processFile ({ file, pathId, basePath }) {
-    const relPath = file.substr(basePath.length + 1)
-    const parsed = this.parser(path.parse(file).name)
-    const match = await Library.matchSong(parsed)
+  async processFile ({ file, pathId }) {
+    const meta = await musicMeta.parseFile(file, {
+      duration: true,
+      skipCovers: true,
+    })
 
-    {
-      // already in database with the same path?
-      const res = await Media.search({
-        pathId,
-        // try both slashes to be POSIX/Win agnostic
-        relPath: [relPath.replace('/', '\\'), relPath.replace('\\', '/')],
-      })
-
-      log.info('  => %s result(s)', res.result.length)
-
-      if (res.result.length) {
-        const cur = res.entities[res.result[0]]
-
-        // did artistId or songId change?
-        if (cur.artistId !== match.artistId || cur.songId !== match.songId) {
-          log.info('  => old: %s', JSON.stringify({
-            artistId: cur.artistId,
-            artist: cur.artist,
-            artistNormalized: cur.artistNormalized,
-            songId: cur.songId,
-            title: cur.title,
-            titleNormalized: cur.titleNormalized,
-          }))
-          log.info('  => new: %s', JSON.stringify(match))
-
-          await IPCMedia.update({
-            mediaId: cur.mediaId,
-            songId: match.songId,
-            dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
-          })
-        } else {
-          log.info('  => ok')
-        }
-
-        return cur.mediaId
-      } // end if
-    }
-
-    // new media
-    // -------------------------------
-    const media = {
-      pathId,
-      relPath,
-      songId: match.songId,
-      dateAdded: Math.round(new Date().getTime() / 1000), // seconds
-    }
-
-    log.info('  => new: %s', JSON.stringify(parsed))
-
-    // need to look for an audio file?
-    if (path.extname(file).toLowerCase() === '.cdg') {
-      let audio
-
-      // look for all uppercase and lowercase permutations of each
-      // file extension since we may be on a case-sensitive fs
-      for (const type of audioTypes) {
-        for (const ext of getPerms(type)) {
-          audio = file.substr(0, file.lastIndexOf('.') + 1) + ext
-
-          // does file exist?
-          try {
-            await stat(audio)
-            log.info('  => found %s audio', type)
-            break
-          } catch (err) {
-            // try another permutation
-            audio = null
-          }
-        } // end for
-
-        if (audio) {
-          try {
-            const meta = await musicMeta.parseFile(audio, { duration: true })
-            media.duration = Math.round(meta.format.duration)
-            media.audioExt = path.extname(audio).replace('.', '')
-            break
-          } catch (err) {
-            // try another type
-            audio = null
-            log.error(err)
-          }
-        }
-      } // end for
-
-      if (!audio) {
-        throw new Error(`  => no valid audio file`)
-      }
-    } else if (path.extname(file).toLowerCase() === '.mp4') {
-      // get video duration
-      const info = await mp4info(file)
-      media.duration = Math.round(info.duration)
-    }
-
-    if (!media.duration) {
+    if (!meta.format.duration) {
       throw new Error(`  => could not determine duration`)
     }
 
     log.info('  => duration: %s:%s',
-      Math.floor(media.duration / 60),
-      Math.round(media.duration % 60, 10).toString().padStart(2, '0')
+      Math.floor(meta.format.duration / 60),
+      Math.round(meta.format.duration % 60, 10).toString().padStart(2, '0')
     )
+
+    // run filename parser (MetaParser)
+    const parsed = this.parser({
+      meta,
+      file: path.parse(file).name,
+    })
+
+    // get artistId and songId
+    const match = await Library.matchSong(parsed)
+
+    const media = {
+      songId: match.songId,
+      pathId,
+      relPath: file.substr(this.paths.entities[pathId].path.length + 1),
+      duration: Math.round(meta.format.duration),
+    }
+
+    // determine player type
+    if (/\.mp4/i.test(path.extname(file))) {
+      media.player = 'mp4'
+    } else {
+      // look for .cdg if not dealing with a video
+      if (!await getCdgName(file)) {
+        throw new Error('No accompanying .cdg for audio-only file')
+      }
+
+      log.info('  => found .cdg file')
+      media.player = 'cdg'
+    }
+
+    // file already in database?
+    const res = await Media.search({
+      pathId,
+      // try both slashes to be POSIX/Win agnostic
+      relPath: [media.relPath.replace('/', '\\'), media.relPath.replace('\\', '/')],
+    })
+
+    log.info('  => %s db result(s)', res.result.length)
+
+    if (res.result.length) {
+      const row = res.entities[res.result[0]]
+
+      // did songId, player or duration change?
+      if (row.songId !== media.songId ||
+          row.player !== media.player ||
+          row.duration !== media.duration) {
+        log.info('  => updated: %s', JSON.stringify(match))
+
+        await IPCMedia.update({
+          mediaId: row.mediaId,
+          songId: media.songId,
+          player: media.player,
+          duration: media.duration,
+          dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
+        })
+      } else {
+        log.info('  => ok')
+      }
+
+      return row.mediaId
+    } // end if
+
+    // new media
+    // -------------------------------
+    media.dateAdded = Math.round(new Date().getTime() / 1000) // seconds
+    log.info('  => new: %s', JSON.stringify(match))
 
     // resolves to a mediaId
     return IPCMedia.add(media)
