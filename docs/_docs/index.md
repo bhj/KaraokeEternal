@@ -24,9 +24,9 @@ permalink: /docs/index.html
 
 ## Overview
 
-Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser. Supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required; your data stays on your server on your local network.
+Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser.  The player is also browser-based and supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required; data stays on your server on your local network.
 
-**Note:** Karaoke Forever does not handle audio *input* since there is a wide variety of possible setups. It's recommended to use a low-latency audio interface with at least two microphones that will be mixed with the Player's output.
+**Note:** Karaoke Forever does not handle audio *input* since there is a wide variety of possible setups. It's recommended to use a low-latency audio interface with at least two microphones that will be mixed with the player's output.
 
 Karaoke Forever has a few parts:
 
@@ -34,35 +34,39 @@ Karaoke Forever has a few parts:
 
 - **[Web app:](#karaoke-forever-the-web-app)** Built from the ground up for mobile browsers, anyone can easily join using their phone.
 
-- **[Player:](#player-admin-only)** Just another part of the web app, but designed to run fullscreen on the system handling audio/video for the room.
+- **[Player:](#player-admin-only)** Part of the web app, designed to run fullscreen on the system handling audio/video for the room.
 
 ## Quick Start
 
-1. Install and run Karaoke Forever Server on the system that will serve the media files and web app on your local network. **Important:** The server app is not currently signed, so macOS and Windows SmartScreen will complain by default. *Do not disable Gatekeeper* on macOS - simply right-click the file and choose Open.
+1. Install and run Karaoke Forever Server on the system that will serve the media files and web app on your local network. Karaoke Forever Server runs in the tray (Windows) or menubar (macOS).
 
-2. Click the Karaoke Forever Server menubar icon (macOS) or right-click the tray icon (Windows) to show the server URL. You can click *Open in browser* or browse to the server URL (including port) from any device on the network. The web app is primarily designed for mobile browsers.
+  ***Important:*** *The server app is not currently signed, so Windows SmartScreen and macOS Gatekeeper will complain by default. Do not disable Gatekeeper on macOS - simply right-click the application and choose Open.*
 
-3. Enter your user details and click Create Account to create your admin account.
+2. Browse to the server URL. You can launch your default browser or copy the URL to the clipboard using the Karaoke Forever Server tray/menubar icon.
 
-4. In the Preferences panel, tap Media Folders and add folder(s) with your [supported media](#supported-media-files). Songs will appear in the library when the scan is complete.
+  ***Note:*** *The web app is designed for mobile browsers, so for the best experience please use your phone from this point forward.*
 
-5. If you are not on the system that will be the [player](#player-admin-only) (handling audio/video) go there now, browse to the server URL and sign in with your admin account.
+3. Create your admin account at the welcome page.
 
-6. You should see a notice that no players are present in the [room](#rooms-admin-only), so tap the Start Player link. (If you don't see a notice it means the browser does not support fullscreen mode; you can still navigate to `/player` manually for this walkthrough)
+4. In the Preferences panel, tap Media Folders and add [supported media](#supported-media-files).
 
-7. Now that a player is running, use another device (or browser tab) to queue some songs and press play to begin. The player will play as long as there are songs in the queue, and after running out of songs the next one to be queued will start immediately.
+5. When the media scan finishes, songs will appear in the [library](#library) organized by artist. Add a few songs to the [queue](#queue) by tapping the artist, then tapping the song title.
 
-You are now ready to test your audio setup and start the party!
+6. If you are not on the system that will be running the [player](#player-admin-only) (and likely handling audio/video) go there now, browse to the server URL and sign in with your admin account.
+
+7. You should see a notice at the top that no players are present, so tap the Start Player link. (If you don't see a notice, your current browser doesn't support fullscreen mode)
+
+8. Click Play in the playback controls at the top. These controls are always present for admins and the current singer. When you're ready to start the party, click the fullscreen button in the player's upper right.
 
 ## Karaoke Forever (the web app)
 
 ### Library
 
-The library page lists available songs organized by artist, and allows searching both artists and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
+The library page lists available songs organized by artist, and allows users to search songs by artist and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
 
-If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see [Preferences](#preferences-admin-only)).
+If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see Media Folders in [Preferences](#preferences-admin-only)).
 
-Admins can reveal additional options for each song by swiping left. Currently the only additional option is Get Info, which shows the song's underlying media file(s).
+Admins can reveal additional options for each song, such as Get Info, by swiping left on the song.
 
 ### Queue
 
@@ -72,13 +76,13 @@ While a user is up they temporarily have access to the playback controls, includ
 
 ### Account
 
-The account page lets users update their account, and will have a few additional panels for admins.
+The account page lets users update their account, while admins will see additional panels.
 
 #### Rooms (Admin Only)
 
 The Rooms panel allows admins to create, edit and remove rooms.
 
-Karaoke Forever uses "rooms" to organize sessions by space and time (spacetime?) Rooms can be either open or closed, and every room has its own song queue. Users choose an open room when signing in.
+Karaoke Forever uses "rooms" to organize sessions by space and time (spacetime?) Every room has its own song queue, and can be either open or closed. Users choose an open room when signing in.
 
 **Warning:** Removing a room will also remove its queue, so the history of songs played during that session will be lost.
 
@@ -86,9 +90,9 @@ Karaoke Forever uses "rooms" to organize sessions by space and time (spacetime?)
 
 #### Preferences (Admin Only)
 
-The Preferences panel allows admins to configure Karaoke Forever. These settings are global (there are currently no per-user settings).
+The Preferences panel allows admins to configure Karaoke Forever.
 
-- **Media Folders:** Add folders with [supported media files](#supported-media-files) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in this list will be used. Karaoke Forever Server does not automatically detect changes to media folders; click Refresh to re-scan.
+- **Media Folders:** Add folders with [supported media files](#supported-media-files) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in the list will be used. Karaoke Forever Server does not automatically detect changes to media folders; click Refresh to re-scan.
 
 #### My Account
 
@@ -96,22 +100,18 @@ This panel lets users change their name, username or password and sign out.
 
 ### Player (admin only)
 
-The player is just another page of the web app that's designed to run in fullscreen mode, usually on the system handling audio/video for a room.
+The player is a page of the web app that's designed to run fullscreen on the system handling audio/video for a room.
 
-When an admin signs in to a [room](#rooms-admin-only) that does not yet have a player running, a notice will appear with a handy link to `/player`. If no notice appears it means the browser does not support fullscreen mode.
+To start the player, sign in as an admin to a [room](#rooms-admin-only) with a browser that supports fullscreen mode. If no player is currently in the room, a notice will appear with a link to start the player. If you don't see a notice, your current browser doesn't support fullscreen mode.
 
-The player has been tested on the current versions of these (desktop) browsers:
+The player makes use of [WebGL 2.0](https://caniuse.com/#feat=webgl2) and the [Web Audio API](https://caniuse.com/#feat=audio-api). The current desktop versions of these browsers should be supported:
 
 - Chrome
 - Firefox
-- Safari
-- Edge
-
-Internet Explorer is not supported.
 
 **Note:** A desktop-class browser is recommended due to limitations in the fullscreen support of some mobile browsers.
 
-**Tip:** Most browsers will mute or prevent playback of media on a page that hasn't been interacted with yet. Pressing play on the player page is usually sufficient, or you can whitelist the player page in your browser.
+**Tip:** Most browsers will mute or prevent playback of media on a page that hasn't been interacted with yet. Clicking on the player page is usually sufficient, or you can add it to your browser's whitelist.
 
 ## Karaoke Forever Server
 
@@ -176,7 +176,7 @@ return {
 
 Instead of a configuration object (as shown above), you can return a function that will be used to create a new parser, allowing anything from tweaking to completely replacing the stock one. This can be useful if you have many filenames that need extra processing to appear nicely in the library.
 
-Karaoke Forever uses a simple middleware-based filename parser. Here *middleware* refers to an individual function, and *parser* refers to a composed stack of middleware (that is itself a function). Your `_kfconfig.js` should return a *parser creator*, in other words, a function that will be called to get the parser for the current folder.
+Karaoke Forever uses a simple middleware-based filename parser. Here, *middleware* refers to an individual function, and *parser* refers to a composed stack of middleware (that is itself a function). Your `_kfconfig.js` should return a *parser creator*, in other words, a function that will be called to get the parser for the current folder.
 
 Your parser creator has access to the [default parser and middleware](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) so it doesn't have to reinvent the wheel. For example, this will create a parser that removes the word 'junk' from filenames, then runs the default parser:
 

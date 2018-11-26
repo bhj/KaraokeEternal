@@ -1,8 +1,8 @@
 # Karaoke Forever
 
-Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser. Supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required.
+Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser.  The player is also browser-based and supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required; data stays on your server on your local network.
 
-**Note:** Karaoke Forever does not handle audio *input* since there is a wide variety of possible setups. It's recommended to use a low-latency audio interface with at least two microphones that will be mixed with Karaoke Forever's output.
+**Note:** Karaoke Forever does not handle audio *input* since there is a wide variety of possible setups. It's recommended to use a low-latency audio interface with at least two microphones that will be mixed with the player's output.
 
 Please get started with [the documentation](https://www.karaoke-forever.com/docs). Packaged downloads are coming soon.
 
