@@ -6,7 +6,7 @@ const {
   QUEUE_ADD,
   QUEUE_REMOVE,
   QUEUE_PUSH,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 // ------------------------------------
 // Action Handlers

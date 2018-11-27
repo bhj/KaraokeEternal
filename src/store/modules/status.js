@@ -8,7 +8,7 @@ import {
   PLAYER_VOLUME_REQUEST,
   PLAYER_STATUS,
   PLAYER_LEAVE,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 // ------------------------------------
 // Actions

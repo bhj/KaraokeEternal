@@ -4,7 +4,7 @@ import {
   PLAYER_NEXT,
   PLAYER_VISUALIZER,
   PLAYER_VISUALIZER_PRESET,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 const presetKeys = Object.keys(butterchurnPresets.getPresets())
 

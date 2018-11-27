@@ -3,7 +3,7 @@ const {
   SCANNER_WORKER_STATUS,
   SCANNER_WORKER_DONE,
   LIBRARY_PUSH,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 // handle a few IPC messages from scanner
 module.exports = function (io) {

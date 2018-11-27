@@ -1,7 +1,7 @@
 import {
   LIBRARY_PUSH,
   LIBRARY_PUSH_SONG,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 // ------------------------------------
 // Action Handlers

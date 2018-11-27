@@ -14,7 +14,7 @@ import {
   _ERROR,
   SOCKET_REQUEST_CONNECT,
   SOCKET_AUTH_ERROR,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 const api = new HttpApi('')
 

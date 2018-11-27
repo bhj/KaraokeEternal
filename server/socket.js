@@ -17,7 +17,7 @@ const {
   PLAYER_LEAVE,
   SOCKET_AUTH_ERROR,
   _ERROR,
-} = require('../shared/actions')
+} = require('../shared/actionTypes')
 
 const handlers = {
   ...LibrarySocket,

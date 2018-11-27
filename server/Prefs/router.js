@@ -8,7 +8,7 @@ const Prefs = require('./Prefs')
 const {
   SCANNER_WORKER_SCAN,
   SCANNER_WORKER_SCAN_CANCEL,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 // start media scan
 router.get('/scan', async (ctx, next) => {

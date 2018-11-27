@@ -13,7 +13,7 @@ const Queue = require('../Queue')
 const User = require('../User')
 const {
   QUEUE_PUSH,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 // user images are stored as binary blobs
 squel.registerValueHandler(Buffer, buffer => buffer)

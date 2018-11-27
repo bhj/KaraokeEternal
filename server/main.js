@@ -8,7 +8,7 @@ const {
   SCANNER_WORKER_DONE,
   SERVER_WORKER_STATUS,
   SERVER_WORKER_ERROR,
-} = require('../shared/actions')
+} = require('../shared/actionTypes')
 
 Object.keys(childEnv).forEach(key => log.verbose(`${key} = ${childEnv[key]}`))
 

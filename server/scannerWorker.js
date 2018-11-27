@@ -6,7 +6,7 @@ const FileScanner = require('./Scanner/FileScanner')
 const {
   SCANNER_WORKER_SCAN,
   SCANNER_WORKER_SCAN_CANCEL,
-} = require('../shared/actions')
+} = require('../shared/actionTypes')
 
 let _Scanner
 let _isScanQueued = true

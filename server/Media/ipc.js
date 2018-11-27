@@ -7,7 +7,7 @@ const {
   MEDIA_UPDATE,
   _SUCCESS,
   _ERROR,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 const ACTION_HANDLERS = {
   [MEDIA_ADD]: async ({ payload }) => Media.add(payload),

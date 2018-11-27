@@ -11,7 +11,7 @@ import {
   CREATE,
   _SUCCESS,
   SOCKET_AUTH_ERROR,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 // ------------------------------------
 // Action creators

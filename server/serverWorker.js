@@ -29,7 +29,7 @@ const IPCPrefsActions = require('./Prefs/ipc')
 const {
   SERVER_WORKER_STATUS,
   SERVER_WORKER_ERROR,
-} = require('../shared/actions')
+} = require('../shared/actionTypes')
 
 // Koa error handling
 app.use(async (ctx, next) => {

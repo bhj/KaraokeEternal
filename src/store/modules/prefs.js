@@ -7,7 +7,7 @@ import {
   SCANNER_WORKER_STATUS,
   SCANNER_WORKER_DONE,
   _ERROR,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 import { logout } from './user'
 import HttpApi from 'lib/HttpApi'

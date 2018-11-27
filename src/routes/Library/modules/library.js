@@ -11,7 +11,7 @@ import {
   SCROLL_ARTISTS,
   _SUCCESS,
   _ERROR,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 const api = new HttpApi('library')
 

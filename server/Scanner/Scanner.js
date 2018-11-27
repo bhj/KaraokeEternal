@@ -1,7 +1,7 @@
 const throttle = require('@jcoreio/async-throttle')
 const {
   SCANNER_WORKER_STATUS,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 class Scanner {
   constructor () {

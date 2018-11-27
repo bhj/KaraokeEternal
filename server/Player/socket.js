@@ -21,7 +21,7 @@ const {
   PLAYER_ERROR_REQUEST,
   PLAYER_LEAVE_REQUEST,
   PLAYER_LEAVE,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 // ------------------------------------
 // Action Handlers

@@ -8,7 +8,7 @@ const {
   MEDIA_CLEANUP,
   MEDIA_REMOVE,
   MEDIA_UPDATE,
-} = require('../../shared/actions')
+} = require('../../shared/actionTypes')
 
 const refs = {}
 let actionId = 0

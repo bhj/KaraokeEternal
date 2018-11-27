@@ -13,7 +13,7 @@ import {
   PLAYER_ERROR,
   PLAYER_LEAVE_REQUEST,
   QUEUE_PUSH,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 // have server emit player status to room
 export function emitStatus (status) {

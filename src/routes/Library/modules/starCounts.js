@@ -2,7 +2,7 @@ import {
   SONG_STARRED,
   SONG_UNSTARRED,
   STAR_COUNTS_PUSH,
-} from 'shared/actions'
+} from 'shared/actionTypes'
 
 // ------------------------------------
 // Action Handlers
