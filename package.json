@@ -105,7 +105,7 @@
     "koa-webpack": "^5.1.1",
     "license-webpack-plugin": "^2.0.3",
     "mini-css-extract-plugin": "^0.4.5",
-    "nodemon": "^1.18.6",
+    "nodemon": "^1.18.7",
     "redbox-react": "^1.6.0",
     "style-loader": "^0.23.1",
     "url-loader": "^1.1.2",
