@@ -23,10 +23,6 @@ On Windows you may want to do this first:
 
 - `npm i --global --production --add-python-to-path windows-build-tools` (then restart shell)
 
-If Electron's ABI version differs from Node's then to get back to non-Electron you may need to:
-
-- `npm rebuild --build-from-source`
-
 ## Contributing
 
 Contributions are most welcome!
