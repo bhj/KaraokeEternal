@@ -38,9 +38,9 @@ class MetaParser {
 
       return {
         artist: ctx.artist,
-        artistNormalized: ctx.artistNormalized || ctx.artist,
+        artistNorm: ctx.artistNorm || ctx.artist,
         title: ctx.title,
-        titleNormalized: ctx.titleNormalized || ctx.title,
+        titleNorm: ctx.titleNorm || ctx.title,
       }
     }
   }

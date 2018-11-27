@@ -205,8 +205,8 @@ When Karaoke Forever scans a media file, it calls the parser with an object (`ct
 
 - `artist` String with the artist's name as it will be shown in the library. Required.
 - `title` String with the song's title as it will be shown in the library. Required.
-- `artistNormalized` String with the artist's name as it will be used internally for matching and sorting. Defaults to `artist` if not set.
-- `titleNormalized` String with the song's title as it will be used internally for matching and sorting. Defaults to `title` if not set.
+- `artistNorm` String with a normalized version of the artist's name (used for matching and sorting). Defaults to `artist` if not set.
+- `titleNorm` String with a normalized version of the song's title (used for matching and sorting). Defaults to `title` if not set.
 
 It's important that each middleware calls `next` unless you don't want the chain to continue (for instance, if you've set `artist` and `title` manually and want to use them as-is).
 

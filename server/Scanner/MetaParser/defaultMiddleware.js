@@ -101,37 +101,37 @@ m.set('move leading articles', (ctx, next) => {
 // normalize
 // ---------
 m.set('set artist and title (normalized)', (ctx, next) => {
-  ctx.artistNormalized = normalizeStr(ctx.artist)
-  ctx.titleNormalized = normalizeStr(ctx.title)
+  ctx.artistNorm = normalizeStr(ctx.artist)
+  ctx.titleNorm = normalizeStr(ctx.title)
   next()
 })
 
 // remove articles
 m.set('remove articles (normalized)', (ctx, next) => {
-  ctx.artistNormalized = removeArticles(ctx.artistNormalized, ctx.cfg.articles)
-  ctx.titleNormalized = removeArticles(ctx.titleNormalized, ctx.cfg.articles)
+  ctx.artistNorm = removeArticles(ctx.artistNorm, ctx.cfg.articles)
+  ctx.titleNorm = removeArticles(ctx.titleNorm, ctx.cfg.articles)
   next()
 })
 
 // remove parantheticals
 m.set('remove parentheses (normalized)', (ctx, next) => {
   const parens = /[([{].*[)\]}]/
-  ctx.artistNormalized = ctx.artistNormalized.replace(parens, '').trim()
-  ctx.titleNormalized = ctx.titleNormalized.replace(parens, '').trim()
+  ctx.artistNorm = ctx.artistNorm.replace(parens, '').trim()
+  ctx.titleNorm = ctx.titleNorm.replace(parens, '').trim()
   next()
 })
 
 // ampersand -> 'and'
 m.set('ampersand to and (normalized)', (ctx, next) => {
-  ctx.artistNormalized = ctx.artistNormalized.replace(' & ', ' and ')
-  ctx.titleNormalized = ctx.titleNormalized.replace(' & ', ' and ')
+  ctx.artistNorm = ctx.artistNorm.replace(' & ', ' and ')
+  ctx.titleNorm = ctx.titleNorm.replace(' & ', ' and ')
   next()
 })
 
 // remove punctuation
 m.set('remove punctuation (normalized)', (ctx, next) => {
-  ctx.artistNormalized = ctx.artistNormalized.replace(/[^\w\s]|_/g, '').replace(/\s+/g, ' ')
-  ctx.titleNormalized = ctx.titleNormalized.replace(/[^\w\s]|_/g, '').replace(/\s+/g, ' ')
+  ctx.artistNorm = ctx.artistNorm.replace(/[^\w\s]|_/g, '').replace(/\s+/g, ' ')
+  ctx.titleNorm = ctx.titleNorm.replace(/[^\w\s]|_/g, '').replace(/\s+/g, ' ')
   next()
 })
 

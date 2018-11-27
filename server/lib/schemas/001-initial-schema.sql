@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS "artists" (
   "artistId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "name" text NOT NULL COLLATE NOCASE,
-  "nameNormalized" text NOT NULL COLLATE NOCASE
+  "nameNorm" text NOT NULL COLLATE NOCASE
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idxName ON "artists" ("name" ASC);
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS "songs" (
   "songId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "artistId" integer NOT NULL,
   "title" text NOT NULL COLLATE NOCASE,
-  "titleNormalized" text NOT NULL COLLATE NOCASE
+  "titleNorm" text NOT NULL COLLATE NOCASE
 );
 
 CREATE INDEX IF NOT EXISTS idxTitle ON "songs" ("title" ASC);

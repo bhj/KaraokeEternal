@@ -41,7 +41,7 @@ class Library {
         .join('songs USING (songId)')
         .join('artists USING (artistId)')
         .group('songs.songId')
-        .order('songs.titleNormalized')
+        .order('songs.titleNorm')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -70,7 +70,7 @@ class Library {
     {
       const q = squel.select()
         .from('artists')
-        .order('nameNormalized')
+        .order('nameNorm')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
@@ -154,7 +154,7 @@ class Library {
     {
       const q = squel.select()
         .from('artists')
-        .where('nameNormalized = ?', parsed.artistNormalized)
+        .where('nameNorm = ?', parsed.artistNorm)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
@@ -163,14 +163,14 @@ class Library {
         // log.info('matched artist: %s', row.name)
         match.artistId = row.artistId
         match.artist = row.name
-        match.artistNormalized = row.nameNormalized
+        match.artistNorm = row.nameNorm
       } else {
         log.info('new artist: %s', parsed.artist)
 
         const q = squel.insert()
           .into('artists')
           .set('name', parsed.artist)
-          .set('nameNormalized', parsed.artistNormalized)
+          .set('nameNorm', parsed.artistNorm)
 
         const { text, values } = q.toParam()
         const res = await db.run(text, values)
@@ -181,7 +181,7 @@ class Library {
 
         match.artistId = res.stmt.lastID
         match.artist = parsed.artist
-        match.artistNormalized = parsed.artistNormalized
+        match.artistNorm = parsed.artistNorm
       }
     }
 
@@ -190,7 +190,7 @@ class Library {
       const q = squel.select()
         .from('songs')
         .where('artistId = ?', match.artistId)
-        .where('titleNormalized = ?', parsed.titleNormalized)
+        .where('titleNorm = ?', parsed.titleNorm)
 
       const { text, values } = q.toParam()
       const row = await db.get(text, values)
@@ -199,7 +199,7 @@ class Library {
         // log.info('matched song: %s', row.title)
         match.songId = row.songId
         match.title = row.title
-        match.titleNormalized = row.titleNormalized
+        match.titleNorm = row.titleNorm
       } else {
         log.info('new song: %s', parsed.title)
 
@@ -207,7 +207,7 @@ class Library {
           .into('songs')
           .set('artistId', match.artistId)
           .set('title', parsed.title)
-          .set('titleNormalized', parsed.titleNormalized)
+          .set('titleNorm', parsed.titleNorm)
 
         const { text, values } = q.toParam()
         const res = await db.run(text, values)
@@ -218,7 +218,7 @@ class Library {
 
         match.songId = res.stmt.lastID
         match.title = parsed.title
-        match.titleNormalized = parsed.titleNormalized
+        match.titleNorm = parsed.titleNorm
       }
     }
 
