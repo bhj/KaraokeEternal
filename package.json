@@ -1,12 +1,12 @@
 {
   "name": "karaoke-forever",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Open karaoke party system",
   "private:": true,
   "main": "./server/main.js",
   "engines": {
-    "node": "^10.8.0",
-    "npm": "^6.2.0"
+    "node": "^10.14.0",
+    "npm": "^6.4.1"
   },
   "scripts": {
     "clean": "rimraf dist",
