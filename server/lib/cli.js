@@ -1,16 +1,9 @@
-let appVer
+const options = {
+  loglevel: 'KF_LOG_LEVEL',
+  port: 'KF_SERVER_PORT',
+}
 
-if (process.versions['electron']) {
-  const app = require('electron').app
-  appVer = app.getVersion()
-
-  // fix for https://github.com/electron/electron/issues/4690
-  if (app.isPackaged) {
-    process.argv.unshift(null)
-  }
-} else appVer = process.env.npm_package_version
-
-const argv = require('yargs')
+const yargs = require('yargs')
   .option('l', {
     alias: 'loglevel',
     describe: 'Log file level (0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug) (default=2)',
@@ -21,12 +14,19 @@ const argv = require('yargs')
     describe: 'Web server port (default=0/auto)',
     requiresArg: true,
   })
-  .version(appVer)
-  .argv
 
-const options = {
-  loglevel: 'KF_LOG_LEVEL',
-  port: 'KF_SERVER_PORT',
+let argv = yargs.argv
+
+if (process.versions['electron']) {
+  const app = require('electron').app
+  yargs.version(app.getVersion())
+
+  // see https://github.com/yargs/yargs/blob/master/docs/api.md#argv
+  if (app.isPackaged) {
+    argv = yargs.parse(process.argv.slice(1))
+  }
+} else {
+  yargs.version(process.env.npm_package_version)
 }
 
 // Sets environment variables for the current process based on CLI args.
