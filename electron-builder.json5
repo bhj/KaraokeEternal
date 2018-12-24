@@ -12,7 +12,7 @@
   },
   "win": {
     "target": "nsis",
-    "icon": "assets/app.png",
+    "icon": "assets/app.ico",
   },
   "nsis": {
     "oneClick": false,
