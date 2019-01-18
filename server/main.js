@@ -35,7 +35,7 @@ function startServer () {
   if (refs.server === undefined) {
     log.info('Starting server process')
     refs.server = childProcess.fork(path.join(__dirname, 'serverWorker.js'), [], {
-      env: childEnv,
+      env: { ...childEnv, 'KF_PROCESS_ROLE': 'server' }
     })
 
     refs.server.on('exit', (code, signal) => {
@@ -67,7 +67,7 @@ function startScanner () {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
     refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
-      env: childEnv,
+      env: { ...childEnv, 'KF_PROCESS_ROLE': 'scanner' }
     })
 
     refs.scanner.on('exit', (code, signal) => {

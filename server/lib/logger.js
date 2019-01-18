@@ -31,6 +31,10 @@ log.transports.console.format = function (msg) {
     text
 }
 
+if (process.env.KF_PROCESS_ROLE) {
+  log.transports.file.fileName = process.env.KF_PROCESS_ROLE + '.log'
+}
+
 function getLogger (prefix) {
   return {
     error: (txt, ...args) => log.error(prefix + ': ' + txt, ...args),
