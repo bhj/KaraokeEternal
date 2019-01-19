@@ -1,6 +1,6 @@
 {
   "name": "karaoke-forever",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Open karaoke party system",
   "private:": true,
   "main": "./server/main.js",
@@ -26,7 +26,7 @@
     "url": "git+https://github.com/bhj/karaoke-forever.git"
   },
   "author": "Brandon H. Jones (https://www.karaoke-forever.com)",
-  "license": "MIT",
+  "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.2.0",
     "@jcoreio/async-throttle": "^1.1.2",
