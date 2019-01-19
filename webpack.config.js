@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const webpack = require('webpack')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -64,8 +65,22 @@ if (__PROD__) {
   }))
 
   config.plugins.push(new LicenseWebpackPlugin({
-    outputFilename: 'licenses.txt',
+    addBanner: true,
+    outputFilename: 'license_en.txt',
     perChunkOutput: false,
+    renderLicenses: (modules) => {
+      let txt = ''
+
+      modules.forEach(m => {
+        if (!m.licenseText) return
+
+        txt += '\n' + '*'.repeat(80) + '\n\n'
+        txt += m.packageJson.name + '\n'
+        txt += m.licenseText.replace(/(\S)\n(\S)/gm, '$1 $2')
+      })
+
+      return fs.readFileSync('./LICENSE', 'utf8') + txt
+    },
   }))
 }
 
