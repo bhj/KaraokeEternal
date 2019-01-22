@@ -74,7 +74,7 @@ if (__PROD__) {
       modules.forEach(m => {
         if (!m.licenseText) return
 
-        txt += '\n' + '*'.repeat(80) + '\n\n'
+        txt += '\n' + '*'.repeat(71) + '\n\n'
         txt += m.packageJson.name + '\n'
         txt += m.licenseText.replace(/(\S)\n(\S)/gm, '$1 $2')
       })
