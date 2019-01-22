@@ -1,4 +1,7 @@
 {
+  "directories": {
+    "buildResources": "dist",
+  },
   "files": [
     "shared/**",
     "server/**",
