@@ -28,7 +28,7 @@
   "author": "Brandon H. Jones (https://www.karaoke-forever.com)",
   "license": "ISC",
   "dependencies": {
-    "@babel/runtime": "^7.2.0",
+    "@babel/runtime": "^7.3.1",
     "@jcoreio/async-throttle": "^1.1.2",
     "bcrypt": "^3.0.3",
     "blueimp-load-image": "^2.20.1",
@@ -78,10 +78,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.2.3",
-    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.3.1",
     "@babel/plugin-transform-runtime": "^7.2.0",
-    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-env": "^7.3.1",
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
@@ -92,10 +92,10 @@
     "css-loader": "^2.1.0",
     "electron": "^3.0.14",
     "electron-builder": "^20.38.5",
-    "eslint": "^5.12.0",
+    "eslint": "^5.12.1",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-import": "^2.15.0",
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.12.4",
@@ -109,7 +109,7 @@
     "redbox-react": "^1.6.0",
     "style-loader": "^0.23.1",
     "url-loader": "^1.1.2",
-    "webpack": "^4.28.4",
+    "webpack": "^4.29.0",
     "webpack-cli": "^3.2.1"
   }
 }
