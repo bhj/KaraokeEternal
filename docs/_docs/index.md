@@ -231,9 +231,11 @@ $ sudo /Applications/Karaoke\ Forever\ Server.app/Contents/MacOS/Karaoke\ Foreve
 #### macOS
 
  - Database: `~/Library/Application Support/Karaoke Forever Server/database.sqlite3`
- - Log: `~/Library/Logs/Karaoke Forever Server/log.log`
+ - Media Scanner Log: `~/Library/Logs/Karaoke Forever Server/scanner.log`
+ - Server Log: `~/Library/Logs/Karaoke Forever Server/server.log`
 
 #### Windows
 
 - Database: `%APPDATA%\Karaoke Forever Server\database.sqlite3`
-- Log: `%APPDATA%\Karaoke Forever Server\log.log`
+- Media Scanner Log: `%APPDATA%\Karaoke Forever Server\scanner.log`
+- Server Log: `%APPDATA%\Karaoke Forever Server\server.log`
