@@ -27,7 +27,7 @@ class PlayerTextOverlay extends React.Component {
       const offset = Math.random() * -300
       Component = <>
         <ColorCycle text='OOPS...' offset={offset} />
-        <ColorCycle text='PRESS NEXT TO CONTINUE' offset={offset} />
+        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} />
       </>
     } else {
       Component =
