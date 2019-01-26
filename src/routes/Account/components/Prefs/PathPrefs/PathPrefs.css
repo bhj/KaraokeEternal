@@ -1,5 +1,5 @@
 .container {
-  background-color: #555;
+  background-color: var(--panel-title-bg-color);
   border-radius: var(--border-radius);
 }
 

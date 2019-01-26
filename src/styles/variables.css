@@ -1,8 +1,11 @@
 :root {
+  --hue-blue: 209;
+  --hue-pink: 296;
+
   /* Defaults */
-  --bg-color: #020f1b;
-  --text-color: #bbb;
-  --link-color: #68b1f9;
+  --bg-color: #000;
+  --text-color: #ddd;
+  --link-color: hsl(var(--hue-blue), 92%, 70%);
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   --drop-shadow-filter: drop-shadow(0 2px 5px #222);
@@ -15,51 +18,51 @@
   --input-bg-color: #eee;
   --input-margin: 7px;
 
-  --btn-bg-color: #404D5A;
+  --btn-bg-color: hsl(var(--hue-blue), 50%, 25%);
   --btn-active-bg-color: var(--link-color);
   --btn-active-filter: none;
-  --btn-danger-bg-color: var(--base-pink);
+  --btn-danger-bg-color: hsl(var(--hue-pink), 100%, 50%);
   --btn-danger-filter: none;
 
   /* UI chrome (header/footer) */
-  --chrome-bg-color: rgba(2, 15, 27, .8);
-  --chrome-border-color: rgba(51, 71, 84, .5);
+  --chrome-bg-color: hsla(var(--hue-blue), 100%, 5%, .8);
+  --chrome-border-color: hsla(var(--hue-blue), 24%, 26%, 0.5);
   --header-notice-color: var(--text-color);
-  --header-notice-bg-color: #00488D;
+  --header-notice-bg-color: hsl(var(--hue-blue), 100%, 27%);
 
   /* Navigation */
-  --nav-link-color: var(--btn-bg-color);
+  --nav-link-color: hsl(var(--hue-blue), 50%, 25%);
   --nav-active-color: var(--link-color);
   --nav-active-filter: var(--btn-active-filter);
 
   /* Library */
   --artist-item-height: 44px;
   --artist-folder-color: var(--text-color);
-  --artist-folder-bg-color: #053664;
+  --artist-folder-bg-color: hsl(var(--hue-blue), 100%, 25%);
 
   --song-item-btn-width: 44px;
   --song-item-btn-height: 44px;
-  --song-item-btn-bg-color: #052544;
+  --song-item-btn-bg-color: hsl(var(--hue-blue), 100%, 10%);
   --song-item-btn-active-color: #333;
   --song-item-btn-active-bg-color: var(--btn-active-bg-color);
   --song-item-btn-active-filter: var(--btn-active-filter);
 
   --alpha-picker-color: var(--artist-folder-bg-color);
-  --queued-item-color: #F5CBF3;
+  --queued-item-color: hsl(var(--hue-pink), 67%, 87%);
   --queued-item-text-shadow: var(--glow-text-shadow);
 
   --search-results-heading-color: var(--text-color);
   --search-results-heading-bg-color: var(--artist-folder-bg-color);
-  --mark-bg-color: #00488D;
+  --mark-bg-color: hsl(var(--hue-blue), 50%, 30%);
 
   /* Queue */
   --current-item-from-bg-color: var(--header-notice-bg-color);
   --current-item-to-bg-color: var(--header-notice-bg-color);
 
   /* Account panels */
-  --panel-bg-color: #303030;
+  --panel-bg-color: hsl(var(--hue-blue), 20%, 10%);
   --panel-title-color: var(--text-color);
-  --panel-title-bg-color: #4d4d4d;
+  --panel-title-bg-color: hsl(var(--hue-blue), 5%, 30%);
   --panel-title-size: 20px;
   --panel-title-padding: 6px;
 
@@ -71,12 +74,12 @@
   --transport-volume-track-active-filter: var(--btn-active-filter);
 
   /* Up Next header/banner */
-  --up-next-bg-color-from: #00488D;
-  --up-next-bg-color-to: var(--base-blue);
+  --up-next-bg-color-from: hsl(var(--hue-blue), 100%, 27%);
+  --up-next-bg-color-to: hsl(var(--hue-blue), 92%, 60%);
   --up-next-filter: none;
 
-  --up-now-bg-color-from: #6C006C;
-  --up-now-bg-color-to: #9C02A7;
+  --up-now-bg-color-from: hsl(var(--hue-pink), 100%, 25%);
+  --up-now-bg-color-to: hsl(var(--hue-pink), 97%, 40%);
   --up-now-filter: none;
 
   /* <button> colors */
@@ -93,11 +96,7 @@
   --animation-bounce: bounce .25s ease-out;
 
   /* Glow */
-  --glow-text-shadow: 0 0 5px var(--base-pink), 0 0 10px var(--base-pink);
-
-  /* Base colors */
-  --base-blue: #138BFF;
-  --base-pink: #EF02FF;
+  --glow-text-shadow: 0 0 5px hsl(var(--hue-pink), 100%, 50%), 0 0 10px hsl(var(--hue-pink), 100%, 50%);
 }
 
 @keyframes bounce {
