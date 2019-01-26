@@ -5,6 +5,7 @@ const {
   MEDIA_CLEANUP,
   MEDIA_REMOVE,
   MEDIA_UPDATE,
+  SCANNER_WORKER_STATUS,
   _SUCCESS,
   _ERROR,
 } = require('../../shared/actionTypes')
@@ -23,8 +24,11 @@ module.exports = function (io) {
   process.on('message', async function (action) {
     const { type } = action
 
+    // ignore some actions to reduce logging noise
+    if (type === SCANNER_WORKER_STATUS) return
+
     if (typeof ACTION_HANDLERS[type] !== 'function') {
-      log.debug('no handler for ipc action: %s', type)
+      log.warn('no handler for ipc action: %s', type)
       return
     }
 
