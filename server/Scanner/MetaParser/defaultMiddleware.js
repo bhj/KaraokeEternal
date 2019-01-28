@@ -149,7 +149,6 @@ function normalizeStr (str, articles) {
   str = removeArticles(str, articles)
     .replace(/-/, ' ') // any remaining hyphens become spaces
     .replace(/[^\w\s]|_/g, '') // remove punctuation
-    // .replace(/\s+/g, ' ') // multiple spaces to single
 
   return str
 }
