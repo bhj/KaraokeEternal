@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS "artists" (
   "nameNorm" text NOT NULL COLLATE NOCASE
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idxName ON "artists" ("name" ASC);
+CREATE UNIQUE INDEX IF NOT EXISTS idxNameNorm ON "artists" ("nameNorm" ASC);
 
 CREATE TABLE IF NOT EXISTS media (
   mediaId integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS "songs" (
   "titleNorm" text NOT NULL COLLATE NOCASE
 );
 
-CREATE INDEX IF NOT EXISTS idxTitle ON "songs" ("title" ASC);
+CREATE INDEX IF NOT EXISTS idxTitleNorm ON "songs" ("titleNorm" ASC);
 
 CREATE TABLE IF NOT EXISTS "artistStars" (
   "userId" integer NOT NULL,
