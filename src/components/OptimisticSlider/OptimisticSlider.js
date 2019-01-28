@@ -22,6 +22,8 @@ export default class OptimisticSlider extends React.Component {
     isStable: true,
   }
 
+  timerId = null
+
   componentDidUpdate (prevProps) {
     if (!this.state.isStable && this.state.val === this.props.value) {
       this.setState({ isStable: true })
@@ -58,7 +60,7 @@ export default class OptimisticSlider extends React.Component {
 
   handleBeforeChange = () => {
     lockScrolling(true)
-
+    clearTimeout(this.timerId)
     this.setState({ isDragging: true })
   }
 
@@ -66,9 +68,13 @@ export default class OptimisticSlider extends React.Component {
     lockScrolling(false)
 
     this.setState({
-      isDragging: false,
-      // @todo add timeout (value could have been changed by another user)
       isStable: val === this.props.value,
+      isDragging: false,
     })
+
+    // revert to the prop after a time since there could be value changes from outside
+    if (val !== this.props.value) {
+      this.timerId = setTimeout(() => this.setState({ val: this.props.value }), 2000)
+    }
   }
 }
