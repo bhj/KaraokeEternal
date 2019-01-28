@@ -100,38 +100,21 @@ m.set('move leading articles', (ctx, next) => {
 // ---------
 // normalize
 // ---------
-m.set('set artist and title (normalized)', (ctx, next) => {
-  ctx.artistNorm = normalizeStr(ctx.artist)
-  ctx.titleNorm = normalizeStr(ctx.title)
+m.set('normalize artist', (ctx, next) => {
+  // skip if already set
+  if (!ctx.artistNorm) {
+    ctx.artistNorm = normalizeStr(ctx.artist, ctx.cfg.articles)
+  }
+
   next()
 })
 
-// remove articles
-m.set('remove articles (normalized)', (ctx, next) => {
-  ctx.artistNorm = removeArticles(ctx.artistNorm, ctx.cfg.articles)
-  ctx.titleNorm = removeArticles(ctx.titleNorm, ctx.cfg.articles)
-  next()
-})
+m.set('normalize title', (ctx, next) => {
+  // skip if already set
+  if (!ctx.titleNorm) {
+    ctx.titleNorm = normalizeStr(ctx.title, ctx.cfg.articles)
+  }
 
-// remove parantheticals
-m.set('remove parentheses (normalized)', (ctx, next) => {
-  const parens = /[([{].*[)\]}]/
-  ctx.artistNorm = ctx.artistNorm.replace(parens, '').trim()
-  ctx.titleNorm = ctx.titleNorm.replace(parens, '').trim()
-  next()
-})
-
-// ampersand -> 'and'
-m.set('ampersand to and (normalized)', (ctx, next) => {
-  ctx.artistNorm = ctx.artistNorm.replace(' & ', ' and ')
-  ctx.titleNorm = ctx.titleNorm.replace(' & ', ' and ')
-  next()
-})
-
-// remove punctuation
-m.set('remove punctuation (normalized)', (ctx, next) => {
-  ctx.artistNorm = ctx.artistNorm.replace(/[^\w\s]|_/g, '').replace(/\s+/g, ' ')
-  ctx.titleNorm = ctx.titleNorm.replace(/[^\w\s]|_/g, '').replace(/\s+/g, ' ')
   next()
 })
 
@@ -156,8 +139,19 @@ function titleCase (str) {
   })
 }
 
-function normalizeStr (str) {
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+function normalizeStr (str, articles) {
+  str = str.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[([{].*[)\]}]/, '') // remove parantheses
+    .replace(' & ', ' and ') // normalize ampersand
+    .trim()
+
+  str = removeArticles(str, articles)
+    .replace(/-/, ' ') // any remaining hyphens become spaces
+    .replace(/[^\w\s]|_/g, '') // remove punctuation
+    // .replace(/\s+/g, ' ') // multiple spaces to single
+
+  return str
 }
 
 // move leading articles to end (but before any parantheses)
