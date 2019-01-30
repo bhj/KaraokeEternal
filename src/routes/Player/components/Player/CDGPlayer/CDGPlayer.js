@@ -149,7 +149,6 @@ class CDGPlayer extends React.Component {
     // emit player status
     this.props.onStatus({
       position: this.audio.current.currentTime,
-      volume: this.audio.current.volume,
     })
   }
 

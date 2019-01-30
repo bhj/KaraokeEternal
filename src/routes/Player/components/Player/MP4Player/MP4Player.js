@@ -97,7 +97,6 @@ class MP4Player extends React.Component {
     // emit player status
     this.props.onStatus({
       position: this.video.current.currentTime,
-      volume: this.video.current.volume,
     })
   }
 
