@@ -7,7 +7,7 @@ const SongList = (props) => props.songIds.map(songId => (
     {...props.songs[songId]}
     artist={props.showArtist ? props.artists[props.songs[songId].artistId].name : ''}
     filterKeywords={props.filterKeywords}
-    isQueued={props.queuedSongIds.includes(songId)}
+    isQueued={props.queuedSongs.includes(songId)}
     isStarred={props.starredSongs.includes(songId)}
     isAdmin={props.isAdmin}
     key={songId}
@@ -21,7 +21,7 @@ const SongList = (props) => props.songIds.map(songId => (
 SongList.propTypes = {
   artists: PropTypes.object.isRequired,
   filterKeywords: PropTypes.array.isRequired,
-  queuedSongIds: PropTypes.array.isRequired,
+  queuedSongs: PropTypes.array.isRequired,
   showArtist: PropTypes.bool.isRequired,
   songs: PropTypes.object.isRequired,
   songIds: PropTypes.array.isRequired,

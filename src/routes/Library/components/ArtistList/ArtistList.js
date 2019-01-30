@@ -10,7 +10,7 @@ class ArtistList extends React.Component {
     artists: PropTypes.object.isRequired, // entities
     artistsResult: PropTypes.array.isRequired, // artistIds
     songs: PropTypes.object.isRequired, // entities
-    queuedSongIds: PropTypes.array.isRequired,
+    queuedSongs: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     starredArtistCounts: PropTypes.object.isRequired,
     expandedArtists: PropTypes.array.isRequired,
@@ -75,7 +75,8 @@ class ArtistList extends React.Component {
         name={artist.name}
         numStars={this.props.starredArtistCounts[artist.artistId] || 0}
         onArtistClick={this.props.toggleArtistExpanded}
-        queuedSongIds={this.props.queuedSongIds}
+        queuedSongs={this.props.queuedSongs}
+        starredSongs={this.props.starredSongs}
         songs={this.props.songs}
         starredSongs={this.props.starredSongs}
         style={style}

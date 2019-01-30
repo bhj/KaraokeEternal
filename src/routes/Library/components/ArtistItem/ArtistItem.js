@@ -13,7 +13,8 @@ class ArtistItem extends React.Component {
     isExpanded: PropTypes.bool.isRequired,
     name: PropTypes.string.isRequired,
     numStars: PropTypes.number.isRequired,
-    queuedSongIds: PropTypes.array.isRequired,
+    queuedSongs: PropTypes.array.isRequired,
+    starredSongs: PropTypes.array.isRequired,
     style: PropTypes.object,
     // actions
     onArtistClick: PropTypes.func.isRequired,
@@ -21,13 +22,14 @@ class ArtistItem extends React.Component {
 
   render () {
     const { props } = this
-    const isChildQueued = props.artistSongIds.some(songId => props.queuedSongIds.includes(songId))
+    const isChildQueued = props.artistSongIds.some(songId => props.queuedSongs.includes(songId))
+    const isChildStarred = props.artistSongIds.some(songId => props.starredSongs.includes(songId))
 
     return (
       <div style={props.style}>
         <div onClick={this.handleArtistClick} styleName='container'>
-          <div styleName='folderContainer'>
-            <Icon icon='FOLDER' size={44} styleName='folderIcon' />
+          <div styleName={isChildStarred ? 'folderStarred' : 'folder'}>
+            <Icon icon='FOLDER' size={44}/>
             {props.isExpanded &&
               <div styleName='expandedIcon'><Icon icon='CHEVRON_DOWN' size={24} /></div>
             }
@@ -45,7 +47,7 @@ class ArtistItem extends React.Component {
             songIds={props.artistSongIds}
             showArtist={false}
             filterKeywords={props.filterKeywords}
-            queuedSongIds={props.queuedSongIds}
+            queuedSongs={props.queuedSongs}
           />
         }
       </div>

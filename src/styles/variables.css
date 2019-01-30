@@ -31,14 +31,15 @@
   --header-notice-bg-color: hsl(var(--hue-blue), 100%, 27%);
 
   /* Navigation */
-  --nav-link-color: hsl(var(--hue-blue), 50%, 25%);
+  --nav-link-color: var(--btn-bg-color);
   --nav-active-color: var(--link-color);
   --nav-active-filter: var(--btn-active-filter);
 
   /* Library */
   --artist-item-height: 44px;
   --artist-folder-color: var(--text-color);
-  --artist-folder-bg-color: hsl(var(--hue-blue), 100%, 25%);
+  --artist-folder-bg-color: hsl(var(--hue-blue), 90%, 27%);
+  --artist-folder-starred-bg-color: hsl(var(--hue-blue), 80%, 50%);
 
   --song-item-btn-width: 44px;
   --song-item-btn-height: 44px;

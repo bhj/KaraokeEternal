@@ -115,7 +115,7 @@ const mapStateToProps = (state) => {
     artists: state.artists.entities,
     songs: state.songs.entities,
     starredArtistCounts: state.starCounts.artists,
-    queuedSongIds: getQueuedSongs(state),
+    queuedSongs: getQueuedSongs(state),
     starredSongs: getStarredSongs(state),
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),

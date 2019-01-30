@@ -18,13 +18,15 @@
   text-shadow: var(--queued-item-text-shadow);
 }
 
-.folderContainer {
+.folder {
   height: var(--artist-item-height);
   margin: 0 3px;
+  fill: var(--artist-folder-bg-color);
 }
 
-.folderIcon {
-  fill: var(--artist-folder-bg-color);
+.folderStarred {
+  composes: folder;
+  fill: var(--artist-folder-starred-bg-color);
 }
 
 .count {
