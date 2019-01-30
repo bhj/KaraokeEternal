@@ -87,16 +87,19 @@ class QueueItem extends React.Component {
                 <Icon icon='PLAY_NEXT' size={40} />
               </div>
             }
-            {props.isRemovable &&
-              <div onClick={this.handleRemoveClick} styleName='remove'>
-                <Icon icon='CLEAR' size={40} />
-              </div>
-            }
-            <div onClick={this.handleStarClick} styleName={state.isExpanded || btnCount === 1 ? 'btn' : 'btnHidden'}>
+
+            <div onClick={this.handleStarClick}>
               <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
                 <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>
               </ToggleAnimation>
             </div>
+
+            {props.isRemovable &&
+              <div onClick={this.handleRemoveClick}
+                styleName={state.isExpanded || btnCount === 1 ? 'btn' : 'btnHidden'}>
+                <Icon icon='CLEAR' size={40} />
+              </div>
+            }
           </div>
         </div>
       </Swipeable>
