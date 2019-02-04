@@ -69,7 +69,7 @@ export default class PathPrefs extends React.Component {
       <div styleName='container'>
         <div styleName='title' onClick={() => this.toggleExpanded()}>
           <div>
-            <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={28} styleName='icon' />
+            <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} styleName='icon' />
           </div>
           <div style={{ flex: 1 }}>Media Folders</div>
         </div>

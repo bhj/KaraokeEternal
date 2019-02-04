@@ -4,7 +4,7 @@
 
   /* Defaults */
   --bg-color: #000;
-  --text-color: #ddd;
+  --text-color: #eee;
   --link-color: hsl(var(--hue-blue), 92%, 70%);
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
@@ -18,7 +18,7 @@
   --input-bg-color: #eee;
   --input-margin: 7px;
 
-  --btn-bg-color: hsl(var(--hue-blue), 50%, 25%);
+  --btn-bg-color: hsl(var(--hue-blue), 40%, 30%);
   --btn-active-bg-color: var(--link-color);
   --btn-active-filter: none;
   --btn-danger-bg-color: hsl(var(--hue-pink), 100%, 50%);
@@ -38,12 +38,14 @@
   /* Library */
   --artist-item-height: 44px;
   --artist-folder-color: var(--text-color);
-  --artist-folder-bg-color: hsl(var(--hue-blue), 90%, 27%);
-  --artist-folder-starred-bg-color: hsl(var(--hue-blue), 80%, 50%);
+  --artist-folder-bg-color: hsl(var(--hue-blue), 90%, 25%);
+  --artist-folder-starred-color: var(--text-color);
+  --artist-folder-starred-bg-color: hsl(var(--hue-blue), 90%, 45%);
+  --artist-expanded-border-color: hsl(var(--hue-blue), 50%, 15%);
 
   --song-item-btn-width: 44px;
   --song-item-btn-height: 44px;
-  --song-item-btn-bg-color: hsl(var(--hue-blue), 100%, 10%);
+  --song-item-btn-bg-color: hsl(var(--hue-blue), 100%, 15%);
   --song-item-btn-active-color: #333;
   --song-item-btn-active-bg-color: var(--btn-active-bg-color);
   --song-item-btn-active-filter: var(--btn-active-filter);
@@ -57,8 +59,8 @@
   --mark-bg-color: hsl(var(--hue-blue), 50%, 30%);
 
   /* Queue */
-  --current-item-from-bg-color: var(--header-notice-bg-color);
-  --current-item-to-bg-color: var(--header-notice-bg-color);
+  --active-item-from-bg-color: hsl(var(--hue-blue), 80%, 40%);
+  --active-item-to-bg-color: hsl(var(--hue-blue), 80%, 40%);
 
   /* Account panels */
   --panel-bg-color: hsl(var(--hue-blue), 20%, 10%);

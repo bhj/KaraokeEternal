@@ -1,19 +1,18 @@
 .container {
   display: flex;
   align-items: center;
-  height: 44px;
 }
 
-.containerExpanded {
+.containerQueued {
   composes: container;
-  height: 60px;
+  color: var(--queued-item-color);
+  text-shadow: var(--queued-item-text-shadow);
 }
 
 .duration {
-  font-size: 13px;
-  text-align: right;
-  margin-right: 18px;
-  width: 40px;
+  font-size: 12px;
+  text-align: center;
+  width: 44px;
 }
 
 .primary {
@@ -26,11 +25,6 @@
   font-size: 18px;
   text-overflow: ellipsis;
   overflow: hidden;
-}
-
-.isQueued {
-  color: var(--queued-item-color);
-  text-shadow: var(--queued-item-text-shadow);
 }
 
 .artist {

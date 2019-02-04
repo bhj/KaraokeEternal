@@ -1,7 +1,7 @@
 .container {
   display: flex;
   align-items: center;
-  background-image: linear-gradient(to right, var(--current-item-from-bg-color), var(--current-item-to-bg-color));
+  background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-to-bg-color));
   background-repeat: no-repeat;
   overflow: hidden;
 }
@@ -52,8 +52,7 @@
 
 .primaryActive {
   composes: primary;
-  color: #eee;
-  text-shadow: var(--text-shadow);
+  /* text-shadow: var(--glow-text-shadow); */
 }
 
 .innerPrimary {
@@ -68,20 +67,25 @@
 
 .title {
   composes: ellipsis;
-  font-size: 19px;
+  font-size: 18px;
 }
 
 .artist {
   composes: ellipsis;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .user {
-  font-size: 15px;
+  font-size: 14px;
   /*  for some reason composes: ellipsis; isn't working here */
   text-overflow: ellipsis;
   overflow:hidden;
   white-space: nowrap;
+  color: #bbb;
+}
+
+.isOwner {
+  color: var(--text-color);
 }
 
 .btnContainer {
@@ -97,21 +101,23 @@
   transition: opacity .3s;
 }
 
-.playNext, .remove, .info {
-  composes: btn;
-  filter: var(--btn-danger-filter);
-}
-
 .btnHidden {
   composes: btn;
   opacity: 0;
 }
 
+.playNext, .remove, .info {
+  composes: btn;
+  filter: var(--btn-danger-filter);
+}
+
 .star {
+  margin-right: var(--btn-margin);
   fill: var(--song-item-btn-bg-color);
 }
 
 .starStarred {
+  composes: star;
   fill: var(--song-item-btn-active-bg-color);
   filter: var(--song-item-btn-active-filter);
 }

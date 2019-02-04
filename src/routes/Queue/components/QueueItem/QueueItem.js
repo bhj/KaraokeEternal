@@ -55,7 +55,7 @@ class QueueItem extends React.Component {
         onSwipingLeft={this.handleSwipeLeft}
         onSwipingRight={this.handleSwipeRight}
         preventDefaultTouchmoveEvent
-        style={{ backgroundSize: props.pctPlayed + '% 100%' }}
+        style={{ backgroundSize: (props.isActive && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
         styleName='container'
       >
         <div styleName='innerContainer'>
@@ -63,7 +63,9 @@ class QueueItem extends React.Component {
             <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={60} styleName='image'/>
             <div styleName='waitContainer'>
               {props.isUpcoming &&
-                <div styleName='wait'>{props.waitValue}{props.waitUnit}</div>
+                <div styleName={props.isOwner ? 'wait isOwner' : 'wait'}>
+                  {props.waitValue}{props.waitUnit}
+                </div>
               }
             </div>
           </div>
@@ -73,7 +75,9 @@ class QueueItem extends React.Component {
               <div styleName='title'>{props.title}</div>
               <div styleName='artist'>{props.artist}</div>
             </div>
-            <div styleName='user'>{props.userDisplayName}</div>
+            <div styleName={props.isOwner ? 'user isOwner' : 'user'}>
+              {props.userDisplayName}
+            </div>
           </div>
 
           <div styleName='btnContainer' style={{ width: btnContainerWidth }}>
@@ -82,21 +86,23 @@ class QueueItem extends React.Component {
                 <Icon icon='INFO_OUTLINE' size={40} />
               </div>
             }
+
+            <div onClick={this.handleStarClick} styleName={props.isStarred ? 'starStarred' : 'star'}>
+              <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
+                <Icon size={40} icon={'STAR_FULL'}/>
+              </ToggleAnimation>
+            </div>
+
             {props.isSkippable &&
-              <div onClick={props.onSkipClick} styleName='playNext'>
+              <div onClick={props.onSkipClick}
+                styleName={state.isExpanded ? 'btn' : 'btnHidden'}>
                 <Icon icon='PLAY_NEXT' size={40} />
               </div>
             }
 
-            <div onClick={this.handleStarClick}>
-              <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
-                <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>
-              </ToggleAnimation>
-            </div>
-
             {props.isRemovable &&
               <div onClick={this.handleRemoveClick}
-                styleName={state.isExpanded || btnCount === 1 ? 'btn' : 'btnHidden'}>
+                styleName={state.isExpanded ? 'btn' : 'btnHidden'}>
                 <Icon icon='CLEAR' size={40} />
               </div>
             }

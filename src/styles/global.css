@@ -123,8 +123,8 @@ button.primary {
 @supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
   .bg-blur {
     background-color: transparent !important;
-    -webkit-backdrop-filter: blur(20px) saturate(200%);
-    -backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: saturate(250%) blur(20px);
+    -backdrop-filter: saturate(250%) blur(20px);
   }
 }
 

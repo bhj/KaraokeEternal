@@ -27,11 +27,13 @@ class ArtistItem extends React.Component {
 
     return (
       <div style={props.style}>
-        <div onClick={this.handleArtistClick} styleName='container'>
+        <div onClick={this.handleArtistClick} styleName={props.isExpanded ? 'containerExpanded' : 'container'}>
           <div styleName={isChildStarred ? 'folderStarred' : 'folder'}>
             <Icon icon='FOLDER' size={44}/>
             {props.isExpanded &&
-              <div styleName='expandedIcon'><Icon icon='CHEVRON_DOWN' size={24} /></div>
+              <div styleName={isChildStarred ? 'iconExpandedStarred' : 'iconExpanded'}>
+                <Icon icon='CHEVRON_DOWN' size={24} />
+              </div>
             }
             {!props.isExpanded &&
               <div styleName='count'>{props.artistSongIds.length}</div>

@@ -3,6 +3,12 @@
   height: var(--artist-item-height);
   align-items: center;
   overflow: hidden;
+  border-bottom: 1px solid var(--artist-expanded-border-color);
+}
+
+.containerExpanded {
+  composes: container;
+  border-bottom-color: var(--bg-color);
 }
 
 .name {
@@ -11,6 +17,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  padding-left: 3px;
 }
 
 .isChildQueued {
@@ -20,12 +27,12 @@
 
 .folder {
   height: var(--artist-item-height);
-  margin: 0 3px;
   fill: var(--artist-folder-bg-color);
 }
 
 .folderStarred {
   composes: folder;
+  color: var(  --artist-folder-starred-color);
   fill: var(--artist-folder-starred-bg-color);
 }
 
@@ -34,12 +41,16 @@
   top: -30px;
   text-align: center;
   font-size: 15px;
-  color: var(--artist-folder-color);
 }
 
-.expandedIcon {
+.iconExpanded {
   position: relative;
   top: -34px;
   text-align: center;
-  fill: var(--artist-folder-color);
+  fill: var(--text-color);
+}
+
+.iconExpandedStarred {
+  composes: iconExpanded;
+  fill: #000;
 }
