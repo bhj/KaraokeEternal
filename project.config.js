@@ -13,7 +13,7 @@ module.exports = {
   publicPath: '/',
   // http server host: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
   serverHost: '0.0.0.0',
-  // http server port: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
+  // http server port
   serverPort: NODE_ENV === 'development' ? 3000 : isNaN(KF_SERVER_PORT) ? 0 : KF_SERVER_PORT,
   // full path to database file
   database: path.join(KF_USER_PATH, 'database.sqlite3'),
