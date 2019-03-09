@@ -6,6 +6,10 @@ Host awesome karaoke parties where everyone can find and queue songs from their 
 
 Please get started with [the documentation](https://www.karaoke-forever.com/docs). Packaged downloads are coming soon.
 
+## Discord
+
+Join the new [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq) for general support and development chat, or say hi and show off your setup!
+
 ## Development
 
 Requires [Node.js 10](https://nodejs.org/en/) or later.
