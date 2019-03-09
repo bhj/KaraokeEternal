@@ -18,15 +18,6 @@ Requires [Node.js 10](https://nodejs.org/en/) or later.
 2. `npm install`
 3. `npm run dev` and look for "Web server running at" for the **server URL**
 
-The packaged builds of Karaoke Forever Server use Electron. If you want to play with that side of things:
-
-- `npm run install-app-deps`
-- `npm start`
-
-On Windows, you may want to do this first from an admin prompt:
-
-- `npm i --global --production windows-build-tools`
-
 ## Contributing
 
 Contributions are most welcome!
