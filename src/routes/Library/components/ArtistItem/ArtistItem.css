@@ -3,12 +3,10 @@
   height: var(--artist-item-height);
   align-items: center;
   overflow: hidden;
-  border-bottom: 1px solid var(--artist-expanded-border-color);
 }
 
 .containerExpanded {
   composes: container;
-  border-bottom-color: var(--bg-color);
 }
 
 .name {

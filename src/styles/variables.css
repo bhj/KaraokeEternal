@@ -4,7 +4,7 @@
 
   /* Defaults */
   --bg-color: #000;
-  --text-color: #eee;
+  --text-color: #ddd;
   --link-color: hsl(var(--hue-blue), 92%, 70%);
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
@@ -39,13 +39,12 @@
   --artist-item-height: 44px;
   --artist-folder-color: var(--text-color);
   --artist-folder-bg-color: hsl(var(--hue-blue), 90%, 25%);
-  --artist-folder-starred-color: var(--text-color);
-  --artist-folder-starred-bg-color: hsl(var(--hue-blue), 90%, 45%);
-  --artist-expanded-border-color: hsl(var(--hue-blue), 50%, 15%);
+  --artist-folder-starred-color: #000;
+  --artist-folder-starred-bg-color: var(--link-color);
 
   --song-item-btn-width: 44px;
   --song-item-btn-height: 44px;
-  --song-item-btn-bg-color: hsl(var(--hue-blue), 100%, 15%);
+  --song-item-btn-bg-color: hsl(var(--hue-blue), 100%, 12%);
   --song-item-btn-active-color: #333;
   --song-item-btn-active-bg-color: var(--btn-active-bg-color);
   --song-item-btn-active-filter: var(--btn-active-filter);
