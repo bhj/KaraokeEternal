@@ -79,7 +79,7 @@ if (__PROD__) {
         txt += m.licenseText.replace(/(\S)\n(\S)/gm, '$1 $2')
       })
 
-      return fs.readFileSync('./LICENSE', 'utf8') + txt
+      return 'Karaoke Forever\n' + fs.readFileSync('./LICENSE', 'utf8') + txt
     },
   }))
 }
