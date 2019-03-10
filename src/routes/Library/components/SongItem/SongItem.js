@@ -40,8 +40,8 @@ export default class SongItem extends React.Component {
 
     return (
       <Swipeable
-        onSwipingLeft={this.handleSwipeLeft}
-        onSwipingRight={this.handleSwipeRight}
+        onSwipedLeft={this.handleSwipeLeft}
+        onSwipedRight={this.handleSwipeRight}
         preventDefaultTouchmoveEvent
         style={{ height: props.artist ? 60 : 44 }}
         styleName={props.isQueued ? 'containerQueued' : 'container'}

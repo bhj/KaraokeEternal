@@ -52,8 +52,8 @@ class QueueItem extends React.Component {
 
     return (
       <Swipeable
-        onSwipingLeft={this.handleSwipeLeft}
-        onSwipingRight={this.handleSwipeRight}
+        onSwipedLeft={this.handleSwipeLeft}
+        onSwipedRight={this.handleSwipeRight}
         preventDefaultTouchmoveEvent
         style={{ backgroundSize: (props.isActive && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
         styleName='container'
