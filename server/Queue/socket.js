@@ -64,12 +64,15 @@ const ACTION_HANDLERS = {
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
-    // delete item
     const q = squel.delete()
       .from('queue')
       .where('queueId = ?', payload.queueId)
       .where('roomId = ?', sock.user.roomId)
-      .where('userId = ?', sock.user.userId)
+
+    // admins can remove any
+    if (!sock.user.isAdmin) {
+      q.where('userId = ?', sock.user.userId)
+    }
 
     const { text, values } = q.toParam()
     const res = await db.run(text, values)
