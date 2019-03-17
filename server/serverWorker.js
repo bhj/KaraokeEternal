@@ -49,6 +49,11 @@ app.on('error', (err, ctx) => {
     return
   }
 
+  // silence 4xx response "errors" (koa-logger should show these anyway)
+  if (ctx.response && ctx.response.status.toString().startsWith('4')) {
+    return
+  }
+
   log.error(err.message)
 })
 
