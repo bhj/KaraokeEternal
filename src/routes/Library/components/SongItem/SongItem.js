@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Swipeable from 'react-swipeable'
+import { Swipeable } from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
 import { formatSeconds } from 'lib/dateTime'
