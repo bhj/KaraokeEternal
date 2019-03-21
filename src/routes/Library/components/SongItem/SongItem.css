@@ -71,6 +71,7 @@
   font-size: 12px;
   top: -26px;
   text-align: center;
+  text-shadow: none;
   color: var(--text-color);
 }
 
