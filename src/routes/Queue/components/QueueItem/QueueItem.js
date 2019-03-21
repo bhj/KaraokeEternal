@@ -38,12 +38,6 @@ class QueueItem extends React.Component {
     isExpanded: false,
   }
 
-  handleSwipeLeft = (e, delta) => this.setState({
-    isExpanded: this.props.isErrored || this.props.isSkippable || this.props.isRemovable,
-  })
-
-  handleSwipeRight = (e, delta) => this.setState({ isExpanded: false })
-
   render () {
     const { props, state } = this
     const btnCount = 1 + props.isErrored + props.isSkippable + props.isRemovable
@@ -52,9 +46,10 @@ class QueueItem extends React.Component {
 
     return (
       <Swipeable
-        onSwipedLeft={this.handleSwipeLeft}
-        onSwipedRight={this.handleSwipeRight}
+        onSwipedLeft={this.handleSwipedLeft}
+        onSwipedRight={this.handleSwipedRight}
         preventDefaultTouchmoveEvent
+        trackMouse
         style={{ backgroundSize: (props.isActive && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
         styleName='container'
       >
@@ -112,17 +107,19 @@ class QueueItem extends React.Component {
     )
   }
 
-  handleStarClick = () => {
-    this.props.onStarClick(this.props.songId)
+  handleSwipedLeft = ({ event }) => {
+    this.setState({
+      isExpanded: this.props.isErrored || this.props.isSkippable || this.props.isRemovable,
+    })
   }
 
-  handleRemoveClick = () => {
-    this.props.onRemoveClick(this.props.queueId)
+  handleSwipedRight = ({ event }) => {
+    this.setState({ isExpanded: false })
   }
 
-  handleErrorInfoClick = () => {
-    this.props.onErrorInfoClick(this.props.errorMessage)
-  }
+  handleStarClick = () => this.props.onStarClick(this.props.songId)
+  handleRemoveClick = () => this.props.onRemoveClick(this.props.queueId)
+  handleErrorInfoClick = () => this.props.onErrorInfoClick(this.props.errorMessage)
 }
 
 export default QueueItem

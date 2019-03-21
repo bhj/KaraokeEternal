@@ -6,6 +6,7 @@ import ToggleAnimation from 'components/ToggleAnimation'
 import { formatSeconds } from 'lib/dateTime'
 import Highlighter from 'react-highlight-words'
 import './SongItem.css'
+let ignoreMouseup = false
 
 export default class SongItem extends React.Component {
   static propTypes = {
@@ -29,20 +30,15 @@ export default class SongItem extends React.Component {
     isExpanded: false,
   }
 
-  handleQueue = () => this.props.onSongQueue(this.props.songId)
-  handleStarClick = () => this.props.onSongStarClick(this.props.songId)
-  handleSwipeLeft = (e, delta) => this.setState({ isExpanded: this.props.isAdmin })
-  handleSwipeRight = (e, delta) => this.setState({ isExpanded: false })
-  handleInfo = () => this.props.onSongInfo(this.props.songId)
-
   render () {
     const { props, state } = this
 
     return (
       <Swipeable
-        onSwipedLeft={this.handleSwipeLeft}
-        onSwipedRight={this.handleSwipeRight}
+        onSwipedLeft={this.handleSwipedLeft}
+        onSwipedRight={this.handleSwipedRight}
         preventDefaultTouchmoveEvent
+        trackMouse
         style={{ height: props.artist ? 60 : 44 }}
         styleName={props.isQueued ? 'containerQueued' : 'container'}
       >
@@ -50,7 +46,7 @@ export default class SongItem extends React.Component {
           {formatSeconds(props.duration)}
         </div>
 
-        <div onClick={this.handleQueue} styleName='primary'>
+        <div onClick={this.handleClick} styleName='primary'>
           <div styleName='title'>
             <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
             {props.isAdmin && props.numMedia > 1 && <i> ({props.numMedia})</i>}
@@ -67,11 +63,28 @@ export default class SongItem extends React.Component {
               {props.numStars ? props.numStars : ''}
             </div>
           </div>
-          <div onClick={this.handleInfo} styleName={state.isExpanded ? 'btn' : 'btnHidden'}>
+          <div onClick={this.handleInfoClick} styleName={state.isExpanded ? 'btn' : 'btnHidden'}>
             <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
           </div>
         </div>
       </Swipeable>
     )
   }
+
+  handleSwipedLeft = ({ event }) => {
+    ignoreMouseup = event.type === 'mouseup'
+    this.setState({ isExpanded: this.props.isAdmin })
+  }
+
+  handleSwipedRight = ({ event }) => {
+    ignoreMouseup = event.type === 'mouseup'
+    this.setState({ isExpanded: false })
+  }
+
+  handleClick = () => {
+    ignoreMouseup ? ignoreMouseup = false : this.props.onSongQueue(this.props.songId)
+  }
+
+  handleStarClick = () => this.props.onSongStarClick(this.props.songId)
+  handleInfoClick = () => this.props.onSongInfo(this.props.songId)
 }
