@@ -1,6 +1,6 @@
 .container {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 0;
 }
 
@@ -29,4 +29,12 @@
   composes: fadeExit;
   opacity: 0.01;
   transition: opacity 1000ms ease-in;
+}
+
+.user {
+  font-size: 5vh;
+}
+
+.userImage {
+  height: 20vh;
 }

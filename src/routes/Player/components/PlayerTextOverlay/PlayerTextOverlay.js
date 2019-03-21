@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import ColorCycle from './ColorCycle'
 import UpNow from './UpNow'
-import UserImage from 'components/UserImage'
 import './PlayerTextOverlay.css'
 
 class PlayerTextOverlay extends React.Component {
@@ -30,15 +29,7 @@ class PlayerTextOverlay extends React.Component {
         <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} />
       </>
     } else {
-      Component =
-        <UpNow queueId={queueItem.queueId}>
-          <UserImage
-            userId={queueItem.userId}
-            dateUpdated={queueItem.dateUpdated}
-            height={this.props.height / 5}
-          />
-          <ColorCycle text={queueItem.userDisplayName} />
-        </UpNow>
+      Component = <UpNow queueItem={queueItem} />
     }
 
     return (

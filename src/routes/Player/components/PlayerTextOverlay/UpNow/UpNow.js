@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { CSSTransition } from 'react-transition-group'
+import UserImage from 'components/UserImage'
 import styles from './UpNow.css'
 
 class UpNow extends React.Component {
   static propTypes = {
-    children: PropTypes.any,
-    queueId: PropTypes.number.isRequired,
+    queueItem: PropTypes.object.isRequired,
   }
 
   timeoutID = null
@@ -19,7 +19,7 @@ class UpNow extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (this.props.queueId !== prevProps.queueId) {
+    if (this.props.queueItem.queueId !== prevProps.queueItem.queueId) {
       this.animate()
     }
   }
@@ -50,7 +50,14 @@ class UpNow extends React.Component {
             exitActive: styles.fadeExitActive,
           }}>
           <div className='bg-blur' styleName='styles.textContainer'>
-            {this.props.children}
+            <UserImage
+              userId={this.props.queueItem.userId}
+              dateUpdated={this.props.queueItem.dateUpdated}
+              className={styles.userImage}
+            />
+            <div className={styles.user}>
+              {this.props.queueItem.userDisplayName}
+            </div>
           </div>
         </CSSTransition>
       </div>
