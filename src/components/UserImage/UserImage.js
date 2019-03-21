@@ -21,7 +21,7 @@ class UserImage extends React.Component {
 
     return (
       <>
-        {(state.isLoading || state.isErrored) &&
+        {(state.isLoading || state.isErrored) && props.height &&
           <Icon icon='ACCOUNT' size={props.height} styleName='placeholder'/>
         }
 
@@ -33,7 +33,7 @@ class UserImage extends React.Component {
             styleName='image'
             style={{
               display: state.isLoading ? 'none' : 'initial',
-              height: props.height || 'auto',
+              height: props.height ? props.height : null,
             }}
           />
         }
