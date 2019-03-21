@@ -61,7 +61,7 @@
 
 .ellipsis {
   text-overflow: ellipsis;
-  overflow:hidden;
+  overflow: hidden;
   white-space: nowrap;
 }
 
@@ -81,11 +81,12 @@
   text-overflow: ellipsis;
   overflow:hidden;
   white-space: nowrap;
-  color: #bbb;
+  color: #999;
 }
 
 .isOwner {
   color: var(--text-color);
+  text-shadow: var(--glow-text-shadow);
 }
 
 .btnContainer {
