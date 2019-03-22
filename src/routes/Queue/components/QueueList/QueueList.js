@@ -21,6 +21,7 @@ class QueueList extends React.Component {
     // actions
     requestPlayNext: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
+    showSongInfo: PropTypes.func.isRequired,
     showErrorMessage: PropTypes.func.isRequired,
     toggleSongStarred: PropTypes.func.isRequired,
   }
@@ -79,6 +80,7 @@ class QueueList extends React.Component {
             waitValue={wait.value}
             // actions
             onErrorInfoClick={props.showErrorMessage}
+            onInfoClick={props.showSongInfo}
             onRemoveClick={props.removeItem}
             onSkipClick={props.requestPlayNext}
             onStarClick={props.toggleSongStarred}

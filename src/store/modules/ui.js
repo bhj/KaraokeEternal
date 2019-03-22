@@ -1,11 +1,17 @@
+import HttpApi from 'lib/HttpApi'
 import { CALCULATE_RESPONSIVE_STATE } from 'redux-responsive'
 import {
   HEADER_HEIGHT_CHANGE,
   FOOTER_HEIGHT_CHANGE,
   SHOW_ERROR_MESSAGE,
   CLEAR_ERROR_MESSAGE,
+  SONG_INFO_REQUEST,
+  SONG_INFO_CLOSE,
+  _SUCCESS,
+  _ERROR,
 } from 'shared/actionTypes'
 
+const api = new HttpApi('library')
 let scrollLockTimer
 
 // ------------------------------------
@@ -61,6 +67,49 @@ export function lockScrolling (lock) {
 }
 
 // ------------------------------------
+// Song info/edit
+// ------------------------------------
+export function showSongInfo (songId) {
+  return (dispatch, getState) => {
+    dispatch(requestSongInfo(songId))
+
+    return api('GET', `/song/${songId}`)
+      .then(res => {
+        dispatch(receiveSongInfo(res))
+      }).catch(err => {
+        dispatch(songInfoError(err))
+      })
+  }
+}
+
+function requestSongInfo (songId) {
+  return {
+    type: SONG_INFO_REQUEST,
+    payload: { songId }
+  }
+}
+
+function receiveSongInfo (res) {
+  return {
+    type: SONG_INFO_REQUEST + _SUCCESS,
+    payload: res
+  }
+}
+
+function songInfoError (err) {
+  return {
+    type: SONG_INFO_REQUEST + _ERROR,
+    error: err.message,
+  }
+}
+
+export function closeSongInfo () {
+  return {
+    type: SONG_INFO_CLOSE,
+  }
+}
+
+// ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
@@ -89,6 +138,23 @@ const ACTION_HANDLERS = {
     ...state,
     errorMessage: null,
   }),
+  [SONG_INFO_REQUEST]: (state, { payload }) => ({
+    ...state,
+    isSongInfoOpen: true,
+    songInfoMedia: { result: [], entities: {} },
+  }),
+  [SONG_INFO_REQUEST + _SUCCESS]: (state, { payload }) => ({
+    ...state,
+    songInfoMedia: payload,
+  }),
+  [SONG_INFO_REQUEST + _ERROR]: (state, { payload }) => ({
+    ...state,
+    isSongInfoOpen: false,
+  }),
+  [SONG_INFO_CLOSE]: (state, { payload }) => ({
+    ...state,
+    isSongInfoOpen: false,
+  }),
 }
 
 // ------------------------------------
@@ -102,6 +168,9 @@ const initialState = {
   viewportWidth: 0,
   viewportHeight: 0,
   errorMessage: null,
+  // song info modal
+  isSongInfoOpen: false,
+  songInfoMedia: { result: [], entities: {} },
 }
 
 export default function uiReducer (state = initialState, action) {

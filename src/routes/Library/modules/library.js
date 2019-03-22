@@ -1,19 +1,12 @@
-import HttpApi from 'lib/HttpApi'
 import {
   LIBRARY_FILTER_STRING,
   LIBRARY_FILTER_STRING_RESET,
   LIBRARY_FILTER_TOGGLE_STARRED,
-  LIBRARY_SONG_INFO_REQUEST,
-  LIBRARY_SONG_INFO_CLOSE,
   LIBRARY_PUSH,
   TOGGLE_ARTIST_EXPANDED,
   TOGGLE_ARTIST_RESULT_EXPANDED,
   SCROLL_ARTISTS,
-  _SUCCESS,
-  _ERROR,
 } from 'shared/actionTypes'
-
-const api = new HttpApi('library')
 
 export function scrollArtists (scrollTop) {
   return {
@@ -62,49 +55,6 @@ export function toggleFilterStarred () {
 }
 
 // ------------------------------------
-// Song info/edit
-// ------------------------------------
-export function showSongInfo (songId) {
-  return (dispatch, getState) => {
-    dispatch(requestSongInfo(songId))
-
-    return api('GET', `/song/${songId}`)
-      .then(res => {
-        dispatch(receiveSongInfo(res))
-      }).catch(err => {
-        dispatch(songInfoError(err))
-      })
-  }
-}
-
-function requestSongInfo (songId) {
-  return {
-    type: LIBRARY_SONG_INFO_REQUEST,
-    payload: { songId }
-  }
-}
-
-function receiveSongInfo (res) {
-  return {
-    type: LIBRARY_SONG_INFO_REQUEST + _SUCCESS,
-    payload: res
-  }
-}
-
-function songInfoError (err) {
-  return {
-    type: LIBRARY_SONG_INFO_REQUEST + _ERROR,
-    error: err.message,
-  }
-}
-
-export function closeSongInfo () {
-  return {
-    type: LIBRARY_SONG_INFO_CLOSE,
-  }
-}
-
-// ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
@@ -144,23 +94,6 @@ const ACTION_HANDLERS = {
       expandedArtistResults: list,
     }
   },
-  [LIBRARY_SONG_INFO_REQUEST]: (state, { payload }) => ({
-    ...state,
-    isSongInfoOpen: true,
-    songInfoMedia: { result: [], entities: {} },
-  }),
-  [LIBRARY_SONG_INFO_REQUEST + _SUCCESS]: (state, { payload }) => ({
-    ...state,
-    songInfoMedia: payload,
-  }),
-  [LIBRARY_SONG_INFO_REQUEST + _ERROR]: (state, { payload }) => ({
-    ...state,
-    isSongInfoOpen: false,
-  }),
-  [LIBRARY_SONG_INFO_CLOSE]: (state, { payload }) => ({
-    ...state,
-    isSongInfoOpen: false,
-  }),
   [LIBRARY_PUSH]: (state, { payload }) => ({
     ...state,
     isLoading: false,
@@ -179,9 +112,6 @@ let initialState = {
   scrollTop: 0,
   expandedArtists: [],
   expandedArtistResults: [],
-  // song info modal
-  isSongInfoOpen: false,
-  songInfoMedia: { result: [], entities: {} },
 }
 
 export default function libraryReducer (state = initialState, action) {

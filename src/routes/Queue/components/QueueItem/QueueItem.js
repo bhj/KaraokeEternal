@@ -5,7 +5,7 @@ import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
 import './QueueItem.css'
-const BTN_WIDTH = 50 // larger than the icon
+const BTN_WIDTH = 45 // larger than the icon
 
 class QueueItem extends React.Component {
   static propTypes = {
@@ -31,6 +31,7 @@ class QueueItem extends React.Component {
     onErrorInfoClick: PropTypes.func.isRequired,
     onRemoveClick: PropTypes.func.isRequired,
     onSkipClick: PropTypes.func.isRequired,
+    onInfoClick: PropTypes.func.isRequired,
     onStarClick: PropTypes.func.isRequired,
   }
 
@@ -40,7 +41,7 @@ class QueueItem extends React.Component {
 
   render () {
     const { props, state } = this
-    const btnCount = 1 + props.isErrored + props.isSkippable + props.isRemovable
+    const btnCount = 2 + props.isErrored + props.isSkippable + props.isRemovable
     // if errored we want to show the skip button as well, even when not expanded
     const btnContainerWidth = BTN_WIDTH * (state.isExpanded ? btnCount : props.isErrored && props.isSkippable ? 2 : 1)
 
@@ -77,12 +78,12 @@ class QueueItem extends React.Component {
 
           <div styleName='btnContainer' style={{ width: btnContainerWidth }}>
             {props.isErrored &&
-              <div onClick={this.handleErrorInfoClick} styleName='info'>
+              <div onClick={this.handleErrorInfoClick} styleName='btnDanger'>
                 <Icon icon='INFO_OUTLINE' size={40} />
               </div>
             }
 
-            <div onClick={this.handleStarClick} styleName={props.isStarred ? 'starStarred' : 'star'}>
+            <div onClick={this.handleStarClick} styleName={props.isStarred ? 'btnActive' : 'btn'}>
               <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
                 <Icon size={40} icon={'STAR_FULL'}/>
               </ToggleAnimation>
@@ -95,9 +96,14 @@ class QueueItem extends React.Component {
               </div>
             }
 
+            <div onClick={this.handleInfoClick}
+              styleName={state.isExpanded ? 'btnActive' : 'btnHidden'}>
+              <Icon icon='INFO_OUTLINE' size={40} />
+            </div>
+
             {props.isRemovable &&
               <div onClick={this.handleRemoveClick}
-                styleName={state.isExpanded ? 'btn' : 'btnHidden'}>
+                styleName={state.isExpanded ? 'btnDanger btnLast' : 'btnHidden btnLast'}>
                 <Icon icon='CLEAR' size={40} />
               </div>
             }
@@ -118,6 +124,7 @@ class QueueItem extends React.Component {
   }
 
   handleStarClick = () => this.props.onStarClick(this.props.songId)
+  handleInfoClick = () => this.props.onInfoClick(this.props.songId)
   handleRemoveClick = () => this.props.onRemoveClick(this.props.queueId)
   handleErrorInfoClick = () => this.props.onErrorInfoClick(this.props.errorMessage)
 }

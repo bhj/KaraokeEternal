@@ -3,12 +3,8 @@ import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from 'reselect'
 import { Searcher } from 'fast-fuzzy'
 import LibraryView from './LibraryView'
-import {
-  scrollArtists,
-  toggleArtistExpanded,
-  toggleArtistResultExpanded,
-  closeSongInfo,
-} from '../modules/library'
+import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'
+import { showSongInfo, closeSongInfo } from 'store/modules/ui'
 
 const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs
@@ -123,7 +119,6 @@ const mapStateToProps = (state) => {
     isSearching: !!getFilterKeywords(state).length || getFilterStarred(state),
     isLoading: state.library.isLoading,
     isEmpty: state.songs.result.length === 0,
-    isSongInfoOpen: state.library.isSongInfoOpen,
     ui: state.ui,
     // SearchResults view
     songsResult: getSongsByView(state),
@@ -138,6 +133,7 @@ const mapActionCreators = {
   toggleArtistExpanded,
   toggleArtistResultExpanded,
   scrollArtists,
+  showSongInfo,
   closeSongInfo,
 }
 

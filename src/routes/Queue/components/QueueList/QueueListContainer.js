@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from 'reselect'
 import QueueList from './QueueList'
-import { showErrorMessage } from 'store/modules/ui'
+import { showErrorMessage, showSongInfo, closeSongInfo } from 'store/modules/ui'
 import { requestPlay, requestPause, requestPlayNext } from 'store/modules/status'
 import { queueSong, removeItem } from '../../modules/queue'
 import { toggleSongStarred } from 'store/modules/userStars'
@@ -54,12 +54,14 @@ const mapStateToProps = (state) => {
 }
 
 const mapActionCreators = {
+  closeSongInfo,
   queueSong,
   removeItem,
   requestPlay,
   requestPlayNext,
   requestPause,
   showErrorMessage,
+  showSongInfo,
   toggleSongStarred,
 }
 

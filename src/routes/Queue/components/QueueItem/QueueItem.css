@@ -52,7 +52,6 @@
 
 .primaryActive {
   composes: primary;
-  /* text-shadow: var(--glow-text-shadow); */
 }
 
 .innerPrimary {
@@ -97,9 +96,15 @@
 
 /* Actions */
 .btn {
+  fill: var(--song-item-btn-bg-color);
   margin-right: var(--btn-margin);
-  fill: var(--btn-danger-bg-color);
   transition: opacity .3s;
+}
+
+.btnActive {
+  composes: btn;
+  fill: var(--song-item-btn-active-bg-color);
+  filter: var(--song-item-btn-active-filter);
 }
 
 .btnHidden {
@@ -107,20 +112,19 @@
   opacity: 0;
 }
 
-.playNext, .remove, .info {
+.btnDanger {
   composes: btn;
+  fill: var(--btn-danger-bg-color);
   filter: var(--btn-danger-filter);
 }
 
-.star {
-  margin-right: var(--btn-margin);
-  fill: var(--song-item-btn-bg-color);
+.btnLast {
+  margin-right: 0;
 }
 
-.starStarred {
-  composes: star;
-  fill: var(--song-item-btn-active-bg-color);
-  filter: var(--song-item-btn-active-filter);
+.playNext, .remove {
+  composes: btn;
+  filter: var(--btn-danger-filter);
 }
 
 .animateStar {
