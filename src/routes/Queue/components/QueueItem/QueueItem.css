@@ -1,12 +1,10 @@
 .container {
-  display: flex;
-  align-items: center;
   background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-to-bg-color));
   background-repeat: no-repeat;
   overflow: hidden;
 }
 
-.innerContainer {
+.content {
   display: flex;
   flex: 1;
   margin: var(--container-padding);
@@ -80,7 +78,7 @@
   text-overflow: ellipsis;
   overflow:hidden;
   white-space: nowrap;
-  color: #999;
+  color: #888;
 }
 
 .isOwner {
@@ -88,17 +86,16 @@
   text-shadow: var(--glow-text-shadow);
 }
 
+/* Buttons */
 .btnContainer {
-  display: flex;
   align-items: center;
-  transition: width var(--spring-duration) var(--function-spring);
+  display: flex;
+  transition: opacity .3s, width var(--spring-duration) var(--spring-function);
 }
 
-/* Actions */
 .btn {
   fill: var(--song-item-btn-bg-color);
   margin-right: var(--btn-margin);
-  transition: opacity .3s;
 }
 
 .btnActive {
@@ -107,23 +104,9 @@
   filter: var(--song-item-btn-active-filter);
 }
 
-.btnHidden {
-  composes: btn;
-  opacity: 0;
-}
-
 .btnDanger {
   composes: btn;
   fill: var(--btn-danger-bg-color);
-  filter: var(--btn-danger-filter);
-}
-
-.btnLast {
-  margin-right: 0;
-}
-
-.playNext, .remove {
-  composes: btn;
   filter: var(--btn-danger-filter);
 }
 

@@ -3,9 +3,12 @@ import React from 'react'
 import { Swipeable } from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
+import Revealable from 'components/Revealable'
 import { formatSeconds } from 'lib/dateTime'
 import Highlighter from 'react-highlight-words'
 import './SongItem.css'
+
+const BTN_WIDTH = 45 // larger than the icon
 let ignoreMouseup = false
 
 export default class SongItem extends React.Component {
@@ -54,7 +57,7 @@ export default class SongItem extends React.Component {
           </div>
         </div>
 
-        <div styleName={state.isExpanded ? 'btnContainerExpanded' : 'btnContainer'}>
+        <div styleName='btnContainer'>
           <div onClick={this.handleStarClick} styleName='btn'>
             <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
               <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>
@@ -63,10 +66,17 @@ export default class SongItem extends React.Component {
               {props.numStars ? props.numStars : ''}
             </div>
           </div>
-          <div onClick={this.handleInfoClick} styleName={state.isExpanded ? 'btn' : 'btnHidden'}>
+        </div>
+
+        <Revealable styleName='btnContainer'
+          reveal={this.state.isExpanded}
+          maxWidth={BTN_WIDTH}
+          minWidth={5} // leave room for animation overshoot
+        >
+          <div onClick={this.handleInfoClick} styleName='btn'>
             <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
           </div>
-        </div>
+        </Revealable>
       </Swipeable>
     )
   }

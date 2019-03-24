@@ -4,6 +4,7 @@ import { Swipeable } from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
+import Revealable from 'components/Revealable'
 import './QueueItem.css'
 const BTN_WIDTH = 45 // larger than the icon
 
@@ -40,10 +41,7 @@ class QueueItem extends React.Component {
   }
 
   render () {
-    const { props, state } = this
-    const btnCount = 2 + props.isErrored + props.isSkippable + props.isRemovable
-    // if errored we want to show the skip button as well, even when not expanded
-    const btnContainerWidth = BTN_WIDTH * (state.isExpanded ? btnCount : props.isErrored && props.isSkippable ? 2 : 1)
+    const { props } = this
 
     return (
       <Swipeable
@@ -54,7 +52,7 @@ class QueueItem extends React.Component {
         style={{ backgroundSize: (props.isActive && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
         styleName='container'
       >
-        <div styleName='innerContainer'>
+        <div styleName='content'>
           <div styleName='imageContainer'>
             <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={60} styleName='image'/>
             <div styleName='waitContainer'>
@@ -76,38 +74,38 @@ class QueueItem extends React.Component {
             </div>
           </div>
 
-          <div styleName='btnContainer' style={{ width: btnContainerWidth }}>
+          <div styleName='btnContainer'>
             {props.isErrored &&
               <div onClick={this.handleErrorInfoClick} styleName='btnDanger'>
                 <Icon icon='INFO_OUTLINE' size={40} />
               </div>
             }
-
             <div onClick={this.handleStarClick} styleName={props.isStarred ? 'btnActive' : 'btn'}>
               <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
                 <Icon size={40} icon={'STAR_FULL'}/>
               </ToggleAnimation>
             </div>
+          </div>
 
-            {props.isSkippable &&
-              <div onClick={props.onSkipClick}
-                styleName={state.isExpanded ? 'btn' : 'btnHidden'}>
-                <Icon icon='PLAY_NEXT' size={40} />
-              </div>
-            }
-
-            <div onClick={this.handleInfoClick}
-              styleName={state.isExpanded ? 'btnActive' : 'btnHidden'}>
+          <Revealable styleName='btnContainer'
+            reveal={this.state.isExpanded}
+            maxWidth={BTN_WIDTH * (1 + props.isRemovable + props.isSkippable)}
+            minWidth={5} // leave room for animation overshoot
+          >
+            <div onClick={this.handleInfoClick} styleName='btnActive'>
               <Icon icon='INFO_OUTLINE' size={40} />
             </div>
-
             {props.isRemovable &&
-              <div onClick={this.handleRemoveClick}
-                styleName={state.isExpanded ? 'btnDanger btnLast' : 'btnHidden btnLast'}>
+              <div onClick={this.handleRemoveClick} styleName='btnDanger'>
                 <Icon icon='CLEAR' size={40} />
               </div>
             }
-          </div>
+            {props.isSkippable &&
+              <div onClick={props.onSkipClick} styleName='btnDanger'>
+                <Icon icon='PLAY_NEXT' size={40} />
+              </div>
+            }
+          </Revealable>
         </div>
       </Swipeable>
     )
