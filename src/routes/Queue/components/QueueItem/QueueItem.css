@@ -76,7 +76,7 @@
   font-size: 14px;
   /*  for some reason composes: ellipsis; isn't working here */
   text-overflow: ellipsis;
-  overflow:hidden;
+  overflow: hidden;
   white-space: nowrap;
   color: #888;
 }
@@ -88,9 +88,8 @@
 
 /* Buttons */
 .btnContainer {
-  align-items: center;
   display: flex;
-  transition: opacity .3s, width var(--spring-duration) var(--spring-function);
+  align-items: center;
 }
 
 .btn {

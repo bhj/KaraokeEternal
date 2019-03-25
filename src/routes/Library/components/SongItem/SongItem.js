@@ -8,7 +8,6 @@ import { formatSeconds } from 'lib/dateTime'
 import Highlighter from 'react-highlight-words'
 import './SongItem.css'
 
-const BTN_WIDTH = 45 // larger than the icon
 let ignoreMouseup = false
 
 export default class SongItem extends React.Component {
@@ -66,17 +65,15 @@ export default class SongItem extends React.Component {
               {props.numStars ? props.numStars : ''}
             </div>
           </div>
+          <Revealable
+            reveal={this.state.isExpanded}
+            width={50}
+          >
+            <div onClick={this.handleInfoClick} styleName='btn'>
+              <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
+            </div>
+          </Revealable>
         </div>
-
-        <Revealable styleName='btnContainer'
-          reveal={this.state.isExpanded}
-          maxWidth={BTN_WIDTH}
-          minWidth={5} // leave room for animation overshoot
-        >
-          <div onClick={this.handleInfoClick} styleName='btn'>
-            <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
-          </div>
-        </Revealable>
       </Swipeable>
     )
   }

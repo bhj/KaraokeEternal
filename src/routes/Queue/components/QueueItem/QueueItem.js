@@ -6,7 +6,6 @@ import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
 import Revealable from 'components/Revealable'
 import './QueueItem.css'
-const BTN_WIDTH = 45 // larger than the icon
 
 class QueueItem extends React.Component {
   static propTypes = {
@@ -85,27 +84,26 @@ class QueueItem extends React.Component {
                 <Icon size={40} icon={'STAR_FULL'}/>
               </ToggleAnimation>
             </div>
-          </div>
 
-          <Revealable styleName='btnContainer'
-            reveal={this.state.isExpanded}
-            maxWidth={BTN_WIDTH * (1 + props.isRemovable + props.isSkippable)}
-            minWidth={5} // leave room for animation overshoot
-          >
-            <div onClick={this.handleInfoClick} styleName='btnActive'>
-              <Icon icon='INFO_OUTLINE' size={40} />
-            </div>
-            {props.isRemovable &&
-              <div onClick={this.handleRemoveClick} styleName='btnDanger'>
-                <Icon icon='CLEAR' size={40} />
+            <Revealable
+              reveal={this.state.isExpanded}
+              width={45 * (1 + props.isRemovable + props.isSkippable)}
+            >
+              <div onClick={this.handleInfoClick} styleName='btnActive'>
+                <Icon icon='INFO_OUTLINE' size={40} />
               </div>
-            }
-            {props.isSkippable &&
-              <div onClick={props.onSkipClick} styleName='btnDanger'>
-                <Icon icon='PLAY_NEXT' size={40} />
-              </div>
-            }
-          </Revealable>
+              {props.isRemovable &&
+                <div onClick={this.handleRemoveClick} styleName='btnDanger'>
+                  <Icon icon='CLEAR' size={40} />
+                </div>
+              }
+              {props.isSkippable &&
+                <div onClick={props.onSkipClick} styleName='btnDanger'>
+                  <Icon icon='PLAY_NEXT' size={40} />
+                </div>
+              }
+            </Revealable>
+          </div>
         </div>
       </Swipeable>
     )

@@ -36,8 +36,8 @@
 
 .btnContainer {
   display: flex;
-  width: var(--song-item-btn-width);
-  transition: opacity .3s, width var(--spring-duration) var(--spring-function);
+  position: relative;
+  left: 5px;
 }
 
 .btn {

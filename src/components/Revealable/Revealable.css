@@ -1,0 +1,5 @@
+.container {
+  display: flex;
+  align-items: center;
+  transition: opacity .3s, width var(--spring-duration) var(--spring-function), max-width var(--spring-duration) var(--spring-function);
+}
