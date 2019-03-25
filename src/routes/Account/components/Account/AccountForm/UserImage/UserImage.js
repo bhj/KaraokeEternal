@@ -69,8 +69,8 @@ export default class AccountForm extends Component {
         }
 
         const scaled = loadImage.scale(canvas, {
-          maxWidth: 200,
-          maxHeight: 150,
+          maxWidth: 400,
+          maxHeight: 300,
           crop: true,
           downsamplingRatio: 0.5,
         })
