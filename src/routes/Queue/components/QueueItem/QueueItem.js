@@ -4,7 +4,7 @@ import { Swipeable } from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
-import Revealable from 'components/Revealable'
+import Buttons from 'components/Buttons'
 import './QueueItem.css'
 
 class QueueItem extends React.Component {
@@ -40,7 +40,7 @@ class QueueItem extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     return (
       <Swipeable
@@ -53,7 +53,7 @@ class QueueItem extends React.Component {
       >
         <div styleName='content'>
           <div styleName='imageContainer'>
-            <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={60} styleName='image'/>
+            <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={72} styleName='image'/>
             <div styleName='waitContainer'>
               {props.isUpcoming &&
                 <div styleName={props.isOwner ? 'wait isOwner' : 'wait'}>
@@ -73,37 +73,32 @@ class QueueItem extends React.Component {
             </div>
           </div>
 
-          <div styleName='btnContainer'>
+          <Buttons btnWidth={45} showHidden={state.isExpanded}>
             {props.isErrored &&
-              <div onClick={this.handleErrorInfoClick} styleName='btnDanger'>
+              <div onClick={this.handleErrorInfoClick} styleName='btn danger'>
                 <Icon icon='INFO_OUTLINE' size={40} />
               </div>
             }
-            <div onClick={this.handleStarClick} styleName={props.isStarred ? 'btnActive' : 'btn'}>
+            <div onClick={this.handleStarClick} styleName={props.isStarred ? 'btn active' : 'btn'}>
               <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
                 <Icon size={40} icon={'STAR_FULL'}/>
               </ToggleAnimation>
             </div>
 
-            <Revealable
-              reveal={this.state.isExpanded}
-              width={45 * (1 + props.isRemovable + props.isSkippable)}
-            >
-              <div onClick={this.handleInfoClick} styleName='btnActive'>
-                <Icon icon='INFO_OUTLINE' size={40} />
+            <div onClick={this.handleInfoClick} styleName='btn active' data-hide>
+              <Icon icon='INFO_OUTLINE' size={40} />
+            </div>
+            {props.isRemovable &&
+              <div onClick={this.handleRemoveClick} styleName='btn danger' data-hide>
+                <Icon icon='CLEAR' size={40} />
               </div>
-              {props.isRemovable &&
-                <div onClick={this.handleRemoveClick} styleName='btnDanger'>
-                  <Icon icon='CLEAR' size={40} />
-                </div>
-              }
-              {props.isSkippable &&
-                <div onClick={props.onSkipClick} styleName='btnDanger'>
-                  <Icon icon='PLAY_NEXT' size={40} />
-                </div>
-              }
-            </Revealable>
-          </div>
+            }
+            {props.isSkippable &&
+              <div onClick={props.onSkipClick} styleName='btn danger' data-hide>
+                <Icon icon='PLAY_NEXT' size={40} />
+              </div>
+            }
+          </Buttons>
         </div>
       </Swipeable>
     )

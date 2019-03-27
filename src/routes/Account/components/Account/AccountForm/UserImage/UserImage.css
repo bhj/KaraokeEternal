@@ -1,8 +1,8 @@
 .container {
     overflow: hidden;
     position: relative;
-    min-width: 100px;
-    height: 75px;
+    min-width: 96px;
+    height: 72px;
     border-radius: var(--border-radius);
     text-align: center;
 }

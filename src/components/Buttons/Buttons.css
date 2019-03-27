@@ -1,0 +1,9 @@
+.container {
+  display: flex;
+  align-items: center;
+  transition: width var(--spring-duration) var(--spring-function);
+}
+
+.btnHide {
+  opacity: 0;
+}

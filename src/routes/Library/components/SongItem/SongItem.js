@@ -3,7 +3,7 @@ import React from 'react'
 import { Swipeable } from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
-import Revealable from 'components/Revealable'
+import Buttons from 'components/Buttons'
 import { formatSeconds } from 'lib/dateTime'
 import Highlighter from 'react-highlight-words'
 import './SongItem.css'
@@ -56,8 +56,8 @@ export default class SongItem extends React.Component {
           </div>
         </div>
 
-        <div styleName='btnContainer'>
-          <div onClick={this.handleStarClick} styleName='btn'>
+        <Buttons btnWidth={45} showHidden={state.isExpanded}>
+          <div onClick={this.handleStarClick} styleName='btn star'>
             <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
               <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>
             </ToggleAnimation>
@@ -65,15 +65,10 @@ export default class SongItem extends React.Component {
               {props.numStars ? props.numStars : ''}
             </div>
           </div>
-          <Revealable
-            reveal={this.state.isExpanded}
-            width={50}
-          >
-            <div onClick={this.handleInfoClick} styleName='btn'>
-              <Icon size={44} icon='INFO_OUTLINE' styleName='info' />
-            </div>
-          </Revealable>
-        </div>
+          <div onClick={this.handleInfoClick} styleName='btn' data-hide>
+            <Icon size={44} icon='INFO_OUTLINE' styleName='btn info' />
+          </div>
+        </Buttons>
       </Swipeable>
     )
   }

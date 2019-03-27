@@ -10,6 +10,7 @@
 }
 
 .duration {
+  color: #888;
   font-size: 12px;
   text-align: center;
   width: 44px;
@@ -19,35 +20,38 @@
   flex: 1;
   overflow: hidden;
   white-space: nowrap;
+  margin-left: var(--btn-margin);
 }
 
 .title {
-  font-size: 16px;
+  font-size: 18px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
 .artist {
-  font-size: 14px;
+  color: #aaa;
+  font-size: 15px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.btnContainer {
-  display: flex;
-  position: relative;
-  left: 5px;
-}
-
+/* Buttons */
 .btn {
   width: var(--song-item-btn-width);
   height: var(--song-item-btn-height);
-  margin-right: var(--btn-margin);
+  margin-left: var(--btn-margin);
+  transition: opacity .3s;
+}
+
+.btn:first-child {
+  margin-left: 0;
 }
 
 .star {
   fill: var(--song-item-btn-bg-color);
+  height: var(--song-item-btn-height);
 }
 
 .starStarred {
@@ -57,8 +61,8 @@
 
 .starCount {
   position: relative;
-  font-size: 12px;
-  top: -26px;
+  font-size: 13px;
+  top: -28px;
   text-align: center;
   text-shadow: none;
   color: var(--text-color);

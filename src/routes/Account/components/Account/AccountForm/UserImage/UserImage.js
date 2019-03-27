@@ -27,11 +27,11 @@ export default class AccountForm extends Component {
     return (
       <div styleName='container'>
         {!this.state.imageURL &&
-          <Icon icon='ACCOUNT_BOX' size={75} styleName='placeholder'/>
+          <Icon icon='ACCOUNT_BOX' size={72} styleName='placeholder'/>
         }
 
         {this.state.imageURL &&
-            <img src={this.state.imageURL} width={100} height={75}
+            <img src={this.state.imageURL} width={96} height={72}
               onLoad={this.handleImgLoad}
               onError={this.handleImgError}
             />

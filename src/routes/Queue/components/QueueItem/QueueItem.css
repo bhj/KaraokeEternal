@@ -7,8 +7,10 @@
 .content {
   display: flex;
   flex: 1;
-  margin: var(--container-padding);
+  margin-top: var(--container-padding);
   margin-right: 0;
+  margin-bottom: var(--container-padding);
+  margin-left: var(--container-padding);
   overflow: hidden;
 }
 
@@ -17,13 +19,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 60px;
+  width: 96px;
+  height: 72px;
 }
 
 .image {
-  max-width: 80px;
-  max-height: 60px;
+  max-width: 96px;
+  max-height: 72px;
 }
 
 .waitContainer {
@@ -35,9 +37,9 @@
 }
 
 .wait {
+  color: #ccc;
   font-size: 15px;
-  padding-top: 1px;
-  padding-left: 3px;
+  padding: 3px 3px;
 }
 
 .primary {
@@ -46,6 +48,7 @@
   flex-direction: column;
   margin-left: var(--container-padding);
   overflow: hidden;
+  padding: 3px 0;
 }
 
 .primaryActive {
@@ -64,21 +67,22 @@
 
 .title {
   composes: ellipsis;
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .artist {
   composes: ellipsis;
-  font-size: 14px;
+  color: #aaa;
+  font-size: 17px;
 }
 
 .user {
-  font-size: 14px;
+  font-size: 15px;
   /*  for some reason composes: ellipsis; isn't working here */
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  color: #888;
+  color: #777;
 }
 
 .isOwner {
@@ -87,24 +91,22 @@
 }
 
 /* Buttons */
-.btnContainer {
-  display: flex;
-  align-items: center;
-}
-
 .btn {
   fill: var(--song-item-btn-bg-color);
-  margin-right: var(--btn-margin);
+  margin-left: var(--btn-margin);
+  transition: opacity .3s;
 }
 
-.btnActive {
-  composes: btn;
+.btn:first-child {
+  margin-left: 0;
+}
+
+.active {
   fill: var(--song-item-btn-active-bg-color);
   filter: var(--song-item-btn-active-filter);
 }
 
-.btnDanger {
-  composes: btn;
+.danger {
   fill: var(--btn-danger-bg-color);
   filter: var(--btn-danger-filter);
 }
