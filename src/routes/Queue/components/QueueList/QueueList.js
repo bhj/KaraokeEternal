@@ -14,6 +14,7 @@ class QueueList extends React.Component {
     errorMessage: PropTypes.string.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
+    playerHistory: PropTypes.array.isRequired,
     queue: PropTypes.object.isRequired,
     starredSongs: PropTypes.array.isRequired,
     user: PropTypes.object.isRequired,
@@ -48,7 +49,7 @@ class QueueList extends React.Component {
       if (item.isOptimistic) return null
 
       const isActive = (queueId === props.curId) && !props.isAtQueueEnd
-      const isUpcoming = queueId > props.curId
+      const isUpcoming = queueId !== props.curId && !props.playerHistory.includes(queueId)
       const isOwner = item.userId === props.user.userId
       const wait = formatSecondsFuzzy(props.waits[queueId])
 
@@ -71,6 +72,7 @@ class QueueList extends React.Component {
             isActive={isActive}
             isErrored={isActive && props.isErrored}
             isOwner={isOwner}
+            isPlayed={!isUpcoming && !isActive}
             isRemovable={isUpcoming && (isOwner || props.user.isAdmin)}
             isSkippable={isActive && (isOwner || props.user.isAdmin)}
             isStarred={props.starredSongs.includes(item.songId)}

@@ -1,18 +1,19 @@
 import { CANCEL } from 'redux-throttle'
 import {
+  PLAYER_BG_ALPHA,
+  PLAYER_ERROR,
+  PLAYER_QUEUE_LOAD,
+  PLAYER_LEAVE_REQUEST,
   PLAYER_MEDIA_ELEMENT_CHANGE,
   PLAYER_MEDIA_REQUEST,
   PLAYER_MEDIA_REQUEST_SUCCESS,
   PLAYER_MEDIA_REQUEST_ERROR,
-  PLAYER_BG_ALPHA,
-  PLAYER_PLAY,
-  PLAYER_PAUSE,
   PLAYER_NEXT,
-  PLAYER_VOLUME,
+  PLAYER_PAUSE,
+  PLAYER_PLAY,
+  PLAYER_QUEUE_END,
   PLAYER_STATUS_REQUEST,
-  PLAYER_ERROR,
-  PLAYER_LEAVE_REQUEST,
-  QUEUE_PUSH,
+  PLAYER_VOLUME,
 } from 'shared/actionTypes'
 
 // have server emit player status to room
@@ -26,6 +27,7 @@ export function emitStatus (status) {
       payload: {
         bgAlpha: player.bgAlpha,
         errorMessage: player.errorMessage,
+        history: player.history, // queueIds
         isAtQueueEnd: player.isAtQueueEnd,
         isErrored: player.isErrored,
         isPlaying: player.isPlaying,
@@ -70,6 +72,16 @@ export function cancelStatus () {
   }
 }
 
+// sets new queueId and adds previous to history
+export function loadQueueItem (queueId) {
+  return {
+    type: PLAYER_QUEUE_LOAD,
+    payload: {
+      queueId,
+    }
+  }
+}
+
 export function mediaElementChange (payload) {
   return {
     type: PLAYER_MEDIA_ELEMENT_CHANGE,
@@ -77,9 +89,10 @@ export function mediaElementChange (payload) {
   }
 }
 
-export function mediaRequest () {
+export function mediaRequest (meta) {
   return {
     type: PLAYER_MEDIA_REQUEST,
+    payload: meta,
   }
 }
 
@@ -101,6 +114,12 @@ export function mediaRequestError (message) {
   }
 }
 
+export function queueEnd () {
+  return {
+    type: PLAYER_QUEUE_END,
+  }
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -118,7 +137,6 @@ const ACTION_HANDLERS = {
   [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
     ...state,
     isFetching: true,
-    isErrored: false,
   }),
   [PLAYER_MEDIA_REQUEST_SUCCESS]: (state, { payload }) => ({
     ...state,
@@ -128,6 +146,13 @@ const ACTION_HANDLERS = {
     ...state,
     isFetching: false,
   }),
+  [PLAYER_NEXT]: (state, { payload }) => ({
+    ...state,
+    isErrored: false,
+    isPlaying: true,
+    isPlayingNext: true,
+    lastCommandAt: Date.now(),
+  }),
   [PLAYER_PAUSE]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
@@ -135,9 +160,31 @@ const ACTION_HANDLERS = {
   }),
   [PLAYER_PLAY]: (state, { payload }) => ({
     ...state,
+    isErrored: false,
     isPlaying: true,
     lastCommandAt: Date.now(),
   }),
+  [PLAYER_QUEUE_END]: (state, { payload }) => ({
+    ...state,
+    isAtQueueEnd: true,
+    isPlayingNext: false,
+  }),
+  [PLAYER_QUEUE_LOAD]: (state, { payload }) => {
+    const history = state.history.slice()
+
+    // save previous
+    if (state.queueId !== -1) {
+      history.push(state.queueId)
+    }
+
+    return {
+      ...state,
+      history,
+      isAtQueueEnd: false,
+      isPlayingNext: false,
+      queueId: payload.queueId,
+    }
+  },
   [PLAYER_STATUS_REQUEST]: (state, { payload }) => ({
     ...state,
     position: payload.position,
@@ -147,30 +194,6 @@ const ACTION_HANDLERS = {
     volume: payload,
     lastCommandAt: Date.now(),
   }),
-  [PLAYER_NEXT]: (state, { payload }) => {
-    const curIdx = payload.result.indexOf(state.queueId)
-    const isAtQueueEnd = curIdx === payload.result.length - 1
-
-    return {
-      ...state,
-      position: 0,
-      queueId: isAtQueueEnd ? state.queueId : payload.result[curIdx + 1],
-      isPlaying: true,
-      isAtQueueEnd,
-    }
-  },
-  [QUEUE_PUSH]: (state, { payload }) => {
-    const curIdx = payload.result.indexOf(state.queueId)
-    const isAtQueueEnd = curIdx === payload.result.length - 1
-
-    return {
-      ...state,
-      // if we're no longer out of songs, play next
-      queueId: (state.isAtQueueEnd && !isAtQueueEnd) ? payload.result[curIdx + 1] : state.queueId,
-      // this should only flip from true -> false here, otherwise playback will stop
-      isAtQueueEnd: (state.isAtQueueEnd && !isAtQueueEnd) ? false : state.isAtQueueEnd,
-    }
-  },
 }
 
 // ------------------------------------
@@ -179,10 +202,12 @@ const ACTION_HANDLERS = {
 const initialState = {
   bgAlpha: 0.5,
   errorMessage: '',
+  history: [], // queueIds
   isAtQueueEnd: false,
   isErrored: false,
   isFetching: false,
   isPlaying: false,
+  isPlayingNext: false,
   lastCommandAt: null,
   position: 0,
   queueId: -1,

@@ -18,7 +18,7 @@ module.exports = {
   QUEUE_PUSH: 'queue/PUSH',
   QUEUE_ADD: 'server/QUEUE_ADD',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
-  // player commands
+  // player remote commands (client -> server)
   PLAYER_PLAY_REQUEST: 'server/PLAYER_PLAY_REQUEST',
   PLAYER_PAUSE_REQUEST: 'server/PLAYER_PAUSE_REQUEST',
   PLAYER_NEXT_REQUEST: 'server/PLAYER_NEXT_REQUEST',
@@ -26,19 +26,21 @@ module.exports = {
   PLAYER_BG_ALPHA_REQUEST: 'server/PLAYER_BG_ALPHA_REQUEST',
   PLAYER_VISUALIZER_REQUEST: 'server/PLAYER_VISUALIZER_REQUEST',
   PLAYER_VISUALIZER_PRESET_REQUEST: 'server/PLAYER_VISUALIZER_PRESET_REQUEST',
-  // from server to player
+  // server -> player
+  PLAYER_BG_ALPHA: 'player/BG_ALPHA',
+  PLAYER_QUEUE_LOAD: 'player/QUEUE_LOAD', // internal
   PLAYER_NEXT: 'player/NEXT',
   PLAYER_PAUSE: 'player/PAUSE',
   PLAYER_PLAY: 'player/PLAY',
-  PLAYER_VOLUME: 'player/VOLUME',
-  PLAYER_BG_ALPHA: 'player/BG_ALPHA',
+  PLAYER_QUEUE_END: 'player/QUEUE_END',
   PLAYER_VISUALIZER: 'player/VISUALIZER',
   PLAYER_VISUALIZER_PRESET: 'player/VISUALIZER_PRESET',
-  // from player to server
+  PLAYER_VOLUME: 'player/VOLUME',
+  // player -> server
   PLAYER_STATUS_REQUEST: 'server/PLAYER_STATUS_REQUEST',
   PLAYER_ERROR_REQUEST: 'server/PLAYER_ERROR_REQUEST',
   PLAYER_LEAVE_REQUEST:  'server/PLAYER_LEAVE_REQUEST',
-  // from server to clients
+  // server -> clients
   PLAYER_STATUS: 'status/PLAYER_STATUS',
   PLAYER_ERROR: 'status/PLAYER_ERROR',
   PLAYER_LEAVE: 'status/PLAYER_LEAVE',

@@ -9,7 +9,6 @@ class CDGPlayer extends React.Component {
   static propTypes = {
     bgAlpha: PropTypes.number.isRequired,
     queueItem: PropTypes.object.isRequired,
-    isErrored: PropTypes.bool.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
@@ -39,11 +38,9 @@ class CDGPlayer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, isErrored, isPlaying, volume } = this.props
+    const { queueItem, isPlaying, volume } = this.props
 
-    // item changed or re-trying errored?
-    if (prevProps.queueItem.queueId !== queueItem.queueId ||
-       (isErrored && !prevProps.isPlaying && isPlaying)) {
+    if (prevProps.queueItem.queueId !== queueItem.queueId) {
       this.updateSources()
     }
 
@@ -94,7 +91,7 @@ class CDGPlayer extends React.Component {
     const { mediaId } = this.props.queueItem
 
     // media request(s) started
-    this.props.onMediaRequest()
+    this.props.onMediaRequest({ ...this.props.queueItem })
 
     // load .cdg file
     this.cdg.stop()

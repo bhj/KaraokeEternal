@@ -52,7 +52,7 @@ class QueueItem extends React.Component {
         styleName='container'
       >
         <div styleName='content'>
-          <div styleName='imageContainer'>
+          <div styleName={props.isPlayed ? 'imageContainer greyed' : 'imageContainer'}>
             <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={72} styleName='image'/>
             <div styleName='waitContainer'>
               {props.isUpcoming &&
@@ -63,7 +63,7 @@ class QueueItem extends React.Component {
             </div>
           </div>
 
-          <div styleName={props.isActive ? 'primaryActive' : 'primary'}>
+          <div styleName={props.isPlayed ? 'primary greyed' : 'primary'}>
             <div styleName='innerPrimary'>
               <div styleName='title'>{props.title}</div>
               <div styleName='artist'>{props.artist}</div>

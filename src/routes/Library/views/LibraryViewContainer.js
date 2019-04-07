@@ -14,13 +14,13 @@ const getStarredArtists = (state) => ensureState(state.userStars).starredArtists
 const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
 const getQueue = (state) => ensureState(state.queue)
 const getCurrentQueueId = (state) => state.status.queueId
+const getPlayerHistory = (state) => state.status.history
 
-const getQueuedSongs = createSelector(
-  [getQueue, getCurrentQueueId],
-  (queue, curId) => {
-    const curPos = queue.result.indexOf(curId)
-    return queue.result.slice(curPos + 1).map(queueId => queue.entities[queueId].songId)
-  }
+const getUpcomingSongs = createSelector(
+  [getQueue, getCurrentQueueId, getPlayerHistory],
+  (queue, curId, history) => queue.result // not currently (re)ordered
+    .filter(queueId => !history.includes(queueId))
+    .map(queueId => queue.entities[queueId].songId)
 )
 
 const getFilterKeywords = createSelector(
@@ -111,7 +111,7 @@ const mapStateToProps = (state) => {
     artists: state.artists.entities,
     songs: state.songs.entities,
     starredArtistCounts: state.starCounts.artists,
-    queuedSongs: getQueuedSongs(state),
+    queuedSongs: getUpcomingSongs(state),
     starredSongs: getStarredSongs(state),
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),

@@ -9,29 +9,38 @@ window._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 class PlayerController extends React.Component {
   static propTypes = {
     bgAlpha: PropTypes.number.isRequired,
-    queueItem: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
+    isPlayingNext: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
+    queue: PropTypes.object.isRequired,
+    queueId: PropTypes.number.isRequired,
     visualizer: PropTypes.object.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
     cancelStatus: PropTypes.func.isRequired,
-    playerError: PropTypes.func.isRequired,
     emitLeave: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
+    loadQueueItem: PropTypes.func.isRequired,
     mediaElementChange: PropTypes.func.isRequired,
     mediaRequest: PropTypes.func.isRequired,
     mediaRequestSuccess: PropTypes.func.isRequired,
     mediaRequestError: PropTypes.func.isRequired,
-    requestPlayNext: PropTypes.func.isRequired,
+    playerError: PropTypes.func.isRequired,
+    queueEnd: PropTypes.func.isRequired,
   }
 
   state = {
     audioSourceNode: null,
+  }
+
+  // simplify player logic; if this reference changes on each
+  // render it will cause an infinite loop of status updates
+  defaultQueueItem = {
+    queueId: -1,
   }
 
   componentDidMount () {
@@ -44,17 +53,22 @@ class PlayerController extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { isPlaying, queueItem, visualizer } = this.props
+    const { isPlaying, isPlayingNext, isAtQueueEnd, queueId, visualizer } = this.props
 
-    // playing for first time?
-    if (isPlaying && queueItem.queueId === -1) {
-      this.props.requestPlayNext()
+    // playing for first time or playing next?
+    if (isPlaying && (queueId === -1 || isPlayingNext)) {
+      this.handleLoadNext()
     }
 
-    if (prevProps.queueItem.queueId !== queueItem.queueId ||
+    // check if queue is no longer exhausted
+    if (isAtQueueEnd && prevProps.queue.result !== this.props.queue.result) {
+      this.handleLoadNext()
+    }
+
+    // cancel pending emits with old info; improves client ui responsiveness
+    if (prevProps.queueId !== queueId ||
         prevProps.isPlaying !== isPlaying ||
         prevProps.visualizer.isEnabled !== visualizer.isEnabled) {
-      // cancel pending emits with old info; improves ui responsiveness
       this.props.cancelStatus()
 
       // may have been suspended by browser if no user interaction yet
@@ -82,8 +96,21 @@ class PlayerController extends React.Component {
     this.props.playerError(msg)
   }
 
+  handleLoadNext = () => {
+    const curIdx = this.props.queue.result.indexOf(this.props.queueId)
+
+    // queue exhausted?
+    if (curIdx === this.props.queue.result.length - 1) {
+      this.props.queueEnd()
+      return
+    }
+
+    this.props.loadQueueItem(this.props.queue.result[curIdx + 1])
+  }
+
   render () {
     const { props, state } = this
+    const queueItem = props.queueId === -1 ? this.defaultQueueItem : props.queue.entities[props.queueId]
 
     return (
       <>
@@ -92,32 +119,32 @@ class PlayerController extends React.Component {
             audioSourceNode={state.audioSourceNode}
             isPlaying={props.isPlaying}
             presetKey={props.visualizer.presetKey}
-            queueItem={props.queueItem}
+            queueItem={queueItem}
             sensitivity={props.visualizer.sensitivity}
             width={props.width}
             height={props.height}
             volume={props.volume}
           />
         }
-        <Player
-          bgAlpha={props.bgAlpha}
-          queueItem={props.queueItem}
-          volume={props.volume}
-          isErrored={props.isErrored}
-          isPlaying={props.isPlaying}
-          isVisible={props.queueItem.queueId !== -1 && !props.isAtQueueEnd}
-          onMediaElement={this.handleMediaElement}
-          onMediaRequest={props.mediaRequest}
-          onMediaRequestSuccess={props.mediaRequestSuccess}
-          onMediaRequestError={this.handleMediaRequestError}
-          onStatus={props.emitStatus}
-          onMediaEnd={props.requestPlayNext}
-          onError={this.handleError}
-          width={props.width}
-          height={props.height}
-        />
+        {queueItem.queueId !== -1 && !props.isErrored && !props.isAtQueueEnd &&
+          <Player
+            bgAlpha={props.bgAlpha}
+            queueItem={queueItem}
+            volume={props.volume}
+            isPlaying={props.isPlaying}
+            onMediaElement={this.handleMediaElement}
+            onMediaRequest={props.mediaRequest}
+            onMediaRequestSuccess={props.mediaRequestSuccess}
+            onMediaRequestError={this.handleMediaRequestError}
+            onStatus={props.emitStatus}
+            onMediaEnd={this.handleLoadNext}
+            onError={this.handleError}
+            width={props.width}
+            height={props.height}
+          />
+        }
         <PlayerTextOverlay
-          queueItem={props.queueItem}
+          queueItem={queueItem}
           isAtQueueEnd={props.isAtQueueEnd}
           isQueueEmpty={props.isQueueEmpty}
           isErrored={props.isErrored}

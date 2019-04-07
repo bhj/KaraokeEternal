@@ -5,9 +5,10 @@ import QueueList from './QueueList'
 import { showErrorMessage, showSongInfo, closeSongInfo } from 'store/modules/ui'
 import { requestPlay, requestPause, requestPlayNext } from 'store/modules/status'
 import { queueSong, removeItem } from '../../modules/queue'
+import getOrderedQueue from '../../selectors/getOrderedQueue'
 import { toggleSongStarred } from 'store/modules/userStars'
 
-const getQueue = (state) => ensureState(state.queue)
+const getQueue = (state) => getOrderedQueue(ensureState(state.queue))
 const getCurId = (state) => state.status.queueId
 const getCurPos = (state) => state.status.position
 const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
@@ -45,7 +46,8 @@ const mapStateToProps = (state) => {
     errorMessage: state.status.errorMessage,
     isAtQueueEnd: state.status.isAtQueueEnd,
     isErrored: state.status.isErrored,
-    queue: ensureState(state.queue),
+    playerHistory: state.status.history,
+    queue: getOrderedQueue(ensureState(state.queue)),
     songs: state.library.songs,
     starredSongs: getStarredSongs(state),
     user: state.user,

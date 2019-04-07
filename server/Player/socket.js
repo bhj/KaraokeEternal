@@ -1,5 +1,3 @@
-const Queue = require('../Queue')
-
 const {
   PLAYER_BG_ALPHA,
   PLAYER_BG_ALPHA_REQUEST,
@@ -36,7 +34,6 @@ const ACTION_HANDLERS = {
   [PLAYER_NEXT_REQUEST]: async (sock, { payload }) => {
     sock.server.to(sock.user.roomId).emit('action', {
       type: PLAYER_NEXT,
-      payload: await Queue.getQueue(sock.user.roomId),
     })
   },
   [PLAYER_PLAY_REQUEST]: async (sock, { payload }) => {
