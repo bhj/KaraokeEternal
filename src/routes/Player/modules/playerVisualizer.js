@@ -18,7 +18,7 @@ const ACTION_HANDLERS = {
   }),
   [PLAYER_NEXT]: (state, { payload }) => ({
     ...state,
-    ...getPresetKeyAndName(getRandomIntInclusive(0, presetKeys.length - 1)),
+    ...getRandomPreset(),
   }),
   [PLAYER_VISUALIZER]: (state, { payload }) => ({
     ...state,
@@ -30,7 +30,7 @@ const ACTION_HANDLERS = {
     if (mode === 'rand') {
       return {
         ...state,
-        ...getPresetKeyAndName(getRandomIntInclusive(0, presetKeys.length - 1)),
+        ...getRandomPreset(),
       }
     }
 
@@ -51,8 +51,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   isEnabled: true,
   isSupported: false,
-  presetKey: null,
-  presetName: '',
+  ...getRandomPreset(),
   sensitivity: 1,
 }
 
@@ -69,8 +68,6 @@ function getPresetKeyAndName (i) {
   }
 }
 
-function getRandomIntInclusive (min, max) {
-  min = Math.ceil(min)
-  max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min + 1)) + min
+function getRandomPreset () {
+  return getPresetKeyAndName(Math.floor(Math.random() * (presetKeys.length - 1)))
 }
