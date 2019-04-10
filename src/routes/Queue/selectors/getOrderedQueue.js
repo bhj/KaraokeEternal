@@ -1,36 +1,42 @@
 import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from 'reselect'
 
-const getResult = (state) => ensureState(state).result
-const getEntities = (state) => ensureState(state).entities
+const getResult = (state) => ensureState(state.queue).result
+const getEntities = (state) => ensureState(state.queue).entities
+const getPlayerHistoryJSON = (state) => state.status.historyJSON
 
 const getOrderedResult = createSelector(
-  [getResult, getEntities],
-  (result, entities) => {
-    const res = []
+  [getResult, getEntities, getPlayerHistoryJSON],
+  (result, entities, history) => {
+    const ordered = []
     const users = new Set()
     const byUser = {} // queueIds
 
-    // create array of queueIds for each user
-    result.forEach(queueId => {
-      const userId = entities[queueId].userId
+    history = JSON.parse(history)
 
-      if (Array.isArray(byUser[userId])) {
-        byUser[userId].push(queueId)
-      } else {
-        users.add(userId)
-        byUser[userId] = [queueId]
-      }
-    })
+    result
+      // leave history intact
+      .filter(queueId => !history.includes(queueId))
+      // create array of queueIds for each user
+      .forEach(queueId => {
+        const userId = entities[queueId].userId
+
+        if (Array.isArray(byUser[userId])) {
+          byUser[userId].push(queueId)
+        } else {
+          users.add(userId)
+          byUser[userId] = [queueId]
+        }
+      })
 
     while (users.size) {
       users.forEach(userId => {
-        res.push(byUser[userId].shift())
+        ordered.push(byUser[userId].shift())
         if (!byUser[userId].length) users.delete(userId)
       })
     }
 
-    return res
+    return [...history, ...ordered]
   }
 )
 

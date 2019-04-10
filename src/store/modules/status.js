@@ -98,7 +98,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   bgAlpha: 1,
   errorMessage: '',
-  history: [], // queueIds
+  historyJSON: '[]', // queueIds in JSON array
   isAtQueueEnd: false,
   isErrored: false,
   isPlayerPresent: false,

@@ -14,13 +14,18 @@ const getStarredArtists = (state) => ensureState(state.userStars).starredArtists
 const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
 const getQueue = (state) => ensureState(state.queue)
 const getCurrentQueueId = (state) => state.status.queueId
-const getPlayerHistory = (state) => state.status.history
+const getPlayerHistoryJSON = (state) => state.status.historyJSON
 
 const getUpcomingSongs = createSelector(
-  [getQueue, getCurrentQueueId, getPlayerHistory],
-  (queue, curId, history) => queue.result // not currently (re)ordered
-    .filter(queueId => !history.includes(queueId))
-    .map(queueId => queue.entities[queueId].songId)
+  [getQueue, getCurrentQueueId, getPlayerHistoryJSON],
+  (queue, curId, history) => {
+    history = JSON.parse(history)
+
+    // not (re)ordering since it doesn't currently matter in library view
+    return queue.result
+      .filter(queueId => !history.includes(queueId))
+      .map(queueId => queue.entities[queueId].songId)
+  }
 )
 
 const getFilterKeywords = createSelector(

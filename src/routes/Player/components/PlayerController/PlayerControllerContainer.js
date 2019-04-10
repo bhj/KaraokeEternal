@@ -40,7 +40,7 @@ const mapStateToProps = (state) => {
     isPlayingNext: player.isPlayingNext,
     isFetching: player.isFetching,
     isErrored: player.isErrored,
-    queue: getOrderedQueue(queue),
+    queue: getOrderedQueue(state),
     queueId: player.queueId,
     volume: player.volume,
     visualizer: playerVisualizer,

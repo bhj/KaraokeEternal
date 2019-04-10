@@ -27,7 +27,8 @@ export function emitStatus (status) {
       payload: {
         bgAlpha: player.bgAlpha,
         errorMessage: player.errorMessage,
-        history: player.history, // queueIds
+        // string primitive is a hack to pass selector equality check on client side
+        historyJSON: JSON.stringify(player.history),
         isAtQueueEnd: player.isAtQueueEnd,
         isErrored: player.isErrored,
         isPlaying: player.isPlaying,

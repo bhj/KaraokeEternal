@@ -8,10 +8,16 @@ import { queueSong, removeItem } from '../../modules/queue'
 import getOrderedQueue from '../../selectors/getOrderedQueue'
 import { toggleSongStarred } from 'store/modules/userStars'
 
-const getQueue = (state) => getOrderedQueue(ensureState(state.queue))
+const getQueue = (state) => getOrderedQueue(state)
 const getCurId = (state) => state.status.queueId
 const getCurPos = (state) => state.status.position
 const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
+const getPlayerHistoryJSON = (state) => state.status.historyJSON
+
+const getPlayerHistory = createSelector(
+  [getPlayerHistoryJSON],
+  (history) => JSON.parse(history)
+)
 
 const getWaits = createSelector(
   [getQueue, getCurId, getCurPos],
@@ -46,8 +52,8 @@ const mapStateToProps = (state) => {
     errorMessage: state.status.errorMessage,
     isAtQueueEnd: state.status.isAtQueueEnd,
     isErrored: state.status.isErrored,
-    playerHistory: state.status.history,
-    queue: getOrderedQueue(ensureState(state.queue)),
+    playerHistory: getPlayerHistory(state),
+    queue: getOrderedQueue(state),
     songs: state.library.songs,
     starredSongs: getStarredSongs(state),
     user: state.user,
