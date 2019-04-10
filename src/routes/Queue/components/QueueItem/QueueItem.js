@@ -14,6 +14,7 @@ class QueueItem extends React.Component {
     errorMessage: PropTypes.string.isRequired,
     isActive: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
+    isInfoable: PropTypes.bool.isRequired,
     isOwner: PropTypes.bool.isRequired,
     isRemovable: PropTypes.bool.isRequired,
     isSkippable: PropTypes.bool.isRequired,
@@ -84,10 +85,11 @@ class QueueItem extends React.Component {
                 <Icon size={40} icon={'STAR_FULL'}/>
               </ToggleAnimation>
             </div>
-
-            <div onClick={this.handleInfoClick} styleName='btn active' data-hide>
-              <Icon icon='INFO_OUTLINE' size={40} />
-            </div>
+            {props.isInfoable &&
+              <div onClick={this.handleInfoClick} styleName='btn active' data-hide>
+                <Icon icon='INFO_OUTLINE' size={40} />
+              </div>
+            }
             {props.isRemovable &&
               <div onClick={this.handleRemoveClick} styleName='btn danger' data-hide>
                 <Icon icon='CLEAR' size={40} />
@@ -105,8 +107,10 @@ class QueueItem extends React.Component {
   }
 
   handleSwipedLeft = ({ event }) => {
+    const { isErrored, isInfoable, isRemovable, isSkippable } = this.props
+
     this.setState({
-      isExpanded: this.props.isErrored || this.props.isSkippable || this.props.isRemovable,
+      isExpanded: isErrored || isInfoable || isRemovable || isSkippable,
     })
   }
 

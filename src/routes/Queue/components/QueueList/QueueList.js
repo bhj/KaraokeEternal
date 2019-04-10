@@ -71,6 +71,7 @@ class QueueList extends React.Component {
             errorMessage={isActive && props.errorMessage ? props.errorMessage : ''}
             isActive={isActive}
             isErrored={isActive && props.isErrored}
+            isInfoable={props.user.isAdmin}
             isOwner={isOwner}
             isPlayed={!isUpcoming && !isActive}
             isRemovable={isUpcoming && (isOwner || props.user.isAdmin)}
