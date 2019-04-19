@@ -22,22 +22,23 @@ const getPlayerHistory = createSelector(
 const getWaits = createSelector(
   [getQueue, getCurId, getCurPos],
   (queue, curId, curPos) => {
+    const curIdx = queue.result.indexOf(curId)
     const waits = {}
     let curWait = 0
     let nextWait = 0
 
-    queue.result.forEach(i => {
-      const duration = queue.entities[i].duration
+    queue.result.forEach((queueId, i) => {
+      const duration = queue.entities[queueId].duration
 
-      if (i === curId) {
+      if (i === curIdx) {
         // currently playing
         nextWait = Math.round(duration - curPos)
-      } else if (i > curId) {
+      } else if (i > curIdx) {
         curWait += nextWait
         nextWait = duration
       }
 
-      waits[i] = curWait
+      waits[queueId] = curWait
     })
 
     return waits
