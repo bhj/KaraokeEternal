@@ -1,6 +1,6 @@
 .container {
   font-size: 16px;
-  color: white;
+  color: var(--text-color);
   animation-duration: 1.5s;
   animation-direction: alternate;
   animation-iteration-count: infinite;
@@ -27,6 +27,11 @@
 @keyframes up-now-bg-animation {
   0% { background-color: var(--up-now-bg-color-to); }
   100% { background-color: var(--up-now-bg-color-from); }
+}
+
+.inQueue {
+  composes: container;
+  background-color: var(--up-next-bg-color-from);
 }
 
 .msg {

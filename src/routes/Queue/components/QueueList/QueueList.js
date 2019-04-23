@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import QueueItem from '../QueueItem'
-import { formatSecondsFuzzy } from 'lib/dateTime'
+import { formatSeconds } from 'lib/dateTime'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styles from './QueueList.css'
 
@@ -51,7 +51,6 @@ class QueueList extends React.Component {
       const isActive = (queueId === props.curId) && !props.isAtQueueEnd
       const isUpcoming = queueId !== props.curId && !props.playerHistory.includes(queueId)
       const isOwner = item.userId === props.user.userId
-      const wait = formatSecondsFuzzy(props.waits[queueId])
 
       return (
         <CSSTransition
@@ -79,8 +78,7 @@ class QueueList extends React.Component {
             isStarred={props.starredSongs.includes(item.songId)}
             isUpcoming={isUpcoming}
             pctPlayed={isActive ? props.curPos / item.duration * 100 : 0}
-            waitUnit={wait.unit}
-            waitValue={wait.value}
+            wait={formatSeconds(props.waits[queueId], true)} // fuzzy
             // actions
             onErrorInfoClick={props.showErrorMessage}
             onInfoClick={props.showSongInfo}

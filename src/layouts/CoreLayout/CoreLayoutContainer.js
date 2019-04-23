@@ -5,7 +5,7 @@ import { clearErrorMessage, closeSongInfo } from 'store/modules/ui'
 const mapStateToProps = (state) => {
   return {
     errorMessage: state.ui.errorMessage,
-    isSongInfoOpen: state.ui.isSongInfoOpen,
+    songInfoId: state.ui.songInfoId,
   }
 }
 

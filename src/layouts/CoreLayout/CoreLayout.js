@@ -32,7 +32,7 @@ export const CoreLayout = (props) => {
       </SkyLightStateless>
 
       <SkyLightStateless
-        isVisible={props.isSongInfoOpen}
+        isVisible={typeof props.songInfoId === 'number'}
         onCloseClicked={props.closeSongInfo}
         onOverlayClicked={props.closeSongInfo}
         title={'Song Details'}
@@ -45,7 +45,7 @@ export const CoreLayout = (props) => {
           overflow: 'auto',
         }}
       >
-        <SongInfo />
+        <SongInfo songId={props.songInfoId}/>
       </SkyLightStateless>
     </>
   )
@@ -56,7 +56,7 @@ export default CoreLayout
 CoreLayout.propTypes = {
   children: PropTypes.any,
   errorMessage: PropTypes.any,
-  isSongInfoOpen: PropTypes.bool.isRequired,
+  songInfoId: PropTypes.number,
   // actions
   clearErrorMessage: PropTypes.func.isRequired,
   closeSongInfo: PropTypes.func.isRequired,

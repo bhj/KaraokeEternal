@@ -26,22 +26,18 @@ export function formatDateTime (dateObj) {
   return (formatDate(dateObj) + ' ' + formatTime(dateObj))
 }
 
-export function formatSeconds (sec) {
+export function formatDuration (sec) {
   const m = Math.floor(sec / 60)
   const s = sec % 60
+
   return `${m}:${s < 10 ? '0' + s : s}`
 }
 
-export function formatSecondsFuzzy (sec) {
-  if (sec >= 60) {
-    return {
-      value: Math.round(sec / 60),
-      unit: 'm',
-    }
-  } else {
-    return {
-      value: Math.floor(sec),
-      unit: 's',
-    }
-  }
+export function formatSeconds (sec, fuzzy = false) {
+  if (sec >= 60 && fuzzy) return Math.round(sec / 60) + 'm'
+
+  const m = Math.floor(sec / 60)
+  const s = sec % 60
+
+  return m ? `${m}m ${s}s` : `${s}s`
 }

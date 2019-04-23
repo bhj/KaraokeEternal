@@ -140,7 +140,7 @@ const ACTION_HANDLERS = {
   }),
   [SONG_INFO_REQUEST]: (state, { payload }) => ({
     ...state,
-    isSongInfoOpen: true,
+    songInfoId: payload.songId,
     songInfoMedia: { result: [], entities: {} },
   }),
   [SONG_INFO_REQUEST + _SUCCESS]: (state, { payload }) => ({
@@ -149,11 +149,11 @@ const ACTION_HANDLERS = {
   }),
   [SONG_INFO_REQUEST + _ERROR]: (state, { payload }) => ({
     ...state,
-    isSongInfoOpen: false,
+    songInfoId: null,
   }),
   [SONG_INFO_CLOSE]: (state, { payload }) => ({
     ...state,
-    isSongInfoOpen: false,
+    songInfoId: null,
   }),
 }
 
@@ -168,8 +168,7 @@ const initialState = {
   viewportWidth: 0,
   viewportHeight: 0,
   errorMessage: null,
-  // song info modal
-  isSongInfoOpen: false,
+  songInfoId: null,
   songInfoMedia: { result: [], entities: {} },
 }
 

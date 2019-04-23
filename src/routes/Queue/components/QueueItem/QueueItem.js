@@ -26,8 +26,7 @@ class QueueItem extends React.Component {
     title: PropTypes.string.isRequired,
     userId: PropTypes.number.isRequired,
     userDisplayName: PropTypes.string.isRequired,
-    waitValue: PropTypes.number.isRequired,
-    waitUnit: PropTypes.string.isRequired,
+    wait: PropTypes.string,
     // actions
     onErrorInfoClick: PropTypes.func.isRequired,
     onRemoveClick: PropTypes.func.isRequired,
@@ -58,7 +57,7 @@ class QueueItem extends React.Component {
             <div styleName='waitContainer'>
               {props.isUpcoming &&
                 <div styleName={props.isOwner ? 'wait isOwner' : 'wait'}>
-                  {props.waitValue}{props.waitUnit}
+                  {props.wait}
                 </div>
               }
             </div>

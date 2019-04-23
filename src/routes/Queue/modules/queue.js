@@ -7,13 +7,12 @@ import {
 // add to queue
 export function queueSong (songId) {
   return (dispatch, getState) => {
+    const song = getState().songs.entities[songId]
+
     dispatch({
       type: QUEUE_ADD,
       meta: { isOptimistic: true },
-      payload: {
-        mediaId: getState().songs.entities[songId].mediaId,
-        songId,
-      },
+      payload: song,
     })
   }
 }
@@ -40,7 +39,7 @@ const ACTION_HANDLERS = {
       result: [...state.result, fakeQueueId],
       entities: {
         ...state.entities,
-        [fakeQueueId]: { songId: payload.songId, isOptimistic: true },
+        [fakeQueueId]: { ...payload, isOptimistic: true },
       }
     }
   },

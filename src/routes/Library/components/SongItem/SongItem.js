@@ -4,7 +4,7 @@ import { Swipeable } from 'react-swipeable'
 import Icon from 'components/Icon'
 import ToggleAnimation from 'components/ToggleAnimation'
 import Buttons from 'components/Buttons'
-import { formatSeconds } from 'lib/dateTime'
+import { formatDuration } from 'lib/dateTime'
 import Highlighter from 'react-highlight-words'
 import './SongItem.css'
 
@@ -45,7 +45,7 @@ export default class SongItem extends React.Component {
         styleName={props.isQueued ? 'containerQueued' : 'container'}
       >
         <div styleName='duration'>
-          {formatSeconds(props.duration)}
+          {formatDuration(props.duration)}
         </div>
 
         <div onClick={this.handleClick} styleName='primary'>
