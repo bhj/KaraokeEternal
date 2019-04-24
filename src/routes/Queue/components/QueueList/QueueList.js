@@ -42,10 +42,8 @@ class QueueList extends React.Component {
     if (props.queue.result.length === 0) return null
 
     // build children array
-    const items = props.queue.result.map((queueId, index) => {
+    const items = props.queue.result.map(queueId => {
       const item = props.queue.entities[queueId]
-
-      // @todo render placeholder for pending/optimistic items?
       if (item.isOptimistic) return null
 
       const isActive = (queueId === props.curId) && !props.isAtQueueEnd
