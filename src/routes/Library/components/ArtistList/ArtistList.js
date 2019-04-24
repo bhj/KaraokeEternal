@@ -78,7 +78,6 @@ class ArtistList extends React.Component {
         queuedSongs={this.props.queuedSongs}
         starredSongs={this.props.starredSongs}
         songs={this.props.songs}
-        starredSongs={this.props.starredSongs}
         style={style}
       />
     )
