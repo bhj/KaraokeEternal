@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Slider from 'rc-slider'
 import { lockScrolling } from 'store/modules/ui'
-import './OptimisticSlider.css'
 // depends on styles/global/rc-slider
 
 export default class OptimisticSlider extends React.Component {
