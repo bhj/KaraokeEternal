@@ -65,14 +65,22 @@ class PlayerController extends React.Component {
       this.handleLoadNext()
     }
 
-    // cancel pending emits with old info; improves client ui responsiveness
-    if (prevProps.queueId !== queueId ||
-        prevProps.isPlaying !== isPlaying ||
-        prevProps.visualizer.isEnabled !== visualizer.isEnabled) {
-      this.props.cancelStatus()
-
-      // may have been suspended by browser if no user interaction yet
+    // may have been suspended by browser if no user interaction yet
+    if (prevProps.isPlaying !== isPlaying) {
       window._audioCtx.resume()
+      this.props.cancelStatus()
+    }
+
+    // improve client ui responsiveness
+    if (prevProps.queueId !== queueId) {
+      this.props.cancelStatus()
+      this.props.emitStatus({ position: 0 })
+      return
+    }
+
+    // improve client ui responsiveness
+    if (prevProps.visualizer.isEnabled !== visualizer.isEnabled) {
+      this.props.cancelStatus()
     }
 
     this.props.emitStatus()
