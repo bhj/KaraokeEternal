@@ -50,8 +50,8 @@
   --song-item-btn-active-filter: var(--btn-active-filter);
 
   --alpha-picker-color: var(--artist-folder-bg-color);
-  --queued-item-color: hsl(var(--hue-pink), 67%, 87%);
-  --queued-item-text-shadow: var(--glow-text-shadow);
+  --queued-item-color: hsl(var(--hue-pink), 70%, 80%);
+  --queued-item-text-shadow: var(--text-shadow-glow);
 
   --search-results-heading-color: var(--text-color);
   --search-results-heading-bg-color: var(--artist-folder-bg-color);
@@ -96,9 +96,10 @@
   --spring-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --function-ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
   --animation-bounce: bounce .25s ease-out;
+  --animation-text-shadow-glow: glow .25s ease-out;
 
   /* Glow */
-  --glow-text-shadow: 0 0 5px hsl(var(--hue-pink), 100%, 50%), 0 0 10px hsl(var(--hue-pink), 100%, 50%);
+  --text-shadow-glow: 0 0 5px hsl(var(--hue-pink), 100%, 50%), 0 0 10px hsl(var(--hue-pink), 100%, 50%);
 }
 
 @keyframes bounce {
@@ -106,4 +107,10 @@
   3% { transform: scale3d(1.75, 1.75, 1.75); }
   95% { transform: scale3d(.9, .9, .9); }
   to { transform: scale3d(1, 1, 1); }
+}
+
+@keyframes glow {
+  from { text-shadow: none; }
+  20% { text-shadow: 0 0 6px hsl(var(--hue-pink), 100%, 100%), 0 0 12px hsl(var(--hue-pink), 100%, 100%); }
+  to { text-shadow: var(--text-shadow-glow); }
 }

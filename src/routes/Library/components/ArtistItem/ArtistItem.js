@@ -3,6 +3,7 @@ import React from 'react'
 import SongList from '../SongList'
 import Icon from 'components/Icon'
 import Highlighter from 'react-highlight-words'
+import ToggleAnimation from 'components/ToggleAnimation'
 import './ArtistItem.css'
 
 class ArtistItem extends React.Component {
@@ -39,9 +40,11 @@ class ArtistItem extends React.Component {
               <div styleName='count'>{props.artistSongIds.length}</div>
             }
           </div>
-          <div styleName={isChildQueued ? 'name isChildQueued' : 'name'}>
-            <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
-          </div>
+          <ToggleAnimation toggle={isChildQueued} styleName='animateGlow'>
+            <div styleName={isChildQueued ? 'name isChildQueued' : 'name'}>
+              <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
+            </div>
+          </ToggleAnimation>
         </div>
 
         {props.isExpanded &&

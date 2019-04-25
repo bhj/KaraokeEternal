@@ -9,6 +9,10 @@
   text-shadow: var(--queued-item-text-shadow);
 }
 
+.animateGlow {
+  animation: var(--animation-text-shadow-glow);
+}
+
 .duration {
   color: #888;
   font-size: 12px;

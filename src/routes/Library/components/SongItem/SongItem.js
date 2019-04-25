@@ -44,17 +44,19 @@ export default class SongItem extends React.Component {
         style={{ height: props.artist ? 60 : 44 }}
         styleName={props.isQueued ? 'containerQueued' : 'container'}
       >
-        <div styleName='duration'>
-          {formatDuration(props.duration)}
-        </div>
 
-        <div onClick={this.handleClick} styleName='primary'>
-          <div styleName='title'>
-            <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
-            {props.isAdmin && props.numMedia > 1 && <i> ({props.numMedia})</i>}
-            {props.artist && <div styleName='artist'>{props.artist}</div>}
+        <ToggleAnimation toggle={props.isQueued} styleName='animateGlow'>
+          <div styleName='duration'>
+            {formatDuration(props.duration)}
           </div>
-        </div>
+          <div onClick={this.handleClick} styleName='primary'>
+            <div styleName='title'>
+              <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
+              {props.isAdmin && props.numMedia > 1 && <i> ({props.numMedia})</i>}
+              {props.artist && <div styleName='artist'>{props.artist}</div>}
+            </div>
+          </div>
+        </ToggleAnimation>
 
         <Buttons btnWidth={45} showHidden={state.isExpanded}>
           <div onClick={this.handleStarClick} styleName='btn star'>

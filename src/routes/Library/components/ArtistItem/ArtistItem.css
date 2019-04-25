@@ -23,6 +23,10 @@
   text-shadow: var(--queued-item-text-shadow);
 }
 
+.animateGlow {
+  animation: var(--animation-text-shadow-glow);
+}
+
 .folder {
   height: var(--artist-item-height);
   fill: var(--artist-folder-bg-color);

@@ -87,7 +87,7 @@
 
 .isOwner {
   color: var(--text-color);
-  text-shadow: var(--glow-text-shadow);
+  text-shadow: var(--text-shadow-glow);
 }
 
 /* Buttons */
