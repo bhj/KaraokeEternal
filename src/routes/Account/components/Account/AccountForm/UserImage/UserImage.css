@@ -5,6 +5,7 @@
     height: 72px;
     border-radius: var(--border-radius);
     text-align: center;
+    cursor: pointer;
 }
 
 .fileInput {

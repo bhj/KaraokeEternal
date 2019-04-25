@@ -24,7 +24,9 @@ export const CoreLayout = (props) => {
           width: '80%',
           minHeight: '200px',
           left: '10%',
-          marginLeft: '0' }}
+          marginLeft: '0',
+          userSelect: 'text'
+        }}
       >
         <p>{props.errorMessage}</p>
         <br /><br /><br />
@@ -35,7 +37,7 @@ export const CoreLayout = (props) => {
         isVisible={typeof props.songInfoId === 'number'}
         onCloseClicked={props.closeSongInfo}
         onOverlayClicked={props.closeSongInfo}
-        title={'Song Details'}
+        title={'Song Info'}
         dialogStyles={{
           width: '90%',
           height: '90%',
@@ -43,6 +45,7 @@ export const CoreLayout = (props) => {
           left: '5%',
           margin: 0,
           overflow: 'auto',
+          userSelect: 'text'
         }}
       >
         <SongInfo songId={props.songInfoId}/>

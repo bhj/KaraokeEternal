@@ -92,6 +92,7 @@
 
 /* Buttons */
 .btn {
+  cursor: pointer;
   fill: var(--song-item-btn-bg-color);
   margin-left: var(--btn-margin);
   transition: opacity .3s;

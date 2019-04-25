@@ -38,18 +38,18 @@ export default class PlaybackCtrl extends React.Component {
     return (
       <div styleName='container'>
         {isPlaying &&
-          <div onClick={props.requestPause}>
-            <Icon icon='PAUSE' size={42} styleName='pause' />
+          <div onClick={props.requestPause} styleName='pause'>
+            <Icon icon='PAUSE' size={42}/>
           </div>
         }
         {!isPlaying &&
-          <div onClick={props.requestPlay}>
-            <Icon icon='PLAY' size={42} styleName='play' />
+          <div onClick={props.requestPlay} styleName='play'>
+            <Icon icon='PLAY' size={42}/>
           </div>
         }
 
-        <div onClick={props.requestPlayNext}>
-          <Icon icon='PLAY_NEXT' size={48} styleName='next'/>
+        <div onClick={props.requestPlayNext} styleName='next'>
+          <Icon icon='PLAY_NEXT' size={48}/>
         </div>
 
         <VolumeSlider
@@ -57,13 +57,13 @@ export default class PlaybackCtrl extends React.Component {
           onVolumeChange={props.requestVolume}
         />
 
-        <div onClick={this.toggleVisualizerCtrl}>
-          <Icon icon='TUNE' size={40} styleName='visualizer'/>
+        <div onClick={this.toggleVisualizerCtrl} styleName='visualizer'>
+          <Icon icon='TUNE' size={40}/>
         </div>
 
         {props.isPlayer && screenfull.enabled &&
-          <div onClick={handleFullscreen}>
-            <Icon icon='FULLSCREEN' size={48} styleName='fullscreen' />
+          <div onClick={handleFullscreen} styleName='fullscreen'>
+            <Icon icon='FULLSCREEN' size={48}/>
           </div>
         }
 

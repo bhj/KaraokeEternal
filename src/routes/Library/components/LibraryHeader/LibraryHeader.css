@@ -17,16 +17,13 @@
   color: var(--input-placeholder-color) !important;
 }
 
-.clear {
-  fill: var(--btn-active-bg-color);
-  filter: var(--btn-active-filter);
-}
-
-.inactive {
+.btn {
+  cursor: pointer;
   fill: var(--btn-bg-color);
+  filter: var(--btn-active-filter);
 }
 
-.active {
+.btnActive {
+  composes: btn;
   fill: var(--btn-active-bg-color);
-  filter: var(--btn-active-filter);
 }

@@ -1,11 +1,12 @@
 .container {
-  position: fixed;
+  align-items: center;
+  color: var(--alpha-picker-color);
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  align-items: center;
   font-size: 2vh;
+  position: fixed;
   right: 0;
   touch-action: none;
   width: 32px;
-  color: var(--alpha-picker-color);
 }

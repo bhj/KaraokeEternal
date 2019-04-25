@@ -17,6 +17,7 @@
 }
 
 .primary {
+  cursor: pointer;
   flex: 1;
   overflow: hidden;
   white-space: nowrap;
@@ -39,6 +40,7 @@
 
 /* Buttons */
 .btn {
+  cursor: pointer;
   width: var(--song-item-btn-width);
   height: var(--song-item-btn-height);
   margin-left: var(--btn-margin);

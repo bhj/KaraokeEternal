@@ -4,26 +4,31 @@
   padding: 0 6px;
 }
 
-.play {
+.btn {
+  cursor: pointer;
   fill: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
+}
+
+.play {
+  composes: btn;
 }
 
 .pause {
-  fill: var(--transport-btn-bg-color);
-  filter: var(--transport-btn-filter);
+  composes: btn;
 }
 
 .next {
-  fill: var(--transport-btn-bg-color);
-  filter: var(--transport-btn-filter);
+  composes: btn;
 }
 
 .visualizer {
+  composes: btn;
   fill: var(--btn-active-bg-color);
   margin-right: var(--btn-margin);
 }
 
 .fullscreen {
+  composes: btn;
   fill: var(--btn-active-bg-color);
 }

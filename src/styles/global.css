@@ -103,15 +103,16 @@ input[type="search"] {
 
 /* Buttons */
 button {
-  display: inline-block;
-  padding: 16px;
-  border-radius: var(--border-radius);
   background-color: var(--btn-default-bg-color);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   color: var(--btn-default-color);
+  cursor: pointer;
+  display: inline-block;
   font-size: 16px;
   font-weight: lighter;
-  border: none;
-  box-shadow: var(--box-shadow);
+  padding: 16px;
   width: 100%;
 }
 

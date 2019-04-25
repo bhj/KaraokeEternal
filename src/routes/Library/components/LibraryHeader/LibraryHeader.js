@@ -39,11 +39,9 @@ class LibraryHeader extends React.Component {
     return (
       <Header>
         <div styleName='container'>
-          <Icon icon='MAGNIFIER'
-            size={40}
-            styleName={filterStr ? 'active' : 'inactive'}
-            onClick={this.handleMagnifierClick}
-          />
+          <div onClick={this.handleMagnifierClick} styleName={filterStr ? 'btnActive' : 'btn'}>
+            <Icon icon='MAGNIFIER' size={40}/>
+          </div>
           <input type='search'
             styleName='searchInput'
             placeholder='search'
@@ -52,13 +50,13 @@ class LibraryHeader extends React.Component {
             ref={this.searchInput}
           />
           {filterStr &&
-            <div onClick={this.clearSearch}>
-              <Icon icon='CLEAR' size={40} styleName='clear' />
+            <div onClick={this.clearSearch} styleName='btnActive'>
+              <Icon icon='CLEAR' size={40}/>
             </div>
           }
 
-          <div onClick={this.props.toggleFilterStarred}>
-            <Icon icon='STAR_FULL' size={40} styleName={filterStarred ? 'active' : 'inactive'} />
+          <div onClick={this.props.toggleFilterStarred} styleName={filterStarred ? 'btnActive' : 'btn'}>
+            <Icon icon='STAR_FULL' size={40}/>
           </div>
         </div>
       </Header>
