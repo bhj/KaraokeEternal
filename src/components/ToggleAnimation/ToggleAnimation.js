@@ -21,15 +21,17 @@ export default class ToggleAnimation extends Component {
   render () {
     const { className, children } = this.props
 
+    // this assumes one child... @todo?
     if (this.state.animate) {
-      return (
-        <div className={className} onAnimationEnd={e => this.setState({ animate: false })}>
-          {children}
-        </div>
-      )
+      return React.cloneElement(children, {
+        className: children.props.className + ' ' + className,
+        onAnimationEnd: this.handleAnimationEnd,
+      })
     }
 
     // don't attach event handler until we really need to
-    return <div>{children}</div>
+    return children
   }
+
+  handleAnimationEnd = e => this.setState({ animate: false })
 }
