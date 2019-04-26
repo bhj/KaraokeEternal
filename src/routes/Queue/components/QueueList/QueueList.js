@@ -4,8 +4,7 @@ import QueueItem from '../QueueItem'
 import { formatSeconds } from 'lib/dateTime'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styles from './QueueList.css'
-
-const QUEUE_ITEM_HEIGHT = 80
+const QUEUE_ITEM_HEIGHT = 92
 
 class QueueList extends React.Component {
   static propTypes = {

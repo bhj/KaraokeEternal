@@ -60,6 +60,7 @@
   /* Queue */
   --active-item-from-bg-color: hsl(var(--hue-blue), 80%, 40%);
   --active-item-to-bg-color: hsl(var(--hue-blue), 80%, 40%);
+  --queue-item-height: 92px;
 
   /* Account panels */
   --panel-bg-color: hsl(var(--hue-blue), 20%, 10%);

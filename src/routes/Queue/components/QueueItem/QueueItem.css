@@ -1,6 +1,7 @@
 .container {
   background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-to-bg-color));
   background-repeat: no-repeat;
+  height: var(--queue-item-height);
   overflow: hidden;
 }
 
