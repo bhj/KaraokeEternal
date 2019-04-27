@@ -76,8 +76,7 @@ class Media {
 
   /**
    * Update media item
-   * @param  {number}  mediaId
-   * @param  {object}  fields
+   * @param  {object}  media Media object
    * @return {Promise}
    */
   static async update (media) {
