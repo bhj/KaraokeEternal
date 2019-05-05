@@ -1,6 +1,7 @@
 .container {
   font-size: 5vw;
   text-rendering: optimizeLegibility;
+  text-shadow: 0px 5px 5px #000;
 }
 
 .char {
