@@ -16,24 +16,6 @@ export const CoreLayout = (props) => {
       <Navigation/>
 
       <SkyLightStateless
-        isVisible={props.errorMessage !== null}
-        onCloseClicked={props.clearErrorMessage}
-        onOverlayClicked={props.clearErrorMessage}
-        title='Oops'
-        dialogStyles={{
-          width: '80%',
-          minHeight: '200px',
-          left: '10%',
-          marginLeft: '0',
-          userSelect: 'text'
-        }}
-      >
-        <p>{props.errorMessage}</p>
-        <br /><br /><br />
-        <button onClick={props.clearErrorMessage}>OK</button>
-      </SkyLightStateless>
-
-      <SkyLightStateless
         isVisible={typeof props.songInfoId === 'number'}
         onCloseClicked={props.closeSongInfo}
         onOverlayClicked={props.closeSongInfo}
@@ -49,6 +31,24 @@ export const CoreLayout = (props) => {
         }}
       >
         <SongInfo songId={props.songInfoId}/>
+      </SkyLightStateless>
+
+      <SkyLightStateless
+        isVisible={props.errorMessage !== null}
+        onCloseClicked={props.clearErrorMessage}
+        onOverlayClicked={props.clearErrorMessage}
+        title='Oops'
+        dialogStyles={{
+          width: '80%',
+          minHeight: '200px',
+          left: '10%',
+          marginLeft: '0',
+          userSelect: 'text'
+        }}
+      >
+        <p>{props.errorMessage}</p>
+        <br /><br /><br />
+        <button onClick={props.clearErrorMessage}>OK</button>
       </SkyLightStateless>
     </>
   )
