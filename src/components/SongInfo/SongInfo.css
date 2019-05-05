@@ -2,3 +2,8 @@
   margin-bottom: 1em;
   overflow-wrap: break-word;
 }
+
+.label {
+  font-weight: bold;
+  color: #777;
+}

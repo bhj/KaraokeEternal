@@ -164,7 +164,7 @@ module.exports = function (io, jwtKey) {
     try {
       io.to(sock.id).emit('action', {
         type: QUEUE_PUSH,
-        payload: await Queue.getQueue(sock.user.roomId),
+        payload: await Queue.get(sock.user.roomId),
       })
     } catch (err) {
       log.error(err)

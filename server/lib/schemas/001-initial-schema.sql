@@ -40,7 +40,7 @@ INSERT INTO prefs (key,data) VALUES ('isFirstRun','true');
 CREATE TABLE IF NOT EXISTS "queue" (
   "queueId" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "roomId" integer NOT NULL,
-  "mediaId" integer NOT NULL,
+  "songId" integer NOT NULL,
   "userId" integer NOT NULL
 );
 

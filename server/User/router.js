@@ -214,7 +214,7 @@ router.put('/account', async (ctx, next) => {
   if (ctx.user.roomId) {
     ctx.io.to(ctx.user.roomId).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.getQueue(ctx.user.roomId)
+      payload: await Queue.get(ctx.user.roomId)
     })
   }
 

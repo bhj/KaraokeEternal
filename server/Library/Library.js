@@ -1,3 +1,4 @@
+const path = require('path')
 const db = require('sqlite')
 const squel = require('squel')
 const log = require('../lib/logger')('Library')
@@ -7,8 +8,7 @@ let _starCountsVersion = Date.now()
 class Library {
   /**
   * Get artists and songs in a format suitable for sending to clients
-  * as quickly as possible. Only lists one media item per song.
-  * @return {Promise} Object with artist and media results
+  * @return {Promise} Object with artists and songs normalized
   */
   static async get () {
     const SongIdsByArtist = {}
@@ -24,36 +24,32 @@ class Library {
     // query #1: songs
     {
       const q = squel.select()
-        .field('media.mediaId AS mediaId')
-        .field('media.duration AS duration')
+        .field('duration, isPreferred')
         .field('songs.artistId AS artistId')
         .field('songs.songId AS songId')
         .field('songs.title AS title')
-        .field('MAX(media.isPreferred) AS isPreferred')
-        .field('COUNT(DISTINCT media.mediaId) AS numMedia')
         .from('media')
-        .join(squel.select()
-          .from('paths')
-          .field('MIN(paths.priority) AS priority')
-          .field('pathId')
-          .group('pathId'),
-        'paths', 'media.pathId = paths.pathId')
         .join('songs USING (songId)')
-        .join('artists USING (artistId)')
-        .group('songs.songId')
-        .order('songs.titleNorm')
+        .join('paths USING (pathId)')
+        .order('songs.titleNorm, paths.priority')
 
       const { text, values } = q.toParam()
       const rows = await db.all(text, values)
 
       for (const row of rows) {
-        // no need to send over the wire but we needed it
-        // in the query to show the correct mediaId
-        delete row.isPreferred
+        if (songs.entities[row.songId]) {
+          if (row.isPreferred) {
+            songs.entities[row.songId].duration = row.duration
+          }
 
-        // normalize song data
-        songs.result.push(row.songId)
+          songs.entities[row.songId].numMedia++
+          continue
+        }
+
+        delete row.isPreferred // no need to send over the wire
         songs.entities[row.songId] = row
+        songs.entities[row.songId].numMedia = 1
+        songs.result.push(row.songId)
 
         // add to artist's songIds
         if (typeof SongIdsByArtist[row.artistId] === 'undefined') {
@@ -64,9 +60,7 @@ class Library {
       }
     }
 
-    // query #2: artists (we do this after songs so we can ignore
-    // artists having no songs, e.g. when a provider is disabled)
-    // @todo see if this can be done in one query now
+    // query #2: artists
     {
       const q = squel.select()
         .from('artists')
@@ -76,16 +70,10 @@ class Library {
       const rows = await db.all(text, values)
 
       for (const row of rows) {
-        // don't include artists without any songs
-        if (typeof SongIdsByArtist[row.artistId] === 'undefined') {
-          continue
-        }
-
-        // normalize artist data
-        artists.result.push(row.artistId)
-        artists.entities[row.artistId] = {
-          ...row,
-          songIds: SongIdsByArtist[row.artistId],
+        if (SongIdsByArtist[row.artistId]) {
+          artists.result.push(row.artistId)
+          artists.entities[row.artistId] = row
+          artists.entities[row.artistId].songIds = SongIdsByArtist[row.artistId]
         }
       }
     }
@@ -94,51 +82,6 @@ class Library {
       artists,
       songs,
       version: Library.getLibraryVersion(),
-    }
-  }
-
-  /**
-  * Returns a single song (with the preferred mediaId)
-  *
-  * @param  {Number}  songId
-  * @return {Promise}        Song entity (same format as with get())
-  */
-  static async getSong (songId) {
-    const q = squel.select()
-      .field('media.mediaId AS mediaId')
-      .field('media.duration AS duration')
-      .field('songs.artistId AS artistId')
-      .field('songs.songId AS songId')
-      .field('songs.title AS title')
-      .field('MAX(media.isPreferred) AS isPreferred')
-      .field('COUNT(DISTINCT media.mediaId) AS numMedia')
-      .field('COUNT(DISTINCT songStars.userId) AS numStars')
-      .from('media')
-      .join(squel.select()
-        .from('paths')
-        .field('MIN(paths.priority) AS priority')
-        .field('pathId')
-        .group('pathId'),
-      'paths', 'media.pathId = paths.pathId')
-      .join('songs USING (songId)')
-      .join('artists USING (artistId)')
-      .left_join('songStars USING(songId)')
-      .group('songs.songId')
-      .where('songs.songId = ?', songId)
-
-    const { text, values } = q.toParam()
-    const row = await db.get(text, values)
-
-    if (typeof row !== 'object') {
-      throw new Error(`Song not found (songId=${songId})`)
-    }
-
-    // no need to send over the wire but we needed it
-    // in the query to show the correct mediaId
-    delete row.isPreferred
-
-    return {
-      [songId]: row,
     }
   }
 
@@ -223,6 +166,44 @@ class Library {
     }
 
     return match
+  }
+
+  /**
+  * Get underlying media for a given song
+  * @param  {number}  songId
+  * @return {Promise} normalized media entries
+  */
+  static async getSong (songId) {
+    const media = {
+      result: [],
+      entities: {},
+    }
+
+    const q = squel.select()
+      .field('media.*')
+      .field('paths.path')
+      .field('songs.artistId, songs.songId, songs.title')
+      .from('media')
+      .where('songId = ?', songId)
+      .join(squel.select()
+        .from('paths')
+        .group('pathId'),
+      'paths', 'paths.pathId = media.pathId')
+      .join('songs USING (songId)')
+      .join('artists USING (artistId)')
+      .order('paths.priority')
+
+    const { text, values } = q.toParam()
+    const rows = await db.all(text, values)
+
+    rows.forEach(row => {
+      media.result.push(row.mediaId)
+
+      row.file = row.path + path.sep + row.relPath
+      media.entities[row.mediaId] = row
+    })
+
+    return media
   }
 
   /**

@@ -60,7 +60,7 @@ class MP4Player extends React.Component {
   }
 
   updateSources = () => {
-    const src = `/api/media/?type=video&mediaId=${this.props.queueItem.mediaId}`
+    const src = `/api/media/${this.props.queueItem.mediaId}?type=video`
 
     this.props.onMediaRequest({ ...this.props.queueItem, src })
     this.video.current.src = src

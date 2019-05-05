@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 import { Searcher } from 'fast-fuzzy'
 import LibraryView from './LibraryView'
 import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'
-import { showSongInfo, closeSongInfo } from 'store/modules/ui'
+import { showSongInfo, closeSongInfo } from 'store/modules/songInfo'
 
 const getArtists = (state) => state.artists
 const getSongs = (state) => state.songs

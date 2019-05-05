@@ -2,11 +2,12 @@ import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from 'reselect'
 import QueueList from './QueueList'
-import { showErrorMessage, showSongInfo, closeSongInfo } from 'store/modules/ui'
 import { requestPlay, requestPause, requestPlayNext } from 'store/modules/status'
+import { showSongInfo, closeSongInfo } from 'store/modules/songInfo'
 import { queueSong, removeItem } from '../../modules/queue'
 import getOrderedQueue from '../../selectors/getOrderedQueue'
 import { toggleSongStarred } from 'store/modules/userStars'
+import { showErrorMessage } from 'store/modules/ui'
 
 const getQueue = (state) => getOrderedQueue(state)
 const getCurId = (state) => state.status.queueId

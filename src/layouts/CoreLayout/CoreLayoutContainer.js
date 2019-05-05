@@ -1,11 +1,12 @@
 import CoreLayout from './CoreLayout'
 import { connect } from 'react-redux'
-import { clearErrorMessage, closeSongInfo } from 'store/modules/ui'
+import { closeSongInfo } from 'store/modules/songInfo'
+import { clearErrorMessage } from 'store/modules/ui'
 
 const mapStateToProps = (state) => {
   return {
     errorMessage: state.ui.errorMessage,
-    songInfoId: state.ui.songInfoId,
+    songInfoId: state.songInfo.songId,
   }
 }
 

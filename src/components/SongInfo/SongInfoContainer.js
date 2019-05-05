@@ -1,13 +1,14 @@
 import { connect } from 'react-redux'
 import SongInfo from './SongInfo'
-import { closeSongInfo } from 'store/modules/ui'
+import { closeSongInfo, setPreferred } from 'store/modules/songInfo'
 
 const mapActionCreators = {
   closeSongInfo,
+  setPreferred,
 }
 
 const mapStateToProps = (state) => ({
-  media: state.ui.songInfoMedia,
+  media: state.songInfo.media,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(SongInfo)

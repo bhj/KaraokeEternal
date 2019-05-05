@@ -10,6 +10,7 @@ import prefs from './modules/prefs'
 import queue from 'routes/Queue/modules/queue'
 import rooms from './modules/rooms'
 import songs from 'routes/Library/modules/songs'
+import songInfo from './modules/songInfo'
 import starCounts from 'routes/Library/modules/starCounts'
 import status from './modules/status'
 import ui from './modules/ui'
@@ -26,6 +27,7 @@ export const makeRootReducer = (asyncReducers) => {
     queue: optimistic(queue),
     rooms,
     songs,
+    songInfo,
     starCounts,
     status,
     ui,

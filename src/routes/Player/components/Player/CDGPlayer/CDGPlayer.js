@@ -97,13 +97,13 @@ class CDGPlayer extends React.Component {
     this.cdg.stop()
     this.isCDGLoaded = false
 
-    api('GET', `/?type=cdg&mediaId=${mediaId}`)
+    api('GET', `/${mediaId}?type=cdg`)
       .then(res => res.arrayBuffer())
       .then(res => {
         this.cdg.load(new Uint8Array(res))
 
         // start loading audio
-        this.audio.current.src = `/api/media/?type=audio&mediaId=${mediaId}`
+        this.audio.current.src = `/api/media/${mediaId}?type=audio`
         this.audio.current.load()
       }).catch(err => {
         this.props.onMediaRequestError(err.message)

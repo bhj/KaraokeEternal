@@ -1,53 +1,21 @@
-const db = require('sqlite')
-const squel = require('squel')
 const KoaRouter = require('koa-router')
-const router = KoaRouter({ prefix: '/api/library' })
-const path = require('path')
+const router = KoaRouter({ prefix: '/api' })
+const Library = require('./Library')
 
-// get song's media info
+// get song info (including media)
 router.get('/song/:songId', async (ctx, next) => {
-  const media = {
-    result: [],
-    entities: {},
-  }
-
   // must be admin
   if (!ctx.user.isAdmin) {
-    ctx.status = 401
-    return
+    ctx.throw(401)
   }
 
-  // required
-  if (!ctx.params.songId) {
-    ctx.status = 422
-    ctx.body = `Invalid songId`
-    return
+  const songId = parseInt(ctx.params.songId, 10)
+
+  if (Number.isNaN(songId)) {
+    ctx.throw(401, 'Invalid songId')
   }
 
-  const q = squel.select()
-    .field('media.*')
-    .field('paths.path')
-    .field('songs.artistId, songs.songId, songs.title')
-    .from('media')
-    .where('songId = ?', ctx.params.songId)
-    .join(squel.select()
-      .from('paths'),
-    'paths', 'paths.pathId = media.pathId')
-    .join('songs USING (songId)')
-    .join('artists USING (artistId)')
-    .order('paths.priority')
-
-  const { text, values } = q.toParam()
-  const rows = await db.all(text, values)
-
-  rows.forEach(row => {
-    media.result.push(row.mediaId)
-
-    row.file = row.path + path.sep + row.relPath
-    media.entities[row.mediaId] = row
-  })
-
-  ctx.body = media
+  ctx.body = await Library.getSong(songId)
 })
 
 module.exports = router

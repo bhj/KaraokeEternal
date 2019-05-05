@@ -153,18 +153,51 @@ class Media {
     log.info(`cleanup: removed ${res.stmt.changes} stars for nonexistent songs`)
     changes += res.stmt.changes
 
-    // remove nonexistent media from the queue
+    // remove nonexistent songs from the queue
     res = await db.run(`
-      DELETE FROM queue WHERE mediaId IN (
-        SELECT queue.mediaId FROM queue LEFT JOIN media USING(mediaId) WHERE media.mediaId IS NULL
+      DELETE FROM queue WHERE songId IN (
+        SELECT queue.songId FROM queue LEFT JOIN media USING(songId) WHERE media.songId IS NULL
       )
     `)
-    log.info(`cleanup: removed ${res.stmt.changes} queue entries for nonexistent media`)
+    log.info(`cleanup: removed ${res.stmt.changes} queue entries for nonexistent songs`)
     changes += res.stmt.changes
 
     if (changes) {
       log.info(`cleanup: vacuuming database`)
       await db.run('VACUUM')
+    }
+  }
+
+  /**
+   * Set isPreferred flag for a given media item
+   * @param  {number}  songId
+   * @return {Promise}
+   */
+  static async setPreferred (mediaId, isPreferred) {
+    if (!Number.isInteger(mediaId) || typeof isPreferred !== 'boolean') {
+      throw new Error(`invalid mediaId or value`)
+    }
+
+    // get songId
+    const res = await Media.search({ mediaId })
+
+    if (!res.result.length) {
+      throw new Error(`mediaId not found: ${mediaId}`)
+    }
+
+    const songId = res.entities[mediaId].songId
+
+    // clear any currently preferred items
+    const q = squel.update()
+      .table('media')
+      .where('songId = ?', songId)
+      .set('isPreferred', 0)
+
+    const { text, values } = q.toParam()
+    await db.run(text, values)
+
+    if (isPreferred) {
+      await Media.update({ mediaId, isPreferred: 1 })
     }
   }
 }

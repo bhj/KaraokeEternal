@@ -21,36 +21,19 @@ const ACTION_HANDLERS = {
       })
     }
 
-    // verify media exists
-    {
-      const q = squel.select()
-        .from('media')
-        .where('mediaId = ?', payload.mediaId)
-
-      const { text, values } = q.toParam()
-      const row = await db.get(text, values)
-
-      if (!row) {
-        return acknowledge({
-          type: QUEUE_ADD + '_ERROR',
-          error: 'mediaId not found: ' + payload.mediaId,
-        })
-      }
-    }
-
     // insert queue item
     {
       const q = squel.insert()
         .into('queue')
         .set('roomId', sock.user.roomId)
-        .set('mediaId', payload.mediaId)
+        .set('songId', payload.songId)
         .set('userId', sock.user.userId)
 
       const { text, values } = q.toParam()
       const res = await db.run(text, values)
 
       if (res.stmt.changes !== 1) {
-        throw new Error('Could not add media item to queue')
+        throw new Error('Could not add song to queue')
       }
     }
 
@@ -60,7 +43,7 @@ const ACTION_HANDLERS = {
     // to all in room
     sock.server.to(sock.user.roomId).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.getQueue(sock.user.roomId)
+      payload: await Queue.get(sock.user.roomId)
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
@@ -90,7 +73,7 @@ const ACTION_HANDLERS = {
     // tell room
     sock.server.to(sock.user.roomId).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.getQueue(sock.user.roomId)
+      payload: await Queue.get(sock.user.roomId)
     })
   },
 }

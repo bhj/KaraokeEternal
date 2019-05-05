@@ -3,7 +3,7 @@ import { ensureState } from 'redux-optimistic-ui'
 import SongList from './SongList'
 import { queueSong } from 'routes/Queue/modules/queue'
 import { toggleSongStarred } from 'store/modules/userStars'
-import { showSongInfo } from 'store/modules/ui'
+import { showSongInfo } from 'store/modules/songInfo'
 
 const mapStateToProps = (state, props) => ({
   artists: state.artists.entities,
