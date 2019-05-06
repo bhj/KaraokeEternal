@@ -201,7 +201,7 @@ Your parser creator will be passed an object with the following properties:
 - `getDefaultParser` Function that returns the default parser. Optionally accepts a configuration object (see [Configuring the Parser](#configuring-the-parser)). The default parser can itself be used as middleware, with custom middleware run before and/or after.
 - `defaultMiddleware`  [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) containing the [default  middleware](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) in order. This can be used to recompose the middleware for your custom parser.
 
-When Karaoke Forever scans a media file, it calls the parser with an object (`ctx`) having the properties `file` (string, filename without extension) and `meta` (object with the [audio file's tags and format information](https://github.com/Borewit/music-metadata#metadata-result)). At the end of the middleware stack `ctx` should have the following properties:
+When Karaoke Forever scans a media file, it calls the parser with an object (`ctx`) having the properties `file` (string, filename without extension) and `meta` (object with these [audio metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md)). At the end of the middleware stack `ctx` should have the following properties:
 
 - `artist` String with the artist's name as it will be shown in the library. Required.
 - `title` String with the song's title as it will be shown in the library. Required.

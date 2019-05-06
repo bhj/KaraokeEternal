@@ -132,7 +132,7 @@ class FileScanner extends Scanner {
 
     // run filename parser (MetaParser)
     const parsed = this.parser({
-      meta,
+      meta: meta.common,
       file: path.parse(file).name,
     })
 
