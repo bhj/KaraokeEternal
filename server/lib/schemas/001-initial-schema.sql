@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS media (
   songId integer NOT NULL,
   pathId integer NOT NULL,
   relPath text NOT NULL,
-  player text NOT NULL,
   duration integer NOT NULL,
   isPreferred integer(1) NOT NULL DEFAULT(0),
   dateAdded integer NOT NULL DEFAULT(0),

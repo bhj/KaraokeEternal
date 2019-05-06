@@ -146,17 +146,13 @@ class FileScanner extends Scanner {
       duration: Math.round(meta.format.duration),
     }
 
-    // determine player type
-    if (/\.mp4/i.test(path.extname(file))) {
-      media.player = 'mp4'
-    } else {
-      // look for .cdg if not dealing with a video
+    // need to look for .cdg if not dealing with a video
+    if (!/\.mp4/i.test(path.extname(file))) {
       if (!await getCdgName(file)) {
         throw new Error('No accompanying .cdg for audio-only file')
       }
 
       log.info('  => found .cdg file')
-      media.player = 'cdg'
     }
 
     // file already in database?
@@ -173,14 +169,12 @@ class FileScanner extends Scanner {
 
       // did songId, player or duration change?
       if (row.songId !== media.songId ||
-          row.player !== media.player ||
           row.duration !== media.duration) {
         log.info('  => updated: %s', JSON.stringify(match))
 
         await IPCMedia.update({
           mediaId: row.mediaId,
           songId: media.songId,
-          player: media.player,
           duration: media.duration,
           dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
         })
