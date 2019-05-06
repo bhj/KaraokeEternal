@@ -5,6 +5,7 @@ const {
   MEDIA_CLEANUP,
   MEDIA_REMOVE,
   MEDIA_UPDATE,
+  SCANNER_WORKER_DONE,
   SCANNER_WORKER_STATUS,
   _SUCCESS,
   _ERROR,
@@ -25,7 +26,9 @@ module.exports = function (io) {
     const { type } = action
 
     // ignore some actions to reduce logging noise
-    if (type === SCANNER_WORKER_STATUS) return
+    if (type === SCANNER_WORKER_STATUS || type === SCANNER_WORKER_DONE) {
+      return
+    }
 
     if (typeof ACTION_HANDLERS[type] !== 'function') {
       log.warn('no handler for ipc action: %s', type)
