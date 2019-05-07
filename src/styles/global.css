@@ -92,7 +92,7 @@ input[type="search"] {
 
 /* Modal dialog */
 .skylight-dialog {
-  background-color: var(--bg-color) !important;
+  background-color: hsl(var(--hue-blue), 70%, 7%) !important;
   border-radius: var(--border-radius) !important;
 }
 
