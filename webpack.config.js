@@ -42,6 +42,10 @@ const config = {
       __PROD__,
     }, project.globals)),
     new CaseSensitivePathsPlugin(),
+    new MiniCssExtractPlugin({
+      filename: __DEV__ ? '[name].css' : '[name].[hash].css',
+      chunkFilename: __DEV__ ? '[id].css' : '[id].[hash].css',
+    }),
   ],
   optimization: {
     splitChunks: {
@@ -56,13 +60,6 @@ if (__PROD__) {
     from: path.join(project.basePath, 'assets'),
     to: path.join(project.basePath, 'dist'),
   }], { /* options */ }))
-
-  // @TODO: using style-loader in development until
-  // MiniCssExtractPlugin supports HMR
-  config.plugins.push(new MiniCssExtractPlugin({
-    filename: __DEV__ ? '[name].css' : '[name].[hash].css',
-    chunkFilename: __DEV__ ? '[id].css' : '[id].[hash].css',
-  }))
 
   config.plugins.push(new LicenseWebpackPlugin({
     addBanner: true,
@@ -122,7 +119,10 @@ config.module.rules.push({
 config.module.rules.push({
   test : /(global)\.css$/,
   use  : [{
-    loader : __PROD__ ? MiniCssExtractPlugin.loader : 'style-loader',
+    loader : MiniCssExtractPlugin.loader,
+    options: {
+      hmr: __DEV__,
+    },
   }, {
     loader  : 'css-loader',
     options : {
@@ -134,17 +134,22 @@ config.module.rules.push({
 
 // CSS Modules
 config.module.rules.push({
-  test : /\.css$/,
+  test: /\.css$/,
   exclude : /(global)\.css$/,
-  use  : [{
-    loader : __PROD__ ? MiniCssExtractPlugin.loader : 'style-loader',
-  }, {
-    loader  : 'css-loader',
-    options : {
-      modules   : true,
-      localIdentName: '[name]__[local]___[hash:base64:5]',
+  use: [
+    {
+      loader : MiniCssExtractPlugin.loader,
+      options: {
+        hmr: __DEV__,
+      }
+    }, {
+      loader: 'css-loader',
+      options: {
+        modules: true,
+        localIdentName: '[name]__[local]___[hash:base64:5]',
+      }
     }
-  }],
+  ],
 })
 
 // Files
