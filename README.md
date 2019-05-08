@@ -12,7 +12,7 @@ Join the new [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq) for ge
 
 ## Development
 
-Requires [Node.js 10](https://nodejs.org/en/).
+Requires [Node.js 10+](https://nodejs.org/en/).
 
 1. Clone the project
 2. `npm install`
