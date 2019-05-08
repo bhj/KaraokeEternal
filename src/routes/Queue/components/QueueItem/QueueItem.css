@@ -87,7 +87,7 @@
 }
 
 .isOwner {
-  color: var(--text-color);
+  color: var(--queued-item-color);
   text-shadow: var(--text-shadow-glow);
 }
 
