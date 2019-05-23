@@ -5,14 +5,14 @@ const m = module.exports = new Map()
 // ----------------------
 
 m.set('normalize whitespace', (ctx, next) => {
-  ctx.file = ctx.file.replace(/_/g, ' ') // underscores to spaces
-  ctx.file = ctx.file.replace(/ {2,}/g, ' ') // multiple spaces to single
+  ctx.name = ctx.name.replace(/_/g, ' ') // underscores to spaces
+  ctx.name = ctx.name.replace(/ {2,}/g, ' ') // multiple spaces to single
   next()
 })
 
 m.set('de-karaoke', (ctx, next) => {
   // remove text having 'karaoke' between (), [], or {}
-  ctx.file = ctx.file.replace(/[([{](?=[^([{]*$).*karaoke.*[)\]}]/i, '')
+  ctx.name = ctx.name.replace(/[([{](?=[^([{]*$).*karaoke.*[)\]}]/i, '')
   next()
 })
 
@@ -22,7 +22,7 @@ m.set('de-karaoke', (ctx, next) => {
 
 // detect separator and set some (default) config
 m.set('detect separator', (ctx, next) => {
-  const matches = ctx.file.match(/ in the style of /i)
+  const matches = ctx.name.match(/ in the style of /i)
 
   ctx.cfg = {
     separator: matches ? matches[0] : '-',
@@ -36,7 +36,7 @@ m.set('detect separator', (ctx, next) => {
 // split to parts
 m.set('split to parts', (ctx, next) => {
   // split, trim and remove empty parts
-  ctx.parts = ctx.file.split(ctx.cfg.separator)
+  ctx.parts = ctx.name.split(ctx.cfg.separator)
     .map(part => part.trim())
     .filter(part => part.length)
 

@@ -1,8 +1,8 @@
 const path = require('path')
 const log = require('../../lib/logger')('FileScanner')
-const fs = require('fs')
 const musicMeta = require('music-metadata')
 const getFiles = require('./getFiles')
+const getConfig = require('./getConfig')
 const getPerms = require('../../lib/getPermutations')
 const getCdgName = require('../../lib/getCdgName')
 const Library = require('../../Library')
@@ -10,7 +10,6 @@ const Media = require('../../Media')
 const IPCMedia = require('../IPCMedia')
 const MetaParser = require('../MetaParser')
 const Scanner = require('../Scanner')
-const { NodeVM } = require('vm2')
 
 const searchExts = ['mp4', 'm4a', 'mp3']
 const searchExtPerms = searchExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
@@ -22,27 +21,25 @@ class FileScanner extends Scanner {
   }
 
   async scan () {
-    const offlinePaths = [] // pathIds
+    const files = new Map() // pathId => [files]
     const validMedia = [] // mediaIds
-    let files = []
-    let lastDir
+    let count = 0
+    let total = 0
 
-    // count files to scan from all paths
-    for (let i = 0; i < this.paths.result.length; i++) {
-      const pathId = this.paths.result[i]
+    // get list of files from all paths
+    for (const pathId of this.paths.result) {
       const basePath = this.paths.entities[pathId].path
 
-      this.emitStatus(`Listing folders (${i + 1} of ${this.paths.result.length})`, 0)
+      this.emitStatus(`Listing folder ${this.paths.result.indexOf(pathId) + 1} of ${this.paths.result.length}`, 0)
       log.info('Searching path: %s', basePath)
 
       try {
-        let list = await getFiles(basePath, { pathId })
+        const list = await getFiles(basePath, file => searchExtPerms.some(ext => file.endsWith('.' + ext)))
+        files.set(pathId, list)
+        total += list.length
 
-        list = list.filter(({ file }) => searchExtPerms.some(ext => file.endsWith('.' + ext)))
-        files = files.concat(list)
         log.info('  => found %s files with valid extensions %s', list.length, JSON.stringify(searchExts))
       } catch (err) {
-        offlinePaths.push(pathId)
         log.error(`  => ${err.message} (path offline)`)
       }
 
@@ -51,89 +48,70 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Processing %s files', files.length)
+    log.info('Processing %s files', total)
 
-    // process files
-    for (let i = 0; i < files.length; i++) {
-      this.emitStatus(`Scanning media (${i + 1} of ${files.length})`, ((i + 1) / files.length) * 100)
+    for (const [pathId, list] of files) {
+      let lastDir
 
-      const { file, pathId } = files[i]
-      const dir = path.dirname(file)
-
-      if (lastDir !== dir) {
-        lastDir = dir
+      for (const item of list) {
+        count++
+        log.info('[%s/%s] %s', count, total, item.file)
+        this.emitStatus(`Scanning media (${count} of ${total})`, (count / total) * 100)
 
         // (re)init parser with this folder's config, if any
-        const cfg = getCfg(dir, this.paths.entities[pathId].path)
-        this.parser = new MetaParser(cfg)
-      }
+        const dir = path.dirname(item.file)
 
-      // emit progress
-      log.info('[%s/%s] %s', i + 1, files.length, file)
+        if (lastDir !== dir) {
+          lastDir = dir
 
-      try {
-        const mediaId = await this.processFile(files[i])
-        validMedia.push(mediaId) // successfuly processed
-      } catch (err) {
-        log.warn(err.message + ': ' + file) // try the next file
-      }
+          const cfg = getConfig(dir, this.paths.entities[pathId].path)
+          this.parser = new MetaParser(cfg)
+        }
 
-      if (this.isCanceling) {
-        return
-      }
+        // process file
+        try {
+          const mediaId = await this.process(item, pathId)
+
+          // success
+          validMedia.push(mediaId)
+        } catch (err) {
+          // try next file
+          log.warn(err.message + ': ' + item.file)
+        }
+
+        if (this.isCanceling) {
+          return
+        }
+      } // end for
     } // end for
 
-    log.info('Scan finished with %s valid media', validMedia.length)
+    log.info('Processing finished with %s valid media entries', validMedia.length)
 
-    // cleanup
-    {
-      const invalidMedia = []
-      const res = await Media.search()
-
-      res.result.forEach(mediaId => {
-        // was this media item just verified?
-        if (validMedia.includes(mediaId)) {
-          return
-        }
-
-        // is media item in an offline path?
-        if (offlinePaths.includes(res.entities[mediaId].pathId)) {
-          return
-        }
-
-        // looks like we need to remove it
-        invalidMedia.push(mediaId)
-      })
-
-      log.info(`${invalidMedia.length} media unaccounted for in database`)
-
-      if (invalidMedia.length) {
-        await IPCMedia.remove(invalidMedia)
-      }
-
-      await IPCMedia.cleanup()
-    }
+    await this.removeInvalid(validMedia, Array.from(files.keys()))
   }
 
-  async processFile ({ file, pathId }) {
-    const meta = await musicMeta.parseFile(file, {
+  async process (item, pathId) {
+    const pathInfo = path.parse(item.file)
+    const tags = await musicMeta.parseFile(item.file, {
       duration: true,
       skipCovers: true,
     })
 
-    if (!meta.format.duration) {
+    if (!tags.format.duration) {
       throw new Error(`  => could not determine duration`)
     }
 
     log.info('  => duration: %s:%s',
-      Math.floor(meta.format.duration / 60),
-      Math.round(meta.format.duration % 60, 10).toString().padStart(2, '0')
+      Math.floor(tags.format.duration / 60),
+      Math.round(tags.format.duration % 60, 10).toString().padStart(2, '0')
     )
 
-    // run filename parser (MetaParser)
+    // run parser
     const parsed = this.parser({
-      meta: meta.common,
-      file: path.parse(file).name,
+      dir: pathInfo.dir,
+      dirSep: path.sep,
+      name: pathInfo.name,
+      tags: tags.common,
     })
 
     // get artistId and songId
@@ -142,13 +120,13 @@ class FileScanner extends Scanner {
     const media = {
       songId: match.songId,
       pathId,
-      relPath: file.substr(this.paths.entities[pathId].path.length + 1),
-      duration: Math.round(meta.format.duration),
+      relPath: item.file.substr(this.paths.entities[pathId].path.length + 1),
+      duration: Math.round(tags.format.duration),
     }
 
     // need to look for .cdg if not dealing with a video
-    if (!/\.mp4/i.test(path.extname(file))) {
-      if (!await getCdgName(file)) {
+    if (!/\.mp4/i.test(path.extname(item.file))) {
+      if (!await getCdgName(item.file)) {
         throw new Error('No accompanying .cdg for audio-only file')
       }
 
@@ -193,34 +171,30 @@ class FileScanner extends Scanner {
     // resolves to a mediaId
     return IPCMedia.add(media)
   }
-}
 
-// search each parent dir (up to baseDir)
-function getCfg (dir, baseDir) {
-  dir = path.normalize(dir)
-  baseDir = path.normalize(baseDir)
-  const file = path.resolve(dir, '_kfconfig.js')
+  async removeInvalid (validMedia = [], validPaths = []) {
+    log.info(`Searching for invalid media entries`)
 
-  try {
-    const userScript = fs.readFileSync(file, 'utf-8')
-    log.info('Using config file %s', file)
+    const res = await Media.search()
+    const invalidMedia = []
 
-    try {
-      const vm = new NodeVM({ wrapper: 'none' })
-      return vm.run(userScript)
-    } catch (err) {
-      log.error(err)
+    res.result.forEach(mediaId => {
+      // just validated or in an offline path?
+      if (validMedia.includes(mediaId) || !validPaths.includes(res.entities[mediaId].pathId)) {
+        return
+      }
+
+      invalidMedia.push(mediaId)
+    })
+
+    log.info(`Found ${invalidMedia.length} invalid media entries`)
+
+    if (invalidMedia.length) {
+      await IPCMedia.remove(invalidMedia)
     }
-  } catch (err) {
-    log.info('No config found in folder %s', dir)
-  }
 
-  if (dir === baseDir) {
-    return
+    await IPCMedia.cleanup()
   }
-
-  // try parent dir
-  return getCfg(path.resolve(dir, '..'), baseDir)
 }
 
 module.exports = FileScanner

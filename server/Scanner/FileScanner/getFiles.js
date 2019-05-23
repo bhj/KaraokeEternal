@@ -1,20 +1,59 @@
-const { promisify } = require('util')
-const { resolve } = require('path')
 const fs = require('fs')
-const readdir = promisify(fs.readdir)
-const stat = promisify(fs.stat)
+const path = require('path')
+const log = require('../../lib/logger')('FileScanner:getFiles')
 
-async function getFiles (dir, extra) {
-  const list = await readdir(dir)
+/**
+ * Silly promise wrapper for synchronous walker
+ *
+ * We want a synchronous walker for performance, but FileScanner runs
+ * the walker in a loop, which will block the (async) socket.io status
+ * emissions unless we use setTimeout here. @todo is there a better way?
+ *
+ * @param  {string} dir      path to recursively list
+ * @param  {function} filterFn filter function applied to each file
+ * @return {array}          array of objects with path and stat properties
+ */
+function getFiles (dir, filterFn) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        resolve(walkSync(dir, filterFn))
+      } catch (err) {
+        reject(err)
+      }
+    }, 0)
+  })
+}
 
-  const files = await Promise.all(list
-    .filter(d => !d.startsWith('.'))
-    .map(async (item) => {
-      const file = resolve(dir, item)
-      return (await stat(file)).isDirectory() ? getFiles(file, extra) : { file, ...extra }
-    }))
+/**
+ * Directory walker that only throws if parent directory
+ * can't be read. Errors stat-ing children are only logged.
+ */
+function walkSync (dir, filterFn) {
+  let results = []
+  const list = fs.readdirSync(dir)
 
-  return files.reduce((a, f) => a.concat(f), [])
+  list.forEach(file => {
+    let stats
+    file = path.join(dir, file)
+
+    try {
+      stats = fs.statSync(file)
+    } catch (err) {
+      log.warn(err.message)
+      return
+    }
+
+    if (stats && stats.isDirectory()) {
+      results = results.concat(walkSync(file, filterFn))
+    } else {
+      if (!filterFn || filterFn(file)) {
+        results.push({ file, stats })
+      }
+    }
+  })
+
+  return results
 }
 
 module.exports = getFiles
