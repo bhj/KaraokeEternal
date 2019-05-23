@@ -1,42 +1,42 @@
 # Karaoke Forever
 
-Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser.  The player is also browser-based and supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required; data stays on your server on your local network.
+Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The web app is locally hosted (see [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server)) with no internet connection required and all data staying on your server/network.
 
-**Note:** Karaoke Forever does not handle audio *input* since there is a wide variety of possible setups. It's recommended to use a low-latency audio interface with at least two microphones that will be mixed with the player's output.
+See the [documentation](https://www.karaoke-forever.com/docs) to get started. Packaged downloads are coming soon.
 
-Please get started with [the documentation](https://www.karaoke-forever.com/docs). Packaged downloads are coming soon.
+## Features
+
+- Modern browser-based app and player
+- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) and MP4 video file support
+- Milkdrop visualizations via [Butterchurn](https://github.com/jberg/butterchurn) (requires [WebGL 2 support](https://caniuse.com/#feat=webgl2))
+- Queue evenly distributes singers based on time since last sang
+- Multiple simultaneous rooms/queues/players
+- Dark UI designed for "karaoke conditions"
+
+**Note:** Karaoke Forever does not handle audio *input* and assumes the player's output will be mixed with any microphones (either in software or an outboard mixer)
+
+## Documentation
+
+See the [full documentation here](https://www.karaoke-forever.com/docs).
+
+## Discord
+
+Join the [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq) for general support and development chat, or say hi and show off your setup!
 
 ## Development
 
-Requires [Node.js 10](https://nodejs.org/en/) or later.
+Currently using [Node.js 12](https://nodejs.org/en/).
 
 1. Clone the project
 2. `npm install`
 3. `npm run dev` and look for "Web server running at" for the **server URL**
 
-The packaged builds of Karaoke Forever Server use Electron. If you want to play with that side of things:
-
-- `npm run install-app-deps`
-- `npm start`
-
-On Windows you may want to do this first:
-
-- `npm i --global --production --add-python-to-path windows-build-tools` (then restart shell)
-
 ## Contributing
 
 Contributions are most welcome!
-
-## Acknowledgements
-
-- [David Zukowski](https://zuko.me): react-redux-starter-kit, which this project began as a fork of (all contributors up until it was detached to its own project are listed on the Contributors page)
-- [Luke Tucker](https://github.com/ltucker/): JavaScript/HTML5 canvas CD+Graphics player
-- Carter Corker: Technical things
-- Stuart Albert: The name (a reference to Duke Nukem Forever, given the *almost* vaporware status)
-- B&W mic icon by [Freepik](http://www.freepik.com/) from [flaticon.com](http://www.flaticon.com/)
 
 ## License
 
 MIT License
 
-Copyright (c) 2018 Brandon H. Jones
+Copyright 2017-2019 RadRoot LLC

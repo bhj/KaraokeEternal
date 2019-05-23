@@ -3,7 +3,7 @@ permalink: /docs/index.html
 ---
 # Karaoke Forever
 
-- [Overview](#overview)
+- [Requirements](#requirements)
 - [Quick Start](#quick-start)
 - [Karaoke Forever](#karaoke-forever-the-web-app) (the web app)
   - [Library](#library)
@@ -15,74 +15,83 @@ permalink: /docs/index.html
   - [Player](#player-admin-only) (admin only)
 - [Karaoke Forever Server](#karaoke-forever-server)
   - [Installation](#installation)
-  - [Supported Media Files](#supported-media-files)
-  - [The Meta Parser](#the-meta-parser)
+  - [Supported File Formats](#supported-file-formats)
+  - [MetaParser](#metaparser)
     - [Configuring the Parser](#configuring-the-parser)
-    - [Augmenting or Replacing the Parser (Advanced)](#augmenting-or-replacing-the-parser-advanced)
+    - [Creating a Parser (Experimental)](#creating-a-parser-experimental)
   - [Command Line Options](#command-line-options)
   - [File Locations](#file-locations)
+- [F.A.Q.](#faq)
+- [Acknowledgements](#acknowledgements)
 
-## Overview
-
-Host awesome karaoke parties where everyone can find and queue songs from their phone's web browser.  The player is also browser-based and supports [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (mp3+cdg) and mp4 video files. No internet connection required; data stays on your server on your local network.
-
-**Note:** Karaoke Forever does not handle audio *input* since there is a wide variety of possible setups. It's recommended to use a low-latency audio interface with at least two microphones that will be mixed with the player's output.
+## Requirements
 
 Karaoke Forever has a few parts:
 
-- **[Server:](#karaoke-forever-server)** Runs on the macOS/Windows/Linux/etc. system with your [supported media files](#supported-media-files) and serves the web app on your local network.
+- **[Server:](#karaoke-forever-server)** Runs on your macOS/Windows/Linux/etc. system to serve the "web" app and [supported media files](#supported-file-formats) on your local network.
 
-- **[Web app:](#karaoke-forever-the-web-app)** Built from the ground up for mobile browsers, anyone can easily join using their phone.
+- **[Web app:](#karaoke-forever-the-web-app)** Supports all modern browsers, but is designed for mobile screens. Does not support Internet Explorer.
 
-- **[Player:](#player-admin-only)** Part of the web app, designed to run fullscreen on the system handling audio/video for the room.
+- **[Player:](#player-admin-only)** Runs in a supported browser on the system handling audio/video for a [room](#rooms-admin-only). It's assumed the player's output will be mixed with any microphones (either in software or an outboard mixer)
+
+  The current versions of these browsers are supported:
+
+  - Chrome/Chromium/Edge
+  - Firefox
+
+  Results may vary in other browsers depending on their support for [WebGL 2.0](https://caniuse.com/#feat=webgl2) and [Web Audio](https://caniuse.com/#feat=audio-api).
+
+**Note:** Karaoke Forever does not handle audio *input* and assumes the player's output will be mixed with any microphones (either in software or an outboard mixer)
 
 ## Quick Start
 
-1. Install and run Karaoke Forever Server on the system that will serve the media files and web app on your local network. Karaoke Forever Server runs in the tray (Windows) or menubar (macOS).
+1. Install and run Karaoke Forever Server on the system that will serve the web app on your local network. On macOS or Windows, Karaoke Forever Server runs in the menu bar or tray.
 
-  ***Important:*** *The server app is not currently signed, so Windows SmartScreen and macOS Gatekeeper will complain by default. Do not disable Gatekeeper on macOS - simply right-click the application and choose Open.*
+  **Important:** *The packaged app is not currently signed, so macOS Gatekeeper and Windows SmartScreen will likely complain by default. On macOS, *do not disable Gatekeeper*, simply right-click the .app and choose Open.*
 
-2. Browse to the server URL. You can launch your default browser or copy the URL to the clipboard using the Karaoke Forever Server tray/menubar icon.
+2. Browse to the server URL. You can copy or open the URL in your default browser using the Karaoke Forever Server menu bar/tray icon.
 
-  ***Note:*** *The web app is designed for mobile browsers, so for the best experience please use your phone from this point forward.*
+  ***Note:*** *The web app is designed for mobile browsers, so try switching to your phone to get an idea of what users will see.*
 
 3. Create your admin account at the welcome page.
 
-4. In the Preferences panel, tap Media Folders and add [supported media](#supported-media-files).
+4. In the Preferences panel, tap Media Folders and add your [supported media](#supported-file-formats).
 
-5. When the media scan finishes, songs will appear in the [library](#library) organized by artist. Add a few songs to the [queue](#queue) by tapping the artist, then tapping the song title.
+5. When the media scan finishes, tap the [library](#library) icon. To queue  songs, tap to expand an artist, then tap a song.
 
-6. If you are not on the system that will be running the [player](#player-admin-only) (and likely handling audio/video) go there now, browse to the server URL and sign in with your admin account.
+6. If you are not on the system that will be running the [player](#player-admin-only) go there now, browse to the server URL and sign in with your admin account.
 
 7. You should see a notice at the top that no players are present, so tap the Start Player link. (If you don't see a notice, your current browser doesn't support fullscreen mode)
 
-8. Click Play in the playback controls at the top. These controls are always present for admins and the current singer. When you're ready to start the party, click the fullscreen button in the player's upper right.
+8. Click Play in the playback controls that appear at the top. The current singer will temporarily have access to these while it's their turn. Admins always have access to the playback controls.
 
 ## Karaoke Forever (the web app)
 
 ### Library
 
-The library page lists available songs organized by artist, and allows users to search songs by artist and titles. Tapping a song's title will add it to the queue, and tapping its star will favorite it.
+The library view lists available songs organized by artist, and allows users to search songs by artist and title.
 
-If you're an admin, you may see songs with an italicized number at the end, like *(2)*. That would mean there are two versions (media files) of the song. The version in the folder with the highest priority will be queued when tapped (see Media Folders in [Preferences](#preferences-admin-only)).
+Tapping a song's title will add it to the queue, and tapping its star will favorite it. Admins can reveal additional options for each song, such as Get Info, by swiping left on the song.
 
-Admins can reveal additional options for each song, such as Get Info, by swiping left on the song.
+As an admin, you may see songs with an italicized number at the end, like *(2)*. That means there are two versions (media files) of the same song. The version in the folder with the highest priority will be queued when tapped (see Media Folders in [Preferences](#preferences-admin-only)).
 
 ### Queue
 
-The queue page shows the current, upcoming and previously played songs. Users can remove any of their upcoming songs and will see a notice (on all pages) when they're up next.
+The queue view shows the current, upcoming and previously played songs.
 
-While a user is up they temporarily have access to the playback controls, including pause, play, next and volume. Admins always have access to these controls.
+Karaoke Forever tries to distribute users as evenly as possible and prioritizes the queue based on the amount of time since each user last sang. This means users that join later in the session won't be stuck at the back of a long queue.
+
+To remove an upcoming song, swipe left and tap the remove button. Non-admin users can only remove their own songs. Admins also see additional options when swiping left.
 
 ### Account
 
-The account page lets users update their account, while admins will see additional panels.
+The account view lets users manage their account and admins manage the server app.
 
 #### Rooms (Admin Only)
 
 The Rooms panel allows admins to create, edit and remove rooms.
 
-Karaoke Forever uses "rooms" to organize sessions by space and time (spacetime?) Every room has its own song queue, and can be either open or closed. Users choose an open room when signing in.
+Karaoke Forever uses "rooms" to organize sessions by space and time (spacetime?) Every room has its own song queue, and can be either open or closed. Users choose a room when they sign in.
 
 **Warning:** Removing a room will also remove its queue, so the history of songs played during that session will be lost.
 
@@ -90,9 +99,9 @@ Karaoke Forever uses "rooms" to organize sessions by space and time (spacetime?)
 
 #### Preferences (Admin Only)
 
-The Preferences panel allows admins to configure Karaoke Forever.
+The Preferences panel allows admins to configure [Karaoke Forever Server](#karaoke-forever-server).
 
-- **Media Folders:** Add folders with [supported media files](#supported-media-files) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in the list will be used. Karaoke Forever Server does not automatically detect changes to media folders; click Refresh to re-scan.
+- **Media Folders:** Add folders with [supported media files](#supported-file-formats) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in the list will be used. Karaoke Forever Server does not automatically detect changes to media folders; click Refresh to re-scan.
 
 #### My Account
 
@@ -100,59 +109,44 @@ This panel lets users change their name, username or password and sign out.
 
 ### Player (admin only)
 
-The player is a page of the web app that's designed to run fullscreen on the system handling audio/video for a room.
+The player is a part of the web app designed to run in fullscreen mode on the system handling audio/video for a room.
 
-To start the player, sign in as an admin to a [room](#rooms-admin-only) with a browser that supports fullscreen mode. If no player is currently in the room, a notice will appear with a link to start the player. If you don't see a notice, your current browser doesn't support fullscreen mode.
-
-The player makes use of [WebGL 2.0](https://caniuse.com/#feat=webgl2) and the [Web Audio API](https://caniuse.com/#feat=audio-api). The current desktop versions of these browsers should be supported:
-
-- Chrome
-- Firefox
-
-**Note:** A desktop-class browser is recommended due to limitations in the fullscreen support of some mobile browsers.
-
-**Tip:** Most browsers will mute or prevent playback of media on a page that hasn't been interacted with yet. Clicking on the player page is usually sufficient, or you can add it to your browser's whitelist.
+To start the player, sign in as an admin to a [room](#rooms-admin-only) using a browser that supports fullscreen mode. If no player is currently in the room, a notice will appear with a link to start the player. If you don't see a notice, your browser doesn't support fullscreen mode (but you can still manually navigate to `/player`).
 
 ## Karaoke Forever Server
 
 ### Installation
 
-The server is bundled as a macOS and Windows application for convenience.
+**Important:** The packaged app is not currently signed, so macOS Gatekeeper and Windows SmartScreen will likely complain by default. On macOS, *do not disable Gatekeeper*, simply right-click the .app and choose Open.
 
-**Important:** The server app is not currently signed, so macOS and Windows SmartScreen will complain by default. *Do not disable Gatekeeper* on macOS - simply right-click the file and choose Open.
-
-Once running, click the Karaoke Forever Server menubar icon (macOS) or right-click the tray icon (Windows) to show the server URL. You can click *Open in browser* or browse to the server URL (be sure to include the port) from any device on the network. Note that the web app is primarily designed for mobile browsers.
-
-You can also run the server on most any platform with Node.js 10 or later:
+You can also run the server on most any platform with Node.js 12:
 
 1. Clone the project repository
 2. `npm install`
 3. `npm run compile`
 4. `npm run serve` and look for "Web server running at" for the **server URL**
 
-### Supported Media Files
-
-The following file formats are supported:
+### Supported File Formats
 
 - [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) (CD+Graphics and MP3 audio in separate files)
 
-  The .cdg and .mp3 files must have the same name. Karaoke Forever will also look for an .m4a file and use it instead of the .mp3 if it finds one.
+  The .cdg and .mp3 files must have the same name. Karaoke Forever will also look for an .m4a audio file and use it instead if present.
 
 - MP4 (video with audio)
 
   Note that since mp4/m4a files are only containers, codec support can vary depending on the browser running the [player](#player-admin-only).
 
-Media folders can be added via the [Preferences](#preferences-admin-only) section of the web app (when signed in as an admin). Media files that can't be scanned will not appear in the library, and are [logged to a file](#file-locations) by default. To change the level of logging, see [Command Line Options](#command-line-options).
+When determining the artist name and song title for each media file, the default behavior is to use the filename, assumed to be in the format "Artist - Title". This can be configured per-folder (see [MetaParser](#metaparser)).
 
-Karaoke Forever expects media filenames to be in the format "Artist - Title" by default. To customize the filename parser's behavior, see [The Meta Parser](#the-meta-parser).
+Media files that couldn't be added to the library are [logged to a file](#file-locations). To change the level of logging, see [Command Line Options](#command-line-options).
 
-### The Meta Parser
+### MetaParser
 
 Karaoke Forever expects media filenames to be in the format "Artist - Title" by default, but the parser can be configured on a per-folder basis using a `_kfconfig.js` file. When a `_kfconfig.js` file is encountered in a folder it applies to all files and subfolders within. If any subfolders have their own `_kfconfig.js` files, those take precedence.
 
 #### Configuring the Parser
 
-You can configure the default parser's behavior by returning an object with the options you want to override. For example, if a folder instead has filenames in the format "Title - Artist", you might drop in the following `_kfconfig.js` file:
+You can configure the default parser by returning an object with the options you want to override. For example, if a folder has filenames in the format "Title - Artist" instead, you could add this `_kfconfig.js` file:
 
 ```js
 return {
@@ -160,7 +154,7 @@ return {
 }
 ```
 
-*Note:* It's important to `return` the configuration object. JSON format is not currently supported.
+**Note:** It's important to `return` the configuration object. JSON format is not currently supported.
 
 The default configuration is as follows:
 
@@ -174,41 +168,48 @@ return {
 
 #### Creating a Parser (Experimental)
 
-Instead of a configuration object (as shown above), you can return a function that will be used to create a new parser, allowing anything from tweaking to completely replacing the stock one. This can be useful if you have many filenames that need extra processing to appear nicely in the library.
+Your `_kfconfig.js` can also return a *parser creator* instead of a configuration object. A parser creator returns a function (parser) that Karaoke Forever can call for each media file. The [default parser](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) is still available so you don't have to reinvent the wheel.
 
-Karaoke Forever uses a simple middleware-based filename parser. Here, *middleware* refers to an individual function, and *parser* refers to a composed stack of middleware (that is itself a function). Your `_kfconfig.js` should return a *parser creator*, in other words, a function that will be called to get the parser for the current folder.
-
-Your parser creator has access to the [default parser and middleware](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) so it doesn't have to reinvent the wheel. For example, this will create a parser that removes the word 'junk' from filenames, then runs the default parser:
+The following example creates a parser that removes the word 'junk' from each filename before handing off to the default parser:
 
 ```js
 return ({ compose, getDefaultParser, defaultMiddleware }) => {
   function customMiddleware (ctx, next) {
-    ctx.file = ctx.file.replace('junk', '')
+    ctx.name = ctx.name.replace('junk', '')
     next()
   }
 
   return compose(
-    customMiddleware,
-    getDefaultParser(), // optionally accepts a configuration object
+    customMiddleware,   // our custom pre-processing
+    getDefaultParser(), // then the default parser (optionally accepts a configuration object)
   )
 }
 
 ```
 
-Your parser creator will be passed an object with the following properties:
+Your parser creator is passed an object with the following properties:
 
-- `compose` Function that takes functions (or arrays of functions) as arguments and returns a single composed function that can be used as a parser.
-- `getDefaultParser` Function that returns the default parser. Optionally accepts a configuration object (see [Configuring the Parser](#configuring-the-parser)). The default parser can itself be used as middleware, with custom middleware run before and/or after.
-- `defaultMiddleware`  [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) containing the [default  middleware](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) in order. This can be used to recompose the middleware for your custom parser.
+- `compose` (function) accepts functions (or arrays of functions) as arguments and returns a single composed function that can be used as a parser
+- `getDefaultParser` (function) gets an instance of the default parser, which itself can be used as middleware. Note that the method must be called because you can optionally pass a [configuration object](#configuring-the-parser) when getting an instance
+- `defaultMiddleware` [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) containing the [default middleware](https://github.com/bhj/karaoke-forever/blob/master/server/Scanner/MetaParser/defaultMiddleware.js) in order. This can be used to recompose the middleware in your custom parser
 
-When Karaoke Forever scans a media file, it calls the parser with an object (`ctx`) having the properties `file` (string, filename without extension) and `meta` (object with these [audio metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md)). At the end of the middleware stack `ctx` should have the following properties:
+When Karaoke Forever scans a media file, it calls the parser with a context object `ctx` having the following properties:
 
-- `artist` String with the artist's name as it will be shown in the library. Required.
-- `title` String with the song's title as it will be shown in the library. Required.
-- `artistNorm` String with a normalized version of the artist's name (used for matching and sorting). Defaults to `artist` if not set.
-- `titleNorm` String with a normalized version of the song's title (used for matching and sorting). Defaults to `title` if not set.
+- `dir` (string) full path of the containing folder
+- `dirSep` (string) path segment separator used by the current OS (`/` or `\`)
+- `name` (string) media filename (without extension)
+- `tags` (object) media file's [tags/metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md)
+
+Middleware may mutate `ctx` as required. Once finished, the following properties on it will be used:
+
+- `artist` (string) artist's name as it will be shown in the library
+- `title` (string) song's title as it will be shown in the library
+- `artistNorm` (string) normalized version of the artist's name; used for matching and sorting (defaults to `artist` if not set)
+- `titleNorm` (string) normalized version of the song's title; used for matching and sorting (defaults to `title` if not set)
 
 It's important that each middleware calls `next` unless you don't want the chain to continue (for instance, if you've set `artist` and `title` manually and want to use them as-is).
+
+**Note:** Media duration is handled automatically and cannot be set from a parser.
 
 ### Command Line Options
 
@@ -218,7 +219,7 @@ Karaoke Forever Server supports the following command line options:
 | --- | --- | --- |
 | <span style="white-space: nowrap;">`-l, --loglevel <number>`</span>| Log file level (**0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug) | 2 |
 | <span style="white-space: nowrap;">`-p, --port <number>`</span>| Web server port. To use low ports such as 80 you may need to run the app with elevated privileges (not recommended) | 0 (auto) |
-| <span style="white-space: nowrap;">`--version`</span>| Output the Karaoke Forever Server version and exit. | |
+| <span style="white-space: nowrap;">`--version`</span>| Output the Karaoke Forever Server version and exit | |
 
 ### File Locations
 
@@ -233,3 +234,28 @@ Karaoke Forever Server supports the following command line options:
 - Database: `%APPDATA%\Karaoke Forever Server\database.sqlite3`
 - Media Scanner Log: `%APPDATA%\Karaoke Forever Server\scanner.log`
 - Server Log: `%APPDATA%\Karaoke Forever Server\server.log`
+
+## F.A.Q.
+
+#### Where can I get karaoke songs?
+
+Below is a non-exhaustive list of sources for downloadable MP4 or MP3+G files:
+
+- [SunFly Karaoke](https://www.sunflykaraoke.com)
+- [PartyTyme Karaoke](https://www.partytyme.net)
+- [Karaoke Version](https://www.karaoke-version.com)
+- [All Star Karaoke](https://www.allstardl.com)
+- [SBI Karaoke](https://downloads.sbikaraoke.com)
+- [PCDJ](https://www.pcdj.com/hd-mp4-karaoke-download-packs/)
+
+#### Is a microphone required?
+
+No, Karaoke Forever makes no assumptions regarding audio input. There are many options for mixing the player's output with microphones (either in software or an outboard mixer)
+
+## Acknowledgements
+
+- [David Zukowski](https://zuko.me): react-redux-starter-kit, which this project began as a fork of (all contributors up until it was detached to its own project are listed on the Contributors page)
+- [Luke Tucker](https://github.com/ltucker/): The original CD+Graphics player
+- Carter Corker: The magic of [babel-plugin-react-css-modules](https://github.com/gajus/babel-plugin-react-css-modules)
+- Stuart Albert: The name (a reference to Duke Nukem Forever, given the almost vaporware status)
+- B&W mic icon by [Freepik](http://www.freepik.com/) from [flaticon.com](http://www.flaticon.com/)
