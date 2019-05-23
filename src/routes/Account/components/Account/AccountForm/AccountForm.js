@@ -59,7 +59,7 @@ export default class AccountForm extends Component {
           <input type='text'
             defaultValue={isUser ? this.props.user.name : ''}
             onChange={this.updateVisible}
-            placeholder='name (public)'
+            placeholder='display name'
             ref={r => { this.name = r }}
             styleName='field name'
           />
