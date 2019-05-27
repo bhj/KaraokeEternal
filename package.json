@@ -9,16 +9,14 @@
     "npm": "^6.9.0"
   },
   "scripts": {
-    "clean": "rimraf dist",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=development nodemon --ignore dist --ignore src",
-    "compile": "npm run clean && webpack",
+    "dev": "cross-env NODE_ENV=development nodemon --ignore build --ignore src",
+    "compile": "rimraf build && webpack",
     "serve": "node .",
     "start": "electron . -p 3000",
-    "dist": "npm run compile && cross-env DEBUG=electron-builder:* electron-builder",
-    "build": "npm run dist",
+    "dist": "rimraf dist && npm run compile && cross-env DEBUG=electron-builder:* electron-builder",
     "install-app-deps": "electron-builder install-app-deps"
   },
   "repository": {

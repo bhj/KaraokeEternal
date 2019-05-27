@@ -1,13 +1,9 @@
 {
-  "directories": {
-    "buildResources": "dist",
-  },
   "files": [
+    "build/**",
     "shared/**",
     "server/**",
     "project.config.js",
-    // use webpack output path but exclude subfolders (ignore /mac, /win, etc.)
-    "dist/*",
   ],
   "mac": {
     "target": "dmg",

@@ -2,7 +2,7 @@ const { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } = require('el
 const path = require('path')
 const log = require('./lib/logger')(`master:electron[${process.pid}]`)
 const config = require('../project.config')
-const ICON_PATH = path.join(config.basePath, app.isPackaged ? 'dist' : 'assets')
+const ICON_PATH = path.join(config.basePath, app.isPackaged ? 'build' : 'assets')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

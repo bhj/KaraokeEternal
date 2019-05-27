@@ -125,8 +125,8 @@ Promise.resolve()
           app.use(KoaStatic(path.resolve(config.basePath, 'assets')))
 
           // "rewrite" other requests to the root /index.html file
-          // (which webpack-dev-server will serve from a virtual ~/dist)
-          const indexFile = path.join(config.basePath, 'dist', 'index.html')
+          // (which webpack-dev-server will serve from a virtual ~/build)
+          const indexFile = path.join(config.basePath, 'build', 'index.html')
 
           app.use(async (ctx, next) => {
             ctx.body = await new Promise(function (resolve, reject) {
@@ -142,11 +142,11 @@ Promise.resolve()
     } else {
       // production mode
 
-      // serve files in ~/dist
-      app.use(KoaStatic(path.join(config.basePath, 'dist')))
+      // serve files in ~/build
+      app.use(KoaStatic(path.join(config.basePath, 'build')))
 
       // "rewrite" all other requests to the root /index.html file
-      const indexFile = path.join(config.basePath, 'dist', 'index.html')
+      const indexFile = path.join(config.basePath, 'build', 'index.html')
       const readFile = promisify(fs.readFile)
 
       app.use(async (ctx, next) => {
