@@ -110,6 +110,11 @@ Promise.resolve()
     app.use(roomsRouter.routes())
     app.use(userRouter.routes())
 
+    // @todo these could be read dynamically from src/routes
+    // but should probably wait for react-router upgrade?
+    const rewriteRoutes = ['account', 'library', 'queue', 'player']
+    const indexFile = path.join(config.buildPath, 'index.html')
+
     if (config.env === 'development') {
       log.info('Enabling webpack dev and HMR middleware')
       const webpack = require('webpack')
@@ -123,13 +128,13 @@ Promise.resolve()
           app.use(middleware)
 
           // serve static assets from ~/assets since Webpack is unaware of these
-          app.use(KoaStatic(path.resolve(config.basePath, 'assets')))
+          app.use(KoaStatic(path.join(config.basePath, 'assets')))
 
-          // "rewrite" other requests to the root /index.html file
-          // (which webpack-dev-server will serve from a virtual ~/build)
-          const indexFile = path.join(config.basePath, 'build', 'index.html')
-
+          // "rewrite" top level SPA routes to index.html
           app.use(async (ctx, next) => {
+            const route = ctx.request.path.substring(1).split('/')[0]
+            if (!rewriteRoutes.includes(route)) return next()
+
             ctx.body = await new Promise(function (resolve, reject) {
               compiler.outputFileSystem.readFile(indexFile, (err, result) => {
                 if (err) { return reject(err) }
@@ -146,11 +151,13 @@ Promise.resolve()
       // serve files in ~/build
       app.use(KoaStatic(path.join(config.basePath, 'build')))
 
-      // "rewrite" all other requests to the root /index.html file
-      const indexFile = path.join(config.basePath, 'build', 'index.html')
+      // "rewrite" top level SPA routes to index.html
       const readFile = promisify(fs.readFile)
 
       app.use(async (ctx, next) => {
+        const route = ctx.request.path.substring(1).split('/')[0]
+        if (!rewriteRoutes.includes(route)) return next()
+
         ctx.body = await readFile(indexFile)
         ctx.set('content-type', 'text/html')
         ctx.status = 200
