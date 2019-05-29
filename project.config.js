@@ -7,8 +7,10 @@ const KF_LOG_LEVEL = parseInt(process.env.KF_LOG_LEVEL, 10)
 module.exports = {
   // environment to use when building the project
   env: NODE_ENV,
-  // full path to the project's root directory
+  // absolute path of project root
   basePath: __dirname,
+  // absolute path for output of 'npm run build'
+  buildPath: path.join(__dirname, 'build'),
   // http server host: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
   serverHost: '0.0.0.0',
   // http server port

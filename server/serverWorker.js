@@ -9,10 +9,12 @@ const { promisify } = require('util')
 const parseCookie = require('./lib/parseCookie')
 const jwtVerify = require('jsonwebtoken').verify
 const Koa = require('koa')
-const KoaBody = require('koa-body')
-const KoaRange = require('koa-range')
-const KoaLogger = require('koa-logger')
-const KoaStatic = require('koa-static')
+const koaBody = require('koa-body')
+const koaFavicon = require('koa-favicon')
+const koaLogger = require('koa-logger')
+const koaMount = require('koa-mount')
+const koaRange = require('koa-range')
+const koaStatic = require('koa-static')
 const app = new Koa()
 
 const Prefs = require('./Prefs')
@@ -69,7 +71,7 @@ Promise.resolve()
   .then(() => Prefs.getJwtKey())
   .then(jwtKey => {
     // koa request/response logging
-    app.use(KoaLogger((str, args) => {
+    app.use(koaLogger((str, args) => {
       if (args.length === 6 && args[3] >= 500) {
         // 5xx status response
         log.error(str)
@@ -78,8 +80,9 @@ Promise.resolve()
       }
     }))
 
-    app.use(KoaRange)
-    app.use(KoaBody({ multipart: true }))
+    app.use(koaFavicon(path.join(config.basePath, 'assets', 'favicon.ico')))
+    app.use(koaRange)
+    app.use(koaBody({ multipart: true }))
 
     // all http (koa) requests
     app.use(async (ctx, next) => {
@@ -120,15 +123,15 @@ Promise.resolve()
       const webpack = require('webpack')
       const webpackConfig = require('../webpack.config')
       const compiler = webpack(webpackConfig)
-      const KoaWebpack = require('koa-webpack')
+      const koaWebpack = require('koa-webpack')
 
-      KoaWebpack({ compiler })
+      koaWebpack({ compiler })
         .then((middleware) => {
           // webpack-dev-middleware and webpack-hot-client
           app.use(middleware)
 
-          // serve static assets from ~/assets since Webpack is unaware of these
-          app.use(KoaStatic(path.join(config.basePath, 'assets')))
+          // serve /assets since webpack-dev-server is unaware of this folder
+          app.use(koaMount('/assets', koaStatic(path.join(config.basePath, 'assets'))))
 
           // "rewrite" top level SPA routes to index.html
           app.use(async (ctx, next) => {
@@ -147,9 +150,9 @@ Promise.resolve()
         })
     } else {
       // production mode
-
-      // serve files in ~/build
-      app.use(KoaStatic(path.join(config.basePath, 'build')))
+      // serve build folder as webroot
+      app.use(koaStatic(config.buildPath))
+      app.use(koaMount('/assets', koaStatic(path.join(config.basePath, 'assets'))))
 
       // "rewrite" top level SPA routes to index.html
       const readFile = promisify(fs.readFile)

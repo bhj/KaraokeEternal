@@ -20,7 +20,7 @@ const config = {
     ],
   },
   output: {
-    path: path.join(project.basePath, 'build'),
+    path: project.buildPath,
     filename: __DEV__ ? '[name].js' : '[name].[hash].js',
     publicPath: '/',
   },
@@ -55,10 +55,10 @@ const config = {
 }
 
 if (__PROD__) {
-  // copy static assets in /assets to /build
+  // copy static assets folder verbatim
   config.plugins.push(new CopyWebpackPlugin([{
     from: path.join(project.basePath, 'assets'),
-    to: path.join(project.basePath, 'build'),
+    to: path.join(project.buildPath, 'assets'),
   }], { /* options */ }))
 
   config.plugins.push(new LicenseWebpackPlugin({
