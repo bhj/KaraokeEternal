@@ -54,7 +54,8 @@ app.on('error', (err, ctx) => {
     return
   }
 
-  log.error(err.message)
+  if (err.stack) log.error(err.stack)
+  else log.error(err)
 })
 
 log.info('Opening database file %s', config.database)
