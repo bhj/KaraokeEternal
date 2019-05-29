@@ -22,7 +22,7 @@ const config = {
   output: {
     path: path.join(project.basePath, 'build'),
     filename: __DEV__ ? '[name].js' : '[name].[hash].js',
-    publicPath: project.publicPath,
+    publicPath: '/',
   },
   resolve: {
     modules: [

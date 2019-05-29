@@ -9,8 +9,6 @@ module.exports = {
   env: NODE_ENV,
   // full path to the project's root directory
   basePath: __dirname,
-  // location of index.html (relative to website public_html)
-  publicPath: '/',
   // http server host: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
   serverHost: '0.0.0.0',
   // http server port
