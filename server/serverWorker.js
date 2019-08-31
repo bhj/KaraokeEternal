@@ -66,7 +66,7 @@ Promise.resolve()
   .then(() => sqlite.open(config.database, { Promise }))
   .then(db => db.migrate({
     migrationsPath: path.join(config.basePath, 'server', 'lib', 'schemas'),
-    // force: 'last' ,
+    // force: 'last',
   }))
   .then(() => Prefs.getJwtKey())
   .then(jwtKey => {
@@ -80,7 +80,7 @@ Promise.resolve()
       }
     }))
 
-    app.use(koaFavicon(path.join(config.basePath, 'assets', 'favicon.ico')))
+    app.use(koaFavicon(path.join(config.assetPath, 'favicon.ico')))
     app.use(koaRange)
     app.use(koaBody({ multipart: true }))
 
@@ -131,7 +131,7 @@ Promise.resolve()
           app.use(middleware)
 
           // serve /assets since webpack-dev-server is unaware of this folder
-          app.use(koaMount('/assets', koaStatic(path.join(config.basePath, 'assets'))))
+          app.use(koaMount('/assets', koaStatic(config.assetPath)))
 
           // "rewrite" top level SPA routes to index.html
           app.use(async (ctx, next) => {
@@ -152,7 +152,7 @@ Promise.resolve()
       // production mode
       // serve build folder as webroot
       app.use(koaStatic(config.buildPath))
-      app.use(koaMount('/assets', koaStatic(path.join(config.basePath, 'assets'))))
+      app.use(koaMount('/assets', koaStatic(config.assetPath)))
 
       // "rewrite" top level SPA routes to index.html
       const readFile = promisify(fs.readFile)

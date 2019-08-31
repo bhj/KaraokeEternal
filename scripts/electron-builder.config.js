@@ -4,6 +4,7 @@ const getUnused = require('./getUnused')
 const config = {
   appId: 'com.karaoke-forever.app',
   files: [
+    'assets/**',
     'build/**',
     'shared/**',
     'server/**',

@@ -4,7 +4,6 @@ const webpack = require('webpack')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { LicenseWebpackPlugin } = require('license-webpack-plugin')
 const project = require('./project.config')
 
@@ -55,12 +54,6 @@ const config = {
 }
 
 if (__PROD__) {
-  // copy static assets folder verbatim
-  config.plugins.push(new CopyWebpackPlugin([{
-    from: path.join(project.basePath, 'assets'),
-    to: path.join(project.buildPath, 'assets'),
-  }], { /* options */ }))
-
   config.plugins.push(new LicenseWebpackPlugin({
     addBanner: true,
     outputFilename: 'license_en.txt',

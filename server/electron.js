@@ -2,7 +2,6 @@ const { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } = require('el
 const path = require('path')
 const log = require('./lib/logger')(`master:electron[${process.pid}]`)
 const config = require('../project.config')
-const ICON_PATH = path.join(app.isPackaged ? config.buildPath : config.basePath, 'assets')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -29,11 +28,11 @@ function createWindow () {
 
   if (process.platform === 'win32') {
     // white 32x32
-    tray = new Tray(path.join(ICON_PATH, 'mic-white@2x.png'))
+    tray = new Tray(path.join(config.assetPath, 'mic-white@2x.png'))
   } else {
     // blackish 32x32 (template works in light and dark macOS modes)
-    tray = new Tray(path.join(ICON_PATH, 'mic-blackTemplate.png'))
-    tray.setPressedImage(path.join(ICON_PATH, 'mic-white.png'))
+    tray = new Tray(path.join(config.assetPath, 'mic-blackTemplate.png'))
+    tray.setPressedImage(path.join(config.assetPath, 'mic-white.png'))
   }
 
   tray.setToolTip('Karaoke Forever Server v' + app.getVersion())

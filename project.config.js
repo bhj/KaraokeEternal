@@ -9,7 +9,9 @@ module.exports = {
   env: NODE_ENV,
   // absolute path of project root
   basePath: __dirname,
-  // absolute path for output of 'npm run build'
+  // absolute path to assets
+  assetPath: path.join(__dirname, 'assets'),
+  // absolute path of webpack output (npm run build)
   buildPath: path.join(__dirname, 'build'),
   // http server host: https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
   serverHost: '0.0.0.0',
