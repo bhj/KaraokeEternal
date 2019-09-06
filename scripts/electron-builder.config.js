@@ -1,4 +1,5 @@
 /* eslint-disable max-len, no-template-curly-in-string */
+const project = require('../project.config')
 const path = require('path')
 const getUnused = require('./getUnused')
 const config = {
@@ -36,7 +37,7 @@ const config = {
 }
 
 module.exports = async function () {
-  const unused = await getUnused()
+  const unused = await getUnused(path.join(project.basePath, 'server'))
 
   unused.forEach(m => {
     config.files.push(

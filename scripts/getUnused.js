@@ -6,14 +6,15 @@ const resolve = require('resolve-tree')
 const resolvePackages = util.promisify(resolve.packages)
 
 /**
- * This craziness attempts to determine which npm modules are
- * require()d by server code, then produces a list of items in
- * node_modules that can be excluded from server distribution
+ * This craziness attempts to determine which node_modules are
+ * *not* used by source files in the given directory. In practice
+ * it's used to exclude node_modules only used by front-end code,
+ * since the packaged server ships with the front-end pre-compiled.
  *
  * @return {Array} package names
  */
-module.exports = async function () {
-  const deps = await getRequires('./server')
+module.exports = async function (dir) {
+  const deps = await getRequires(dir)
   const childDeps = await resolveDeps(deps)
   const all = getAll()
   const unused = []
@@ -66,7 +67,7 @@ async function getRequires (dir) {
     .then(files => {
       Object.keys(files).forEach(file => {
         files[file].forEach(f => {
-          const name = dirToName(f)
+          const name = getPackageName(f)
           if (name) names.add(name)
         })
       })
@@ -87,15 +88,15 @@ async function resolveDeps (packageNames = []) {
 }
 
 /**
- * Convert path to npm package name (handles namespaces)
- * @param  {String} dir
+ * Convert require() string to npm package name (handles namespaces)
+ * @param  {String} str
  * @return {String} package name
  */
-function dirToName (dir) {
-  const parts = dir.split(path.sep)
+function getPackageName (str) {
+  const parts = str.split('/')
   const i = parts.indexOf('node_modules')
   if (i === -1) return false
 
   const ns = parts[i + 1].startsWith('@')
-  return parts[i + 1] + (ns ? path.sep + parts[i + 2] : '')
+  return parts[i + 1] + (ns ? '/' + parts[i + 2] : '')
 }
