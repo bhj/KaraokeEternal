@@ -4,6 +4,7 @@ const path = require('path')
 const getUnused = require('./getUnused')
 const config = {
   appId: 'com.karaoke-forever.app',
+  productName: 'Karaoke Forever Server',
   files: [
     'assets/**',
     'build/**',
