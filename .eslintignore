@@ -1,5 +1,6 @@
+build/**
+dist/**
 node_modules/**
 src/index.html
 coverage/**
 *.spec.js
-dist/**
