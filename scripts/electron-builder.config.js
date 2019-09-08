@@ -25,7 +25,7 @@ const config = {
     '!**/node_modules/sqlite3/tools',
   ],
   mac: {
-    target: 'dir',
+    target: 'dmg',
     icon: 'assets/app.png',
   },
   win: {
