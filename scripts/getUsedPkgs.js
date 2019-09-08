@@ -1,57 +1,18 @@
-const path = require('path')
-const fs = require('fs')
 const util = require('util')
 const madge = require('madge')
 const resolve = require('resolve-tree')
 const resolvePackages = util.promisify(resolve.packages)
 
 /**
- * This craziness attempts to determine which node_modules are
- * *not* used by source files in the given directory. In practice
- * it's used to exclude node_modules only used by front-end code,
- * since the packaged server ships with the front-end pre-compiled.
- *
+ * Get the node_modules require()d by source files in the given directory
+ * @param  {String} dir starting search path
  * @return {Array} package names
  */
 module.exports = async function (dir) {
   const deps = await getRequires(dir)
   const childDeps = await resolveDeps(deps)
-  const all = getAll()
-  const unused = []
 
-  all.forEach((m, i) => {
-    if (!deps.includes(m) && !childDeps.includes(m)) {
-      unused.push(m)
-    }
-  })
-
-  return unused
-}
-
-/**
- * Get all directories in ./node_moduules
- * @return {Array}
- */
-function getAll () {
-  const dirs = fs.readdirSync('./node_modules')
-  const out = []
-
-  dirs.forEach(d => {
-    if (!d.startsWith('@')) {
-      out.push(d)
-      return
-    }
-
-    const subDirs = fs.readdirSync(path.resolve('./node_modules', d))
-
-    subDirs.forEach(s => {
-      if (fs.statSync(path.resolve('./node_modules', d, s)).isDirectory()) {
-        out.push(d + path.sep + s)
-      }
-    })
-  })
-
-  return out
+  return [...deps, ...childDeps]
 }
 
 /**
