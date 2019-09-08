@@ -19,22 +19,21 @@ const config = {
     '!**/node_modules/bcrypt/build${/*}',
     '!**/node_modules/bcrypt/examples${/*}',
     '!**/node_modules/bcrypt/test${/*}',
-    '!**/node_modules/node-pre-gyp${/*}',
-    '!**/node_modules/sqlite3/lib/binding/node-${/*}',
+    '!**/node_modules/sqlite3/lib/binding/node-*${/*}',
     '!**/node_modules/sqlite3/build',
     '!**/node_modules/sqlite3/deps',
     '!**/node_modules/sqlite3/tools',
   ],
-  'mac': {
-    'target': 'dmg',
-    'icon': 'assets/app.png',
+  mac: {
+    target: 'dir',
+    icon: 'assets/app.png',
   },
-  'win': {
-    'target': 'nsis',
-    'icon': 'assets/app.ico',
+  win: {
+    target: 'nsis',
+    icon: 'assets/app.ico',
   },
-  'nsis': {
-    'oneClick': false,
+  nsis: {
+    oneClick: false,
   },
 }
 
