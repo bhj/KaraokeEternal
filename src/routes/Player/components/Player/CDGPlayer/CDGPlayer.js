@@ -53,7 +53,7 @@ class CDGPlayer extends React.Component {
 
   render () {
     const { bgAlpha, width, height } = this.props
-    let style = {
+    const style = {
       backgroundColor: 'transparent',
     }
 

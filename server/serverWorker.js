@@ -175,8 +175,8 @@ Promise.resolve()
       log.error(err)
 
       process.send({
-        'type': SERVER_WORKER_ERROR,
-        'error': err.message,
+        type: SERVER_WORKER_ERROR,
+        error: err.message,
       })
 
       // not much we can do without a working server
@@ -200,8 +200,8 @@ Promise.resolve()
       log.info(`Web server running at ${url}`)
 
       process.send({
-        'type': SERVER_WORKER_STATUS,
-        'payload': { url },
+        type: SERVER_WORKER_STATUS,
+        payload: { url },
       })
     })
   })

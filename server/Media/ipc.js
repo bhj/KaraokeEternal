@@ -40,14 +40,14 @@ module.exports = function (io) {
 
       process.send({
         ...action,
-        'type': type + _SUCCESS,
-        'payload': res,
+        type: type + _SUCCESS,
+        payload: res,
       })
     } catch (err) {
       process.send({
         ...action,
-        'type': type + _ERROR,
-        'error': err,
+        type: type + _ERROR,
+        error: err,
       })
 
       log.debug(`error in ipc action ${type}: ${err.message}`)

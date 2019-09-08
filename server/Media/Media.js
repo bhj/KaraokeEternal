@@ -163,7 +163,7 @@ class Media {
     changes += res.stmt.changes
 
     if (changes) {
-      log.info(`cleanup: vacuuming database`)
+      log.info('cleanup: vacuuming database')
       await db.run('VACUUM')
     }
   }
@@ -175,7 +175,7 @@ class Media {
    */
   static async setPreferred (mediaId, isPreferred) {
     if (!Number.isInteger(mediaId) || typeof isPreferred !== 'boolean') {
-      throw new Error(`invalid mediaId or value`)
+      throw new Error('invalid mediaId or value')
     }
 
     // get songId

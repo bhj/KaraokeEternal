@@ -16,6 +16,7 @@ class QueueItem extends React.Component {
     isErrored: PropTypes.bool.isRequired,
     isInfoable: PropTypes.bool.isRequired,
     isOwner: PropTypes.bool.isRequired,
+    isPlayed: PropTypes.bool.isRequired,
     isRemovable: PropTypes.bool.isRequired,
     isSkippable: PropTypes.bool.isRequired,
     isStarred: PropTypes.bool.isRequired,

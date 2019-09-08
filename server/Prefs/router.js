@@ -17,7 +17,7 @@ router.get('/scan', async (ctx, next) => {
   }
 
   ctx.status = 200
-  process.send({ 'type': SCANNER_WORKER_SCAN })
+  process.send({ type: SCANNER_WORKER_SCAN })
 })
 
 // cancel media scan
@@ -27,7 +27,7 @@ router.get('/scan/cancel', async (ctx, next) => {
   }
 
   ctx.status = 200
-  process.send({ 'type': SCANNER_WORKER_SCAN_CANCEL })
+  process.send({ type: SCANNER_WORKER_SCAN_CANCEL })
 })
 
 // get preferences and media paths
@@ -64,7 +64,7 @@ router.post('/path', async (ctx, next) => {
   ctx.body = await Prefs.get()
 
   // update library
-  process.send({ 'type': SCANNER_WORKER_SCAN })
+  process.send({ type: SCANNER_WORKER_SCAN })
 })
 
 // remove media file path
@@ -85,7 +85,7 @@ router.delete('/path/:pathId', async (ctx, next) => {
   ctx.body = await Prefs.get()
 
   // update library
-  process.send({ 'type': SCANNER_WORKER_SCAN })
+  process.send({ type: SCANNER_WORKER_SCAN })
 })
 
 // get folder listing for path browser

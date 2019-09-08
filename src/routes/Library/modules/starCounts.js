@@ -32,7 +32,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-let initialState = {
+const initialState = {
   artists: {},
   songs: {},
   version: 0,

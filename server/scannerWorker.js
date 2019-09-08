@@ -19,11 +19,11 @@ Promise.resolve()
     // attach start/stop handlers
     process.on('message', function ({ type, payload }) {
       if (type === SCANNER_WORKER_SCAN) {
-        log.info(`Media scan requested (restarting)`)
+        log.info('Media scan requested (restarting)')
         _isScanQueued = true
         cancelScan()
       } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
-        log.info(`Stopping media scan (user requested)`)
+        log.info('Stopping media scan (user requested)')
         _isScanQueued = false
         cancelScan()
       }
@@ -33,7 +33,7 @@ Promise.resolve()
   })
 
 async function startScan () {
-  log.info(`Starting media scan`)
+  log.info('Starting media scan')
 
   while (_isScanQueued) {
     _isScanQueued = false

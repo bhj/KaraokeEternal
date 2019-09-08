@@ -17,7 +17,7 @@ const yargs = require('yargs')
 
 let argv = yargs.argv
 
-if (process.versions['electron']) {
+if (process.versions.electron) {
   const app = require('electron').app
   yargs.version(app.getVersion())
 

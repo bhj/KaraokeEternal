@@ -134,7 +134,7 @@ router.post('/setup', async (ctx, next) => {
     const q = squel.update()
       .table('prefs')
       .where('key = ?', 'isFirstRun')
-      .set('data', squel.select().field(`json('false')`))
+      .set('data', squel.select().field('json(\'false\')'))
 
     const { text, values } = q.toParam()
     await db.run(text, values)

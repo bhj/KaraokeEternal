@@ -104,7 +104,8 @@ export default class Rooms extends Component {
               width: '80%',
               minHeight: '200px',
               left: '10%',
-              marginLeft: '0' }}
+              marginLeft: '0',
+            }}
           >
             {this.props.isEditorOpen &&
               <EditRoom room={this.props.editingRoom }/>

@@ -75,7 +75,7 @@ const ACTION_HANDLERS = {
     scrollTop: payload,
   }),
   [TOGGLE_ARTIST_EXPANDED]: (state, { payload }) => {
-    let list = state.expandedArtists.slice()
+    const list = state.expandedArtists.slice()
     const i = list.indexOf(payload)
     i === -1 ? list.push(payload) : list.splice(i, 1)
 
@@ -85,7 +85,7 @@ const ACTION_HANDLERS = {
     }
   },
   [TOGGLE_ARTIST_RESULT_EXPANDED]: (state, { payload }) => {
-    let list = state.expandedArtistResults.slice()
+    const list = state.expandedArtistResults.slice()
     const i = list.indexOf(payload)
     i === -1 ? list.push(payload) : list.splice(i, 1)
 
@@ -104,7 +104,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-let initialState = {
+const initialState = {
   isLoading: true,
   version: 0,
   filterStr: '',

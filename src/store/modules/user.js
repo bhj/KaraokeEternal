@@ -314,7 +314,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 // Reducers
 // ------------------------------------
-let initialState = {
+const initialState = {
   userId: null,
   username: null,
   name: null,

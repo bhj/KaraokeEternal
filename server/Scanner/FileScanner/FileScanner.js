@@ -98,7 +98,7 @@ class FileScanner extends Scanner {
     })
 
     if (!tags.format.duration) {
-      throw new Error(`  => could not determine duration`)
+      throw new Error('  => could not determine duration')
     }
 
     log.info('  => duration: %s:%s',
@@ -173,7 +173,7 @@ class FileScanner extends Scanner {
   }
 
   async removeInvalid (validMedia = [], validPaths = []) {
-    log.info(`Searching for invalid media entries`)
+    log.info('Searching for invalid media entries')
 
     const res = await Media.search()
     const invalidMedia = []

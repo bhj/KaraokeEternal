@@ -87,7 +87,7 @@ export function requestScan () {
       type: PREFS_REQUEST_SCAN,
     })
 
-    return api('GET', `/scan`)
+    return api('GET', '/scan')
       .catch(err => {
         dispatch({
           type: PREFS_REQUEST_SCAN + '_ERROR',
@@ -107,7 +107,7 @@ export function requestScanCancel () {
       type: PREFS_REQUEST_SCAN_CANCEL,
     })
 
-    return api('GET', `/scan/cancel`)
+    return api('GET', '/scan/cancel')
       .catch(err => {
         dispatch({
           type: PREFS_REQUEST_SCAN_CANCEL + '_ERROR',
@@ -141,7 +141,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-let initialState = {
+const initialState = {
   isUpdating: false,
   updateText: '',
   updateProgress: 0,

@@ -29,7 +29,7 @@ const config = {
       'node_modules',
     ],
     alias: {
-      'shared': path.join(project.basePath, 'shared'),
+      shared: path.join(project.basePath, 'shared'),
     }
   },
   module: { rules: [] },
@@ -97,7 +97,7 @@ config.module.rules.push({
         '@babel/plugin-proposal-object-rest-spread',
         ['react-css-modules', {
           webpackHotModuleReloading: __DEV__,
-          'generateScopedName' : '[name]__[local]___[hash:base64:5]',
+          generateScopedName : '[name]__[local]___[hash:base64:5]',
         }]
       ],
       presets: [

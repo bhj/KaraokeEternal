@@ -29,7 +29,7 @@ class User {
    */
   static async getByUsername (username, creds = false) {
     if (typeof username !== 'string') {
-      throw new Error(`username must be a string`)
+      throw new Error('username must be a string')
     }
 
     const q = squel.select()

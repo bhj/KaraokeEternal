@@ -39,8 +39,8 @@ function sendAction (type, payload) {
   })
 
   process.send({
-    'type': type,
-    'meta': {
+    type: type,
+    meta: {
       ipcActionId: id,
     },
     payload,

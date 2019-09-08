@@ -44,7 +44,7 @@ router.get('/:mediaId', async (ctx, next) => {
     file = await getCdgName(file)
 
     if (!file) {
-      ctx.throw(404, `The .cdg file could not be found`)
+      ctx.throw(404, 'The .cdg file could not be found')
     }
   }
 
