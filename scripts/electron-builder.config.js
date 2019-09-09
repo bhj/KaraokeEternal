@@ -34,6 +34,7 @@ const config = {
   },
   nsis: {
     oneClick: false,
+    runAfterFinish: false,
   },
 }
 
