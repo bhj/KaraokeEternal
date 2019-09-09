@@ -22,7 +22,7 @@ module.exports = function () {
       rows.shift()
 
       resolve(rows.filter(r => !!r.trim()).map(r => ({
-        path: r.trim().substr(0, 2) + '\\',
+        path: r.trim().substring(0, 2) + '\\',
         label: r,
       })))
     })

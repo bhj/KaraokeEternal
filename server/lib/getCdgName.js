@@ -6,7 +6,7 @@ const getPerms = require('./getPermutations')
 module.exports = async function getCdgName (file) {
   // upper and lowercase permutations since fs may be case-sensitive
   for (const ext of getPerms('cdg')) {
-    const cdg = file.substr(0, file.lastIndexOf('.') + 1) + ext
+    const cdg = file.substring(0, file.lastIndexOf('.') + 1) + ext
 
     try {
       await stat(cdg)

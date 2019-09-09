@@ -120,7 +120,7 @@ class FileScanner extends Scanner {
     const media = {
       songId: match.songId,
       pathId,
-      relPath: item.file.substr(this.paths.entities[pathId].path.length + 1),
+      relPath: item.file.substring(this.paths.entities[pathId].path.length),
       duration: Math.round(tags.format.duration),
     }
 

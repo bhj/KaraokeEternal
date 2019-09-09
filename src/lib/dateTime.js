@@ -19,7 +19,7 @@ export function formatTime (dateObj) {
 }
 
 export function formatDate (dateObj) {
-  return dateObj.toISOString().substr(0, 10)
+  return dateObj.toISOString().substring(0, 10)
 }
 
 export function formatDateTime (dateObj) {

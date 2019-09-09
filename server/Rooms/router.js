@@ -127,7 +127,7 @@ async function getRooms (ctx) {
     result.push(row.roomId)
 
     row.numUsers = room ? room.length : 0
-    row.dateCreated = row.dateCreated.substr(0, 10)
+    row.dateCreated = row.dateCreated.substring(0, 10)
     entities[row.roomId] = row
   })
 

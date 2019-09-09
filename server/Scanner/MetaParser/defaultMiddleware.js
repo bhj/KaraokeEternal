@@ -135,7 +135,7 @@ function cleanParts (patterns) {
 
 function titleCase (str) {
   return str.replace(/\w\S*/g, function (word) {
-    return word.charAt(0).toUpperCase() + word.substr(1)
+    return word.charAt(0).toUpperCase() + word.substring(1)
   })
 }
 
@@ -165,10 +165,10 @@ function moveArticles (str, articles) {
       const parens = /[([{].*$/.exec(str)
 
       if (parens) {
-        str = str.substr(search.length, parens.index - search.length)
+        str = str.substring(search.length, parens.index - search.length)
           .trim() + `, ${article} ${parens[0]}`
       } else {
-        str = str.substr(search.length) + `, ${article}`
+        str = str.substring(search.length) + `, ${article}`
       }
 
       // only replace one article per string
