@@ -32,7 +32,7 @@ export default class PlaybackCtrl extends React.Component {
     const { isPlaying, isPlayerPresent, volume } = props.status
 
     if (!isPlayerPresent) {
-      return (props.isAdmin && props.isInRoom && screenfull.enabled) ? <NoPlayer /> : null
+      return (props.isAdmin && props.isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
     }
 
     return (
@@ -61,7 +61,7 @@ export default class PlaybackCtrl extends React.Component {
           <Icon icon='TUNE' size={40}/>
         </div>
 
-        {props.isPlayer && screenfull.enabled &&
+        {props.isPlayer && screenfull.isEnabled &&
           <div onClick={handleFullscreen} styleName='fullscreen'>
             <Icon icon='FULLSCREEN' size={48}/>
           </div>
@@ -86,7 +86,7 @@ export default class PlaybackCtrl extends React.Component {
 }
 
 const handleFullscreen = () => {
-  if (screenfull.enabled) {
+  if (screenfull.isEnabled) {
     const el = document.getElementById('player-fs-container')
     screenfull.request(el)
   }
