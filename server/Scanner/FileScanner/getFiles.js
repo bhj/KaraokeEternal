@@ -45,7 +45,11 @@ function walkSync (dir, filterFn) {
     }
 
     if (stats && stats.isDirectory()) {
-      results = results.concat(walkSync(file, filterFn))
+      try {
+        results = results.concat(walkSync(file, filterFn))
+      } catch (err) {
+        log.warn(err.message)
+      }
     } else {
       if (!filterFn || filterFn(file)) {
         results.push({ file, stats })
