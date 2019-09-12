@@ -4,8 +4,7 @@ const path = require('path')
 const getAllPkgs = require('./getAllPkgs')
 const getUsedPkgs = require('./getUsedPkgs')
 const config = {
-  appId: 'com.karaoke-forever.app',
-  productName: 'Karaoke Forever Server',
+  appId: 'com.RadRootLLC.KaraokeForeverServer',
   files: [
     'assets/**',
     'build/**',

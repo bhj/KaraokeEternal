@@ -24,6 +24,7 @@
     "type": "git",
     "url": "git+https://github.com/bhj/karaoke-forever.git"
   },
+  "productName": "Karaoke Forever Server",
   "author": "RadRoot LLC",
   "license": "ISC",
   "dependencies": {
