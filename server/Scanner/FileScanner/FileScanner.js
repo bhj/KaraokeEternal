@@ -120,7 +120,8 @@ class FileScanner extends Scanner {
     const media = {
       songId: match.songId,
       pathId,
-      relPath: item.file.substring(this.paths.entities[pathId].path.length),
+      // normalize slashes going into the db
+      relPath: item.file.substring(this.paths.entities[pathId].path.length + 1).replace('\\', '/'),
       duration: Math.round(tags.format.duration),
     }
 
@@ -136,8 +137,7 @@ class FileScanner extends Scanner {
     // file already in database?
     const res = await Media.search({
       pathId,
-      // try both slashes to be POSIX/Win agnostic
-      relPath: [media.relPath.replace('/', '\\'), media.relPath.replace('\\', '/')],
+      relPath: media.relPath,
     })
 
     log.info('  => %s db result(s)', res.result.length)
