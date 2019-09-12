@@ -1,6 +1,6 @@
 {
   "name": "karaoke-forever",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Open karaoke party system",
   "private:": true,
   "main": "./server/main.js",
@@ -90,7 +90,7 @@
     "case-sensitive-paths-webpack-plugin": "^2.2.0",
     "cross-env": "^5.2.1",
     "css-loader": "^3.2.0",
-    "electron": "^6.0.7",
+    "electron": "^6.0.9",
     "electron-builder": "^21.2.0",
     "eslint": "^6.3.0",
     "eslint-config-standard": "^14.1.0",
@@ -110,7 +110,7 @@
     "redbox-react": "^1.6.0",
     "resolve-tree": "^0.1.14",
     "url-loader": "^2.1.0",
-    "webpack": "^4.39.3",
+    "webpack": "^4.40.0",
     "webpack-cli": "^3.3.8",
     "webpack-node-externals": "^1.7.2"
   }
