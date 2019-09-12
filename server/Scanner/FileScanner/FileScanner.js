@@ -120,8 +120,8 @@ class FileScanner extends Scanner {
     const media = {
       songId: match.songId,
       pathId,
-      // normalize slashes going into the db
-      relPath: item.file.substring(this.paths.entities[pathId].path.length + 1).replace('\\', '/'),
+      // normalize relPath to forward slashes with no leading slash
+      relPath: item.file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
       duration: Math.round(tags.format.duration),
     }
 
