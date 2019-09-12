@@ -110,7 +110,7 @@
     "redbox-react": "^1.6.0",
     "resolve-tree": "^0.1.14",
     "url-loader": "^2.1.0",
-    "webpack": "^4.40.0",
+    "webpack": "^4.39.3",
     "webpack-cli": "^3.3.8",
     "webpack-node-externals": "^1.7.2"
   }
