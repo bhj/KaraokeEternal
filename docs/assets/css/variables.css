@@ -1,0 +1,20 @@
+:root {
+  --hue-blue: 209;
+  --hue-pink: 290;
+
+  --bg-color: #000;
+  --text-color: #ddd;
+  --link-color: hsl(var(--hue-blue), 92%, 70%);
+  --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+
+  --btn-bg-color: hsl(var(--hue-blue), 10%, 50%);
+  --btn-active-bg-color: var(--link-color);
+
+  --info-color: var(--link-color);
+  --info-bg-color: hsl(var(--hue-blue), 100%, 12%);
+  --warn-color: hsl(var(--hue-pink), 100%, 50%);
+  --warn-bg-color: hsl(var(--hue-pink), 50%, 20%);
+
+  --text-shadow-glow: 0 0 5px hsl(var(--hue-pink), 100%, 45%), 0 0 10px hsl(var(--hue-pink), 100%, 45%);
+}

@@ -1,42 +1,42 @@
-# Karaoke Forever
+---
+layout: default
+title: Overview
+---
+<h1 class="overview">Overview</h1>
 
-Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The web app is locally hosted (see [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server)) with no internet connection required and all data staying on your server/network.
+Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The player is also browser-based with support for [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and MP4 video files. The server runs on your local network (see [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server)) with no internet connection required.
 
-See the [documentation](https://www.karaoke-forever.com/docs) to get started. Packaged downloads are coming soon.
+Karaoke Forever basically has 3 parts:
+
+- **[Server:](https://www.karaoke-forever.com/docs/#karaoke-forever-server)** Runs on Mac/Windows/Linux/etc. to serve the app and media files on your local network.
+
+- **[Mobile browser app:](https://www.karaoke-forever.com/docs/#karaoke-forever)** Everyone can quickly join and queue songs without having to install anything.
+
+- **[Player:](#player-admin-only)** Just another part of the browser app, but designed to run in fullscreen mode on the system handling audio and video for a [room](https://www.karaoke-forever.com/docs/#rooms-admin-only).
 
 ## Features
 
-- Modern browser-based app and player
-- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) and MP4 video file support
-- Milkdrop visualizations via [Butterchurn](https://github.com/jberg/butterchurn) (requires [WebGL 2 support](https://caniuse.com/#feat=webgl2))
-- Queue evenly distributes singers based on time since last sang
+- Modern browser-based app and player with dark UI designed for "karaoke conditions"
+- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and MP4 video file support
+- Milkdrop visualizations via [Butterchurn](https://github.com/jberg/butterchurn)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> (requires [WebGL 2](https://caniuse.com/#feat=webgl2)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>)
+- Prioritizes singers based on the amount of time since each last sang
 - Multiple simultaneous rooms/queues/players
-- Dark UI designed for "karaoke conditions"
 
-**Note:** Karaoke Forever does not handle audio *input* and assumes the player's output will be mixed with any microphones (either in software or an outboard mixer)
+<br>
+Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the [F.A.Q.](https://www.karaoke-forever.com/faq/#whats-the-recommended-microphone-audio-setup) for more information.
+
+## Download
+
+The latest release of [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server) for macOS and Windows is available on the <a href="{{ site.github.releases_url }}">Releases</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> page.
 
 ## Documentation
 
-See the [full documentation here](https://www.karaoke-forever.com/docs).
+Please see [Quick Start](https://www.karaoke-forever.com/docs#quick-start) to get started, or jump to the documentation for [Karaoke Forever](https://www.karaoke-forever.com/docs/#karaoke-forever) (the "web" app) or [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server).
 
-## Discord
+## Discord / Support
 
-Join the [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq) for general support and development chat, or say hi and show off your setup!
+Join the [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> for general support and development chat, or just to say hi!
 
-## Development
+## Contributing & Development
 
-Currently using [Node.js 12](https://nodejs.org/en/).
-
-1. Clone the project
-2. `npm install`
-3. `npm run dev` and look for "Web server running at" for the **server URL**
-
-## Contributing
-
-Contributions are most welcome!
-
-## License
-
-MIT License
-
-Copyright 2017-2019 RadRoot LLC
+See the <a href="{{ site.github.repository_url }}">GitHub project page</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>.

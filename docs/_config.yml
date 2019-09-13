@@ -1,13 +1,16 @@
-theme: jekyll-theme-midnight
 title: Karaoke Forever
 description: Open karaoke party system
+baseurl: "/"
 collections:
   docs:
     output: true
     permalink: /:collection/:name/
 defaults:
   - scope:
-      path: ""
+      path: "" # all files in the project
       type: "docs"
     values:
       layout: default
+plugins:
+  - jekyll-gist
+  - jekyll-paginate

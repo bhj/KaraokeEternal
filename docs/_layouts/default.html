@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  {% include head.html %}
+
+  <body>
+    {% include sidebar.html %}
+
+    <div class="content container">
+      {{ content }}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/cferdinandi/gumshoe@5/dist/gumshoe.polyfills.min.js"></script>
+    <script>
+      // remove trailing slash and/or hash fragment
+      const cur = window.location.href.replace(/\/(|#.*)$/, '')
+      const seg = cur.substring(cur.lastIndexOf('/') + 1)
+      let btn, nav
+
+      document.addEventListener("DOMContentLoaded", function(event) {
+        // init ToC highlighter in sidebar if we're in docs
+        if (seg === 'docs') {
+          const gs = new Gumshoe('#doc-toc a')
+        }
+
+        btn = document.getElementById('btn-nav')
+        nav = document.getElementsByTagName('nav')[0]
+        toggleNav()
+      })
+
+      function toggleNav() {
+        btn.classList.toggle('active')
+        nav.classList.toggle('active')
+      }
+    </script>
+  </body>
+</html>
