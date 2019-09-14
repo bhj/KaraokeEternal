@@ -31,7 +31,7 @@ The latest release of [Karaoke Forever Server](https://www.karaoke-forever.com/d
 
 ## Documentation
 
-Please see [Quick Start](https://www.karaoke-forever.com/docs#quick-start) to get started, or jump to the documentation for [Karaoke Forever](https://www.karaoke-forever.com/docs/#karaoke-forever) (the "web" app) or [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server).
+Please see [Quick Start](https://www.karaoke-forever.com/docs/#quick-start) to get started, or jump to the documentation for [Karaoke Forever](https://www.karaoke-forever.com/docs/#karaoke-forever) (the "web" app) or [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server).
 
 ## Discord / Support
 
