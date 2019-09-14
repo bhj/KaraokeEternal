@@ -8,7 +8,7 @@ Karaoke Forever basically has 3 parts:
 
 - **[Mobile browser app:](https://www.karaoke-forever.com/docs/#karaoke-forever)** Everyone can quickly join and queue songs without having to install anything.
 
-- **[Player:](#player-admin-only)** Just another part of the browser app, but designed to run in fullscreen mode on the system handling audio and video for a [room](https://www.karaoke-forever.com/docs/#rooms-admin-only).
+- **[Player:](https://www.karaoke-forever.com/docs/#player-admin-only)** Just another part of the browser app, but designed to run in fullscreen mode on the system handling audio and video for a [room](https://www.karaoke-forever.com/docs/#rooms-admin-only).
 
 ## Features
 
