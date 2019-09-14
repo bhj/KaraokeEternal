@@ -5,12 +5,6 @@
 @import "poole.css";
 @import "syntax.css";
 
-@media (min-width: 38em) {
-  html {
-    font-size: inherit;
-  }
-}
-
 body {
   background-color: #000;
   color: hsl(var(--hue-blue), 10%, 70%);
@@ -19,22 +13,31 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Raleway', sans-serif;
+  margin-top: 2rem;
   margin-bottom: 1rem;
 }
+
 h1 {
-  font-size: 32px;
+  font-size: 36px;
   color: hsl(var(--hue-blue), 10%, 75%);
   border-bottom: 1px solid hsl(var(--hue-blue), 10%, 65%);
-  margin-bottom: 3rem;
+  margin-top: .5rem;
 }
-h2 {
-  font-size: 28px;
-  color: hsl(var(--hue-blue), 10%, 70%);
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+
+h2 { font-size: 32px; color: hsl(var(--hue-blue), 10%, 70%); }
+h3 { font-size: 24px; color: hsl(var(--hue-blue), 10%, 60%); }
+h4 { font-size: 18px; color: hsl(var(--hue-blue), 10%, 50%); }
+
+@media (min-width: 42em) {
+  html {
+    font-size: inherit;
+  }
+
+  h1, h2, h3 {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
 }
-h3 { color: hsl(var(--hue-blue), 10%, 60%); font-size: 22px; margin-top: 2rem; margin-bottom: .5rem; }
-h4 { color: hsl(var(--hue-blue), 10%, 50%); font-size: 18px; margin-top: 1rem; }
 
 strong {
   color: inherit;
@@ -72,6 +75,10 @@ tbody tr:nth-child(odd) td, tbody tr:nth-child(odd) th {
 
 hr { border-color: #777; }
 
+.copyright {
+  color: #777;
+}
+
 /*
  * Sidebar
  */
@@ -96,10 +103,6 @@ hr { border-color: #777; }
   }
 }
 
-.copyright {
-  color: #777;
-}
-
 /*
  * Navigation
  */
@@ -110,13 +113,17 @@ hr { border-color: #777; }
 #btn-nav {
   box-sizing: content-box;
   fill: var(--btn-bg-color);
-  width: 40px;
   padding: .5em 1em;
   cursor: pointer;
 }
 
 #btn-nav.active {
   fill: var(--btn-active-bg-color);
+}
+
+#btn-nav .icon {
+  width: 48px;
+  height: 48px;
 }
 
 nav {
