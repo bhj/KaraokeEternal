@@ -12,12 +12,21 @@
 
     <script src="https://cdn.jsdelivr.net/gh/cferdinandi/gumshoe@5/dist/gumshoe.polyfills.min.js"></script>
     <script>
-      // remove trailing slash and/or hash fragment
-      const cur = window.location.href.replace(/\/(|#.*)$/, '')
-      const seg = cur.substring(cur.lastIndexOf('/') + 1)
+      const cur = window.location.href
+        .replace(/^http(s?):\/\//i, '') // remove http(s):// from start
+        .replace(/\/(|#.*)$/i, '') // remove trailing slash and/or hash fragment
+        .replace(/\.html$/i, '') // remove .html extensions
+
+      const seg = cur.lastIndexOf('/') === -1 ? 'index' : cur.substring(cur.lastIndexOf('/') + 1)
       let btn, nav
 
       document.addEventListener("DOMContentLoaded", function(event) {
+        // upgrade video quality based on screen width
+        if (seg === 'index' && getBrowserWidth() !== 'sm') {
+          const vid = document.getElementById('video1')
+          vid.src = vid.src.replace('540p', '720p')
+        }
+
         // init ToC highlighter in sidebar if we're in docs
         if (seg === 'docs') {
           const gs = new Gumshoe('#doc-toc a')
@@ -28,9 +37,19 @@
         toggleNav()
       })
 
-      function toggleNav() {
+      function toggleNav () {
         btn.classList.toggle('active')
         nav.classList.toggle('active')
+      }
+
+      function getBrowserWidth () {
+        if (window.innerWidth < 480){
+            return 'xs'
+        } else if(window.innerWidth < 768){
+            return 'sm'
+        } else if(window.innerWidth < 992){
+            return 'md'
+        } else return 'lg'
       }
     </script>
   </body>

@@ -225,7 +225,7 @@ a.nav-item:focus {
 @media (min-width: 42em) {
   .content {
     padding-top: 8rem;
-    max-width: 60rem;
+    max-width: 80rem;
     margin-left: 23rem;
     margin-right: 0;
   }
@@ -279,11 +279,6 @@ aside.warn {
   flex-shrink: 0;
 }
 
-.row figcaption {
-  font-style: italic;
-  text-align: center;
-}
-
 /*
  * Icons
  */
@@ -293,3 +288,23 @@ aside.warn {
 }
 
 .icon.external { fill: var(--info-color); }
+
+/*
+ * Screenshots/Videos
+ */
+figure {
+  margin: 1.5em 0;
+
+  figcaption {
+    text-align: center;
+    font-style: italic;
+  }
+
+  video {
+    max-width: 100%;
+    min-width: 100%;
+    height: auto !important;
+    border: 1px solid #333;
+    outline: none;
+  }
+}
