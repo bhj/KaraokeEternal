@@ -15,6 +15,7 @@
     "dev": "cross-env NODE_ENV=development nodemon --ignore build --ignore dist --ignore src",
     "build": "rimraf build && webpack",
     "serve": "node ./server/main.js",
+    "serve:docs": "jekyll serve --source=./docs --destination=./docs/_site --incremental --livereload --host=0.0.0.0",
     "server": "npm run serve",
     "start": "electron . -p 3000",
     "dist": "cross-env DEBUG=electron-builder:* electron-builder -c ./scripts/electron-builder.config.js",
