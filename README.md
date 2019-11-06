@@ -13,6 +13,7 @@ Karaoke Forever basically has 3 parts:
 [![Karaoke Forever Demo Video](https://static.karaoke-forever.com/karaoke-forever-demo1-540p.jpg)](https://static.karaoke-forever.com/karaoke-forever-demo1-540p.mp4)
 
 <p align="center">
+  <i>App running in Mobile Safari (left) and Firefox/Chrome/Edge (right)</i><br>
   Watch demo video in
   <a href="https://static.karaoke-forever.com/karaoke-forever-demo1-540p.mp4">540p</a> |
   <a href="https://static.karaoke-forever.com/karaoke-forever-demo1-720p.mp4">720p</a> |
