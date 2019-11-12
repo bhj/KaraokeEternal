@@ -1,9 +1,8 @@
 build/
 coverage/
 dist/
-docs/.jekyll-metadata
-docs/.sass-cache/
-docs/_site/
+docs/public/
+docs/resources/
 node_modules/
 
 .DS_Store

@@ -1,9 +1,6 @@
 ---
-permalink: /faq/
-layout: default
 title: F.A.Q.
 ---
-# F.A.Q.
 
 ## Where can I download karaoke songs?
 

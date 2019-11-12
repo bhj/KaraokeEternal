@@ -1,0 +1,6 @@
+baseURL: /
+languageCode: en-us
+title: Karaoke Forever
+permalinks:
+  page: "/:slug/"
+pygmentsStyle: solarized-dark

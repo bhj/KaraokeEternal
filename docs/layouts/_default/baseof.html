@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
-  {% include head.html %}
-
+  {{ partial "head.html" . }}
   <body>
-    {% include sidebar.html %}
-
+    {{ partial "sidebar.html" . }}
     <div class="content container">
-      {{ content }}
+      {{ block "main" . }}{{ end }}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/gh/cferdinandi/gumshoe@5/dist/gumshoe.polyfills.min.js"></script>
+    <script src='{{ (resources.Get "js/gumshoe.min.js").Permalink }}'></script>
     <script>
       const cur = window.location.href
         .replace(/^http(s?):\/\//i, '') // remove http(s):// from start

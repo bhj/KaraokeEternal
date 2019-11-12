@@ -1,0 +1,27 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <link rel="shortcut icon" href='{{ (resources.Get "images/favicon.ico").Permalink }}'>
+  <title>{{ .Title }} | {{ .Site.Title }}</title>
+
+  <style type="text/css">
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 200;
+      src: local('Raleway ExtraLight'), local('Raleway-ExtraLight'),
+           url('{{ (resources.Get "fonts/raleway-v14-latin-200.woff2").Permalink }}') format('woff2'),
+           url('{{ (resources.Get "fonts/raleway-v14-latin-200.woff").Permalink }}') format('woff');
+    }
+    @font-face {
+      font-family: 'Raleway';
+      font-style: normal;
+      font-weight: 700;
+      src: local('Raleway Bold'), local('Raleway-Bold'),
+           url('{{ (resources.Get "fonts/raleway-v14-latin-700.woff2").Permalink }}') format('woff2'),
+           url('{{ (resources.Get "fonts/raleway-v14-latin-700.woff").Permalink }}') format('woff');
+    }
+  </style>
+  {{ $style := resources.Get "css/style.scss" | toCSS | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $style.Permalink }}">
+</head>

@@ -1,12 +1,10 @@
 ---
-permalink: /docs/
 title: Documentation
 ---
-# Documentation
 
 ## Quick Start
 
-1. <a href="{{ site.github.releases_url }}">Download</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and install [Karaoke Forever Server](#karaoke-forever-server) on the system that will serve the app and media on your local network.
+1. <a href="{{% baseurl %}}download">Download</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and install [Karaoke Forever Server](#karaoke-forever-server) on the system that will serve the app and media on your local network.
 
 2. Browse to the server URL. You can copy or open the URL in your default browser using the Karaoke Forever Server menu bar or tray icon (macOS or Windows only).
 
@@ -104,18 +102,11 @@ The server software hosts the app and your media files on your local network (it
 
 #### macOS or Windows
 
-<a href="{{ site.github.releases_url }}">Download</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and install the latest release. Karaoke Forever Server runs in the menu bar or tray:
+<a href="{{% baseurl %}}download">Download</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and install the latest release. Karaoke Forever Server runs in the menu bar or tray:
 
 <div class="row">
-  <figure>
-    <img src="/assets/images/kfs_mac.png" alt="Karaoke Forever Server (macOS)" />
-    <figcaption>macOS</figcaption>
-  </figure>
-
-  <figure>
-    <img src="/assets/images/kfs_win.png" alt="Karaoke Forever Server (Windows)" />
-    <figcaption>Windows</figcaption>
-  </figure>
+  {{< figure src="kfs_mac.png" alt="Karaoke Forever Server (macOS)" caption="macOS" >}}
+  {{< figure src="kfs_win.png" alt="Karaoke Forever Server (Windows)" caption="Windows" >}}
 </div>
 
 <aside class="info">
@@ -129,7 +120,7 @@ The server software hosts the app and your media files on your local network (it
 
 You can also install and run the server on most any platform with [Node.js](https://nodejs.org)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> v12 or later:
 
-1. Clone the <a href="{{ site.github.repository_url }}">project repository</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+1. Clone the <a href="https://github.com/bhj/karaoke-forever">project repository</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
 2. `npm install`
 3. `npm run build` (this runs Webpack to compile the front-end app)
 4. `npm run serve` and look for "Web server running at" for the **server URL**
@@ -152,11 +143,11 @@ When determining the artist name and song title for each media file, the default
 
 You can configure the default parser by returning an object with the options you want to override. For example, if a folder has filenames in the format "Title - Artist" instead, you could add this `_kfconfig.js` file:
 
-```js
+{{< highlight js >}}
 return {
   artistOnLeft: false, // override default
 }
-```
+{{< /highlight >}}
 
 <aside class="info">
   <svg class="icon" viewBox="0 0 24 24">
@@ -167,13 +158,13 @@ return {
 
 The default configuration is:
 
-```js
+{{< highlight js >}}
 return {
   articles: ['A', 'An', 'The'], // false will disable article normalization
   artistOnLeft: true,
   separator: '-',
 }
-```
+{{< /highlight >}}
 
 #### Creating a Parser (Experimental)
 
@@ -181,7 +172,7 @@ Your `_kfconfig.js` can also return a *parser creator* instead of a configuratio
 
 The following example creates a parser that removes the word 'junk' from each filename before handing off to the default parser:
 
-```js
+{{< highlight js >}}
 return ({ compose, getDefaultParser, defaultMiddleware }) => {
   function customMiddleware (ctx, next) {
     ctx.name = ctx.name.replace('junk', '')
@@ -193,8 +184,7 @@ return ({ compose, getDefaultParser, defaultMiddleware }) => {
     getDefaultParser(), // then the default parser (optionally accepts a configuration object)
   )
 }
-
-```
+{{< /highlight >}}
 
 Your parser creator is passed an object with the following properties:
 
@@ -255,7 +245,6 @@ Karaoke Forever Server supports the following command line options:
 
 - [David Zukowski](https://zuko.me)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>: react-redux-starter-kit, which this project began as a fork of (all contributors up until it was detached to its own project are listed on the Contributors page)
 - [Luke Tucker](https://github.com/ltucker/)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>: the original JavaScript CD+Graphics implementation
-- Kuanyu Chen: (in)sanity testing on Windows
 - Carter Corker: pointing out [babel-plugin-react-css-modules](https://github.com/gajus/babel-plugin-react-css-modules)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> is totally a thing
 - Stuart Albert: the name, originally a reference to Duke Nukem Forever, given the development time and almost vaporware status
-- B&W mic icon by [Freepik](http://www.freepik.com/)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> from [flaticon.com](http://www.flaticon.com/)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+- B&W mic icon by [Freepik](https://www.freepik.com/)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> from [flaticon.com](https://www.flaticon.com/)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>

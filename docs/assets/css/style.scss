@@ -1,9 +1,5 @@
----
----
-
-@import "variables.css";
-@import "poole.css";
-@import "syntax.css";
+@import "variables.scss";
+@import "poole.scss";
 
 body {
   background-color: #000;
@@ -272,7 +268,7 @@ aside.warn {
 .row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-around;
 }
 
 .row figure {
