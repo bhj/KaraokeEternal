@@ -120,7 +120,7 @@ The server software hosts the app and your media files on your local network (it
 
 You can also install and run the server on most any platform with [Node.js](https://nodejs.org)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> v12 or later:
 
-1. Clone the <a href="https://github.com/bhj/karaoke-forever">project repository</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+1. Clone the <a href="{{% baseurl %}}repo">project repository</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
 2. `npm install`
 3. `npm run build` (this runs Webpack to compile the front-end app)
 4. `npm run serve` and look for "Web server running at" for the **server URL**
