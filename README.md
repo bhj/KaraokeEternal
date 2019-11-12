@@ -10,7 +10,7 @@ Karaoke Forever basically has 3 parts:
 
 - **[Player:](https://www.karaoke-forever.com/docs/#player-admin-only)** Just another part of the browser app, but designed to run in fullscreen mode on the system handling audio and video for a [room](https://www.karaoke-forever.com/docs/#rooms-admin-only).
 
-[![Karaoke Forever Demo Video](https://www.karaoke-forever.com/static/araoke-forever-demo1-540p.jpg)](https://www.karaoke-forever.com/static/karaoke-forever-demo1-540p.mp4)
+[![Karaoke Forever Demo Video](https://www.karaoke-forever.com/static/karaoke-forever-demo1-540p.jpg)](https://www.karaoke-forever.com/static/karaoke-forever-demo1-540p.mp4)
 
 <p align="center">
   <i>App running in Mobile Safari (left) and Firefox/Chrome/Edge (right)</i><br>
