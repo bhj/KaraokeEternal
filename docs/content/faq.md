@@ -19,7 +19,7 @@ Karaoke tracks require original recording and production. Please support the cre
 
 No, but... is it still karaoke without a mic? :)
 
-Karaoke Forever makes no assumptions about audio input so that it can work with any microphone setup, including none at all, and assumes any mics will be mixed in software or an outboard mixer.
+Karaoke Forever makes no assumptions about audio input so that it can work with any microphone setup, including none at all. The <a href='{{< ref "docs/index.md#player-admin-only" >}}'>player's</a> output (music) can be mixed with microphones in software or an outboard mixer (see below).
 
 ## What's the recommended microphone/audio setup?
 
