@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const childProcess = require('child_process')
 const childEnv = require('./lib/cli')()
 const log = require('./lib/logger')(`master[${process.pid}]`)
