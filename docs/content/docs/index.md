@@ -4,7 +4,7 @@ title: Documentation
 
 ## Quick Start
 
-1. <a href="{{% baseurl %}}download">Download</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and install [Karaoke Forever Server](#karaoke-forever-server) on the system that will serve the app and media on your local network.
+1. Install [Karaoke Forever Server](#karaoke-forever-server) on the system that will serve the app and media on your local network.
 
 2. Browse to the server URL. You can copy or open the URL in your default browser using the Karaoke Forever Server menu bar or tray icon (macOS or Windows only).
 
@@ -96,7 +96,7 @@ To start a player, sign in as an admin to the desired room and a notice will app
 
 ## Karaoke Forever Server
 
-The server software hosts the "web" app and your media files on your local network (it is not designed to be run as a service exposed to the Internet). Built on Node.js and SQLite, it can run on relatively minimal hardware (Raspberry Pi 3B+).
+The server software hosts the "web" app and your media files on your local network (it is not designed to be run as a service exposed to the Internet). Built on [Node.js 12](https://nodejs.org)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and SQLite, it can run on relatively minimal hardware (Raspberry Pi 3B+).
 
 ### Installation
 
@@ -116,16 +116,28 @@ The server software hosts the "web" app and your media files on your local netwo
   <p>Beta versions of Karaoke Forever Server are not currently signed, so macOS Gatekeeper and Windows SmartScreen will likely complain. On macOS, <strong>do not disable Gatekeeper</strong>, just right-click <code>Karaoke Forever Server.app</code> in your Applications folder and choose Open.</p>
 </aside>
 
-#### Other Platforms
+#### Any OS with Node.js 12
 
-You can also install and run the server on most any platform with [Node.js](https://nodejs.org)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> v12 or later:
+- Install via ```npm```
 
-1. Clone the <a href="{{% baseurl %}}repo">project repository</a><svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-2. `npm install`
-3. `npm run build` (this runs Webpack to compile the front-end app)
-4. `npm run serve` and look for "Web server running at" for the **server URL**
+{{< highlight shell >}}
+  $ npm i -g karaoke-forever
+{{< /highlight >}}
 
-See [Quick Start](#quick-start) for more information on first-time setup once the server is installed and running.
+- Start the server
+
+{{< highlight shell >}}
+  $ karaoke-forever-server
+{{< /highlight >}}
+
+- Watch the output for "Web server running at..." and browse to the server URL
+
+<aside class="info">
+  <svg class="icon" viewBox="0 0 24 24">
+    <path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/>
+  </svg>
+  <p>Depending on availability of pre-built modules (specifically SQLite and bcrypt) for your architecture, compilation tools may need to be present (see the requirements for <a href="https://github.com/nodejs/node-gyp#installation">node-gyp</a>)</p>
+</aside>
 
 ### Supported Media
 
@@ -168,7 +180,7 @@ return {
 
 #### Creating a Parser (Experimental)
 
-Your `_kfconfig.js` can also return a *parser creator* instead of a configuration object. A parser creator returns a function (parser) that Karaoke Forever can call for each media file. The [default parser](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> is still available so you don't have to reinvent the wheel.
+Your `_kfconfig.js` can also return a *parser creator* instead of a configuration object. A parser creator returns a function (parser) that can be called for each media file. The [default parser](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> is still available so you don't have to reinvent the wheel.
 
 The following example creates a parser that removes the word 'junk' from each filename before handing off to the default parser:
 
@@ -192,7 +204,7 @@ Your parser creator is passed an object with the following properties:
 - `getDefaultParser` (function) gets an instance of the default parser, which itself can be used as middleware. Note that the method must be called because you can optionally pass a [configuration object](#configuring-the-parser) when getting an instance
 - `defaultMiddleware` [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> containing the [default middleware](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> in order. This can be used to recompose the middleware in your custom parser
 
-When Karaoke Forever scans a media file, it calls the parser with a context object `ctx` having the following properties:
+When a media file is scanned, the parser is called with a context object `ctx` having the following properties:
 
 - `dir` (string) full path of the containing folder
 - `dirSep` (string) path segment separator used by the current OS (`/` or `\`)
@@ -202,8 +214,8 @@ When Karaoke Forever scans a media file, it calls the parser with a context obje
 Middleware may mutate `ctx` as required. Once finished, the following properties on it will be used:
 
 - `artist` (string) artist's name as it will be shown in the library
-- `title` (string) song's title as it will be shown in the library
 - `artistNorm` (string) normalized version of the artist's name; used for matching and sorting (`artist` if not set)
+- `title` (string) song's title as it will be shown in the library
 - `titleNorm` (string) normalized version of the song's title; used for matching and sorting (`title` if not set)
 
 It's important that each middleware calls `next` unless you don't want the chain to continue (for instance, if you've set `artist` and `title` manually and want to use them as-is).
