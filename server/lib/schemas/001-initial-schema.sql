@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS media (
   dateUpdated integer NOT NULL DEFAULT(0)
 );
 
-
 CREATE INDEX IF NOT EXISTS idxSong ON "media" ("songId" ASC);
 
 CREATE TABLE IF NOT EXISTS "paths" (
