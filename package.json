@@ -2,7 +2,17 @@
   "name": "karaoke-forever",
   "version": "0.7.4-beta.1",
   "description": "Open karaoke party system",
-  "keywords": ["karaoke", "party", "player", "lyrics", "cdgraphics", "cdg", "mp3+g", "mp4", "webgl"],
+  "keywords": [
+    "karaoke",
+    "party",
+    "player",
+    "lyrics",
+    "cdgraphics",
+    "cdg",
+    "mp3+g",
+    "mp4",
+    "webgl"
+  ],
   "homepage": "https://www.karaoke-forever.com",
   "main": "./server/main.js",
   "engines": {
