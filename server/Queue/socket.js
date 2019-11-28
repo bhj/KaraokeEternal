@@ -1,6 +1,7 @@
 const db = require('sqlite')
-const squel = require('squel')
+const sql = require('sqlate')
 const Queue = require('./Queue')
+const Rooms = require('../Rooms')
 
 const {
   QUEUE_ADD,
@@ -14,27 +15,26 @@ const {
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: async (sock, { payload }, acknowledge) => {
     // is room open?
-    if (!await _isRoomOpen(sock.user.roomId)) {
+    if (!await Rooms.isRoomOpen(sock.user.roomId)) {
       return acknowledge({
         type: QUEUE_ADD + '_ERROR',
         error: 'Sorry, the room is no longer open',
       })
     }
 
-    // insert queue item
-    {
-      const q = squel.insert()
-        .into('queue')
-        .set('roomId', sock.user.roomId)
-        .set('songId', payload.songId)
-        .set('userId', sock.user.userId)
+    const fields = new Map()
+    fields.set('roomId', sock.user.roomId)
+    fields.set('songId', payload.songId)
+    fields.set('userId', sock.user.userId)
 
-      const { text, values } = q.toParam()
-      const res = await db.run(text, values)
+    const query = sql`
+      INSERT INTO queue ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = await db.run(String(query), query.parameters)
 
-      if (res.stmt.changes !== 1) {
-        throw new Error('Could not add song to queue')
-      }
+    if (res.stmt.changes !== 1) {
+      throw new Error('Could not add song to queue')
     }
 
     // success
@@ -47,18 +47,19 @@ const ACTION_HANDLERS = {
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
-    const q = squel.delete()
-      .from('queue')
-      .where('queueId = ?', payload.queueId)
-      .where('roomId = ?', sock.user.roomId)
+    let whereClause = sql`queueId = ${payload.queueId} AND roomId = ${sock.user.roomId}`
 
     // admins can remove any
     if (!sock.user.isAdmin) {
-      q.where('userId = ?', sock.user.userId)
+      whereClause += sql` AND userId = ${sock.user.userId}`
     }
 
-    const { text, values } = q.toParam()
-    const res = await db.run(text, values)
+    const query = sql`
+      DELETE FROM queue
+      WHERE ${whereClause}
+    `
+    console.log(String(query))
+    const res = await db.run(String(query), query.parameters)
 
     if (!res.stmt.changes) {
       return acknowledge({
@@ -76,17 +77,6 @@ const ACTION_HANDLERS = {
       payload: await Queue.get(sock.user.roomId)
     })
   },
-}
-
-async function _isRoomOpen (roomId) {
-  const q = squel.select()
-    .from('rooms')
-    .where('roomId = ?', roomId)
-
-  const { text, values } = q.toParam()
-  const room = await db.get(text, values)
-
-  return (room && room.status === 'open')
 }
 
 module.exports = ACTION_HANDLERS

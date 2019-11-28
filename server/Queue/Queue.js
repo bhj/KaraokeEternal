@@ -1,6 +1,6 @@
 const path = require('path')
 const db = require('sqlite')
-const squel = require('squel')
+const sql = require('sqlate')
 
 class Queue {
   /**
@@ -13,23 +13,23 @@ class Queue {
     const result = []
     const entities = {}
 
-    const q = squel.select()
-      .field('queueId, mediaId, userId')
-      .field('media.duration, media.isPreferred, media.relPath')
-      .field('artists.name AS artist')
-      .field('songs.songId, songs.title')
-      .field('users.name AS userDisplayName, users.dateUpdated')
-      .from('queue')
-      .join('users USING(userId)')
-      .join('media USING(songId)')
-      .join('songs USING (songId)')
-      .join('paths USING (pathId)')
-      .join('artists USING (artistId)')
-      .where('roomId = ?', roomId)
-      .order('queueId, paths.priority')
-
-    const { text, values } = q.toParam()
-    const rows = await db.all(text, values)
+    const query = sql`
+      SELECT queueId, mediaId, userId,
+        media.duration, media.isPreferred, media.relPath,
+        artists.name AS artist,
+        songs.songId, songs.title,
+        users.name AS userDisplayName, users.dateUpdated
+      FROM
+        queue
+        INNER JOIN users USING(userId)
+        INNER JOIN media USING (songId)
+        INNER JOIN songs USING (songId)
+        INNER JOIN paths USING (pathId)
+        INNER JOIN artists USING (artistId)
+      WHERE roomId = ${roomId}
+      ORDER BY queueId, paths.priority ASC
+    `
+    const rows = await db.all(String(query), query.parameters)
 
     for (const row of rows) {
       if (entities[row.queueId]) {

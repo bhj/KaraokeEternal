@@ -3,7 +3,7 @@ const fs = require('fs')
 const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
 const db = require('sqlite')
-const squel = require('squel')
+const sql = require('sqlate')
 const jwtSign = require('jsonwebtoken').sign
 const bcrypt = require('../lib/bcrypt')
 const KoaRouter = require('koa-router')
@@ -15,8 +15,11 @@ const {
   QUEUE_PUSH,
 } = require('../../shared/actionTypes')
 
-// user images are stored as binary blobs
-squel.registerValueHandler(Buffer, buffer => buffer)
+const BCRYPT_ROUNDS = 12
+const USERNAME_MAX_LENGTH = 256
+const PASSWORD_MAX_LENGTH = 72 // per bcrypt
+const NAME_MAX_LENGTH = 50
+const IMG_MAX_LENGTH = 50000 // bytes
 
 // login
 router.post('/login', async (ctx, next) => {
@@ -29,118 +32,6 @@ router.get('/logout', async (ctx, next) => {
   ctx.cookies.set('kfToken', '')
   ctx.status = 200
   ctx.body = {}
-})
-
-// create
-router.post('/account', async (ctx, next) => {
-  const { name, username, newPassword, newPasswordConfirm, roomId } = ctx.request.body
-
-  // required fields
-  if (!name || !username || !newPassword || !newPasswordConfirm) {
-    ctx.throw(422, 'All fields are required')
-  }
-
-  {
-    // check for duplicate username
-    const user = await User.getByUsername(username.trim())
-
-    if (user) {
-      ctx.throw(401, 'Username already exists')
-    }
-  }
-
-  // check that passwords match
-  if (newPassword !== newPasswordConfirm) {
-    ctx.throw(422, 'Passwords do not match')
-  }
-
-  {
-    // insert user
-    const q = squel.insert()
-      .into('users')
-      .set('username', username.trim())
-      .set('password', await bcrypt.hash(newPassword, 12))
-      .set('name', name.trim())
-      .set('isAdmin', 0)
-      .set('dateCreated', Math.floor(Date.now() / 1000))
-
-    // user image?
-    if (ctx.request.files.image) {
-      q.set('image', await readFile(ctx.request.files.image.path))
-      await deleteFile(ctx.request.files.image.path)
-    }
-
-    const { text, values } = q.toParam()
-    await db.run(text, values)
-  }
-
-  // log them in automatically
-  await _login(ctx, { username, password: newPassword, roomId })
-})
-
-// first-time setup
-router.post('/setup', async (ctx, next) => {
-  const { name, username, newPassword, newPasswordConfirm } = ctx.request.body
-  let roomId
-
-  // must be first run
-  const prefs = await Prefs.get()
-
-  if (prefs.isFirstRun !== true) {
-    ctx.throw(403)
-  }
-
-  // check presence of all fields
-  if (!name || !username || !newPassword || !newPasswordConfirm) {
-    ctx.throw(422, 'All fields are required')
-  }
-
-  // check that passwords match
-  if (newPassword !== newPasswordConfirm) {
-    ctx.throw(422, 'Passwords do not match')
-  }
-
-  // create admin user
-  {
-    const q = squel.insert()
-      .into('users')
-      .set('username', username.trim())
-      .set('password', await bcrypt.hash(newPassword, 12))
-      .set('name', name.trim())
-      .set('isAdmin', 1)
-      .set('dateCreated', Math.floor(Date.now() / 1000))
-
-    const { text, values } = q.toParam()
-    await db.run(text, values)
-  }
-
-  // create default room
-  {
-    const q = squel.insert()
-      .into('rooms')
-      .set('name', 'Room 1')
-      .set('status', 'open')
-      .set('dateCreated', Math.floor(Date.now() / 1000))
-
-    const { text, values } = q.toParam()
-    const res = await db.run(text, values)
-
-    // sign in to room
-    roomId = res.stmt.lastID
-  }
-
-  // unset isFirstRun
-  {
-    const q = squel.update()
-      .table('prefs')
-      .where('key = ?', 'isFirstRun')
-      .set('data', squel.select().field('json(\'false\')'))
-
-    const { text, values } = q.toParam()
-    await db.run(text, values)
-  }
-
-  await _login(ctx, { username, password: newPassword, roomId })
 })
 
 // update account
@@ -159,56 +50,68 @@ router.put('/account', async (ctx, next) => {
   }
 
   if (!await bcrypt.compare(password, user.password)) {
-    ctx.throw(401, 'Current password is incorrect')
+    ctx.throw(401, 'Incorrect current password')
   }
 
-  // begin query
-  const q = squel.update()
-    .table('users')
-    .where('userId = ?', ctx.user.userId)
-
-  if (name && name.trim()) {
-    // @todo check length
-    q.set('name', name.trim())
-  }
+  // validated
+  const fields = new Map()
 
   // changing username?
-  if (username && username.trim()) {
-    // check for duplicate
-    if (await User.getByUsername(username.trim())) {
-      ctx.throw(401, 'Username or email is not available')
+  if (username) {
+    username = username.trim()
+
+    if (!username || username.length > USERNAME_MAX_LENGTH) {
+      ctx.throw(400, 'Invalid username')
     }
 
-    // @todo check length
-    q.set('username', username.trim())
-  } else {
-    // use current username to log in
-    username = user.username
+    // check for duplicate
+    if (await User.getByUsername(username)) {
+      ctx.throw(409, 'Username or email is not available')
+    }
+
+    fields.set('username', username)
+  }
+
+  // changing display name?
+  if (name) {
+    name = name.trim()
+
+    if (!name || name.length > NAME_MAX_LENGTH) {
+      ctx.throw(400, 'Invalid display name')
+    }
+
+    fields.set('name', name)
   }
 
   // changing password?
   if (newPassword) {
-    // @todo check length
+    if (newPassword.length > PASSWORD_MAX_LENGTH) {
+      ctx.throw(400, `Invalid password (max length=${PASSWORD_MAX_LENGTH})`)
+    }
+
     if (newPassword !== newPasswordConfirm) {
       ctx.throw(422, 'New passwords do not match')
     }
 
-    q.set('password', await bcrypt.hash(newPassword, 10))
-    password = newPassword
+    fields.set('password', await bcrypt.hash(newPassword, BCRYPT_ROUNDS))
   }
 
   // changing user image?
   if (ctx.request.files.image) {
-    q.set('image', await readFile(ctx.request.files.image.path))
+    fields.set('image', await readFile(ctx.request.files.image.path))
     await deleteFile(ctx.request.files.image.path)
   } else if (ctx.request.body.image === 'null') {
-    q.set('image', null)
+    fields.set('image', null)
   }
 
-  q.set('dateUpdated', Math.floor(Date.now() / 1000))
+  fields.set('dateUpdated', Math.floor(Date.now() / 1000))
 
-  const { text, values } = q.toParam()
-  await db.run(text, values)
+  const query = sql`
+    UPDATE users
+    SET ${sql.tuple(Array.from(fields.keys()).map(sql.column))} = ${sql.tuple(Array.from(fields.values()))}
+    WHERE userId = ${ctx.user.userId}
+  `
+  await db.run(String(query), query.parameters)
 
   // notify room?
   if (ctx.user.roomId) {
@@ -219,7 +122,68 @@ router.put('/account', async (ctx, next) => {
   }
 
   // get updated token
-  await _login(ctx, { username, password, roomId: ctx.user.roomId })
+  console.log({
+    username: username || user.username,
+    password: newPassword || password,
+    roomId: ctx.user.roomId || null,
+  })
+
+  await _login(ctx, {
+    username: username || user.username,
+    password: newPassword || password,
+    roomId: ctx.user.roomId || null,
+  })
+})
+
+// create account
+router.post('/account', async (ctx, next) => {
+  const creds = await _create(ctx, false) // non-admin
+
+  // @todo validate room
+  const { roomId } = ctx.request.body
+
+  // log them in automatically
+  await _login(ctx, { ...creds, roomId })
+})
+
+// first-time setup
+router.post('/setup', async (ctx, next) => {
+  // must be first run
+  const prefs = await Prefs.get()
+
+  if (prefs.isFirstRun !== true) {
+    ctx.throw(403)
+  }
+
+  // create admin user
+  const creds = await _create(ctx, true)
+
+  // create default room
+  const fields = new Map()
+  fields.set('name', 'Room 1')
+  fields.set('status', 'open')
+  fields.set('dateCreated', Math.floor(Date.now() / 1000))
+
+  const query = sql`
+    INSERT INTO rooms ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+    VALUES ${sql.tuple(Array.from(fields.values()))}
+  `
+  const res = await db.run(String(query), query.parameters)
+
+  // sign in to the new room
+  creds.roomId = res.stmt.lastID
+
+  // unset isFirstRun
+  {
+    const query = sql`
+      UPDATE prefs
+      SET data = 'false'
+      WHERE key = 'isFirstRun'
+    `
+    await db.run(String(query))
+  }
+
+  await _login(ctx, creds)
 })
 
 // get own account (helps sync account changes across devices)
@@ -260,6 +224,72 @@ router.get('/user/image/:userId', async (ctx, next) => {
 
 module.exports = router
 
+async function _create (ctx, isAdmin = 0) {
+  let { name, username, newPassword, newPasswordConfirm } = ctx.request.body
+
+  if (!username || !name || !newPassword || !newPasswordConfirm) {
+    ctx.throw(422, 'All fields are required')
+  }
+
+  username = username.trim()
+  name = name.trim()
+
+  if (!username || username.length > USERNAME_MAX_LENGTH) {
+    ctx.throw(400, 'Invalid username')
+  }
+
+  if (!name || name.length > NAME_MAX_LENGTH) {
+    ctx.throw(400, `Invalid display name (max length=${NAME_MAX_LENGTH})`)
+  }
+
+  if (newPassword.length > PASSWORD_MAX_LENGTH) {
+    ctx.throw(400, `Invalid password (max length=${PASSWORD_MAX_LENGTH})`)
+  }
+
+  if (newPassword !== newPasswordConfirm) {
+    ctx.throw(422, 'Passwords do not match')
+  }
+
+  // check for duplicate username
+  if (await User.getByUsername(username)) {
+    ctx.throw(409, 'Username or email is not available')
+  }
+
+  const fields = new Map()
+  fields.set('username', username)
+  fields.set('password', await bcrypt.hash(newPassword, BCRYPT_ROUNDS))
+  fields.set('name', name)
+  fields.set('dateCreated', Math.floor(Date.now() / 1000))
+  fields.set('isAdmin', isAdmin)
+
+  // user image?
+  if (ctx.request.files.image) {
+    const img = await readFile(ctx.request.files.image.path)
+    await deleteFile(ctx.request.files.image.path)
+
+    // client should resize before uploading to be
+    // well below this limit, but just in case...
+    if (img.length > IMG_MAX_LENGTH) {
+      ctx.throw(413, 'Invalid image')
+    }
+
+    fields.set('image', img)
+  }
+
+  const query = sql`
+    INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+    VALUES ${sql.tuple(Array.from(fields.values()))}
+  `
+
+  await db.run(String(query), query.parameters)
+
+  // success! return the (cleaned) credentials for sign-in
+  return {
+    username,
+    password: newPassword,
+  }
+}
+
 async function _login (ctx, creds) {
   const { username, password, roomId } = creds
 
@@ -289,15 +319,15 @@ async function _login (ctx, creds) {
 
   // validate roomId
   if (roomId) {
-    const q = squel.select()
-      .from('rooms')
-      .where('roomId = ?', roomId)
-
-    const { text, values } = q.toParam()
-    const row = await db.get(text, values)
+    const query = sql`
+      SELECT *
+      FROM rooms
+      WHERE roomId = ${roomId}
+    `
+    const row = await db.get(String(query), query.parameters)
 
     if (!row) ctx.throw(401, 'Invalid roomId')
-    if (row.status !== 'open') ctx.throw(401, 'Room is no longer open')
+    if (row.status !== 'open') ctx.throw(401, 'Sorry, this room is no longer open')
 
     user.roomId = row.roomId
   }

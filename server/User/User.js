@@ -1,5 +1,5 @@
 const db = require('sqlite')
-const squel = require('squel')
+const sql = require('sqlate')
 
 class User {
   /**
@@ -14,10 +14,7 @@ class User {
       throw new Error('userId must be a number')
     }
 
-    const q = squel.select()
-      .where('userId = ?', userId)
-
-    return User._get(q, creds)
+    return User._get({ userId }, creds)
   }
 
   /**
@@ -32,30 +29,29 @@ class User {
       throw new Error('username must be a string')
     }
 
-    const q = squel.select()
-      .where('username = ?', username)
-
-    return User._get(q, creds)
+    return User._get({ username }, creds)
   }
 
   /**
    * (private) runs the query
-   * @param  {[type]}  q     Squel query object
-   * @param  {[type]}  creds Whether to include username and password in result
-   * @return {Promise}       User object
+   * @param  {Object}  id   with fields 'username' or 'userId'
+   * @param  {Bool}  creds  whether to include username and password in result
+   * @return {Promise}      user object
    */
-  static async _get (q, creds) {
-    q.from('users')
-      .field('userId, name, isAdmin, image, dateCreated, dateUpdated')
+  static async _get ({ userId, username }, creds) {
+    const query = sql`
+      SELECT *
+      FROM users
+      WHERE ${typeof userId === 'number' ? sql`userId = ${userId}` : sql`username = ${username}`}
+    `
 
-    if (creds) {
-      q.field('username, password')
-    }
-
-    const { text, values } = q.toParam()
-    const user = await db.get(text, values)
-
+    const user = await db.get(String(query), query.parameters)
     if (!user) return false
+
+    if (!creds) {
+      delete user.username
+      delete user.password
+    }
 
     // client expects boolean
     user.isAdmin = user.isAdmin === 1

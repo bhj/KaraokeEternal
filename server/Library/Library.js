@@ -1,13 +1,15 @@
 const path = require('path')
 const db = require('sqlite')
-const squel = require('squel')
+const sql = require('sqlate')
 const log = require('../lib/logger')('Library')
 let _libraryVersion = Date.now()
 let _starCountsVersion = Date.now()
 
 class Library {
   /**
-  * Get artists and songs in a format suitable for sending to clients
+  * Get artists and songs in a format suitable for sending to clients.
+  * Should not include songs or artists for which there are no media.
+  *
   * @return {Promise} Object with artists and songs normalized
   */
   static async get () {
@@ -23,18 +25,14 @@ class Library {
 
     // query #1: songs
     {
-      const q = squel.select()
-        .field('duration, isPreferred')
-        .field('songs.artistId AS artistId')
-        .field('songs.songId AS songId')
-        .field('songs.title AS title')
-        .from('media')
-        .join('songs USING (songId)')
-        .join('paths USING (pathId)')
-        .order('songs.titleNorm, paths.priority')
-
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
+      const query = sql`
+        SELECT duration, isPreferred, songs.artistId AS artistId, songs.songId AS songId, songs.title AS title
+        FROM media
+          INNER JOIN songs USING (songId)
+          INNER JOIN paths USING (pathId)
+        ORDER BY songs.titleNorm, paths.priority ASC
+      `
+      const rows = await db.all(String(query), query.parameters)
 
       for (const row of rows) {
         if (songs.entities[row.songId]) {
@@ -62,12 +60,12 @@ class Library {
 
     // query #2: artists
     {
-      const q = squel.select()
-        .from('artists')
-        .order('nameNorm')
-
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
+      const query = sql`
+        SELECT *
+        FROM artists
+        ORDER BY nameNorm ASC
+      `
+      const rows = await db.all(String(query), query.parameters)
 
       for (const row of rows) {
         if (SongIdsByArtist[row.artistId]) {
@@ -87,6 +85,7 @@ class Library {
 
   /**
   * Matches or creates artist and song
+  *
   * @param  {object}  parsed  The object returned from MetaParser
   * @return {object}          { artistId, songId }
   */
@@ -95,12 +94,12 @@ class Library {
 
     // match artist
     {
-      const q = squel.select()
-        .from('artists')
-        .where('nameNorm = ?', parsed.artistNorm)
-
-      const { text, values } = q.toParam()
-      const row = await db.get(text, values)
+      const query = sql`
+        SELECT *
+        FROM artists
+        WHERE nameNorm = ${parsed.artistNorm}
+      `
+      const row = await db.get(String(query), query.parameters)
 
       if (row) {
         // log.info('matched artist: %s', row.name)
@@ -110,13 +109,15 @@ class Library {
       } else {
         log.info('new artist: %s', parsed.artist)
 
-        const q = squel.insert()
-          .into('artists')
-          .set('name', parsed.artist)
-          .set('nameNorm', parsed.artistNorm)
+        const fields = new Map()
+        fields.set('name', parsed.artist)
+        fields.set('nameNorm', parsed.artistNorm)
 
-        const { text, values } = q.toParam()
-        const res = await db.run(text, values)
+        const query = sql`
+          INSERT INTO artists ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+          VALUES ${sql.tuple(Array.from(fields.values()))}
+        `
+        const res = await db.run(String(query), query.parameters)
 
         if (!Number.isInteger(res.stmt.lastID)) {
           throw new Error('invalid artistId after insert')
@@ -128,15 +129,14 @@ class Library {
       }
     }
 
-    // match title
+    // match song title
     {
-      const q = squel.select()
-        .from('songs')
-        .where('artistId = ?', match.artistId)
-        .where('titleNorm = ?', parsed.titleNorm)
-
-      const { text, values } = q.toParam()
-      const row = await db.get(text, values)
+      const query = sql`
+        SELECT *
+        FROM songs
+        WHERE artistId = ${match.artistId} AND titleNorm = ${parsed.titleNorm}
+      `
+      const row = await db.get(String(query), query.parameters)
 
       if (row) {
         // log.info('matched song: %s', row.title)
@@ -146,14 +146,16 @@ class Library {
       } else {
         log.info('new song: %s', parsed.title)
 
-        const q = squel.insert()
-          .into('songs')
-          .set('artistId', match.artistId)
-          .set('title', parsed.title)
-          .set('titleNorm', parsed.titleNorm)
+        const fields = new Map()
+        fields.set('artistId', match.artistId)
+        fields.set('title', parsed.title)
+        fields.set('titleNorm', parsed.titleNorm)
 
-        const { text, values } = q.toParam()
-        const res = await db.run(text, values)
+        const query = sql`
+          INSERT INTO songs ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+          VALUES ${sql.tuple(Array.from(fields.values()))}
+        `
+        const res = await db.run(String(query), query.parameters)
 
         if (!Number.isInteger(res.stmt.lastID)) {
           throw new Error('invalid songId after insert')
@@ -170,6 +172,7 @@ class Library {
 
   /**
   * Get underlying media for a given song
+  *
   * @param  {number}  songId
   * @return {Promise} normalized media entries
   */
@@ -179,22 +182,20 @@ class Library {
       entities: {},
     }
 
-    const q = squel.select()
-      .field('media.*')
-      .field('paths.path')
-      .field('songs.artistId, songs.songId, songs.title')
-      .from('media')
-      .where('songId = ?', songId)
-      .join(squel.select()
-        .from('paths')
-        .group('pathId'),
-      'paths', 'paths.pathId = media.pathId')
-      .join('songs USING (songId)')
-      .join('artists USING (artistId)')
-      .order('paths.priority')
-
-    const { text, values } = q.toParam()
-    const rows = await db.all(text, values)
+    const query = sql`
+      SELECT media.*, paths.path, songs.artistId, songs.songId, songs.title
+      FROM media
+        INNER JOIN (
+          SELECT *
+          FROM paths
+          GROUP BY pathId
+        ) paths ON (paths.pathId = media.pathId)
+        INNER JOIN songs USING (songId)
+        INNER JOIN artists USING (artistId)
+      WHERE songId = ${songId}
+      ORDER BY paths.priority ASC
+    `
+    const rows = await db.all(String(query), query.parameters)
 
     rows.forEach(row => {
       media.result.push(row.mediaId)
@@ -217,26 +218,24 @@ class Library {
 
     // get starred artists
     {
-      const q = squel.select()
-        .from('artistStars')
-        .field('artistId')
-        .where('userId = ?', userId)
-
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
+      const query = sql`
+        SELECT artistId
+        FROM artistStars
+        WHERE userId = ${userId}
+      `
+      const rows = await db.all(String(query), query.parameters)
 
       starredArtists = rows.map(row => row.artistId)
     }
 
     // get starred songs
     {
-      const q = squel.select()
-        .from('songStars')
-        .field('songId')
-        .where('userId = ?', userId)
-
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
+      const query = sql`
+        SELECT songId
+        FROM songStars
+        WHERE userId = ${userId}
+      `
+      const rows = await db.all(String(query), query.parameters)
 
       starredSongs = rows.map(row => row.songId)
     }
@@ -255,28 +254,24 @@ class Library {
 
     // get artist star counts
     {
-      const q = squel.select()
-        .from('artistStars')
-        .field('artistId')
-        .field('COUNT(userId) AS count')
-        .group('artistId')
-
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
+      const query = sql`
+        SELECT artistId, COUNT(userId) AS count
+        FROM artistStars
+        GROUP BY artistId
+      `
+      const rows = await db.all(String(query), query.parameters)
 
       rows.forEach(row => { artists[row.artistId] = row.count })
     }
 
     // get song star counts
     {
-      const q = squel.select()
-        .from('songStars')
-        .field('songId')
-        .field('COUNT(userId) AS count')
-        .group('songId')
-
-      const { text, values } = q.toParam()
-      const rows = await db.all(text, values)
+      const query = sql`
+        SELECT songId, COUNT(userId) AS count
+        FROM songStars
+        GROUP BY songId
+      `
+      const rows = await db.all(String(query), query.parameters)
 
       rows.forEach(row => { songs[row.songId] = row.count })
     }

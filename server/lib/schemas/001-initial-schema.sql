@@ -92,7 +92,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS idxUsername ON "users" ("username" ASC);
 DROP TABLE artists;
 DROP TABLE media;
 DROP TABLE prefs;
-DROP TABLE providers;
 DROP TABLE queue;
 DROP TABLE rooms;
 DROP TABLE songs;

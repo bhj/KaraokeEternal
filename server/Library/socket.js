@@ -1,5 +1,5 @@
 const db = require('sqlite')
-const squel = require('squel')
+const sql = require('sqlate')
 const Library = require('./Library')
 const {
   STAR_SONG,
@@ -11,55 +11,58 @@ const {
 
 const ACTION_HANDLERS = {
   [STAR_SONG]: async (sock, { payload }, acknowledge) => {
-    // @TODO use upsert
-    const q = squel.insert()
-      .into('songStars')
-      .set('userId', sock.user.userId)
-      .set('songId', payload.songId)
+    const fields = new Map()
+    fields.set('userId', sock.user.userId)
+    fields.set('songId', payload.songId)
 
-    const { text, values } = q.toParam()
-    await db.run(text, values)
+    const query = sql`
+      INSERT OR IGNORE INTO songStars ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = await db.run(String(query), query.parameters)
 
     // success
     acknowledge({ type: STAR_SONG + _SUCCESS })
 
-    // update star count version
-    Library.setStarCountsVersion()
+    if (res.stmt.changes) {
+      // update star count version
+      Library.setStarCountsVersion()
 
-    // tell all clients (some users may be in multiple rooms)
-    sock.server.emit('action', {
-      type: SONG_STARRED,
-      payload: {
-        userId: sock.user.userId,
-        songId: payload.songId,
-        version: Library.getStarCountsVersion(),
-      },
-    })
+      // tell all clients (some users may be in multiple rooms)
+      sock.server.emit('action', {
+        type: SONG_STARRED,
+        payload: {
+          userId: sock.user.userId,
+          songId: payload.songId,
+          version: Library.getStarCountsVersion(),
+        },
+      })
+    }
   },
   [UNSTAR_SONG]: async (sock, { payload }, acknowledge) => {
-    const q = squel.delete()
-      .from('songStars')
-      .where('userId = ?', sock.user.userId)
-      .where('songId = ?', payload.songId)
-
-    const { text, values } = q.toParam()
-    await db.get(text, values)
+    const query = sql`
+      DELETE FROM songStars
+      WHERE userId = ${sock.user.userId} AND songId = ${payload.songId}
+    `
+    const res = await db.run(String(query), query.parameters)
 
     // success
     acknowledge({ type: UNSTAR_SONG + _SUCCESS })
 
-    // update star count version
-    Library.setStarCountsVersion()
+    if (res.stmt.changes) {
+      // update star count version
+      Library.setStarCountsVersion()
 
-    // tell all clients (some users may be in multiple rooms)
-    sock.server.emit('action', {
-      type: SONG_UNSTARRED,
-      payload: {
-        userId: sock.user.userId,
-        songId: payload.songId,
-        version: Library.getStarCountsVersion(),
-      },
-    })
+      // tell all clients (some users may be in multiple rooms)
+      sock.server.emit('action', {
+        type: SONG_UNSTARRED,
+        payload: {
+          userId: sock.user.userId,
+          songId: payload.songId,
+          version: Library.getStarCountsVersion(),
+        },
+      })
+    }
   }
 }
 
