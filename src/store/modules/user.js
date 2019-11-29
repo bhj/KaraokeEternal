@@ -275,7 +275,7 @@ export function connectSocket () {
   return (dispatch, getState) => {
     const versions = {
       library: getState().library.version,
-      starCounts: getState().starCounts.version,
+      stars: getState().starCounts.version,
     }
 
     dispatch(requestSocketConnect(versions))

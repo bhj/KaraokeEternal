@@ -29,7 +29,7 @@ module.exports = function (io, jwtKey) {
   io.on('connection', async (sock) => {
     const { kfToken } = parseCookie(sock.handshake.headers.cookie)
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
-    const clientStarsVersion = parseInt(sock.handshake.query.starCounts, 10)
+    const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
 
     // decode JWT in cookie sent with socket handshake
     try {
