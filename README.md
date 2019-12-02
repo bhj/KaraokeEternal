@@ -41,9 +41,8 @@ Join the [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq) for genera
 
 ## Contributing & Development
 
-Contributions are most welcome! To get started developing
-make sure you have [Node.js 12](https://nodejs.org/en/) or later, then:
+Contributions are most welcome! Make sure you have [Node.js 12](https://nodejs.org/en/), then:
 
-1. Clone the project
-2. `npm install`
+1. Fork and clone the repo
+2. `npm i`
 3. `npm run dev` and look for "Web server running at" for the **server URL**
