@@ -1,6 +1,6 @@
 {
   "name": "karaoke-forever",
-  "version": "0.7.4-beta.3",
+  "version": "0.7.4-beta.4",
   "description": "Open karaoke party system",
   "keywords": [
     "karaoke",
@@ -63,7 +63,7 @@
     "koa-range": "^0.3.0",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
-    "music-metadata": "^5.0.1",
+    "music-metadata": "^4.9.2",
     "rimraf": "^3.0.0",
     "socket.io": "^2.2.0",
     "sqlate": "^2.1.0",
