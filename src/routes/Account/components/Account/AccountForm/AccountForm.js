@@ -29,6 +29,7 @@ export default class AccountForm extends Component {
     return (
       <form styleName='container'>
         <input type='text'
+          autoComplete='off'
           autoFocus={!isUser}
           onChange={this.updateVisible}
           placeholder={isUser ? 'change username (optional)' : 'username or email'}
@@ -37,6 +38,7 @@ export default class AccountForm extends Component {
         />
 
         <input type='password'
+          autoComplete='off'
           onChange={this.updateVisible}
           placeholder={isUser ? 'change password (optional)' : 'password'}
           ref={r => { this.newPassword = r }}
@@ -45,6 +47,7 @@ export default class AccountForm extends Component {
 
         {this.state.isChangingPassword &&
           <input type='password'
+            autoComplete='off'
             placeholder={isUser ? 'new password confirm' : 'confirm password'}
             ref={r => { this.newPasswordConfirm = r }}
             styleName='field'
