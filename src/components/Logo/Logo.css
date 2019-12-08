@@ -1,0 +1,43 @@
+.container {
+  font-family: 'Raleway', sans-serif;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.imgMic {
+  margin: 0;
+  width: 2em;
+}
+
+.title {
+  border: none;
+  color: hsl(var(--hue-blue), 10%, 80%);
+  display: inline-block;
+  font-weight: 200;
+  font-size: 100%;
+  margin: 0;
+  text-shadow: var(--text-shadow-glow);
+  position: relative;
+  left: -.75em;
+}
+
+.forever {
+  font-weight: 700;
+}
+
+.nospace {
+  font-size: 0;
+}
+
+/* @media (min-width: 42em) {
+  .container {
+    font-size: 36px;
+  }
+
+  .imgMic {
+    width: 50px;
+    height: 50px;
+    top: -10px;
+    right: -20px;
+  }
+} */
