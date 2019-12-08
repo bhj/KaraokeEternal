@@ -58,7 +58,6 @@ const ACTION_HANDLERS = {
       DELETE FROM queue
       WHERE ${whereClause}
     `
-    console.log(String(query))
     const res = await db.run(String(query), query.parameters)
 
     if (!res.stmt.changes) {

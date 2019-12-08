@@ -122,12 +122,6 @@ router.put('/account', async (ctx, next) => {
   }
 
   // get updated token
-  console.log({
-    username: username || user.username,
-    password: newPassword || password,
-    roomId: ctx.user.roomId || null,
-  })
-
   await _login(ctx, {
     username: username || user.username,
     password: newPassword || password,
