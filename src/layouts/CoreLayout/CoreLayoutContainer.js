@@ -6,6 +6,7 @@ import { clearErrorMessage } from 'store/modules/ui'
 const mapStateToProps = (state) => {
   return {
     errorMessage: state.ui.errorMessage,
+    isLoggedIn: state.user.userId !== null,
     songInfoId: state.songInfo.songId,
   }
 }

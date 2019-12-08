@@ -13,7 +13,9 @@ export const CoreLayout = (props) => {
     <>
       {props.children}
 
-      <Navigation/>
+      {props.isLoggedIn &&
+        <Navigation/>
+      }
 
       <SkyLightStateless
         isVisible={typeof props.songInfoId === 'number'}
@@ -59,6 +61,7 @@ export default CoreLayout
 CoreLayout.propTypes = {
   children: PropTypes.any,
   errorMessage: PropTypes.any,
+  isLoggedIn: PropTypes.bool,
   songInfoId: PropTypes.number,
   // actions
   clearErrorMessage: PropTypes.func.isRequired,
