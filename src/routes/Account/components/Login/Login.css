@@ -1,21 +1,31 @@
 .container {
-  background-color: var(--panel-bg-color);
-  border-radius: var(--border-radius);
-  margin: 10px 0;
+  margin: 1em auto;
+  max-width: 32em;
   overflow: hidden;
+  padding: var(--container-padding);
 
   /* fixes panel disappearing in iOS 11 due to overflow: scroll on parent
   container and -webkit-overflow-scrolling: touch on parent */
   -webkit-transform: translate3d(0, 0, 0);
 }
 
-.title {
-  margin: 0;
-  font-size: var(--panel-title-size);
-  padding: var(--panel-title-padding);
-  background-color: var(--panel-title-bg-color);
+.heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
+  color: hsl(var(--hue-blue), 10%, 60%);
 }
 
-.content {
-  padding: var(--container-padding);
+.heading h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 28px;
+  white-space: nowrap;
+}
+
+.logo {
+  padding-bottom: 1.5em;
+  text-align: center;
+  font-size: 28px;
 }

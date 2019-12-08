@@ -15,7 +15,7 @@
 
   --input-color: #444;
   --input-placeholder-color: var(--btn-bg-color);
-  --input-bg-color: #eee;
+  --input-bg-color: hsl(var(--hue-blue), 10%, 90%);
   --input-margin: 7px;
 
   --btn-bg-color: hsl(var(--hue-blue), 40%, 30%);
