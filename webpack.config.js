@@ -29,6 +29,7 @@ const config = {
       'node_modules',
     ],
     alias: {
+      assets: path.join(project.basePath, 'assets'),
       shared: path.join(project.basePath, 'shared'),
     }
   },
@@ -39,6 +40,9 @@ const config = {
       __DEV__,
       __TEST__,
       __PROD__,
+      __KF_VERSION__: JSON.stringify(process.env.npm_package_version),
+      __KF_HOMEPAGE__: JSON.stringify('https://www.karaoke-forever.com'),
+      __KF_COPYRIGHT__: JSON.stringify(`2017-${new Date().getFullYear()} RadRoot LLC`),
     }, project.globals)),
     new CaseSensitivePathsPlugin(),
     new MiniCssExtractPlugin({
