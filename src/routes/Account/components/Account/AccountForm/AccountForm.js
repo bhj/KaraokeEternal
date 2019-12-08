@@ -38,7 +38,7 @@ export default class AccountForm extends Component {
         />
 
         <input type='password'
-          autoComplete='off'
+          autoComplete='new-password'
           onChange={this.updateVisible}
           placeholder={isUser ? 'change password (optional)' : 'password'}
           ref={r => { this.newPassword = r }}
@@ -47,7 +47,7 @@ export default class AccountForm extends Component {
 
         {this.state.isChangingPassword &&
           <input type='password'
-            autoComplete='off'
+            autoComplete='new-password'
             placeholder={isUser ? 'new password confirm' : 'confirm password'}
             ref={r => { this.newPasswordConfirm = r }}
             styleName='field'
@@ -72,6 +72,7 @@ export default class AccountForm extends Component {
           <>
             <br />
             <input type='password'
+              autoComplete='current-password'
               placeholder='current password'
               ref={r => { this.curPassword = r }}
               styleName='field'

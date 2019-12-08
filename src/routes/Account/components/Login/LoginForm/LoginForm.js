@@ -15,13 +15,15 @@ export default class LoginForm extends Component {
   render () {
     return (
       <form>
-        <input type='text'
-          placeholder='username or email'
+        <input type='email'
+          autoComplete='username'
           autoFocus
+          placeholder='username or email'
           ref={this.username}
           styleName='field'
         />
         <input type='password'
+          autoComplete='current-password'
           placeholder='password'
           ref={this.password}
           styleName='field'
