@@ -54,7 +54,7 @@ export default class Login extends Component {
         <>
           <div styleName='heading'>
             <h1>Welcome</h1>
-            <span>Create your <b>admin</b> account to get started. All data is stored on your server.</span>
+            <p>Create your <b>admin</b> account to get started. Your data is locally stored and never shared.</p>
           </div>
           <AccountForm user={user} onSubmitClick={this.props.createAccount} showRoom={false} />
         </>

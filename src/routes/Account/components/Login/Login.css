@@ -19,9 +19,10 @@
 
 .heading h1 {
   flex: 1;
-  margin: 0;
-  font-size: 28px;
+  margin: 0 1em 0 0;
+  font-size: 24px;
   white-space: nowrap;
+  color: hsl(var(--hue-blue), 10%, 80%);
 }
 
 .logo {
