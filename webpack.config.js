@@ -30,6 +30,7 @@ const config = {
     ],
     alias: {
       assets: path.join(project.basePath, 'assets'),
+      fonts: path.join(project.basePath, 'docs', 'assets', 'fonts'),
       shared: path.join(project.basePath, 'shared'),
     }
   },
