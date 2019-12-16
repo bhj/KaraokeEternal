@@ -157,8 +157,6 @@ config.module.rules.push(
     test    : /\.woff(\?.*)?$/,
     loader  : 'url-loader',
     options : {
-      prefix   : 'fonts/',
-      name     : 'fonts/[name].[ext]',
       limit    : '10000',
       mimetype : 'application/font-woff'
     }
@@ -167,8 +165,6 @@ config.module.rules.push(
     test    : /\.woff2(\?.*)?$/,
     loader  : 'url-loader',
     options : {
-      prefix   : 'fonts/',
-      name     : 'fonts/[name].[ext]',
       limit    : '10000',
       mimetype : 'application/font-woff2'
     }
@@ -177,8 +173,6 @@ config.module.rules.push(
     test    : /\.svg(\?.*)?$/,
     loader  : 'url-loader',
     options : {
-      prefix   : 'fonts/',
-      name     : 'fonts/[name].[ext]',
       limit    : '10000',
       mimetype : 'image/svg+xml'
     }
