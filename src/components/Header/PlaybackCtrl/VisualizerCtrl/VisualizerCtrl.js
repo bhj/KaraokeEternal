@@ -116,6 +116,6 @@ export default class VisualizerCtrl extends React.Component {
 // volume slider handle/grabber
 const handle = (props) => (
   <Icon icon='CIRCLE' size={36} styleName='handle' style={{
-    left: `calc(${props.offset}% - 18px)`,
+    left: `calc(${props.offset}% - 18px)`, // eslint-disable-line react/prop-types
   }}/>
 )

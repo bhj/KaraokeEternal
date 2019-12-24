@@ -9,11 +9,11 @@ export default class About extends React.Component {
       <div styleName='container'>
         <h1 styleName='title'>About</h1>
         <div styleName='content'>
-          <a href={__KF_HOMEPAGE__}>
+          <a href={__KF_HOMEPAGE__}> {/* eslint-disable-line no-undef */}
             <Logo styleName='logo'/>
           </a>
           <p styleName='sm'>
-            v{__KF_VERSION__}<br/>&copy;{__KF_COPYRIGHT__}
+            v{__KF_VERSION__}<br/>&copy;{__KF_COPYRIGHT__} {/* eslint-disable-line no-undef */}
           </p>
           <p><a href='/license_en.txt' target='blank'>Open Source Licenses</a></p>
         </div>

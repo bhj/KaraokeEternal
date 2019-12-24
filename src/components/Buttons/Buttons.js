@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React from 'react'
 import PropTypes from 'prop-types'
 import styles from './Buttons.css'
@@ -7,6 +6,7 @@ export default class Buttons extends React.Component {
   static propTypes = {
     btnWidth: PropTypes.number.isRequired,
     className: PropTypes.string,
+    children: PropTypes.any,
     showHidden: PropTypes.bool.isRequired,
   }
 

@@ -58,7 +58,7 @@ class CDGPlayer extends React.Component {
     }
 
     if (this.state.CDGBackgroundColor) {
-      const [r, g, b, a] = this.state.CDGBackgroundColor
+      const [r, g, b, a] = this.state.CDGBackgroundColor // eslint-disable-line no-unused-vars
       style.backgroundColor = `rgba(${r},${g},${b},${bgAlpha})`
     }
 

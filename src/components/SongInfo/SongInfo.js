@@ -49,7 +49,7 @@ export default class SongInfo extends Component {
           <span styleName='label'>Song ID: </span>{songId}<br />
           <span styleName='label'>Media Files: </span>{media.result.length}
         </p>
-          {mediaDetails}
+        {mediaDetails}
         <button onClick={this.props.closeSongInfo}>Done</button>
       </>
     )
