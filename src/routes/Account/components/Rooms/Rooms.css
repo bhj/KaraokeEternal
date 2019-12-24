@@ -15,7 +15,7 @@
   flex: 1;
   margin: 0;
   padding: 0;
-  font-size: var(--panel-title-size);
+  font: var(--panel-title-font);
 }
 
 .content {
@@ -23,10 +23,10 @@
 }
 
 .tableHeader {
+  align-items: center;
+  color: hsl(var(--hue-blue), 10%, 60%);
   display: flex;
   flex-direction: row;
-  align-items: center;
-  font-weight: bold;
 }
 
 .tableRow {

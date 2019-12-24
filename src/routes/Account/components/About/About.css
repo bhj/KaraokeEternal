@@ -6,10 +6,10 @@
 }
 
 .title {
-  margin: 0;
-  font-size: var(--panel-title-size);
-  padding: var(--panel-title-padding);
   background-color: var(--panel-title-bg-color);
+  font: var(--panel-title-font);
+  margin: 0;
+  padding: var(--panel-title-padding);
 }
 
 .content {

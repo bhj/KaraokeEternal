@@ -11,7 +11,7 @@
 
 .title {
   margin: 0;
-  font-size: var(--panel-title-size);
+  font: var(--panel-title-font);
   padding: var(--panel-title-padding);
   background-color: var(--panel-title-bg-color);
 }

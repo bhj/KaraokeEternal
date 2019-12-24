@@ -3,8 +3,9 @@
   --hue-pink: 290;
 
   /* Defaults */
+  --font-family: system-ui, Roboto, Helvetica, Arial, sans-serif;
   --bg-color: #000;
-  --text-color: #ddd;
+  --text-color: hsl(var(--hue-blue), 10%, 87%);
   --link-color: hsl(var(--hue-blue), 92%, 70%);
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
@@ -68,6 +69,7 @@
   --panel-title-bg-color: hsl(var(--hue-blue), 5%, 30%);
   --panel-title-size: 20px;
   --panel-title-padding: 6px;
+  --panel-title-font: normal 20px Raleway;
 
   /* PlaybackCtrl */
   --transport-btn-bg-color: var(--btn-danger-bg-color);

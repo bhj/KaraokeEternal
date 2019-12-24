@@ -1,4 +1,5 @@
 @import './variables.css';
+@import './fonts.css';
 @import './rc-slider.css';
 
 html {
@@ -21,8 +22,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  /* Helvetica Neue Regular Font Stack */
-  font-family: "HelveticaNeue", "Helvetica Neue", "HelveticaNeueRoman", "HelveticaNeue-Roman", "Helvetica Neue Roman", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; font-weight:400; font-stretch:normal;
+  font-family: var(--font-family);
   color: var(--text-color);
 }
 
@@ -113,8 +113,6 @@ button {
   color: var(--btn-default-color);
   cursor: pointer;
   display: inline-block;
-  font-size: 16px;
-  font-weight: lighter;
   padding: 16px;
   width: 100%;
 }
