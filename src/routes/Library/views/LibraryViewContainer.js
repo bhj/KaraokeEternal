@@ -124,7 +124,6 @@ const mapStateToProps = (state) => {
     isSearching: !!getFilterKeywords(state).length || getFilterStarred(state),
     isLoading: state.library.isLoading,
     isEmpty: state.songs.result.length === 0,
-    ui: state.ui,
     // SearchResults view
     songsResult: getSongsByView(state),
     artistsResult: getArtistsByView(state),

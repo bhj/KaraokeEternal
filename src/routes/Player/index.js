@@ -14,7 +14,7 @@ export default (store) => ({
     require.ensure([], (require) => {
       /*  Webpack - use require callback to define
           dependencies for bundling   */
-      const PlayerView = require('./views/PlayerViewContainer').default
+      const PlayerView = require('./views/PlayerView').default
       const playerReducer = require('./modules/player').default
       const playerVisualizerReducer = require('./modules/playerVisualizer').default
 

@@ -1,4 +1,3 @@
-import { CALCULATE_RESPONSIVE_STATE } from 'redux-responsive'
 import {
   HEADER_HEIGHT_CHANGE,
   FOOTER_HEIGHT_CHANGE,
@@ -64,22 +63,13 @@ export function lockScrolling (lock) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [CALCULATE_RESPONSIVE_STATE]: (state, { innerWidth, innerHeight }) => ({
-    ...state,
-    browserWidth: innerWidth,
-    browserHeight: innerHeight,
-    viewportWidth: innerWidth,
-    viewportHeight: innerHeight - state.headerHeight - state.footerHeight,
-  }),
   [HEADER_HEIGHT_CHANGE]: (state, { payload }) => ({
     ...state,
     headerHeight: payload,
-    viewportHeight: state.browserHeight - payload - state.footerHeight,
   }),
   [FOOTER_HEIGHT_CHANGE]: (state, { payload }) => ({
     ...state,
     footerHeight: payload,
-    viewportHeight: state.browserHeight - payload - state.headerHeight,
   }),
   [SHOW_ERROR_MESSAGE]: (state, action) => ({
     ...state,
@@ -95,12 +85,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  browserWidth: 0,
-  browserHeight: 0,
   headerHeight: 0,
   footerHeight: 0,
-  viewportWidth: 0,
-  viewportHeight: 0,
   errorMessage: null,
 }
 

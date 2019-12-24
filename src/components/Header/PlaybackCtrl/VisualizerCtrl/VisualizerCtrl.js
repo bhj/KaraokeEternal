@@ -49,7 +49,6 @@ export default class VisualizerCtrl extends React.Component {
         title='Display'
         dialogStyles={{
           width: '90%',
-          // height: '85%',
           top: '5%',
           left: '5%',
           margin: 0,

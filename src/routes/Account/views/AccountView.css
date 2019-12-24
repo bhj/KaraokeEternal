@@ -1,6 +1,7 @@
 .container {
+  margin: 0 auto;
+  padding: 0 1vw;
   overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  padding: 0 1vw;
 }

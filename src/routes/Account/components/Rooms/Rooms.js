@@ -11,8 +11,7 @@ export default class Rooms extends Component {
     rooms: PropTypes.object.isRequired,
     isEditorOpen: PropTypes.bool.isRequired,
     editingRoom: PropTypes.object,
-    isAdmin: PropTypes.bool.isRequired,
-    width: PropTypes.number,
+    contentWidth: PropTypes.number.isRequired,
     // Actions
     openRoomEditor: PropTypes.func.isRequired,
     closeRoomEditor: PropTypes.func.isRequired,
@@ -37,10 +36,8 @@ export default class Rooms extends Component {
   }
 
   render () {
-    const { rooms, isAdmin, width } = this.props
+    const { rooms, contentWidth } = this.props
     const { showClosed } = this.state
-
-    if (!isAdmin || typeof width === 'undefined') return null
 
     return (
       <div styleName='style.container'>
@@ -55,7 +52,7 @@ export default class Rooms extends Component {
         </div>
         <div styleName='style.content'>
           <Table
-            width={width}
+            width={contentWidth}
             height={rooms.result.filter(i => rooms.entities[i].status === 'open' || showClosed).length * 30 + 20}
             headerHeight={20}
             rowHeight={this.getRowHeight}
@@ -68,7 +65,7 @@ export default class Rooms extends Component {
             <Column
               label='Name'
               dataKey='name'
-              width={width * 0.40}
+              width={contentWidth * 0.40}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => (
                 <a onClick={() => this.props.openRoomEditor(rowData.roomId)}>{rowData.name}</a>
@@ -77,14 +74,14 @@ export default class Rooms extends Component {
             <Column
               label='Status'
               dataKey='status'
-              width={width * 0.20}
+              width={contentWidth * 0.20}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
             />
             <Column
               label='Created'
               dataKey='dateCreated'
-              width={width * 0.40}
+              width={contentWidth * 0.40}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
             />

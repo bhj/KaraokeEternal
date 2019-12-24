@@ -13,8 +13,6 @@ const mapStateToProps = (state) => ({
   rooms: state.rooms,
   isEditorOpen: state.rooms.isEditorOpen,
   editingRoom: state.rooms.entities[state.rooms.editingRoomId],
-  isAdmin: state.user.isAdmin,
-  width: state.ui.viewportWidth,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(Rooms)

@@ -7,25 +7,29 @@ const ROW_HEIGHT = 44
 
 class ArtistList extends React.Component {
   static propTypes = {
+    alphaPickerMap: PropTypes.object.isRequired,
     artists: PropTypes.object.isRequired, // entities
     artistsResult: PropTypes.array.isRequired, // artistIds
-    songs: PropTypes.object.isRequired, // entities
+    expandedArtists: PropTypes.array.isRequired,
+    filterKeywords: PropTypes.array.isRequired,
     queuedSongs: PropTypes.array.isRequired,
+    songs: PropTypes.object.isRequired, // entities
     starredSongs: PropTypes.array.isRequired,
     starredArtistCounts: PropTypes.object.isRequired,
-    expandedArtists: PropTypes.array.isRequired,
-    alphaPickerMap: PropTypes.object.isRequired,
-    filterKeywords: PropTypes.array.isRequired,
     scrollTop: PropTypes.number.isRequired,
-    ui: PropTypes.object.isRequired,
     // actions
     toggleArtistExpanded: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
+    // ui
+    browserWidth: PropTypes.number.isRequired,
+    browserHeight: PropTypes.number.isRequired,
+    headerHeight: PropTypes.number.isRequired,
+    footerHeight: PropTypes.number.isRequired,
   }
 
   render () {
     if (this.props.artistsResult.length === 0) return null
-    const { ui } = this.props
+    const { browserWidth, browserHeight, headerHeight, footerHeight } = this.props
 
     return (
       <div>
@@ -35,18 +39,18 @@ class ArtistList extends React.Component {
           rowRenderer={this.rowRenderer}
           onScroll={this.handleScroll}
           onRef={this.handleRef}
-          paddingTop={ui.headerHeight}
+          paddingTop={headerHeight}
           paddingRight={30} // width of AlphaPicker
-          paddingBottom={ui.footerHeight}
-          width={ui.browserWidth}
-          height={ui.browserHeight}
+          paddingBottom={footerHeight}
+          width={browserWidth}
+          height={browserHeight}
           scrollToAlignment='start'
         />
         <AlphaPicker
           onPick={this.handleAlphaPick}
           onTouch={this.handleAlphaTouch}
-          height={ui.viewportHeight - 20}
-          top={ui.headerHeight + 10}
+          height={browserHeight - headerHeight - footerHeight}
+          top={headerHeight}
         />
       </div>
     )

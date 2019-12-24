@@ -11,7 +11,13 @@ import SongInfo from 'components/SongInfo'
 export const CoreLayout = (props) => {
   return (
     <>
-      {props.children}
+      {React.cloneElement(props.children, {
+        browserWidth: props.browser.width,
+        browserHeight: props.browser.height,
+        contentWidth: props.browser.greaterThan.small ? props.browser.breakpoints.small : props.browser.width,
+        headerHeight: props.ui.headerHeight,
+        footerHeight: props.ui.footerHeight,
+      })}
 
       {props.isLoggedIn &&
         <Navigation/>
@@ -59,10 +65,12 @@ export const CoreLayout = (props) => {
 export default CoreLayout
 
 CoreLayout.propTypes = {
+  browser: PropTypes.object.isRequired,
   children: PropTypes.any,
   errorMessage: PropTypes.any,
   isLoggedIn: PropTypes.bool,
   songInfoId: PropTypes.number,
+  ui: PropTypes.object.isRequired,
   // actions
   clearErrorMessage: PropTypes.func.isRequired,
   closeSongInfo: PropTypes.func.isRequired,

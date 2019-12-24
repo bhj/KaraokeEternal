@@ -7,13 +7,15 @@ import './PlayerView.css'
 
 class PlayerView extends React.Component {
   static propTypes = {
-    ui: PropTypes.object.isRequired,
+    browserWidth: PropTypes.number.isRequired,
+    browserHeight: PropTypes.number.isRequired,
+    headerHeight: PropTypes.number.isRequired,
+    footerHeight: PropTypes.number.isRequired,
   }
 
   render () {
-    const { ui } = this.props
-    const { isFullscreen } = screenfull
-    const height = isFullscreen ? ui.browserHeight : ui.viewportHeight
+    const { browserWidth, browserHeight, headerHeight, footerHeight } = this.props
+    const viewportHeight = browserHeight - headerHeight - footerHeight
 
     return (
       <>
@@ -23,12 +25,15 @@ class PlayerView extends React.Component {
             id='player-fs-container'
             styleName='container'
             style={{
-              top: isFullscreen ? 0 : ui.headerHeight,
-              width: ui.browserWidth,
-              height,
+              top: screenfull.isFullscreen ? 0 : headerHeight,
+              width: browserWidth,
+              height: screenfull.isFullscreen ? browserHeight : viewportHeight,
             }}
           >
-            <PlayerController width={ui.browserWidth} height={height} />
+            <PlayerController
+              width={browserWidth}
+              height={screenfull.isFullscreen ? browserHeight : viewportHeight}
+            />
           </div>
         </div>
       </>

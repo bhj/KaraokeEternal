@@ -10,25 +10,28 @@ import './AccountView.css'
 
 export default class AccountView extends Component {
   static propTypes = {
-    isAdmin: PropTypes.bool,
-    isLoggedIn: PropTypes.bool,
-    ui: PropTypes.object.isRequired,
+    browserHeight: PropTypes.number.isRequired,
+    contentWidth: PropTypes.number.isRequired,
+    headerHeight: PropTypes.number.isRequired,
+    footerHeight: PropTypes.number.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
+    isLoggedIn: PropTypes.bool.isRequired,
   }
 
   render () {
-    const { isAdmin, isLoggedIn, ui } = this.props
+    const { browserHeight, contentWidth, headerHeight, footerHeight, isAdmin, isLoggedIn } = this.props
 
     return (
       <div styleName='container' style={{
-        paddingTop: ui.headerHeight,
-        paddingBottom: ui.footerHeight,
-        width: ui.browserWidth,
-        height: ui.browserHeight,
+        paddingTop: headerHeight,
+        paddingBottom: footerHeight,
+        width: contentWidth,
+        height: browserHeight,
       }}>
         <Header />
 
         {isAdmin &&
-          <Rooms />
+          <Rooms contentWidth={contentWidth}/>
         }
 
         {isAdmin &&

@@ -9,10 +9,10 @@ import './QueueView.css'
 
 const QueueView = (props) => (
   <div styleName='container' style={{
-    paddingTop: props.ui.headerHeight,
-    paddingBottom: props.ui.footerHeight,
-    width: props.ui.browserWidth,
-    height: props.ui.browserHeight,
+    paddingTop: props.headerHeight,
+    paddingBottom: props.footerHeight,
+    width: props.browserWidth,
+    height: props.browserHeight,
   }}>
     <Header />
 
@@ -42,7 +42,11 @@ QueueView.propTypes = {
   isInRoom: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isQueueEmpty: PropTypes.bool.isRequired,
-  ui: PropTypes.object.isRequired,
+  // ui
+  browserWidth: PropTypes.number.isRequired,
+  browserHeight: PropTypes.number.isRequired,
+  headerHeight: PropTypes.number.isRequired,
+  footerHeight: PropTypes.number.isRequired,
 }
 
 export default QueueView

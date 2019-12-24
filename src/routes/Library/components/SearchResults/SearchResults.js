@@ -14,17 +14,21 @@ class SearchResults extends React.Component {
   static propTypes = {
     artists: PropTypes.object.isRequired,
     artistsResult: PropTypes.array.isRequired,
-    songs: PropTypes.object.isRequired,
-    songsResult: PropTypes.array.isRequired,
-    starredSongs: PropTypes.array.isRequired,
-    starredArtistCounts: PropTypes.object.isRequired,
     expandedArtistResults: PropTypes.array.isRequired,
     filterKeywords: PropTypes.array.isRequired,
     filterStarred: PropTypes.bool.isRequired,
     queuedSongs: PropTypes.array.isRequired,
-    ui: PropTypes.object.isRequired,
+    songs: PropTypes.object.isRequired,
+    songsResult: PropTypes.array.isRequired,
+    starredSongs: PropTypes.array.isRequired,
+    starredArtistCounts: PropTypes.object.isRequired,
     // actions
     toggleArtistResultExpanded: PropTypes.func.isRequired,
+    // ui
+    browserWidth: PropTypes.number.isRequired,
+    browserHeight: PropTypes.number.isRequired,
+    headerHeight: PropTypes.number.isRequired,
+    footerHeight: PropTypes.number.isRequired,
   }
 
   componentDidUpdate (prevProps) {
@@ -39,11 +43,11 @@ class SearchResults extends React.Component {
         rowCount={this.props.artistsResult.length + 3} // both headers + SongList
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
-        paddingTop={this.props.ui.headerHeight}
+        paddingTop={this.props.headerHeight}
         paddingRight={10}
-        paddingBottom={this.props.ui.footerHeight}
-        width={this.props.ui.browserWidth}
-        height={this.props.ui.browserHeight}
+        paddingBottom={this.props.footerHeight}
+        width={this.props.browserWidth}
+        height={this.props.browserHeight}
         onRef={this.setRef}
       />
     )
