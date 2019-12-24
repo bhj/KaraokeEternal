@@ -1,7 +1,5 @@
 .rc-slider {
   position: relative;
-  top: -3px;
-  width: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 

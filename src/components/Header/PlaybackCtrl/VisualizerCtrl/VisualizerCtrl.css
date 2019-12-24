@@ -2,10 +2,15 @@
 }
 
 .slider {
+  margin: 0 15px;
 }
 
 .handle {
+  cursor: pointer;
   fill: var(--btn-active-bg-color);
+  position: absolute;
+  top: -15px;
+  touch-action: 'pan-x';
 }
 
 .presetBtnContainer {

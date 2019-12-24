@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { SkyLightStateless } from 'react-skylight'
 import OptimisticSlider from 'components/OptimisticSlider'
-import { Handle } from 'rc-slider'
 import Icon from 'components/Icon'
 import './VisualizerCtrl.css'
 
@@ -115,19 +114,8 @@ export default class VisualizerCtrl extends React.Component {
 }
 
 // volume slider handle/grabber
-const handle = (props) => {
-  const { value, dragging, ...restProps } = props
-
-  const style = Object.assign({ left: `${props.offset}%` }, {
-    position: 'absolute',
-    transform: 'translate(-50%, -42%)',
-    touchAction: 'pan-x',
-  })
-
-  return (
-    <div style={style}>
-      <Icon icon='CIRCLE' size={36} styleName='handle' />
-      <Handle {...restProps} />
-    </div>
-  )
-}
+const handle = (props) => (
+  <Icon icon='CIRCLE' size={36} styleName='handle' style={{
+    left: `calc(${props.offset}% - 18px)`,
+  }}/>
+)

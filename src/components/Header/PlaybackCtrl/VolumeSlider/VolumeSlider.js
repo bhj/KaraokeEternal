@@ -2,7 +2,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import OptimisticSlider from 'components/OptimisticSlider'
-import { Handle } from 'rc-slider'
 import Icon from 'components/Icon'
 import './VolumeSlider.css'
 // depends on styles/global/rc-slider
@@ -30,12 +29,7 @@ export default class VolumeSlider extends React.Component {
 
 // volume slider handle/grabber
 const handle = (props) => {
-  const { value, dragging, ...restProps } = props
-  const style = Object.assign({ left: `${props.offset}%` }, {
-    position: 'absolute',
-    transform: 'translate(-50%, -42%)',
-    touchAction: 'pan-x',
-  })
+  const { value } = props
 
   let icon = 'VOLUME_UP'
   if (value === 0) icon = 'VOLUME_OFF'
@@ -43,9 +37,8 @@ const handle = (props) => {
   else if (value < 0.7) icon = 'VOLUME_DOWN'
 
   return (
-    <div style={style}>
-      <Icon icon={icon} size={42} styleName='icon' />
-      <Handle {...restProps} />
-    </div>
+    <Icon icon={icon} size={42} styleName='handle' style={{
+      left: `calc(${props.offset}% - 18px)`,
+    }}/>
   )
 }

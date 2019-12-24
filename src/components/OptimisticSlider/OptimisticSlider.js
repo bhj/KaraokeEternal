@@ -39,7 +39,6 @@ export default class OptimisticSlider extends React.Component {
 
   render () {
     return (
-    <>
       <Slider
         {...this.props}
         value={this.state.isDragging ? this.state.val : this.props.value}
@@ -47,7 +46,6 @@ export default class OptimisticSlider extends React.Component {
         onBeforeChange={this.handleBeforeChange}
         onAfterChange={this.handleAfterChange}
       />
-    </>
     )
   }
 
