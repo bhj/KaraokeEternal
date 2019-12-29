@@ -14,7 +14,7 @@ export default class About extends React.Component {
           <p styleName='sm'>
             v{__KF_VERSION__}<br/>&copy;{__KF_COPYRIGHT__} {/* eslint-disable-line no-undef */}
           </p>
-          <p><a href='/license_en.txt' target='blank'>View Licenses</a></p>
+          <p><a href='/licenses.txt' target='blank'>View Licenses</a></p>
         </div>
       </div>
     )

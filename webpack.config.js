@@ -61,7 +61,7 @@ const config = {
 if (__PROD__) {
   config.plugins.push(new LicenseWebpackPlugin({
     addBanner: true,
-    outputFilename: 'license_en.txt',
+    outputFilename: 'licenses.txt',
     perChunkOutput: false,
     renderLicenses: (modules) => {
       let txt = ''
