@@ -45,7 +45,7 @@
 
   --song-item-btn-width: 44px;
   --song-item-btn-height: 44px;
-  --song-item-btn-bg-color: hsl(var(--hue-blue), 100%, 12%);
+  --song-item-btn-bg-color: hsl(var(--hue-blue), 100%, 15%);
   --song-item-btn-active-color: #333;
   --song-item-btn-active-bg-color: var(--btn-active-bg-color);
   --song-item-btn-active-filter: var(--btn-active-filter);
