@@ -7,7 +7,7 @@ const api = new HttpApi('media')
 
 class CDGPlayer extends React.Component {
   static propTypes = {
-    bgAlpha: PropTypes.number.isRequired,
+    alpha: PropTypes.number.isRequired,
     queueItem: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     volume: PropTypes.number.isRequired,
@@ -52,14 +52,14 @@ class CDGPlayer extends React.Component {
   }
 
   render () {
-    const { bgAlpha, width, height } = this.props
+    const { alpha, width, height } = this.props
     const style = {
       backgroundColor: 'transparent',
     }
 
     if (this.state.CDGBackgroundColor) {
       const [r, g, b, a] = this.state.CDGBackgroundColor // eslint-disable-line no-unused-vars
-      style.backgroundColor = `rgba(${r},${g},${b},${bgAlpha})`
+      style.backgroundColor = `rgba(${r},${g},${b},${alpha})`
     }
 
     // cd graphics are chunky; scale to a max of 80% viewport height

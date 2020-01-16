@@ -33,7 +33,8 @@ const mapStateToProps = (state) => {
   const queue = ensureState(state.queue)
 
   return {
-    bgAlpha: player.bgAlpha,
+    alpha: player.alpha,
+    isAlphaSupported: player.isAlphaSupported,
     isAtQueueEnd: player.isAtQueueEnd,
     isQueueEmpty: queue.result.length === 0,
     isPlaying: player.isPlaying,

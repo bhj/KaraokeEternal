@@ -4,7 +4,7 @@ import screenfull from 'screenfull'
 import Icon from 'components/Icon'
 import VolumeSlider from './VolumeSlider'
 import NoPlayer from './NoPlayer'
-import VisualizerCtrl from './VisualizerCtrl'
+import DisplayCtrl from './DisplayCtrl'
 import './PlaybackCtrl.css'
 
 export default class PlaybackCtrl extends React.Component {
@@ -24,7 +24,7 @@ export default class PlaybackCtrl extends React.Component {
   }
 
   state = {
-    showVisualizerCtrl: false,
+    isVisible: false,
   }
 
   render () {
@@ -57,7 +57,7 @@ export default class PlaybackCtrl extends React.Component {
           onVolumeChange={props.requestVolume}
         />
 
-        <div onClick={this.toggleVisualizerCtrl} styleName='visualizer'>
+        <div onClick={this.toggleDisplayCtrl} styleName='displayCtrl'>
           <Icon icon='TUNE' size={40}/>
         </div>
 
@@ -67,21 +67,25 @@ export default class PlaybackCtrl extends React.Component {
           </div>
         }
 
-        <VisualizerCtrl
-          {...props.status.visualizer}
-          bgAlpha={props.status.bgAlpha}
-          isVisible={this.state.showVisualizerCtrl}
-          onBackgroundAlphaChange={props.requestBackgroundAlpha}
+        <DisplayCtrl
+          alpha={props.status.alpha}
+          isAlphaSupported={props.status.isAlphaSupported}
+          isVisible={this.state.isVisible}
+          isVisualizerEnabled={props.status.visualizer.isEnabled}
+          isVisualizerSupported={props.status.visualizer.isSupported}
+          visualizerPresetName={props.status.visualizer.presetName}
+          visualizerSensitivity={props.status.visualizer.sensitivity}
+          onAlphaChange={props.requestBackgroundAlpha}
           onChangePreset={props.requestVisualizerPreset}
           onChange={props.requestVisualizer}
-          onClose={this.toggleVisualizerCtrl}
+          onClose={this.toggleDisplayCtrl}
         />
       </div>
     )
   }
 
-  toggleVisualizerCtrl = () => {
-    this.setState({ showVisualizerCtrl: !this.state.showVisualizerCtrl })
+  toggleDisplayCtrl = () => {
+    this.setState({ isVisible: !this.state.isVisible })
   }
 }
 

@@ -8,7 +8,8 @@ window._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 
 class PlayerController extends React.Component {
   static propTypes = {
-    bgAlpha: PropTypes.number.isRequired,
+    alpha: PropTypes.number.isRequired,
+    isAlphaSupported: PropTypes.bool.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isPlayingNext: PropTypes.bool.isRequired,
@@ -122,7 +123,7 @@ class PlayerController extends React.Component {
 
     return (
       <>
-        {state.audioSourceNode && props.visualizer.isSupported && props.visualizer.isEnabled &&
+        {state.audioSourceNode && props.isAlphaSupported && props.visualizer.isSupported && props.visualizer.isEnabled &&
           <PlayerVisualizer
             audioSourceNode={state.audioSourceNode}
             isPlaying={props.isPlaying}
@@ -136,7 +137,7 @@ class PlayerController extends React.Component {
         }
         {queueItem.queueId !== -1 && !props.isErrored && !props.isAtQueueEnd &&
           <Player
-            bgAlpha={props.bgAlpha}
+            alpha={props.alpha}
             queueItem={queueItem}
             volume={props.volume}
             isPlaying={props.isPlaying}

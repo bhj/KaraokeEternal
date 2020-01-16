@@ -1,0 +1,74 @@
+.section {
+  border: 1px solid var(--btn-bg-color);
+  border-radius: var(--border-radius);
+  margin: 1em 0;
+}
+
+.visualizer {
+  composes: section;
+}
+
+.lyrics {
+  composes: section;
+}
+
+.visualizer legend label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.visualizer legend input[type="checkbox"] {
+  margin-right: .25em;
+}
+
+.field {
+  display: block;
+  margin: 1em 0;
+  color: hsl(var(--hue-blue), 10%, 67%);
+}
+
+.lyrics label:first-of-type {
+  margin-top: .5em;
+}
+
+.presetBtnContainer {
+  display: flex;
+  margin: .5em 0;
+  justify-content: space-between;
+}
+
+.btnPreset {
+  width: 30%;
+  display: block;
+  padding: 0;
+  background-color: var(--btn-active-bg-color);
+}
+
+.btnIcon {
+  fill: var(--btn-base-blue);
+}
+
+.section legend label {
+  font-size: 18px;
+  padding: 0 .25em;
+}
+
+.unsupported {
+  text-align: center;
+  margin: 1rem 0;
+  color: grey;
+}
+
+.slider {
+  padding-bottom: 1em;
+  margin: 0 15px;
+}
+
+.handle {
+  cursor: pointer;
+  fill: var(--btn-active-bg-color);
+  position: absolute;
+  top: -15px;
+  touch-action: 'pan-x';
+}

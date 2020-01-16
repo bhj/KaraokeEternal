@@ -22,7 +22,7 @@
   composes: btn;
 }
 
-.visualizer {
+.displayCtrl {
   composes: btn;
   fill: var(--btn-active-bg-color);
   margin-right: var(--btn-margin);

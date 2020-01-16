@@ -25,7 +25,7 @@ export function emitStatus (status) {
     dispatch({
       type: PLAYER_STATUS_REQUEST,
       payload: {
-        bgAlpha: player.bgAlpha,
+        alpha: player.alpha,
         errorMessage: player.errorMessage,
         // string primitive is a hack to pass selector equality check on client side
         historyJSON: JSON.stringify(player.history),
@@ -127,13 +127,17 @@ export function queueEnd () {
 const ACTION_HANDLERS = {
   [PLAYER_BG_ALPHA]: (state, { payload }) => ({
     ...state,
-    bgAlpha: payload,
+    alpha: payload,
   }),
   [PLAYER_ERROR]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
     isErrored: true,
     errorMessage: payload.message,
+  }),
+  [PLAYER_MEDIA_ELEMENT_CHANGE]: (state, { payload }) => ({
+    ...state,
+    isAlphaSupported: payload.isAlphaSupported,
   }),
   [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
     ...state,
@@ -201,10 +205,11 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  bgAlpha: 0.5,
+  alpha: 0.5,
   errorMessage: '',
   history: [], // queueIds
   isAtQueueEnd: false,
+  isAlphaSupported: false,
   isErrored: false,
   isFetching: false,
   isPlaying: false,
