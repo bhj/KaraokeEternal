@@ -8,7 +8,7 @@ export default class About extends React.Component {
       <div styleName='container'>
         <h1 styleName='title'>About</h1>
         <div styleName='content'>
-          <a href={__KF_HOMEPAGE__}> {/* eslint-disable-line no-undef */}
+          <a href={__KF_HOMEPAGE__} target='blank'> {/* eslint-disable-line no-undef */}
             <Logo styleName='logo'/>
           </a>
           <p styleName='sm'>
