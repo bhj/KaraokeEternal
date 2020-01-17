@@ -96,7 +96,7 @@ To start a player, sign in as an admin to the desired room and a notice will app
 
 ## Karaoke Forever Server
 
-The server software hosts the "web" app and your media files on your local network (it is not designed to be run as a service exposed to the Internet). Built on [Node.js 12](https://nodejs.org)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and SQLite, it can run on relatively minimal hardware (Raspberry Pi 3B+).
+The server software hosts the "web" app and your media files on your local network (it is not designed to be run as a service exposed to the Internet). Built on [Node.js](https://nodejs.org)<svg class="icon external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> and [SQLite](https://www.sqlite.org), it can run on relatively minimal hardware (Raspberry Pi 3B+).
 
 ### Installation
 
@@ -116,7 +116,7 @@ The server software hosts the "web" app and your media files on your local netwo
   <p>Beta versions of Karaoke Forever Server are not currently signed, so macOS Gatekeeper and Windows SmartScreen will likely complain. On macOS, <strong>do not disable Gatekeeper</strong>, just right-click <code>Karaoke Forever Server.app</code> in your Applications folder and choose Open.</p>
 </aside>
 
-#### Any OS with Node.js 12
+#### Any OS with Node.js 12+
 
 - Install via ```npm```
 
