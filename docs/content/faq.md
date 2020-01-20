@@ -1,5 +1,8 @@
 ---
 title: F.A.Q.
+sitemap:
+  changefreq: monthly
+  priority: 0.5
 ---
 
 ## Where can I download karaoke songs?
