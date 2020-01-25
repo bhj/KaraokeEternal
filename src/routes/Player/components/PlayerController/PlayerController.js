@@ -4,8 +4,6 @@ import Player from '../Player'
 import PlayerTextOverlay from '../PlayerTextOverlay'
 import PlayerVisualizer from '../PlayerVisualizer'
 
-window._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-
 class PlayerController extends React.Component {
   static propTypes = {
     alpha: PropTypes.number.isRequired,
@@ -38,6 +36,9 @@ class PlayerController extends React.Component {
     audioSourceNode: null,
   }
 
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  audioGainNode = this.audioCtx.createGain()
+
   // simplify player logic; if this reference changes on each
   // render it will cause an infinite loop of status updates
   defaultQueueItem = {
@@ -46,6 +47,7 @@ class PlayerController extends React.Component {
 
   componentDidMount () {
     this.props.emitStatus()
+    this.audioGainNode.gain.setValueAtTime(this.props.volume, this.audioCtx.currentTime)
   }
 
   componentWillUnmount () {
@@ -54,21 +56,26 @@ class PlayerController extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { isPlaying, isPlayingNext, isAtQueueEnd, queueId, visualizer } = this.props
+    const { isPlaying, isPlayingNext, isAtQueueEnd, queueId, visualizer, volume } = this.props
 
     // playing for first time or playing next?
     if (isPlaying && (queueId === -1 || isPlayingNext)) {
       this.handleLoadNext()
     }
 
-    // check if queue is no longer exhausted
+    // queue was exhausted, but is no longer?
     if (isAtQueueEnd && prevProps.queue.result !== this.props.queue.result) {
       this.handleLoadNext()
     }
 
+    // volume changed?
+    if (prevProps.volume !== volume) {
+      this.audioGainNode.gain.setValueAtTime(volume, this.audioCtx.currentTime)
+    }
+
     // may have been suspended by browser if no user interaction yet
     if (prevProps.isPlaying !== isPlaying) {
-      window._audioCtx.resume()
+      this.audioCtx.resume()
       this.props.cancelStatus()
     }
 
@@ -88,9 +95,10 @@ class PlayerController extends React.Component {
   }
 
   handleMediaElement = (el, mediaInfo) => {
-    this.setState({ audioSourceNode: window._audioCtx.createMediaElementSource(el) }, () => {
-      // route it back to the output, otherwise, silence
-      this.state.audioSourceNode.connect(window._audioCtx.destination)
+    this.setState({ audioSourceNode: this.audioCtx.createMediaElementSource(el) }, () => {
+      const sourceNodeCopy = this.state.audioSourceNode
+      sourceNodeCopy.connect(this.audioGainNode)
+      this.audioGainNode.connect(this.audioCtx.destination)
     })
 
     // isAlphaSupported, etc.
@@ -139,7 +147,6 @@ class PlayerController extends React.Component {
           <Player
             alpha={props.alpha}
             queueItem={queueItem}
-            volume={props.volume}
             isPlaying={props.isPlaying}
             onMediaElement={this.handleMediaElement}
             onMediaRequest={props.mediaRequest}

@@ -10,7 +10,6 @@ class CDGPlayer extends React.Component {
     alpha: PropTypes.number.isRequired,
     queueItem: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
-    volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
@@ -32,23 +31,18 @@ class CDGPlayer extends React.Component {
       onBackgroundChange: this.handleCDGBackgroundChange,
     })
 
-    this.setVolume(this.props.volume)
     this.props.onMediaElement(this.audio.current, { isAlphaSupported: true })
     this.updateSources()
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, isPlaying, volume } = this.props
-
-    if (prevProps.queueItem.queueId !== queueItem.queueId) {
+    if (prevProps.queueItem.queueId !== this.props.queueItem.queueId) {
       this.updateSources()
     }
 
-    if (prevProps.isPlaying !== isPlaying) {
+    if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
     }
-
-    this.setVolume(volume)
   }
 
   render () {
@@ -110,10 +104,6 @@ class CDGPlayer extends React.Component {
       })
   }
 
-  setVolume = (vol) => {
-    this.audio.current.volume = vol
-  }
-
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
       const promise = this.audio.current.play()
@@ -139,7 +129,6 @@ class CDGPlayer extends React.Component {
   /**
  * <audio> event handlers
  */
-
   handleAudioTimeUpdate = () => {
     this.cdg.sync(this.audio.current.currentTime * 1000)
 

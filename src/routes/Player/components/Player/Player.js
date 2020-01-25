@@ -11,7 +11,6 @@ const players = {
 class Player extends React.Component {
   static propTypes = {
     queueItem: PropTypes.object.isRequired,
-    volume: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,

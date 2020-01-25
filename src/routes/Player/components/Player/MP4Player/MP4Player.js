@@ -6,7 +6,6 @@ class MP4Player extends React.Component {
   static propTypes = {
     isPlaying: PropTypes.bool.isRequired,
     queueItem: PropTypes.object.isRequired,
-    volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
@@ -22,22 +21,17 @@ class MP4Player extends React.Component {
 
   componentDidMount () {
     this.props.onMediaElement(this.video.current, { isAlphaSupported: false })
-    this.setVolume(this.props.volume)
     this.updateSources()
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, isPlaying, volume } = this.props
-
-    if (prevProps.queueItem.queueId !== queueItem.queueId) {
+    if (prevProps.queueItem.queueId !== this.props.queueItem.queueId) {
       this.updateSources()
     }
 
-    if (prevProps.isPlaying !== isPlaying) {
+    if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
     }
-
-    this.setVolume(volume)
   }
 
   render () {
@@ -65,10 +59,6 @@ class MP4Player extends React.Component {
     this.props.onMediaRequest({ ...this.props.queueItem, src })
     this.video.current.src = src
     this.video.current.load()
-  }
-
-  setVolume = (vol) => {
-    this.video.current.volume = vol
   }
 
   updateIsPlaying = () => {
