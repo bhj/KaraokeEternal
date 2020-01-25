@@ -26,6 +26,7 @@ export function emitStatus (status) {
       type: PLAYER_STATUS_REQUEST,
       payload: {
         alpha: player.alpha,
+        isAlphaSupported: player.isAlphaSupported,
         errorMessage: player.errorMessage,
         // string primitive is a hack to pass selector equality check on client side
         historyJSON: JSON.stringify(player.history),
