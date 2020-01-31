@@ -1,5 +1,5 @@
 const path = require('path')
-const log = require('../../lib/logger')('FileScanner:getConfig')
+const log = require('../../lib/logger')('FileScanner')
 const fs = require('fs')
 const { NodeVM } = require('vm2')
 const KF_CONFIG = '_kfconfig.js'
@@ -12,7 +12,7 @@ function getConfig (dir, baseDir) {
 
   try {
     const userScript = fs.readFileSync(cfgPath, 'utf-8')
-    log.info('Found config: %s', cfgPath)
+    log.info('  => using config: %s', cfgPath)
 
     try {
       const vm = new NodeVM({ wrapper: 'none' })
@@ -21,7 +21,7 @@ function getConfig (dir, baseDir) {
       log.error(err)
     }
   } catch (err) {
-    log.info(`No ${KF_CONFIG} found in ${dir}`)
+    log.info(`  => no config in ${dir}`)
   }
 
   if (dir === baseDir) {
