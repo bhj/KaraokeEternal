@@ -58,12 +58,12 @@ class FileScanner extends Scanner {
         log.info('[%s/%s] %s', count, total, item.file)
         this.emitStatus(`Scanning media (${count} of ${total})`, (count / total) * 100)
 
-        // (re)init parser with this folder's config, if any
         const dir = path.dirname(item.file)
 
         if (lastDir !== dir) {
           lastDir = dir
 
+          // (re)init parser with this folder's config, if any
           const cfg = getConfig(dir, this.paths.entities[pathId].path)
           this.parser = new MetaParser(cfg)
         }
@@ -71,11 +71,8 @@ class FileScanner extends Scanner {
         // process file
         try {
           const mediaId = await this.process(item, pathId)
-
-          // success
-          validMedia.push(mediaId)
+          validMedia.push(mediaId) // success
         } catch (err) {
-          // try next file
           log.warn(err.message + ': ' + item.file)
         }
 
@@ -91,7 +88,6 @@ class FileScanner extends Scanner {
   }
 
   async process (item, pathId) {
-    const pathInfo = path.parse(item.file)
     const tags = await musicMeta.parseFile(item.file, {
       duration: true,
       skipCovers: true,
@@ -106,7 +102,8 @@ class FileScanner extends Scanner {
       Math.round(tags.format.duration % 60, 10).toString().padStart(2, '0')
     )
 
-    // run parser
+    // run MetaParser
+    const pathInfo = path.parse(item.file)
     const parsed = this.parser({
       dir: pathInfo.dir,
       dirSep: path.sep,
@@ -125,13 +122,13 @@ class FileScanner extends Scanner {
       duration: Math.round(tags.format.duration),
     }
 
-    // need to look for .cdg if not dealing with a video
+    // need to look for .cdg if this is an audio-only file
     if (!/\.mp4/i.test(path.extname(item.file))) {
       if (!await getCdgName(item.file)) {
-        throw new Error('No accompanying .cdg for audio-only file')
+        throw new Error('  => no .cdg sidecar found; skipping')
       }
 
-      log.info('  => found .cdg file')
+      log.info('  => found .cdg sidecar')
     }
 
     // file already in database?
