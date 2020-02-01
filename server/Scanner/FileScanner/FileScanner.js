@@ -120,6 +120,8 @@ class FileScanner extends Scanner {
       // normalize relPath to forward slashes with no leading slash
       relPath: item.file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
       duration: Math.round(tags.format.duration),
+      rgTrackGain: tags.common.replaygain_track_gain ? tags.common.replaygain_track_gain.dB : null,
+      rgTrackPeak: tags.common.replaygain_track_peak ? tags.common.replaygain_track_peak.ratio : null,
     }
 
     // need to look for .cdg if this is an audio-only file
