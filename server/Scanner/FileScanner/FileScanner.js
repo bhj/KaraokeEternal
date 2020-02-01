@@ -143,18 +143,21 @@ class FileScanner extends Scanner {
 
     if (res.result.length) {
       const row = res.entities[res.result[0]]
+      const diff = {}
 
-      // did songId, player or duration change?
-      if (row.songId !== media.songId ||
-          row.duration !== media.duration) {
-        log.info('  => updated: %s', JSON.stringify(match))
+      // did anything change?
+      Object.keys(media).forEach(key => {
+        if (media[key] !== row[key]) diff[key] = media[key]
+      })
 
+      if (Object.keys(diff).length) {
         await IPCMedia.update({
           mediaId: row.mediaId,
-          songId: media.songId,
-          duration: media.duration,
           dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
+          ...diff,
         })
+
+        log.info('  => updated: %s', Object.keys(diff).join(', '))
       } else {
         log.info('  => ok')
       }
