@@ -137,7 +137,6 @@ class PlayerController extends React.Component {
             isPlaying={props.isPlaying}
             presetKey={props.visualizer.presetKey}
             queueItem={queueItem}
-            sensitivity={props.visualizer.sensitivity}
             width={props.width}
             height={props.height}
             volume={props.volume}

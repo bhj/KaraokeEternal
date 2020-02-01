@@ -74,7 +74,6 @@ export default class PlaybackCtrl extends React.Component {
           isVisualizerEnabled={props.status.visualizer.isEnabled}
           isVisualizerSupported={props.status.visualizer.isSupported}
           visualizerPresetName={props.status.visualizer.presetName}
-          visualizerSensitivity={props.status.visualizer.sensitivity}
           onAlphaChange={props.requestBackgroundAlpha}
           onChangePreset={props.requestVisualizerPreset}
           onChange={props.requestVisualizer}

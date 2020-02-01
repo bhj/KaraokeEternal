@@ -9,7 +9,6 @@ class PlayerVisualizer extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     presetKey: PropTypes.string.isRequired,
     queueItem: PropTypes.object,
-    sensitivity: PropTypes.number.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,

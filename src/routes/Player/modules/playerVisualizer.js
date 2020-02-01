@@ -47,7 +47,6 @@ const initialState = {
   isEnabled: true,
   isSupported: getWebGLSupport(),
   ...getRandomPreset(),
-  sensitivity: 1,
 }
 
 export default function playerVisualizer (state = initialState, action) {

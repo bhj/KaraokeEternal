@@ -13,7 +13,6 @@ export default class DisplayCtrl extends React.Component {
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isVisualizerSupported: PropTypes.bool.isRequired,
     visualizerPresetName: PropTypes.string.isRequired,
-    visualizerSensitivity: PropTypes.number.isRequired,
     // actions
     onAlphaChange: PropTypes.func.isRequired,
     onChangePreset: PropTypes.func.isRequired,
@@ -30,11 +29,6 @@ export default class DisplayCtrl extends React.Component {
   handlePresetNext = () => { this.props.onChangePreset('next') }
   handlePresetPrev = () => { this.props.onChangePreset('prev') }
   handlePresetRand = () => { this.props.onChangePreset('rand') }
-
-  handleChangeSensitivity = val => {
-    this.props.onChange({ sensitivity: val })
-  }
-
   handleAlpha = val => {
     this.props.onAlphaChange(val)
   }
@@ -83,17 +77,6 @@ export default class DisplayCtrl extends React.Component {
               </div>
 
               <label>{this.props.visualizerPresetName}</label>
-
-              <label styleName='field'>Sensitivity</label>
-              <OptimisticSlider
-                min={0}
-                max={1}
-                step={0.01}
-                value={this.props.visualizerSensitivity}
-                onChange={this.handleChangeSensitivity}
-                handle={handle}
-                styleName='slider'
-              />
             </>
             }
 
