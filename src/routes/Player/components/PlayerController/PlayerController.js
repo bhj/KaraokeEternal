@@ -13,7 +13,7 @@ class PlayerController extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     isPlayingNext: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
-    isRGEnabled: PropTypes.bool.isRequired,
+    isReplayGainEnabled: PropTypes.bool.isRequired,
     queue: PropTypes.object.isRequired,
     queueId: PropTypes.number.isRequired,
     rgTrackGain: PropTypes.number,
@@ -59,38 +59,41 @@ class PlayerController extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { isPlaying, isPlayingNext, isAtQueueEnd, queueId, visualizer, volume, rgTrackGain, rgTrackPeak } = this.props
+    const { props } = this
 
     // playing for first time or playing next?
-    if (isPlaying && (queueId === -1 || isPlayingNext)) {
+    if (props.isPlaying && (props.queueId === -1 || props.isPlayingNext)) {
       this.handleLoadNext()
     }
 
     // queue was exhausted, but is no longer?
-    if (isAtQueueEnd && prevProps.queue.result !== this.props.queue.result) {
+    if (props.isAtQueueEnd && prevProps.queue.result !== props.queue.result) {
       this.handleLoadNext()
     }
 
     // volume or replaygain params changed?
-    if (prevProps.volume !== volume || prevProps.rgTrackGain !== rgTrackGain || prevProps.rgTrackPeak !== rgTrackPeak) {
+    if (prevProps.volume !== props.volume ||
+        prevProps.rgTrackGain !== props.rgTrackGain ||
+        prevProps.rgTrackPeak !== props.rgTrackPeak ||
+        prevProps.isReplayGainEnabled !== props.isReplayGainEnabled) {
       this.updateVolume()
     }
 
     // may have been suspended by browser if no user interaction yet
-    if (prevProps.isPlaying !== isPlaying) {
+    if (prevProps.isPlaying !== props.isPlaying) {
       this.audioCtx.resume()
       this.props.cancelStatus()
     }
 
     // improve client ui responsiveness
-    if (prevProps.queueId !== queueId) {
+    if (prevProps.queueId !== props.queueId) {
       this.props.cancelStatus()
       this.props.emitStatus({ position: 0 })
       return
     }
 
     // improve client ui responsiveness
-    if (prevProps.visualizer.isEnabled !== visualizer.isEnabled) {
+    if (prevProps.visualizer.isEnabled !== props.visualizer.isEnabled) {
       this.props.cancelStatus()
     }
 
