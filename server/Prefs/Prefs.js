@@ -17,6 +17,7 @@ class Prefs {
     {
       const query = sql`
         SELECT * FROM prefs
+        WHERE key != "jwtKey"
       `
       const rows = await db.all(String(query), query.parameters)
 
