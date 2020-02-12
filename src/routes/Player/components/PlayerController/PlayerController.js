@@ -8,13 +8,16 @@ class PlayerController extends React.Component {
   static propTypes = {
     alpha: PropTypes.number.isRequired,
     isAlphaSupported: PropTypes.bool.isRequired,
-    isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
+    isErrored: PropTypes.bool.isRequired,
+    isPlaying: PropTypes.bool.isRequired,
     isPlayingNext: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
-    isErrored: PropTypes.bool.isRequired,
+    isRGEnabled: PropTypes.bool.isRequired,
     queue: PropTypes.object.isRequired,
     queueId: PropTypes.number.isRequired,
+    rgTrackGain: PropTypes.number,
+    rgTrackPeak: PropTypes.number,
     visualizer: PropTypes.object.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
@@ -56,7 +59,7 @@ class PlayerController extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { isPlaying, isPlayingNext, isAtQueueEnd, queueId, visualizer, volume } = this.props
+    const { isPlaying, isPlayingNext, isAtQueueEnd, queueId, visualizer, volume, rgTrackGain, rgTrackPeak } = this.props
 
     // playing for first time or playing next?
     if (isPlaying && (queueId === -1 || isPlayingNext)) {
@@ -68,9 +71,9 @@ class PlayerController extends React.Component {
       this.handleLoadNext()
     }
 
-    // volume changed?
-    if (prevProps.volume !== volume) {
-      this.audioGainNode.gain.setValueAtTime(volume, this.audioCtx.currentTime)
+    // volume or replaygain params changed?
+    if (prevProps.volume !== volume || prevProps.rgTrackGain !== rgTrackGain || prevProps.rgTrackPeak !== rgTrackPeak) {
+      this.updateVolume()
     }
 
     // may have been suspended by browser if no user interaction yet
@@ -122,7 +125,15 @@ class PlayerController extends React.Component {
       return
     }
 
-    this.props.loadQueueItem(this.props.queue.result[curIdx + 1])
+    this.props.loadQueueItem(this.props.queue.entities[this.props.queue.result[curIdx + 1]])
+  }
+
+  updateVolume = () => {
+    const gainDb = this.props.rgTrackGain
+    const peakDb = 10 * Math.log10(this.props.rgTrackPeak) // ratio to dB
+    const safeGainDb = (gainDb + peakDb >= 0) ? -0.01 - peakDb : gainDb
+
+    this.audioGainNode.gain.setValueAtTime(this.props.volume * Math.pow(10, safeGainDb / 10), this.audioCtx.currentTime)
   }
 
   render () {

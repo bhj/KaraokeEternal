@@ -43,6 +43,8 @@ const mapStateToProps = (state) => {
     isErrored: player.isErrored,
     queue: getOrderedQueue(state),
     queueId: player.queueId,
+    rgTrackGain: player.rgTrackGain,
+    rgTrackPeak: player.rgTrackPeak,
     volume: player.volume,
     visualizer: playerVisualizer,
     // timestamp pass-through triggers status emission for each received command

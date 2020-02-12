@@ -1,3 +1,6 @@
+- (app) WebAudio support is now required for browsers running the player
+- (app) Removed visualizer sensitivity control
+
 ## v0.7.4 (2019-12-30)
 
 - Initial release on [npm](https://www.npmjs.com/package/karaoke-forever)

@@ -2,7 +2,6 @@ import { CANCEL } from 'redux-throttle'
 import {
   PLAYER_BG_ALPHA,
   PLAYER_ERROR,
-  PLAYER_QUEUE_LOAD,
   PLAYER_LEAVE_REQUEST,
   PLAYER_MEDIA_ELEMENT_CHANGE,
   PLAYER_MEDIA_REQUEST,
@@ -11,6 +10,7 @@ import {
   PLAYER_NEXT,
   PLAYER_PAUSE,
   PLAYER_PLAY,
+  PLAYER_QUEUE_LOAD,
   PLAYER_QUEUE_END,
   PLAYER_STATUS_REQUEST,
   PLAYER_VOLUME,
@@ -74,12 +74,10 @@ export function cancelStatus () {
 }
 
 // sets new queueId and adds previous to history
-export function loadQueueItem (queueId) {
+export function loadQueueItem (queueItem) {
   return {
     type: PLAYER_QUEUE_LOAD,
-    payload: {
-      queueId,
-    }
+    payload: queueItem,
   }
 }
 
@@ -188,6 +186,8 @@ const ACTION_HANDLERS = {
       isAtQueueEnd: false,
       isPlayingNext: false,
       queueId: payload.queueId,
+      rgTrackGain: payload.rgTrackGain,
+      rgTrackPeak: payload.rgTrackPeak,
     }
   },
   [PLAYER_STATUS_REQUEST]: (state, { payload }) => ({
@@ -217,6 +217,8 @@ const initialState = {
   lastCommandAt: null,
   position: 0,
   queueId: -1,
+  rgTrackGain: null,
+  rgTrackPeak: null,
   volume: 1,
 }
 
