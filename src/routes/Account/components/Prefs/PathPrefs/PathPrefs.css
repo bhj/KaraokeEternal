@@ -1,19 +1,41 @@
 .container {
   background-color: var(--panel-title-bg-color);
   border-radius: var(--border-radius);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  padding: 3px 3px 0 5px;
   cursor: pointer;
+}
+
+.title {
+  flex: 1;
+  margin-left: 5px;
 }
 
 .content {
   padding: var(--container-padding);
 }
 
-.title {
-  display: flex;
-  align-items: center;
-  padding: 3px 0;
-}
-
 .icon {
   fill: var(--text-color);
+}
+
+.pathItem {
+  display: flex;
+  align-items: center;
+  background-color: var(--panel-bg-color);
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: var(--border-radius);
+}
+
+.pathName {
+  flex: 1;
+}
+
+.btnClear {
+  fill: var(--btn-danger-bg-color);
 }

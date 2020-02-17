@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import PathItem from '../PathItem'
+import PathItem from './PathItem'
 import { SkyLightStateless } from 'react-skylight'
 import HttpApi from 'lib/HttpApi'
 import './PathChooser.css'
