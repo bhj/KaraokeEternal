@@ -20,7 +20,7 @@ const Header = (props) => {
           <PlaybackCtrl />
         }
 
-        {isAdmin && props.isUpdating &&
+        {isAdmin && props.isScanning &&
           <ProgressBar
             text={props.updateText}
             progress={props.updateProgress}
@@ -42,7 +42,7 @@ Header.propTypes = {
   isUpNext: PropTypes.bool.isRequired,
   isUpNow: PropTypes.bool.isRequired,
   wait: PropTypes.number,
-  isUpdating: PropTypes.bool.isRequired,
+  isScanning: PropTypes.bool.isRequired,
   updateText: PropTypes.string.isRequired,
   updateProgress: PropTypes.number.isRequired,
   // actions
