@@ -3,7 +3,7 @@
   --hue-pink: 290;
 
   /* Defaults */
-  --font-family: system-ui, Roboto, Helvetica, Arial, sans-serif;
+  --font-family: Raleway, system-ui, Roboto, Helvetica, Arial, sans-serif;
   --bg-color: #000;
   --text-color: hsl(var(--hue-blue), 10%, 87%);
   --link-color: hsl(var(--hue-blue), 92%, 70%);
