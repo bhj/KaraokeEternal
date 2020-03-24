@@ -69,7 +69,8 @@
   --panel-title-bg-color: hsl(var(--hue-blue), 5%, 30%);
   --panel-title-size: 20px;
   --panel-title-padding: 6px;
-  --panel-title-font: normal 20px Raleway;
+  --panel-title-font: 200 20px Raleway;
+  --prefs-heading-font: 16px Raleway;
 
   /* PlaybackCtrl */
   --transport-btn-bg-color: var(--btn-danger-bg-color);

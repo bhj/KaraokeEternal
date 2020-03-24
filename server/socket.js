@@ -4,10 +4,10 @@ const jwtVerify = require('jsonwebtoken').verify
 const LibrarySocket = require('./Library/socket')
 const QueueSocket = require('./Queue/socket')
 const PlayerSocket = require('./Player/socket')
+const PrefsSocket = require('./Prefs/socket')
 const Library = require('./Library')
 const Queue = require('./Queue')
 const parseCookie = require('./lib/parseCookie')
-
 const {
   LIBRARY_PUSH,
   QUEUE_PUSH,
@@ -23,6 +23,7 @@ const handlers = {
   ...LibrarySocket,
   ...QueueSocket,
   ...PlayerSocket,
+  ...PrefsSocket,
 }
 
 module.exports = function (io, jwtKey) {
@@ -31,9 +32,10 @@ module.exports = function (io, jwtKey) {
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
     const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
 
-    // decode JWT in cookie sent with socket handshake
+    // authenticate the JWT sent via cookie in http handshake
     try {
       sock.user = jwtVerify(kfToken, jwtKey)
+      log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)
     } catch (err) {
       io.to(sock.id).emit('action', {
         type: SOCKET_AUTH_ERROR,
@@ -42,12 +44,7 @@ module.exports = function (io, jwtKey) {
       sock.user = null
       sock.disconnect()
       log.info('disconnected %s (%s)', sock.handshake.address, err.message)
-      return
     }
-
-    log.verbose('%s (%s) connected from %s',
-      sock.user.name, sock.id, sock.handshake.address
-    )
 
     // attach disconnect handler
     sock.on('disconnect', reason => {

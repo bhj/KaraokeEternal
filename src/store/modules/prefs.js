@@ -1,7 +1,8 @@
 import {
   PREFS_REQUEST,
-  PREFS_SET,
   PREFS_RECEIVE,
+  PREFS_SET,
+  PREFS_PUSH,
   PREFS_REQUEST_SCAN,
   PREFS_REQUEST_SCAN_CANCEL,
   SCANNER_WORKER_STATUS,
@@ -13,29 +14,10 @@ import { logout } from './user'
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('prefs')
 
-// ------------------------------------
-// Set prefs
-// ------------------------------------
-export function setPrefs (domain, data) {
-  return (dispatch, getState) => {
-    // informational
-    dispatch({
-      type: PREFS_SET,
-      payload: { domain, data },
-    })
-
-    return api('PUT', `?domain=${encodeURIComponent(domain)}`, {
-      body: data
-    })
-      .then(prefs => {
-        dispatch(receivePrefs(prefs))
-      })
-      .catch(err => {
-        dispatch({
-          type: PREFS_SET + _ERROR,
-          error: err.message,
-        })
-      })
+export function setPref (key, data) {
+  return {
+    type: PREFS_SET,
+    payload: { key, data },
   }
 }
 
@@ -122,7 +104,10 @@ export function requestScanCancel () {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [PREFS_RECEIVE]: (state, { payload }) => ({
-    // not all domains may be returned
+    ...state,
+    ...payload,
+  }),
+  [PREFS_PUSH]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),
@@ -143,6 +128,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   isUpdating: false,
+  isReplayGainEnabled: false,
   updateText: '',
   updateProgress: 0,
   paths: { result: [], entities: {} }

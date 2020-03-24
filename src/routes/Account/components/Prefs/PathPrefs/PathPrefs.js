@@ -70,7 +70,7 @@ export default class PathPrefs extends React.Component {
           <Icon icon='FOLDER_MUSIC' size={28} styleName='icon' />
           <div styleName='title'>Media Folders</div>
           <div>
-            <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_LEFT'} size={24} styleName='icon' />
+            <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} styleName='icon' />
           </div>
         </div>
 

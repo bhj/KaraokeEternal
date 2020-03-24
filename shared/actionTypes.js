@@ -64,13 +64,11 @@ module.exports = {
   STAR_SONG: 'server/STAR_SONG',
   UNSTAR_SONG: 'server/UNSTAR_SONG',
   STARS_PUSH: 'user/STARS_PUSH',
-  // misc
-  _SUCCESS: '_SUCCESS',
-  _ERROR: '_ERROR',
   // prefs
   PREFS_REQUEST: 'prefs/REQUEST',
-  PREFS_SET: 'prefs/SET',
+  PREFS_SET: 'server/PREFS_SET',
   PREFS_RECEIVE: 'prefs/RECEIVE',
+  PREFS_PUSH: 'prefs/PREFS_PUSH',
   PREFS_REQUEST_SCAN: 'prefs/REQUEST_SCAN',
   PREFS_REQUEST_SCAN_CANCEL: 'prefs/REQUEST_SCAN_CANCEL',
   // ui
@@ -92,4 +90,7 @@ module.exports = {
   MEDIA_CLEANUP: 'scannerWorker/MEDIA_CLEANUP',
   MEDIA_REMOVE: 'scannerWorker/MEDIA_REMOVE',
   MEDIA_UPDATE: 'scannerWorker/MEDIA_UPDATE',
+  // misc
+  _SUCCESS: '_SUCCESS',
+  _ERROR: '_ERROR',
 }
