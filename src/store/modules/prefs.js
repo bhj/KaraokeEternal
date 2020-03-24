@@ -128,13 +128,13 @@ const ACTION_HANDLERS = {
   }),
   [SCANNER_WORKER_STATUS]: (state, { payload }) => ({
     ...state,
-    isUpdating: true,
+    isScanning: true,
     updateText: payload.text,
     updateProgress: payload.progress,
   }),
   [SCANNER_WORKER_DONE]: (state, { payload }) => ({
     ...state,
-    isUpdating: false,
+    isScanning: false,
   }),
 }
 
@@ -142,10 +142,10 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  isUpdating: false,
+  isScanning: false,
   updateText: '',
   updateProgress: 0,
-  paths: { result: [], entities: {} }
+  paths: { result: [], entities: {} },
 }
 
 export default function prefsReducer (state = initialState, action) {

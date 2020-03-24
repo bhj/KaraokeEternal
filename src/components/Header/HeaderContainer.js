@@ -53,7 +53,7 @@ const mapStateToProps = (state) => {
     isAdmin: state.user.isAdmin,
     isPlayer: state.location.pathname === '/player',
     isPlayerPresent: state.status.isPlayerPresent,
-    isUpdating: state.prefs.isUpdating,
+    isScanning: state.prefs.isScanning,
     updateText: state.prefs.updateText,
     updateProgress: state.prefs.updateProgress,
   }
