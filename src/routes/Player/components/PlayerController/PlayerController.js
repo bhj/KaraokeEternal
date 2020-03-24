@@ -132,11 +132,17 @@ class PlayerController extends React.Component {
   }
 
   updateVolume = () => {
-    const gainDb = this.props.rgTrackGain
-    const peakDb = 10 * Math.log10(this.props.rgTrackPeak) // ratio to dB
-    const safeGainDb = (gainDb + peakDb >= 0) ? -0.01 - peakDb : gainDb
+    let vol = this.props.volume
 
-    this.audioGainNode.gain.setValueAtTime(this.props.volume * Math.pow(10, safeGainDb / 10), this.audioCtx.currentTime)
+    if (this.props.isReplayGainEnabled) {
+      const gainDb = this.props.rgTrackGain
+      const peakDb = 10 * Math.log10(this.props.rgTrackPeak) // ratio to dB
+      const safeGainDb = (gainDb + peakDb >= 0) ? -0.01 - peakDb : gainDb
+
+      vol = vol * Math.pow(10, safeGainDb / 10) // dB to ratio
+    }
+
+    this.audioGainNode.gain.setValueAtTime(vol, this.audioCtx.currentTime)
   }
 
   render () {
