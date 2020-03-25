@@ -28,7 +28,7 @@ export default class AccountForm extends Component {
 
     return (
       <form styleName='container'>
-        <input type='text'
+        <input type='email'
           autoComplete='off'
           autoFocus={!isUser}
           onChange={this.updateVisible}
