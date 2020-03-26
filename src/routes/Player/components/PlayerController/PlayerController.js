@@ -156,7 +156,6 @@ class PlayerController extends React.Component {
             audioSourceNode={state.audioSourceNode}
             isPlaying={props.isPlaying}
             presetKey={props.visualizer.presetKey}
-            queueItem={queueItem}
             width={props.width}
             height={props.height}
             volume={props.volume}

@@ -8,7 +8,6 @@ class PlayerVisualizer extends React.Component {
     audioSourceNode: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     presetKey: PropTypes.string.isRequired,
-    queueItem: PropTypes.object,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
