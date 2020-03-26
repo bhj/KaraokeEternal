@@ -29,17 +29,18 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => {
-  const { player, playerVisualizer } = state
+  const { player, playerVisualizer, prefs } = state
   const queue = ensureState(state.queue)
 
   return {
     alpha: player.alpha,
     isAlphaSupported: player.isAlphaSupported,
     isAtQueueEnd: player.isAtQueueEnd,
+    isFetching: player.isFetching,
     isQueueEmpty: queue.result.length === 0,
     isPlaying: player.isPlaying,
     isPlayingNext: player.isPlayingNext,
-    isFetching: player.isFetching,
+    isReplayGainEnabled: prefs.isReplayGainEnabled,
     isErrored: player.isErrored,
     queue: getOrderedQueue(state),
     queueId: player.queueId,
