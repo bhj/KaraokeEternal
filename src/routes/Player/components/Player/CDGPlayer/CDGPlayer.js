@@ -8,12 +8,12 @@ const api = new HttpApi('media')
 class CDGPlayer extends React.Component {
   static propTypes = {
     alpha: PropTypes.number.isRequired,
-    queueItem: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
+    queueItem: PropTypes.object.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+    onAudioElement: PropTypes.func.isRequired,
     // actions
-    onMediaElement: PropTypes.func.isRequired,
     onMediaRequest: PropTypes.func.isRequired,
     onMediaRequestSuccess: PropTypes.func.isRequired,
     onMediaRequestError: PropTypes.func.isRequired,
@@ -31,7 +31,7 @@ class CDGPlayer extends React.Component {
       onBackgroundChange: this.handleCDGBackgroundChange,
     })
 
-    this.props.onMediaElement(this.audio.current, { isAlphaSupported: true })
+    this.props.onAudioElement(this.audio.current)
     this.updateSources()
   }
 
@@ -83,6 +83,8 @@ class CDGPlayer extends React.Component {
 
   updateSources = () => {
     const { mediaId } = this.props.queueItem
+
+    this.props.onStatus({ isAlphaSupported: true, position: 0 }, true)
 
     // media request(s) started
     this.props.onMediaRequest({ ...this.props.queueItem })

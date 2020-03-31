@@ -27,7 +27,6 @@ class PlayerController extends React.Component {
     emitLeave: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
     loadQueueItem: PropTypes.func.isRequired,
-    mediaElementChange: PropTypes.func.isRequired,
     mediaRequest: PropTypes.func.isRequired,
     mediaRequestSuccess: PropTypes.func.isRequired,
     mediaRequestError: PropTypes.func.isRequired,
@@ -39,9 +38,6 @@ class PlayerController extends React.Component {
     audioSourceNode: null,
   }
 
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-  audioGainNode = this.audioCtx.createGain()
-
   // simplify player logic; if this reference changes on each
   // render it will cause an infinite loop of status updates
   defaultQueueItem = {
@@ -50,7 +46,6 @@ class PlayerController extends React.Component {
 
   componentDidMount () {
     this.props.emitStatus()
-    this.audioGainNode.gain.setValueAtTime(this.props.volume, this.audioCtx.currentTime)
   }
 
   componentWillUnmount () {
@@ -70,45 +65,10 @@ class PlayerController extends React.Component {
     if (props.isAtQueueEnd && prevProps.queue.result !== props.queue.result) {
       this.handleLoadNext()
     }
-
-    // volume or replaygain params changed?
-    if (prevProps.volume !== props.volume ||
-        prevProps.rgTrackGain !== props.rgTrackGain ||
-        prevProps.rgTrackPeak !== props.rgTrackPeak ||
-        prevProps.isReplayGainEnabled !== props.isReplayGainEnabled) {
-      this.updateVolume()
-    }
-
-    // may have been suspended by browser if no user interaction yet
-    if (prevProps.isPlaying !== props.isPlaying) {
-      this.audioCtx.resume()
-      this.props.cancelStatus()
-    }
-
-    // improve client ui responsiveness
-    if (prevProps.queueId !== props.queueId) {
-      this.props.cancelStatus()
-      this.props.emitStatus({ position: 0 })
-      return
-    }
-
-    // improve client ui responsiveness
-    if (prevProps.visualizer.isEnabled !== props.visualizer.isEnabled) {
-      this.props.cancelStatus()
-    }
-
-    this.props.emitStatus()
   }
 
-  handleMediaElement = (el, mediaInfo) => {
-    this.setState({ audioSourceNode: this.audioCtx.createMediaElementSource(el) }, () => {
-      const sourceNodeCopy = this.state.audioSourceNode
-      sourceNodeCopy.connect(this.audioGainNode)
-      this.audioGainNode.connect(this.audioCtx.destination)
-    })
-
-    // isAlphaSupported, etc.
-    this.props.mediaElementChange(mediaInfo)
+  handleAudioSourceNode = (source) => {
+    this.setState({ audioSourceNode: source })
   }
 
   handleMediaRequestError = msg => {
@@ -129,20 +89,6 @@ class PlayerController extends React.Component {
     }
 
     this.props.loadQueueItem(this.props.queue.entities[this.props.queue.result[curIdx + 1]])
-  }
-
-  updateVolume = () => {
-    let vol = this.props.volume
-
-    if (this.props.isReplayGainEnabled) {
-      const gainDb = this.props.rgTrackGain
-      const peakDb = 10 * Math.log10(this.props.rgTrackPeak) // ratio to dB
-      const safeGainDb = (gainDb + peakDb >= 0) ? -0.01 - peakDb : gainDb
-
-      vol = vol * Math.pow(10, safeGainDb / 10) // dB to ratio
-    }
-
-    this.audioGainNode.gain.setValueAtTime(vol, this.audioCtx.currentTime)
   }
 
   render () {
@@ -166,13 +112,17 @@ class PlayerController extends React.Component {
             alpha={props.alpha}
             queueItem={queueItem}
             isPlaying={props.isPlaying}
-            onMediaElement={this.handleMediaElement}
+            isReplayGainEnabled={props.isReplayGainEnabled}
+            onAudioSourceNode={this.handleAudioSourceNode}
             onMediaRequest={props.mediaRequest}
             onMediaRequestSuccess={props.mediaRequestSuccess}
             onMediaRequestError={this.handleMediaRequestError}
             onStatus={props.emitStatus}
             onMediaEnd={this.handleLoadNext}
             onError={this.handleError}
+            rgTrackGain={props.rgTrackGain}
+            rgTrackPeak={props.rgTrackPeak}
+            volume={props.volume}
             width={props.width}
             height={props.height}
           />

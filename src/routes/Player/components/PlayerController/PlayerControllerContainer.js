@@ -8,7 +8,6 @@ import {
   emitLeave,
   cancelStatus,
   loadQueueItem,
-  mediaElementChange,
   mediaRequest,
   mediaRequestSuccess,
   mediaRequestError,
@@ -21,7 +20,6 @@ const mapActionCreators = {
   emitLeave,
   cancelStatus,
   loadQueueItem,
-  mediaElementChange,
   mediaRequest,
   mediaRequestSuccess,
   mediaRequestError,
@@ -48,8 +46,6 @@ const mapStateToProps = (state) => {
     rgTrackPeak: player.rgTrackPeak,
     volume: player.volume,
     visualizer: playerVisualizer,
-    // timestamp pass-through triggers status emission for each received command
-    lastCommandAt: player.lastCommandAt,
   }
 }
 

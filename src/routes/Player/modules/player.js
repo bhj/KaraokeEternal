@@ -1,9 +1,7 @@
 import { CANCEL } from 'redux-throttle'
 import {
-  PLAYER_BG_ALPHA,
   PLAYER_ERROR,
   PLAYER_LEAVE_REQUEST,
-  PLAYER_MEDIA_ELEMENT_CHANGE,
   PLAYER_MEDIA_REQUEST,
   PLAYER_MEDIA_REQUEST_SUCCESS,
   PLAYER_MEDIA_REQUEST_ERROR,
@@ -17,27 +15,18 @@ import {
 } from 'shared/actionTypes'
 
 // have server emit player status to room
-export function emitStatus (status) {
+export function emitStatus (status, cancelPrev = false) {
   return (dispatch, getState) => {
-    const player = getState().player
-    const visualizer = getState().playerVisualizer
+    if (cancelPrev) {
+      dispatch(cancelStatus())
+    }
 
     dispatch({
       type: PLAYER_STATUS_REQUEST,
       payload: {
-        alpha: player.alpha,
-        isAlphaSupported: player.isAlphaSupported,
-        errorMessage: player.errorMessage,
-        // string primitive is a hack to pass selector equality check on client side
-        historyJSON: JSON.stringify(player.history),
-        isAtQueueEnd: player.isAtQueueEnd,
-        isErrored: player.isErrored,
-        isPlaying: player.isPlaying,
-        position: player.position,
-        queueId: player.queueId,
-        volume: player.volume,
-        visualizer,
-        ...status, // may have current position, etc.
+        ...getState().player,
+        ...status,
+        visualizer: getState().playerVisualizer,
       },
       meta: {
         throttle: {
@@ -82,13 +71,6 @@ export function loadQueueItem (queueItem) {
   }
 }
 
-export function mediaElementChange (payload) {
-  return {
-    type: PLAYER_MEDIA_ELEMENT_CHANGE,
-    payload,
-  }
-}
-
 export function mediaRequest (meta) {
   return {
     type: PLAYER_MEDIA_REQUEST,
@@ -124,19 +106,11 @@ export function queueEnd () {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_BG_ALPHA]: (state, { payload }) => ({
-    ...state,
-    alpha: payload,
-  }),
   [PLAYER_ERROR]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
     isErrored: true,
     errorMessage: payload.message,
-  }),
-  [PLAYER_MEDIA_ELEMENT_CHANGE]: (state, { payload }) => ({
-    ...state,
-    isAlphaSupported: payload.isAlphaSupported,
   }),
   [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
     ...state,
@@ -155,18 +129,15 @@ const ACTION_HANDLERS = {
     isErrored: false,
     isPlaying: true,
     isPlayingNext: true,
-    lastCommandAt: Date.now(),
   }),
   [PLAYER_PAUSE]: (state, { payload }) => ({
     ...state,
     isPlaying: false,
-    lastCommandAt: Date.now(),
   }),
   [PLAYER_PLAY]: (state, { payload }) => ({
     ...state,
     isErrored: false,
     isPlaying: true,
-    lastCommandAt: Date.now(),
   }),
   [PLAYER_QUEUE_END]: (state, { payload }) => ({
     ...state,
@@ -174,7 +145,7 @@ const ACTION_HANDLERS = {
     isPlayingNext: false,
   }),
   [PLAYER_QUEUE_LOAD]: (state, { payload }) => {
-    const history = state.history.slice()
+    const history = JSON.parse(state.historyJSON)
 
     // save previous
     if (state.queueId !== -1) {
@@ -183,7 +154,7 @@ const ACTION_HANDLERS = {
 
     return {
       ...state,
-      history,
+      historyJSON: JSON.stringify(history),
       isAtQueueEnd: false,
       isPlayingNext: false,
       queueId: payload.queueId,
@@ -193,12 +164,11 @@ const ACTION_HANDLERS = {
   },
   [PLAYER_STATUS_REQUEST]: (state, { payload }) => ({
     ...state,
-    position: payload.position,
+    ...payload,
   }),
   [PLAYER_VOLUME]: (state, { payload }) => ({
     ...state,
     volume: payload,
-    lastCommandAt: Date.now(),
   }),
 }
 
@@ -208,14 +178,13 @@ const ACTION_HANDLERS = {
 const initialState = {
   alpha: 0.5,
   errorMessage: '',
-  history: [], // queueIds
+  historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,
   isAlphaSupported: false,
   isErrored: false,
   isFetching: false,
   isPlaying: false,
   isPlayingNext: false,
-  lastCommandAt: null,
   position: 0,
   queueId: -1,
   rgTrackGain: null,

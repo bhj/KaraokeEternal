@@ -8,8 +8,8 @@ class MP4Player extends React.Component {
     queueItem: PropTypes.object.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+    onAudioElement: PropTypes.func.isRequired,
     // actions
-    onMediaElement: PropTypes.func.isRequired,
     onMediaRequest: PropTypes.func.isRequired,
     onMediaRequestSuccess: PropTypes.func.isRequired,
     onMediaRequestError: PropTypes.func.isRequired,
@@ -20,7 +20,7 @@ class MP4Player extends React.Component {
   video = React.createRef()
 
   componentDidMount () {
-    this.props.onMediaElement(this.video.current, { isAlphaSupported: false })
+    this.props.onAudioElement(this.video.current)
     this.updateSources()
   }
 
@@ -54,6 +54,8 @@ class MP4Player extends React.Component {
   }
 
   updateSources = () => {
+    this.props.onStatus({ isAlphaSupported: false, position: 0 }, true)
+
     const src = `/api/media/${this.props.queueItem.mediaId}?type=video`
 
     this.props.onMediaRequest({ ...this.props.queueItem, src })
