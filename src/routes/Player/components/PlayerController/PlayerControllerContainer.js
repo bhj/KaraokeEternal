@@ -7,7 +7,6 @@ import {
   emitStatus,
   playerError,
   playerLoad,
-  playerOpts,
   playerPlay,
   playerStatus,
 } from '../../modules/player'
@@ -17,7 +16,6 @@ const mapActionCreators = {
   emitStatus,
   playerError,
   playerLoad,
-  playerOpts,
   playerPlay,
   playerStatus,
 }
