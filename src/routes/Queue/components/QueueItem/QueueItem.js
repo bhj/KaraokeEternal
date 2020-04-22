@@ -12,7 +12,7 @@ class QueueItem extends React.Component {
     artist: PropTypes.string.isRequired,
     dateUpdated: PropTypes.number.isRequired,
     errorMessage: PropTypes.string.isRequired,
-    isActive: PropTypes.bool.isRequired,
+    isCurrent: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
     isInfoable: PropTypes.bool.isRequired,
     isOwner: PropTypes.bool.isRequired,
@@ -49,7 +49,7 @@ class QueueItem extends React.Component {
         onSwipedRight={this.handleSwipedRight}
         preventDefaultTouchmoveEvent
         trackMouse
-        style={{ backgroundSize: (props.isActive && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
+        style={{ backgroundSize: (props.isCurrent && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
         styleName='container'
       >
         <div styleName='content'>
