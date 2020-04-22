@@ -37,7 +37,7 @@ const getWaits = createSelector(
         // currently playing
         nextWait = Math.round(songs.entities[songId].duration - position)
       } else if (i > curIdx) {
-        // upcomming
+        // upcoming
         curWait += nextWait
         nextWait = songs.entities[songId].duration
       }
