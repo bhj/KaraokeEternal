@@ -42,7 +42,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  isEnabled: false,
+  isEnabled: true,
   isSupported: isWebGLSupported(),
   ...getRandomPreset(),
 }

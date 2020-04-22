@@ -12,7 +12,7 @@ export default class PlayerPrefs extends React.Component {
   }
 
   state = {
-    isExpanded: true,
+    isExpanded: false,
   }
 
   toggleExpanded = () => {
