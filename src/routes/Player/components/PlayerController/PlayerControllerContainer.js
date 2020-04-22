@@ -3,27 +3,23 @@ import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
 import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
 import {
+  emitLeave,
   emitStatus,
   playerError,
-  emitLeave,
-  cancelStatus,
-  loadQueueItem,
-  mediaRequest,
-  mediaRequestSuccess,
-  mediaRequestError,
-  queueEnd,
+  playerLoad,
+  playerOpts,
+  playerPlay,
+  playerStatus,
 } from '../../modules/player'
 
 const mapActionCreators = {
+  emitLeave,
   emitStatus,
   playerError,
-  emitLeave,
-  cancelStatus,
-  loadQueueItem,
-  mediaRequest,
-  mediaRequestSuccess,
-  mediaRequestError,
-  queueEnd,
+  playerLoad,
+  playerOpts,
+  playerPlay,
+  playerStatus,
 }
 
 const mapStateToProps = (state) => {
@@ -32,6 +28,7 @@ const mapStateToProps = (state) => {
 
   return {
     alpha: player.alpha,
+    historyJSON: state.status.historyJSON,
     isAlphaSupported: player.isAlphaSupported,
     isAtQueueEnd: player.isAtQueueEnd,
     isFetching: player.isFetching,

@@ -1,8 +1,7 @@
 import butterchurnPresets from 'butterchurn-presets'
 import {
-  PLAYER_NEXT,
-  PLAYER_VISUALIZER,
-  PLAYER_VISUALIZER_PRESET,
+  PLAYER_CMD_NEXT,
+  PLAYER_CMD_OPTIONS,
 } from 'shared/actionTypes'
 
 const _presetKeys = Object.keys(butterchurnPresets.getPresets())
@@ -11,31 +10,30 @@ const _presetKeys = Object.keys(butterchurnPresets.getPresets())
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_NEXT]: (state, { payload }) => ({
+  [PLAYER_CMD_NEXT]: (state, { payload }) => ({
     ...state,
     ...getRandomPreset(),
   }),
-  [PLAYER_VISUALIZER]: (state, { payload }) => ({
-    ...state,
-    ...payload,
-  }),
-  [PLAYER_VISUALIZER_PRESET]: (state, { payload }) => {
-    const { mode } = payload
+  [PLAYER_CMD_OPTIONS]: (state, { payload }) => {
+    const { visualizer } = payload
+    if (typeof visualizer !== 'object') return state
 
-    if (mode === 'rand') {
-      return {
-        ...state,
-        ...getRandomPreset(),
-      }
+    let preset = {}
+
+    if (visualizer.nextPreset || visualizer.prevPreset) {
+      const curIdx = _presetKeys.indexOf(state.presetKey)
+      const nextIdx = curIdx === _presetKeys.length - 1 ? 0 : curIdx + 1 // wrap around
+      const prevIdx = curIdx === 0 ? _presetKeys.length - 1 : curIdx - 1 // wrap around
+
+      preset = getPreset(visualizer.nextPreset ? nextIdx : visualizer.prevPreset ? prevIdx : curIdx)
+    } else if (visualizer.randomPreset) {
+      preset = getRandomPreset()
     }
-
-    const curIdx = _presetKeys.indexOf(state.presetKey)
-    const nextIdx = curIdx === _presetKeys.length - 1 ? 0 : curIdx + 1 // wrap around
-    const prevIdx = curIdx === 0 ? _presetKeys.length - 1 : curIdx - 1 // wrap around
 
     return {
       ...state,
-      ...getPresetKeyAndName(mode === 'prev' ? prevIdx : nextIdx),
+      ...preset,
+      isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
     }
   },
 }
@@ -44,8 +42,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  isEnabled: true,
-  isSupported: getWebGLSupport(),
+  isEnabled: false,
+  isSupported: isWebGLSupported(),
   ...getRandomPreset(),
 }
 
@@ -55,7 +53,7 @@ export default function playerVisualizer (state = initialState, action) {
   return handler ? handler(state, action) : state
 }
 
-function getPresetKeyAndName (i) {
+function getPreset (i) {
   return {
     presetKey: _presetKeys[i],
     presetName: `[${i + 1}/${_presetKeys.length}] ` + _presetKeys[i],
@@ -63,10 +61,10 @@ function getPresetKeyAndName (i) {
 }
 
 function getRandomPreset () {
-  return getPresetKeyAndName(Math.floor(Math.random() * (_presetKeys.length - 1)))
+  return getPreset(Math.floor(Math.random() * (_presetKeys.length - 1)))
 }
 
-function getWebGLSupport () {
+function isWebGLSupported () {
   try {
     return !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('webgl')
   } catch (e) {

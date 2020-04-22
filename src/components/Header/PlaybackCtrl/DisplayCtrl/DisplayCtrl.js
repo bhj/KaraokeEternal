@@ -14,24 +14,31 @@ export default class DisplayCtrl extends React.Component {
     isVisualizerSupported: PropTypes.bool.isRequired,
     visualizerPresetName: PropTypes.string.isRequired,
     // actions
-    onAlphaChange: PropTypes.func.isRequired,
-    onChangePreset: PropTypes.func.isRequired,
-    onChange: PropTypes.func.isRequired,
+    onRequestOptions: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
   }
 
   checkbox = React.createRef()
 
-  handleToggleVisualizer = () => {
-    this.props.onChange({ isEnabled: !this.props.isVisualizerEnabled })
+  handleAlpha = val => {
+    this.props.onRequestOptions({ alpha: val })
   }
 
-  handlePresetNext = () => { this.props.onChangePreset('next') }
-  handlePresetPrev = () => { this.props.onChangePreset('prev') }
-  handlePresetRand = () => { this.props.onChangePreset('rand') }
-  handleAlpha = val => {
-    this.props.onAlphaChange(val)
-  }
+  handleToggleVisualizer = () => this.props.onRequestOptions({
+    visualizer: { isEnabled: !this.props.isVisualizerEnabled }
+  })
+
+  handlePresetNext = () => this.props.onRequestOptions({
+    visualizer: { nextPreset: true }
+  })
+
+  handlePresetPrev = () => this.props.onRequestOptions({
+    visualizer: { prevPreset: true }
+  })
+
+  handlePresetRandom = () => this.props.onRequestOptions({
+    visualizer: { randomPreset: true }
+  })
 
   render () {
     return (
@@ -68,7 +75,7 @@ export default class DisplayCtrl extends React.Component {
                 <button styleName='btnPreset' onClick={this.handlePresetPrev}>
                   <Icon icon='CHEVRON_LEFT' size={42} styleName='btnIcon' />
                 </button>
-                <button styleName='btnPreset' onClick={this.handlePresetRand}>
+                <button styleName='btnPreset' onClick={this.handlePresetRandom}>
                   <Icon icon='DICE' size={48} styleName='btnIcon' />
                 </button>
                 <button styleName='btnPreset' onClick={this.handlePresetNext}>
