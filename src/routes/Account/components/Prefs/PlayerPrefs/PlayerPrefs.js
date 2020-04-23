@@ -8,7 +8,6 @@ export default class PlayerPrefs extends React.Component {
     isReplayGainEnabled: PropTypes.bool.isRequired,
     // actions
     setPref: PropTypes.func.isRequired,
-    requestScan: PropTypes.func.isRequired,
   }
 
   state = {
