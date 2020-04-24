@@ -151,7 +151,7 @@ module.exports = function (io, jwtKey) {
 
     // if there's a player in room, emit its last known status
     const lastStatusSocket = Object.keys(room.sockets)
-      .find(id => !!io.sockets.sockets[id]._lastPlayerStatus)
+      .find(id => !!io.sockets.sockets[id] && !!io.sockets.sockets[id]._lastPlayerStatus)
 
     if (lastStatusSocket) {
       io.to(sock.id).emit('action', {
