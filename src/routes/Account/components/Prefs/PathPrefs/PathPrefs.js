@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import PathItem from './PathItem'
 import PathChooser from './PathChooser'
 import Icon from 'components/Icon'
 import './PathPrefs.css'
@@ -67,11 +66,12 @@ export default class PathPrefs extends React.Component {
 
     return (
       <div styleName='container'>
-        <div styleName='title' onClick={() => this.toggleExpanded()}>
+        <div styleName='heading' onClick={() => this.toggleExpanded()}>
+          <Icon icon='FOLDER_MUSIC' size={28} styleName='icon' />
+          <div styleName='title'>Media Folders</div>
           <div>
             <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} styleName='icon' />
           </div>
-          <div style={{ flex: 1 }}>Media Folders</div>
         </div>
 
         <div styleName='content' style={{ display: isExpanded ? 'block' : 'none' }}>
@@ -80,12 +80,14 @@ export default class PathPrefs extends React.Component {
           }
 
           {paths.result.map(id =>
-            <PathItem
-              key={id}
-              path={paths.entities[id].path}
-              onRemoveClick={() => this.handleRemovePath(id)}
-              isRemovable
-            />
+            <div key={id} styleName='pathItem'>
+              <div styleName='pathName'>
+                {paths.entities[id].path}
+              </div>
+              <div onClick={() => this.handleRemovePath(id)} styleName='btnClear'>
+                <Icon icon='CLEAR' size={32} />
+              </div>
+            </div>
           )}
           <br />
           <div style={{ display: 'flex' }}>

@@ -1,13 +1,14 @@
 const log = require('./lib/logger')(`server[${process.pid}]`)
 const jwtVerify = require('jsonwebtoken').verify
 
-const LibrarySocket = require('./Library/socket')
-const QueueSocket = require('./Queue/socket')
-const PlayerSocket = require('./Player/socket')
 const Library = require('./Library')
+const LibrarySocket = require('./Library/socket')
+const PlayerSocket = require('./Player/socket')
+const Prefs = require('./Prefs')
+const PrefsSocket = require('./Prefs/socket')
 const Queue = require('./Queue')
+const QueueSocket = require('./Queue/socket')
 const parseCookie = require('./lib/parseCookie')
-
 const {
   LIBRARY_PUSH,
   QUEUE_PUSH,
@@ -15,6 +16,7 @@ const {
   STAR_COUNTS_PUSH,
   PLAYER_STATUS,
   PLAYER_LEAVE,
+  PREFS_PUSH,
   SOCKET_AUTH_ERROR,
   _ERROR,
 } = require('../shared/actionTypes')
@@ -23,6 +25,7 @@ const handlers = {
   ...LibrarySocket,
   ...QueueSocket,
   ...PlayerSocket,
+  ...PrefsSocket,
 }
 
 module.exports = function (io, jwtKey) {
@@ -31,9 +34,10 @@ module.exports = function (io, jwtKey) {
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
     const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
 
-    // decode JWT in cookie sent with socket handshake
+    // authenticate the JWT sent via cookie in http handshake
     try {
       sock.user = jwtVerify(kfToken, jwtKey)
+      log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)
     } catch (err) {
       io.to(sock.id).emit('action', {
         type: SOCKET_AUTH_ERROR,
@@ -42,12 +46,7 @@ module.exports = function (io, jwtKey) {
       sock.user = null
       sock.disconnect()
       log.info('disconnected %s (%s)', sock.handshake.address, err.message)
-      return
     }
-
-    log.verbose('%s (%s) connected from %s',
-      sock.user.name, sock.id, sock.handshake.address
-    )
 
     // attach disconnect handler
     sock.on('disconnect', reason => {
@@ -56,7 +55,7 @@ module.exports = function (io, jwtKey) {
       )
 
       // beyond this point assumes there is a room
-      if (typeof sock.user.roomId === 'undefined') {
+      if (typeof sock.user.roomId !== 'number') {
         return
       }
 
@@ -103,36 +102,41 @@ module.exports = function (io, jwtKey) {
       }
     })
 
-    try {
-      // push library (only if client's is outdated)
-      if (clientLibraryVersion < Library.getLibraryVersion()) {
-        log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
-          sock.user.name, sock.id, clientLibraryVersion, Library.getLibraryVersion())
-
-        io.to(sock.id).emit('action', {
-          type: LIBRARY_PUSH,
-          payload: await Library.get(),
-        })
-      }
-
-      // push user's stars
+    // push prefs (admin only)
+    if (sock.user.isAdmin) {
+      log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
       io.to(sock.id).emit('action', {
-        type: STARS_PUSH,
-        payload: await Library.getStars(sock.user.userId),
+        type: PREFS_PUSH,
+        payload: await Prefs.get(),
       })
+    }
 
-      // push star counts (only if client's is outdated)
-      if (clientStarsVersion < Library.getStarCountsVersion()) {
-        log.verbose('pushing star counts to %s (%s) (client=%s, server=%s)',
-          sock.user.name, sock.id, clientStarsVersion, Library.getStarCountsVersion())
+    // push library (only if client's is outdated)
+    if (clientLibraryVersion !== Library.getLibraryVersion()) {
+      log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
+        sock.user.name, sock.id, clientLibraryVersion, Library.getLibraryVersion())
 
-        io.to(sock.id).emit('action', {
-          type: STAR_COUNTS_PUSH,
-          payload: await Library.getStarCounts(),
-        })
-      }
-    } catch (err) {
-      log.error(err)
+      io.to(sock.id).emit('action', {
+        type: LIBRARY_PUSH,
+        payload: await Library.get(),
+      })
+    }
+
+    // push user's stars
+    io.to(sock.id).emit('action', {
+      type: STARS_PUSH,
+      payload: await Library.getStars(sock.user.userId),
+    })
+
+    // push star counts (only if client's is outdated)
+    if (clientStarsVersion !== Library.getStarCountsVersion()) {
+      log.verbose('pushing star counts to %s (%s) (client=%s, server=%s)',
+        sock.user.name, sock.id, clientStarsVersion, Library.getStarCountsVersion())
+
+      io.to(sock.id).emit('action', {
+        type: STAR_COUNTS_PUSH,
+        payload: await Library.getStarCounts(),
+      })
     }
 
     // it's possible for an admin to not be in a room
@@ -161,13 +165,9 @@ module.exports = function (io, jwtKey) {
     )
 
     // send room's queue
-    try {
-      io.to(sock.id).emit('action', {
-        type: QUEUE_PUSH,
-        payload: await Queue.get(sock.user.roomId),
-      })
-    } catch (err) {
-      log.error(err)
-    }
+    io.to(sock.id).emit('action', {
+      type: QUEUE_PUSH,
+      payload: await Queue.get(sock.user.roomId),
+    })
   })
 }

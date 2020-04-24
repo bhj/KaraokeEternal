@@ -12,11 +12,6 @@ const PathItem = (props) => {
       <div styleName='path'>
         {props.path}
       </div>
-      {props.isRemovable &&
-        <div onClick={props.onRemoveClick}>
-          <Icon icon='CLEAR' size={32} styleName='clear' />
-        </div>
-      }
     </div>
   )
 }
@@ -24,8 +19,6 @@ const PathItem = (props) => {
 PathItem.propTypes = {
   path: PropTypes.string.isRequired,
   onSelect: PropTypes.func,
-  isRemovable: PropTypes.bool,
-  onRemoveClick: PropTypes.func,
 }
 
 export default PathItem

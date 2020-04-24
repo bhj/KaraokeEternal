@@ -45,6 +45,21 @@ class Prefs {
   }
 
   /**
+   * Set a preference key
+   * @param  {string}  key  Prefs key name
+   * @param  {any}     data to be JSON encoded
+   * @return {Promise}      Success/fail boolean
+   */
+  static async set (key, data) {
+    const query = sql`
+      REPLACE INTO prefs (key, data)
+      VALUES (${key}, ${JSON.stringify(data)})
+    `
+    const res = await db.run(String(query), query.parameters)
+    return res.stmt.changes === 1
+  }
+
+  /**
    * Add media path
    * @param  {string}  dir Absolute path
    * @return {Promise}     pathId (Number) of newly-added path

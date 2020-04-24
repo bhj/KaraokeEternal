@@ -1,11 +1,9 @@
 import {
-  PLAYER_BG_ALPHA_REQUEST,
-  PLAYER_PLAY_REQUEST,
-  PLAYER_PAUSE_REQUEST,
-  PLAYER_NEXT_REQUEST,
-  PLAYER_VISUALIZER_REQUEST,
-  PLAYER_VISUALIZER_PRESET_REQUEST,
-  PLAYER_VOLUME_REQUEST,
+  PLAYER_REQ_OPTIONS,
+  PLAYER_REQ_PLAY,
+  PLAYER_REQ_PAUSE,
+  PLAYER_REQ_NEXT,
+  PLAYER_REQ_VOLUME,
   PLAYER_STATUS,
   PLAYER_LEAVE,
 } from 'shared/actionTypes'
@@ -13,60 +11,40 @@ import {
 // ------------------------------------
 // Actions
 // ------------------------------------
+export function requestOptions (opts) {
+  return {
+    type: PLAYER_REQ_OPTIONS,
+    payload: opts,
+    meta: {
+      throttle: {
+        wait: 200,
+        leading: true,
+      }
+    },
+  }
+}
+
 export function requestPlay () {
   return {
-    type: PLAYER_PLAY_REQUEST,
+    type: PLAYER_REQ_PLAY,
   }
 }
 
 export function requestPause () {
   return {
-    type: PLAYER_PAUSE_REQUEST,
+    type: PLAYER_REQ_PAUSE,
   }
 }
 
 export function requestPlayNext () {
   return {
-    type: PLAYER_NEXT_REQUEST,
-  }
-}
-
-export function requestBackgroundAlpha (val) {
-  return {
-    type: PLAYER_BG_ALPHA_REQUEST,
-    payload: val,
-    meta: {
-      throttle: {
-        wait: 200,
-        leading: false,
-      }
-    },
-  }
-}
-
-export function requestVisualizer (payload) {
-  return {
-    type: PLAYER_VISUALIZER_REQUEST,
-    payload,
-    meta: {
-      throttle: {
-        wait: 200,
-        leading: false,
-      }
-    },
-  }
-}
-
-export function requestVisualizerPreset (mode) {
-  return {
-    type: PLAYER_VISUALIZER_PRESET_REQUEST,
-    payload: { mode },
+    type: PLAYER_REQ_NEXT,
   }
 }
 
 export function requestVolume (vol) {
   return {
-    type: PLAYER_VOLUME_REQUEST,
+    type: PLAYER_REQ_VOLUME,
     payload: vol,
     meta: {
       throttle: {

@@ -14,10 +14,6 @@
   white-space: nowrap;
 }
 
-.clear {
-  fill: var(--btn-danger-bg-color);
-}
-
 .folder {
   fill: var(--text-color);
 }

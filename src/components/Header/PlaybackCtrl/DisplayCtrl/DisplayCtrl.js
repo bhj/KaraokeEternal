@@ -13,31 +13,32 @@ export default class DisplayCtrl extends React.Component {
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isVisualizerSupported: PropTypes.bool.isRequired,
     visualizerPresetName: PropTypes.string.isRequired,
-    visualizerSensitivity: PropTypes.number.isRequired,
     // actions
-    onAlphaChange: PropTypes.func.isRequired,
-    onChangePreset: PropTypes.func.isRequired,
-    onChange: PropTypes.func.isRequired,
+    onRequestOptions: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
   }
 
   checkbox = React.createRef()
 
-  handleToggleVisualizer = () => {
-    this.props.onChange({ isEnabled: !this.props.isVisualizerEnabled })
-  }
-
-  handlePresetNext = () => { this.props.onChangePreset('next') }
-  handlePresetPrev = () => { this.props.onChangePreset('prev') }
-  handlePresetRand = () => { this.props.onChangePreset('rand') }
-
-  handleChangeSensitivity = val => {
-    this.props.onChange({ sensitivity: val })
-  }
-
   handleAlpha = val => {
-    this.props.onAlphaChange(val)
+    this.props.onRequestOptions({ alpha: val })
   }
+
+  handleToggleVisualizer = () => this.props.onRequestOptions({
+    visualizer: { isEnabled: !this.props.isVisualizerEnabled }
+  })
+
+  handlePresetNext = () => this.props.onRequestOptions({
+    visualizer: { nextPreset: true }
+  })
+
+  handlePresetPrev = () => this.props.onRequestOptions({
+    visualizer: { prevPreset: true }
+  })
+
+  handlePresetRandom = () => this.props.onRequestOptions({
+    visualizer: { randomPreset: true }
+  })
 
   render () {
     return (
@@ -74,7 +75,7 @@ export default class DisplayCtrl extends React.Component {
                 <button styleName='btnPreset' onClick={this.handlePresetPrev}>
                   <Icon icon='CHEVRON_LEFT' size={42} styleName='btnIcon' />
                 </button>
-                <button styleName='btnPreset' onClick={this.handlePresetRand}>
+                <button styleName='btnPreset' onClick={this.handlePresetRandom}>
                   <Icon icon='DICE' size={48} styleName='btnIcon' />
                 </button>
                 <button styleName='btnPreset' onClick={this.handlePresetNext}>
@@ -83,17 +84,6 @@ export default class DisplayCtrl extends React.Component {
               </div>
 
               <label>{this.props.visualizerPresetName}</label>
-
-              <label styleName='field'>Sensitivity</label>
-              <OptimisticSlider
-                min={0}
-                max={1}
-                step={0.01}
-                value={this.props.visualizerSensitivity}
-                onChange={this.handleChangeSensitivity}
-                handle={handle}
-                styleName='slider'
-              />
             </>
             }
 

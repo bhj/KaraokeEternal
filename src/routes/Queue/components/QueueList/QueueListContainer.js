@@ -9,11 +9,12 @@ import getOrderedQueue from '../../selectors/getOrderedQueue'
 import { toggleSongStarred } from 'store/modules/userStars'
 import { showErrorMessage } from 'store/modules/ui'
 
-const getQueue = (state) => getOrderedQueue(state)
-const getCurId = (state) => state.status.queueId
-const getCurPos = (state) => state.status.position
-const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
 const getPlayerHistoryJSON = (state) => state.status.historyJSON
+const getPosition = (state) => state.status.position
+const getQueue = (state) => getOrderedQueue(state)
+const getQueueId = (state) => state.status.queueId
+const getSongs = (state) => state.songs
+const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
 
 const getPlayerHistory = createSelector(
   [getPlayerHistoryJSON],
@@ -21,22 +22,24 @@ const getPlayerHistory = createSelector(
 )
 
 const getWaits = createSelector(
-  [getQueue, getCurId, getCurPos],
-  (queue, curId, curPos) => {
-    const curIdx = queue.result.indexOf(curId)
+  [getQueue, getQueueId, getPosition, getSongs],
+  (queue, queueId, position, songs) => {
+    const curIdx = queue.result.indexOf(queueId)
     const waits = {}
     let curWait = 0
     let nextWait = 0
 
     queue.result.forEach((queueId, i) => {
-      const duration = queue.entities[queueId].duration
+      const songId = queue.entities[queueId].songId
+      if (!songs.entities[songId]) return
 
       if (i === curIdx) {
         // currently playing
-        nextWait = Math.round(duration - curPos)
+        nextWait = Math.round(songs.entities[songId].duration - position)
       } else if (i > curIdx) {
+        // upcoming
         curWait += nextWait
-        nextWait = duration
+        nextWait = songs.entities[songId].duration
       }
 
       waits[queueId] = curWait
@@ -48,15 +51,14 @@ const getWaits = createSelector(
 
 const mapStateToProps = (state) => {
   return {
-    artists: state.library.artists,
-    curId: state.status.queueId,
-    curPos: state.status.position,
     errorMessage: state.status.errorMessage,
     isAtQueueEnd: state.status.isAtQueueEnd,
     isErrored: state.status.isErrored,
     playerHistory: getPlayerHistory(state),
+    position: state.status.position,
     queue: getOrderedQueue(state),
-    songs: state.library.songs,
+    queueId: state.status.queueId,
+    songs: state.songs,
     starredSongs: getStarredSongs(state),
     user: state.user,
     waits: getWaits(state),

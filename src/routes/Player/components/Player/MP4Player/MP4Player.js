@@ -5,100 +5,82 @@ import './MP4Player.css'
 class MP4Player extends React.Component {
   static propTypes = {
     isPlaying: PropTypes.bool.isRequired,
-    queueItem: PropTypes.object.isRequired,
-    volume: PropTypes.number.isRequired,
+    mediaId: PropTypes.number.isRequired,
+    mediaKey: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    // actions
-    onMediaElement: PropTypes.func.isRequired,
-    onMediaRequest: PropTypes.func.isRequired,
-    onMediaRequestSuccess: PropTypes.func.isRequired,
-    onMediaRequestError: PropTypes.func.isRequired,
-    onMediaEnd: PropTypes.func.isRequired,
+    onAudioElement: PropTypes.func.isRequired,
+    // media events
+    onEnd: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired,
+    onLoad: PropTypes.func.isRequired,
+    onPlay: PropTypes.func.isRequired,
     onStatus: PropTypes.func.isRequired,
   }
 
   video = React.createRef()
 
   componentDidMount () {
-    this.props.onMediaElement(this.video.current, { isAlphaSupported: false })
-    this.setVolume(this.props.volume)
+    this.props.onAudioElement(this.video.current)
+    this.props.onStatus({ isAlphaSupported: false })
     this.updateSources()
   }
 
   componentDidUpdate (prevProps) {
-    const { queueItem, isPlaying, volume } = this.props
-
-    if (prevProps.queueItem.queueId !== queueItem.queueId) {
+    if (prevProps.mediaKey !== this.props.mediaKey) {
       this.updateSources()
     }
 
-    if (prevProps.isPlaying !== isPlaying) {
+    if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
     }
-
-    this.setVolume(volume)
   }
 
   render () {
     const { width, height } = this.props
 
     return (
-      <div styleName='container'>
-        <video styleName='video'
-          preload='none'
-          width={width}
-          height={height}
-          onCanPlayThrough={this.updateIsPlaying}
-          onTimeUpdate={this.handleTimeUpdate}
-          onEnded={this.props.onMediaEnd}
-          onError={this.handleError}
-          ref={this.video}
-        />
-      </div>
+      <video styleName='video'
+        preload='auto'
+        width={width}
+        height={height}
+        onCanPlayThrough={this.updateIsPlaying}
+        onEnded={this.props.onEnd}
+        onError={this.handleError}
+        onLoadStart={this.props.onLoad}
+        onTimeUpdate={this.handleTimeUpdate}
+        ref={this.video}
+      />
     )
   }
 
   updateSources = () => {
-    const src = `/api/media/${this.props.queueItem.mediaId}?type=video`
-
-    this.props.onMediaRequest({ ...this.props.queueItem, src })
-    this.video.current.src = src
+    this.video.current.src = `/api/media/${this.props.mediaId}?type=video`
     this.video.current.load()
-  }
-
-  setVolume = (vol) => {
-    this.video.current.volume = vol
   }
 
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
-      const promise = this.video.current.play()
-
-      if (typeof promise !== 'undefined') {
-        promise.then(() => {
-          this.props.onMediaRequestSuccess()
-        }).catch(err => {
-          this.props.onMediaRequestError(err.message)
-        })
-      }
+      this.video.current.play()
+        .then(() => this.props.onPlay())
+        .catch(err => this.props.onError(err.message))
     } else {
       this.video.current.pause()
     }
   }
 
+  /*
+  * <video> event handlers
+  */
+  handleError = (el) => {
+    const { message, code } = el.target.error
+    this.props.onError(`${message} (code ${code})`)
+  }
+
   handleTimeUpdate = () => {
-    // emit player status
     this.props.onStatus({
       position: this.video.current.currentTime,
     })
-  }
-
-  handleError = (err) => {
-    const msg = `Could not load video (error ${err.target.error.code})`
-
-    // media request failed
-    this.props.onMediaRequestError(msg)
   }
 }
 

@@ -15,7 +15,7 @@ class Queue {
 
     const query = sql`
       SELECT queueId, mediaId, userId,
-        media.duration, media.isPreferred, media.relPath,
+        media.isPreferred, media.relPath, media.rgTrackGain, media.rgTrackPeak,
         artists.name AS artist,
         songs.songId, songs.title,
         users.name AS userDisplayName, users.dateUpdated
@@ -35,7 +35,6 @@ class Queue {
       if (entities[row.queueId]) {
         if (row.isPreferred) {
           entities[row.queueId].mediaId = row.mediaId
-          entities[row.queueId].duration = row.duration
           entities[row.queueId].player = this.getPlayer(row.relPath)
         }
 

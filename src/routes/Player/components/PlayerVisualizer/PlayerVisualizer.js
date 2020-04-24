@@ -8,8 +8,6 @@ class PlayerVisualizer extends React.Component {
     audioSourceNode: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     presetKey: PropTypes.string.isRequired,
-    queueItem: PropTypes.object,
-    sensitivity: PropTypes.number.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -20,11 +18,12 @@ class PlayerVisualizer extends React.Component {
   frameId = null
 
   componentDidMount () {
-    this.visualizer = butterchurn.createVisualizer(window._audioCtx, this.canvas.current, {
+    this.visualizer = butterchurn.createVisualizer(this.props.audioSourceNode.context, this.canvas.current, {
       width: this.props.width,
       height: this.props.height,
     })
 
+    // @todo
     // this.visualizer.setOutputAA(true)
 
     const preset = this.presets[this.props.presetKey]
@@ -42,13 +41,6 @@ class PlayerVisualizer extends React.Component {
 
     if (props.audioSourceNode !== prevProps.audioSourceNode) {
       this.updateAudioSource()
-    }
-
-    if (this.gainNode && (props.volume !== prevProps.volume || props.sensitivity !== prevProps.sensitivity)) {
-      // apply makeup gain to the visualizer's source so it
-      // maintains intensity even with "real" output volume lowered
-      const makeup = props.volume ? 1 / props.volume : 0
-      this.gainNode.gain.setValueAtTime(makeup * props.sensitivity, window._audioCtx.currentTime)
     }
 
     if (props.isPlaying !== prevProps.isPlaying) {
@@ -83,9 +75,7 @@ class PlayerVisualizer extends React.Component {
   }
 
   updateAudioSource = () => {
-    this.sourceNodeCopy = this.props.audioSourceNode
-    this.gainNode = new GainNode(window._audioCtx)
-    this.visualizer.connectAudio(this.sourceNodeCopy.connect(this.gainNode))
+    this.visualizer.connectAudio(this.props.audioSourceNode)
   }
 
   updatePlaying = () => {

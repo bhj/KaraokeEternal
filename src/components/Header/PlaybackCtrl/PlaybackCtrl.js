@@ -14,18 +14,18 @@ export default class PlaybackCtrl extends React.Component {
     isPlayer: PropTypes.bool.isRequired,
     status: PropTypes.object.isRequired,
     // actions
-    requestBackgroundAlpha: PropTypes.func.isRequired,
+    requestOptions: PropTypes.func.isRequired,
+    requestPause: PropTypes.func.isRequired,
     requestPlay: PropTypes.func.isRequired,
     requestPlayNext: PropTypes.func.isRequired,
-    requestPause: PropTypes.func.isRequired,
-    requestVisualizer: PropTypes.func.isRequired,
-    requestVisualizerPreset: PropTypes.func.isRequired,
     requestVolume: PropTypes.func.isRequired,
   }
 
   state = {
     isVisible: false,
   }
+
+  toggleDisplayCtrl = () => this.setState({ isVisible: !this.state.isVisible })
 
   render () {
     const { props } = this
@@ -74,18 +74,11 @@ export default class PlaybackCtrl extends React.Component {
           isVisualizerEnabled={props.status.visualizer.isEnabled}
           isVisualizerSupported={props.status.visualizer.isSupported}
           visualizerPresetName={props.status.visualizer.presetName}
-          visualizerSensitivity={props.status.visualizer.sensitivity}
-          onAlphaChange={props.requestBackgroundAlpha}
-          onChangePreset={props.requestVisualizerPreset}
-          onChange={props.requestVisualizer}
           onClose={this.toggleDisplayCtrl}
+          onRequestOptions={props.requestOptions}
         />
       </div>
     )
-  }
-
-  toggleDisplayCtrl = () => {
-    this.setState({ isVisible: !this.state.isVisible })
   }
 }
 

@@ -4,44 +4,36 @@ import Player from '../Player'
 import PlayerTextOverlay from '../PlayerTextOverlay'
 import PlayerVisualizer from '../PlayerVisualizer'
 
-window._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-
 class PlayerController extends React.Component {
   static propTypes = {
     alpha: PropTypes.number.isRequired,
+    historyJSON: PropTypes.string.isRequired,
     isAlphaSupported: PropTypes.bool.isRequired,
-    isPlaying: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
+    isErrored: PropTypes.bool.isRequired,
+    isPlaying: PropTypes.bool.isRequired,
     isPlayingNext: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
-    isErrored: PropTypes.bool.isRequired,
+    isReplayGainEnabled: PropTypes.bool.isRequired,
     queue: PropTypes.object.isRequired,
     queueId: PropTypes.number.isRequired,
+    rgTrackGain: PropTypes.number,
+    rgTrackPeak: PropTypes.number,
     visualizer: PropTypes.object.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
-    cancelStatus: PropTypes.func.isRequired,
     emitLeave: PropTypes.func.isRequired,
     emitStatus: PropTypes.func.isRequired,
-    loadQueueItem: PropTypes.func.isRequired,
-    mediaElementChange: PropTypes.func.isRequired,
-    mediaRequest: PropTypes.func.isRequired,
-    mediaRequestSuccess: PropTypes.func.isRequired,
-    mediaRequestError: PropTypes.func.isRequired,
     playerError: PropTypes.func.isRequired,
-    queueEnd: PropTypes.func.isRequired,
+    playerLoad: PropTypes.func.isRequired,
+    playerPlay: PropTypes.func.isRequired,
+    playerStatus: PropTypes.func.isRequired,
   }
 
   state = {
     audioSourceNode: null,
-  }
-
-  // simplify player logic; if this reference changes on each
-  // render it will cause an infinite loop of status updates
-  defaultQueueItem = {
-    queueId: -1,
   }
 
   componentDidMount () {
@@ -49,60 +41,40 @@ class PlayerController extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.cancelStatus()
     this.props.emitLeave()
   }
 
   componentDidUpdate (prevProps) {
-    const { isPlaying, isPlayingNext, isAtQueueEnd, queueId, visualizer } = this.props
+    const { props } = this
 
     // playing for first time or playing next?
-    if (isPlaying && (queueId === -1 || isPlayingNext)) {
+    if ((props.isPlaying && props.queueId === -1) || props.isPlayingNext) {
       this.handleLoadNext()
-    }
-
-    // check if queue is no longer exhausted
-    if (isAtQueueEnd && prevProps.queue.result !== this.props.queue.result) {
-      this.handleLoadNext()
-    }
-
-    // may have been suspended by browser if no user interaction yet
-    if (prevProps.isPlaying !== isPlaying) {
-      window._audioCtx.resume()
-      this.props.cancelStatus()
-    }
-
-    // improve client ui responsiveness
-    if (prevProps.queueId !== queueId) {
-      this.props.cancelStatus()
-      this.props.emitStatus({ position: 0 })
       return
     }
 
-    // improve client ui responsiveness
-    if (prevProps.visualizer.isEnabled !== visualizer.isEnabled) {
-      this.props.cancelStatus()
+    // queue was exhausted, but is no longer?
+    if (props.isAtQueueEnd && prevProps.queue.result !== props.queue.result) {
+      this.handleLoadNext()
+      return
+    }
+
+    // re-trying after error?
+    if (props.isErrored && props.isPlaying && !prevProps.isPlaying) {
+      props.playerStatus({ isErrored: false })
+      return
     }
 
     this.props.emitStatus()
   }
 
-  handleMediaElement = (el, mediaInfo) => {
-    this.setState({ audioSourceNode: window._audioCtx.createMediaElementSource(el) }, () => {
-      // route it back to the output, otherwise, silence
-      this.state.audioSourceNode.connect(window._audioCtx.destination)
-    })
-
-    // isAlphaSupported, etc.
-    this.props.mediaElementChange(mediaInfo)
+  handleAudioSourceNode = (source) => {
+    this.setState({ audioSourceNode: source })
   }
 
-  handleMediaRequestError = msg => {
-    this.props.mediaRequestError(msg)
-  }
-
-  handleError = msg => {
+  handleError = (msg) => {
     this.props.playerError(msg)
+    this.props.emitStatus()
   }
 
   handleLoadNext = () => {
@@ -110,46 +82,70 @@ class PlayerController extends React.Component {
 
     // queue exhausted?
     if (curIdx === this.props.queue.result.length - 1) {
-      this.props.queueEnd()
+      this.props.playerStatus({
+        isAtQueueEnd: true,
+        isPlayingNext: false,
+      })
+
       return
     }
 
-    this.props.loadQueueItem(this.props.queue.result[curIdx + 1])
+    // update history of played items
+    const history = JSON.parse(this.props.historyJSON)
+
+    if (this.props.queueId !== -1) {
+      history.push(this.props.queueId)
+    }
+
+    this.props.playerStatus({
+      historyJSON: JSON.stringify(history),
+      isAtQueueEnd: false,
+      isPlaying: true,
+      isPlayingNext: false,
+      position: 0,
+      queueId: this.props.queue.result[curIdx + 1],
+    })
+  }
+
+  handleStatus = (status) => {
+    this.props.playerStatus(status)
+    this.props.emitStatus()
   }
 
   render () {
     const { props, state } = this
-    const queueItem = props.queueId === -1 ? this.defaultQueueItem : props.queue.entities[props.queueId]
+    const queueItem = props.queue.entities[props.queueId]
 
     return (
       <>
+        <Player
+          alpha={props.alpha}
+          isPlaying={props.isPlaying}
+          isVisible={!!queueItem && !props.isErrored && !props.isAtQueueEnd}
+          isReplayGainEnabled={props.isReplayGainEnabled}
+          mediaId={queueItem ? queueItem.mediaId : null}
+          mediaKey={queueItem ? queueItem.queueId : null}
+          mediaType={queueItem ? queueItem.player : null}
+          onAudioSourceNode={this.handleAudioSourceNode}
+          onEnd={this.handleLoadNext}
+          onError={this.handleError}
+          onLoad={props.playerLoad}
+          onPlay={props.playerPlay}
+          onStatus={this.handleStatus}
+          rgTrackGain={props.rgTrackGain}
+          rgTrackPeak={props.rgTrackPeak}
+          volume={props.volume}
+          width={props.width}
+          height={props.height}
+        />
         {state.audioSourceNode && props.isAlphaSupported && props.visualizer.isSupported && props.visualizer.isEnabled &&
           <PlayerVisualizer
             audioSourceNode={state.audioSourceNode}
             isPlaying={props.isPlaying}
             presetKey={props.visualizer.presetKey}
-            queueItem={queueItem}
-            sensitivity={props.visualizer.sensitivity}
             width={props.width}
             height={props.height}
             volume={props.volume}
-          />
-        }
-        {queueItem.queueId !== -1 && !props.isErrored && !props.isAtQueueEnd &&
-          <Player
-            alpha={props.alpha}
-            queueItem={queueItem}
-            volume={props.volume}
-            isPlaying={props.isPlaying}
-            onMediaElement={this.handleMediaElement}
-            onMediaRequest={props.mediaRequest}
-            onMediaRequestSuccess={props.mediaRequestSuccess}
-            onMediaRequestError={this.handleMediaRequestError}
-            onStatus={props.emitStatus}
-            onMediaEnd={this.handleLoadNext}
-            onError={this.handleError}
-            width={props.width}
-            height={props.height}
           />
         }
         <PlayerTextOverlay

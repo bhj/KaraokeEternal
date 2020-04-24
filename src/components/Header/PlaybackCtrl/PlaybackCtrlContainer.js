@@ -1,23 +1,19 @@
 import { connect } from 'react-redux'
 import PlaybackCtrl from './PlaybackCtrl'
 import {
-  requestBackgroundAlpha,
+  requestOptions,
   requestPause,
   requestPlay,
   requestPlayNext,
-  requestVisualizer,
-  requestVisualizerPreset,
   requestVolume,
 } from 'store/modules/status'
 
 //  Object of action creators (can also be function that returns object).
 const mapActionCreators = {
-  requestBackgroundAlpha,
+  requestOptions,
   requestPause,
   requestPlay,
   requestPlayNext,
-  requestVisualizer,
-  requestVisualizerPreset,
   requestVolume,
 }
 
@@ -25,7 +21,7 @@ const mapStateToProps = (state) => {
   return {
     isAdmin: state.user.isAdmin,
     isInRoom: state.user.roomId !== null,
-    isPlayer: state.location.pathname === '/player',
+    isPlayer: state.location.pathname.startsWith('/player'),
     status: state.status,
   }
 }

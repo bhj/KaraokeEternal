@@ -1,43 +1,59 @@
 import { CANCEL } from 'redux-throttle'
 import {
-  PLAYER_BG_ALPHA,
+  PLAYER_CMD_NEXT,
+  PLAYER_CMD_OPTIONS,
+  PLAYER_CMD_PAUSE,
+  PLAYER_CMD_PLAY,
+  PLAYER_CMD_VOLUME,
+  PLAYER_EMIT_LEAVE,
+  PLAYER_EMIT_STATUS,
   PLAYER_ERROR,
-  PLAYER_QUEUE_LOAD,
-  PLAYER_LEAVE_REQUEST,
-  PLAYER_MEDIA_ELEMENT_CHANGE,
-  PLAYER_MEDIA_REQUEST,
-  PLAYER_MEDIA_REQUEST_SUCCESS,
-  PLAYER_MEDIA_REQUEST_ERROR,
-  PLAYER_NEXT,
-  PLAYER_PAUSE,
+  PLAYER_LOAD,
   PLAYER_PLAY,
-  PLAYER_QUEUE_END,
-  PLAYER_STATUS_REQUEST,
-  PLAYER_VOLUME,
+  PLAYER_STATUS,
 } from 'shared/actionTypes'
 
-// have server emit player status to room
-export function emitStatus (status) {
+// ------------------------------------
+// Actions triggered by media events
+// ------------------------------------
+export function playerStatus (status = {}) {
+  return {
+    type: PLAYER_STATUS,
+    payload: status,
+  }
+}
+
+export function playerError (msg) {
+  return {
+    type: PLAYER_ERROR,
+    payload: { message: msg },
+  }
+}
+
+export function playerLoad () {
+  return {
+    type: PLAYER_LOAD,
+  }
+}
+
+export function playerPlay () {
+  return {
+    type: PLAYER_PLAY,
+  }
+}
+
+// ------------------------------------
+// Actions for emitting to room
+// ------------------------------------
+export function emitStatus (cancelPrev = false) {
   return (dispatch, getState) => {
-    const player = getState().player
-    const visualizer = getState().playerVisualizer
+    if (cancelPrev) dispatch(cancelEmitStatus())
 
     dispatch({
-      type: PLAYER_STATUS_REQUEST,
+      type: PLAYER_EMIT_STATUS,
       payload: {
-        alpha: player.alpha,
-        isAlphaSupported: player.isAlphaSupported,
-        errorMessage: player.errorMessage,
-        // string primitive is a hack to pass selector equality check on client side
-        historyJSON: JSON.stringify(player.history),
-        isAtQueueEnd: player.isAtQueueEnd,
-        isErrored: player.isErrored,
-        isPlaying: player.isPlaying,
-        position: player.position,
-        queueId: player.queueId,
-        volume: player.volume,
-        visualizer,
-        ...status, // may have current position, etc.
+        ...getState().player,
+        visualizer: getState().playerVisualizer,
       },
       meta: {
         throttle: {
@@ -49,76 +65,22 @@ export function emitStatus (status) {
   }
 }
 
-// generic player error
-export function playerError (message) {
-  return {
-    type: PLAYER_ERROR,
-    payload: { message },
-  }
-}
-
-// player left room
-export function emitLeave () {
-  return {
-    type: PLAYER_LEAVE_REQUEST,
-  }
-}
-
-// cancel any pending status emits
-export function cancelStatus () {
+// cancel any throttled/queued status emits
+export function cancelEmitStatus () {
   return {
     type: CANCEL,
     payload: {
-      type: PLAYER_STATUS_REQUEST
+      type: PLAYER_EMIT_STATUS,
     }
   }
 }
 
-// sets new queueId and adds previous to history
-export function loadQueueItem (queueId) {
-  return {
-    type: PLAYER_QUEUE_LOAD,
-    payload: {
-      queueId,
-    }
-  }
-}
-
-export function mediaElementChange (payload) {
-  return {
-    type: PLAYER_MEDIA_ELEMENT_CHANGE,
-    payload,
-  }
-}
-
-export function mediaRequest (meta) {
-  return {
-    type: PLAYER_MEDIA_REQUEST,
-    payload: meta,
-  }
-}
-
-export function mediaRequestSuccess () {
-  return {
-    type: PLAYER_MEDIA_REQUEST_SUCCESS,
-  }
-}
-
-export function mediaRequestError (message) {
+export function emitLeave () {
   return (dispatch, getState) => {
+    dispatch(cancelEmitStatus())
     dispatch({
-      type: PLAYER_MEDIA_REQUEST_ERROR,
-      payload: { message }
+      type: PLAYER_EMIT_LEAVE,
     })
-
-    // generic error action (stops playback)
-    dispatch(playerError(message))
-  }
-}
-
-export function queueEnd () {
-  return {
-    type: PLAYER_QUEUE_END,
   }
 }
 
@@ -126,79 +88,46 @@ export function queueEnd () {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_BG_ALPHA]: (state, { payload }) => ({
+  [PLAYER_CMD_NEXT]: (state, { payload }) => ({
     ...state,
-    alpha: payload,
+    isPlayingNext: true,
+  }),
+  [PLAYER_CMD_OPTIONS]: (state, { payload }) => ({
+    ...state,
+    alpha: typeof payload.alpha === 'number' ? payload.alpha : state.alpha,
+  }),
+  [PLAYER_CMD_PAUSE]: (state, { payload }) => ({
+    ...state,
+    isPlaying: false,
+  }),
+  [PLAYER_CMD_PLAY]: (state, { payload }) => ({
+    ...state,
+    isPlaying: true,
+  }),
+  [PLAYER_CMD_VOLUME]: (state, { payload }) => ({
+    ...state,
+    volume: payload,
   }),
   [PLAYER_ERROR]: (state, { payload }) => ({
     ...state,
-    isPlaying: false,
-    isErrored: true,
     errorMessage: payload.message,
-  }),
-  [PLAYER_MEDIA_ELEMENT_CHANGE]: (state, { payload }) => ({
-    ...state,
-    isAlphaSupported: payload.isAlphaSupported,
-  }),
-  [PLAYER_MEDIA_REQUEST]: (state, { payload }) => ({
-    ...state,
-    isFetching: true,
-  }),
-  [PLAYER_MEDIA_REQUEST_SUCCESS]: (state, { payload }) => ({
-    ...state,
+    isErrored: true,
     isFetching: false,
-  }),
-  [PLAYER_MEDIA_REQUEST_ERROR]: (state, { payload }) => ({
-    ...state,
-    isFetching: false,
-  }),
-  [PLAYER_NEXT]: (state, { payload }) => ({
-    ...state,
-    isErrored: false,
-    isPlaying: true,
-    isPlayingNext: true,
-    lastCommandAt: Date.now(),
-  }),
-  [PLAYER_PAUSE]: (state, { payload }) => ({
-    ...state,
     isPlaying: false,
-    lastCommandAt: Date.now(),
+  }),
+  [PLAYER_LOAD]: (state, { payload }) => ({
+    ...state,
+    errorMessage: '',
+    isErrored: false,
+    isFetching: true,
   }),
   [PLAYER_PLAY]: (state, { payload }) => ({
     ...state,
-    isErrored: false,
-    isPlaying: true,
-    lastCommandAt: Date.now(),
+    isFetching: false,
   }),
-  [PLAYER_QUEUE_END]: (state, { payload }) => ({
+  [PLAYER_STATUS]: (state, { payload }) => ({
     ...state,
-    isAtQueueEnd: true,
-    isPlayingNext: false,
-  }),
-  [PLAYER_QUEUE_LOAD]: (state, { payload }) => {
-    const history = state.history.slice()
-
-    // save previous
-    if (state.queueId !== -1) {
-      history.push(state.queueId)
-    }
-
-    return {
-      ...state,
-      history,
-      isAtQueueEnd: false,
-      isPlayingNext: false,
-      queueId: payload.queueId,
-    }
-  },
-  [PLAYER_STATUS_REQUEST]: (state, { payload }) => ({
-    ...state,
-    position: payload.position,
-  }),
-  [PLAYER_VOLUME]: (state, { payload }) => ({
-    ...state,
-    volume: payload,
-    lastCommandAt: Date.now(),
+    ...payload,
   }),
 }
 
@@ -208,16 +137,17 @@ const ACTION_HANDLERS = {
 const initialState = {
   alpha: 0.5,
   errorMessage: '',
-  history: [], // queueIds
+  historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,
   isAlphaSupported: false,
   isErrored: false,
   isFetching: false,
   isPlaying: false,
   isPlayingNext: false,
-  lastCommandAt: null,
   position: 0,
   queueId: -1,
+  rgTrackGain: null,
+  rgTrackPeak: null,
   volume: 1,
 }
 

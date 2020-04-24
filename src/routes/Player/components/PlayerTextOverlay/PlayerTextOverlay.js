@@ -6,7 +6,7 @@ import './PlayerTextOverlay.css'
 
 class PlayerTextOverlay extends React.Component {
   static propTypes = {
-    queueItem: PropTypes.object.isRequired,
+    queueItem: PropTypes.object,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
@@ -20,7 +20,7 @@ class PlayerTextOverlay extends React.Component {
 
     if (this.props.isQueueEmpty || this.props.isAtQueueEnd) {
       Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' />
-    } else if (queueItem.queueId === -1) {
+    } else if (!queueItem) {
       Component = <ColorCycle text='PRESS PLAY TO BEGIN' />
     } else if (this.props.isErrored) {
       const offset = Math.random() * -300

@@ -8,21 +8,22 @@ const QUEUE_ITEM_HEIGHT = 92
 
 class QueueList extends React.Component {
   static propTypes = {
-    curId: PropTypes.number,
-    curPos: PropTypes.number,
     errorMessage: PropTypes.string.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
     playerHistory: PropTypes.array.isRequired,
+    position: PropTypes.number,
     queue: PropTypes.object.isRequired,
+    queueId: PropTypes.number,
+    songs: PropTypes.object.isRequired,
     starredSongs: PropTypes.array.isRequired,
     user: PropTypes.object.isRequired,
     waits: PropTypes.object.isRequired,
     // actions
-    requestPlayNext: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
-    showSongInfo: PropTypes.func.isRequired,
+    requestPlayNext: PropTypes.func.isRequired,
     showErrorMessage: PropTypes.func.isRequired,
+    showSongInfo: PropTypes.func.isRequired,
     toggleSongStarred: PropTypes.func.isRequired,
   }
 
@@ -31,7 +32,7 @@ class QueueList extends React.Component {
   componentDidMount () {
     // ensure current song is visible
     if (this.containerRef.current) {
-      const i = this.props.queue.result.indexOf(this.props.curId)
+      const i = this.props.queue.result.indexOf(this.props.queueId)
       this.containerRef.current.parentNode.scrollTop = QUEUE_ITEM_HEIGHT * i
     }
   }
@@ -43,10 +44,11 @@ class QueueList extends React.Component {
     // build children array
     const items = props.queue.result.map(queueId => {
       const item = props.queue.entities[queueId]
-      if (item.isOptimistic) return null
+      if (item.isOptimistic || !props.songs.entities[item.songId]) return null
 
-      const isActive = (queueId === props.curId) && !props.isAtQueueEnd
-      const isUpcoming = queueId !== props.curId && !props.playerHistory.includes(queueId)
+      const duration = props.songs.entities[item.songId].duration
+      const isCurrent = (queueId === props.queueId) && !props.isAtQueueEnd
+      const isUpcoming = queueId !== props.queueId && !props.playerHistory.includes(queueId)
       const isOwner = item.userId === props.user.userId
 
       return (
@@ -64,17 +66,17 @@ class QueueList extends React.Component {
           }}
         >
           <QueueItem {...item}
-            errorMessage={isActive && props.errorMessage ? props.errorMessage : ''}
-            isActive={isActive}
-            isErrored={isActive && props.isErrored}
+            errorMessage={isCurrent && props.errorMessage ? props.errorMessage : ''}
+            isCurrent={isCurrent}
+            isErrored={isCurrent && props.isErrored}
             isInfoable={props.user.isAdmin}
             isOwner={isOwner}
-            isPlayed={!isUpcoming && !isActive}
+            isPlayed={!isUpcoming && !isCurrent}
             isRemovable={isUpcoming && (isOwner || props.user.isAdmin)}
-            isSkippable={isActive && (isOwner || props.user.isAdmin)}
+            isSkippable={isCurrent && (isOwner || props.user.isAdmin)}
             isStarred={props.starredSongs.includes(item.songId)}
             isUpcoming={isUpcoming}
-            pctPlayed={isActive ? props.curPos / item.duration * 100 : 0}
+            pctPlayed={isCurrent ? props.position / duration * 100 : 0}
             wait={formatSeconds(props.waits[queueId], true)} // fuzzy
             // actions
             onErrorInfoClick={props.showErrorMessage}
