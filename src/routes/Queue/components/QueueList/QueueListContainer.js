@@ -51,6 +51,7 @@ const getWaits = createSelector(
 
 const mapStateToProps = (state) => {
   return {
+    artists: state.artists,
     errorMessage: state.status.errorMessage,
     isAtQueueEnd: state.status.isAtQueueEnd,
     isErrored: state.status.isErrored,

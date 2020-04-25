@@ -8,6 +8,7 @@ const QUEUE_ITEM_HEIGHT = 92
 
 class QueueList extends React.Component {
   static propTypes = {
+    artists: PropTypes.object.isRequired,
     errorMessage: PropTypes.string.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
@@ -44,7 +45,10 @@ class QueueList extends React.Component {
     // build children array
     const items = props.queue.result.map(queueId => {
       const item = props.queue.entities[queueId]
-      if (item.isOptimistic || !props.songs.entities[item.songId]) return null
+
+      if (item.isOptimistic ||
+          !props.songs.entities[item.songId] ||
+          !props.artists.entities[props.songs.entities[item.songId].artistId]) return null
 
       const duration = props.songs.entities[item.songId].duration
       const isCurrent = (queueId === props.queueId) && !props.isAtQueueEnd
@@ -66,6 +70,7 @@ class QueueList extends React.Component {
           }}
         >
           <QueueItem {...item}
+            artist={props.artists.entities[props.songs.entities[item.songId].artistId].name}
             errorMessage={isCurrent && props.errorMessage ? props.errorMessage : ''}
             isCurrent={isCurrent}
             isErrored={isCurrent && props.isErrored}
@@ -77,6 +82,7 @@ class QueueList extends React.Component {
             isStarred={props.starredSongs.includes(item.songId)}
             isUpcoming={isUpcoming}
             pctPlayed={isCurrent ? props.position / duration * 100 : 0}
+            title={props.songs.entities[item.songId].title}
             wait={formatSeconds(props.waits[queueId], true)} // fuzzy
             // actions
             onErrorInfoClick={props.showErrorMessage}

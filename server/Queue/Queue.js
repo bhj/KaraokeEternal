@@ -14,18 +14,14 @@ class Queue {
     const entities = {}
 
     const query = sql`
-      SELECT queueId, mediaId, userId,
+      SELECT queueId, songId, userId,
         media.isPreferred, media.relPath, media.rgTrackGain, media.rgTrackPeak,
-        artists.name AS artist,
-        songs.songId, songs.title,
         users.name AS userDisplayName, users.dateUpdated
       FROM
         queue
         INNER JOIN users USING(userId)
         INNER JOIN media USING (songId)
-        INNER JOIN songs USING (songId)
         INNER JOIN paths USING (pathId)
-        INNER JOIN artists USING (artistId)
       WHERE roomId = ${roomId}
       ORDER BY queueId, paths.priority ASC
     `

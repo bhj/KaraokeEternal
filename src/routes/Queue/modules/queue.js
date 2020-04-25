@@ -7,12 +7,10 @@ import {
 // add to queue
 export function queueSong (songId) {
   return (dispatch, getState) => {
-    const song = getState().songs.entities[songId]
-
     dispatch({
       type: QUEUE_ADD,
       meta: { isOptimistic: true },
-      payload: song,
+      payload: { songId },
     })
   }
 }
@@ -32,6 +30,7 @@ export function removeItem (queueId) {
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: (state, { payload }) => {
     // optimistic
+    // @todo: should probably use a result.length + rand index to avoid possible collision?
     const fakeQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 0
 
     return {
