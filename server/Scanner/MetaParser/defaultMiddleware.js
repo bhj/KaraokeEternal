@@ -72,13 +72,6 @@ m.set('remove surrounding quotes', (ctx, next) => {
   next()
 })
 
-// title case
-m.set('title case', (ctx, next) => {
-  ctx.artist = titleCase(ctx.artist)
-  ctx.title = titleCase(ctx.title)
-  next()
-})
-
 // some artist-specific tweaks
 m.set('artist tweaks', (ctx, next) => {
   // Last, First [Middle] -> First [Middle] Last
@@ -131,12 +124,6 @@ function cleanParts (patterns) {
 
     next()
   }
-}
-
-function titleCase (str) {
-  return str.replace(/\w\S*/g, function (word) {
-    return word.charAt(0).toUpperCase() + word.substring(1)
-  })
 }
 
 function normalizeStr (str, articles) {
