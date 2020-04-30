@@ -1,5 +1,6 @@
 ## TBD (not yet released)
 
+- (server) Improved filename parser and renamed config option `separator` to `delimiter`
 - (player) WebAudio support is now required (only for browsers running the player)
 - (player) Fixed an issue in Firefox where media might not (pre)load
 - (player) Removed visualizer sensitivity control (drop a note if you used it)

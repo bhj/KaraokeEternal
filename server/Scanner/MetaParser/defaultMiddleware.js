@@ -20,33 +20,31 @@ m.set('de-karaoke', (ctx, next) => {
 // parse
 // --------------
 
-// detect separator and set some (default) config
-m.set('detect separator', (ctx, next) => {
+// detect delimiter and split to parts
+m.set('split', (ctx, next) => {
   const matches = ctx.name.match(/ in the style of /i)
 
   ctx.cfg = {
-    separator: matches ? matches[0] : '-',
+    delimiter: matches ? matches[0] : '-',
     artistOnLeft: !matches,
     ...ctx.cfg,
+  }
+
+  // allow leading and/or trailing space around delimiter
+  const d = ctx.cfg.delimiter instanceof RegExp ? ctx.cfg.delimiter : new RegExp(` ?${ctx.cfg.delimiter} ?`, 'g')
+  ctx.parts = ctx.name.split(d)
+
+  if (ctx.parts.length < 2) {
+    throw new Error('delimiter not found in filename')
   }
 
   next()
 })
 
-// split to parts
-m.set('split to parts', (ctx, next) => {
-  // split, trim and remove empty parts
-  ctx.parts = ctx.name.split(ctx.cfg.separator)
-    .map(part => part.trim())
-    .filter(part => part.length)
-
-  next()
-})
-
-m.set('remove parts', cleanParts([
+m.set('clean parts', cleanParts([
   /^\d*\.?$/, // looks like a track number?
   /^\W*$/, // all non-word chars?
-  /^[a-zA-Z]{2,4}\d{1,}/i, // starts with 2-4 letters followed by 1 or more digits
+  /^[a-zA-Z]{2,4}[ -]?\d{1,}/i, // 2-4 letters followed by 1 or more digits
 ]))
 
 // set arist and title properties
@@ -56,7 +54,7 @@ m.set('set artist and title', (ctx, next) => {
 
   // @todo this assumes delimiter won't appear in title
   ctx.title = ctx.cfg.artistOnLeft ? ctx.parts.pop() : ctx.parts.shift()
-  ctx.artist = ctx.parts.join(ctx.cfg.separator)
+  ctx.artist = ctx.parts.join(ctx.cfg.delimiter)
 
   next()
 })
@@ -66,7 +64,7 @@ m.set('set artist and title', (ctx, next) => {
 // -----------
 
 // remove any surrounding quotes
-m.set('remove surrounding quotes', (ctx, next) => {
+m.set('remove quotes', (ctx, next) => {
   ctx.artist = ctx.artist.replace(/^['|"](.*)['|"]$/, '$1')
   ctx.title = ctx.title.replace(/^['|"](.*)['|"]$/, '$1')
   next()
@@ -115,26 +113,25 @@ m.set('normalize title', (ctx, next) => {
 // end middleware stack
 // ---------------------
 
+// clean left-to-right until a valid part is encountered (or only 2 parts left)
 function cleanParts (patterns) {
   return function (ctx, next) {
-    ctx.parts = ctx.parts.filter(part => {
-      if (ctx.parts.length < 3) return true
-      return !patterns.some(exp => !part.replace(exp, '').trim())
-    })
+    for (let i = 0; i < ctx.parts.length; i++) {
+      if (patterns.some(exp => exp.test(ctx.parts[i].trim())) && ctx.parts.length > 2) {
+        ctx.parts.shift()
+        i--
+      } else break
+    }
 
     next()
   }
 }
 
 function normalizeStr (str, articles) {
-  str = str.normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[([{].*[)\]}]/, '') // remove parantheses
-    .replace(' & ', ' and ') // normalize ampersand
-    .trim()
-
   str = removeArticles(str, articles)
-    .replace(/-/, ' ') // any remaining hyphens become spaces
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(' & ', ' and ') // normalize ampersand
     .replace(/[^\w\s]|_/g, '') // remove punctuation
 
   return str
@@ -144,7 +141,7 @@ function normalizeStr (str, articles) {
 function moveArticles (str, articles) {
   if (!Array.isArray(articles)) return str
 
-  for (let article of articles) {
+  for (const article of articles) {
     const search = article + ' '
 
     // leading article?
@@ -167,7 +164,7 @@ function moveArticles (str, articles) {
 }
 
 function removeArticles (str, articles) {
-  for (let article of articles) {
+  for (const article of articles) {
     const leading = new RegExp(`^${article} `, 'i')
     const trailing = new RegExp(`, ${article}$`, 'i')
 

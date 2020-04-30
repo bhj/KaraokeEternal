@@ -174,7 +174,7 @@ The default configuration is:
 return {
   articles: ['A', 'An', 'The'], // false will disable article normalization
   artistOnLeft: true,
-  separator: '-',
+  delimiter: '-',
 }
 {{< /highlight >}}
 
