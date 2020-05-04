@@ -6,7 +6,7 @@ class Media {
   /**
    * Get media matching all search criteria
    *
-   * @param  {object}  filter Search criteria
+   * @param  {Object}  filter Search criteria
    * @return {Promise}        Object with media results
    */
   static async search (filter) {
@@ -19,11 +19,17 @@ class Media {
       : sql`${sql.tuple(Object.keys(filter).map(sql.column))} = ${sql.tuple(Object.values(filter))}`
 
     const query = sql`
-      SELECT media.*, songs.*, artists.artistId, artists.name AS artist, artists.nameNorm AS artistNorm
+      SELECT
+        media.*,
+        songs.*,
+        artists.artistId, artists.name AS artist, artists.nameNorm AS artistNorm,
+        paths.pathId, paths.path
       FROM media
         INNER JOIN songs USING (songId)
         INNER JOIN artists USING (artistId)
+        INNER JOIN paths USING (pathId)
       WHERE ${whereClause}
+      ORDER BY paths.priority ASC
     `
     const rows = await db.all(String(query), query.parameters)
 
