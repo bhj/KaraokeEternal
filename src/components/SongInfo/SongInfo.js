@@ -25,7 +25,7 @@ export default class SongInfo extends Component {
 
       return (
         <div key={item.mediaId} styleName='media'>
-          {item.file}<br />
+          {item.path + (item.path.indexOf('/') === 0 ? '/' : '\\') + item.relPath}<br />
           <span styleName='label'>Duration: </span>{formatDuration(item.duration)}<br />
           <span styleName='label'>Media ID: </span>{mediaId}<br />
           <span styleName='label'>Preferred: </span>
