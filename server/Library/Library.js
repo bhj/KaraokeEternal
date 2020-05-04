@@ -61,7 +61,7 @@ class Library {
     // query #2: artists
     {
       const query = sql`
-        SELECT *
+        SELECT artistId, name
         FROM artists
         ORDER BY nameNorm ASC
       `
