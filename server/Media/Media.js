@@ -1,6 +1,6 @@
 const db = require('sqlite')
-const log = require('../lib/logger')('Media')
 const sql = require('sqlate')
+const log = require('../lib/logger')('Media')
 
 class Media {
   /**
@@ -44,8 +44,8 @@ class Media {
   /**
    * Add media file to the library
    *
-   * @param  {object}  media Media object
-   * @return {number}        New media's mediaId
+   * @param  {Object}  media Media object
+   * @return {Number}        New media's mediaId
    */
   static async add (media) {
     if (!Number.isInteger(media.songId) ||
@@ -71,7 +71,7 @@ class Media {
   /**
    * Update media item
    *
-   * @param  {object}  media Media object
+   * @param  {Object}  media Media object
    * @return {Promise}
    */
   static async update (media) {
@@ -95,7 +95,7 @@ class Media {
   /**
    * Removes media from the db in sqlite-friendly batches
    *
-   * @param  {array}  mediaIds
+   * @param  {Array}  mediaIds
    * @return {Promise}
    */
   static async remove (mediaIds) {
@@ -142,9 +142,9 @@ class Media {
 
   /**
    * Set isPreferred flag for a given media item
-   *
-   * @param  {number}  songId
-   * @return {Promise}
+   * @param  {Number}  mediaId
+   * @param  {Boolean} isPreferred
+   * @return {Promise} songId of the (un)preferred media item
    */
   static async setPreferred (mediaId, isPreferred) {
     if (!Number.isInteger(mediaId) || typeof isPreferred !== 'boolean') {
@@ -171,6 +171,8 @@ class Media {
     if (isPreferred) {
       await Media.update({ mediaId, isPreferred: 1 })
     }
+
+    return songId
   }
 }
 
