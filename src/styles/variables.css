@@ -1,9 +1,9 @@
 :root {
   --hue-blue: 209;
-  --hue-pink: 290;
+  --hue-pink: 280;
 
   /* Defaults */
-  --font-family: system-ui, Roboto, Helvetica, Arial, sans-serif;
+  --font-family: Raleway, system-ui, Roboto, Helvetica, Arial, sans-serif;
   --bg-color: #000;
   --text-color: hsl(var(--hue-blue), 10%, 87%);
   --link-color: hsl(var(--hue-blue), 92%, 70%);
@@ -22,8 +22,8 @@
   --btn-bg-color: hsl(var(--hue-blue), 40%, 30%);
   --btn-active-bg-color: var(--link-color);
   --btn-active-filter: none;
-  --btn-danger-bg-color: hsl(var(--hue-pink), 100%, 50%);
-  --btn-danger-filter: none;
+  --btn-danger-bg-color: hsl(var(--hue-pink), 90%, 60%);
+   --btn-danger-filter: none;
 
   /* UI chrome (header/footer) */
   --chrome-bg-color: hsla(var(--hue-blue), 100%, 5%, .8);
