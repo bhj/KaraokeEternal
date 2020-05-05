@@ -1,7 +1,6 @@
 .container {
   display: flex;
   position: absolute;
-  background: black;
   align-items: center;
   justify-content: center;
 }

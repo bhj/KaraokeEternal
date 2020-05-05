@@ -89,9 +89,7 @@ class Player extends React.Component {
     }
 
     return (
-      <div style={{ position: 'absolute', zIndex: 1 }}>
-        <PlayerComponent {...this.props} onAudioElement={this.handleAudioElement} />
-      </div>
+      <PlayerComponent {...this.props} onAudioElement={this.handleAudioElement} />
     )
   }
 }
