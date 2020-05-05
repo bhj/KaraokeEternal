@@ -26,27 +26,19 @@ class Library {
     // query #1: songs
     {
       const query = sql`
-        SELECT duration, isPreferred, songs.artistId AS artistId, songs.songId AS songId, songs.title AS title
+        SELECT duration, songs.artistId AS artistId, songs.songId AS songId, songs.title AS title,
+          MAX(isPreferred) AS isPreferred, COUNT(DISTINCT media.mediaId) AS numMedia
         FROM media
           INNER JOIN songs USING (songId)
           INNER JOIN paths USING (pathId)
+        GROUP BY songId
         ORDER BY songs.titleNorm, paths.priority ASC
       `
       const rows = await db.all(String(query), query.parameters)
 
       for (const row of rows) {
-        if (songs.entities[row.songId]) {
-          if (row.isPreferred) {
-            songs.entities[row.songId].duration = row.duration
-          }
-
-          songs.entities[row.songId].numMedia++
-          continue
-        }
-
-        delete row.isPreferred // no need to send over the wire
+        delete row.isPreferred
         songs.entities[row.songId] = row
-        songs.entities[row.songId].numMedia = 1
         songs.result.push(row.songId)
 
         // add to artist's songIds

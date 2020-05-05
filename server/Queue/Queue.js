@@ -15,28 +15,20 @@ class Queue {
 
     const query = sql`
       SELECT queueId, songId, userId,
-        media.isPreferred, media.relPath, media.rgTrackGain, media.rgTrackPeak,
-        users.name AS userDisplayName, users.dateUpdated
-      FROM
-        queue
+        media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
+        users.name AS userDisplayName, users.dateUpdated,
+        MAX(isPreferred)
+      FROM queue
         INNER JOIN users USING(userId)
         INNER JOIN media USING (songId)
         INNER JOIN paths USING (pathId)
       WHERE roomId = ${roomId}
+      GROUP BY queueId
       ORDER BY queueId, paths.priority ASC
     `
     const rows = await db.all(String(query), query.parameters)
 
     for (const row of rows) {
-      if (entities[row.queueId]) {
-        if (row.isPreferred) {
-          entities[row.queueId].mediaId = row.mediaId
-          entities[row.queueId].player = this.getPlayer(row.relPath)
-        }
-
-        continue
-      }
-
       result.push(row.queueId)
       entities[row.queueId] = row
       entities[row.queueId].player = this.getPlayer(row.relPath)
