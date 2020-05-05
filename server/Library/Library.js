@@ -1,7 +1,7 @@
-const path = require('path')
 const db = require('sqlite')
 const sql = require('sqlate')
 const log = require('../lib/logger')('Library')
+const Media = require('../Media')
 let _libraryVersion = Date.now()
 let _starCountsVersion = Date.now()
 
@@ -72,6 +72,35 @@ class Library {
       artists,
       songs,
       version: Library.getLibraryVersion(),
+    }
+  }
+
+  /**
+  * Get single song in format similar to get()
+  *
+  * @param  {number}  songId
+  * @return {Promise} normalized media entries
+  */
+  static async getSong (songId) {
+    const { result, entities } = await Media.search({ songId })
+    if (!result.length) return {}
+
+    // should be in order of path priority...
+    let media = entities[result[0]]
+
+    // ...but are any preferred?
+    for (const mediaId of result) {
+      if (entities[mediaId].isPreferred) media = entities[mediaId]
+    }
+
+    return {
+      [songId]: {
+        artistId: media.artistId,
+        duration: media.duration,
+        songId: media.songId,
+        title: media.title,
+        numMedia: result.length,
+      }
     }
   }
 
@@ -160,43 +189,6 @@ class Library {
     }
 
     return match
-  }
-
-  /**
-  * Get underlying media for a given song
-  *
-  * @param  {number}  songId
-  * @return {Promise} normalized media entries
-  */
-  static async getSong (songId) {
-    const media = {
-      result: [],
-      entities: {},
-    }
-
-    const query = sql`
-      SELECT media.*, paths.path, songs.artistId, songs.songId, songs.title
-      FROM media
-        INNER JOIN (
-          SELECT *
-          FROM paths
-          GROUP BY pathId
-        ) paths ON (paths.pathId = media.pathId)
-        INNER JOIN songs USING (songId)
-        INNER JOIN artists USING (artistId)
-      WHERE songId = ${songId}
-      ORDER BY paths.priority ASC
-    `
-    const rows = await db.all(String(query), query.parameters)
-
-    rows.forEach(row => {
-      media.result.push(row.mediaId)
-
-      row.file = row.path + path.sep + row.relPath
-      media.entities[row.mediaId] = row
-    })
-
-    return media
   }
 
   /**

@@ -6,10 +6,14 @@ const log = require('../lib/logger')('Media')
 const getCdgName = require('../lib/getCdgName')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/media' })
+const Library = require('../Library')
 const Media = require('./Media')
 const Prefs = require('../Prefs')
 const Queue = require('../Queue')
-const { QUEUE_PUSH } = require('../../shared/actionTypes')
+const {
+  LIBRARY_PUSH_SONG,
+  QUEUE_PUSH
+} = require('../../shared/actionTypes')
 
 // stream a media file
 router.get('/:mediaId', async (ctx, next) => {
@@ -73,7 +77,7 @@ router.all('/:mediaId/prefer', async (ctx, next) => {
     ctx.throw(422)
   }
 
-  await Media.setPreferred(mediaId, ctx.request.method === 'PUT')
+  const songId = await Media.setPreferred(mediaId, ctx.request.method === 'PUT')
   ctx.status = 200
 
   // emit (potentially) updated queues to each room
@@ -89,6 +93,12 @@ router.all('/:mediaId/prefer', async (ctx, next) => {
         })
       }
     })
+
+  // emit (potentially) new duration
+  ctx.io.emit('action', {
+    type: LIBRARY_PUSH_SONG,
+    payload: await Library.getSong(songId),
+  })
 })
 
 module.exports = router

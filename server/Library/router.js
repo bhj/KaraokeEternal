@@ -1,8 +1,8 @@
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
-const Library = require('./Library')
+const Media = require('../Media')
 
-// get song info (including media)
+// lists underlying media for a given song
 router.get('/song/:songId', async (ctx, next) => {
   // must be admin
   if (!ctx.user.isAdmin) {
@@ -15,7 +15,13 @@ router.get('/song/:songId', async (ctx, next) => {
     ctx.throw(401, 'Invalid songId')
   }
 
-  ctx.body = await Library.getSong(songId)
+  const res = await Media.search(songId)
+
+  if (!res.result.length) {
+    ctx.throw(404)
+  }
+
+  ctx.body = res
 })
 
 module.exports = router
