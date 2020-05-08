@@ -86,7 +86,7 @@
     "butterchurn": "^2.6.7",
     "butterchurn-presets": "^2.4.7",
     "case-sensitive-paths-webpack-plugin": "^2.2.0",
-    "cdgraphics": "^2.0.1",
+    "cdgraphics": "^3.0.0-beta.2",
     "core-js-compat": "^3.6.1",
     "cross-env": "^6.0.3",
     "css-loader": "^3.4.0",

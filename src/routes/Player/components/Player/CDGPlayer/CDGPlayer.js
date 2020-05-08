@@ -125,7 +125,7 @@ class CDGPlayer extends React.Component {
     this.props.onError(`${message} (code ${code})`)
   }
 
-  handlePause = () => this.cdg.stop()
+  handlePause = () => this.cdg.pause()
   handlePlay = () => this.cdg.play()
 
   handleTimeUpdate = () => {
