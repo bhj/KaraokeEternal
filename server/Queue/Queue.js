@@ -17,7 +17,7 @@ class Queue {
       SELECT queueId, songId, userId,
         media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
         users.name AS userDisplayName, users.dateUpdated,
-        MAX(isPreferred)
+        MAX(isPreferred) AS isPreferred
       FROM queue
         INNER JOIN users USING(userId)
         INNER JOIN media USING (songId)
@@ -32,7 +32,10 @@ class Queue {
       result.push(row.queueId)
       entities[row.queueId] = row
       entities[row.queueId].player = this.getPlayer(row.relPath)
+
+      // don't send over the wire
       delete entities[row.queueId].relPath
+      delete entities[row.queueId].isPreferred
     }
 
     return { result, entities }
