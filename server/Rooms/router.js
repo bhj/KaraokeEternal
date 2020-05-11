@@ -110,17 +110,26 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
     ctx.throw(422, 'Invalid roomId')
   }
 
-  const query = sql`
+  let query = sql`
     DELETE FROM rooms
     WHERE roomId = ${roomId}
   `
-  const res = await db.run(String(query), query.parameters)
+  let res = await db.run(String(query), query.parameters)
 
   if (res.stmt.changes) {
     log.info('%s deleted roomId %s', ctx.user.name, roomId)
   }
 
-  // @todo remove room's queue
+  // remove room's queue
+  query = sql`
+    DELETE FROM queue
+    WHERE roomId = ${roomId}
+  `
+  res = await db.run(String(query), query.parameters)
+
+  if (res.stmt.changes) {
+    log.info('removed %s queue item(s) for roomId %s', res.stmt.changes, roomId)
+  }
 
   // send updated room list
   ctx.body = await Rooms.get(ctx)
