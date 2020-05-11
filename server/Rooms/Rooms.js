@@ -5,15 +5,13 @@ class Rooms {
   /**
    * Get all rooms
    *
-   * @param  {Object}  ctx  Koa request context
+   * @param  {Boolean}  onlyOpen  Whether to restrict query to open rooms only
    * @return {Promise}
    */
-  static async get (ctx) {
+  static async get (onlyOpen = true) {
     const result = []
     const entities = {}
-
-    // only admins can see non-open rooms
-    const whereClause = !ctx.user.isAdmin ? sql`status = "open"` : sql`true`
+    const whereClause = onlyOpen ? sql`status = "open"` : sql`true`
 
     const query = sql`
       SELECT * FROM rooms
@@ -23,10 +21,7 @@ class Rooms {
     const res = await db.all(String(query), query.parameters)
 
     res.forEach(row => {
-      const room = ctx.io.sockets.adapter.rooms[row.roomId]
       result.push(row.roomId)
-
-      row.numUsers = room ? room.length : 0
       row.dateCreated = row.dateCreated.substring(0, 10)
       entities[row.roomId] = row
     })

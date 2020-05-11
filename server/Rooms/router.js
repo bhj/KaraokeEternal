@@ -4,13 +4,20 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const log = require('../lib/logger')('Rooms')
 const Rooms = require('../Rooms')
-
 const NAME_MAX_LENGTH = 50
 const STATUSES = ['open', 'closed']
 
-// list available rooms
+// list rooms
 router.get('/rooms', async (ctx, next) => {
-  ctx.body = await Rooms.get(ctx)
+  // non-admins can only see open rooms
+  const res = await Rooms.get(!ctx.user.isAdmin)
+
+  res.result.forEach(roomId => {
+    const room = ctx.io.sockets.adapter.rooms[Rooms.prefix(roomId)]
+    res.entities[roomId].numUsers = room ? room.length : 0
+  })
+
+  ctx.body = res
 })
 
 // create room
