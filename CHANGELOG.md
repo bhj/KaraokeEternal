@@ -1,8 +1,9 @@
 ## TBD (not yet released)
 
+- (server) Fixed an issue where the queue could be incorrect after setting preferred media
 - (server) Improved filename parser and renamed config option `separator` to `delimiter`
-- (player) WebAudio support is now required (only for browsers running the player)
-- (player) Fixed an issue in Firefox where media might not (pre)load
+- (player) Web Audio API support is now required (only for browsers running the player)
+- (player) Fixed an issue where media might not (pre)load in Firefox
 - (player) Removed visualizer sensitivity control (drop a note if you used it)
 
 ## v0.7.4 (2019-12-30)

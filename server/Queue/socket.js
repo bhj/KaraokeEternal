@@ -41,7 +41,7 @@ const ACTION_HANDLERS = {
     acknowledge({ type: QUEUE_ADD + '_SUCCESS' })
 
     // to all in room
-    sock.server.to(sock.user.roomId).emit('action', {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
       payload: await Queue.get(sock.user.roomId)
     })
@@ -71,7 +71,7 @@ const ACTION_HANDLERS = {
     acknowledge({ type: QUEUE_REMOVE + '_SUCCESS' })
 
     // tell room
-    sock.server.to(sock.user.roomId).emit('action', {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
       payload: await Queue.get(sock.user.roomId)
     })

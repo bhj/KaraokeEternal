@@ -6,6 +6,7 @@ const LibrarySocket = require('./Library/socket')
 const PlayerSocket = require('./Player/socket')
 const Prefs = require('./Prefs')
 const PrefsSocket = require('./Prefs/socket')
+const Rooms = require('./Rooms')
 const Queue = require('./Queue')
 const QueueSocket = require('./Queue/socket')
 const parseCookie = require('./lib/parseCookie')
@@ -59,7 +60,7 @@ module.exports = function (io, jwtKey) {
         return
       }
 
-      const room = sock.adapter.rooms[sock.user.roomId] || []
+      const room = sock.adapter.rooms[Rooms.prefix(sock.user.roomId)] || []
 
       log.info('%s (%s) left room %s (%s; %s in room)',
         sock.user.name, sock.id, sock.user.roomId, reason, room.length
@@ -69,7 +70,7 @@ module.exports = function (io, jwtKey) {
       if (room.length && !Object
         .keys(room.sockets)
         .some(id => io.sockets.sockets[id] && !!io.sockets.sockets[id]._lastPlayerStatus)) {
-        io.to(sock.user.roomId).emit('action', {
+        io.to(Rooms.prefix(sock.user.roomId)).emit('action', {
           type: PLAYER_LEAVE,
         })
       }
@@ -145,9 +146,8 @@ module.exports = function (io, jwtKey) {
     // beyond this point assumes there is a room
 
     // add user to room
-    sock.join(sock.user.roomId)
-
-    const room = sock.adapter.rooms[sock.user.roomId]
+    sock.join(Rooms.prefix(sock.user.roomId))
+    const room = sock.adapter.rooms[Rooms.prefix(sock.user.roomId)]
 
     // if there's a player in room, emit its last known status
     const lastStatusSocket = Object.keys(room.sockets)

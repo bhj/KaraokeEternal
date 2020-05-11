@@ -44,6 +44,10 @@ class Rooms {
 
     return (room && room.status === 'open')
   }
+
+  static prefix (roomId = '') {
+    return `KF_ROOM_ID_${roomId}`
+  }
 }
 
 module.exports = Rooms

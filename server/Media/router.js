@@ -10,6 +10,7 @@ const Library = require('../Library')
 const Media = require('./Media')
 const Prefs = require('../Prefs')
 const Queue = require('../Queue')
+const Rooms = require('../Rooms')
 const {
   LIBRARY_PUSH_SONG,
   QUEUE_PUSH
@@ -81,18 +82,17 @@ router.all('/:mediaId/prefer', async (ctx, next) => {
   ctx.status = 200
 
   // emit (potentially) updated queues to each room
-  Object.keys(ctx.io.sockets.adapter.rooms)
-    .forEach(async key => {
-      const roomId = parseInt(key, 10)
+  for (const room of Object.keys(ctx.io.sockets.adapter.rooms)) {
+    // ignore auto-generated per-user rooms
+    if (room.startsWith(Rooms.prefix())) {
+      const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
 
-      // ignore auto-generated per-user rooms
-      if (Number.isInteger(roomId)) {
-        ctx.io.to(roomId).emit('action', {
-          type: QUEUE_PUSH,
-          payload: await Queue.get(roomId)
-        })
-      }
-    })
+      ctx.io.to(room).emit('action', {
+        type: QUEUE_PUSH,
+        payload: await Queue.get(roomId),
+      })
+    }
+  }
 
   // emit (potentially) new duration
   ctx.io.emit('action', {

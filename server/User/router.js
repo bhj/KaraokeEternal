@@ -10,6 +10,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const Prefs = require('../Prefs')
 const Queue = require('../Queue')
+const Rooms = require('../Rooms')
 const User = require('../User')
 const {
   QUEUE_PUSH,
@@ -115,7 +116,7 @@ router.put('/account', async (ctx, next) => {
 
   // notify room?
   if (ctx.user.roomId) {
-    ctx.io.to(ctx.user.roomId).emit('action', {
+    ctx.io.to(Rooms.prefix(ctx.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
       payload: await Queue.get(ctx.user.roomId)
     })
