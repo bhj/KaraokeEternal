@@ -30,6 +30,7 @@ class PlayerController extends React.Component {
     playerLoad: PropTypes.func.isRequired,
     playerPlay: PropTypes.func.isRequired,
     playerStatus: PropTypes.func.isRequired,
+    playerVisualizerError: PropTypes.func.isRequired,
   }
 
   state = {
@@ -142,6 +143,7 @@ class PlayerController extends React.Component {
           <PlayerVisualizer
             audioSourceNode={state.audioSourceNode}
             isPlaying={props.isPlaying}
+            onError={props.playerVisualizerError}
             presetKey={props.visualizer.presetKey}
             width={props.width}
             height={props.height}

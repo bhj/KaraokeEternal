@@ -10,6 +10,7 @@ import {
   playerPlay,
   playerStatus,
 } from '../../modules/player'
+import { playerVisualizerError } from '../../modules/playerVisualizer'
 
 const mapActionCreators = {
   emitLeave,
@@ -18,6 +19,7 @@ const mapActionCreators = {
   playerLoad,
   playerPlay,
   playerStatus,
+  playerVisualizerError,
 }
 
 const mapStateToProps = (state) => {

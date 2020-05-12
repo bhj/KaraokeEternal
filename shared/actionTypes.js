@@ -37,6 +37,7 @@ module.exports = {
   PLAYER_LEAVE: 'status/PLAYER_LEAVE',
   PLAYER_LOAD: 'status/PLAYER_LOAD',
   PLAYER_PLAY: 'status/PLAYER_PLAY',
+  PLAYER_VISUALIZER_ERROR: 'status/PLAYER_VISUALIZER_ERROR',
   // user
   LOGIN: 'user/LOGIN',
   LOGOUT: 'user/LOGOUT',

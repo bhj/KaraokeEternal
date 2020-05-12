@@ -2,9 +2,17 @@ import butterchurnPresets from 'butterchurn-presets'
 import {
   PLAYER_CMD_NEXT,
   PLAYER_CMD_OPTIONS,
+  PLAYER_VISUALIZER_ERROR,
 } from 'shared/actionTypes'
 
 const _presetKeys = Object.keys(butterchurnPresets.getPresets())
+
+export function playerVisualizerError (err) {
+  return {
+    type: PLAYER_VISUALIZER_ERROR,
+    payload: { message: err.message },
+  }
+}
 
 // ------------------------------------
 // Action Handlers
@@ -36,6 +44,10 @@ const ACTION_HANDLERS = {
       isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
     }
   },
+  [PLAYER_VISUALIZER_ERROR]: (state, { payload }) => ({
+    ...state,
+    isSupported: false,
+  }),
 }
 
 // ------------------------------------

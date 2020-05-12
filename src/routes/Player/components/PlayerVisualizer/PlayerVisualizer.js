@@ -8,6 +8,7 @@ class PlayerVisualizer extends React.Component {
   static propTypes = {
     audioSourceNode: PropTypes.object.isRequired,
     isPlaying: PropTypes.bool.isRequired,
+    onError: PropTypes.func.isRequired,
     presetKey: PropTypes.string.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
@@ -19,10 +20,15 @@ class PlayerVisualizer extends React.Component {
   frameId = null
 
   componentDidMount () {
-    this.visualizer = butterchurn.createVisualizer(this.props.audioSourceNode.context, this.canvas.current, {
-      width: this.props.width,
-      height: this.props.height,
-    })
+    try {
+      this.visualizer = butterchurn.createVisualizer(this.props.audioSourceNode.context, this.canvas.current, {
+        width: this.props.width,
+        height: this.props.height,
+      })
+    } catch (err) {
+      this.props.onError(err)
+      return
+    }
 
     // @todo
     // this.visualizer.setOutputAA(true)
