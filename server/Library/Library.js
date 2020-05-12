@@ -123,12 +123,12 @@ class Library {
       const row = await db.get(String(query), query.parameters)
 
       if (row) {
-        // log.info('matched artist: %s', row.name)
+        log.verbose('matched artist: %s', row.name)
         match.artistId = row.artistId
         match.artist = row.name
         match.artistNorm = row.nameNorm
       } else {
-        log.info('new artist: %s', parsed.artist)
+        log.verbose('new artist: %s', parsed.artist)
 
         const fields = new Map()
         fields.set('name', parsed.artist)
@@ -160,12 +160,12 @@ class Library {
       const row = await db.get(String(query), query.parameters)
 
       if (row) {
-        // log.info('matched song: %s', row.title)
+        log.verbose('matched song: %s', row.title)
         match.songId = row.songId
         match.title = row.title
         match.titleNorm = row.titleNorm
       } else {
-        log.info('new song: %s', parsed.title)
+        log.verbose('new song: %s', parsed.title)
 
         const fields = new Map()
         fields.set('artistId', match.artistId)

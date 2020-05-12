@@ -46,7 +46,7 @@ module.exports = function (io, jwtKey) {
 
       sock.user = null
       sock.disconnect()
-      log.info('disconnected %s (%s)', sock.handshake.address, err.message)
+      log.verbose('disconnected %s (%s)', sock.handshake.address, err.message)
     }
 
     // attach disconnect handler
@@ -62,7 +62,7 @@ module.exports = function (io, jwtKey) {
 
       const room = sock.adapter.rooms[Rooms.prefix(sock.user.roomId)] || []
 
-      log.info('%s (%s) left room %s (%s; %s in room)',
+      log.verbose('%s (%s) left room %s (%s; %s in room)',
         sock.user.name, sock.id, sock.user.roomId, reason, room.length
       )
 
@@ -160,7 +160,7 @@ module.exports = function (io, jwtKey) {
       })
     }
 
-    log.info('%s (%s) joined room %s (%s in room)',
+    log.verbose('%s (%s) joined room %s (%s in room)',
       sock.user.name, sock.id, sock.user.roomId, room.length
     )
 

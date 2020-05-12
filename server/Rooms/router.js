@@ -51,7 +51,7 @@ router.post('/rooms', async (ctx, next) => {
   const res = await db.run(String(query), query.parameters)
 
   if (res.stmt.changes) {
-    log.info('%s created room "%s" (roomId: %s)', ctx.user.name, name, res.stmt.lastID)
+    log.verbose('%s created room "%s" (roomId: %s)', ctx.user.name, name, res.stmt.lastID)
   }
 
   // send updated room list
@@ -91,7 +91,7 @@ router.put('/rooms/:roomId', async (ctx, next) => {
   const res = await db.run(String(query), query.parameters)
 
   if (res.stmt.changes) {
-    log.info('%s updated roomId %s', ctx.user.name, ctx.params.roomId)
+    log.verbose('%s updated roomId %s', ctx.user.name, ctx.params.roomId)
   }
 
   // send updated room list
@@ -117,7 +117,7 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   let res = await db.run(String(query), query.parameters)
 
   if (res.stmt.changes) {
-    log.info('%s deleted roomId %s', ctx.user.name, roomId)
+    log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
   }
 
   // remove room's queue
@@ -128,7 +128,7 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   res = await db.run(String(query), query.parameters)
 
   if (res.stmt.changes) {
-    log.info('removed %s queue item(s) for roomId %s', res.stmt.changes, roomId)
+    log.verbose('removed %s queue item(s) for roomId %s', res.stmt.changes, roomId)
   }
 
   // send updated room list

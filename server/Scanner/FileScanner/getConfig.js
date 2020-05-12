@@ -21,7 +21,7 @@ function getConfig (dir, baseDir) {
       log.error(err)
     }
   } catch (err) {
-    log.info(`  => no config in ${dir}`)
+    log.verbose(`  => no config in ${dir}`)
   }
 
   if (dir === baseDir) {

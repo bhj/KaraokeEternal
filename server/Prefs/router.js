@@ -111,7 +111,7 @@ router.get('/path/ls', async (ctx, next) => {
     const parent = path.resolve(dir, '../')
 
     const list = await getFolders(dir)
-    log.info('%s listed path: %s', ctx.user.name, current)
+    log.verbose('%s listed path: %s', ctx.user.name, current)
 
     ctx.body = {
       current,

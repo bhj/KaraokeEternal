@@ -97,7 +97,7 @@ class FileScanner extends Scanner {
       throw new Error('  => could not determine duration')
     }
 
-    log.info('  => duration: %s:%s',
+    log.verbose('  => duration: %s:%s',
       Math.floor(tags.format.duration / 60),
       Math.round(tags.format.duration % 60, 10).toString().padStart(2, '0')
     )
@@ -130,7 +130,7 @@ class FileScanner extends Scanner {
         throw new Error('  => no .cdg sidecar found; skipping')
       }
 
-      log.info('  => found .cdg sidecar')
+      log.verbose('  => found .cdg sidecar')
     }
 
     // file already in database?
@@ -139,7 +139,7 @@ class FileScanner extends Scanner {
       relPath: media.relPath,
     })
 
-    log.info('  => %s db result(s)', res.result.length)
+    log.verbose('  => %s db result(s)', res.result.length)
 
     if (res.result.length) {
       const row = res.entities[res.result[0]]

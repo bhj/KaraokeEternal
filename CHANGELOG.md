@@ -2,6 +2,7 @@
 
 - (server) Fixed an issue where the queue could be incorrect after setting preferred media
 - (server) Improved filename parser and renamed config option `separator` to `delimiter`
+- (server) Improved logging and default log file level is now `3` (info)
 - (player) Web Audio API support is now required (only for browsers running the player)
 - (player) Fixed an issue where media might not (pre)load in Firefox
 - (player) Removed visualizer sensitivity control (drop a note if you used it)
