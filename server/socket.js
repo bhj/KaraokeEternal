@@ -47,6 +47,7 @@ module.exports = function (io, jwtKey) {
       sock.user = null
       sock.disconnect()
       log.verbose('disconnected %s (%s)', sock.handshake.address, err.message)
+      return
     }
 
     // attach disconnect handler
