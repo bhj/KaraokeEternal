@@ -7,6 +7,7 @@
       {{ block "main" . }}{{ end }}
     </div>
 
+    <script src='{{ (resources.Get "js/buttons.min.js").Permalink }}'></script>
     <script src='{{ (resources.Get "js/gumshoe.min.js").Permalink }}'></script>
     <script>
       const cur = window.location.href

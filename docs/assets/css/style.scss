@@ -73,6 +73,12 @@ hr { border-color: #777; }
 
 .copyright {
   color: #777;
+  text-align: center;
+}
+
+.copyright a {
+  color: #777;
+  text-decoration: underline;
 }
 
 /*
@@ -102,14 +108,14 @@ hr { border-color: #777; }
 /*
  * Navigation
  */
- header {
-   display: flex;
- }
+header {
+ display: flex;
+}
 
 #btn-nav {
   box-sizing: content-box;
   fill: var(--btn-bg-color);
-  padding: .5em 1em;
+  padding: .5em 1em 0 0;
   cursor: pointer;
 }
 
@@ -148,6 +154,19 @@ a.nav-item:focus {
   font-weight: bold;
 }
 
+#doc-toc {
+  margin-bottom: 0;
+}
+
+.github {
+  margin: 0;
+}
+
+.github li span {
+  display: inline-table;
+  vertical-align: middle;
+}
+
 /*
  * Logo
  */
@@ -155,7 +174,7 @@ a.nav-item:focus {
   font-family: 'Raleway', sans-serif;
   font-size: 18px;
   white-space: nowrap;
-  margin-top: .5em;
+  padding-top: .5em;
   flex: 1;
 }
 
