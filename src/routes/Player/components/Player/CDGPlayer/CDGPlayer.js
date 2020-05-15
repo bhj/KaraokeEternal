@@ -58,9 +58,9 @@ class CDGPlayer extends React.Component {
       style.backgroundColor = `rgba(${r},${g},${b},${alpha})`
     }
 
-    // cd graphics are chunky; default to 60% viewport height
-    const vMaxScale = (height * 0.6) / 216
-    const hMaxScale = width / 300
+    // cd graphics are chunky; scale to a max of 80% viewport height
+    const vMaxScale = Math.floor((height * 0.8) / 216)
+    const hMaxScale = Math.floor(width / 300)
     const scale = Math.min(vMaxScale, hMaxScale)
 
     return (
