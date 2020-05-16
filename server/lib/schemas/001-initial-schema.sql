@@ -26,8 +26,6 @@ CREATE TABLE IF NOT EXISTS "paths" (
   "priority" integer NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idxPath ON "paths" ("pathId" ASC);
-
 CREATE TABLE IF NOT EXISTS "prefs" (
   "key" text PRIMARY KEY NOT NULL,
   "data" text NOT NULL
