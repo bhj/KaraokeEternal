@@ -68,7 +68,8 @@ export default class PlaybackCtrl extends React.Component {
         }
 
         <DisplayCtrl
-          alpha={props.status.alpha}
+          cdgAlpha={props.status.cdgAlpha}
+          cdgSize={props.status.cdgSize}
           isAlphaSupported={props.status.isAlphaSupported}
           isVisible={this.state.isVisible}
           isVisualizerEnabled={props.status.visualizer.isEnabled}

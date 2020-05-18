@@ -27,7 +27,8 @@ const mapStateToProps = (state) => {
   const queue = ensureState(state.queue)
 
   return {
-    alpha: player.alpha,
+    cdgAlpha: player.cdgAlpha,
+    cdgSize: player.cdgSize,
     historyJSON: state.status.historyJSON,
     isAlphaSupported: player.isAlphaSupported,
     isAtQueueEnd: player.isAtQueueEnd,

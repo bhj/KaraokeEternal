@@ -6,7 +6,8 @@ import PlayerVisualizer from '../PlayerVisualizer'
 
 class PlayerController extends React.Component {
   static propTypes = {
-    alpha: PropTypes.number.isRequired,
+    cdgAlpha: PropTypes.number.isRequired,
+    cdgSize: PropTypes.number.isRequired,
     historyJSON: PropTypes.string.isRequired,
     isAlphaSupported: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
@@ -120,7 +121,8 @@ class PlayerController extends React.Component {
     return (
       <>
         <Player
-          alpha={props.alpha}
+          cdgAlpha={props.cdgAlpha}
+          cdgSize={props.cdgSize}
           isPlaying={props.isPlaying}
           isVisible={!!queueItem && !props.isErrored && !props.isAtQueueEnd}
           isReplayGainEnabled={props.isReplayGainEnabled}

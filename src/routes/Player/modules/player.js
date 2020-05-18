@@ -94,7 +94,8 @@ const ACTION_HANDLERS = {
   }),
   [PLAYER_CMD_OPTIONS]: (state, { payload }) => ({
     ...state,
-    alpha: typeof payload.alpha === 'number' ? payload.alpha : state.alpha,
+    cdgAlpha: typeof payload.cdgAlpha === 'number' ? payload.cdgAlpha : state.cdgAlpha,
+    cdgSize: typeof payload.cdgSize === 'number' ? payload.cdgSize : state.cdgSize,
   }),
   [PLAYER_CMD_PAUSE]: (state, { payload }) => ({
     ...state,
@@ -135,7 +136,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  alpha: 0.5,
+  cdgAlpha: 0.5,
+  cdgSize: 0.6,
   errorMessage: '',
   historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,

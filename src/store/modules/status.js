@@ -74,7 +74,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  alpha: 1,
+  cdgAlpha: 0.5,
+  cdgSize: 0.6,
   errorMessage: '',
   historyJSON: '[]', // queueIds in JSON array
   isAlphaSupported: false,

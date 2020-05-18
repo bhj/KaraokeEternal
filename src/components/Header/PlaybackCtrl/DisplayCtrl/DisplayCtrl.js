@@ -7,7 +7,8 @@ import './DisplayCtrl.css'
 
 export default class DisplayCtrl extends React.Component {
   static propTypes = {
-    alpha: PropTypes.number.isRequired,
+    cdgAlpha: PropTypes.number.isRequired,
+    cdgSize: PropTypes.number.isRequired,
     isAlphaSupported: PropTypes.bool.isRequired,
     isVisible: PropTypes.bool.isRequired,
     isVisualizerEnabled: PropTypes.bool.isRequired,
@@ -21,7 +22,11 @@ export default class DisplayCtrl extends React.Component {
   checkbox = React.createRef()
 
   handleAlpha = val => {
-    this.props.onRequestOptions({ alpha: val })
+    this.props.onRequestOptions({ cdgAlpha: val })
+  }
+
+  handleSize = val => {
+    this.props.onRequestOptions({ cdgSize: val })
   }
 
   handleToggleVisualizer = () => this.props.onRequestOptions({
@@ -94,15 +99,26 @@ export default class DisplayCtrl extends React.Component {
 
           <fieldset styleName='lyrics'>
             <legend>
-              <label>Lyrics</label>
+              <label>CD+Graphics</label>
             </legend>
+
+            <label styleName='field'>Size</label>
+            <OptimisticSlider
+              min={0.3}
+              max={0.9}
+              step={0.01}
+              value={this.props.cdgSize}
+              onChange={this.handleSize}
+              handle={handle}
+              styleName='slider'
+            />
 
             <label styleName='field'>Background</label>
             <OptimisticSlider
               min={0}
               max={1}
               step={0.01}
-              value={this.props.alpha}
+              value={this.props.cdgAlpha}
               onChange={this.handleAlpha}
               handle={handle}
               styleName='slider'
