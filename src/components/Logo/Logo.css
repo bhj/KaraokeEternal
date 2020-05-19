@@ -1,5 +1,5 @@
 .container {
-  font-family: 'Raleway', sans-serif;
+  font-family: var(--font-family-custom);
   white-space: nowrap;
   flex: 1;
 }

@@ -8,7 +8,6 @@
   align-items: center;
   padding: 3px 5px;
   cursor: pointer;
-  font: var(--prefs-heading-font);
 }
 
 .title {
