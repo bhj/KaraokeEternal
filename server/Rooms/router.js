@@ -55,7 +55,7 @@ router.post('/rooms', async (ctx, next) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(ctx)
+  ctx.body = await Rooms.get(false)
 })
 
 // update room
@@ -95,7 +95,7 @@ router.put('/rooms/:roomId', async (ctx, next) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(ctx)
+  ctx.body = await Rooms.get(false)
 })
 
 // remove room
@@ -132,7 +132,7 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(ctx)
+  ctx.body = await Rooms.get(false)
 })
 
 module.exports = router
