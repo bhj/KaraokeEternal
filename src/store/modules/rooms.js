@@ -5,6 +5,7 @@ import {
   ROOM_UPDATE,
   ROOM_CREATE,
   ROOM_REMOVE,
+  ROOM_TOGGLE_SHOW_ALL,
   _SUCCESS,
   _ERROR,
 } from 'shared/actionTypes'
@@ -130,8 +131,15 @@ export function removeRoom (roomId) {
 }
 
 // ------------------------------------
-// open/close room editor dialog
+// room list/editor UI
 // ------------------------------------
+export function closeRoomEditor () {
+  return {
+    type: ROOM_EDITOR_CLOSE,
+    payload: null
+  }
+}
+
 export function openRoomEditor (roomId) {
   return {
     type: ROOM_EDITOR_OPEN,
@@ -139,9 +147,9 @@ export function openRoomEditor (roomId) {
   }
 }
 
-export function closeRoomEditor () {
+export function toggleShowAll () {
   return {
-    type: ROOM_EDITOR_CLOSE,
+    type: ROOM_TOGGLE_SHOW_ALL,
     payload: null
   }
 }
@@ -156,13 +164,17 @@ const ACTION_HANDLERS = {
   }),
   [ROOM_EDITOR_OPEN]: (state, { payload }) => ({
     ...state,
-    isEditorOpen: true,
+    isEditing: true,
     editingRoomId: payload,
   }),
   [ROOM_EDITOR_CLOSE]: (state, { payload }) => ({
     ...state,
-    isEditorOpen: false,
+    isEditing: false,
     editingRoomId: null,
+  }),
+  [ROOM_TOGGLE_SHOW_ALL]: (state, { payload }) => ({
+    ...state,
+    isShowingAll: !state.isShowingAll,
   }),
 }
 
@@ -172,7 +184,8 @@ const ACTION_HANDLERS = {
 const initialState = {
   result: [],
   entities: {},
-  isEditorOpen: false,
+  isEditing: false,
+  isShowingAll: false,
   editingRoomId: null,
 }
 

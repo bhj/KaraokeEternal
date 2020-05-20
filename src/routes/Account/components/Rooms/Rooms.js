@@ -9,54 +9,43 @@ import style from './Rooms.css'
 export default class Rooms extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
-    isEditorOpen: PropTypes.bool.isRequired,
+    isEditing: PropTypes.bool.isRequired,
+    isShowingAll: PropTypes.bool.isRequired,
     editingRoom: PropTypes.object,
     contentWidth: PropTypes.number.isRequired,
     // Actions
-    openRoomEditor: PropTypes.func.isRequired,
     closeRoomEditor: PropTypes.func.isRequired,
     fetchRooms: PropTypes.func.isRequired,
+    openRoomEditor: PropTypes.func.isRequired,
+    toggleShowAll: PropTypes.func.isRequired,
     updateRoom: PropTypes.func.isRequired,
   }
 
-  constructor (props) {
-    super(props)
-    this.state = { showClosed: false }
-    this.table = React.createRef()
-  }
+  table = React.createRef()
 
   componentDidMount () {
     this.props.fetchRooms()
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (prevState.showClosed !== this.state.showClosed) {
-      this.table.current.recomputeRowHeights()
-    }
-  }
-
   render () {
-    const { rooms, contentWidth } = this.props
-    const { showClosed } = this.state
-
     return (
       <div styleName='style.container'>
         <div styleName='style.titleContainer'>
           <h1 styleName='style.title'>Rooms</h1>
           <label>
             <input type='checkbox'
-              checked={!this.state.showClosed}
-              onChange={this.handleToggle}
-            /> Hide closed
+              checked={this.props.isShowingAll}
+              onChange={this.props.toggleShowAll}
+            /> Show all
           </label>
         </div>
         <div styleName='style.content'>
           <Table
-            width={contentWidth}
-            height={rooms.result.filter(i => rooms.entities[i].status === 'open' || showClosed).length * 30 + 20}
+            width={this.props.contentWidth}
+            height={this.props.rooms.result.length * 30 + 20}
             headerHeight={20}
-            rowHeight={this.getRowHeight}
-            rowCount={rooms.result.length}
+            rowHeight={30}
+            rowCount={this.props.rooms.result.length}
             rowGetter={this.getRow}
             headerClassName={style.tableHeader}
             rowClassName={style.tableRow}
@@ -65,7 +54,7 @@ export default class Rooms extends Component {
             <Column
               label='Name'
               dataKey='name'
-              width={contentWidth * 0.40}
+              width={this.props.contentWidth * 0.40}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => (
                 <a onClick={() => this.props.openRoomEditor(rowData.roomId)}>{rowData.name}</a>
@@ -74,14 +63,14 @@ export default class Rooms extends Component {
             <Column
               label='Status'
               dataKey='status'
-              width={contentWidth * 0.20}
+              width={this.props.contentWidth * 0.20}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
             />
             <Column
               label='Created'
               dataKey='dateCreated'
-              width={contentWidth * 0.40}
+              width={this.props.contentWidth * 0.40}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
             />
@@ -93,7 +82,7 @@ export default class Rooms extends Component {
           </button>
 
           <SkyLightStateless
-            isVisible={this.props.isEditorOpen}
+            isVisible={this.props.isEditing}
             onCloseClicked={this.props.closeRoomEditor}
             onOverlayClicked={this.props.closeRoomEditor}
             title={this.props.editingRoom ? 'Edit Room' : 'Create Room'}
@@ -104,22 +93,13 @@ export default class Rooms extends Component {
               marginLeft: '0',
             }}
           >
-            {this.props.isEditorOpen &&
+            {this.props.isEditing &&
               <EditRoom room={this.props.editingRoom }/>
             }
           </SkyLightStateless>
         </div>
       </div>
     )
-  }
-
-  handleToggle = (e) => {
-    this.setState({ showClosed: !this.state.showClosed })
-  }
-
-  getRowHeight = ({ index }) => {
-    const { status } = this.props.rooms.entities[this.props.rooms.result[index]]
-    return status === 'open' || this.state.showClosed ? 30 : 0
   }
 
   getRow = ({ index }) => this.props.rooms.entities[this.props.rooms.result[index]]

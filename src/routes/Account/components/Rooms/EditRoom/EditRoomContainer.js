@@ -10,7 +10,7 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
-  isEditorOpen: state.rooms.isEditorOpen,
+  isEditing: state.rooms.isEditing,
   room: state.rooms.entities[state.rooms.editingRoomId],
 })
 

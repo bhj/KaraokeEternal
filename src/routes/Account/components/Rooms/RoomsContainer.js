@@ -1,17 +1,20 @@
 import { connect } from 'react-redux'
 import Rooms from './Rooms'
-import { fetchRooms, openRoomEditor, closeRoomEditor, updateRoom } from 'store/modules/rooms'
+import { closeRoomEditor, fetchRooms, openRoomEditor, toggleShowAll, updateRoom } from 'store/modules/rooms'
+import getRoomList from '../../selectors/getRoomList'
 
 const mapActionCreators = {
+  closeRoomEditor,
   fetchRooms,
   openRoomEditor,
-  closeRoomEditor,
+  toggleShowAll,
   updateRoom,
 }
 
 const mapStateToProps = (state) => ({
-  rooms: state.rooms,
-  isEditorOpen: state.rooms.isEditorOpen,
+  rooms: getRoomList(state),
+  isEditing: state.rooms.isEditing,
+  isShowingAll: state.rooms.isShowingAll,
   editingRoom: state.rooms.entities[state.rooms.editingRoomId],
 })
 
