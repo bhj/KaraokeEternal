@@ -68,7 +68,7 @@ export default class EditRoom extends Component {
   handleCreateClick = () => {
     this.props.createRoom({
       name: this.text.current.value,
-      status: 'open',
+      status: this.checkbox.current.checked ? 'open' : 'closed',
     })
   }
 
