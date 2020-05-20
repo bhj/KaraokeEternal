@@ -80,7 +80,7 @@ export default class EditRoom extends Component {
   }
 
   handleRemoveClick = () => {
-    if (confirm(`Remove room "${this.props.room.name}"?`)) {
+    if (confirm(`Remove room "${this.props.room.name}" and its queue?`)) {
       this.props.removeRoom(this.props.room.roomId)
     }
   }
