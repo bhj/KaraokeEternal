@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "artists" (
 
 CREATE UNIQUE INDEX IF NOT EXISTS idxNameNorm ON "artists" ("nameNorm" ASC);
 
-CREATE TABLE IF NOT EXISTS media (
+CREATE TABLE IF NOT EXISTS "media" (
   mediaId integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   songId integer NOT NULL,
   pathId integer NOT NULL,
