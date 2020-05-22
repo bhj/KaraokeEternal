@@ -130,7 +130,7 @@ class CDGPlayer extends React.Component {
   handlePlay = () => this.cdg.play()
 
   handleTimeUpdate = () => {
-    this.cdg.sync(this.audio.current.currentTime * 1000)
+    this.cdg.syncTime(this.audio.current.currentTime)
 
     this.props.onStatus({
       position: this.audio.current.currentTime,
