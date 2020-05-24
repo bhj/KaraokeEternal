@@ -154,14 +154,6 @@ config.module.rules.push({
 // Files
 config.module.rules.push(
   {
-    test    : /\.woff(\?.*)?$/,
-    loader  : 'url-loader',
-    options : {
-      limit    : '10000',
-      mimetype : 'application/font-woff'
-    }
-  },
-  {
     test    : /\.woff2(\?.*)?$/,
     loader  : 'url-loader',
     options : {
