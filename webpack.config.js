@@ -29,6 +29,7 @@ const config = {
       'node_modules',
     ],
     alias: {
+      '<PROJECT_ROOT>': project.basePath,
       assets: path.join(project.basePath, 'assets'),
       fonts: path.join(project.basePath, 'docs', 'assets', 'fonts'),
       shared: path.join(project.basePath, 'shared'),
@@ -42,7 +43,10 @@ const config = {
       __TEST__,
       __PROD__,
       __KF_VERSION__: JSON.stringify(process.env.npm_package_version),
-      __KF_HOMEPAGE__: JSON.stringify('https://www.karaoke-forever.com'),
+      __KF_URL_HOME__: JSON.stringify('https://www.karaoke-forever.com'),
+      __KF_URL_LICENSE__: JSON.stringify('/licenses.txt'),
+      __KF_URL_REPO__: JSON.stringify('https://github.com/bhj/karaoke-forever/'),
+      __KF_URL_SPONSOR__: JSON.stringify('https://github.com/sponsors/bhj/'),
       __KF_COPYRIGHT__: JSON.stringify(`2017-${new Date().getFullYear()} RadRoot LLC`),
     }, project.globals)),
     new CaseSensitivePathsPlugin(),
@@ -176,6 +180,21 @@ config.module.rules.push(
       limit : '8192'
     }
   }
+)
+
+// Markdown
+config.module.rules.push(
+  {
+    test: /\.md$/,
+    use: [
+      {
+        loader: 'html-loader'
+      },
+      {
+        loader: 'markdown-loader',
+      }
+    ]
+  },
 )
 
 module.exports = config

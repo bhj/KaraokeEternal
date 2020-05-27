@@ -1,11 +1,20 @@
 ## TBD (not yet released)
 
-- (server) Fixed an issue where the queue could be incorrect after setting preferred media
-- (server) Improved filename parser and renamed config option `separator` to `delimiter`
-- (server) Improved logging and default log file level is now `3` (info)
+### New:
+
+- Added [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) support. With properly tagged media files, the player can automatically adjust each song's volume for a much smoother experience when songs vary widely in average loudness. *Requires re-scanning media*.
+- Added the ability to resize CD+Graphics
+- Added Changelog viewer to the About panel
+
+### Changed:
+
+- (app) Fixed status not being respected when creating a new room
 - (player) Web Audio API support is now required (only for browsers running the player)
-- (player) Fixed an issue where media might not (pre)load in Firefox
+- (player) Fixed media potentially not (pre)loading in Firefox
 - (player) Removed visualizer sensitivity control (drop a note if you used it)
+- (server) Fixed potentially incorrect queue list being emitted after setting preferred media
+- (server) Improved filename parser and renamed config option `separator` to `delimiter`
+- (server) Improved logging and made `3 (info)` the default log file level
 
 ## v0.7.4 (2019-12-30)
 

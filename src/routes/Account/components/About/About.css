@@ -23,6 +23,11 @@
 }
 
 .sm {
-  font-size: 80%;
   color: #aaa;
+  font-size: 75%;
+  margin-top: .5em;
+}
+
+.pseudolink {
+  text-decoration: underline;
 }
