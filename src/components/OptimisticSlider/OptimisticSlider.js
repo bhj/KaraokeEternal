@@ -24,6 +24,7 @@ export default class OptimisticSlider extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (!this.state.isStable && this.state.val === this.props.value) {
+      clearTimeout(this.timerId)
       this.setState({ isStable: true })
     }
   }
