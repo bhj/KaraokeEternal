@@ -1,10 +1,12 @@
 import {
-  HEADER_HEIGHT_CHANGE,
-  FOOTER_HEIGHT_CHANGE,
-  SHOW_ERROR_MESSAGE,
   CLEAR_ERROR_MESSAGE,
+  FOOTER_HEIGHT_CHANGE,
+  HEADER_HEIGHT_CHANGE,
+  SHOW_ERROR_MESSAGE,
+  UI_WINDOW_RESIZE,
 } from 'shared/actionTypes'
 
+const MAX_CONTENT_WIDTH = 768
 let scrollLockTimer
 
 // ------------------------------------
@@ -45,6 +47,19 @@ export function setFooterHeight ({ height }) {
   }
 }
 
+export function windowResize (window) {
+  return {
+    type: UI_WINDOW_RESIZE,
+    payload: window,
+    meta: {
+      throttle: {
+        wait: 200,
+        leading: false,
+      }
+    }
+  }
+}
+
 // does not dispatch anything (only affects the DOM)
 export function lockScrolling (lock) {
   if (lock) {
@@ -79,15 +94,24 @@ const ACTION_HANDLERS = {
     ...state,
     errorMessage: null,
   }),
+  [UI_WINDOW_RESIZE]: (state, { payload }) => ({
+    ...state,
+    innerWidth: payload.innerWidth,
+    innerHeight: payload.innerHeight,
+    contentWidth: payload.innerWidth > MAX_CONTENT_WIDTH ? MAX_CONTENT_WIDTH : payload.innerWidth,
+  }),
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 const initialState = {
-  headerHeight: 0,
-  footerHeight: 0,
   errorMessage: null,
+  footerHeight: 0,
+  headerHeight: 0,
+  innerWidth: window.innerWidth,
+  innerHeight: window.innerHeight,
+  contentWidth: window.innerWidth > MAX_CONTENT_WIDTH ? MAX_CONTENT_WIDTH : window.innerWidth,
 }
 
 export default function uiReducer (state = initialState, action) {

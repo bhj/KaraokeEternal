@@ -3,7 +3,6 @@ import { optimistic } from 'redux-optimistic-ui'
 
 // reducers
 import artists from 'routes/Library/modules/artists'
-import browser from './modules/browser'
 import library from 'routes/Library/modules/library'
 import location from './modules/location'
 import prefs from './modules/prefs'
@@ -20,7 +19,6 @@ import userStars from './modules/userStars'
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     artists,
-    browser,
     library,
     location,
     prefs,

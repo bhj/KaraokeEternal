@@ -5,31 +5,28 @@ import createThrottle from 'redux-throttle'
 import { browserHistory } from 'react-router'
 import makeRootReducer from './reducers'
 import { updateLocation } from './modules/location'
-import { responsiveStoreEnhancer, calculateResponsiveState } from 'redux-responsive'
+import { windowResize } from './modules/ui'
 
 export default (initialState = {}) => {
+  // resize action
+  window.addEventListener('resize', () => store.dispatch(windowResize(window)))
+
   // ======================================================
   // Middleware Configuration
   // ======================================================
   const throttle = createThrottle(1000, {
     // https://lodash.com/docs#throttle
     leading: true,
-    trailing: true
+    trailing: true,
   })
 
   const socketMiddleware = createSocketMiddleware(window._socket, 'server/')
-
   const middleware = [thunk, throttle, socketMiddleware]
 
   // ======================================================
   // Store Enhancers
   // ======================================================
-  const enhancers = [
-    responsiveStoreEnhancer,
-  ]
-
-  window.addEventListener('resize', () => store.dispatch(calculateResponsiveState(window)))
-
+  const enhancers = []
   let composeEnhancers = compose
 
   if (__DEV__) {

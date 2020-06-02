@@ -12,9 +12,9 @@ export const CoreLayout = (props) => {
   return (
     <>
       {React.cloneElement(props.children, {
-        browserWidth: props.browser.width,
-        browserHeight: props.browser.height,
-        contentWidth: props.browser.greaterThan.small ? props.browser.breakpoints.small : props.browser.width,
+        browserWidth: props.ui.innerWidth,
+        browserHeight: props.ui.innerHeight,
+        contentWidth: props.ui.contentWidth,
         headerHeight: props.ui.headerHeight,
         footerHeight: props.ui.footerHeight,
       })}
@@ -42,7 +42,7 @@ export const CoreLayout = (props) => {
       </SkyLightStateless>
 
       <SkyLightStateless
-        isVisible={props.errorMessage !== null}
+        isVisible={props.ui.errorMessage !== null}
         onCloseClicked={props.clearErrorMessage}
         onOverlayClicked={props.clearErrorMessage}
         title='Oops'
@@ -54,7 +54,7 @@ export const CoreLayout = (props) => {
           userSelect: 'text'
         }}
       >
-        <p>{props.errorMessage}</p>
+        <p>{props.ui.errorMessage}</p>
         <br /><br /><br />
         <button onClick={props.clearErrorMessage}>OK</button>
       </SkyLightStateless>
@@ -65,9 +65,7 @@ export const CoreLayout = (props) => {
 export default CoreLayout
 
 CoreLayout.propTypes = {
-  browser: PropTypes.object.isRequired,
   children: PropTypes.any,
-  errorMessage: PropTypes.any,
   isLoggedIn: PropTypes.bool,
   songInfoId: PropTypes.number,
   ui: PropTypes.object.isRequired,
