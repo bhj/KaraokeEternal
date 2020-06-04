@@ -50,6 +50,7 @@ export default class Rooms extends Component {
             headerClassName={style.tableHeader}
             rowClassName={style.tableRow}
             ref={this.table}
+            styleName='table'
           >
             <Column
               label='Name'

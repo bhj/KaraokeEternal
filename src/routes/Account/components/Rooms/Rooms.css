@@ -22,6 +22,10 @@
   padding: var(--container-padding);
 }
 
+.table > * {
+  outline: none;
+}
+
 .tableHeader {
   align-items: center;
   color: hsl(var(--hue-blue), 10%, 60%);
