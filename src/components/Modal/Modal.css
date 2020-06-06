@@ -1,0 +1,57 @@
+.overlay {
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: flex-start;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1000;
+  padding: 1.2rem;
+}
+
+.modal {
+  position: relative;
+  padding: .5rem 1rem;
+  background: var(--bg-color);
+  background-clip: padding-box;
+  box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.25);
+  margin: 0 auto;
+  user-select: text;
+}
+
+.closeButton {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background-color: transparent;
+  fill: var(--btn-active-bg-color);
+  width: auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.title {
+  font-family: var(--font-family-custom);
+  margin: 0 0 .5rem 0;
+}
+
+.content {
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+}
+
+.buttons {
+  margin-top: var(--container-padding);
+}

@@ -5,59 +5,36 @@ import React from 'react'
 import 'normalize.css'
 import '../../styles/global.css'
 import Navigation from 'components/Navigation'
-import { SkyLightStateless } from 'react-skylight'
+import Modal from 'components/Modal'
 import SongInfo from 'components/SongInfo'
 
 export const CoreLayout = (props) => {
   return (
     <>
-      {React.cloneElement(props.children, {
-        browserWidth: props.ui.innerWidth,
-        browserHeight: props.ui.innerHeight,
-        contentWidth: props.ui.contentWidth,
-        headerHeight: props.ui.headerHeight,
-        footerHeight: props.ui.footerHeight,
-      })}
+      {props.children}
 
       {props.isLoggedIn &&
         <Navigation/>
       }
 
-      <SkyLightStateless
+      <Modal
         isVisible={typeof props.songInfoId === 'number'}
-        onCloseClicked={props.closeSongInfo}
-        onOverlayClicked={props.closeSongInfo}
-        title={'Song Info'}
-        dialogStyles={{
-          width: '90%',
-          height: '90%',
-          top: '5%',
-          left: '5%',
-          margin: 0,
-          overflow: 'auto',
-          userSelect: 'text'
-        }}
+        onClose={props.closeSongInfo}
+        title='Song Info'
+        buttons=<button onClick={props.closeSongInfo}>Done</button>
+        style={{ width: '100%', height: '100%' }}
       >
         <SongInfo songId={props.songInfoId}/>
-      </SkyLightStateless>
+      </Modal>
 
-      <SkyLightStateless
+      <Modal
         isVisible={props.ui.errorMessage !== null}
-        onCloseClicked={props.clearErrorMessage}
-        onOverlayClicked={props.clearErrorMessage}
+        onClose={props.clearErrorMessage}
         title='Oops'
-        dialogStyles={{
-          width: '80%',
-          minHeight: '200px',
-          left: '10%',
-          marginLeft: '0',
-          userSelect: 'text'
-        }}
+        buttons=<button onClick={props.clearErrorMessage}>OK</button>
       >
         <p>{props.ui.errorMessage}</p>
-        <br /><br /><br />
-        <button onClick={props.clearErrorMessage}>OK</button>
-      </SkyLightStateless>
+      </Modal>
     </>
   )
 }

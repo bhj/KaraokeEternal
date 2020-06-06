@@ -1,7 +1,18 @@
-.current {
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.folderCurrent {
   padding: 10px;
   border: 1px solid #ccc;
-  margin-bottom: 5px;
+}
+
+.folderList {
+  flex: 1;
+  margin: .5rem 0;
+  overflow: scroll;
 }
 
 .submit {

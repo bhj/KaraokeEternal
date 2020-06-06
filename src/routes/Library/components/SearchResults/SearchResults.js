@@ -22,13 +22,9 @@ class SearchResults extends React.Component {
     songsResult: PropTypes.array.isRequired,
     starredSongs: PropTypes.array.isRequired,
     starredArtistCounts: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
     // actions
     toggleArtistResultExpanded: PropTypes.func.isRequired,
-    // ui
-    browserWidth: PropTypes.number.isRequired,
-    browserHeight: PropTypes.number.isRequired,
-    headerHeight: PropTypes.number.isRequired,
-    footerHeight: PropTypes.number.isRequired,
   }
 
   componentDidUpdate (prevProps) {
@@ -43,11 +39,11 @@ class SearchResults extends React.Component {
         rowCount={this.props.artistsResult.length + 3} // both headers + SongList
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
-        paddingTop={this.props.headerHeight}
+        paddingTop={this.props.ui.headerHeight}
         paddingRight={10}
-        paddingBottom={this.props.footerHeight}
-        width={this.props.browserWidth}
-        height={this.props.browserHeight}
+        paddingBottom={this.props.ui.footerHeight}
+        width={this.props.ui.innerWidth}
+        height={this.props.ui.innerHeight}
         onRef={this.setRef}
       />
     )

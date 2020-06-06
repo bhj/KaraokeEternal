@@ -94,14 +94,14 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 /* Modal dialog */
-.skylight-dialog {
-  background-color: hsl(var(--hue-blue), 70%, 7%) !important;
-  border-radius: var(--border-radius) !important;
+@keyframes react-responsive-modal-fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-.skylight-dialog h2 {
-  font-weight: normal;
-  margin-top: 0;
+@keyframes react-responsive-modal-fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* Buttons */

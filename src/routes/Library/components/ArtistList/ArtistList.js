@@ -17,19 +17,14 @@ class ArtistList extends React.Component {
     starredSongs: PropTypes.array.isRequired,
     starredArtistCounts: PropTypes.object.isRequired,
     scrollTop: PropTypes.number.isRequired,
+    ui: PropTypes.object.isRequired,
     // actions
     toggleArtistExpanded: PropTypes.func.isRequired,
     scrollArtists: PropTypes.func.isRequired,
-    // ui
-    browserWidth: PropTypes.number.isRequired,
-    browserHeight: PropTypes.number.isRequired,
-    headerHeight: PropTypes.number.isRequired,
-    footerHeight: PropTypes.number.isRequired,
   }
 
   render () {
     if (this.props.artistsResult.length === 0) return null
-    const { browserWidth, browserHeight, headerHeight, footerHeight } = this.props
 
     return (
       <div>
@@ -39,18 +34,18 @@ class ArtistList extends React.Component {
           rowRenderer={this.rowRenderer}
           onScroll={this.handleScroll}
           onRef={this.handleRef}
-          paddingTop={headerHeight}
+          paddingTop={this.props.ui.headerHeight}
           paddingRight={30} // width of AlphaPicker
-          paddingBottom={footerHeight}
-          width={browserWidth}
-          height={browserHeight}
+          paddingBottom={this.props.ui.footerHeight}
+          width={this.props.ui.innerWidth}
+          height={this.props.ui.innerHeight}
           scrollToAlignment='start'
         />
         <AlphaPicker
           onPick={this.handleAlphaPick}
           onTouch={this.handleAlphaTouch}
-          height={browserHeight - headerHeight - footerHeight}
-          top={headerHeight}
+          height={this.props.ui.innerHeight - this.props.ui.headerHeight - this.props.ui.footerHeight}
+          top={this.props.ui.headerHeight}
         />
       </div>
     )

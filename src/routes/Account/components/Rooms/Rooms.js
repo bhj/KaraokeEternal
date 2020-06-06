@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { formatDateTime } from 'lib/dateTime'
-import { SkyLightStateless } from 'react-skylight'
+import Modal from 'components/Modal'
 import EditRoom from './EditRoom'
 import { Column, Table } from 'react-virtualized'
 import style from './Rooms.css'
@@ -82,22 +82,16 @@ export default class Rooms extends Component {
             Create Room
           </button>
 
-          <SkyLightStateless
+          <Modal
             isVisible={this.props.isEditing}
-            onCloseClicked={this.props.closeRoomEditor}
-            onOverlayClicked={this.props.closeRoomEditor}
+            onClose={this.props.closeRoomEditor}
             title={this.props.editingRoom ? 'Edit Room' : 'Create Room'}
-            dialogStyles={{
-              width: '80%',
-              minHeight: '200px',
-              left: '10%',
-              marginLeft: '0',
-            }}
+            style={{ minWidth: '300px' }}
           >
             {this.props.isEditing &&
               <EditRoom room={this.props.editingRoom }/>
             }
-          </SkyLightStateless>
+          </Modal>
         </div>
       </div>
     )

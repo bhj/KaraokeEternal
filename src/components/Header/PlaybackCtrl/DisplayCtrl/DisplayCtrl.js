@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { SkyLightStateless } from 'react-skylight'
+import Modal from 'components/Modal'
 import OptimisticSlider from 'components/OptimisticSlider'
 import Icon from 'components/Icon'
 import './DisplayCtrl.css'
@@ -14,6 +14,7 @@ export default class DisplayCtrl extends React.Component {
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isVisualizerSupported: PropTypes.bool.isRequired,
     visualizerPresetName: PropTypes.string.isRequired,
+    ui: PropTypes.object.isRequired,
     // actions
     onRequestOptions: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -47,18 +48,13 @@ export default class DisplayCtrl extends React.Component {
 
   render () {
     return (
-      <SkyLightStateless
+      <Modal
         isVisible={this.props.isVisible}
-        onCloseClicked={this.props.onClose}
-        onOverlayClicked={this.props.onClose}
+        onClose={this.props.onClose}
         title='Display'
-        dialogStyles={{
-          width: '90%',
-          top: '5%',
-          left: '5%',
-          margin: 0,
-          paddingLeft: '15px',
-          paddingRight: '15px',
+        buttons=<button onClick={this.props.onClose}>Done</button>
+        style={{
+          width: Math.max(320, this.props.ui.contentWidth * 0.66),
         }}
       >
         <div className='container'>
@@ -124,14 +120,8 @@ export default class DisplayCtrl extends React.Component {
               styleName='slider'
             />
           </fieldset>
-
-          <div styleName='field'>
-            <button onClick={this.props.onClose}>
-              Done
-            </button>
-          </div>
         </div>
-      </SkyLightStateless>
+      </Modal>
     )
   }
 }

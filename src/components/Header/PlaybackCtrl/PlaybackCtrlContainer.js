@@ -23,6 +23,7 @@ const mapStateToProps = (state) => {
     isInRoom: state.user.roomId !== null,
     isPlayer: state.location.pathname.startsWith('/player'),
     status: state.status,
+    ui: state.ui,
   }
 }
 

@@ -7,6 +7,7 @@ const mapStateToProps = (state) => {
     isInRoom: !!state.user.roomId,
     isLoading: ensureState(state.queue).isLoading,
     isQueueEmpty: ensureState(state.queue).result.length === 0,
+    ui: state.ui,
   }
 }
 

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import PathItem from './PathItem'
-import { SkyLightStateless } from 'react-skylight'
+import Modal from 'components/Modal'
 import HttpApi from 'lib/HttpApi'
 import './PathChooser.css'
 
@@ -41,26 +41,21 @@ export default class PathChooser extends React.Component {
 
   render () {
     return (
-      <SkyLightStateless
+      <Modal
         isVisible={this.props.isVisible}
-        onCloseClicked={this.props.onCancel}
-        onOverlayClicked={this.props.onCancel}
+        onClose={this.props.onCancel}
         title='Add Folder'
-        dialogStyles={{
-          width: '90%',
-          height: '85%',
-          top: '5%',
-          left: '5%',
-          margin: 0,
-          paddingBottom: 0,
+        style={{
+          width: '100%',
+          height: '100%',
         }}
       >
-        <div style={{ height: '85%', display: 'flex', flexDirection: 'column' }}>
-          <div styleName='current'>
+        <div styleName='container'>
+          <div styleName='folderCurrent'>
             {this.state.current || '\u00a0'}
           </div>
 
-          <div style={{ flex: '1', marginBottom: '1em', overflow: 'scroll' }} ref={this.list}>
+          <div styleName='folderList' ref={this.list}>
             {this.state.parent !== false &&
               <strong><PathItem path={'..'} onSelect={() => this.getListing(this.state.parent)} /></strong>
             }
@@ -79,7 +74,7 @@ export default class PathChooser extends React.Component {
             </button>
           </div>
         </div>
-      </SkyLightStateless>
+      </Modal>
     )
   }
 }

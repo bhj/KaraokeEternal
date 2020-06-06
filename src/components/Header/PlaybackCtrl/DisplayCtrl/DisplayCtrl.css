@@ -1,7 +1,7 @@
 .section {
   border: 1px solid var(--btn-bg-color);
   border-radius: var(--border-radius);
-  margin: 1em 0;
+  margin-top: var(--container-padding);
 }
 
 .visualizer {
@@ -10,6 +10,11 @@
 
 .lyrics {
   composes: section;
+}
+
+.visualizer legend,
+.lyrics legend {
+  margin-left: -.5em;
 }
 
 .visualizer legend label {
@@ -24,17 +29,17 @@
 
 .field {
   display: block;
-  margin: 1em 0;
+  margin: 0.8em 0;
   color: hsl(var(--hue-blue), 10%, 67%);
 }
 
 .lyrics label:first-of-type {
-  margin-top: .5em;
+  margin-top: .25rem;
 }
 
 .presetBtnContainer {
   display: flex;
-  margin: .5em 0;
+  margin: .25rem 0 .5rem 0;
   justify-content: space-between;
 }
 

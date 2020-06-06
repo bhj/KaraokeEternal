@@ -13,6 +13,7 @@ export default class PlaybackCtrl extends React.Component {
     isInRoom: PropTypes.bool.isRequired,
     isPlayer: PropTypes.bool.isRequired,
     status: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
     // actions
     requestOptions: PropTypes.func.isRequired,
     requestPause: PropTypes.func.isRequired,
@@ -77,6 +78,7 @@ export default class PlaybackCtrl extends React.Component {
           visualizerPresetName={props.status.visualizer.presetName}
           onClose={this.toggleDisplayCtrl}
           onRequestOptions={props.requestOptions}
+          ui={props.ui}
         />
       </div>
     )

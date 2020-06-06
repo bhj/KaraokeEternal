@@ -1,7 +1,7 @@
 import React from 'react'
 import GitHubButton from 'react-github-btn'
 import Logo from 'components/Logo'
-import { SkyLightStateless } from 'react-skylight'
+import Modal from 'components/Modal'
 import './About.css'
 import html from '<PROJECT_ROOT>/CHANGELOG.md'
 
@@ -13,26 +13,15 @@ export default class About extends React.Component {
   toggleChangelog = () => this.setState({ isChangelogVisible: !this.state.isChangelogVisible })
 
   render () {
-    const Changelog = <SkyLightStateless
+    const Changelog = <Modal
       isVisible={this.state.isChangelogVisible}
-      onCloseClicked={this.toggleChangelog}
-      onOverlayClicked={this.toggleChangelog}
+      onClose={this.toggleChangelog}
       title={'Changelog & Sponsors'}
-      dialogStyles={{
-        width: '90%',
-        height: '90%',
-        top: '5%',
-        left: '5%',
-        margin: 0,
-        overflow: 'auto',
-        userSelect: 'text'
-      }}
+      buttons=<button onClick={this.toggleChangelog}>Done</button>
+      style={{ height: '100%' }}
     >
       <div dangerouslySetInnerHTML={{ __html: html }}></div>
-      <button onClick={this.toggleChangelog}>
-        Done
-      </button>
-    </SkyLightStateless>
+    </Modal>
 
     return (
       <div styleName='container'>
