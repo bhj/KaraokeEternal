@@ -1,7 +1,9 @@
 import {
+  LOGIN,
   QUEUE_ADD,
   QUEUE_PUSH,
   QUEUE_REMOVE,
+  _SUCCESS,
 } from 'shared/actionTypes'
 
 // add to queue
@@ -28,6 +30,13 @@ export function removeItem (queueId) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  // clear queue if we didn't sign in to a room
+  [LOGIN + _SUCCESS]: (state, { payload }) => {
+    return (typeof payload.roomId === 'number') ? state : {
+      result: [],
+      entities: {},
+    }
+  },
   [QUEUE_ADD]: (state, { payload }) => {
     // optimistic
     // @todo: should probably use a result.length + rand index to avoid possible collision?

@@ -28,10 +28,10 @@ function requestLogin (creds) {
   }
 }
 
-function receiveLogin (response) {
+function receiveLogin (user) {
   return {
     type: LOGIN + _SUCCESS,
-    payload: response
+    payload: user,
   }
 }
 
