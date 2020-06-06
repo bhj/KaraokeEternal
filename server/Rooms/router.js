@@ -4,6 +4,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const log = require('../lib/logger')('Rooms')
 const Rooms = require('../Rooms')
+const NAME_MIN_LENGTH = 1
 const NAME_MAX_LENGTH = 50
 const STATUSES = ['open', 'closed']
 
@@ -31,8 +32,8 @@ router.post('/rooms', async (ctx, next) => {
   name = name.trim()
   status = status.trim()
 
-  if (!name || !name.length > NAME_MAX_LENGTH) {
-    ctx.throw(400, `Invalid room name (max length=${NAME_MAX_LENGTH})`)
+  if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+    ctx.throw(400, `Room name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
   }
 
   if (!status || !STATUSES.includes(status)) {
@@ -70,8 +71,8 @@ router.put('/rooms/:roomId', async (ctx, next) => {
   name = name.trim()
   status = status.trim()
 
-  if (!name || !name.length > NAME_MAX_LENGTH) {
-    ctx.throw(400, `Invalid room name (max length=${NAME_MAX_LENGTH})`)
+  if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+    ctx.throw(400, `Room name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
   }
 
   if (!status || !STATUSES.includes(status)) {
