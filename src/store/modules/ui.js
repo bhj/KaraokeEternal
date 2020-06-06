@@ -88,17 +88,18 @@ const ACTION_HANDLERS = {
   }),
   [SHOW_ERROR_MESSAGE]: (state, action) => ({
     ...state,
+    isErrored: true,
     errorMessage: action.error,
   }),
   [CLEAR_ERROR_MESSAGE]: (state, { payload }) => ({
     ...state,
-    errorMessage: null,
+    isErrored: false,
   }),
   [UI_WINDOW_RESIZE]: (state, { payload }) => ({
     ...state,
     innerWidth: payload.innerWidth,
     innerHeight: payload.innerHeight,
-    contentWidth: payload.innerWidth > MAX_CONTENT_WIDTH ? MAX_CONTENT_WIDTH : payload.innerWidth,
+    contentWidth: Math.min(payload.innerWidth, MAX_CONTENT_WIDTH),
   }),
 }
 
@@ -106,12 +107,13 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  isErrored: false,
   errorMessage: null,
   footerHeight: 0,
   headerHeight: 0,
   innerWidth: window.innerWidth,
   innerHeight: window.innerHeight,
-  contentWidth: window.innerWidth > MAX_CONTENT_WIDTH ? MAX_CONTENT_WIDTH : window.innerWidth,
+  contentWidth: Math.min(window.innerWidth, MAX_CONTENT_WIDTH),
 }
 
 export default function uiReducer (state = initialState, action) {
@@ -121,6 +123,7 @@ export default function uiReducer (state = initialState, action) {
   if (action.error) {
     return {
       ...newState,
+      isErrored: true,
       errorMessage: action.error,
     }
   }

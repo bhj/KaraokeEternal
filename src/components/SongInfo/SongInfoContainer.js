@@ -8,7 +8,10 @@ const mapActionCreators = {
 }
 
 const mapStateToProps = (state) => ({
+  isLoading: state.songInfo.isLoading,
+  isVisible: state.songInfo.isVisible,
   media: state.songInfo.media,
+  songId: state.songInfo.songId,
 })
 
 export default connect(mapStateToProps, mapActionCreators)(SongInfo)

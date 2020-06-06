@@ -84,19 +84,23 @@ export function setPreferred (songId, mediaId, isPreferred) {
 const ACTION_HANDLERS = {
   [SONG_INFO_REQUEST]: (state, { payload }) => ({
     ...initialState,
+    isLoading: true,
+    isVisible: true,
     songId: payload.songId,
   }),
   [SONG_INFO_REQUEST + _SUCCESS]: (state, { payload }) => ({
     ...state,
+    isLoading: false,
     media: payload,
   }),
   [SONG_INFO_REQUEST + _ERROR]: (state, { payload }) => ({
     ...state,
-    songId: null,
+    isLoading: false,
+    isVisible: false,
   }),
   [SONG_INFO_CLOSE]: (state, { payload }) => ({
     ...state,
-    songId: null,
+    isVisible: false,
   }),
 }
 
@@ -104,6 +108,8 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  isLoading: false,
+  isVisible: false,
   songId: null,
   media: { result: [], entities: {} },
 }

@@ -17,20 +17,12 @@ export const CoreLayout = (props) => {
         <Navigation/>
       }
 
-      <Modal
-        isVisible={typeof props.songInfoId === 'number'}
-        onClose={props.closeSongInfo}
-        title='Song Info'
-        buttons=<button onClick={props.closeSongInfo}>Done</button>
-        style={{ width: '100%', height: '100%' }}
-      >
-        <SongInfo songId={props.songInfoId}/>
-      </Modal>
+      <SongInfo/>
 
       <Modal
-        isVisible={props.ui.errorMessage !== null}
+        isVisible={props.ui.isErrored}
         onClose={props.clearErrorMessage}
-        title='Oops'
+        title='Oops...'
         buttons=<button onClick={props.clearErrorMessage}>OK</button>
       >
         <p>{props.ui.errorMessage}</p>
@@ -44,7 +36,6 @@ export default CoreLayout
 CoreLayout.propTypes = {
   children: PropTypes.any,
   isLoggedIn: PropTypes.bool,
-  songInfoId: PropTypes.number,
   ui: PropTypes.object.isRequired,
   // actions
   clearErrorMessage: PropTypes.func.isRequired,
