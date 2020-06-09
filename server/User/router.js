@@ -17,8 +17,10 @@ const {
 } = require('../../shared/actionTypes')
 
 const BCRYPT_ROUNDS = 12
+const USERNAME_MIN_LENGTH = 3
 const USERNAME_MAX_LENGTH = 256
-const PASSWORD_MAX_LENGTH = 72 // per bcrypt
+const PASSWORD_MIN_LENGTH = 8
+const NAME_MIN_LENGTH = 2
 const NAME_MAX_LENGTH = 50
 const IMG_MAX_LENGTH = 50000 // bytes
 
@@ -61,8 +63,8 @@ router.put('/account', async (ctx, next) => {
   if (username) {
     username = username.trim()
 
-    if (!username || username.length > USERNAME_MAX_LENGTH) {
-      ctx.throw(400, 'Invalid username')
+    if (username.lenth < USERNAME_MIN_LENGTH || username.length > USERNAME_MAX_LENGTH) {
+      ctx.throw(400, `Username or email must have ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters`)
     }
 
     // check for duplicate
@@ -77,8 +79,8 @@ router.put('/account', async (ctx, next) => {
   if (name) {
     name = name.trim()
 
-    if (!name || name.length > NAME_MAX_LENGTH) {
-      ctx.throw(400, 'Invalid display name')
+    if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+      ctx.throw(400, `Display name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
     }
 
     fields.set('name', name)
@@ -86,8 +88,8 @@ router.put('/account', async (ctx, next) => {
 
   // changing password?
   if (newPassword) {
-    if (newPassword.length > PASSWORD_MAX_LENGTH) {
-      ctx.throw(400, `Invalid password (max length=${PASSWORD_MAX_LENGTH})`)
+    if (newPassword.length < PASSWORD_MIN_LENGTH) {
+      ctx.throw(400, `Password must have at least ${PASSWORD_MIN_LENGTH} characters`)
     }
 
     if (newPassword !== newPasswordConfirm) {
@@ -229,20 +231,20 @@ async function _create (ctx, isAdmin = 0) {
   username = username.trim()
   name = name.trim()
 
-  if (!username || username.length > USERNAME_MAX_LENGTH) {
-    ctx.throw(400, 'Invalid username')
+  if (username.lenth < USERNAME_MIN_LENGTH || username.length > USERNAME_MAX_LENGTH) {
+    ctx.throw(400, `Username or email must have ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters`)
   }
 
-  if (!name || name.length > NAME_MAX_LENGTH) {
-    ctx.throw(400, `Invalid display name (max length=${NAME_MAX_LENGTH})`)
+  if (newPassword.length < PASSWORD_MIN_LENGTH) {
+    ctx.throw(400, `Password must have at least ${PASSWORD_MIN_LENGTH} characters`)
   }
 
-  if (newPassword.length > PASSWORD_MAX_LENGTH) {
-    ctx.throw(400, `Invalid password (max length=${PASSWORD_MAX_LENGTH})`)
+  if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+    ctx.throw(400, `Display name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
   }
 
   if (newPassword !== newPasswordConfirm) {
-    ctx.throw(422, 'Passwords do not match')
+    ctx.throw(422, 'New passwords do not match')
   }
 
   // check for duplicate username
