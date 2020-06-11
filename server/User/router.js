@@ -134,13 +134,20 @@ router.put('/account', async (ctx, next) => {
 
 // create account
 router.post('/account', async (ctx, next) => {
+  // validate room info first
+  const { roomId, roomPassword } = ctx.request.body
+
+  try {
+    await Rooms.validate(roomId, roomPassword)
+  } catch (err) {
+    ctx.throw(401, err.message)
+  }
+
+  // create user
   const creds = await _create(ctx, false) // non-admin
 
-  // @todo validate room
-  const { roomId } = ctx.request.body
-
   // log them in automatically
-  await _login(ctx, { ...creds, roomId })
+  await _login(ctx, { ...creds, roomId, roomPassword })
 })
 
 // first-time setup
@@ -288,7 +295,8 @@ async function _create (ctx, isAdmin = 0) {
 }
 
 async function _login (ctx, creds) {
-  const { username, password, roomId } = creds
+  const { username, password, roomPassword } = creds
+  const roomId = parseInt(creds.roomId, 10) || undefined
 
   if (!username || !password) {
     ctx.throw(422, 'Username/email and password are required')
@@ -296,37 +304,21 @@ async function _login (ctx, creds) {
 
   const user = await User.getByUsername(username, true)
 
-  if (!user) {
-    ctx.throw(401)
+  if (!user || !await bcrypt.compare(password, user.password)) {
+    ctx.throw(401, 'Incorrect username/email or password')
   }
-
-  // validate password
-  if (!await bcrypt.compare(password, user.password)) {
-    ctx.throw(401)
-  }
-
-  // don't want these in the response
-  delete user.password
-  delete user.image
 
   // roomId is required if not an admin
-  if (!roomId && !user.isAdmin) {
-    ctx.throw(422, 'Please select a room')
-  }
+  if (!user.isAdmin) {
+    if (!roomId) ctx.throw(422, 'Please select a room')
 
-  // validate roomId
-  if (roomId) {
-    const query = sql`
-      SELECT *
-      FROM rooms
-      WHERE roomId = ${roomId}
-    `
-    const row = await db.get(String(query), query.parameters)
+    try {
+      await Rooms.validate(roomId, roomPassword)
+    } catch (err) {
+      ctx.throw(401, err.message)
+    }
 
-    if (!row) ctx.throw(401, 'Invalid roomId')
-    if (row.status !== 'open') ctx.throw(401, 'Sorry, this room is no longer open')
-
-    user.roomId = row.roomId
+    user.roomId = roomId
   }
 
   // encrypt JWT based on subset of user object
@@ -341,6 +333,10 @@ async function _login (ctx, creds) {
   ctx.cookies.set('kfToken', token, {
     httpOnly: true,
   })
+
+  // don't want these in the response
+  delete user.password
+  delete user.image
 
   ctx.body = user
 }

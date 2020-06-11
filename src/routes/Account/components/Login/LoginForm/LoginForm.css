@@ -2,10 +2,6 @@
   margin-bottom: var(--input-margin);
 }
 
-.roomId {
+.roomSelect {
   height: 36px;
-}
-
-.signIn {
-  margin-top: var(--input-margin);
 }

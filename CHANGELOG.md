@@ -3,6 +3,7 @@
 ### New:
 
 - Added [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) support. With properly tagged media files, the player can automatically adjust each song's volume for a much smoother experience when songs vary widely in average loudness. *Requires re-scanning media*.
+- Rooms can now be password-protected
 - Added the ability to resize CD+Graphics
 - Added Changelog viewer to the About panel
 

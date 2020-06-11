@@ -11,6 +11,7 @@ export default class LoginForm extends Component {
   username = React.createRef()
   password = React.createRef()
   handleRoomSelectRef = r => { this.roomSelect = r }
+  handleRoomPasswordRef = r => { this.roomPassword = r }
 
   render () {
     return (
@@ -28,9 +29,14 @@ export default class LoginForm extends Component {
           ref={this.password}
           styleName='field'
         />
-        <RoomSelect onRef={this.handleRoomSelectRef} styleName='field roomId'/>
 
-        <button onClick={this.handleSubmit} className='primary' styleName='signIn'>
+        <RoomSelect
+          onSelectRef={this.handleRoomSelectRef}
+          onPasswordRef={this.handleRoomPasswordRef}
+          styleName='field roomSelect'
+        />
+
+        <button onClick={this.handleSubmit} className='primary'>
           Sign in
         </button>
       </form>
@@ -44,6 +50,7 @@ export default class LoginForm extends Component {
       username: this.username.current.value.trim(),
       password: this.password.current.value,
       roomId: this.roomSelect.value,
+      roomPassword: this.roomPassword ? this.roomPassword.value : undefined,
     })
   }
 }

@@ -1,11 +1,15 @@
+const bcrypt = require('../lib/bcrypt')
 const db = require('sqlite')
 const sql = require('sqlate')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const log = require('../lib/logger')('Rooms')
 const Rooms = require('../Rooms')
+
+const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1
 const NAME_MAX_LENGTH = 50
+const PASSWORD_MIN_LENGTH = 5
 const STATUSES = ['open', 'closed']
 
 // list rooms
@@ -27,13 +31,14 @@ router.post('/rooms', async (ctx, next) => {
     ctx.throw(401)
   }
 
-  let { name, status } = ctx.request.body
+  const { name, password, status } = ctx.request.body
 
-  name = name.trim()
-  status = status.trim()
-
-  if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+  if (!name || !name.trim() || name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
     ctx.throw(400, `Room name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
+  }
+
+  if (password && password.length < PASSWORD_MIN_LENGTH) {
+    ctx.throw(400, `Room password must have at least ${PASSWORD_MIN_LENGTH} characters`)
   }
 
   if (!status || !STATUSES.includes(status)) {
@@ -41,7 +46,8 @@ router.post('/rooms', async (ctx, next) => {
   }
 
   const fields = new Map()
-  fields.set('name', name)
+  fields.set('name', name.trim())
+  fields.set('password', password ? await bcrypt.hash(password, BCRYPT_ROUNDS) : null)
   fields.set('status', status)
   fields.set('dateCreated', Math.floor(Date.now() / 1000))
 
@@ -65,14 +71,15 @@ router.put('/rooms/:roomId', async (ctx, next) => {
     ctx.throw(401)
   }
 
-  let { name, status } = ctx.request.body
+  const { name, password, status } = ctx.request.body
   const roomId = parseInt(ctx.params.roomId, 10)
 
-  name = name.trim()
-  status = status.trim()
-
-  if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+  if (!name || !name.trim() || name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
     ctx.throw(400, `Room name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
+  }
+
+  if (password && password.length < PASSWORD_MIN_LENGTH) {
+    ctx.throw(400, `Room password must have at least ${PASSWORD_MIN_LENGTH} characters`)
   }
 
   if (!status || !STATUSES.includes(status)) {
@@ -80,9 +87,14 @@ router.put('/rooms/:roomId', async (ctx, next) => {
   }
 
   const fields = new Map()
-  fields.set('name', name)
+  fields.set('name', name.trim())
   fields.set('status', status)
   fields.set('roomId', roomId)
+
+  // falsey value will unset password
+  if (typeof password !== 'undefined') {
+    fields.set('password', password ? await bcrypt.hash(password, BCRYPT_ROUNDS) : null)
+  }
 
   const query = sql`
     UPDATE rooms

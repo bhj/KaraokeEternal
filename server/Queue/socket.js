@@ -14,11 +14,12 @@ const {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: async (sock, { payload }, acknowledge) => {
-    // is room open?
-    if (!await Rooms.isRoomOpen(sock.user.roomId)) {
+    try {
+      await Rooms.validate(sock.user.roomId, null, { validatePassword: false })
+    } catch (err) {
       return acknowledge({
         type: QUEUE_ADD + '_ERROR',
-        error: 'Sorry, the room is no longer open',
+        error: err.message,
       })
     }
 

@@ -18,6 +18,7 @@
   --input-color: #444;
   --input-placeholder-color: var(--btn-bg-color);
   --input-bg-color: hsl(var(--hue-blue), 10%, 90%);
+  --input-outline-color: var(--link-color);
   --input-margin: 7px;
 
   --btn-bg-color: hsl(var(--hue-blue), 40%, 30%);
@@ -90,7 +91,7 @@
 
   /* <button> colors */
   --btn-default-color: #333;
-  --btn-default-bg-color: var(--text-color);
+  --btn-default-bg-color: hsl(var(--hue-blue), 10%, 75%);
 
   --btn-primary-color: #333;
   --btn-primary-bg-color: var(--btn-active-bg-color);

@@ -81,7 +81,11 @@ export default class AccountForm extends Component {
         }
 
         {this.props.showRoom &&
-          <RoomSelect onRef={this.handleRoomSelectRef} styleName='field roomId' />
+          <RoomSelect
+            onSelectRef={this.handleRoomSelectRef}
+            onPasswordRef={this.handleRoomPasswordRef}
+            styleName='field roomSelect'
+          />
         }
 
         {(this.state.isDirty || !isUser) &&
@@ -100,7 +104,7 @@ export default class AccountForm extends Component {
 
     if (this.curPassword) {
       if (!this.curPassword.value) {
-        alert('Please enter your current password to make changes.')
+        alert('Please enter your current password to make changes')
         this.curPassword.focus()
         return
       }
@@ -126,7 +130,17 @@ export default class AccountForm extends Component {
     }
 
     if (this.roomSelect) {
+      if (!this.roomSelect.value) {
+        alert('Please select a room')
+        this.roomSelect.focus()
+        return
+      }
+
       data.append('roomId', this.roomSelect.value)
+
+      if (this.roomPassword) {
+        data.append('roomPassword', this.roomPassword.value)
+      }
     }
 
     this.props.onSubmitClick(data)
@@ -140,6 +154,7 @@ export default class AccountForm extends Component {
   }
 
   handleRoomSelectRef = r => { this.roomSelect = r }
+  handleRoomPasswordRef = r => { this.roomPassword = r }
 
   updateVisible = () => {
     if (this.props.user.userId === null) return
