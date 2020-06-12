@@ -60,6 +60,7 @@ const config = {
       chunks: 'all',
     },
   },
+  stats: 'minimal',
 }
 
 if (__PROD__) {
