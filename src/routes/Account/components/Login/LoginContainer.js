@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
     user: state.user,
     isFirstRun: state.prefs.isFirstRun === true,
     isLoggedIn: state.user.userId !== null,
+    ui: state.ui,
   }
 }
 

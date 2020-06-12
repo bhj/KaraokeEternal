@@ -28,7 +28,7 @@ export default class AccountView extends Component {
         <Header />
 
         {isAdmin &&
-          <Rooms contentWidth={this.props.ui.contentWidth}/>
+          <Rooms ui={this.props.ui}/>
         }
 
         {isAdmin &&
@@ -40,7 +40,7 @@ export default class AccountView extends Component {
         }
 
         {!isLoggedIn &&
-          <Login />
+          <Login style={{ maxWidth: Math.max(340, this.props.ui.contentWidth * 0.66) }}/>
         }
 
         {isLoggedIn &&

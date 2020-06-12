@@ -7,8 +7,9 @@ import './Login.css'
 
 export default class Login extends Component {
   static propTypes = {
-    user: PropTypes.object.isRequired,
     isFirstRun: PropTypes.bool.isRequired,
+    style: PropTypes.object,
+    user: PropTypes.object.isRequired,
     // actions
     login: PropTypes.func.isRequired,
     createAccount: PropTypes.func.isRequired,
@@ -27,7 +28,7 @@ export default class Login extends Component {
     const { isCreating } = this.state
 
     return (
-      <div styleName='container'>
+      <div styleName='container' style={this.props.style}>
         <Logo styleName='logo'/>
 
         {!isFirstRun && !isCreating &&

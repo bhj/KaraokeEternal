@@ -12,7 +12,7 @@ export default class Rooms extends Component {
     isEditing: PropTypes.bool.isRequired,
     isShowingAll: PropTypes.bool.isRequired,
     editingRoom: PropTypes.object,
-    contentWidth: PropTypes.number.isRequired,
+    ui: PropTypes.object.isRequired,
     // Actions
     closeRoomEditor: PropTypes.func.isRequired,
     fetchRooms: PropTypes.func.isRequired,
@@ -41,7 +41,7 @@ export default class Rooms extends Component {
         </div>
         <div styleName='style.content'>
           <Table
-            width={this.props.contentWidth}
+            width={this.props.ui.contentWidth}
             height={this.props.rooms.result.length * 30 + 20}
             headerHeight={20}
             rowHeight={30}
@@ -55,7 +55,7 @@ export default class Rooms extends Component {
             <Column
               label='Name'
               dataKey='name'
-              width={this.props.contentWidth * 0.40}
+              width={this.props.ui.contentWidth * 0.40}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => (
                 <a onClick={() => this.props.openRoomEditor(rowData.roomId)}>{rowData.name}</a>
@@ -64,14 +64,14 @@ export default class Rooms extends Component {
             <Column
               label='Status'
               dataKey='status'
-              width={this.props.contentWidth * 0.20}
+              width={this.props.ui.contentWidth * 0.20}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
             />
             <Column
               label='Created'
               dataKey='dateCreated'
-              width={this.props.contentWidth * 0.40}
+              width={this.props.ui.contentWidth * 0.40}
               styleName='style.tableCol'
               cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
             />

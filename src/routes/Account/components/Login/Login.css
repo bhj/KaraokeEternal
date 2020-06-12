@@ -1,6 +1,5 @@
 .container {
-  margin: 1em auto;
-  max-width: 32em;
+  margin: 0 auto;
   overflow: hidden;
   padding: var(--container-padding);
 
@@ -13,20 +12,21 @@
   align-items: baseline;
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 1em;
+  margin-bottom: var(--container-padding);
   color: hsl(var(--hue-blue), 10%, 60%);
 }
 
 .heading h1 {
   flex: 1;
   margin: 0 1em 0 0;
-  font-size: 24px;
+  font-size: 32px;
+  font-family: var(--font-family-custom);
   white-space: nowrap;
   color: hsl(var(--hue-blue), 10%, 80%);
 }
 
 .logo {
-  padding-bottom: 1.5em;
+  margin-bottom: 1.5rem;
   text-align: center;
   font-size: 28px;
 }

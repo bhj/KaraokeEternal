@@ -5,7 +5,3 @@
 .roomId {
   height: 36px;
 }
-
-.signIn {
-  margin-top: var(--input-margin);
-}
