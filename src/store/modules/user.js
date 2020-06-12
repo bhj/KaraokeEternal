@@ -38,7 +38,7 @@ function receiveLogin (user) {
 function loginError (err) {
   return {
     type: LOGIN + _ERROR,
-    error: err.message + ' (incorrect login)',
+    error: err.message,
   }
 }
 

@@ -16,6 +16,6 @@
   margin: 0 0 0 var(--input-margin);
 }
 
-.roomId {
+.roomSelect {
   height: 36px;
 }

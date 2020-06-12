@@ -1,3 +1,4 @@
+const bcrypt = require('../lib/bcrypt')
 const db = require('sqlite')
 const sql = require('sqlate')
 
@@ -21,8 +22,11 @@ class Rooms {
     const res = await db.all(String(query), query.parameters)
 
     res.forEach(row => {
-      result.push(row.roomId)
       row.dateCreated = row.dateCreated.substring(0, 10)
+      row.hasPassword = !!row.password
+      delete row.password
+
+      result.push(row.roomId)
       entities[row.roomId] = row
     })
 
@@ -30,19 +34,30 @@ class Rooms {
   }
 
   /**
-   * Check if a given roomId is open
+   * Validate a room against optional criteria
    *
-   * @param  {Number}  roomId
-   * @return {Promise}
+   * @param  {Number}    roomId
+   * @param  {[String]}  password      Room password
+   * @param  {[Object]}  opts          (bool) isOpen, (bool) validatePassword
+   * @return {Promise}                 True if validated, otherwise throws an error
    */
-  static async isRoomOpen (roomId) {
+  static async validate (roomId, password, { isOpen = true, validatePassword = true } = {}) {
     const query = sql`
       SELECT * FROM rooms
       WHERE roomId = ${roomId}
     `
     const room = await db.get(String(query), query.parameters)
+    if (!room) throw new Error('Room not found')
 
-    return (room && room.status === 'open')
+    if (isOpen && room.status !== 'open') {
+      throw new Error('Room is no longer open')
+    }
+
+    if (validatePassword && room.password && !await bcrypt.compare(password, room.password)) {
+      throw new Error('Room password is incorrect')
+    }
+
+    return true
   }
 
   static prefix (roomId = '') {
