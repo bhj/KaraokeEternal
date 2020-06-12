@@ -31,7 +31,7 @@ export default class LoginForm extends Component {
         <RoomSelect onRef={this.handleRoomSelectRef} styleName='field roomId'/>
 
         <button onClick={this.handleSubmit} className='primary'>
-          Sign in
+          Sign In
         </button>
       </form>
     )

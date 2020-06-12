@@ -34,7 +34,7 @@ export default class Login extends Component {
         {!isFirstRun && !isCreating &&
         <>
           <div styleName='heading'>
-            <h1>Sign in</h1>
+            <h1>Sign In</h1>
             <span><a onClick={this.toggleMode}>Don&rsquo;t have an account?</a></span>
           </div>
           <LoginForm onSubmitClick={this.props.login} />
@@ -44,7 +44,7 @@ export default class Login extends Component {
         {!isFirstRun && isCreating &&
         <>
           <div styleName='heading'>
-            <h1>Create account</h1>
+            <h1>Create Account</h1>
             <span><a onClick={this.toggleMode}>Already have an account?</a></span>
           </div>
           <AccountForm user={user} onSubmitClick={this.props.createAccount} showRoom />
