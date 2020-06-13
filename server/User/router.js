@@ -309,17 +309,17 @@ async function _login (ctx, creds) {
   }
 
   // roomId is required if not an admin
-  if (!user.isAdmin) {
-    if (!roomId) ctx.throw(422, 'Please select a room')
-
+  if (roomId) {
     try {
       await Rooms.validate(roomId, roomPassword)
     } catch (err) {
       ctx.throw(401, err.message)
     }
-
-    user.roomId = roomId
+  } else if (!user.isAdmin) {
+    ctx.throw(422, 'Please select a room')
   }
+
+  user.roomId = roomId
 
   // encrypt JWT based on subset of user object
   const token = jwtSign({
