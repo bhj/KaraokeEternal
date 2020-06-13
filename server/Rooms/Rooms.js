@@ -47,14 +47,23 @@ class Rooms {
       WHERE roomId = ${roomId}
     `
     const room = await db.get(String(query), query.parameters)
-    if (!room) throw new Error('Room not found')
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
 
     if (isOpen && room.status !== 'open') {
       throw new Error('Room is no longer open')
     }
 
-    if (validatePassword && room.password && !await bcrypt.compare(password, room.password)) {
-      throw new Error('Room password is incorrect')
+    if (validatePassword && room.password) {
+      if (!password) {
+        throw new Error('Room password is required')
+      }
+
+      if (!await bcrypt.compare(password, room.password)) {
+        throw new Error('Incorrect room password')
+      }
     }
 
     return true
