@@ -66,7 +66,6 @@ Promise.resolve()
   .then(() => sqlite.open(config.database, { Promise }))
   .then(db => db.migrate({
     migrationsPath: path.join(config.basePath, 'server', 'lib', 'schemas'),
-    // force: 'last',
   }))
   .then(() => Prefs.getJwtKey())
   .then(jwtKey => {
