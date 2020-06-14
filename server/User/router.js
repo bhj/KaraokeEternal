@@ -308,10 +308,10 @@ async function _login (ctx, creds) {
     ctx.throw(401, 'Incorrect username/email or password')
   }
 
-  // roomId is required if not an admin
   if (roomId) {
     try {
-      await Rooms.validate(roomId, roomPassword)
+      // admins can sign in to closed rooms
+      await Rooms.validate(roomId, roomPassword, { isOpen: !user.isAdmin })
     } catch (err) {
       ctx.throw(401, err.message)
     }
