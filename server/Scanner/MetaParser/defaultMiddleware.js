@@ -22,17 +22,21 @@ m.set('de-karaoke', (ctx, next) => {
 
 // detect delimiter and split to parts
 m.set('split', (ctx, next) => {
-  const matches = ctx.name.match(/ in the style of /i)
+  const inTheStyleOf = ctx.name.match(/ in the style of /i)
 
   ctx.cfg = {
-    delimiter: matches ? matches[0] : '-',
-    artistOnLeft: !matches,
+    delimiter: inTheStyleOf ? inTheStyleOf[0] : '-',
+    artistOnLeft: !inTheStyleOf,
     ...ctx.cfg,
   }
 
-  // allow leading and/or trailing space around delimiter
+  // allow leading and/or trailing space when searching for delimiter,
+  // then pick the match with the most whitespace (longest match) as it's
+  // most likely to be the actual delimiter rather than a false positive
   const d = ctx.cfg.delimiter instanceof RegExp ? ctx.cfg.delimiter : new RegExp(` ?${ctx.cfg.delimiter} ?`, 'g')
-  ctx.parts = ctx.name.split(d)
+  const matches = ctx.name.match(d)
+  const longest = matches.reduce((a, b) => a.length > b.length ? a : b)
+  ctx.parts = ctx.name.split(longest)
 
   if (ctx.parts.length < 2) {
     throw new Error('delimiter not found in filename')
