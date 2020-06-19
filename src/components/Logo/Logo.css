@@ -6,7 +6,7 @@
 
 .imgMic {
   margin: 0;
-  width: 2em;
+  width: 1.75em;
 }
 
 .title {
@@ -18,7 +18,7 @@
   margin: 0;
   text-shadow: var(--text-shadow-glow);
   position: relative;
-  left: -.75em;
+  left: -.66em;
 }
 
 .forever {
@@ -28,16 +28,3 @@
 .nospace {
   font-size: 0;
 }
-
-/* @media (min-width: 42em) {
-  .container {
-    font-size: 36px;
-  }
-
-  .imgMic {
-    width: 50px;
-    height: 50px;
-    top: -10px;
-    right: -20px;
-  }
-} */
