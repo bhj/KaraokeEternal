@@ -1,7 +1,7 @@
 import butterchurnPresets from 'butterchurn-presets'
 import {
-  PLAYER_CMD_NEXT,
   PLAYER_CMD_OPTIONS,
+  PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
 } from 'shared/actionTypes'
 
@@ -18,7 +18,7 @@ export function playerVisualizerError (err) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_CMD_NEXT]: (state, { payload }) => ({
+  [PLAYER_LOAD]: (state, { payload }) => ({
     ...state,
     ...getRandomPreset(),
   }),
