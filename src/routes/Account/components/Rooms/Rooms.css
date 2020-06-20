@@ -18,6 +18,10 @@
   font: var(--panel-title-font);
 }
 
+.showAll {
+  cursor: pointer;
+}
+
 .content {
   padding: var(--container-padding);
 }

@@ -29,17 +29,18 @@ export default class Rooms extends Component {
 
   render () {
     return (
-      <div styleName='style.container'>
-        <div styleName='style.titleContainer'>
-          <h1 styleName='style.title'>Rooms</h1>
-          <label>
+      <div styleName='container'>
+        <div styleName='titleContainer'>
+          <h1 styleName='title'>Rooms</h1>
+          <label styleName='showAll'>
             <input type='checkbox'
               checked={this.props.isShowingAll}
               onChange={this.props.toggleShowAll}
+              styleName='showAll'
             /> Show all
           </label>
         </div>
-        <div styleName='style.content'>
+        <div styleName='content'>
           <Table
             width={this.props.ui.contentWidth}
             height={this.props.rooms.result.length * 30 + 20}
@@ -56,7 +57,7 @@ export default class Rooms extends Component {
               label='Name'
               dataKey='name'
               width={this.props.ui.contentWidth * 0.40}
-              styleName='style.tableCol'
+              styleName='tableCol'
               cellRenderer={({ rowData }) => (
                 <a onClick={() => this.props.openRoomEditor(rowData.roomId)}>{rowData.name}</a>
               )}
@@ -65,14 +66,14 @@ export default class Rooms extends Component {
               label='Status'
               dataKey='status'
               width={this.props.ui.contentWidth * 0.20}
-              styleName='style.tableCol'
+              styleName='tableCol'
               cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
             />
             <Column
               label='Created'
               dataKey='dateCreated'
               width={this.props.ui.contentWidth * 0.40}
-              styleName='style.tableCol'
+              styleName='tableCol'
               cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
             />
           </Table>
