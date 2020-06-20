@@ -75,10 +75,11 @@ export default class PlaybackCtrl extends React.Component {
           isVisible={this.state.isVisible}
           isVisualizerEnabled={props.status.visualizer.isEnabled}
           isVisualizerSupported={props.status.visualizer.isSupported}
-          visualizerPresetName={props.status.visualizer.presetName}
           onClose={this.toggleDisplayCtrl}
           onRequestOptions={props.requestOptions}
+          sensitivity={props.status.visualizer.sensitivity}
           ui={props.ui}
+          visualizerPresetName={props.status.visualizer.presetName}
         />
       </div>
     )

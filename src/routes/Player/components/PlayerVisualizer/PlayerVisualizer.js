@@ -10,14 +10,16 @@ class PlayerVisualizer extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     onError: PropTypes.func.isRequired,
     presetKey: PropTypes.string.isRequired,
+    sensitivity: PropTypes.number.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
   }
 
+  audioGainNode = null
   canvas = React.createRef()
-  presets = butterchurnPresets.getPresets()
   frameId = null
+  presets = butterchurnPresets.getPresets()
 
   componentDidMount () {
     try {
@@ -61,6 +63,10 @@ class PlayerVisualizer extends React.Component {
     if (props.presetKey !== prevProps.presetKey) {
       this.visualizer.loadPreset(this.presets[props.presetKey], 1) // 2nd arg is # of seconds to blend presets
     }
+
+    if (this.audioGainNode && props.sensitivity !== prevProps.sensitivity) {
+      this.audioGainNode.gain.setValueAtTime(props.sensitivity, this.audioGainNode.context.currentTime)
+    }
   }
 
   componentWillUnmount () {
@@ -82,7 +88,9 @@ class PlayerVisualizer extends React.Component {
   }
 
   updateAudioSource = () => {
-    this.visualizer.connectAudio(this.props.audioSourceNode)
+    this.audioGainNode = this.props.audioSourceNode.context.createGain()
+    this.props.audioSourceNode.connect(this.audioGainNode)
+    this.visualizer.connectAudio(this.audioGainNode)
   }
 
   updatePlaying = () => {

@@ -13,6 +13,7 @@ export default class DisplayCtrl extends React.Component {
     isVisible: PropTypes.bool.isRequired,
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isVisualizerSupported: PropTypes.bool.isRequired,
+    sensitivity: PropTypes.number.isRequired,
     visualizerPresetName: PropTypes.string.isRequired,
     ui: PropTypes.object.isRequired,
     // actions
@@ -25,6 +26,10 @@ export default class DisplayCtrl extends React.Component {
   handleAlpha = val => {
     this.props.onRequestOptions({ cdgAlpha: val })
   }
+
+  handleSensitivity = val => this.props.onRequestOptions({
+    visualizer: { sensitivity: val }
+  })
 
   handleSize = val => {
     this.props.onRequestOptions({ cdgSize: val })
@@ -83,8 +88,18 @@ export default class DisplayCtrl extends React.Component {
                   <Icon icon='CHEVRON_RIGHT' size={42} styleName='btnIcon' />
                 </button>
               </div>
-
               <label>{this.props.visualizerPresetName}</label>
+
+              <label styleName='field'>Sensitivity</label>
+              <OptimisticSlider
+                min={0}
+                max={2}
+                step={0.01}
+                value={this.props.sensitivity}
+                onChange={this.handleSensitivity}
+                handle={handle}
+                styleName='slider'
+              />
             </>
             }
 
@@ -95,7 +110,7 @@ export default class DisplayCtrl extends React.Component {
 
           <fieldset styleName='lyrics'>
             <legend>
-              <label>CD+Graphics</label>
+              <label>Lyrics</label>
             </legend>
 
             <label styleName='field'>Size</label>

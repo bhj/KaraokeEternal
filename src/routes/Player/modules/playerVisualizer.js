@@ -42,6 +42,7 @@ const ACTION_HANDLERS = {
       ...state,
       ...preset,
       isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
+      sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
     }
   },
   [PLAYER_VISUALIZER_ERROR]: (state, { payload }) => ({
@@ -57,6 +58,7 @@ const initialState = {
   isEnabled: true,
   isSupported: isWebGLSupported(),
   ...getRandomPreset(),
+  sensitivity: 1,
 }
 
 export default function playerVisualizer (state = initialState, action) {
