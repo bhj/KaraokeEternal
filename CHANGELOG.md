@@ -2,18 +2,20 @@
 
 ### New:
 
-- Added [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) support. With properly tagged media files, the player can automatically adjust each song's volume for a much smoother experience when songs vary widely in average loudness. *Requires re-scanning media*.
+- [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) support. No more scrambling for the volume when a new song starts! With properly tagged media, each song's loudness can now be normalized automatically. 
 - Rooms can now be password-protected
-- Added the ability to resize CD+Graphics
-- Added Changelog viewer to the About panel
+- CD+Graphics can now be resized in the player
+- Added Changelog/Sponsor viewer and GitHub links to the About panel
 
 ### Changed:
 
-- (app) Fixed status not being respected when creating a new room
+- (app) Reduced motion and improved accessibility of modals
+- (app) Fixed status not respected when creating a new room
 - (player) Web Audio API support is now required (only for browsers running the player)
-- (player) Fixed media potentially not (pre)loading in Firefox
-- (player) Removed visualizer sensitivity control (drop a note if you used it)
-- (server) Fixed potentially incorrect queue list being emitted after setting preferred media
+- (player) Fixed media possibly not (pre)loading in Firefox
+- (player) Visualizer sensitivity can now be set up to 200%
+- (server) Added minimum password length (8) requirement and removed length limit
+- (server) Fixed incorrect queue potentially emitted after setting preferred media
 - (server) Improved filename parser and renamed config option `separator` to `delimiter`
 - (server) Improved logging and made `3 (info)` the default log file level
 
