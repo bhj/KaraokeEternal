@@ -28,8 +28,9 @@ class CDGPlayer extends React.Component {
 
   componentDidMount () {
     this.cdg = new CDGraphics(this.canvas.current, {
-      forceTransparent: true,
+      forceKey: true,
       onBackgroundChange: this.handleCDGBackgroundChange,
+      shadowBlur: Math.min(16, this.props.height * this.props.cdgSize * 0.0333),
     })
 
     this.props.onAudioElement(this.audio.current)
@@ -45,6 +46,12 @@ class CDGPlayer extends React.Component {
 
     if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
+    }
+
+    if (prevProps.width !== this.props.width ||
+        prevProps.height !== this.props.height ||
+        prevProps.cdgSize !== this.props.cdgSize) {
+      this.cdg.setOptions({ shadowBlur: Math.min(16, this.props.height * this.props.cdgSize * 0.0333) })
     }
   }
 
