@@ -129,7 +129,7 @@ router.put('/account', async (ctx, next) => {
     username: username || user.username,
     password: newPassword || password,
     roomId: ctx.user.roomId || null,
-  })
+  }, false) // don't require room password to update account
 })
 
 // create account
@@ -294,7 +294,7 @@ async function _create (ctx, isAdmin = 0) {
   }
 }
 
-async function _login (ctx, creds) {
+async function _login (ctx, creds, validateRoomPassword = true) {
   const { username, password, roomPassword } = creds
   const roomId = parseInt(creds.roomId, 10) || undefined
 
@@ -311,7 +311,10 @@ async function _login (ctx, creds) {
   if (roomId) {
     try {
       // admins can sign in to closed rooms
-      await Rooms.validate(roomId, roomPassword, { isOpen: !user.isAdmin })
+      await Rooms.validate(roomId, roomPassword, {
+        isOpen: !user.isAdmin,
+        validatePassword: validateRoomPassword,
+      })
     } catch (err) {
       ctx.throw(401, err.message)
     }
