@@ -2,6 +2,6 @@
   margin: 0 auto;
   padding: 0 1vw;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

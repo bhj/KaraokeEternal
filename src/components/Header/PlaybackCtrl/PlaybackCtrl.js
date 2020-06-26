@@ -40,12 +40,12 @@ export default class PlaybackCtrl extends React.Component {
       <div styleName='container'>
         {isPlaying &&
           <div onClick={props.requestPause} styleName='pause'>
-            <Icon icon='PAUSE' size={42}/>
+            <Icon icon='PAUSE' size={44}/>
           </div>
         }
         {!isPlaying &&
           <div onClick={props.requestPlay} styleName='play'>
-            <Icon icon='PLAY' size={42}/>
+            <Icon icon='PLAY' size={44}/>
           </div>
         }
 
@@ -59,7 +59,7 @@ export default class PlaybackCtrl extends React.Component {
         />
 
         <div onClick={this.toggleDisplayCtrl} styleName='displayCtrl'>
-          <Icon icon='TUNE' size={40}/>
+          <Icon icon='TUNE' size={44}/>
         </div>
 
         {props.isPlayer && screenfull.isEnabled &&

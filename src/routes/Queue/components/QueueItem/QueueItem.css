@@ -3,6 +3,7 @@
   background-repeat: no-repeat;
   height: var(--queue-item-height);
   overflow: hidden;
+  padding-right: 4px;
 }
 
 .content {
@@ -16,7 +17,7 @@
 }
 
 .greyed {
-  opacity: .6;
+  opacity: .5;
 }
 
 .imageContainer {
@@ -95,12 +96,8 @@
 .btn {
   cursor: pointer;
   fill: var(--song-item-btn-bg-color);
-  margin-left: var(--btn-margin);
+  margin-right: var(--btn-margin);
   transition: opacity .3s;
-}
-
-.btn:first-child {
-  margin-left: 0;
 }
 
 .active {

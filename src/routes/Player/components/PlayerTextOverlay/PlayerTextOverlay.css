@@ -1,4 +1,5 @@
 .container {
+  font-family: var(--font-family-custom);
   position: absolute;
   top: 0;
   display: flex;

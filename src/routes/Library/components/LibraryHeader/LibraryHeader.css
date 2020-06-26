@@ -1,7 +1,7 @@
 .container {
   display: flex;
   align-items: center;
-  padding: 4px var(--container-padding) 4px 2px;
+  padding-right: var(--container-padding);
 }
 
 .searchInput {

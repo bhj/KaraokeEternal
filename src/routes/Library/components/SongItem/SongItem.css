@@ -47,12 +47,8 @@
   cursor: pointer;
   width: var(--song-item-btn-width);
   height: var(--song-item-btn-height);
-  margin-left: var(--btn-margin);
+  margin-right: var(--btn-margin);
   transition: opacity .3s;
-}
-
-.btn:first-child {
-  margin-left: 0;
 }
 
 .star {

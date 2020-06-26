@@ -7,7 +7,7 @@ export default class Buttons extends React.Component {
     btnWidth: PropTypes.number.isRequired,
     className: PropTypes.string,
     children: PropTypes.any,
-    showHidden: PropTypes.bool.isRequired,
+    isExpanded: PropTypes.bool.isRequired,
   }
 
   render () {
@@ -15,7 +15,7 @@ export default class Buttons extends React.Component {
 
     const children = React.Children.map(this.props.children, (c, i) => {
       if (React.isValidElement(c)) {
-        if (c.props['data-hide'] && !this.props.showHidden) {
+        if (c.props['data-hide'] && !this.props.isExpanded) {
           return React.cloneElement(c, {
             className: c.props.className + ' ' + styles.btnHide,
           })

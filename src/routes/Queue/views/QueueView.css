@@ -1,5 +1,9 @@
 .container {
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.container h1 {
+  font-family: var(--font-family-custom);
 }

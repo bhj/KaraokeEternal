@@ -26,7 +26,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  fill: var(--btn-danger-bg-color);
+  fill: hsl(var(--hue-pink), 100%, 70%);
   z-index: 99;
 }
 

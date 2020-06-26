@@ -56,7 +56,7 @@ class LibraryHeader extends React.Component {
           }
 
           <div onClick={this.props.toggleFilterStarred} styleName={filterStarred ? 'btnActive' : 'btn'}>
-            <Icon icon='STAR_FULL' size={40}/>
+            <Icon icon='STAR_FULL' size={44}/>
           </div>
         </div>
       </Header>

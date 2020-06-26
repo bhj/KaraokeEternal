@@ -58,7 +58,7 @@ export default class SongItem extends React.Component {
           </div>
         </ToggleAnimation>
 
-        <Buttons btnWidth={45} showHidden={state.isExpanded}>
+        <Buttons btnWidth={50} isExpanded={state.isExpanded}>
           <div onClick={this.handleStarClick} styleName='btn star'>
             <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
               <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>

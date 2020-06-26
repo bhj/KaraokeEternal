@@ -74,30 +74,30 @@ class QueueItem extends React.Component {
             </div>
           </div>
 
-          <Buttons btnWidth={45} showHidden={state.isExpanded}>
+          <Buttons btnWidth={50} isExpanded={state.isExpanded}>
             {props.isErrored &&
               <div onClick={this.handleErrorInfoClick} styleName='btn danger'>
-                <Icon icon='INFO_OUTLINE' size={40} />
+                <Icon icon='INFO_OUTLINE' size={44} />
               </div>
             }
             <div onClick={this.handleStarClick} styleName={props.isStarred ? 'btn active' : 'btn'}>
               <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
-                <Icon size={40} icon={'STAR_FULL'}/>
+                <Icon size={44} icon={'STAR_FULL'}/>
               </ToggleAnimation>
             </div>
             {props.isInfoable &&
               <div onClick={this.handleInfoClick} styleName='btn active' data-hide>
-                <Icon icon='INFO_OUTLINE' size={40} />
+                <Icon icon='INFO_OUTLINE' size={44} />
               </div>
             }
             {props.isRemovable &&
               <div onClick={this.handleRemoveClick} styleName='btn danger' data-hide>
-                <Icon icon='CLEAR' size={40} />
+                <Icon icon='CLEAR' size={44} />
               </div>
             }
             {props.isSkippable &&
               <div onClick={props.onSkipClick} styleName='btn danger' data-hide>
-                <Icon icon='PLAY_NEXT' size={40} />
+                <Icon icon='PLAY_NEXT' size={44} />
               </div>
             }
           </Buttons>

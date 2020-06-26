@@ -1,30 +1,30 @@
 :root {
   --hue-blue: 209;
-  --hue-pink: 280;
+  --hue-pink: 270;
 
   /* Defaults */
   --font-family: system-ui, sans-serif;
   --font-family-custom: Raleway, system-ui, sans-serif;
   --bg-color: #000;
   --text-color: hsl(var(--hue-blue), 10%, 87%);
-  --link-color: hsl(var(--hue-blue), 92%, 70%);
+  --link-color: hsl(var(--hue-blue), 92%, 69%);
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   --drop-shadow-filter: drop-shadow(0 2px 5px #222);
   --container-padding: 10px;
-  --btn-margin: 5px;
+  --btn-margin: 6px;
   --border-radius: 5px;
 
   --input-color: #444;
   --input-placeholder-color: var(--btn-bg-color);
   --input-bg-color: hsl(var(--hue-blue), 10%, 90%);
-  --input-outline-color: var(--link-color);
+  --input-outline-color: hsl(var(--hue-blue), 90%, 50%);
   --input-margin: 7px;
 
   --btn-bg-color: hsl(var(--hue-blue), 40%, 30%);
   --btn-active-bg-color: var(--link-color);
   --btn-active-filter: none;
-  --btn-danger-bg-color: hsl(var(--hue-pink), 90%, 60%);
+  --btn-danger-bg-color: hsl(var(--hue-pink), 60%, 57%);
    --btn-danger-filter: none;
 
   /* UI chrome (header/footer) */
@@ -61,8 +61,8 @@
   --mark-bg-color: hsl(var(--hue-blue), 50%, 30%);
 
   /* Queue */
-  --active-item-from-bg-color: hsl(var(--hue-blue), 80%, 40%);
-  --active-item-to-bg-color: hsl(var(--hue-blue), 80%, 40%);
+  --active-item-from-bg-color: hsl(var(--hue-blue), 70%, 15%);
+  --active-item-to-bg-color: hsl(var(--hue-blue), 70%, 30%);
   --queue-item-height: 92px;
 
   /* Account panels */
@@ -81,12 +81,12 @@
   --transport-volume-track-active-filter: var(--btn-active-filter);
 
   /* Up Next header/banner */
-  --up-next-bg-color-from: hsl(var(--hue-blue), 100%, 27%);
-  --up-next-bg-color-to: hsl(var(--hue-blue), 92%, 60%);
+  --up-next-bg-color-from: hsl(var(--hue-blue), 70%, 20%);
+  --up-next-bg-color-to: hsl(var(--hue-blue), 70%, 35%);
   --up-next-filter: none;
 
-  --up-now-bg-color-from: hsl(var(--hue-pink), 100%, 25%);
-  --up-now-bg-color-to: hsl(var(--hue-pink), 97%, 40%);
+  --up-now-bg-color-from: hsl(var(--hue-pink), 70%, 20%);
+  --up-now-bg-color-to: hsl(var(--hue-pink), 50%, 40%);
   --up-now-filter: none;
 
   /* <button> colors */
@@ -116,6 +116,6 @@
 
 @keyframes glow {
   from { text-shadow: none; }
-  20% { text-shadow: 0 0 6px hsl(var(--hue-pink), 100%, 100%), 0 0 12px hsl(var(--hue-pink), 100%, 100%); }
+  25% { text-shadow: 0 0 4px hsl(var(--hue-pink), 100%, 100%), 0 0 8px hsl(var(--hue-pink), 100%, 100%), 0 0 12px hsl(var(--hue-pink), 100%, 100%); }
   to { text-shadow: var(--text-shadow-glow); }
 }
