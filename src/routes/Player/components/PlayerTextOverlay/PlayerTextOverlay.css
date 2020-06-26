@@ -7,3 +7,17 @@
   justify-content: center;
   flex-direction: column;
 }
+
+.backdrop {
+  background-color: var(--chrome-bg-color);
+  border-radius: var(--border-radius);
+  padding: 1rem 2rem;
+}
+
+@supports (backdrop-filter: saturate(50%) blur(20px)) or (-webkit-backdrop-filter: saturate(50%) blur(20px)) {
+  .backdrop {
+    background-color: transparent !important;
+    -webkit-backdrop-filter: saturate(50%) blur(20px);
+    backdrop-filter: saturate(50%) blur(20px);
+  }
+}

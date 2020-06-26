@@ -6,6 +6,7 @@ const framerate = 33 // ms
 
 class ColorCycle extends React.Component {
   static propTypes = {
+    className: PropTypes.string,
     text: PropTypes.string.isRequired,
     offset: PropTypes.number,
   }
@@ -32,7 +33,7 @@ class ColorCycle extends React.Component {
     })
 
     return (
-      <div styleName='container'>
+      <div styleName='container' className={this.props.className}>
         {text}
       </div>
     )

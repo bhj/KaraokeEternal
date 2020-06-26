@@ -19,14 +19,14 @@ class PlayerTextOverlay extends React.Component {
     let Component
 
     if (this.props.isQueueEmpty || this.props.isAtQueueEnd) {
-      Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' />
+      Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' styleName='backdrop'/>
     } else if (!queueItem) {
-      Component = <ColorCycle text='PRESS PLAY TO BEGIN' />
+      Component = <ColorCycle text='PRESS PLAY TO BEGIN' styleName='backdrop'/>
     } else if (this.props.isErrored) {
       const offset = Math.random() * -300
       Component = <>
-        <ColorCycle text='OOPS...' offset={offset} />
-        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} />
+        <ColorCycle text='OOPS...' offset={offset} styleName='backdrop'/>
+        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} styleName='backdrop'/>
       </>
     } else {
       Component = <UpNow queueItem={queueItem} />

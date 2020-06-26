@@ -11,6 +11,14 @@
   padding: 20px;
 }
 
+@supports (backdrop-filter: saturate(50%) blur(20px)) or (-webkit-backdrop-filter: saturate(50%) blur(20px)) {
+  .textContainer {
+    background-color: transparent !important;
+    -webkit-backdrop-filter: saturate(50%) blur(20px);
+    backdrop-filter: saturate(50%) blur(20px);
+  }
+}
+
 .fadeEnter {
   opacity: 0.01;
 }

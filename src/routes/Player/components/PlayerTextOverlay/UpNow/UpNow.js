@@ -49,7 +49,7 @@ class UpNow extends React.Component {
             exit: styles.fadeExit,
             exitActive: styles.fadeExitActive,
           }}>
-          <div className='bg-blur' styleName='styles.textContainer'>
+          <div styleName='styles.textContainer'>
             <UserImage
               userId={this.props.queueItem.userId}
               dateUpdated={this.props.queueItem.dateUpdated}
