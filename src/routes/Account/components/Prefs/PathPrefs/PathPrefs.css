@@ -34,6 +34,7 @@
 
 .pathName {
   flex: 1;
+  user-select: text;
 }
 
 .btnClear {
