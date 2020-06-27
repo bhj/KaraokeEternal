@@ -17,7 +17,7 @@ export default class CustomModal extends React.Component {
   render () {
     return (
       <Modal
-        animationDuration={200}
+        animationDuration={167}
         open={this.props.isVisible}
         onClose={this.props.onClose}
         closeOnEsc
