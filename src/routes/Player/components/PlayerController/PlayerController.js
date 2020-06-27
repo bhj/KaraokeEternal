@@ -135,8 +135,8 @@ class PlayerController extends React.Component {
           onLoad={props.playerLoad}
           onPlay={props.playerPlay}
           onStatus={this.handleStatus}
-          rgTrackGain={props.rgTrackGain}
-          rgTrackPeak={props.rgTrackPeak}
+          rgTrackGain={queueItem ? queueItem.rgTrackGain : null}
+          rgTrackPeak={queueItem ? queueItem.rgTrackPeak : null}
           volume={props.volume}
           width={props.width}
           height={props.height}

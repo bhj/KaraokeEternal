@@ -40,8 +40,6 @@ const mapStateToProps = (state) => {
     isErrored: player.isErrored,
     queue: getOrderedQueue(state),
     queueId: player.queueId,
-    rgTrackGain: player.rgTrackGain,
-    rgTrackPeak: player.rgTrackPeak,
     volume: player.volume,
     visualizer: playerVisualizer,
   }
