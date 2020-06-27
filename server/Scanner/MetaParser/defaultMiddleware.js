@@ -11,8 +11,8 @@ m.set('normalize whitespace', (ctx, next) => {
 })
 
 m.set('de-karaoke', (ctx, next) => {
-  // remove text having 'karaoke' between (), [], or {}
-  ctx.name = ctx.name.replace(/[([{](?=[^([{]*$).*karaoke.*[)\]}]/i, '')
+  // 'karaoke' or 'vocal' surrounded by (), [], or {}
+  ctx.name = ctx.name.replace(/[([{](?=[^([{]*$).*(?:karaoke|vocal).*[)\]}]/i, '')
   next()
 })
 
@@ -46,20 +46,29 @@ m.set('split', (ctx, next) => {
 })
 
 m.set('clean parts', cleanParts([
-  /^\d*\.?$/, // looks like a track number?
-  /^\W*$/, // all non-word chars?
+  /^\d*\.?$/, // looks like a track number
+  /^\W*$/, // all non-word chars
   /^[a-zA-Z]{2,4}[ -]?\d{1,}/i, // 2-4 letters followed by 1 or more digits
 ]))
 
-// set arist and title properties
-m.set('set artist and title', (ctx, next) => {
+// set title
+m.set('set title', (ctx, next) => {
   // skip if already set
-  if (ctx.artist || ctx.title) return next()
+  if (ctx.title) return next()
 
   // @todo this assumes delimiter won't appear in title
   ctx.title = ctx.cfg.artistOnLeft ? ctx.parts.pop() : ctx.parts.shift()
-  ctx.artist = ctx.parts.join(ctx.cfg.delimiter)
+  ctx.title = ctx.title.trim()
+  next()
+})
 
+// set arist
+m.set('set artist', (ctx, next) => {
+  // skip if already set
+  if (ctx.artist) return next()
+
+  ctx.artist = ctx.parts.join(ctx.cfg.delimiter)
+  ctx.artist = ctx.artist.trim()
   next()
 })
 
@@ -97,19 +106,17 @@ m.set('move leading articles', (ctx, next) => {
 // ---------
 m.set('normalize artist', (ctx, next) => {
   // skip if already set
-  if (!ctx.artistNorm) {
-    ctx.artistNorm = normalizeStr(ctx.artist, ctx.cfg.articles)
-  }
+  if (ctx.artistNorm) return next()
 
+  ctx.artistNorm = normalizeStr(ctx.artist, ctx.cfg.articles)
   next()
 })
 
 m.set('normalize title', (ctx, next) => {
   // skip if already set
-  if (!ctx.titleNorm) {
-    ctx.titleNorm = normalizeStr(ctx.title, ctx.cfg.articles)
-  }
+  if (ctx.titleNorm) return next()
 
+  ctx.titleNorm = normalizeStr(ctx.title, ctx.cfg.articles)
   next()
 })
 
