@@ -15,7 +15,7 @@ const ACTION_HANDLERS = {
       })
     }
 
-    log.verbose('%s (%s) set preference %s = %s', sock.user.name, sock.id, payload.key, payload.data)
+    log.info('%s (%s) set pref %s = %s', sock.user.name, sock.id, payload.key, payload.data)
     await Prefs.set(payload.key, payload.data)
 
     // only push to admins
