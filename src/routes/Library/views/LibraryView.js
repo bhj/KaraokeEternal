@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import { Link } from 'react-router'
 import LibraryHeader from '../components/LibraryHeader'
 import ArtistList from '../components/ArtistList'
 import SearchResults from '../components/SearchResults'
 import TextOverlay from 'components/TextOverlay'
 import Spinner from 'components/Spinner'
+import './LibraryView.css'
 
 const LibraryView = (props) => {
-  const { isSearching, isLoading, isEmpty } = props
+  const { isAdmin, isEmpty, isLoading, isSearching } = props
 
   return (
     <>
@@ -26,8 +28,11 @@ const LibraryView = (props) => {
       }
 
       {!isLoading && isEmpty &&
-        <TextOverlay>
+        <TextOverlay styleName='empty'>
           <h1>Library Empty</h1>
+          {isAdmin &&
+            <p><Link to='/account'>Add media folders</Link> to get started.</p>
+          }
         </TextOverlay>
       }
     </>
@@ -35,6 +40,7 @@ const LibraryView = (props) => {
 }
 
 LibraryView.propTypes = {
+  isAdmin: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isSearching: PropTypes.bool.isRequired,
   isEmpty: PropTypes.bool.isRequired,

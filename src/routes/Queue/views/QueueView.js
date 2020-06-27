@@ -30,7 +30,7 @@ const QueueView = (props) => (
     {!props.isLoading && props.isQueueEmpty &&
       <TextOverlay>
         <h1>Queue Empty</h1>
-        <p>Tap a song in the <Link to='/library'>library</Link> to queue it</p>
+        <p>Tap a song in the <Link to='/library'>library</Link> to queue it.</p>
       </TextOverlay>
     }
 

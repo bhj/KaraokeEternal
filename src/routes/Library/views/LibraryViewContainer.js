@@ -121,6 +121,7 @@ const mapStateToProps = (state) => {
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),
     scrollTop: state.library.scrollTop,
+    isAdmin: state.user.isAdmin,
     isSearching: !!getFilterKeywords(state).length || getFilterStarred(state),
     isLoading: state.library.isLoading,
     isEmpty: state.songs.result.length === 0,
