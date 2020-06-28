@@ -9,13 +9,13 @@ export const Navigation = (props) => (
   <Measure onMeasure={props.setFooterHeight} whitelist={['height']}>
     <div styleName='container' className='bg-blur'>
       <Link to='/library' styleName='styles.btn' activeClassName={styles.btnActive}>
-        <Icon icon='NAV_LIBRARY' size={42}/>
+        <Icon icon='NAV_LIBRARY' size={42} styleName='styles.shadow'/>
       </Link>
       <Link to='/queue' styleName='styles.btn' activeClassName={styles.btnActive}>
-        <Icon icon='NAV_SUBSCRIPTIONS' size={42}/>
+        <Icon icon='NAV_SUBSCRIPTIONS' size={42} styleName='styles.shadow'/>
       </Link>
       <Link to='/account' styleName='styles.btn' activeClassName={styles.btnActive}>
-        <Icon icon='NAV_ACCOUNT' size={42}/>
+        <Icon icon='NAV_ACCOUNT' size={42} styleName='styles.shadow'/>
       </Link>
     </div>
   </Measure>

@@ -22,3 +22,7 @@
   fill: var(--nav-active-color);
   filter: var(--nav-active-filter);
 }
+
+.shadow {
+  filter: drop-shadow(0px 1px 0px hsl(var(--hue-blue), 100%, 30%));
+}
