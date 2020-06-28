@@ -23,8 +23,8 @@ class FileScanner extends Scanner {
   async scan () {
     const files = new Map() // pathId => [files]
     const validMedia = [] // mediaIds
-    let count = 0
-    let total = 0
+    let i = 0 // file counter
+    let total = 0 // total num. files
 
     // get list of files from all paths
     for (const pathId of this.paths.result) {
@@ -54,9 +54,9 @@ class FileScanner extends Scanner {
       let lastDir
 
       for (const item of list) {
-        count++
-        log.info('[%s/%s] %s', count, total, item.file)
-        this.emitStatus(`Scanning media (${count} of ${total})`, (count / total) * 100)
+        i++
+        log.info('[%s/%s] %s', i, total, item.file)
+        this.emitStatus(`Scanning media (${i.toLocaleString()} of ${total.toLocaleString()})`, (i / total) * 100)
 
         const dir = path.dirname(item.file)
 
