@@ -38,7 +38,7 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   border-top-left-radius: var(--border-radius);
 }
 
