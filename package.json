@@ -26,7 +26,7 @@
     "dev": "cross-env NODE_ENV=development nodemon --ignore build --ignore dist --ignore src",
     "build": "rimraf build && webpack",
     "serve": "node ./server/main.js",
-    "serve:docs": "hugo serve --source ./docs",
+    "serve:docs": "hugo serve --source ./docs -b http://$(hostname) --bind 0.0.0.0",
     "server": "npm run serve",
     "start": "electron . -p 3000",
     "dist": "cross-env DEBUG=electron-builder:* electron-builder -c ./scripts/electron-builder.config.js",
