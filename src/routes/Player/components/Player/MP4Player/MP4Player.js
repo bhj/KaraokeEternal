@@ -48,6 +48,7 @@ class MP4Player extends React.Component {
         onEnded={this.props.onEnd}
         onError={this.handleError}
         onLoadStart={this.props.onLoad}
+        onPlay={this.handlePlay}
         onTimeUpdate={this.handleTimeUpdate}
         ref={this.video}
       />
@@ -62,7 +63,6 @@ class MP4Player extends React.Component {
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
       this.video.current.play()
-        .then(() => this.props.onPlay())
         .catch(err => this.props.onError(err.message))
     } else {
       this.video.current.pause()
@@ -76,6 +76,8 @@ class MP4Player extends React.Component {
     const { message, code } = el.target.error
     this.props.onError(`${message} (code ${code})`)
   }
+
+  handlePlay = () => this.props.onPlay()
 
   handleTimeUpdate = () => {
     this.props.onStatus({

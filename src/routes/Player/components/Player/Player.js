@@ -33,22 +33,28 @@ class Player extends React.Component {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)()
   audioGainNode = this.audioCtx.createGain()
   audioSourceNode = null
+  isFetching = false // internal
 
   componentDidMount () {
     this.updateVolume()
   }
 
   componentDidUpdate (prevProps) {
+    // may have been suspended by browser if no user interaction yet
     if (this.props.isPlaying && !prevProps.isPlaying) {
-      // may have been suspended by browser if no user interaction yet
       this.audioCtx.resume()
     }
 
-    // volume or replaygain params changed?
-    if (prevProps.volume !== this.props.volume ||
-        prevProps.rgTrackGain !== this.props.rgTrackGain ||
-        prevProps.rgTrackPeak !== this.props.rgTrackPeak ||
-        prevProps.isReplayGainEnabled !== this.props.isReplayGainEnabled) {
+    // prevent applying next song's RG vals prematurely
+    if (this.props.mediaKey !== prevProps.mediaKey) {
+      this.isFetching = true
+    }
+
+    // don't change volume if we know we're changing songs
+    if (!this.isFetching && (prevProps.volume !== this.props.volume ||
+      prevProps.rgTrackGain !== this.props.rgTrackGain ||
+      prevProps.rgTrackPeak !== this.props.rgTrackPeak ||
+      prevProps.isReplayGainEnabled !== this.props.isReplayGainEnabled)) {
       this.updateVolume()
     }
   }
@@ -61,6 +67,12 @@ class Player extends React.Component {
     // hand back copy of original audio source
     const sourceNodeCopy = this.audioSourceNode
     this.props.onAudioSourceNode(sourceNodeCopy)
+  }
+
+  handlePlay = () => {
+    this.isFetching = false
+    this.updateVolume()
+    this.props.onPlay()
   }
 
   updateVolume = () => {
@@ -89,7 +101,11 @@ class Player extends React.Component {
     }
 
     return (
-      <PlayerComponent {...this.props} onAudioElement={this.handleAudioElement} />
+      <PlayerComponent
+        {...this.props}
+        onAudioElement={this.handleAudioElement}
+        onPlay={this.handlePlay}
+      />
     )
   }
 }

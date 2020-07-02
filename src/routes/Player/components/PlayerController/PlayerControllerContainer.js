@@ -32,7 +32,6 @@ const mapStateToProps = (state) => {
     historyJSON: state.status.historyJSON,
     isAlphaSupported: player.isAlphaSupported,
     isAtQueueEnd: player.isAtQueueEnd,
-    isFetching: player.isFetching,
     isQueueEmpty: queue.result.length === 0,
     isPlaying: player.isPlaying,
     isPlayingNext: player.isPlayingNext,

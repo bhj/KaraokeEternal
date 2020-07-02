@@ -95,8 +95,6 @@ class CDGPlayer extends React.Component {
   }
 
   updateSources = () => {
-    this.audio.current.pause()
-
     // load .cdg file
     api('GET', `/${this.props.mediaId}?type=cdg`)
       .then(res => res.arrayBuffer())
@@ -114,7 +112,6 @@ class CDGPlayer extends React.Component {
   updateIsPlaying = () => {
     if (this.props.isPlaying) {
       this.audio.current.play()
-        .then(() => this.props.onPlay())
         .catch(err => this.props.onError(err.message))
     } else {
       this.audio.current.pause()
@@ -134,7 +131,11 @@ class CDGPlayer extends React.Component {
   }
 
   handlePause = () => this.cdg.pause()
-  handlePlay = () => this.cdg.play()
+
+  handlePlay = () => {
+    this.props.onPlay()
+    this.cdg.play()
+  }
 
   handleTimeUpdate = () => {
     this.cdg.syncTime(this.audio.current.currentTime)
