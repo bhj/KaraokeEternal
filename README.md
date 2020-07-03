@@ -35,7 +35,7 @@ Join the [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq) for genera
 
 ## Contributing & Development
 
-Contributions are most welcome! Make sure you have [Node.js 12](https://nodejs.org/en/), then:
+Contributions are most welcome! Make sure you have [Node.js](https://nodejs.org/en/) 12 or later, then:
 
 1. Fork and clone the repo
 2. `npm i`
