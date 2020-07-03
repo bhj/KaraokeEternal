@@ -2,7 +2,7 @@
 
 Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The player is also browser-based with support for MP3+G, MP4 video and WebGL visualizations. The server runs locally, no internet connection required.
 
-[![Karaoke Forever](/docs/assets/images/README.jpg?raw=true)](https://www.karaoke-forever.com/)
+[![Karaoke Forever](/docs/assets/images/README.jpg?raw=true)](/docs/assets/images/README.jpg?raw=true)
 
 <p align="center">
   <i>App in mobile browser (top) controlling player in Firefox/Chrome (bottom)</i>
@@ -11,9 +11,7 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 Karaoke Forever basically has 3 parts:
 
 - **[Server:](https://www.karaoke-forever.com/docs/#karaoke-forever-server)** Runs on almost any OS to serve the app and your media files
-
 - **[App:](https://www.karaoke-forever.com/docs/#karaoke-forever-the-web-app)** Fast, modern browser app designed for "karaoke conditions"
-
 - **[Player:](https://www.karaoke-forever.com/docs/#player)** Just another part of the app, designed to run fullscreen on the system handling audio/video for a [room](https://www.karaoke-forever.com/docs/#rooms-admin-only)
 
 ## Features
@@ -27,9 +25,9 @@ Karaoke Forever basically has 3 parts:
 
 Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the [F.A.Q.](https://www.karaoke-forever.com/faq/#whats-the-recommended-microphone-audio-setup) for more information.
 
-## Documentation
+## Getting Started
 
-Please see [Quick Start](https://www.karaoke-forever.com/docs#quick-start) to get started, or jump to the documentation for [Karaoke Forever](https://www.karaoke-forever.com/docs/#karaoke-forever-the-web-app) (the "web" app) or [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server).
+The [Karaoke Forever website](https://www.karaoke-forever.com/) has a [Quick Start ](https://www.karaoke-forever.com/docs#quick-start) section as well as the documentation for [Karaoke Forever](https://www.karaoke-forever.com/docs/#karaoke-forever-the-web-app) (the "web" app) and [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server).
 
 ## Discord / Support
 
