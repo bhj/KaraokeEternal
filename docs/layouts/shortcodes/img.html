@@ -1,0 +1,12 @@
+<figure>
+  <a href="#{{ anchorize (.Get "src") }}">
+    <img srcset="{{.Get "srcset" }}" src="{{.Get "src" }}" alt="{{.Get "alt" }}" />
+  </a>
+  <a href="#_" class="overlay" id="{{ anchorize (.Get "src") }}">
+    <img srcset="{{.Get "srcset" }}" src="{{.Get "src" }}" alt="{{.Get "alt" }}" />
+  </a>
+  <figcaption>
+    <p>{{.Get "alt" }}</p>
+  </figcaption>
+</figure>
+{{ .Inner }}
