@@ -6,7 +6,6 @@
     <div class="content container">
       {{ block "main" . }}{{ end }}
     </div>
-
     <script src='{{ (resources.Get "js/buttons.min.js").Permalink }}'></script>
     <script src='{{ (resources.Get "js/gumshoe.min.js").Permalink }}'></script>
     <script>
@@ -19,35 +18,17 @@
       let btn, nav
 
       document.addEventListener("DOMContentLoaded", function(event) {
-        // upgrade video quality based on screen width
-        if (seg === 'index' && getBrowserWidth() !== 'sm') {
-          const vid = document.getElementById('video1')
-          vid.src = vid.src.replace('540p', '720p')
-        }
-
-        // init ToC highlighter in sidebar if we're in docs
-        if (seg === 'docs') {
-          const gs = new Gumshoe('#doc-toc a')
-        }
-
         btn = document.getElementById('btn-nav')
         nav = document.getElementsByTagName('nav')[0]
         toggleNav()
+
+        // init ToC highlighter in sidebar if we're in docs
+        if (seg === 'docs') new Gumshoe('#doc-toc a')
       })
 
       function toggleNav () {
         btn.classList.toggle('active')
         nav.classList.toggle('active')
-      }
-
-      function getBrowserWidth () {
-        if (window.innerWidth < 480){
-            return 'xs'
-        } else if(window.innerWidth < 768){
-            return 'sm'
-        } else if(window.innerWidth < 992){
-            return 'md'
-        } else return 'lg'
       }
     </script>
     {{ partial "footer.html" . }}

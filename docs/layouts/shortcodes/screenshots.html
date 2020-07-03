@@ -1,0 +1,18 @@
+<ul class="screenshots">
+{{ with .Site.GetPage "docs" }}
+  {{ range (.Resources.ByType "image").Match "app-*" }}
+    {{ with . }}
+      {{ if .Params.galleryOrder }}
+        <li style="order: {{ .Params.galleryOrder }}">
+          <a href="#{{ anchorize (.RelPermalink) }}">
+            <img srcset="{{.Permalink }} 2x" src="{{.Permalink }}" alt="{{.Title }}" />
+          </a>
+          <a href="#_" class="overlay" id="{{ anchorize (.RelPermalink) }}">
+            <img srcset="{{.Permalink }} 2x" src="{{.Permalink }}" alt="{{.Title }}" />
+          </a>
+        </li>
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+</ul>
