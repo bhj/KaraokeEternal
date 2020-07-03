@@ -41,6 +41,8 @@
 
 .user {
   font-size: 6vh;
+  text-rendering: optimizeLegibility;
+  text-shadow: 0px 3px 5px #000;
 }
 
 .userImage {
