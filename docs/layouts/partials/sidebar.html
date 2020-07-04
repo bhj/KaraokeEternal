@@ -1,4 +1,4 @@
-{{ $lastSeg := index (last 1 (split (delimit (split .URL "/") "," "") ",")) 0 }}
+{{ $lastSeg := index (last 1 (split (delimit (split .Permalink "/") "," "") ",")) 0 }}
 <div class="sidebar">
   <header>
     <div class="logo">
@@ -18,27 +18,21 @@
     <a class="nav-item{{ if .IsHome }} active{{ end }}" href="{{ .Site.BaseURL }}">Overview</a>
     <a class="nav-item{{ if eq $lastSeg "faq"}} active{{ end }}" href="{{ .Site.BaseURL }}faq">F.A.Q.</a>
 
-    <!-- <a class="nav-item" rel="external" href="{{ .Site.BaseURL }}download">Download
-      <svg class="icon external" viewBox="0 0 24 24">
-        <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
-      </svg>
-    </a> -->
-
     <span class="nav-item">
-      <a rel="external" href="{{ .Site.BaseURL }}repo">GitHub</a>
+      <a rel="external" target="_blank" href="https://github.com/bhj/karaoke-forever">GitHub</a>
       <svg class="icon external" viewBox="0 0 24 24">
         <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
     </span>
     <ul class="github">
-      <li><a class="github-button" href="{{ .Site.BaseURL }}download" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-cloud-download" data-size="large" aria-label="Download bhj/karaoke-forever on GitHub">Download</a></li>
+      <li><a class="github-button" href="https://github.com/bhj/karaoke-forever/releases" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-cloud-download" data-size="large" aria-label="Download bhj/karaoke-forever on GitHub">Download</a></li>
       <li>
-        <a class="github-button" href="{{ .Site.BaseURL }}repo" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-star" aria-label="Star bhj/karaoke-forever on GitHub">Star</a>
+        <a class="github-button" href="https://github.com/bhj/karaoke-forever" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-star" aria-label="Star bhj/karaoke-forever on GitHub">Star</a>
         <a class="github-button" href="https://github.com/sponsors/bhj" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-heart" aria-label="Sponsor @bhj on GitHub">Sponsor</a>
+        <a class="github-button" href="https://github.com/bhj/karaoke-forever/issues" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-issue-opened" aria-label="Issue bhj/karaoke-forever on GitHub">Issue</a>
       </li>
-      <li><a class="github-button" href="{{ .Site.BaseURL }}repo/issues" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-issue-opened" aria-label="Issue bhj/karaoke-forever on GitHub">Issue</a></li>
     </ul>
 
-    <a class="nav-item" rel="external" href="{{ .Site.BaseURL }}discord">Discord
+    <a class="nav-item" rel="external" target="_blank" href="{{ .Site.BaseURL }}discord">Discord
       <svg class="icon external" viewBox="0 0 24 24">
         <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
       </svg>
@@ -53,14 +47,13 @@
           <li><a href="{{ .Site.BaseURL }}docs/#queue">Queue</a></li>
           <li><a href="{{ .Site.BaseURL }}docs/#account">Account</a>
           </li>
-          <li><a href="{{ .Site.BaseURL }}docs/#player-admin-only">Player</a></li>
+          <li><a href="{{ .Site.BaseURL }}docs/#player">Player</a></li>
         </ul>
       </li>
       <li><a href="{{ .Site.BaseURL }}docs/#karaoke-forever-server">Karaoke Forever Server</a>
         <ul>
           <li><a href="{{ .Site.BaseURL }}docs/#installation">Installation</a></li>
-          <li><a href="{{ .Site.BaseURL }}docs/#supported-media">Supported Media</a></li>
-          <li><a href="{{ .Site.BaseURL }}docs/#metaparser">MetaParser</a>
+          <li><a href="{{ .Site.BaseURL }}docs/#media-files">Media Files</a>
           </li>
           <li><a href="{{ .Site.BaseURL }}docs/#command-line-options">Command Line Options</a></li>
           <li><a href="{{ .Site.BaseURL }}docs/#file-locations">File Locations</a></li>

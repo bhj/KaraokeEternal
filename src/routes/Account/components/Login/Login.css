@@ -26,7 +26,14 @@
 }
 
 .logo {
-  margin-bottom: 1.5rem;
+  margin: 2rem 0;
   text-align: center;
-  font-size: 28px;
+  font-size: 30px;
+}
+
+@media (min-width: 42em) {
+  .logo {
+    margin: 3rem 0;
+    font-size: 36px;
+  }
 }
