@@ -27,7 +27,7 @@ Karaoke Forever assumes its player will be mixed with any microphones (either in
 
 ## Getting Started
 
-The [Karaoke Forever website](https://www.karaoke-forever.com/) has a [Quick Start ](https://www.karaoke-forever.com/docs#quick-start) section as well as the documentation for [Karaoke Forever](https://www.karaoke-forever.com/docs/#karaoke-forever-the-web-app) (the "web" app) and [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server).
+The [Karaoke Forever website](https://www.karaoke-forever.com/) has a [Quick Start ](https://www.karaoke-forever.com/docs/#quick-start) section as well as the documentation for [Karaoke Forever](https://www.karaoke-forever.com/docs/#karaoke-forever-the-web-app) (the "web" app) and [Karaoke Forever Server](https://www.karaoke-forever.com/docs/#karaoke-forever-server).
 
 ## Discord / Support
 

@@ -22,7 +22,7 @@ Karaoke Forever basically has 3 parts:
 - No telemetry; all data stored locally
 
 <br>
-Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the <a href='{{< ref "/faq.md#what-s-the-recommended-microphone-audio-setup" >}}'>F.A.Q.</a> for more information.
+Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the <a href='{{< ref "/faq.md/#whats-the-recommended-audio-setup" >}}'>F.A.Q.</a> for more information.
 
 ## Download
 
