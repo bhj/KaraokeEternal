@@ -24,7 +24,7 @@ No, but... is it still karaoke without a mic? :)
 
 Karaoke Forever makes no assumptions about audio input so that it can work with any microphone setup, including none at all. The <a href='{{< ref "docs/index.md#player" >}}'>player's</a> output (music) can be mixed with microphones in software or an outboard mixer (see below).
 
-## What's the recommended microphone/audio setup?
+## What's the recommended audio setup?
 
 There are generally 2 ways to mix Karaoke Forever's player output (the music) with microphones. In either case, at least 2 mics are recommended.
 

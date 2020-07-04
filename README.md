@@ -23,7 +23,7 @@ Karaoke Forever basically has 3 parts:
 - Multiple simultaneous rooms/queues (optionally password-protected)
 - No telemetry; all data stored locally
 
-Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the [F.A.Q.](https://www.karaoke-forever.com/faq/#whats-the-recommended-microphone-audio-setup) for more information.
+Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the [F.A.Q.](https://www.karaoke-forever.com/faq#whats-the-recommended-audio-setup) for more information.
 
 ## Getting Started
 
