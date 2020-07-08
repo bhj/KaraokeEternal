@@ -22,7 +22,6 @@ class MP4Player extends React.Component {
 
   componentDidMount () {
     this.props.onAudioElement(this.video.current)
-    this.props.onStatus({ isAlphaSupported: false })
     this.updateSources()
   }
 

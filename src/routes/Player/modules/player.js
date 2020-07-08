@@ -141,7 +141,6 @@ const initialState = {
   errorMessage: '',
   historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,
-  isAlphaSupported: false,
   isErrored: false,
   isFetching: false,
   isPlaying: false,

@@ -78,7 +78,6 @@ const initialState = {
   cdgSize: 0.6,
   errorMessage: '',
   historyJSON: '[]', // queueIds in JSON array
-  isAlphaSupported: false,
   isAtQueueEnd: false,
   isErrored: false,
   isPlayerPresent: false,

@@ -9,7 +9,6 @@ export default class DisplayCtrl extends React.Component {
   static propTypes = {
     cdgAlpha: PropTypes.number.isRequired,
     cdgSize: PropTypes.number.isRequired,
-    isAlphaSupported: PropTypes.bool.isRequired,
     isVisible: PropTypes.bool.isRequired,
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isVisualizerSupported: PropTypes.bool.isRequired,

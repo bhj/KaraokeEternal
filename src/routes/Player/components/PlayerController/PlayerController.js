@@ -9,7 +9,6 @@ class PlayerController extends React.Component {
     cdgAlpha: PropTypes.number.isRequired,
     cdgSize: PropTypes.number.isRequired,
     historyJSON: PropTypes.string.isRequired,
-    isAlphaSupported: PropTypes.bool.isRequired,
     isAtQueueEnd: PropTypes.bool.isRequired,
     isErrored: PropTypes.bool.isRequired,
     isPlaying: PropTypes.bool.isRequired,
@@ -141,7 +140,7 @@ class PlayerController extends React.Component {
           width={props.width}
           height={props.height}
         />
-        {state.audioSourceNode && props.isAlphaSupported && props.visualizer.isSupported && props.visualizer.isEnabled &&
+        {state.audioSourceNode && props.visualizer.isSupported && props.visualizer.isEnabled &&
           <PlayerVisualizer
             audioSourceNode={state.audioSourceNode}
             isPlaying={props.isPlaying}
