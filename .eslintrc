@@ -24,5 +24,10 @@
     "max-len"              : [2, 120, 2],
     "object-curly-spacing" : [2, "always"],
     "comma-dangle"         : [0, "always-multiline"],
+  },
+  "settings": {
+    "react": {
+      "version": "detect",
+    }
   }
 }
