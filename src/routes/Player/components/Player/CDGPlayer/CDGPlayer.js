@@ -22,8 +22,9 @@ class CDGPlayer extends React.Component {
     onStatus: PropTypes.func.isRequired,
   }
 
-  canvas = React.createRef()
   audio = React.createRef()
+  canvas = React.createRef()
+  frameId = null
   state = { CDGBackgroundColor: null }
 
   componentDidMount () {
@@ -53,6 +54,10 @@ class CDGPlayer extends React.Component {
         prevProps.cdgSize !== this.props.cdgSize) {
       this.cdg.setOptions({ shadowBlur: Math.min(16, this.props.height * this.props.cdgSize * 0.0333) })
     }
+  }
+
+  componentWillUnmount () {
+    this.stopCDG()
   }
 
   render () {
@@ -85,7 +90,6 @@ class CDGPlayer extends React.Component {
           onEnded={this.props.onEnd}
           onError={this.handleError}
           onLoadStart={this.props.onLoad}
-          onPause={this.handlePause}
           onPlay={this.handlePlay}
           onTimeUpdate={this.handleTimeUpdate}
           ref={this.audio}
@@ -95,6 +99,8 @@ class CDGPlayer extends React.Component {
   }
 
   updateSources = () => {
+    this.stopCDG()
+
     // load .cdg file
     api('GET', `/${this.props.mediaId}?type=cdg`)
       .then(res => res.arrayBuffer())
@@ -115,6 +121,7 @@ class CDGPlayer extends React.Component {
         .catch(err => this.props.onError(err.message))
     } else {
       this.audio.current.pause()
+      this.stopCDG()
     }
   }
 
@@ -130,20 +137,26 @@ class CDGPlayer extends React.Component {
     this.props.onError(`${message} (code ${code})`)
   }
 
-  handlePause = () => this.cdg.pause()
-
   handlePlay = () => {
     this.props.onPlay()
-    this.cdg.play()
+    this.startCDG()
   }
 
   handleTimeUpdate = () => {
-    this.cdg.syncTime(this.audio.current.currentTime)
-
     this.props.onStatus({
       position: this.audio.current.currentTime,
     })
   }
+
+  /*
+  * CDGraphics render loop
+  */
+  startCDG = () => {
+    this.frameId = requestAnimationFrame(this.startCDG)
+    this.cdg.render(this.audio.current.currentTime)
+  }
+
+  stopCDG = () => cancelAnimationFrame(this.frameId)
 }
 
 export default CDGPlayer

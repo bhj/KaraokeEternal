@@ -52,6 +52,7 @@
   "dependencies": {
     "@babel/runtime": "^7.10.4",
     "bcrypt": "^5.0.0",
+    "cdgraphics": "^5.0.0-beta.1",
     "ctx-compose": "^3.0.0",
     "electron-log": "^3.0.7",
     "jsonwebtoken": "^8.5.1",
@@ -88,7 +89,6 @@
     "butterchurn": "^2.6.7",
     "butterchurn-presets": "^2.4.7",
     "case-sensitive-paths-webpack-plugin": "^2.3.0",
-    "cdgraphics": "^4.0.0",
     "core-js-compat": "^3.6.5",
     "cross-env": "^7.0.2",
     "css-loader": "^3.6.0",
