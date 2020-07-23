@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import './MP4Player.css'
+import GLChroma from 'gl-chromakey'
 
 class MP4Player extends React.Component {
   static propTypes = {
@@ -19,20 +19,27 @@ class MP4Player extends React.Component {
   }
 
   canvas = React.createRef()
-  video = document.createElement('video')
   frameId = null
+  video = document.createElement('video')
+  state = {
+    videoWidth: 0,
+    videoHeight: 0,
+  }
 
   componentDidMount () {
+    this.props.onAudioElement(this.video)
     this.video.oncanplaythrough = this.updateIsPlaying
-    this.video.onended = this.props.onEnd
+    this.video.onended = this.handleEnded
     this.video.onerror = this.handleError
     this.video.onloadstart = this.props.onLoad
+    this.video.onloadedmetadata = this.handleLoadedMetadata
     this.video.onplay = this.handlePlay
     this.video.ontimeupdate = this.handleTimeUpdate
     this.video.preload = 'auto'
 
-    this.props.onAudioElement(this.video)
-    this.canvasCtx = this.canvas.current.getContext('2d')
+    this.chroma = new GLChroma(this.video, this.canvas.current)
+    this.chroma.key({ color: 'auto', tolerance: 0.3 })
+
     this.updateSources()
   }
 
@@ -46,40 +53,35 @@ class MP4Player extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    this.stopChroma()
+    this.chroma.unload()
+  }
+
   render () {
-    const { width, height } = this.props
+    const screenAspect = this.props.width / this.props.height
+    const videoAspect = this.state.videoWidth / this.state.videoHeight
+    const scale = screenAspect > videoAspect
+      ? this.props.height / this.state.videoHeight : this.props.width / this.state.videoWidth
 
     return (
       <canvas
-        width={width}
-        height={height}
+        width={(this.state.videoWidth * scale) || 0}
+        height={(this.state.videoHeight * scale) || 0}
         ref={this.canvas}
       />
     )
   }
 
-  updateFrame = () => {
-    this.frameId = requestAnimationFrame(this.updateFrame)
-
-    this.canvasCtx.drawImage(this.video, 0, 0, this.video.videoWidth, this.video.videoHeight)
-
-    const frame = this.canvasCtx.getImageData(0, 0, this.video.videoWidth, this.video.videoHeight)
-    const l = frame.data.length / 4
-
-    for (let i = 0; i < l; i++) {
-      const r = frame.data[i * 4 + 0]
-      const g = frame.data[i * 4 + 1]
-      const b = frame.data[i * 4 + 2]
-
-      if (g < 20 && r < 20 && b < 20) {
-        frame.data[i * 4 + 3] = 0
-      }
-    }
-
-    this.canvasCtx.putImageData(frame, 0, 0)
+  handleLoadedMetadata = () => {
+    this.setState({
+      videoWidth: this.video.videoWidth,
+      videoHeight: this.video.videoHeight,
+    })
   }
 
   updateSources = () => {
+    this.stopChroma()
     this.video.src = `/api/media/${this.props.mediaId}?type=video`
     this.video.load()
   }
@@ -90,14 +92,25 @@ class MP4Player extends React.Component {
         .catch(err => this.props.onError(err.message))
     } else {
       this.video.pause()
-      cancelAnimationFrame(this.frameId)
-      this.frameId = null
+      this.stopChroma()
     }
   }
+
+  startChroma = () => {
+    this.frameId = requestAnimationFrame(this.startChroma)
+    this.chroma.render()
+  }
+
+  stopChroma = () => cancelAnimationFrame(this.frameId)
 
   /*
   * <video> event handlers
   */
+  handleEnded = (el) => {
+    this.props.onEnd()
+    this.stopChroma()
+  }
+
   handleError = (el) => {
     const { message, code } = el.target.error
     this.props.onError(`${message} (code ${code})`)
@@ -105,7 +118,7 @@ class MP4Player extends React.Component {
 
   handlePlay = () => {
     this.props.onPlay()
-    this.updateFrame()
+    this.startChroma()
   }
 
   handleTimeUpdate = () => {
