@@ -87,7 +87,7 @@ class CDGPlayer extends React.Component {
         <audio
           preload='auto'
           onCanPlayThrough={this.updateIsPlaying}
-          onEnded={this.props.onEnd}
+          onEnded={this.handleEnded}
           onError={this.handleError}
           onLoadStart={this.props.onLoad}
           onPlay={this.handlePlay}
@@ -132,6 +132,11 @@ class CDGPlayer extends React.Component {
   /*
   * <audio> event handlers
   */
+  handleEnded = (el) => {
+    this.props.onEnd()
+    this.cdg.pause()
+  }
+
   handleError = (el) => {
     const { message, code } = el.target.error
     this.props.onError(`${message} (code ${code})`)
