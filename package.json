@@ -54,7 +54,7 @@
     "bcrypt": "^5.0.0",
     "ctx-compose": "^3.0.0",
     "electron-log": "^3.0.7",
-    "gl-chromakey": "^1.0.0-beta.0",
+    "gl-chromakey": "^1.0.0-beta.2",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
     "koa-body": "^4.2.0",

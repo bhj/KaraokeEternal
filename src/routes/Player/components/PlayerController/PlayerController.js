@@ -15,6 +15,7 @@ class PlayerController extends React.Component {
     isPlayingNext: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
     isReplayGainEnabled: PropTypes.bool.isRequired,
+    mp4Alpha: PropTypes.number.isRequired,
     queue: PropTypes.object.isRequired,
     queueId: PropTypes.number.isRequired,
     rgTrackGain: PropTypes.number,
@@ -25,7 +26,6 @@ class PlayerController extends React.Component {
     height: PropTypes.number.isRequired,
     // actions
     emitLeave: PropTypes.func.isRequired,
-    emitStatus: PropTypes.func.isRequired,
     playerError: PropTypes.func.isRequired,
     playerLoad: PropTypes.func.isRequired,
     playerPlay: PropTypes.func.isRequired,
@@ -35,10 +35,11 @@ class PlayerController extends React.Component {
 
   state = {
     audioSourceNode: null,
+    queueItem: null,
   }
 
   componentDidMount () {
-    this.props.emitStatus()
+    this.handleStatus()
   }
 
   componentWillUnmount () {
@@ -62,11 +63,15 @@ class PlayerController extends React.Component {
 
     // re-trying after error?
     if (props.isErrored && props.isPlaying && !prevProps.isPlaying) {
-      props.playerStatus({ isErrored: false })
+      this.handleStatus({ isErrored: false })
       return
     }
 
-    this.props.emitStatus()
+    if (props.queueId !== prevProps.queueId) {
+      this.setState({ queueItem: props.queue.entities[props.queueId] })
+    }
+
+    this.handleStatus()
   }
 
   handleAudioSourceNode = (source) => {
@@ -75,7 +80,7 @@ class PlayerController extends React.Component {
 
   handleError = (msg) => {
     this.props.playerError(msg)
-    this.props.emitStatus()
+    this.handleStatus()
   }
 
   handleLoadNext = () => {
@@ -83,7 +88,7 @@ class PlayerController extends React.Component {
 
     // queue exhausted?
     if (curIdx === this.props.queue.result.length - 1) {
-      this.props.playerStatus({
+      this.handleStatus({
         isAtQueueEnd: true,
         isPlayingNext: false,
       })
@@ -98,7 +103,7 @@ class PlayerController extends React.Component {
       history.push(this.props.queueId)
     }
 
-    this.props.playerStatus({
+    this.handleStatus({
       historyJSON: JSON.stringify(history),
       isAtQueueEnd: false,
       isPlaying: true,
@@ -108,14 +113,13 @@ class PlayerController extends React.Component {
     })
   }
 
-  handleStatus = (status) => {
-    this.props.playerStatus(status)
-    this.props.emitStatus()
-  }
+  handleStatus = (status) => this.props.playerStatus({
+    ...status,
+    mediaType: this.state.queueItem ? this.state.queueItem.mediaType : null,
+  })
 
   render () {
     const { props, state } = this
-    const queueItem = props.queue.entities[props.queueId]
 
     return (
       <>
@@ -123,19 +127,20 @@ class PlayerController extends React.Component {
           cdgAlpha={props.cdgAlpha}
           cdgSize={props.cdgSize}
           isPlaying={props.isPlaying}
-          isVisible={!!queueItem && !props.isErrored && !props.isAtQueueEnd}
+          isVisible={!!state.queueItem && !props.isErrored && !props.isAtQueueEnd}
           isReplayGainEnabled={props.isReplayGainEnabled}
-          mediaId={queueItem ? queueItem.mediaId : null}
-          mediaKey={queueItem ? queueItem.queueId : null}
-          mediaType={queueItem ? queueItem.player : null}
+          mediaId={state.queueItem ? state.queueItem.mediaId : null}
+          mediaKey={state.queueItem ? state.queueItem.queueId : null}
+          mediaType={state.queueItem ? state.queueItem.mediaType : null}
+          mp4Alpha={props.mp4Alpha}
           onAudioSourceNode={this.handleAudioSourceNode}
           onEnd={this.handleLoadNext}
           onError={this.handleError}
           onLoad={props.playerLoad}
           onPlay={props.playerPlay}
           onStatus={this.handleStatus}
-          rgTrackGain={queueItem ? queueItem.rgTrackGain : null}
-          rgTrackPeak={queueItem ? queueItem.rgTrackPeak : null}
+          rgTrackGain={state.queueItem ? state.queueItem.rgTrackGain : null}
+          rgTrackPeak={state.queueItem ? state.queueItem.rgTrackPeak : null}
           volume={props.volume}
           width={props.width}
           height={props.height}
@@ -153,7 +158,7 @@ class PlayerController extends React.Component {
           />
         }
         <PlayerTextOverlay
-          queueItem={queueItem}
+          queueItem={state.queueItem}
           isAtQueueEnd={props.isAtQueueEnd}
           isQueueEmpty={props.isQueueEmpty}
           isErrored={props.isErrored}

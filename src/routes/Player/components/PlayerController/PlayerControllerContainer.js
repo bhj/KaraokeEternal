@@ -4,7 +4,6 @@ import { ensureState } from 'redux-optimistic-ui'
 import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
 import {
   emitLeave,
-  emitStatus,
   playerError,
   playerLoad,
   playerPlay,
@@ -14,7 +13,6 @@ import { playerVisualizerError } from '../../modules/playerVisualizer'
 
 const mapActionCreators = {
   emitLeave,
-  emitStatus,
   playerError,
   playerLoad,
   playerPlay,
@@ -29,13 +27,14 @@ const mapStateToProps = (state) => {
   return {
     cdgAlpha: player.cdgAlpha,
     cdgSize: player.cdgSize,
-    historyJSON: state.status.historyJSON,
+    historyJSON: state.status.historyJSON, // @TODO use state.player instead?
     isAtQueueEnd: player.isAtQueueEnd,
     isQueueEmpty: queue.result.length === 0,
     isPlaying: player.isPlaying,
     isPlayingNext: player.isPlayingNext,
     isReplayGainEnabled: prefs.isReplayGainEnabled,
     isErrored: player.isErrored,
+    mp4Alpha: player.mp4Alpha,
     queue: getOrderedQueue(state),
     queueId: player.queueId,
     volume: player.volume,

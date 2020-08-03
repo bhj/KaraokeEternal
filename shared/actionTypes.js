@@ -18,6 +18,8 @@ module.exports = {
   QUEUE_PUSH: 'queue/PUSH',
   QUEUE_ADD: 'server/QUEUE_ADD',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
+  // player internal
+  PLAYER_UPDATE: 'player/UPDATE',
   // player room commands
   PLAYER_CMD_OPTIONS: 'player/CMD_OPTIONS',
   PLAYER_CMD_NEXT: 'player/CMD_NEXT',

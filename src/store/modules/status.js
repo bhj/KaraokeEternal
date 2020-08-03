@@ -82,6 +82,8 @@ const initialState = {
   isErrored: false,
   isPlayerPresent: false,
   isPlaying: false,
+  mediaType: null,
+  mp4Alpha: 1,
   position: 0,
   queueId: -1,
   visualizer: {},

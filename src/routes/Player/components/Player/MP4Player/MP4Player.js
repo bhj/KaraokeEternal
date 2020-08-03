@@ -7,6 +7,7 @@ class MP4Player extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     mediaId: PropTypes.number.isRequired,
     mediaKey: PropTypes.number.isRequired,
+    mp4Alpha: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     onAudioElement: PropTypes.func.isRequired,
@@ -38,7 +39,7 @@ class MP4Player extends React.Component {
     this.video.preload = 'auto'
 
     this.chroma = new GLChroma(this.video, this.canvas.current)
-    this.chroma.key({ color: 'auto', tolerance: 0.3 })
+    this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
 
     this.updateSources()
   }
@@ -51,11 +52,19 @@ class MP4Player extends React.Component {
     if (prevProps.isPlaying !== this.props.isPlaying) {
       this.updateIsPlaying()
     }
+
+    if (prevProps.mp4Alpha !== this.props.mp4Alpha) {
+      this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
+    }
   }
 
   componentWillUnmount () {
+    this.video.pause()
     this.stopChroma()
+
     this.chroma.unload()
+    this.video.removeAttribute('src')
+    this.video.remove()
   }
 
   render () {

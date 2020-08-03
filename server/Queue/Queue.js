@@ -31,7 +31,7 @@ class Queue {
     for (const row of rows) {
       result.push(row.queueId)
       entities[row.queueId] = row
-      entities[row.queueId].player = this.getPlayer(row.relPath)
+      entities[row.queueId].mediaType = this.getType(row.relPath)
 
       // don't send over the wire
       delete entities[row.queueId].relPath
@@ -42,11 +42,11 @@ class Queue {
   }
 
   /**
-   * Get player type from media file extension
+   * Get media type from file extension
    * @param  {string} file filename
    * @return {string}      player component
    */
-  static getPlayer (file) {
+  static getType (file) {
     return /\.mp4/i.test(path.extname(file)) ? 'mp4' : 'cdg'
   }
 }
