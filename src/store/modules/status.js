@@ -78,11 +78,12 @@ const initialState = {
   cdgSize: 0.6,
   errorMessage: '',
   historyJSON: '[]', // queueIds in JSON array
-  isAlphaSupported: false,
   isAtQueueEnd: false,
   isErrored: false,
   isPlayerPresent: false,
   isPlaying: false,
+  mediaType: null,
+  mp4Alpha: 1,
   position: 0,
   queueId: -1,
   visualizer: {},

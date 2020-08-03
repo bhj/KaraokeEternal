@@ -10,12 +10,15 @@ const players = {
 
 class Player extends React.Component {
   static propTypes = {
+    cdgAlpha: PropTypes.number.isRequired,
+    cdgSize: PropTypes.number.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     isVisible: PropTypes.bool.isRequired,
     isReplayGainEnabled: PropTypes.bool.isRequired,
     mediaId: PropTypes.number,
     mediaKey: PropTypes.number,
     mediaType: PropTypes.string,
+    mp4Alpha: PropTypes.number.isRequired,
     rgTrackGain: PropTypes.number,
     rgTrackPeak: PropTypes.number,
     volume: PropTypes.number.isRequired,
@@ -96,7 +99,7 @@ class Player extends React.Component {
     const PlayerComponent = players[this.props.mediaType.toUpperCase() + 'Player']
 
     if (typeof PlayerComponent === 'undefined') {
-      this.props.onError(`No component for mediaType: ${this.props.mediaType}`)
+      this.props.onError(`No player for mediaType: ${this.props.mediaType}`)
       return null
     }
 

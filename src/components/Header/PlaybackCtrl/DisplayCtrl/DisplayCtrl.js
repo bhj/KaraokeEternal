@@ -9,10 +9,11 @@ export default class DisplayCtrl extends React.Component {
   static propTypes = {
     cdgAlpha: PropTypes.number.isRequired,
     cdgSize: PropTypes.number.isRequired,
-    isAlphaSupported: PropTypes.bool.isRequired,
     isVisible: PropTypes.bool.isRequired,
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isVisualizerSupported: PropTypes.bool.isRequired,
+    mediaType: PropTypes.string,
+    mp4Alpha: PropTypes.number.isRequired,
     sensitivity: PropTypes.number.isRequired,
     visualizerPresetName: PropTypes.string.isRequired,
     ui: PropTypes.object.isRequired,
@@ -24,7 +25,7 @@ export default class DisplayCtrl extends React.Component {
   checkbox = React.createRef()
 
   handleAlpha = val => {
-    this.props.onRequestOptions({ cdgAlpha: val })
+    this.props.onRequestOptions({ [this.props.mediaType + 'Alpha']: val })
   }
 
   handleSensitivity = val => this.props.onRequestOptions({
@@ -129,7 +130,7 @@ export default class DisplayCtrl extends React.Component {
               min={0}
               max={1}
               step={0.01}
-              value={this.props.cdgAlpha}
+              value={this.props[this.props.mediaType + 'Alpha']}
               onChange={this.handleAlpha}
               handle={handle}
               styleName='slider'

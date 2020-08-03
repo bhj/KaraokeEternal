@@ -35,7 +35,6 @@ class CDGPlayer extends React.Component {
     })
 
     this.props.onAudioElement(this.audio.current)
-    this.props.onStatus({ isAlphaSupported: true })
     this.updateSources()
   }
 

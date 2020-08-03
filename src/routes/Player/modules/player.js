@@ -10,19 +10,12 @@ import {
   PLAYER_ERROR,
   PLAYER_LOAD,
   PLAYER_PLAY,
-  PLAYER_STATUS,
+  PLAYER_UPDATE,
 } from 'shared/actionTypes'
 
 // ------------------------------------
 // Actions triggered by media events
 // ------------------------------------
-export function playerStatus (status = {}) {
-  return {
-    type: PLAYER_STATUS,
-    payload: status,
-  }
-}
-
 export function playerError (msg) {
   return {
     type: PLAYER_ERROR,
@@ -45,20 +38,36 @@ export function playerPlay () {
 // ------------------------------------
 // Actions for emitting to room
 // ------------------------------------
-export function emitStatus (cancelPrev = false) {
+export function playerStatus (status = {}, deferEmit = false) {
   return (dispatch, getState) => {
-    if (cancelPrev) dispatch(cancelEmitStatus())
+    dispatch({
+      type: PLAYER_UPDATE,
+      payload: status,
+    })
+
+    const { player } = getState()
 
     dispatch({
       type: PLAYER_EMIT_STATUS,
       payload: {
-        ...getState().player,
+        cdgAlpha: player.cdgAlpha,
+        cdgSize: player.cdgSize,
+        errorMessage: player.errorMessage,
+        historyJSON: player.historyJSON,
+        isAtQueueEnd: player.isAtQueueEnd,
+        isErrored: player.isErrored,
+        isPlaying: player.isPlaying,
+        mediaType: player.mediaType,
+        mp4Alpha: player.mp4Alpha,
+        position: player.position,
+        queueId: player.queueId,
+        volume: player.volume,
         visualizer: getState().playerVisualizer,
       },
       meta: {
         throttle: {
           wait: 1000,
-          leading: true,
+          leading: !deferEmit,
         }
       }
     })
@@ -96,6 +105,7 @@ const ACTION_HANDLERS = {
     ...state,
     cdgAlpha: typeof payload.cdgAlpha === 'number' ? payload.cdgAlpha : state.cdgAlpha,
     cdgSize: typeof payload.cdgSize === 'number' ? payload.cdgSize : state.cdgSize,
+    mp4Alpha: typeof payload.mp4Alpha === 'number' ? payload.mp4Alpha : state.mp4Alpha,
   }),
   [PLAYER_CMD_PAUSE]: (state, { payload }) => ({
     ...state,
@@ -126,7 +136,7 @@ const ACTION_HANDLERS = {
     ...state,
     isFetching: false,
   }),
-  [PLAYER_STATUS]: (state, { payload }) => ({
+  [PLAYER_UPDATE]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),
@@ -141,11 +151,12 @@ const initialState = {
   errorMessage: '',
   historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,
-  isAlphaSupported: false,
   isErrored: false,
   isFetching: false,
   isPlaying: false,
   isPlayingNext: false,
+  mediaType: null,
+  mp4Alpha: 1,
   position: 0,
   queueId: -1,
   rgTrackGain: null,
