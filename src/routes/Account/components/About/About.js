@@ -35,7 +35,6 @@ export default class About extends React.Component {
           </p>
           <p><a styleName='pseudolink' onClick={this.toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}
           <GitHubButton href={__KF_URL_REPO__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>GitHub</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
-          <GitHubButton data-icon='octicon-star' href={__KF_URL_REPO__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Star</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
           <GitHubButton data-icon='octicon-heart' href={__KF_URL_SPONSOR__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Sponsor</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
           <GitHubButton data-icon='octicon-issue-opened' href={__KF_URL_REPO__ + 'issues'} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Issue</GitHubButton> {/* eslint-disable-line no-undef, max-len */}
         </div>

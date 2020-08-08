@@ -48,7 +48,7 @@ const config = {
       __KF_URL_LICENSE__: JSON.stringify('/licenses.txt'),
       __KF_URL_REPO__: JSON.stringify('https://github.com/bhj/karaoke-forever/'),
       __KF_URL_SPONSOR__: JSON.stringify('https://github.com/sponsors/bhj/'),
-      __KF_COPYRIGHT__: JSON.stringify(`2017-${new Date().getFullYear()} RadRoot LLC`),
+      __KF_COPYRIGHT__: JSON.stringify(`2019-${new Date().getFullYear()} RadRoot LLC`),
     }, project.globals)),
     new CaseSensitivePathsPlugin(),
     new MiniCssExtractPlugin({
