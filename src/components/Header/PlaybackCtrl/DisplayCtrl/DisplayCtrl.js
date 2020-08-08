@@ -11,7 +11,7 @@ export default class DisplayCtrl extends React.Component {
     cdgSize: PropTypes.number.isRequired,
     isVisible: PropTypes.bool.isRequired,
     isVisualizerEnabled: PropTypes.bool.isRequired,
-    isVisualizerSupported: PropTypes.bool.isRequired,
+    isWebGLEnabled: PropTypes.bool.isRequired,
     mediaType: PropTypes.string,
     mp4Alpha: PropTypes.number.isRequired,
     sensitivity: PropTypes.number.isRequired,
@@ -53,6 +53,8 @@ export default class DisplayCtrl extends React.Component {
   })
 
   render () {
+    const isBGEnabled = this.props.mediaType && typeof this.props[this.props.mediaType + 'Alpha'] === 'number'
+
     return (
       <Modal
         isVisible={this.props.isVisible}
@@ -69,14 +71,14 @@ export default class DisplayCtrl extends React.Component {
               <label>
                 <input type='checkbox'
                   checked={this.props.isVisualizerEnabled}
-                  disabled={!this.props.isVisualizerSupported}
+                  disabled={!this.props.isWebGLEnabled}
                   onChange={this.handleToggleVisualizer}
                   ref={this.checkbox}
                 /> Visualizer
               </label>
             </legend>
 
-            {this.props.isVisualizerSupported &&
+            {this.props.isWebGLEnabled &&
             <>
               <div styleName='presetBtnContainer'>
                 <button styleName='btnPreset' onClick={this.handlePresetPrev}>
@@ -104,8 +106,8 @@ export default class DisplayCtrl extends React.Component {
             </>
             }
 
-            {!this.props.isVisualizerSupported &&
-              <p styleName='unsupported'>WebGL support not detected</p>
+            {!this.props.isWebGLEnabled &&
+              <p styleName='unsupported'>WebGL not supported</p>
             }
           </fieldset>
 
@@ -114,27 +116,39 @@ export default class DisplayCtrl extends React.Component {
               <label>Lyrics</label>
             </legend>
 
-            <label styleName='field'>Size</label>
-            <OptimisticSlider
-              min={0.4}
-              max={1}
-              step={0.01}
-              value={this.props.cdgSize}
-              onChange={this.handleSize}
-              handle={handle}
-              styleName='slider'
-            />
+            {this.props.mediaType === 'cdg' &&
+            <>
+              <label styleName='field'>Size</label>
+              <OptimisticSlider
+                min={0.4}
+                max={1}
+                step={0.01}
+                value={this.props.cdgSize}
+                onChange={this.handleSize}
+                handle={handle}
+                styleName='slider'
+              />
+            </>
+            }
 
-            <label styleName='field'>Background</label>
-            <OptimisticSlider
-              min={0}
-              max={1}
-              step={0.01}
-              value={this.props[this.props.mediaType + 'Alpha']}
-              onChange={this.handleAlpha}
-              handle={handle}
-              styleName='slider'
-            />
+            {isBGEnabled &&
+            <>
+              <label styleName='field'>Background</label>
+              <OptimisticSlider
+                min={0}
+                max={1}
+                step={0.01}
+                value={this.props[this.props.mediaType + 'Alpha']}
+                onChange={this.handleAlpha}
+                handle={handle}
+                styleName='slider'
+              />
+            </>
+            }
+
+            {!isBGEnabled && this.props.mediaType !== 'cdg' &&
+              <p styleName='unsupported'>No options available</p>
+            }
           </fieldset>
         </div>
       </Modal>

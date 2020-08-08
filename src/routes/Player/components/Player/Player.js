@@ -15,6 +15,7 @@ class Player extends React.Component {
     isPlaying: PropTypes.bool.isRequired,
     isVisible: PropTypes.bool.isRequired,
     isReplayGainEnabled: PropTypes.bool.isRequired,
+    isWebGLEnabled: PropTypes.bool.isRequired,
     mediaId: PropTypes.number,
     mediaKey: PropTypes.number,
     mediaType: PropTypes.string,

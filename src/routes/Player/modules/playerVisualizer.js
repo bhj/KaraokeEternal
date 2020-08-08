@@ -56,7 +56,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   isEnabled: true,
-  isSupported: isWebGLSupported(),
+  isSupported: true,
   ...getRandomPreset(),
   sensitivity: 1,
 }
@@ -76,12 +76,4 @@ function getPreset (i) {
 
 function getRandomPreset () {
   return getPreset(Math.floor(Math.random() * (_presetKeys.length - 1)))
-}
-
-function isWebGLSupported () {
-  try {
-    return !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('webgl2')
-  } catch (e) {
-    return false
-  }
 }

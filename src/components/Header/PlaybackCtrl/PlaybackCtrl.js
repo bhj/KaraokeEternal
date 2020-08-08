@@ -73,7 +73,7 @@ export default class PlaybackCtrl extends React.Component {
           cdgSize={props.status.cdgSize}
           isVisible={this.state.isVisible}
           isVisualizerEnabled={props.status.visualizer.isEnabled}
-          isVisualizerSupported={props.status.visualizer.isSupported}
+          isWebGLEnabled={props.status.isWebGLEnabled}
           mediaType={props.status.mediaType}
           mp4Alpha={props.status.mp4Alpha}
           onClose={this.toggleDisplayCtrl}

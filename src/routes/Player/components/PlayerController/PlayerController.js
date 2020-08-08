@@ -15,6 +15,7 @@ class PlayerController extends React.Component {
     isPlayingNext: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
     isReplayGainEnabled: PropTypes.bool.isRequired,
+    isWebGLEnabled: PropTypes.bool.isRequired,
     mp4Alpha: PropTypes.number.isRequired,
     queue: PropTypes.object.isRequired,
     queueId: PropTypes.number.isRequired,
@@ -25,7 +26,7 @@ class PlayerController extends React.Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     // actions
-    emitLeave: PropTypes.func.isRequired,
+    playerLeave: PropTypes.func.isRequired,
     playerError: PropTypes.func.isRequired,
     playerLoad: PropTypes.func.isRequired,
     playerPlay: PropTypes.func.isRequired,
@@ -40,14 +41,19 @@ class PlayerController extends React.Component {
 
   componentDidMount () {
     this.handleStatus()
+    this.setState({ queueItem: this.props.queue.entities[this.props.queueId] }) // @todo: use getDerivedStateFromProps?
   }
 
   componentWillUnmount () {
-    this.props.emitLeave()
+    this.props.playerLeave()
   }
 
   componentDidUpdate (prevProps) {
     const { props } = this
+
+    if (props.queueId !== prevProps.queueId) {
+      this.setState({ queueItem: props.queue.entities[props.queueId] })
+    }
 
     // playing for first time or playing next?
     if ((props.isPlaying && props.queueId === -1) || props.isPlayingNext) {
@@ -65,10 +71,6 @@ class PlayerController extends React.Component {
     if (props.isErrored && props.isPlaying && !prevProps.isPlaying) {
       this.handleStatus({ isErrored: false })
       return
-    }
-
-    if (props.queueId !== prevProps.queueId) {
-      this.setState({ queueItem: props.queue.entities[props.queueId] })
     }
 
     this.handleStatus()
@@ -129,6 +131,7 @@ class PlayerController extends React.Component {
           isPlaying={props.isPlaying}
           isVisible={!!state.queueItem && !props.isErrored && !props.isAtQueueEnd}
           isReplayGainEnabled={props.isReplayGainEnabled}
+          isWebGLEnabled={props.isWebGLEnabled}
           mediaId={state.queueItem ? state.queueItem.mediaId : null}
           mediaKey={state.queueItem ? state.queueItem.queueId : null}
           mediaType={state.queueItem ? state.queueItem.mediaType : null}

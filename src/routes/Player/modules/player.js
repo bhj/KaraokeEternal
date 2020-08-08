@@ -1,4 +1,5 @@
 import { CANCEL } from 'redux-throttle'
+import getWebGLSupport from 'lib/getWebGLSupport'
 import {
   PLAYER_CMD_NEXT,
   PLAYER_CMD_OPTIONS,
@@ -45,7 +46,7 @@ export function playerStatus (status = {}, deferEmit = false) {
       payload: status,
     })
 
-    const { player } = getState()
+    const { player, playerVisualizer } = getState()
 
     dispatch({
       type: PLAYER_EMIT_STATUS,
@@ -57,12 +58,13 @@ export function playerStatus (status = {}, deferEmit = false) {
         isAtQueueEnd: player.isAtQueueEnd,
         isErrored: player.isErrored,
         isPlaying: player.isPlaying,
+        isWebGLEnabled: player.isWebGLEnabled,
         mediaType: player.mediaType,
         mp4Alpha: player.mp4Alpha,
         position: player.position,
         queueId: player.queueId,
         volume: player.volume,
-        visualizer: getState().playerVisualizer,
+        visualizer: playerVisualizer,
       },
       meta: {
         throttle: {
@@ -75,7 +77,7 @@ export function playerStatus (status = {}, deferEmit = false) {
 }
 
 // cancel any throttled/queued status emits
-export function cancelEmitStatus () {
+export function playerStatusCancel () {
   return {
     type: CANCEL,
     payload: {
@@ -84,9 +86,9 @@ export function cancelEmitStatus () {
   }
 }
 
-export function emitLeave () {
+export function playerLeave () {
   return (dispatch, getState) => {
-    dispatch(cancelEmitStatus())
+    dispatch(playerStatusCancel())
     dispatch({
       type: PLAYER_EMIT_LEAVE,
     })
@@ -155,6 +157,7 @@ const initialState = {
   isFetching: false,
   isPlaying: false,
   isPlayingNext: false,
+  isWebGLEnabled: getWebGLSupport(),
   mediaType: null,
   mp4Alpha: 1,
   position: 0,
