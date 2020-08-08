@@ -59,6 +59,7 @@ class MP4Player extends React.Component {
   }
 
   componentWillUnmount () {
+    this.video.ontimeupdate = null
     this.video.pause()
     this.stopChroma()
 
