@@ -2,14 +2,14 @@
 title: Overview
 ---
 
-Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The player is also browser-based with support for MP3+G, MP4 video and WebGL visualizations. The server runs locally, no internet connection required.
+Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The player is also browser-based with support for MP3+G, MP4 video and WebGL visualizations. The server is self-hosted with no internet connection required.
 
 {{< screenshots >}}
 
 Karaoke Forever basically has 3 parts:
 
 - **<a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>Server:</a>** Runs on almost any OS to serve the app and your media files
-- **<a href='{{< ref "docs/index.md/#karaoke-forever-the-web-app" >}}'>App:</a>** Fast, modern browser app designed for "karaoke conditions"
+- **<a href='{{< ref "docs/index.md/#karaoke-forever-the-web-app" >}}'>App:</a>** Fast, modern mobile browser app designed for "karaoke conditions"
 - **<a href='{{< ref "docs/index.md/#player" >}}'>Player:</a>** Just another part of the app, designed to run fullscreen on the system handling audio/video for a <a href='{{< ref "docs/index.md/#rooms-admin-only" >}}'>room</a>
 
 ## Features
