@@ -7,14 +7,22 @@ import '../../styles/global.css'
 import Navigation from 'components/Navigation'
 import Modal from 'components/Modal'
 import SongInfo from 'components/SongInfo'
+import useObserver from 'lib/useObserver'
 
-export const CoreLayout = (props) => {
+const CoreLayout = (props) => {
+  const navRef = React.useRef(null)
+
+  useObserver({
+    callback: () => props.setFooterHeight(navRef.current?.clientHeight),
+    element: navRef,
+  })
+
   return (
     <>
       {props.children}
 
       {props.isLoggedIn &&
-        <Navigation/>
+        <Navigation loc={props.loc} ref={navRef} />
       }
 
       <SongInfo/>
@@ -31,13 +39,15 @@ export const CoreLayout = (props) => {
   )
 }
 
-export default CoreLayout
-
 CoreLayout.propTypes = {
   children: PropTypes.any,
   isLoggedIn: PropTypes.bool,
+  loc: PropTypes.string.isRequired,
   ui: PropTypes.object.isRequired,
   // actions
   clearErrorMessage: PropTypes.func.isRequired,
   closeSongInfo: PropTypes.func.isRequired,
+  setFooterHeight: PropTypes.func.isRequired,
 }
+
+export default CoreLayout

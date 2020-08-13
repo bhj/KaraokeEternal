@@ -36,7 +36,7 @@ export function headerHeightChange ({ height }) {
   }
 }
 
-export function setFooterHeight ({ height }) {
+export function setFooterHeight (height) {
   return (dispatch, getState) => {
     if (getState().ui.footerHeight === height) return
 
