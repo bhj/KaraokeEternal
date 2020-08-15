@@ -1,4 +1,4 @@
-const throttle = require('../lib/async-throttle')
+const throttle = require('@jcoreio/async-throttle')
 const {
   SCANNER_WORKER_STATUS,
 } = require('../../shared/actionTypes')

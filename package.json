@@ -51,6 +51,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.11.2",
+    "@jcoreio/async-throttle": "^1.1.2",
     "bcrypt": "^5.0.0",
     "ctx-compose": "^3.0.0",
     "electron-log": "^3.0.7",
