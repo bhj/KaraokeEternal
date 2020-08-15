@@ -15,6 +15,7 @@ const useObserver = ({ callback, element }) => {
     observer.current = new ResizeObserver(callback)
     observe()
 
+    // callback for unmount
     return () => {
       if (observer && observer.current && element && element.current) {
         observer.current.unobserve(element.current)

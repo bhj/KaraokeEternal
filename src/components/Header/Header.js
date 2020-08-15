@@ -1,41 +1,42 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Measure from 'react-measure'
 import PlaybackCtrl from './PlaybackCtrl'
 import ProgressBar from './ProgressBar'
 import UpNext from './UpNext'
 import './Header.css'
 
-const Header = (props) => {
+const Header = React.forwardRef((props, ref) => {
   const { isPlayer, isPlayerPresent, isUpNext, isUpNow, isAdmin } = props
+  const CustomHeader = props.customHeader
 
   return (
-    <Measure onMeasure={props.headerHeightChange} whitelist={['height']}>
-      <div styleName='container' className='bg-blur'>
-        {!isPlayer && isPlayerPresent &&
-          <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={props.wait} />
-        }
+    <div styleName='container' className='bg-blur' ref={ref}>
+      {!isPlayer && isPlayerPresent &&
+        <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={props.wait} />
+      }
 
-        {(isUpNow || isAdmin) &&
-          <PlaybackCtrl />
-        }
+      {(isUpNow || isAdmin) &&
+        <PlaybackCtrl />
+      }
 
-        {isAdmin && props.isScanning &&
-          <ProgressBar
-            text={props.updateText}
-            progress={props.updateProgress}
-            onCancel={props.requestScanCancel}
-          />
-        }
+      {isAdmin && props.isScanning &&
+        <ProgressBar
+          text={props.updateText}
+          progress={props.updateProgress}
+          onCancel={props.requestScanCancel}
+        />
+      }
 
-        {props.children}
-      </div>
-    </Measure>
+      {props.customHeader &&
+        <CustomHeader/>
+      }
+    </div>
   )
-}
+})
 
+Header.displayName = 'Header'
 Header.propTypes = {
-  children: PropTypes.node,
+  customHeader: PropTypes.object,
   isAdmin: PropTypes.bool.isRequired,
   isPlayer: PropTypes.bool.isRequired,
   isPlayerPresent: PropTypes.bool.isRequired,
@@ -46,7 +47,6 @@ Header.propTypes = {
   updateText: PropTypes.string.isRequired,
   updateProgress: PropTypes.number.isRequired,
   // actions
-  headerHeightChange: PropTypes.func.isRequired,
   requestScanCancel: PropTypes.func.isRequired,
 }
 

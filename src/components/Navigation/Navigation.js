@@ -18,9 +18,9 @@ const Navigation = React.forwardRef((props, ref) => (
   </div>
 ))
 
+Navigation.displayName = 'Navigation'
 Navigation.propTypes = {
   loc: PropTypes.string.isRequired,
 }
-Navigation.displayName = 'Navigation'
 
 export default Navigation

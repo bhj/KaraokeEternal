@@ -1,7 +1,6 @@
 import { connect } from 'react-redux'
 import Header from './Header'
 import { createSelector } from 'reselect'
-import { headerHeightChange } from 'store/modules/ui'
 import { requestScanCancel } from 'store/modules/prefs'
 import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
 
@@ -60,8 +59,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapActionCreators = {
-  headerHeightChange,
   requestScanCancel,
 }
 
-export default connect(mapStateToProps, mapActionCreators)(Header)
+export default connect(mapStateToProps, mapActionCreators, null, { forwardRef: true })(Header)

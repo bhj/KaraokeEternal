@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import Header from 'components/Header'
+import React from 'react'
 import About from '../components/About'
 import Account from '../components/Account'
 import Login from '../components/Login'
@@ -8,45 +7,45 @@ import Prefs from '../components/Prefs'
 import Rooms from '../components/Rooms'
 import './AccountView.css'
 
-export default class AccountView extends Component {
-  static propTypes = {
-    isAdmin: PropTypes.bool.isRequired,
-    isLoggedIn: PropTypes.bool.isRequired,
-    ui: PropTypes.object.isRequired,
-  }
+const AccountView = (props) => {
+  const { isAdmin, isLoggedIn } = props
+  React.useLayoutEffect(() => props.setHeader(null))
 
-  render () {
-    const { isAdmin, isLoggedIn } = this.props
+  return (
+    <div styleName='container' style={{
+      paddingTop: props.ui.headerHeight,
+      paddingBottom: props.ui.footerHeight,
+      width: props.ui.contentWidth,
+      height: props.ui.innerHeight,
+    }}>
+      {isAdmin &&
+        <Rooms ui={props.ui}/>
+      }
 
-    return (
-      <div styleName='container' style={{
-        paddingTop: this.props.ui.headerHeight,
-        paddingBottom: this.props.ui.footerHeight,
-        width: this.props.ui.contentWidth,
-        height: this.props.ui.innerHeight,
-      }}>
-        <Header />
+      {isAdmin &&
+        <Prefs />
+      }
 
-        {isAdmin &&
-          <Rooms ui={this.props.ui}/>
-        }
+      {isLoggedIn &&
+        <Account />
+      }
 
-        {isAdmin &&
-          <Prefs />
-        }
+      {!isLoggedIn &&
+        <Login style={{ maxWidth: Math.max(340, props.ui.contentWidth * 0.66) }}/>
+      }
 
-        {isLoggedIn &&
-          <Account />
-        }
-
-        {!isLoggedIn &&
-          <Login style={{ maxWidth: Math.max(340, this.props.ui.contentWidth * 0.66) }}/>
-        }
-
-        {isLoggedIn &&
-          <About />
-        }
-      </div>
-    )
-  }
+      {isLoggedIn &&
+        <About />
+      }
+    </div>
+  )
 }
+
+AccountView.propTypes = {
+  isAdmin: PropTypes.bool.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
+  setHeader: PropTypes.func.isRequired,
+  ui: PropTypes.object.isRequired,
+}
+
+export default AccountView

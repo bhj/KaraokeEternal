@@ -1,3 +1,9 @@
+## TBD
+
+### Changed
+
+- **(app)** **(breaking)** Browsers without the [ResizeObserver API](https://caniuse.com/#feat=mdn-api_resizeobserver) are no longer supported
+
 ## v0.8.0 (2020-07-03)
 
 ### [Black Lives Matter.](https://blacklivesmatter.com)

@@ -1,41 +1,37 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import PlayerController from '../components/PlayerController'
-import Header from 'components/Header'
 import screenfull from 'screenfull'
 import './PlayerView.css'
 
-class PlayerView extends React.Component {
-  static propTypes = {
-    ui: PropTypes.object.isRequired,
-  }
+const PlayerView = (props) => {
+  const { innerWidth, innerHeight, headerHeight, footerHeight } = props.ui
+  const viewportHeight = innerHeight - headerHeight - footerHeight
+  React.useLayoutEffect(() => props.setHeader(null))
 
-  render () {
-    const { innerWidth, innerHeight, headerHeight, footerHeight } = this.props.ui
-    const viewportHeight = innerHeight - headerHeight - footerHeight
+  return (
+    <div style={{ overflow: 'hidden' }}>
+      <div
+        id='player-fs-container'
+        styleName='container'
+        style={{
+          top: screenfull.isFullscreen ? 0 : headerHeight,
+          width: innerWidth,
+          height: screenfull.isFullscreen ? innerHeight : viewportHeight,
+        }}
+      >
+        <PlayerController
+          width={innerWidth}
+          height={screenfull.isFullscreen ? innerHeight : viewportHeight}
+        />
+      </div>
+    </div>
+  )
+}
 
-    return (
-      <>
-        <Header />
-        <div style={{ overflow: 'hidden' }}>
-          <div
-            id='player-fs-container'
-            styleName='container'
-            style={{
-              top: screenfull.isFullscreen ? 0 : headerHeight,
-              width: innerWidth,
-              height: screenfull.isFullscreen ? innerHeight : viewportHeight,
-            }}
-          >
-            <PlayerController
-              width={innerWidth}
-              height={screenfull.isFullscreen ? innerHeight : viewportHeight}
-            />
-          </div>
-        </div>
-      </>
-    )
-  }
+PlayerView.propTypes = {
+  setHeader: PropTypes.func.isRequired,
+  ui: PropTypes.object.isRequired,
 }
 
 export default PlayerView

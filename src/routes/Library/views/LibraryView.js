@@ -10,11 +10,10 @@ import './LibraryView.css'
 
 const LibraryView = (props) => {
   const { isAdmin, isEmpty, isLoading, isSearching } = props
+  React.useLayoutEffect(() => props.setHeader(LibraryHeader))
 
   return (
     <>
-      <LibraryHeader />
-
       {!isSearching &&
         <ArtistList {...props} />
       }
@@ -44,6 +43,7 @@ LibraryView.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isSearching: PropTypes.bool.isRequired,
   isEmpty: PropTypes.bool.isRequired,
+  setHeader: PropTypes.func.isRequired,
 }
 
 export default LibraryView
