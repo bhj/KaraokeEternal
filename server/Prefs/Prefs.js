@@ -88,7 +88,6 @@ class Prefs {
       throw new Error('invalid lastID from path insert')
     }
 
-    // return pathId
     return res.stmt.lastID
   }
 
