@@ -10,7 +10,7 @@ If you have fun with it, consider [sponsoring](https://github.com/sponsors/bhj) 
 
 ### New
 
-- **(app)** [ReplayGain support](http://www.karaoke-forever.com/docs/#preferences-admin-only).  No more scrambling for the volume when a new song starts! With properly tagged media, the player can automatically minimize volume differences between songs.
+- **(app)** [ReplayGain support](http://www.karaoke-forever.com/docs/#preferences-admin-only). No more scrambling for the volume when a new song starts! With properly tagged media, the player can automatically minimize volume differences between songs.
 - **(app)** Rooms can now be password-protected
 - **(player)** CD+Graphics now have shadows, can be resized, and use less CPU
 - **(player)** **(breaking)** Web Audio API support is now required (only for browsers running the player)
