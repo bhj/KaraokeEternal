@@ -1,4 +1,4 @@
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 const log = require('../lib/logger')('Media')
 
@@ -61,11 +61,11 @@ class Media {
     `
     const res = await db.run(String(query), query.parameters)
 
-    if (!Number.isInteger(res.stmt.lastID)) {
+    if (!Number.isInteger(res.lastID)) {
       throw new Error('invalid lastID from media insert')
     }
 
-    return res.stmt.lastID
+    return res.lastID
   }
 
   /**
@@ -108,7 +108,7 @@ class Media {
       `
       const res = await db.run(String(query), query.parameters)
 
-      log.info(`removed ${res.stmt.changes} media`)
+      log.info(`removed ${res.changes} media`)
     }
   }
 
@@ -126,7 +126,7 @@ class Media {
         SELECT media.mediaId FROM media LEFT JOIN paths USING(pathId) WHERE paths.pathId IS NULL
       )
     `)
-    log.info(`cleanup: ${res.stmt.changes} media in nonexistent paths`)
+    log.info(`cleanup: ${res.changes} media in nonexistent paths`)
 
     // remove stars for nonexistent songs
     res = await db.run(`
@@ -134,7 +134,7 @@ class Media {
         SELECT songStars.songId FROM songStars LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
       )
     `)
-    log.info(`cleanup: ${res.stmt.changes} stars for nonexistent songs`)
+    log.info(`cleanup: ${res.changes} stars for nonexistent songs`)
 
     log.info('cleanup: vacuuming database')
     await db.run('VACUUM')

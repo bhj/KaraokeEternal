@@ -1,4 +1,3 @@
-const throttle = require('@jcoreio/async-throttle')
 const {
   SCANNER_WORKER_STATUS,
 } = require('../../shared/actionTypes')
@@ -14,12 +13,16 @@ class Scanner {
   }
 
   getStatusEmitter () {
-    return throttle((text, progress) => {
+    return (text, progress, isScanning = true) => {
       process.send({
         type: SCANNER_WORKER_STATUS,
-        payload: { text, progress },
+        payload: {
+          isScanning,
+          progress,
+          text,
+        },
       })
-    }, 1000)
+    }
   }
 }
 

@@ -3,6 +3,7 @@
 ### Changed
 
 - **(app)** **(breaking)** Browsers without the [ResizeObserver API](https://caniuse.com/#feat=mdn-api_resizeobserver) are no longer supported
+- **(server)** Uses one less process/helper
 
 ## v0.8.0 (2020-07-03)
 

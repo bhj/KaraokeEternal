@@ -76,9 +76,9 @@ module.exports = {
   // IPC messages
   SCANNER_WORKER_SCAN: 'scannerWorker/SCAN',
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
-  SCANNER_WORKER_DONE: 'scannerWorker/DONE',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
   SERVER_WORKER_ERROR: 'serverWorker/ERROR',
+  LIBRARY_MATCH: 'scannerWorker/LIBRARY_MATCH',
   MEDIA_ADD: 'scannerWorker/MEDIA_ADD',
   MEDIA_CLEANUP: 'scannerWorker/MEDIA_CLEANUP',
   MEDIA_REMOVE: 'scannerWorker/MEDIA_REMOVE',

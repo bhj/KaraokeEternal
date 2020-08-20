@@ -24,7 +24,8 @@ class FileScanner extends Scanner {
     const files = new Map() // pathId => [files]
     const validMedia = [] // mediaIds
     let i = 0 // file counter
-    let total = 0 // total num. files
+    let numTotal = 0
+    let numAdded = 0
 
     // get list of files from all paths
     for (const pathId of this.paths.result) {
@@ -36,9 +37,12 @@ class FileScanner extends Scanner {
       try {
         const list = await getFiles(basePath, file => searchExtPerms.some(ext => file.endsWith('.' + ext)))
         files.set(pathId, list)
-        total += list.length
+        numTotal += list.length
 
-        log.info('  => found %s files with valid extensions %s', list.length, JSON.stringify(searchExts))
+        log.info('  => found %s files with valid extensions %s',
+          list.length.toLocaleString(),
+          JSON.stringify(searchExts)
+        )
       } catch (err) {
         log.error(`  => ${err.message} (path offline)`)
       }
@@ -48,15 +52,15 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Processing %s files', total)
+    log.info('Processing %s files', numTotal.toLocaleString())
 
     for (const [pathId, list] of files) {
       let lastDir
 
       for (const item of list) {
         i++
-        log.info('[%s/%s] %s', i, total, item.file)
-        this.emitStatus(`Scanning media (${i.toLocaleString()} of ${total.toLocaleString()})`, (i / total) * 100)
+        log.info('[%s/%s] %s', i, numTotal, item.file)
+        this.emitStatus(`Scanning media (${i.toLocaleString()} of ${numTotal.toLocaleString()})`, (i / numTotal) * 100)
 
         const dir = path.dirname(item.file)
 
@@ -70,8 +74,11 @@ class FileScanner extends Scanner {
 
         // process file
         try {
-          const mediaId = await this.process(item, pathId)
-          validMedia.push(mediaId) // success
+          const res = await this.process(item, pathId)
+
+          // success
+          validMedia.push(res.mediaId)
+          if (res.isNew) numAdded++
         } catch (err) {
           log.warn(err.message + ': ' + item.file)
         }
@@ -82,9 +89,13 @@ class FileScanner extends Scanner {
       } // end for
     } // end for
 
-    log.info('Processing finished with %s valid media entries', validMedia.length)
+    log.info('Processed %s valid media files', validMedia.length.toLocaleString())
 
-    await this.removeInvalid(validMedia, Array.from(files.keys()))
+    const numRemoved = await this.removeInvalid(validMedia, Array.from(files.keys()))
+
+    this.emitStatus(`${numAdded} added, ${numRemoved} removed, ${validMedia.length} total media`, 100, false)
+
+    await IPCMedia.cleanup()
   }
 
   async process (item, pathId) {
@@ -162,16 +173,16 @@ class FileScanner extends Scanner {
         log.info('  => ok')
       }
 
-      return row.mediaId
+      return { mediaId: row.mediaId, isNew: false }
     } // end if
 
     // new media
-    // -------------------------------
+    // ---------
     media.dateAdded = Math.round(new Date().getTime() / 1000) // seconds
     log.info('  => new: %s', JSON.stringify(match))
 
     // resolves to a mediaId
-    return IPCMedia.add(media)
+    return { mediaId: await IPCMedia.add(media), isNew: true }
   }
 
   async removeInvalid (validMedia = [], validPaths = []) {
@@ -195,7 +206,7 @@ class FileScanner extends Scanner {
       await IPCMedia.remove(invalidMedia)
     }
 
-    await IPCMedia.cleanup()
+    return invalidMedia.length
   }
 }
 

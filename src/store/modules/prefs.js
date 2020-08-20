@@ -6,7 +6,6 @@ import {
   PREFS_REQUEST_SCAN,
   PREFS_REQUEST_SCAN_CANCEL,
   SCANNER_WORKER_STATUS,
-  SCANNER_WORKER_DONE,
   _ERROR,
 } from 'shared/actionTypes'
 
@@ -113,13 +112,9 @@ const ACTION_HANDLERS = {
   }),
   [SCANNER_WORKER_STATUS]: (state, { payload }) => ({
     ...state,
-    isScanning: true,
+    isScanning: payload.isScanning,
     updateText: payload.text,
     updateProgress: payload.progress,
-  }),
-  [SCANNER_WORKER_DONE]: (state, { payload }) => ({
-    ...state,
-    isScanning: false,
   }),
 }
 

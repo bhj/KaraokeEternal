@@ -1,5 +1,5 @@
 const bcrypt = require('../lib/bcrypt')
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
@@ -57,8 +57,8 @@ router.post('/rooms', async (ctx, next) => {
   `
   const res = await db.run(String(query), query.parameters)
 
-  if (res.stmt.changes) {
-    log.verbose('%s created room "%s" (roomId: %s)', ctx.user.name, name, res.stmt.lastID)
+  if (res.changes) {
+    log.verbose('%s created room "%s" (roomId: %s)', ctx.user.name, name, res.lastID)
   }
 
   // send updated room list
@@ -103,7 +103,7 @@ router.put('/rooms/:roomId', async (ctx, next) => {
   `
   const res = await db.run(String(query), query.parameters)
 
-  if (res.stmt.changes) {
+  if (res.changes) {
     log.verbose('%s updated roomId %s', ctx.user.name, ctx.params.roomId)
   }
 
@@ -129,7 +129,7 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   `
   let res = await db.run(String(query), query.parameters)
 
-  if (res.stmt.changes) {
+  if (res.changes) {
     log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
   }
 
@@ -140,8 +140,8 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   `
   res = await db.run(String(query), query.parameters)
 
-  if (res.stmt.changes) {
-    log.verbose('removed %s queue item(s) for roomId %s', res.stmt.changes, roomId)
+  if (res.changes) {
+    log.verbose('removed %s queue item(s) for roomId %s', res.changes, roomId)
   }
 
   // send updated room list

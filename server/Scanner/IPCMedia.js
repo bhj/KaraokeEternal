@@ -8,17 +8,19 @@ const {
   MEDIA_CLEANUP,
   MEDIA_REMOVE,
   MEDIA_UPDATE,
+  _SUCCESS,
+  _ERROR,
 } = require('../../shared/actionTypes')
 
 const refs = {}
 let actionId = 0
 
 // listen for action success/error
-process.on('message', async function (action) {
-  const { meta, error } = action
+process.on('message', function (action) {
+  const { error, meta, type } = action
 
-  if (!meta || !meta.ipcActionId || !refs[meta.ipcActionId]) {
-    log.debug('ignoring action %s', JSON.stringify(action))
+  if (!refs[meta?.ipcActionId] || !(type.endsWith(_SUCCESS) || type.endsWith(_ERROR))) {
+    log.debug('ignoring action: %s', type)
     return
   }
 
