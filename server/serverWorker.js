@@ -23,6 +23,7 @@ const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
+const IPCMessenger = require('./lib/IPCMessenger')
 const IPCLibraryActions = require('./Library/ipc')
 const IPCMediaActions = require('./Media/ipc')
 const {
@@ -30,7 +31,7 @@ const {
   SERVER_WORKER_ERROR,
 } = require('../shared/actionTypes')
 
-async function serverWorker () {
+async function serverWorker (startScanner) {
   const jwtKey = await Prefs.getJwtKey()
   const app = new Koa()
 
@@ -73,6 +74,7 @@ async function serverWorker () {
   app.use(async (ctx, next) => {
     ctx.io = io
     ctx.jwtKey = jwtKey
+    ctx.startScanner = startScanner
 
     // verify jwt
     try {
@@ -173,8 +175,9 @@ async function serverWorker () {
   socketActions(io, jwtKey)
 
   // attach IPC action handlers
-  IPCLibraryActions(io)
-  IPCMediaActions(io)
+  const ipc = new IPCMessenger('serverWorker')
+  ipc.use(IPCLibraryActions(io))
+  ipc.use(IPCMediaActions(io))
 
   log.info(`Starting web server (host=${config.serverHost}; port=${config.serverPort})`)
 

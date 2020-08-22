@@ -5,11 +5,18 @@ const getFiles = require('./getFiles')
 const getConfig = require('./getConfig')
 const getPerms = require('../../lib/getPermutations')
 const getCdgName = require('../../lib/getCdgName')
-const Library = require('../../Library')
 const Media = require('../../Media')
-const IPCMedia = require('../IPCMedia')
 const MetaParser = require('../MetaParser')
 const Scanner = require('../Scanner')
+const IPCMessenger = require('../../lib/IPCMessenger')
+const ipc = new IPCMessenger('scannerWorker')
+const {
+  LIBRARY_MATCH_SONG,
+  MEDIA_ADD,
+  MEDIA_CLEANUP,
+  MEDIA_REMOVE,
+  MEDIA_UPDATE,
+} = require('../../../shared/actionTypes')
 
 const searchExts = ['mp4', 'm4a', 'mp3']
 const searchExtPerms = searchExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
@@ -95,7 +102,7 @@ class FileScanner extends Scanner {
 
     this.emitStatus(`${numAdded} added, ${numRemoved} removed, ${validMedia.length} total media`, 100, false)
 
-    await IPCMedia.cleanup()
+    await ipc.send({ type: MEDIA_CLEANUP })
   }
 
   async process (item, pathId) {
@@ -123,7 +130,7 @@ class FileScanner extends Scanner {
     })
 
     // get artistId and songId
-    const match = await Library.matchSong(parsed)
+    const match = await ipc.send({ type: LIBRARY_MATCH_SONG, payload: parsed })
 
     const media = {
       songId: match.songId,
@@ -162,10 +169,13 @@ class FileScanner extends Scanner {
       })
 
       if (Object.keys(diff).length) {
-        await IPCMedia.update({
-          mediaId: row.mediaId,
-          dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
-          ...diff,
+        await ipc.send({
+          type: MEDIA_UPDATE,
+          payload: {
+            mediaId: row.mediaId,
+            dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
+            ...diff,
+          }
         })
 
         log.info('  => updated: %s', Object.keys(diff).join(', '))
@@ -181,8 +191,10 @@ class FileScanner extends Scanner {
     media.dateAdded = Math.round(new Date().getTime() / 1000) // seconds
     log.info('  => new: %s', JSON.stringify(match))
 
-    // resolves to a mediaId
-    return { mediaId: await IPCMedia.add(media), isNew: true }
+    return {
+      mediaId: await ipc.send({ type: MEDIA_ADD, payload: media }),
+      isNew: true
+    }
   }
 
   async removeInvalid (validMedia = [], validPaths = []) {
@@ -203,7 +215,7 @@ class FileScanner extends Scanner {
     log.info(`Found ${invalidMedia.length} invalid media entries`)
 
     if (invalidMedia.length) {
-      await IPCMedia.remove(invalidMedia)
+      await ipc.send({ type: MEDIA_REMOVE, payload: invalidMedia })
     }
 
     return invalidMedia.length

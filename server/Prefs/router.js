@@ -17,7 +17,8 @@ router.get('/scan', async (ctx, next) => {
   }
 
   ctx.status = 200
-  process.emit('message', { type: SCANNER_WORKER_SCAN })
+  // process.emit('serverWorker', { type: SCANNER_WORKER_SCAN })
+  ctx.startScanner()
 })
 
 // cancel media scan

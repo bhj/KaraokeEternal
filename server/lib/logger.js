@@ -31,8 +31,8 @@ log.transports.console.format = function (msg) {
     text
 }
 
-if (process.env.KF_PROCESS_ROLE) {
-  log.transports.file.fileName = process.env.KF_PROCESS_ROLE + '.log'
+if (process.env.KF_CHILD_PROCESS) {
+  log.transports.file.fileName = process.env.KF_CHILD_PROCESS + '.log'
 }
 
 function getLogger (prefix) {

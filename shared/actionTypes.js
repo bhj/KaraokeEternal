@@ -78,7 +78,7 @@ module.exports = {
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
   SERVER_WORKER_ERROR: 'serverWorker/ERROR',
-  LIBRARY_MATCH: 'scannerWorker/LIBRARY_MATCH',
+  LIBRARY_MATCH_SONG: 'scannerWorker/LIBRARY_MATCH_SONG',
   MEDIA_ADD: 'scannerWorker/MEDIA_ADD',
   MEDIA_CLEANUP: 'scannerWorker/MEDIA_CLEANUP',
   MEDIA_REMOVE: 'scannerWorker/MEDIA_REMOVE',
