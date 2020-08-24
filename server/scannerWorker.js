@@ -1,6 +1,8 @@
+const log = require('./lib/Log')
+  .set('console')
+  .getLogger(`scanner[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
-const log = require('./lib/logger')(`scanner[${process.pid}]`)
 const {
   SCANNER_CMD_START,
   SCANNER_CMD_STOP,

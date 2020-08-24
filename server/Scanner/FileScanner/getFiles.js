@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const log = require('../../lib/logger')('FileScanner:getFiles')
+const log = require('../../lib/Log').getLogger('FileScanner:getFiles')
 
 /**
  * Silly promise wrapper for synchronous walker

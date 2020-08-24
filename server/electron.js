@@ -1,6 +1,6 @@
 const { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
-const log = require('./lib/logger')(`parent:electron[${process.pid}]`)
+const log = require('./lib/Log').getLogger(`parent:electron[${process.pid}]`)
 const config = require('../project.config')
 
 // Keep a global reference of the window object, if you don't, the window will

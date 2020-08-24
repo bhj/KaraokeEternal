@@ -1,4 +1,4 @@
-const log = require('./lib/logger')(`server[${process.pid}]`)
+const log = require('./lib/Log').getLogger(`server[${process.pid}]`)
 const jwtVerify = require('jsonwebtoken').verify
 
 const Library = require('./Library')

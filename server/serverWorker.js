@@ -1,4 +1,4 @@
-const log = require('./lib/logger')(`server[${process.pid}]`)
+const log = require('./lib/Log').getLogger(`server[${process.pid}]`)
 const path = require('path')
 const config = require('../project.config')
 const getIPAddress = require('./lib/getIPAddress')
@@ -106,7 +106,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   const rewriteRoutes = ['account', 'library', 'queue', 'player']
   const indexFile = path.join(config.buildPath, 'index.html')
 
-  if (config.env === 'development') {
+  if (env.NODE_ENV === 'development') {
     log.info('Enabling webpack dev and HMR middleware')
     const webpack = require('webpack')
     const webpackConfig = require('../webpack.config')

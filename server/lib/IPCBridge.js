@@ -1,4 +1,4 @@
-const log = require('./logger')('IPC')
+const log = require('./Log').getLogger('IPC')
 const {
   _ERROR,
   _SUCCESS,

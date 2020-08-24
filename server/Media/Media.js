@@ -1,6 +1,6 @@
 const db = require('../lib/Database').db
 const sql = require('sqlate')
-const log = require('../lib/logger')('Media')
+const log = require('../lib/Log').getLogger('Media')
 
 class Media {
   /**

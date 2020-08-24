@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 const childProcess = require('child_process')
+const path = require('path')
+const env = require('./lib/cli')
+const log = require('./lib/Log')
+  .set('console')
+  .getLogger(`main[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
-const env = require('./lib/cli')
-const log = require('./lib/logger')(`main[${process.pid}]`)
-const path = require('path')
 const refs = {}
 const {
   SCANNER_CMD_START,

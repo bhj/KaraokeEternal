@@ -54,7 +54,7 @@
     "@jcoreio/async-throttle": "^1.1.2",
     "bcrypt": "^5.0.0",
     "ctx-compose": "^3.0.0",
-    "electron-log": "^3.0.7",
+    "electron-log": "^4.2.4",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
     "koa-body": "^4.2.0",

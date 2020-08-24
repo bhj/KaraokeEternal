@@ -1,5 +1,5 @@
 const path = require('path')
-const log = require('../../lib/logger')('FileScanner')
+const log = require('../../lib/Log').getLogger('FileScanner')
 const musicMeta = require('music-metadata')
 const getFiles = require('./getFiles')
 const getConfig = require('./getConfig')

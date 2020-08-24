@@ -3,7 +3,7 @@ const db = require('../lib/Database').db
 const sql = require('sqlate')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
-const log = require('../lib/logger')('Rooms')
+const log = require('../lib/Log').getLogger('Rooms')
 const Rooms = require('../Rooms')
 
 const BCRYPT_ROUNDS = 12

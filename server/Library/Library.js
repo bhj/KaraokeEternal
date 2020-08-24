@@ -1,6 +1,6 @@
 const db = require('../lib/Database').db
 const sql = require('sqlate')
-const log = require('../lib/logger')('Library')
+const log = require('../lib/Log').getLogger('Library')
 const Media = require('../Media')
 let _libraryVersion = Date.now()
 let _starCountsVersion = Date.now()
