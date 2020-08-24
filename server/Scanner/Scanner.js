@@ -1,3 +1,4 @@
+const IPC = require('../lib/IPCBridge')
 const {
   SCANNER_WORKER_STATUS,
 } = require('../../shared/actionTypes')
@@ -13,14 +14,17 @@ class Scanner {
   }
 
   getStatusEmitter () {
-    return (text, progress, isScanning = true) => {
-      process.send({
+    return (text, pct, isScanning = true) => {
+      IPC.emit({
         type: SCANNER_WORKER_STATUS,
         payload: {
           isScanning,
-          progress,
+          pct,
           text,
         },
+        meta: {
+          noAck: true,
+        }
       })
     }
   }

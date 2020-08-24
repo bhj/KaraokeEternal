@@ -8,8 +8,7 @@ const getCdgName = require('../../lib/getCdgName')
 const Media = require('../../Media')
 const MetaParser = require('../MetaParser')
 const Scanner = require('../Scanner')
-const IPCMessenger = require('../../lib/IPCMessenger')
-const ipc = new IPCMessenger('scannerWorker')
+const IPC = require('../../lib/IPCBridge')
 const {
   LIBRARY_MATCH_SONG,
   MEDIA_ADD,
@@ -29,7 +28,7 @@ class FileScanner extends Scanner {
 
   async scan () {
     const files = new Map() // pathId => [files]
-    const validMedia = [] // mediaIds
+    const valid = [] // mediaIds
     let i = 0 // file counter
     let numTotal = 0
     let numAdded = 0
@@ -84,25 +83,26 @@ class FileScanner extends Scanner {
           const res = await this.process(item, pathId)
 
           // success
-          validMedia.push(res.mediaId)
+          valid.push(res.mediaId)
           if (res.isNew) numAdded++
         } catch (err) {
           log.warn(err.message + ': ' + item.file)
         }
 
         if (this.isCanceling) {
+          this.emitStatus(`Stopped (${numAdded} new media)`, 100, false)
           return
         }
       } // end for
     } // end for
 
-    log.info('Processed %s valid media files', validMedia.length.toLocaleString())
+    log.info('Processed %s valid media files', valid.length.toLocaleString())
 
-    const numRemoved = await this.removeInvalid(validMedia, Array.from(files.keys()))
+    const numRemoved = await this.removeInvalid(valid, Array.from(files.keys()))
 
-    this.emitStatus(`${numAdded} added, ${numRemoved} removed, ${validMedia.length} total media`, 100, false)
+    this.emitStatus(`Finished (${numAdded} new, ${numRemoved} removed, ${valid.length} total media)`, 100, false)
 
-    await ipc.send({ type: MEDIA_CLEANUP })
+    await IPC.req({ type: MEDIA_CLEANUP })
   }
 
   async process (item, pathId) {
@@ -130,7 +130,7 @@ class FileScanner extends Scanner {
     })
 
     // get artistId and songId
-    const match = await ipc.send({ type: LIBRARY_MATCH_SONG, payload: parsed })
+    const match = await IPC.req({ type: LIBRARY_MATCH_SONG, payload: parsed })
 
     const media = {
       songId: match.songId,
@@ -169,7 +169,7 @@ class FileScanner extends Scanner {
       })
 
       if (Object.keys(diff).length) {
-        await ipc.send({
+        await IPC.req({
           type: MEDIA_UPDATE,
           payload: {
             mediaId: row.mediaId,
@@ -192,7 +192,7 @@ class FileScanner extends Scanner {
     log.info('  => new: %s', JSON.stringify(match))
 
     return {
-      mediaId: await ipc.send({ type: MEDIA_ADD, payload: media }),
+      mediaId: await IPC.req({ type: MEDIA_ADD, payload: media }),
       isNew: true
     }
   }
@@ -215,7 +215,7 @@ class FileScanner extends Scanner {
     log.info(`Found ${invalidMedia.length} invalid media entries`)
 
     if (invalidMedia.length) {
-      await ipc.send({ type: MEDIA_REMOVE, payload: invalidMedia })
+      await IPC.req({ type: MEDIA_REMOVE, payload: invalidMedia })
     }
 
     return invalidMedia.length

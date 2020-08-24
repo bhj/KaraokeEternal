@@ -5,10 +5,6 @@ const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
 const getWindowsDrives = require('../lib/getWindowsDrives')
 const Prefs = require('./Prefs')
-const {
-  SCANNER_WORKER_SCAN,
-  SCANNER_WORKER_SCAN_CANCEL,
-} = require('../../shared/actionTypes')
 
 // start media scan
 router.get('/scan', async (ctx, next) => {
@@ -17,18 +13,17 @@ router.get('/scan', async (ctx, next) => {
   }
 
   ctx.status = 200
-  // process.emit('serverWorker', { type: SCANNER_WORKER_SCAN })
   ctx.startScanner()
 })
 
-// cancel media scan
-router.get('/scan/cancel', async (ctx, next) => {
+// stop media scan
+router.get('/scan/stop', async (ctx, next) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
 
   ctx.status = 200
-  process.emit('message', { type: SCANNER_WORKER_SCAN_CANCEL })
+  ctx.stopScanner()
 })
 
 // get preferences and media paths
@@ -65,7 +60,7 @@ router.post('/path', async (ctx, next) => {
   ctx.body = await Prefs.get()
 
   // update library
-  process.emit('message', { type: SCANNER_WORKER_SCAN })
+  ctx.startScanner()
 })
 
 // remove media file path
@@ -86,7 +81,7 @@ router.delete('/path/:pathId', async (ctx, next) => {
   ctx.body = await Prefs.get()
 
   // update library
-  process.send({ type: SCANNER_WORKER_SCAN })
+  ctx.startScanner()
 })
 
 // get folder listing for path browser

@@ -1,30 +1,31 @@
 const Database = require('./lib/Database')
+const IPC = require('./lib/IPCBridge')
 const log = require('./lib/logger')(`scanner[${process.pid}]`)
 const {
-  SCANNER_WORKER_SCAN,
-  SCANNER_WORKER_SCAN_CANCEL,
+  SCANNER_CMD_START,
+  SCANNER_CMD_STOP,
 } = require('../shared/actionTypes')
 
 let FileScanner, Prefs
 let _Scanner
 let _isScanQueued = true
 
-// attach start/stop handlers
-process.on('message', function ({ type, payload }) {
-  if (type === SCANNER_WORKER_SCAN) {
-    log.info('Media scan requested (restarting)')
-    _isScanQueued = true
-    cancelScan()
-  } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
-    log.info('Stopping media scan (user requested)')
-    _isScanQueued = false
-    cancelScan()
-  }
-})
-
 Database.open({ readonly: true, log: log.info }).then(db => {
   Prefs = require('./Prefs')
   FileScanner = require('./Scanner/FileScanner')
+
+  IPC.use({
+    [SCANNER_CMD_START]: async () => {
+      log.info('Media scan requested (restarting)')
+      _isScanQueued = true
+      cancelScan()
+    },
+    [SCANNER_CMD_STOP]: async () => {
+      log.info('Stopping media scan (user requested)')
+      _isScanQueued = false
+      cancelScan()
+    }
+  })
 
   startScan()
 })

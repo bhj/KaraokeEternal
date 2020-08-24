@@ -1,10 +1,15 @@
 #!/usr/bin/env node
 const childProcess = require('child_process')
 const Database = require('./lib/Database')
+const IPC = require('./lib/IPCBridge')
 const env = require('./lib/cli')()
 const log = require('./lib/logger')(`main[${process.pid}]`)
 const path = require('path')
 const refs = {}
+const {
+  SCANNER_CMD_START,
+  SCANNER_CMD_STOP,
+} = require('../shared/actionTypes')
 
 Object.keys(env).forEach(key => log.verbose(`${key} = ${env[key]}`))
 
@@ -18,24 +23,6 @@ process.on('unhandledRejection', (reason, p) => {
   log.error('Unhandled Rejection at: Promise', p, 'reason:', reason)
 })
 
-// parent process' actions -> child process
-process.on('serverWorker', function (action) {
-  const { payload, type } = action
-
-  if (refs.scanner) {
-    refs.scanner.send(action)
-  }
-
-  // @todo
-  // if (refs.electron) {
-  //   if (type === SERVER_WORKER_STATUS) {
-  //     return refs.electron.setStatus('url', payload.url)
-  //   } else if (type === SERVER_WORKER_ERROR) {
-  //     return refs.electron.setError(action.error)
-  //   }
-  // }
-})
-
 // detect electron
 if (process.versions.electron) {
   refs.electron = require('./electron.js')
@@ -43,7 +30,18 @@ if (process.versions.electron) {
 }
 
 Database.open({ readonly: false, log: log.info }).then(db => {
-  require('./serverWorker.js')(startScanner)
+  // process.on('serverWorker', function (action) {
+  //   if (refs.electron) {
+  //     if (type === SERVER_WORKER_STATUS) {
+  //       return refs.electron.setStatus('url', payload.url)
+  //     } else if (type === SERVER_WORKER_ERROR) {
+  //       return refs.electron.setError(action.error)
+  //     }
+  //   }
+  // })
+
+  // start web server
+  require('./serverWorker.js')(startScanner, stopScanner)
 })
 
 function startScanner () {
@@ -55,12 +53,18 @@ function startScanner () {
 
     refs.scanner.on('exit', (code, signal) => {
       log.info(`Media scanner exited (${signal || code})`)
+      IPC.unsubscribe(refs.scanner)
       delete refs.scanner
     })
 
-    // child process' actions -> parent process
-    refs.scanner.on('message', function (action) {
-      process.emit('scannerWorker', action)
-    })
+    IPC.subscribe(refs.scanner)
+  } else {
+    IPC.emit({ type: SCANNER_CMD_START })
+  }
+}
+
+function stopScanner () {
+  if (refs.scanner) {
+    IPC.emit({ type: SCANNER_CMD_STOP })
   }
 }

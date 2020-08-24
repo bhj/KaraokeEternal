@@ -3,8 +3,8 @@ import {
   PREFS_RECEIVE,
   PREFS_SET,
   PREFS_PUSH,
-  PREFS_REQUEST_SCAN,
-  PREFS_REQUEST_SCAN_CANCEL,
+  PREFS_REQ_SCANNER_START,
+  PREFS_REQ_SCANNER_STOP,
   SCANNER_WORKER_STATUS,
   _ERROR,
 } from 'shared/actionTypes'
@@ -65,13 +65,13 @@ export function requestScan () {
   return (dispatch, getState) => {
     // informational
     dispatch({
-      type: PREFS_REQUEST_SCAN,
+      type: PREFS_REQ_SCANNER_START,
     })
 
     return api('GET', '/scan')
       .catch(err => {
         dispatch({
-          type: PREFS_REQUEST_SCAN + '_ERROR',
+          type: PREFS_REQ_SCANNER_START + '_ERROR',
           error: err.message,
         })
       })
@@ -81,17 +81,17 @@ export function requestScan () {
 // ------------------------------------
 // request cancelation of media scan
 // ------------------------------------
-export function requestScanCancel () {
+export function requestScanStop () {
   return (dispatch, getState) => {
     // informational
     dispatch({
-      type: PREFS_REQUEST_SCAN_CANCEL,
+      type: PREFS_REQ_SCANNER_STOP,
     })
 
-    return api('GET', '/scan/cancel')
+    return api('GET', '/scan/stop')
       .catch(err => {
         dispatch({
-          type: PREFS_REQUEST_SCAN_CANCEL + '_ERROR',
+          type: PREFS_REQ_SCANNER_STOP + '_ERROR',
           error: err.message,
         })
       })
@@ -113,8 +113,8 @@ const ACTION_HANDLERS = {
   [SCANNER_WORKER_STATUS]: (state, { payload }) => ({
     ...state,
     isScanning: payload.isScanning,
-    updateText: payload.text,
-    updateProgress: payload.progress,
+    scannerPct: payload.pct,
+    scannerText: payload.text,
   }),
 }
 
@@ -124,9 +124,9 @@ const ACTION_HANDLERS = {
 const initialState = {
   isScanning: false,
   isReplayGainEnabled: false,
-  updateText: '',
-  updateProgress: 0,
   paths: { result: [], entities: {} },
+  scannerPct: 0,
+  scannerText: '',
 }
 
 export default function prefsReducer (state = initialState, action) {
