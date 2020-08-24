@@ -7,9 +7,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { LicenseWebpackPlugin } = require('license-webpack-plugin')
 const project = require('./project.config')
 
-const __DEV__ = project.env === 'development'
-const __TEST__ = project.env === 'test'
-const __PROD__ = project.env === 'production'
+const NODE_ENV = process.env.NODE_ENV || 'production'
+const __DEV__ = NODE_ENV === 'development'
+const __TEST__ = NODE_ENV === 'test'
+const __PROD__ = NODE_ENV === 'production'
 
 const config = {
   mode: __PROD__ ? 'production' : 'development',
@@ -39,7 +40,7 @@ const config = {
   module: { rules: [] },
   plugins: [
     new webpack.DefinePlugin(Object.assign({
-      'process.env': { NODE_ENV: JSON.stringify(project.env) },
+      'process.env': { NODE_ENV: JSON.stringify(NODE_ENV) },
       __DEV__,
       __TEST__,
       __PROD__,
@@ -49,7 +50,7 @@ const config = {
       __KF_URL_REPO__: JSON.stringify('https://github.com/bhj/karaoke-forever/'),
       __KF_URL_SPONSOR__: JSON.stringify('https://github.com/sponsors/bhj/'),
       __KF_COPYRIGHT__: JSON.stringify(`2019-${new Date().getFullYear()} RadRoot LLC`),
-    }, project.globals)),
+    })),
     new CaseSensitivePathsPlugin(),
     new MiniCssExtractPlugin({
       filename: __DEV__ ? '[name].css' : '[name].[hash].css',
