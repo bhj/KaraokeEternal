@@ -2,13 +2,15 @@
 const childProcess = require('child_process')
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
-const env = require('./lib/cli')()
+const env = require('./lib/cli')
 const log = require('./lib/logger')(`main[${process.pid}]`)
 const path = require('path')
 const refs = {}
 const {
   SCANNER_CMD_START,
   SCANNER_CMD_STOP,
+  SERVER_WORKER_ERROR,
+  SERVER_WORKER_STATUS,
 } = require('../shared/actionTypes')
 
 Object.keys(env).forEach(key => log.verbose(`${key} = ${env[key]}`))
@@ -30,18 +32,20 @@ if (process.versions.electron) {
 }
 
 Database.open({ readonly: false, log: log.info }).then(db => {
-  // process.on('serverWorker', function (action) {
-  //   if (refs.electron) {
-  //     if (type === SERVER_WORKER_STATUS) {
-  //       return refs.electron.setStatus('url', payload.url)
-  //     } else if (type === SERVER_WORKER_ERROR) {
-  //       return refs.electron.setError(action.error)
-  //     }
-  //   }
-  // })
+  if (refs.electron) {
+    process.on('serverWorker', action => {
+      const { type, payload } = action
+
+      if (type === SERVER_WORKER_STATUS) {
+        return refs.electron.setStatus('url', payload.url)
+      } else if (type === SERVER_WORKER_ERROR) {
+        return refs.electron.setError(action.error)
+      }
+    })
+  }
 
   // start web server
-  require('./serverWorker.js')(startScanner, stopScanner)
+  require('./serverWorker.js')({ env, startScanner, stopScanner })
 })
 
 function startScanner () {

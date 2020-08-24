@@ -47,4 +47,4 @@ function computeEnv () {
   return env
 }
 
-module.exports = computeEnv
+module.exports = computeEnv()

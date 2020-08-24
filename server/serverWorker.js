@@ -31,7 +31,7 @@ const {
   SERVER_WORKER_ERROR,
 } = require('../shared/actionTypes')
 
-async function serverWorker (startScanner, stopScanner) {
+async function serverWorker ({ env, startScanner, stopScanner }) {
   const jwtKey = await Prefs.getJwtKey()
   const app = new Koa()
 
@@ -162,7 +162,7 @@ async function serverWorker (startScanner, stopScanner) {
   server.on('error', function (err) {
     log.error(err)
 
-    process.emit({
+    process.emit('serverWorker', {
       type: SERVER_WORKER_ERROR,
       error: err.message,
     })
@@ -179,15 +179,15 @@ async function serverWorker (startScanner, stopScanner) {
   IPC.use(IPCLibraryActions(io))
   IPC.use(IPCMediaActions(io))
 
-  log.info(`Starting web server (host=${config.serverHost}; port=${config.serverPort})`)
+  log.info(`Starting web server (host=${env.KF_SERVER_HOST}; port=${env.KF_SERVER_PORT})`)
 
-  // success callback is added as a listener for the 'listening' event
-  server.listen(config.serverPort, config.serverHost, () => {
+  // success callback in 3rd arg
+  server.listen(env.KF_SERVER_PORT, env.KF_SERVER_HOST, () => {
     const port = server.address().port
     const url = `http://${getIPAddress()}` + (port === 80 ? '' : ':' + port)
     log.info(`Web server running at ${url}`)
 
-    process.emit({
+    process.emit('serverWorker', {
       type: SERVER_WORKER_STATUS,
       payload: { url },
     })
