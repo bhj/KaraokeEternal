@@ -17,11 +17,16 @@
   color: var(--text-color);
 }
 
-.cancel {
+.btn {
   cursor: pointer;
 }
 
-.cancelIcon {
+.cancel {
   fill: var(--btn-danger-bg-color);
   filter: var(--btn-danger-filter);
+}
+
+.close {
+  fill: var(--btn-active-bg-color);
+  filter: var(--btn-active-filter);
 }

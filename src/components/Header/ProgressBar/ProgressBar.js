@@ -41,8 +41,8 @@ export default class ProgressBar extends React.Component {
     return (
       <div styleName='container' style={{ backgroundSize: props.pct + '% 100%' }}>
         <p styleName='text'>{state.isCanceling ? 'Stopping...' : props.text}</p>
-        <div styleName='cancel' onClick={this.handleCancelClick}>
-          <Icon icon='CLEAR' size={40} styleName='cancelIcon' />
+        <div styleName='btn' onClick={this.handleCancelClick}>
+          <Icon icon='CLEAR' size={40} styleName={props.isActive ? 'cancel' : 'close'} />
         </div>
       </div>
     )
