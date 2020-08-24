@@ -1,4 +1,4 @@
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 const log = require('../lib/logger')('Library')
 const Media = require('../Media')
@@ -140,11 +140,11 @@ class Library {
         `
         const res = await db.run(String(query), query.parameters)
 
-        if (!Number.isInteger(res.stmt.lastID)) {
+        if (!Number.isInteger(res.lastID)) {
           throw new Error('invalid artistId after insert')
         }
 
-        match.artistId = res.stmt.lastID
+        match.artistId = res.lastID
         match.artist = parsed.artist
         match.artistNorm = parsed.artistNorm
       }
@@ -178,11 +178,11 @@ class Library {
         `
         const res = await db.run(String(query), query.parameters)
 
-        if (!Number.isInteger(res.stmt.lastID)) {
+        if (!Number.isInteger(res.lastID)) {
           throw new Error('invalid songId after insert')
         }
 
-        match.songId = res.stmt.lastID
+        match.songId = res.lastID
         match.title = parsed.title
         match.titleNorm = parsed.titleNorm
       }

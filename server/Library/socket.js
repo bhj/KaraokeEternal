@@ -1,4 +1,4 @@
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 const Library = require('./Library')
 const {
@@ -24,7 +24,7 @@ const ACTION_HANDLERS = {
     // success
     acknowledge({ type: STAR_SONG + _SUCCESS })
 
-    if (res.stmt.changes) {
+    if (res.changes) {
       // update star count version
       Library.setStarCountsVersion()
 
@@ -49,7 +49,7 @@ const ACTION_HANDLERS = {
     // success
     acknowledge({ type: UNSTAR_SONG + _SUCCESS })
 
-    if (res.stmt.changes) {
+    if (res.changes) {
       // update star count version
       Library.setStarCountsVersion()
 

@@ -3,7 +3,7 @@
   align-items: center;
   height: 40px;
   width: 100%;
-  background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-to-bg-color));
+  background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-from-bg-color));
   background-repeat: no-repeat;
 }
 
@@ -17,11 +17,16 @@
   color: var(--text-color);
 }
 
-.cancel {
-  padding-right: 10px;
+.btn {
+  cursor: pointer;
 }
 
-.cancelIcon {
+.cancel {
   fill: var(--btn-danger-bg-color);
   filter: var(--btn-danger-filter);
+}
+
+.close {
+  fill: var(--btn-active-bg-color);
+  filter: var(--btn-active-filter);
 }

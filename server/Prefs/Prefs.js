@@ -1,5 +1,5 @@
 const path = require('path')
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 const crypto = require('crypto')
 const log = require('../lib/logger')('Prefs')
@@ -56,7 +56,7 @@ class Prefs {
       VALUES (${key}, ${JSON.stringify(data)})
     `
     const res = await db.run(String(query), query.parameters)
-    return res.stmt.changes === 1
+    return res.changes === 1
   }
 
   /**
@@ -84,11 +84,11 @@ class Prefs {
     `
     const res = await db.run(String(query), query.parameters)
 
-    if (!Number.isInteger(res.stmt.lastID)) {
+    if (!Number.isInteger(res.lastID)) {
       throw new Error('invalid lastID from path insert')
     }
 
-    return res.stmt.lastID
+    return res.lastID
   }
 
   /**
@@ -140,7 +140,7 @@ class Prefs {
     `
     const res = await db.run(String(query), query.parameters)
 
-    if (res.stmt.changes) return jwtKey
+    if (res.changes) return jwtKey
   }
 }
 

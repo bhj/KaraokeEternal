@@ -1,36 +1,34 @@
-const config = require('../project.config')
+const Database = require('./lib/Database')
+const IPC = require('./lib/IPCBridge')
 const log = require('./lib/logger')(`scanner[${process.pid}]`)
-const sqlite = require('sqlite')
-const Prefs = require('./Prefs')
-const FileScanner = require('./Scanner/FileScanner')
 const {
-  SCANNER_WORKER_SCAN,
-  SCANNER_WORKER_SCAN_CANCEL,
+  SCANNER_CMD_START,
+  SCANNER_CMD_STOP,
 } = require('../shared/actionTypes')
 
+let FileScanner, Prefs
 let _Scanner
 let _isScanQueued = true
 
-log.info('Opening database file %s', config.database)
+Database.open({ readonly: true, log: log.info }).then(db => {
+  Prefs = require('./Prefs')
+  FileScanner = require('./Scanner/FileScanner')
 
-Promise.resolve()
-  .then(() => sqlite.open(config.database, { Promise }))
-  .then(() => {
-    // attach start/stop handlers
-    process.on('message', function ({ type, payload }) {
-      if (type === SCANNER_WORKER_SCAN) {
-        log.info('Media scan requested (restarting)')
-        _isScanQueued = true
-        cancelScan()
-      } else if (type === SCANNER_WORKER_SCAN_CANCEL) {
-        log.info('Stopping media scan (user requested)')
-        _isScanQueued = false
-        cancelScan()
-      }
-    })
-
-    return startScan()
+  IPC.use({
+    [SCANNER_CMD_START]: async () => {
+      log.info('Media scan requested (restarting)')
+      _isScanQueued = true
+      cancelScan()
+    },
+    [SCANNER_CMD_STOP]: async () => {
+      log.info('Stopping media scan (user requested)')
+      _isScanQueued = false
+      cancelScan()
+    }
   })
+
+  startScan()
+})
 
 async function startScan () {
   log.info('Starting media scan')

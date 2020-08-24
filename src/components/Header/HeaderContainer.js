@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import Header from './Header'
 import { createSelector } from 'reselect'
-import { requestScanCancel } from 'store/modules/prefs'
+import { requestScanStop } from 'store/modules/prefs'
 import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
 
 const getIsAtQueueEnd = (state) => state.status.isAtQueueEnd
@@ -53,13 +53,13 @@ const mapStateToProps = (state) => {
     isPlayer: state.location.pathname === '/player',
     isPlayerPresent: state.status.isPlayerPresent,
     isScanning: state.prefs.isScanning,
-    updateText: state.prefs.updateText,
-    updateProgress: state.prefs.updateProgress,
+    scannerText: state.prefs.scannerText,
+    scannerPct: state.prefs.scannerPct,
   }
 }
 
 const mapActionCreators = {
-  requestScanCancel,
+  requestScanStop,
 }
 
 export default connect(mapStateToProps, mapActionCreators, null, { forwardRef: true })(Header)

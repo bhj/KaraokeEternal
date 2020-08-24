@@ -1,4 +1,4 @@
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 const Queue = require('./Queue')
 const Rooms = require('../Rooms')
@@ -34,7 +34,7 @@ const ACTION_HANDLERS = {
     `
     const res = await db.run(String(query), query.parameters)
 
-    if (res.stmt.changes !== 1) {
+    if (res.changes !== 1) {
       throw new Error('Could not add song to queue')
     }
 
@@ -61,7 +61,7 @@ const ACTION_HANDLERS = {
     `
     const res = await db.run(String(query), query.parameters)
 
-    if (!res.stmt.changes) {
+    if (!res.changes) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         error: 'Could not remove queueId: ' + payload.queueId,

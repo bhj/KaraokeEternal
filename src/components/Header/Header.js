@@ -19,11 +19,12 @@ const Header = React.forwardRef((props, ref) => {
         <PlaybackCtrl />
       }
 
-      {isAdmin && props.isScanning &&
+      {isAdmin &&
         <ProgressBar
-          text={props.updateText}
-          progress={props.updateProgress}
-          onCancel={props.requestScanCancel}
+          isActive={props.isScanning}
+          onCancel={props.requestScanStop}
+          pct={props.scannerPct}
+          text={props.scannerText}
         />
       }
 
@@ -44,10 +45,10 @@ Header.propTypes = {
   isUpNow: PropTypes.bool.isRequired,
   wait: PropTypes.number,
   isScanning: PropTypes.bool.isRequired,
-  updateText: PropTypes.string.isRequired,
-  updateProgress: PropTypes.number.isRequired,
+  scannerText: PropTypes.string.isRequired,
+  scannerPct: PropTypes.number.isRequired,
   // actions
-  requestScanCancel: PropTypes.func.isRequired,
+  requestScanStop: PropTypes.func.isRequired,
 }
 
 export default Header

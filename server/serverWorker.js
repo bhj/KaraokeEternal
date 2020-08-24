@@ -1,4 +1,3 @@
-const sqlite = require('sqlite')
 const log = require('./lib/logger')(`server[${process.pid}]`)
 const path = require('path')
 const config = require('../project.config')
@@ -15,7 +14,6 @@ const koaLogger = require('koa-logger')
 const koaMount = require('koa-mount')
 const koaRange = require('koa-range')
 const koaStatic = require('koa-static')
-const app = new Koa()
 
 const Prefs = require('./Prefs')
 const libraryRouter = require('./Library/router')
@@ -25,182 +23,175 @@ const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
+const IPC = require('./lib/IPCBridge')
+const IPCLibraryActions = require('./Library/ipc')
 const IPCMediaActions = require('./Media/ipc')
-const IPCPrefsActions = require('./Prefs/ipc')
-
 const {
   SERVER_WORKER_STATUS,
   SERVER_WORKER_ERROR,
 } = require('../shared/actionTypes')
 
-// Koa error handling
-app.use(async (ctx, next) => {
-  try {
-    await next()
-  } catch (err) {
-    ctx.status = err.status || 500
-    ctx.body = err.message
-    ctx.app.emit('error', err, ctx)
-  }
-})
+async function serverWorker (startScanner, stopScanner) {
+  const jwtKey = await Prefs.getJwtKey()
+  const app = new Koa()
 
-app.on('error', (err, ctx) => {
-  if (err.code === 'EPIPE') {
-    // these are common since browsers make multiple requests for media files
-    log.verbose(err.message)
-    return
-  }
+  // server error handler
+  app.on('error', (err, ctx) => {
+    if (err.code === 'EPIPE') {
+      // these are common since browsers make multiple requests for media files
+      log.verbose(err.message)
+      return
+    }
 
-  // silence 4xx response "errors" (koa-logger should show these anyway)
-  if (ctx.response && ctx.response.status.toString().startsWith('4')) {
-    return
-  }
+    // silence 4xx response "errors" (koa-logger should show these anyway)
+    if (ctx.response && ctx.response.status.toString().startsWith('4')) {
+      return
+    }
 
-  if (err.stack) log.error(err.stack)
-  else log.error(err)
-})
+    if (err.stack) log.error(err.stack)
+    else log.error(err)
+  })
 
-log.info('Opening database file %s', config.database)
-
-Promise.resolve()
-  .then(() => sqlite.open(config.database, { Promise }))
-  .then(db => db.migrate({
-    migrationsPath: path.join(config.basePath, 'server', 'lib', 'schemas'),
-  }))
-  .then(() => Prefs.getJwtKey())
-  .then(jwtKey => {
-    // koa request/response logging
-    app.use(koaLogger((str, args) => {
-      if (args.length === 6 && args[3] >= 500) {
-        // 5xx status response
-        log.error(str)
-      } else {
-        log.verbose(str)
-      }
-    }))
-
-    app.use(koaFavicon(path.join(config.assetPath, 'favicon.ico')))
-    app.use(koaRange)
-    app.use(koaBody({ multipart: true }))
-
-    // all http (koa) requests
-    app.use(async (ctx, next) => {
-      ctx.io = io
-      ctx.jwtKey = jwtKey
-
-      // verify jwt
-      try {
-        const { kfToken } = parseCookie(ctx.request.header.cookie)
-        ctx.user = jwtVerify(kfToken, jwtKey)
-      } catch (err) {
-        ctx.user = {
-          userId: null,
-          username: null,
-          name: null,
-          isAdmin: false,
-          roomId: null,
-        }
-      }
-
+  // middleware error handler
+  app.use(async (ctx, next) => {
+    try {
       await next()
-    })
+    } catch (err) {
+      ctx.status = err.status || 500
+      ctx.body = err.message
+      ctx.app.emit('error', err, ctx)
+    }
+  })
 
-    // http api (koa-router) endpoints
-    app.use(libraryRouter.routes())
-    app.use(mediaRouter.routes())
-    app.use(prefsRouter.routes())
-    app.use(roomsRouter.routes())
-    app.use(userRouter.routes())
+  // http request/response logging
+  app.use(koaLogger((str, args) => (args.length === 6 && args[3] >= 500) ? log.error(str) : log.verbose(str)))
 
-    // @todo these could be read dynamically from src/routes
-    // but should probably wait for react-router upgrade?
-    const rewriteRoutes = ['account', 'library', 'queue', 'player']
-    const indexFile = path.join(config.buildPath, 'index.html')
+  app.use(koaFavicon(path.join(config.assetPath, 'favicon.ico')))
+  app.use(koaRange)
+  app.use(koaBody({ multipart: true }))
 
-    if (config.env === 'development') {
-      log.info('Enabling webpack dev and HMR middleware')
-      const webpack = require('webpack')
-      const webpackConfig = require('../webpack.config')
-      const compiler = webpack(webpackConfig)
-      const koaWebpack = require('koa-webpack')
+  // all http requests
+  app.use(async (ctx, next) => {
+    ctx.io = io
+    ctx.jwtKey = jwtKey
+    ctx.startScanner = startScanner
+    ctx.stopScanner = stopScanner
 
-      koaWebpack({ compiler })
-        .then((middleware) => {
-          // webpack-dev-middleware and webpack-hot-client
-          app.use(middleware)
+    // verify jwt
+    try {
+      const { kfToken } = parseCookie(ctx.request.header.cookie)
+      ctx.user = jwtVerify(kfToken, jwtKey)
+    } catch (err) {
+      ctx.user = {
+        userId: null,
+        username: null,
+        name: null,
+        isAdmin: false,
+        roomId: null,
+      }
+    }
 
-          // serve /assets since webpack-dev-server is unaware of this folder
-          app.use(koaMount('/assets', koaStatic(config.assetPath)))
+    await next()
+  })
 
-          // "rewrite" top level SPA routes to index.html
-          app.use(async (ctx, next) => {
-            const route = ctx.request.path.substring(1).split('/')[0]
-            if (!rewriteRoutes.includes(route)) return next()
+  // http api (koa-router) endpoints
+  app.use(libraryRouter.routes())
+  app.use(mediaRouter.routes())
+  app.use(prefsRouter.routes())
+  app.use(roomsRouter.routes())
+  app.use(userRouter.routes())
 
-            ctx.body = await new Promise(function (resolve, reject) {
-              compiler.outputFileSystem.readFile(indexFile, (err, result) => {
-                if (err) { return reject(err) }
-                return resolve(result)
-              })
+  // @todo these could be read dynamically from src/routes
+  // but should probably wait for react-router upgrade?
+  const rewriteRoutes = ['account', 'library', 'queue', 'player']
+  const indexFile = path.join(config.buildPath, 'index.html')
+
+  if (config.env === 'development') {
+    log.info('Enabling webpack dev and HMR middleware')
+    const webpack = require('webpack')
+    const webpackConfig = require('../webpack.config')
+    const compiler = webpack(webpackConfig)
+    const koaWebpack = require('koa-webpack')
+
+    koaWebpack({ compiler })
+      .then((middleware) => {
+        // webpack-dev-middleware and webpack-hot-client
+        app.use(middleware)
+
+        // serve /assets since webpack-dev-server is unaware of this folder
+        app.use(koaMount('/assets', koaStatic(config.assetPath)))
+
+        // "rewrite" top level SPA routes to index.html
+        app.use(async (ctx, next) => {
+          const route = ctx.request.path.substring(1).split('/')[0]
+          if (!rewriteRoutes.includes(route)) return next()
+
+          ctx.body = await new Promise(function (resolve, reject) {
+            compiler.outputFileSystem.readFile(indexFile, (err, result) => {
+              if (err) { return reject(err) }
+              return resolve(result)
             })
-            ctx.set('content-type', 'text/html')
-            ctx.status = 200
           })
+          ctx.set('content-type', 'text/html')
+          ctx.status = 200
         })
-    } else {
-      // production mode
-      // serve build folder as webroot
-      app.use(koaStatic(config.buildPath))
-      app.use(koaMount('/assets', koaStatic(config.assetPath)))
-
-      // "rewrite" top level SPA routes to index.html
-      const readFile = promisify(fs.readFile)
-
-      app.use(async (ctx, next) => {
-        const route = ctx.request.path.substring(1).split('/')[0]
-        if (!rewriteRoutes.includes(route)) return next()
-
-        ctx.body = await readFile(indexFile)
-        ctx.set('content-type', 'text/html')
-        ctx.status = 200
       })
-    } // end if
+  } else {
+    // production mode
+    // serve build folder as webroot
+    app.use(koaStatic(config.buildPath))
+    app.use(koaMount('/assets', koaStatic(config.assetPath)))
 
-    // create http server
-    const server = http.createServer(app.callback())
+    // "rewrite" top level SPA routes to index.html
+    const readFile = promisify(fs.readFile)
 
-    // http server error handler
-    server.on('error', function (err) {
-      log.error(err)
+    app.use(async (ctx, next) => {
+      const route = ctx.request.path.substring(1).split('/')[0]
+      if (!rewriteRoutes.includes(route)) return next()
 
-      process.send({
-        type: SERVER_WORKER_ERROR,
-        error: err.message,
-      })
+      ctx.body = await readFile(indexFile)
+      ctx.set('content-type', 'text/html')
+      ctx.status = 200
+    })
+  } // end if
 
-      // not much we can do without a working server
-      process.exit(1)
+  // create http server
+  const server = http.createServer(app.callback())
+
+  // http server error handler
+  server.on('error', function (err) {
+    log.error(err)
+
+    process.emit({
+      type: SERVER_WORKER_ERROR,
+      error: err.message,
     })
 
-    // create socket.io server and attach handlers
-    const io = new SocketIO(server)
-    socketActions(io, jwtKey)
+    // not much we can do without a working server
+    process.exit(1)
+  })
 
-    // attach IPC action handlers
-    IPCMediaActions(io)
-    IPCPrefsActions(io)
+  // create socket.io server and attach handlers
+  const io = new SocketIO(server)
+  socketActions(io, jwtKey)
 
-    log.info(`Starting web server (host=${config.serverHost}; port=${config.serverPort})`)
+  // attach IPC action handlers
+  IPC.use(IPCLibraryActions(io))
+  IPC.use(IPCMediaActions(io))
 
-    // success callback is added as a listener for the 'listening' event
-    server.listen(config.serverPort, config.serverHost, () => {
-      const port = server.address().port
-      const url = `http://${getIPAddress()}` + (port === 80 ? '' : ':' + port)
-      log.info(`Web server running at ${url}`)
+  log.info(`Starting web server (host=${config.serverHost}; port=${config.serverPort})`)
 
-      process.send({
-        type: SERVER_WORKER_STATUS,
-        payload: { url },
-      })
+  // success callback is added as a listener for the 'listening' event
+  server.listen(config.serverPort, config.serverHost, () => {
+    const port = server.address().port
+    const url = `http://${getIPAddress()}` + (port === 80 ? '' : ':' + port)
+    log.info(`Web server running at ${url}`)
+
+    process.emit({
+      type: SERVER_WORKER_STATUS,
+      payload: { url },
     })
   })
+}
+
+module.exports = serverWorker

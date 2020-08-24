@@ -3,6 +3,10 @@
 ### Changed
 
 - **(app)** **(breaking)** Browsers without the [ResizeObserver API](https://caniuse.com/#feat=mdn-api_resizeobserver) are no longer supported
+- **(app)** Summary is now shown following a media scan
+- **(server)** Uses one less process/helper
+- **(server)** Media scanner process now has read-only database access
+- **(server)** Fixed potential SQLITE_BUSY errors while scanning media
 
 ## v0.8.0 (2020-07-03)
 

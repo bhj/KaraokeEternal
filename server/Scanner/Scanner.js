@@ -1,4 +1,4 @@
-const throttle = require('@jcoreio/async-throttle')
+const IPC = require('../lib/IPCBridge')
 const {
   SCANNER_WORKER_STATUS,
 } = require('../../shared/actionTypes')
@@ -14,12 +14,19 @@ class Scanner {
   }
 
   getStatusEmitter () {
-    return throttle((text, progress) => {
-      process.send({
+    return (text, pct, isScanning = true) => {
+      IPC.emit({
         type: SCANNER_WORKER_STATUS,
-        payload: { text, progress },
+        payload: {
+          isScanning,
+          pct,
+          text,
+        },
+        meta: {
+          noAck: true,
+        }
       })
-    }, 1000)
+    }
   }
 }
 

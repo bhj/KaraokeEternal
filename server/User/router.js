@@ -2,7 +2,7 @@ const { promisify } = require('util')
 const fs = require('fs')
 const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 const jwtSign = require('jsonwebtoken').sign
 const bcrypt = require('../lib/bcrypt')
@@ -175,7 +175,7 @@ router.post('/setup', async (ctx, next) => {
   const res = await db.run(String(query), query.parameters)
 
   // sign in to the new room
-  creds.roomId = res.stmt.lastID
+  creds.roomId = res.lastID
 
   // unset isFirstRun
   {

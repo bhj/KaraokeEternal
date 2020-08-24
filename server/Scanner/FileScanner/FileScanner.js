@@ -5,11 +5,17 @@ const getFiles = require('./getFiles')
 const getConfig = require('./getConfig')
 const getPerms = require('../../lib/getPermutations')
 const getCdgName = require('../../lib/getCdgName')
-const Library = require('../../Library')
 const Media = require('../../Media')
-const IPCMedia = require('../IPCMedia')
 const MetaParser = require('../MetaParser')
 const Scanner = require('../Scanner')
+const IPC = require('../../lib/IPCBridge')
+const {
+  LIBRARY_MATCH_SONG,
+  MEDIA_ADD,
+  MEDIA_CLEANUP,
+  MEDIA_REMOVE,
+  MEDIA_UPDATE,
+} = require('../../../shared/actionTypes')
 
 const searchExts = ['mp4', 'm4a', 'mp3']
 const searchExtPerms = searchExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
@@ -22,9 +28,10 @@ class FileScanner extends Scanner {
 
   async scan () {
     const files = new Map() // pathId => [files]
-    const validMedia = [] // mediaIds
+    const valid = [] // mediaIds
     let i = 0 // file counter
-    let total = 0 // total num. files
+    let numTotal = 0
+    let numAdded = 0
 
     // get list of files from all paths
     for (const pathId of this.paths.result) {
@@ -36,9 +43,12 @@ class FileScanner extends Scanner {
       try {
         const list = await getFiles(basePath, file => searchExtPerms.some(ext => file.endsWith('.' + ext)))
         files.set(pathId, list)
-        total += list.length
+        numTotal += list.length
 
-        log.info('  => found %s files with valid extensions %s', list.length, JSON.stringify(searchExts))
+        log.info('  => found %s files with valid extensions %s',
+          list.length.toLocaleString(),
+          JSON.stringify(searchExts)
+        )
       } catch (err) {
         log.error(`  => ${err.message} (path offline)`)
       }
@@ -48,15 +58,15 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Processing %s files', total)
+    log.info('Processing %s files', numTotal.toLocaleString())
 
     for (const [pathId, list] of files) {
       let lastDir
 
       for (const item of list) {
         i++
-        log.info('[%s/%s] %s', i, total, item.file)
-        this.emitStatus(`Scanning media (${i.toLocaleString()} of ${total.toLocaleString()})`, (i / total) * 100)
+        log.info('[%s/%s] %s', i, numTotal, item.file)
+        this.emitStatus(`Scanning media (${i.toLocaleString()} of ${numTotal.toLocaleString()})`, (i / numTotal) * 100)
 
         const dir = path.dirname(item.file)
 
@@ -70,21 +80,29 @@ class FileScanner extends Scanner {
 
         // process file
         try {
-          const mediaId = await this.process(item, pathId)
-          validMedia.push(mediaId) // success
+          const res = await this.process(item, pathId)
+
+          // success
+          valid.push(res.mediaId)
+          if (res.isNew) numAdded++
         } catch (err) {
           log.warn(err.message + ': ' + item.file)
         }
 
         if (this.isCanceling) {
+          this.emitStatus(`Stopped (${numAdded} new media)`, 100, false)
           return
         }
       } // end for
     } // end for
 
-    log.info('Processing finished with %s valid media entries', validMedia.length)
+    log.info('Processed %s valid media files', valid.length.toLocaleString())
 
-    await this.removeInvalid(validMedia, Array.from(files.keys()))
+    const numRemoved = await this.removeInvalid(valid, Array.from(files.keys()))
+
+    this.emitStatus(`Finished (${numAdded} new, ${numRemoved} removed, ${valid.length} total media)`, 100, false)
+
+    await IPC.req({ type: MEDIA_CLEANUP })
   }
 
   async process (item, pathId) {
@@ -112,7 +130,7 @@ class FileScanner extends Scanner {
     })
 
     // get artistId and songId
-    const match = await Library.matchSong(parsed)
+    const match = await IPC.req({ type: LIBRARY_MATCH_SONG, payload: parsed })
 
     const media = {
       songId: match.songId,
@@ -151,10 +169,13 @@ class FileScanner extends Scanner {
       })
 
       if (Object.keys(diff).length) {
-        await IPCMedia.update({
-          mediaId: row.mediaId,
-          dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
-          ...diff,
+        await IPC.req({
+          type: MEDIA_UPDATE,
+          payload: {
+            mediaId: row.mediaId,
+            dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
+            ...diff,
+          }
         })
 
         log.info('  => updated: %s', Object.keys(diff).join(', '))
@@ -162,16 +183,18 @@ class FileScanner extends Scanner {
         log.info('  => ok')
       }
 
-      return row.mediaId
+      return { mediaId: row.mediaId, isNew: false }
     } // end if
 
     // new media
-    // -------------------------------
+    // ---------
     media.dateAdded = Math.round(new Date().getTime() / 1000) // seconds
     log.info('  => new: %s', JSON.stringify(match))
 
-    // resolves to a mediaId
-    return IPCMedia.add(media)
+    return {
+      mediaId: await IPC.req({ type: MEDIA_ADD, payload: media }),
+      isNew: true
+    }
   }
 
   async removeInvalid (validMedia = [], validPaths = []) {
@@ -192,10 +215,10 @@ class FileScanner extends Scanner {
     log.info(`Found ${invalidMedia.length} invalid media entries`)
 
     if (invalidMedia.length) {
-      await IPCMedia.remove(invalidMedia)
+      await IPC.req({ type: MEDIA_REMOVE, payload: invalidMedia })
     }
 
-    await IPCMedia.cleanup()
+    return invalidMedia.length
   }
 }
 

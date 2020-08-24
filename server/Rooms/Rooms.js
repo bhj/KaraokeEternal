@@ -1,5 +1,5 @@
 const bcrypt = require('../lib/bcrypt')
-const db = require('sqlite')
+const db = require('../lib/Database').db
 const sql = require('sqlate')
 
 class Rooms {
