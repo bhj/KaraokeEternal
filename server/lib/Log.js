@@ -15,10 +15,8 @@ const colors = {
 log.transports.console.level = 'debug'
 log.transports.console.format = function (msg) {
   const text = util.format.apply(null, msg.data)
-  return colors[msg.level] +
-    `${msg.date.toLocaleString()} [${msg.level}] ` +
-    colors.reset +
-    text
+  const lvl = ('[' + msg.level + ']').padStart(9, ' ')
+  return `${colors[msg.level]}${msg.date.toLocaleString()} ${lvl}${colors.reset} ${text}`
 }
 
 // file defaults
@@ -30,16 +28,16 @@ log.transports.file.format = (msg) => {
 }
 
 class Log {
-  static setLevel (transport, userLevel, defaultLevel) {
+  static set (transport, userLevel, defaultLevel) {
     if (typeof userLevel !== 'number') userLevel = parseInt(userLevel, 10)
 
-    // use defaultLevel if user-provided value is invalid
+    // resolve level by using the default if the user-provided value is invalid
     if (isNaN(userLevel) || typeof _levels[userLevel] === 'undefined') {
-      log.transports[transport].level = defaultLevel
-      return this
+      log.transports[transport].level = _levels[defaultLevel]
+    } else {
+      log.transports[transport].level = _levels[userLevel]
     }
 
-    log.transports[transport].level = _levels[userLevel]
     return this
   }
 
