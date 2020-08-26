@@ -1,5 +1,6 @@
 const log = require('./lib/Log')
-  .set('console')
+  .setLevel('console', process.env.KF_SCANNER_CONSOLE_LEVEL, 'verbose')
+  .setLevel('file', process.env.KF_SCANNER_LOG_LEVEL, 'info')
   .getLogger(`scanner[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')

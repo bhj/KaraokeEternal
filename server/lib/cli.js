@@ -1,26 +1,48 @@
 let _app
 const options = {
-  loglevel: 'KF_LOG_LEVEL',
+  scannerConsoleLevel: 'KF_SCANNER_CONSOLE_LEVEL',
+  scannerLogLevel: 'KF_SCANNER_LOG_LEVEL',
+  serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
+  serverLogLevel: 'KF_SERVER_LOG_LEVEL',
   port: 'KF_SERVER_PORT',
 }
 
 const yargs = require('yargs')
   .version(false) // disable default handler
   .command('scanonly', 'Run a media scan on server startup, then exit when finished')
-  .option('l', {
-    alias: 'loglevel',
-    describe: 'Log file level (0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug) (default=2)',
-    requiresArg: true,
-  })
   .option('p', {
     alias: 'port',
-    describe: 'Web server port (default=0/auto)',
+    describe: 'Web server port (default=auto)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('scannerConsoleLevel', {
+    describe: 'Media scanner console level (default=4)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('scannerLogLevel', {
+    describe: 'Media scanner log file level (default=3)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('serverConsoleLevel', {
+    describe: 'Web server console level (default=4)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('serverLogLevel', {
+    describe: 'Web server log file level (default=3)',
+    number: true,
     requiresArg: true,
   })
   .option('v', {
     alias: 'version',
     describe: 'Output the Karaoke Forever Server version and exit',
   })
+  .usage('$0')
+  .usage('  Some options use the following numeric levels:')
+  .usage('  0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug')
 
 let argv = yargs.argv
 

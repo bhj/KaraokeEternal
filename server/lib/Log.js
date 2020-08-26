@@ -1,10 +1,7 @@
 const log = require('electron-log')
-log.transports.file.level = false // disable by default
-log.transports.console.level = false // disable by default
-
+const _levels = [false, 'error', 'warn', 'info', 'verbose', 'debug']
 const util = require('util')
 const stripAnsi = require('strip-ansi')
-const levels = [false, 'error', 'warn', 'info', 'verbose', 'debug']
 const colors = {
   error: '\x1b[1;31m', // red
   warn: '\x1b[1;33m', // yellow
@@ -14,11 +11,8 @@ const colors = {
   reset: '\x1b[0m',
 }
 
-log.transports.file.format = (msg) => {
-  const text = stripAnsi(util.format.apply(null, msg.data))
-  return `${msg.date.toLocaleString()} [${msg.level}] ${text}`
-}
-
+// console defaults
+log.transports.console.level = 'debug'
 log.transports.console.format = function (msg) {
   const text = util.format.apply(null, msg.data)
   return colors[msg.level] +
@@ -27,21 +21,29 @@ log.transports.console.format = function (msg) {
     text
 }
 
-if (process.env.KF_CHILD_PROCESS) {
-  log.transports.file.fileName = process.env.KF_CHILD_PROCESS + '.log'
+// file defaults
+log.transports.file.level = false
+log.transports.file.fileName = (process.env.KF_CHILD_PROCESS || 'server') + '.log'
+log.transports.file.format = (msg) => {
+  const text = stripAnsi(util.format.apply(null, msg.data))
+  return `${msg.date.toLocaleString()} [${msg.level}] ${text}`
 }
 
 class Log {
-  static set (transport, level = Infinity) {
-    log.transports[transport].level = level
+  static setLevel (transport, userLevel, defaultLevel) {
+    if (typeof userLevel !== 'number') userLevel = parseInt(userLevel, 10)
+
+    // use defaultLevel if user-provided value is invalid
+    if (isNaN(userLevel) || typeof _levels[userLevel] === 'undefined') {
+      log.transports[transport].level = defaultLevel
+      return this
+    }
+
+    log.transports[transport].level = _levels[userLevel]
     return this
   }
 
   static getLogger (prefix) {
-    if (log.transports.file.level === false && log.transports.console.level === false) {
-      throw new Error('no open log transports')
-    }
-
     return {
       error: (txt, ...args) => log.error(prefix + ': ' + txt, ...args),
       warn: (txt, ...args) => log.warn(prefix + ': ' + txt, ...args),
