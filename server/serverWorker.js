@@ -179,6 +179,11 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   IPC.use(IPCLibraryActions(io))
   IPC.use(IPCMediaActions(io))
 
+  // nothing left to do if we're only scanning
+  if (env.KF_SERVER_SCAN_ONLY) {
+    return
+  }
+
   log.info(`Starting web server (host=${env.KF_SERVER_HOST}; port=${env.KF_SERVER_PORT})`)
 
   // success callback in 3rd arg
