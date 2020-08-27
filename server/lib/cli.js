@@ -1,4 +1,7 @@
-let _app
+const env = {
+  NODE_ENV: process.env.NODE_ENV,
+}
+
 const options = {
   scannerConsoleLevel: 'KF_SCANNER_CONSOLE_LEVEL',
   scannerLogLevel: 'KF_SCANNER_LOG_LEVEL',
@@ -46,6 +49,7 @@ const yargs = require('yargs')
 
 let argv = yargs.argv
 
+let _app
 if (process.versions.electron) {
   _app = require('electron').app
 
@@ -60,22 +64,18 @@ if (argv.version) {
   process.exit(0)
 }
 
-// Sets environment variables for the current process based on CLI args.
-// Returns an object of env vars ready to hand to child_process.fork()
-function computeEnv () {
-  const env = { NODE_ENV: process.env.NODE_ENV }
-
-  // options set via CLI take precendence over env vars
-  Object.keys(options).forEach(key => {
-    if (typeof argv[key] !== 'undefined') {
-      env[options[key]] = argv[key]
-      process.env[options[key]] = argv[key]
-    } else if (process.env[options[key]]) {
-      env[options[key]] = process.env[options[key]]
-    }
-  })
-
-  return env
+if (argv._.includes('scanonly')) {
+  env.KF_SERVER_SCAN_ONLY = true
 }
 
-module.exports = computeEnv()
+// settings via CLI take precendence over env vars
+Object.keys(options).forEach(key => {
+  if (typeof argv[key] !== 'undefined') {
+    env[options[key]] = argv[key]
+    process.env[options[key]] = argv[key]
+  } else if (process.env[options[key]]) {
+    env[options[key]] = process.env[options[key]]
+  }
+})
+
+module.exports = env

@@ -49,6 +49,10 @@ Database.open({ readonly: false, log: log.info }).then(db => {
 
   // start web server
   require('./serverWorker.js')({ env, startScanner, stopScanner })
+
+  if (env.KF_SERVER_SCAN_ONLY) {
+    startScanner()
+  }
 })
 
 function startScanner () {
@@ -62,6 +66,11 @@ function startScanner () {
       log.info(`Media scanner exited (${signal || code})`)
       IPC.removeChild(refs.scanner)
       delete refs.scanner
+
+      if (env.KF_SERVER_SCAN_ONLY) {
+        log.info('SCAN_ONLY: Exiting')
+        process.exit()
+      }
     })
 
     IPC.addChild(refs.scanner)
