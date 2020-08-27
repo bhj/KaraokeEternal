@@ -30,11 +30,11 @@ process.on('unhandledRejection', (reason, p) => {
 
 // detect electron
 if (process.versions.electron) {
-  refs.electron = require('./electron.js')
-  env.KF_USER_PATH = refs.electron.app.getPath('userData')
+  refs.electron = require('./lib/electron.js')({ env })
+  env.KF_SERVER_PATH_DATA = refs.electron.app.getPath('userData')
 }
 
-Database.open({ readonly: false, log: log.info }).then(db => {
+Database.open({ readonly: false, env }).then(db => {
   if (refs.electron) {
     process.on('serverWorker', action => {
       const { type, payload } = action
@@ -68,7 +68,7 @@ function startScanner () {
       delete refs.scanner
 
       if (env.KF_SERVER_SCAN_ONLY) {
-        log.info('SCAN_ONLY: Exiting')
+        log.info('SCAN_ONLY flag present; exiting')
         process.exit()
       }
     })

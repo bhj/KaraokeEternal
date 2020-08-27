@@ -1,9 +1,7 @@
+const log = require('./Log').getLogger(`${process.env.KF_CHILD_PROCESS || 'main'}[${process.pid}]`)
 const path = require('path')
 const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
-
-const _dbPath = process.env.KF_USER_PATH || path.resolve(path.dirname(require.main.filename), '..')
-const _dbFile = path.resolve(_dbPath, 'database.sqlite3')
 let _db
 
 class Database {
@@ -11,13 +9,14 @@ class Database {
     // @todo
   }
 
-  static async open ({ readonly = true, log = () => {} } = {}) {
-    if (_db) throw new Error('Database already opened')
+  static async open ({ readonly = true, env = process.env } = {}) {
+    if (_db) throw new Error('Database already open')
 
-    log('Opening database file %s %s', readonly ? '(read-only)' : '(writeable)', _dbFile)
+    const dbPath = path.resolve(env.KF_SERVER_PATH_DATA, 'database.sqlite3')
+    log.info('Opening database file %s %s', readonly ? '(read-only)' : '(writeable)', dbPath)
 
     const db = await open({
-      filename: _dbFile,
+      filename: dbPath,
       driver: sqlite3.Database,
       mode: readonly ? sqlite3.OPEN_READONLY : null,
     })

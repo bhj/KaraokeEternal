@@ -1,6 +1,5 @@
 const log = require('./lib/Log').getLogger(`server[${process.pid}]`)
 const path = require('path')
-const config = require('../project.config')
 const getIPAddress = require('./lib/getIPAddress')
 const http = require('http')
 const fs = require('fs')
@@ -66,7 +65,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   // http request/response logging
   app.use(koaLogger((str, args) => (args.length === 6 && args[3] >= 500) ? log.error(str) : log.verbose(str)))
 
-  app.use(koaFavicon(path.join(config.assetPath, 'favicon.ico')))
+  app.use(koaFavicon(path.join(env.KF_SERVER_PATH_ASSETS, 'favicon.ico')))
   app.use(koaRange)
   app.use(koaBody({ multipart: true }))
 
@@ -104,7 +103,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   // @todo these could be read dynamically from src/routes
   // but should probably wait for react-router upgrade?
   const rewriteRoutes = ['account', 'library', 'queue', 'player']
-  const indexFile = path.join(config.buildPath, 'index.html')
+  const indexFile = path.join(env.KF_SERVER_PATH_WEBROOT, 'index.html')
 
   if (env.NODE_ENV === 'development') {
     log.info('Enabling webpack dev and HMR middleware')
@@ -119,7 +118,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
         app.use(middleware)
 
         // serve /assets since webpack-dev-server is unaware of this folder
-        app.use(koaMount('/assets', koaStatic(config.assetPath)))
+        app.use(koaMount('/assets', koaStatic(env.KF_SERVER_PATH_ASSETS)))
 
         // "rewrite" top level SPA routes to index.html
         app.use(async (ctx, next) => {
@@ -139,8 +138,8 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   } else {
     // production mode
     // serve build folder as webroot
-    app.use(koaStatic(config.buildPath))
-    app.use(koaMount('/assets', koaStatic(config.assetPath)))
+    app.use(koaStatic(env.KF_SERVER_PATH_WEBROOT))
+    app.use(koaMount('/assets', koaStatic(env.KF_SERVER_PATH_ASSETS)))
 
     // "rewrite" top level SPA routes to index.html
     const readFile = promisify(fs.readFile)

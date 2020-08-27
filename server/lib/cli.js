@@ -1,18 +1,15 @@
+const path = require('path')
+const baseDir = path.resolve(path.dirname(require.main.filename), '..')
 const env = {
   NODE_ENV: process.env.NODE_ENV,
-}
-
-const options = {
-  scannerConsoleLevel: 'KF_SCANNER_CONSOLE_LEVEL',
-  scannerLogLevel: 'KF_SCANNER_LOG_LEVEL',
-  serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
-  serverLogLevel: 'KF_SERVER_LOG_LEVEL',
-  port: 'KF_SERVER_PORT',
+  KF_SERVER_PATH_DATA: baseDir,
+  KF_SERVER_PATH_ASSETS: path.join(baseDir, 'assets'),
+  KF_SERVER_PATH_WEBROOT: path.join(baseDir, 'build'),
 }
 
 const yargs = require('yargs')
   .version(false) // disable default handler
-  .command('scanonly', 'Run a media scan on server startup, then exit when finished')
+  .command('scanonly', 'Only run the media scanner, then exit when finished')
   .option('p', {
     alias: 'port',
     describe: 'Web server port (default=auto)',
@@ -69,12 +66,20 @@ if (argv._.includes('scanonly')) {
 }
 
 // settings via CLI take precendence over env vars
-Object.keys(options).forEach(key => {
+const opts = {
+  scannerConsoleLevel: 'KF_SCANNER_CONSOLE_LEVEL',
+  scannerLogLevel: 'KF_SCANNER_LOG_LEVEL',
+  serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
+  serverLogLevel: 'KF_SERVER_LOG_LEVEL',
+  port: 'KF_SERVER_PORT',
+}
+
+Object.keys(opts).forEach(key => {
   if (typeof argv[key] !== 'undefined') {
-    env[options[key]] = argv[key]
-    process.env[options[key]] = argv[key]
-  } else if (process.env[options[key]]) {
-    env[options[key]] = process.env[options[key]]
+    env[opts[key]] = argv[key]
+    process.env[opts[key]] = argv[key]
+  } else if (process.env[opts[key]]) {
+    env[opts[key]] = process.env[opts[key]]
   }
 })
 

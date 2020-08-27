@@ -5,7 +5,6 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { LicenseWebpackPlugin } = require('license-webpack-plugin')
-const project = require('./project.config')
 
 const NODE_ENV = process.env.NODE_ENV || 'production'
 const __DEV__ = NODE_ENV === 'development'
@@ -20,20 +19,20 @@ const config = {
     ],
   },
   output: {
-    path: project.buildPath,
+    path: path.join(__dirname, 'build'),
     filename: __DEV__ ? '[name].js' : '[name].[hash].js',
     publicPath: '/',
   },
   resolve: {
     modules: [
-      path.join(project.basePath, 'src'),
+      path.join(__dirname, 'src'),
       'node_modules',
     ],
     alias: {
-      '<PROJECT_ROOT>': project.basePath,
-      assets: path.join(project.basePath, 'assets'),
-      fonts: path.join(project.basePath, 'docs', 'assets', 'fonts'),
-      shared: path.join(project.basePath, 'shared'),
+      '<PROJECT_ROOT>': __dirname,
+      assets: path.join(__dirname, 'assets'),
+      fonts: path.join(__dirname, 'docs', 'assets', 'fonts'),
+      shared: path.join(__dirname, 'shared'),
     },
     symlinks: false,
   },
