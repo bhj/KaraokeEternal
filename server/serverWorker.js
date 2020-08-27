@@ -108,7 +108,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   if (env.NODE_ENV === 'development') {
     log.info('Enabling webpack dev and HMR middleware')
     const webpack = require('webpack')
-    const webpackConfig = require('../webpack.config')
+    const webpackConfig = require('../config/webpack.config')
     const compiler = webpack(webpackConfig)
     const koaWebpack = require('koa-webpack')
 

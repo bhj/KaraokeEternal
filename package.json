@@ -24,12 +24,12 @@
     "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development nodemon --ignore build --ignore dist --ignore src -- -p3000",
-    "build": "rimraf build && webpack",
+    "build": "rimraf build && webpack --config ./config/webpack.config.js",
     "serve": "node ./server/main.js",
     "serve:docs": "hugo serve --source ./docs -b http://$(hostname) --bind 0.0.0.0",
     "server": "npm run serve",
     "start": "electron . -p 3000",
-    "dist": "cross-env DEBUG=electron-builder:* electron-builder -c ./scripts/electron-builder.config.js",
+    "dist": "cross-env DEBUG=electron-builder:* electron-builder -c ./config/electron-builder.config.js",
     "install-app-deps": "electron-builder install-app-deps"
   },
   "files": [

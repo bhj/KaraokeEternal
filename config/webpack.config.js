@@ -10,6 +10,7 @@ const NODE_ENV = process.env.NODE_ENV || 'production'
 const __DEV__ = NODE_ENV === 'development'
 const __TEST__ = NODE_ENV === 'test'
 const __PROD__ = NODE_ENV === 'production'
+const baseDir = path.resolve(__dirname, '..')
 
 const config = {
   mode: __PROD__ ? 'production' : 'development',
@@ -19,20 +20,20 @@ const config = {
     ],
   },
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(baseDir, 'build'),
     filename: __DEV__ ? '[name].js' : '[name].[hash].js',
     publicPath: '/',
   },
   resolve: {
     modules: [
-      path.join(__dirname, 'src'),
+      path.join(baseDir, 'src'),
       'node_modules',
     ],
     alias: {
-      '<PROJECT_ROOT>': __dirname,
-      assets: path.join(__dirname, 'assets'),
-      fonts: path.join(__dirname, 'docs', 'assets', 'fonts'),
-      shared: path.join(__dirname, 'shared'),
+      '<PROJECT_ROOT>': baseDir,
+      assets: path.join(baseDir, 'assets'),
+      fonts: path.join(baseDir, 'docs', 'assets', 'fonts'),
+      shared: path.join(baseDir, 'shared'),
     },
     symlinks: false,
   },
