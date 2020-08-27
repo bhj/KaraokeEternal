@@ -60,11 +60,11 @@ function startScanner () {
 
     refs.scanner.on('exit', (code, signal) => {
       log.info(`Media scanner exited (${signal || code})`)
-      IPC.unsubscribe(refs.scanner)
+      IPC.removeChild(refs.scanner)
       delete refs.scanner
     })
 
-    IPC.subscribe(refs.scanner)
+    IPC.addChild(refs.scanner)
   } else {
     IPC.emit({ type: SCANNER_CMD_START })
   }

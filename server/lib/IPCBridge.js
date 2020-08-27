@@ -5,27 +5,14 @@ const {
 } = require('../../shared/actionTypes')
 
 const PROCESS_NAME = process.env.KF_CHILD_PROCESS || 'main'
+const children = []
 let handlers = {}
 const reqs = {}
-const pSubs = []
 const isParent = typeof process.env.KF_CHILD_PROCESS === 'undefined' // @todo
 const isChild = !isParent
 let actionId = 0
 
 class IPCBridge {
-  static subscribe (p) {
-    p.on('message', action => {
-      // from child process
-      this._handle(action)
-    })
-
-    pSubs.push(p)
-  }
-
-  static unsubscribe (p) {
-    pSubs.splice(pSubs.indexOf(p), 1)
-  }
-
   static emit (action) {
     // log.debug(`${PROCESS_NAME} emit: `, action.type)
 
@@ -34,8 +21,8 @@ class IPCBridge {
       return
     }
 
-    if (!pSubs.length) throw new Error('no subscribers')
-    pSubs.forEach(p => p.send(action))
+    if (!children.length) throw new Error('no child processes')
+    children.forEach(p => p.send(action))
   }
 
   static req (action) {
@@ -99,6 +86,14 @@ class IPCBridge {
       log.debug(`${PROCESS_NAME} error in ipc action ${type}: ${err.message}`)
     })
   }
+
+  static addChild (p) {
+    // message from child process
+    p.on('message', action => this._handle(action))
+    children.push(p)
+  }
+
+  static removeChild (p) { children.splice(children.indexOf(p), 1) }
 
   // @todo make real middleware?
   static use (obj) {
