@@ -286,6 +286,7 @@ ul.screenshots {
   display: flex;
   flex-wrap: wrap;
   list-style: none;
+  margin-bottom: .5rem;
   padding: 0;
 
   li {
@@ -347,13 +348,19 @@ figure {
 }
 
 .overlay img {
-  max-width: 90% !important;
-  max-height: 90% !important;
+  max-width: 90vh !important;
+  max-height: 90vh !important;
   margin: auto;
   width: auto;
   height: auto;
 }
 
+@media (min-width: 50rem) {
+  .overlay img {
+    max-width: 66vh !important;
+    max-height: 66vh !important;
+  }
+}
 .overlay:target {
   visibility: visible;
   outline: none;

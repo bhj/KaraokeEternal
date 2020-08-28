@@ -20,9 +20,9 @@ resources:
 
 ## Quick Start
 
-1. Install [Karaoke Forever Server](#karaoke-forever-server) on the system that will serve the app and media on your local network.
+1. Install and run [Karaoke Forever Server](#karaoke-forever-server) on the system that will serve the app and media on your local network.
 
-2. Browse to the [app](#karaoke-forever-the-web-app) at the **server URL**. You can copy or open the URL in your default browser using the Karaoke Forever Server menu bar or tray icon in macOS or Windows, respectively.
+2. Browse to the [app](#karaoke-forever-the-web-app) at the **server URL**. You can copy the URL or open it in your default browser using the Karaoke Forever Server menu bar or tray icon in macOS or Windows.
 
 <aside class="info">
   {{% icon-info %}}
@@ -263,8 +263,8 @@ Karaoke Forever Server supports the following command line options:
 | Option | Description | Default |
 | --- | --- | --- |
 | <span style="white-space: nowrap;">`-l, --loglevel <number>`</span>| Log file level (**0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug) | 3 |
-| <span style="white-space: nowrap;">`-p, --port <number>`</span>| Web server port. To use low ports such as 80 you may need to run the app with elevated privileges (not recommended) | 0 (auto) |
-| <span style="white-space: nowrap;">`--version`</span>| Output the Karaoke Forever Server version and exit | |
+| <span style="white-space: nowrap;">`-p, --port <number>`</span>| Web server port. To use low ports such as 80 you may need to run with elevated privileges (not recommended) | 0 (auto) |
+| <span style="white-space: nowrap;">`-v, --version`</span>| Output the Karaoke Forever Server version and exit | |
 
 ### File Locations
 

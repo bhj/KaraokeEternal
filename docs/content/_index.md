@@ -6,11 +6,9 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 
 {{< screenshots >}}
 
-Karaoke Forever basically has 3 parts:
-
-- **<a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>Server:</a>** Runs on almost any OS to serve the app and your media files
-- **<a href='{{< ref "docs/index.md/#karaoke-forever-the-web-app" >}}'>App:</a>** Fast, modern mobile browser app designed for "karaoke conditions"
-- **<a href='{{< ref "docs/index.md/#player" >}}'>Player:</a>** Just another part of the app, designed to run fullscreen on the system handling audio/video for a <a href='{{< ref "docs/index.md/#rooms-admin-only" >}}'>room</a>
+<p style="text-align: center;">
+  <i>App in mobile browser (top) controlling player in Firefox/Chrome (bottom)</i>
+</p>
 
 ## Features
 
@@ -21,16 +19,19 @@ Karaoke Forever basically has 3 parts:
 - Multiple simultaneous rooms/queues (optionally password-protected)
 - No telemetry; all data stored locally
 
-<br>
 Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the <a href='{{< ref "faq.md/#whats-the-recommended-audio-setup" >}}'>F.A.Q.</a> for more information.
 
 ## Download
 
-If you'll be running the <a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>server</a> on macOS or Windows, you probably want <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}}. On any OS with [Node.js](https://nodejs.org){{% icon-external %}}, see <a href='{{< ref "docs/index.md/#any-os-with-nodejs" >}}'>Installation</a>.
+If you'll be running the <a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>server</a> on macOS or Windows, you probably want <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}}. You can also easily install it on <a href='{{< ref "docs/index.md/#any-os-with-nodejs" >}}'>any OS with Node.js</a>.
 
-## Documentation
+## Getting Started
 
-Please see <a href='{{< ref "docs/index.md/#quick-start" >}}'>Quick Start</a> to get started, or jump to the documentation for <a href='{{< ref "docs/index.md/#karaoke-forever-the-web-app" >}}'>Karaoke Forever</a> (the "web" app) or <a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>Karaoke Forever Server</a>.
+ Karaoke Forever basically has 3 parts. You can jump to the documentation for each below, or <a href='{{< ref "docs/index.md/#quick-start" >}}'>Quick Start</a> to get up and running step-by-step.
+
+- **<a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>Server:</a>** Runs on almost any OS to serve the app and your media files
+- **<a href='{{< ref "docs/index.md/#karaoke-forever-the-web-app" >}}'>App:</a>** Fast, modern mobile browser app designed for "karaoke conditions"
+- **<a href='{{< ref "docs/index.md/#player" >}}'>Player:</a>** Just another part of the app, designed to run fullscreen on the system handling audio/video for a <a href='{{< ref "docs/index.md/#rooms-admin-only" >}}'>room</a>
 
 ## Discord / Support
 
