@@ -7,7 +7,7 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 {{< screenshots >}}
 
 <p style="text-align: center;">
-  <i>App in mobile browser (top) controlling player in Firefox/Chrome (bottom)</i>
+  <i>App in mobile browser (top/left) controlling player in Firefox/Chrome (bottom/right)</i>
 </p>
 
 ## Features
