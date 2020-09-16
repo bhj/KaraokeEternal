@@ -75,12 +75,12 @@ function startScanner () {
 
     IPC.addChild(refs.scanner)
   } else {
-    IPC.emit({ type: SCANNER_CMD_START })
+    IPC.send({ type: SCANNER_CMD_START })
   }
 }
 
 function stopScanner () {
   if (refs.scanner) {
-    IPC.emit({ type: SCANNER_CMD_STOP })
+    IPC.send({ type: SCANNER_CMD_STOP })
   }
 }

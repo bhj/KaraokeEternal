@@ -13,8 +13,8 @@ const isChild = !isParent
 let actionId = 0
 
 class IPCBridge {
-  static emit (action) {
-    // log.debug(`${PROCESS_NAME} emit: `, action.type)
+  static send (action) {
+    // log.debug(`${PROCESS_NAME} send: `, action.type)
 
     if (isChild) {
       process.send(action)
@@ -40,26 +40,29 @@ class IPCBridge {
       }
     }
 
-    this.emit(action)
+    this.send(action)
 
     return promise
   }
 
   static _handle (action) {
     const { error, meta, type } = action
-    // log.debug(`${PROCESS_NAME} rcv:`, type)
 
     // is it an ACK for an outstanding request?
-    if (meta?.ipcName === PROCESS_NAME && reqs[meta?.ipcId]) {
+    if (meta && meta.ipcName === PROCESS_NAME && reqs[meta.ipcId]) {
       if (error) {
         reqs[meta.ipcId].reject(error)
       } else {
         reqs[meta.ipcId].resolve(action.payload)
       }
 
+      // log.debug(`${PROCESS_NAME} ack:`, type)
+
       delete reqs[meta.ipcId]
       return
     }
+
+    // log.debug(`${PROCESS_NAME} rcv:`, type)
 
     // handle request
     if (!type || typeof handlers[type] !== 'function') {
@@ -69,15 +72,15 @@ class IPCBridge {
 
     // @todo handle non-promises?
     handlers[type](action).then(res => {
-      if (!meta?.noAck) {
-        IPCBridge.emit({
+      if (meta && !meta.noAck) {
+        this.send({
           ...action,
           type: type + _SUCCESS,
           payload: res,
         })
       }
     }).catch(err => {
-      IPCBridge.emit({
+      this.send({
         ...action,
         type: type + _ERROR,
         error: err,

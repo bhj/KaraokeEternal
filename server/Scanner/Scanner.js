@@ -15,7 +15,7 @@ class Scanner {
 
   getStatusEmitter () {
     return (text, pct, isScanning = true) => {
-      IPC.emit({
+      IPC.send({
         type: SCANNER_WORKER_STATUS,
         payload: {
           isScanning,
