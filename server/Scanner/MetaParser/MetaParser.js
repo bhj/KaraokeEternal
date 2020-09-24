@@ -33,7 +33,7 @@ class MetaParser {
       parser(ctx)
 
       if (!ctx.artist || !ctx.title) {
-        throw new Error('Could not determine artist or title')
+        throw new Error('could not determine artist or title')
       }
 
       return {

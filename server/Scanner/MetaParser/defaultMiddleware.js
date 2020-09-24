@@ -35,11 +35,16 @@ m.set('split', (ctx, next) => {
   // most likely to be the actual delimiter rather than a false positive
   const d = ctx.cfg.delimiter instanceof RegExp ? ctx.cfg.delimiter : new RegExp(` ?${ctx.cfg.delimiter} ?`, 'g')
   const matches = ctx.name.match(d)
+
+  if (!matches) {
+    throw new Error('no artist/title delimiter in filename')
+  }
+
   const longest = matches.reduce((a, b) => a.length > b.length ? a : b)
   ctx.parts = ctx.name.split(longest)
 
   if (ctx.parts.length < 2) {
-    throw new Error('delimiter not found in filename')
+    throw new Error('no artist/title delimiter in filename')
   }
 
   next()

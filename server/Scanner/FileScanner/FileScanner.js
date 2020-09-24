@@ -86,7 +86,7 @@ class FileScanner extends Scanner {
           valid.push(res.mediaId)
           if (res.isNew) numAdded++
         } catch (err) {
-          log.warn(err.message + ': ' + item.file)
+          log.warn(`  => ${err.message}: ${item.file}`)
         }
 
         if (this.isCanceling) {
@@ -112,7 +112,7 @@ class FileScanner extends Scanner {
     })
 
     if (!tags.format.duration) {
-      throw new Error('  => could not determine duration')
+      throw new Error('could not determine duration')
     }
 
     log.verbose('  => duration: %s:%s',
@@ -145,7 +145,7 @@ class FileScanner extends Scanner {
     // need to look for .cdg if this is an audio-only file
     if (!/\.mp4/i.test(path.extname(item.file))) {
       if (!await getCdgName(item.file)) {
-        throw new Error('  => no .cdg sidecar found; skipping')
+        throw new Error('no .cdg sidecar found; skipping')
       }
 
       log.verbose('  => found .cdg sidecar')
