@@ -42,3 +42,4 @@ Contributions are most welcome! Make sure you have [Node.js](https://nodejs.org/
 1. Fork and clone the repo
 2. `npm i`
 3. `npm run dev` and look for "Web server running at" for the **server URL**
+[![Run on Repl.it](https://repl.it/badge/github/bhj/karaoke-forever)](https://repl.it/github/bhj/karaoke-forever)
