@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import QueueList from '../components/QueueList'
 import Spinner from 'components/Spinner'
 import TextOverlay from 'components/TextOverlay'

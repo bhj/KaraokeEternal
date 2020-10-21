@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import LibraryHeader from '../components/LibraryHeader'
 import ArtistList from '../components/ArtistList'
 import SearchResults from '../components/SearchResults'

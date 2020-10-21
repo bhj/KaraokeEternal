@@ -1,16 +1,12 @@
-import { connectedReduxRedirect } from 'redux-auth-wrapper/history3/redirect'
-import { browserHistory } from 'react-router'
+import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect'
 
-const RequireAuth = connectedReduxRedirect({
+const RequireAuth = connectedRouterRedirect({
   // how to check auth status
   authenticatedSelector: state => state.user.userId !== null,
   // HoC's display name
   wrapperDisplayName: 'UserIsAuthenticated',
   // on auth failure
   redirectPath: '/account',
-  redirectAction: (newLoc) => (dispatch) => {
-    browserHistory.push(newLoc)
-  },
 })
 
 export default RequireAuth

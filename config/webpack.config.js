@@ -107,6 +107,7 @@ config.module.rules.push({
         '@babel/plugin-transform-runtime',
         '@babel/plugin-proposal-class-properties',
         '@babel/plugin-proposal-object-rest-spread',
+        '@babel/plugin-syntax-dynamic-import',
         ['react-css-modules', {
           webpackHotModuleReloading: __DEV__,
           generateScopedName : '[name]__[local]___[hash:base64:5]',

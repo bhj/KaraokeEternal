@@ -3,12 +3,13 @@ import React from 'react'
 // global stylesheets should be imported before any
 // components that will import their own modular css
 import 'normalize.css'
-import '../../styles/global.css'
+import '../../../styles/global.css'
 import Header from 'components/Header'
 import Navigation from 'components/Navigation'
 import Modal from 'components/Modal'
 import SongInfo from 'components/SongInfo'
 import useObserver from 'lib/useObserver'
+import Routes from '../Routes'
 
 const CoreLayout = (props) => {
   const [header, setHeader] = React.useState(null)
@@ -29,11 +30,9 @@ const CoreLayout = (props) => {
     <>
       <Header customHeader={header} ref={headRef} />
 
-      { React.cloneElement(props.children, { setHeader }) }
+      <Routes setHeader={setHeader} />
 
-      {props.isLoggedIn &&
-        <Navigation loc={props.loc} ref={navRef} />
-      }
+      <Navigation ref={navRef} />
 
       <SongInfo/>
 
@@ -50,9 +49,6 @@ const CoreLayout = (props) => {
 }
 
 CoreLayout.propTypes = {
-  children: PropTypes.any,
-  isLoggedIn: PropTypes.bool,
-  loc: PropTypes.string.isRequired,
   ui: PropTypes.object.isRequired,
   // actions
   clearErrorMessage: PropTypes.func.isRequired,

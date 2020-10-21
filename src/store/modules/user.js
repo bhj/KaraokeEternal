@@ -1,9 +1,9 @@
-import { browserHistory } from 'react-router'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { fetchPrefs } from './prefs'
 import parseQueryStr from 'lib/parseQueryStr'
 import HttpApi from 'lib/HttpApi'
+import history from 'lib/history'
 import {
   LOGIN,
   LOGOUT,
@@ -61,21 +61,18 @@ export function login (data) {
         if (user.isAdmin) {
           dispatch(fetchPrefs())
         }
-
         // redirect in query string?
-        const loc = getState().location
-
-        if (loc && loc.search) {
-          const { redirect } = parseQueryStr(loc.search)
+        if (history.location.search) {
+          const { redirect } = parseQueryStr(history.location.search)
 
           if (redirect) {
-            return browserHistory.push(redirect)
+            return history.push(redirect)
           }
         }
 
         // default redirect if not an admin
         if (!user.isAdmin) {
-          browserHistory.push('/library')
+          history.push('/library')
         }
       })
       .catch(err => {
@@ -171,7 +168,7 @@ export function createAccount (user, isFirstRun) {
 
         if (!user.isAdmin) {
           // default redirect
-          browserHistory.push('/library')
+          history.push('/library')
           return
         }
 

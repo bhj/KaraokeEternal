@@ -5,8 +5,6 @@ import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modul
 
 const mapStateToProps = (state) => {
   return {
-    isLoggedIn: state.user.userId !== null,
-    loc: state.location.pathname,
     ui: state.ui,
   }
 }

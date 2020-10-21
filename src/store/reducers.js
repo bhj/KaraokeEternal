@@ -4,7 +4,6 @@ import { optimistic } from 'redux-optimistic-ui'
 // reducers
 import artists from 'routes/Library/modules/artists'
 import library from 'routes/Library/modules/library'
-import location from './modules/location'
 import prefs from './modules/prefs'
 import queue from 'routes/Queue/modules/queue'
 import rooms from './modules/rooms'
@@ -20,7 +19,6 @@ export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     artists,
     library,
-    location,
     prefs,
     queue: optimistic(queue),
     rooms,

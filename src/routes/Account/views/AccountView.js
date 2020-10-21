@@ -1,15 +1,24 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useEffect, useLayoutEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import About from '../components/About'
 import Account from '../components/Account'
 import Login from '../components/Login'
 import Prefs from '../components/Prefs'
 import Rooms from '../components/Rooms'
+import { fetchPrefs } from 'store/modules/prefs'
 import './AccountView.css'
 
 const AccountView = (props) => {
   const { isAdmin, isLoggedIn } = props
-  React.useLayoutEffect(() => props.setHeader(null))
+  const dispatch = useDispatch()
+
+  useLayoutEffect(() => props.setHeader(null))
+
+  // do this here instead of Prefs component to detect firstRun
+  useEffect(() => {
+    dispatch(fetchPrefs())
+  }, []) // once per mount
 
   return (
     <div styleName='container' style={{

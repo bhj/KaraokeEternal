@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import history from 'lib/history'
 import PlaybackCtrl from './PlaybackCtrl'
 import {
   requestOptions,
@@ -21,7 +22,7 @@ const mapStateToProps = (state) => {
   return {
     isAdmin: state.user.isAdmin,
     isInRoom: state.user.roomId !== null,
-    isPlayer: state.location.pathname.startsWith('/player'),
+    isPlayer: history.location.pathname.startsWith('/player'),
     status: state.status,
     ui: state.ui,
   }

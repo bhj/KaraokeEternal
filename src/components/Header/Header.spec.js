@@ -1,6 +1,6 @@
 import React from 'react'
 import { Header } from 'components/Header/Header'
-import { IndexLink, Link } from 'react-router'
+import { IndexLink, Link } from 'react-router-dom'
 import { shallow } from 'enzyme'
 
 describe('(Component) Header', () => {

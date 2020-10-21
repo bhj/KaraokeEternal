@@ -1,8 +1,9 @@
 import { connect } from 'react-redux'
-import Header from './Header'
 import { createSelector } from 'reselect'
 import { requestScanStop } from 'store/modules/prefs'
 import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
+import history from 'lib/history'
+import Header from './Header'
 
 const getIsAtQueueEnd = (state) => state.status.isAtQueueEnd
 const getPosition = (state) => state.status.position
@@ -50,7 +51,7 @@ const mapStateToProps = (state) => {
     ...getStatusProps(state),
     wait: getUserWait(state),
     isAdmin: state.user.isAdmin,
-    isPlayer: state.location.pathname === '/player',
+    isPlayer: history.location.pathname.startsWith('/player'),
     isPlayerPresent: state.status.isPlayerPresent,
     isScanning: state.prefs.isScanning,
     scannerText: state.prefs.scannerText,

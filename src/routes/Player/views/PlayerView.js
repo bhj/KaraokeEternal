@@ -1,13 +1,25 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import { useSelector, useStore } from 'react-redux'
+import { injectReducer } from 'store/reducers'
+import playerReducer from '../modules/player'
+import playerVisualizerReducer from '../modules/playerVisualizer'
+
 import PlayerController from '../components/PlayerController'
 import screenfull from 'screenfull'
 import './PlayerView.css'
 
 const PlayerView = (props) => {
-  const { innerWidth, innerHeight, headerHeight, footerHeight } = props.ui
+  const { innerWidth, innerHeight, headerHeight, footerHeight } = useSelector(state => state.ui)
   const viewportHeight = innerHeight - headerHeight - footerHeight
   React.useLayoutEffect(() => props.setHeader(null))
+
+  // @todo: find better place for this?
+  if (!useSelector(state => state.player)) {
+    const store = useStore()
+    injectReducer(store, { key: 'player', reducer: playerReducer })
+    injectReducer(store, { key: 'playerVisualizer', reducer: playerVisualizerReducer })
+  }
 
   return (
     <div style={{ overflow: 'hidden' }}>
@@ -31,7 +43,6 @@ const PlayerView = (props) => {
 
 PlayerView.propTypes = {
   setHeader: PropTypes.func.isRequired,
-  ui: PropTypes.object.isRequired,
 }
 
 export default PlayerView

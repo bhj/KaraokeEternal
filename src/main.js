@@ -37,10 +37,8 @@ window._persistor = persistStore(store, null, () => {
 const MOUNT_NODE = document.getElementById('root')
 
 let render = () => {
-  const routes = require('./routes/index').default(store)
-
   ReactDOM.render(
-    <App store={store} routes={routes} persistor={window._persistor} />,
+    <App store={store} persistor={window._persistor} />,
     MOUNT_NODE
   )
 }
@@ -65,14 +63,6 @@ if (__DEV__) {
         renderError(error)
       }
     }
-
-    // Setup hot module replacement
-    module.hot.accept('./routes/index', () =>
-      setImmediate(() => {
-        ReactDOM.unmountComponentAtNode(MOUNT_NODE)
-        render()
-      })
-    )
   }
 }
 
