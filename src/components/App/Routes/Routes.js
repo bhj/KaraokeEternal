@@ -3,7 +3,7 @@ import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import RequireAuth from 'components/RequireAuth'
 import AccountView from 'routes/Account/views'
 import LibraryView from 'routes/Library/views'
-import QueueView from 'routes/Queue/views'
+import QueueView from 'routes/Queue/views/QueueView'
 
 const Library = withRouter(RequireAuth(LibraryView))
 const Queue = withRouter(RequireAuth(QueueView))
