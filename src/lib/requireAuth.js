@@ -1,6 +1,6 @@
 import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect'
 
-const RequireAuth = connectedRouterRedirect({
+const requireAuth = connectedRouterRedirect({
   // how to check auth status
   authenticatedSelector: state => state.user.userId !== null,
   // HoC's display name
@@ -9,4 +9,4 @@ const RequireAuth = connectedRouterRedirect({
   redirectPath: '/account',
 })
 
-export default RequireAuth
+export default requireAuth

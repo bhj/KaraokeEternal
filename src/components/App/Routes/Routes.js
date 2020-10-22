@@ -1,13 +1,13 @@
 import React from 'react'
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
-import RequireAuth from 'components/RequireAuth'
+import requireAuth from 'lib/requireAuth'
 import AccountView from 'routes/Account/views'
 import LibraryView from 'routes/Library/views'
 import QueueView from 'routes/Queue/views/QueueView'
 
-const Library = withRouter(RequireAuth(LibraryView))
-const Queue = withRouter(RequireAuth(QueueView))
-const Player = withRouter(RequireAuth(React.lazy(() => import('routes/Player/views/PlayerView'))))
+const Library = withRouter(requireAuth(LibraryView))
+const Queue = withRouter(requireAuth(QueueView))
+const Player = withRouter(requireAuth(React.lazy(() => import('routes/Player/views/PlayerView'))))
 
 const Routes = (props) => (
   <Switch>
