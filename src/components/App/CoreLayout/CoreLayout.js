@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 // global stylesheets should be imported before any
 // components that will import their own modular css
 import 'normalize.css'
@@ -10,21 +10,26 @@ import Modal from 'components/Modal'
 import SongInfo from 'components/SongInfo'
 import useObserver from 'lib/useObserver'
 import Routes from '../Routes'
+import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
 
 const CoreLayout = (props) => {
+  const dispatch = useDispatch()
   const [header, setHeader] = React.useState(null)
   const headRef = React.useRef(null)
   const navRef = React.useRef(null)
 
   useObserver({
-    callback: () => props.setHeaderHeight(headRef.current?.clientHeight),
+    callback: () => dispatch(setHeaderHeight(headRef.current?.clientHeight)),
     element: headRef,
   })
 
   useObserver({
-    callback: () => props.setFooterHeight(navRef.current?.clientHeight),
+    callback: () => dispatch(setFooterHeight(navRef.current?.clientHeight)),
     element: navRef,
   })
+
+  const ui = useSelector(state => state.ui)
+  const closeError = useCallback(() => dispatch(clearErrorMessage()), [dispatch])
 
   return (
     <>
@@ -37,24 +42,15 @@ const CoreLayout = (props) => {
       <SongInfo/>
 
       <Modal
-        isVisible={props.ui.isErrored}
-        onClose={props.clearErrorMessage}
+        isVisible={ui.isErrored}
+        onClose={closeError}
         title='Oops...'
-        buttons=<button onClick={props.clearErrorMessage}>OK</button>
+        buttons=<button onClick={closeError}>OK</button>
       >
-        <p>{props.ui.errorMessage}</p>
+        <p>{ui.errorMessage}</p>
       </Modal>
     </>
   )
-}
-
-CoreLayout.propTypes = {
-  ui: PropTypes.object.isRequired,
-  // actions
-  clearErrorMessage: PropTypes.func.isRequired,
-  closeSongInfo: PropTypes.func.isRequired,
-  setFooterHeight: PropTypes.func.isRequired,
-  setHeaderHeight: PropTypes.func.isRequired,
 }
 
 export default CoreLayout
