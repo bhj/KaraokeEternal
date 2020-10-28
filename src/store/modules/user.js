@@ -1,7 +1,7 @@
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
+import locationHelperBuilder from 'redux-auth-wrapper/history4/locationHelper'
 import { fetchPrefs } from './prefs'
-import parseQueryStr from 'lib/parseQueryStr'
 import HttpApi from 'lib/HttpApi'
 import history from 'lib/history'
 import {
@@ -17,6 +17,7 @@ import {
 } from 'shared/actionTypes'
 
 const api = new HttpApi('')
+const locationHelper = locationHelperBuilder({})
 
 // ------------------------------------
 // Login
@@ -61,13 +62,12 @@ export function login (data) {
         if (user.isAdmin) {
           dispatch(fetchPrefs())
         }
-        // redirect in query string?
-        if (history.location.search) {
-          const { redirect } = parseQueryStr(history.location.search)
 
-          if (redirect) {
-            return history.push(redirect)
-          }
+        // redirect in query string?
+        const redirect = locationHelper.getRedirectQueryParam(history)
+
+        if (redirect) {
+          return history.push(redirect)
         }
 
         // default redirect if not an admin
