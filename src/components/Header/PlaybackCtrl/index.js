@@ -1,3 +1,3 @@
-import PlaybackCtrlContainer from './PlaybackCtrlContainer'
+import PlaybackCtrl from './PlaybackCtrl'
 
-export default PlaybackCtrlContainer
+export default PlaybackCtrl

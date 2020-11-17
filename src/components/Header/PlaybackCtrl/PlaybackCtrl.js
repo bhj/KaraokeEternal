@@ -1,91 +1,13 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useCallback, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import screenfull from 'screenfull'
+import history from 'lib/history'
+import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolume } from 'store/modules/status'
 import Icon from 'components/Icon'
 import VolumeSlider from './VolumeSlider'
 import NoPlayer from './NoPlayer'
 import DisplayCtrl from './DisplayCtrl'
 import './PlaybackCtrl.css'
-
-export default class PlaybackCtrl extends React.Component {
-  static propTypes = {
-    isAdmin: PropTypes.bool.isRequired,
-    isInRoom: PropTypes.bool.isRequired,
-    isPlayer: PropTypes.bool.isRequired,
-    status: PropTypes.object.isRequired,
-    ui: PropTypes.object.isRequired,
-    // actions
-    requestOptions: PropTypes.func.isRequired,
-    requestPause: PropTypes.func.isRequired,
-    requestPlay: PropTypes.func.isRequired,
-    requestPlayNext: PropTypes.func.isRequired,
-    requestVolume: PropTypes.func.isRequired,
-  }
-
-  state = {
-    isVisible: false,
-  }
-
-  toggleDisplayCtrl = () => this.setState({ isVisible: !this.state.isVisible })
-
-  render () {
-    const { props } = this
-    const { isPlaying, isPlayerPresent, volume } = props.status
-
-    if (!isPlayerPresent) {
-      return (props.isAdmin && props.isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
-    }
-
-    return (
-      <div styleName='container'>
-        {isPlaying &&
-          <div onClick={props.requestPause} styleName='pause'>
-            <Icon icon='PAUSE' size={44}/>
-          </div>
-        }
-        {!isPlaying &&
-          <div onClick={props.requestPlay} styleName='play'>
-            <Icon icon='PLAY' size={44}/>
-          </div>
-        }
-
-        <div onClick={props.requestPlayNext} styleName='next'>
-          <Icon icon='PLAY_NEXT' size={48}/>
-        </div>
-
-        <VolumeSlider
-          volume={volume}
-          onVolumeChange={props.requestVolume}
-        />
-
-        <div onClick={this.toggleDisplayCtrl} styleName='displayCtrl'>
-          <Icon icon='TUNE' size={44}/>
-        </div>
-
-        {props.isPlayer && screenfull.isEnabled &&
-          <div onClick={handleFullscreen} styleName='fullscreen'>
-            <Icon icon='FULLSCREEN' size={48}/>
-          </div>
-        }
-
-        <DisplayCtrl
-          cdgAlpha={props.status.cdgAlpha}
-          cdgSize={props.status.cdgSize}
-          isVisible={this.state.isVisible}
-          isVisualizerEnabled={props.status.visualizer.isEnabled}
-          isWebGLEnabled={props.status.isWebGLEnabled}
-          mediaType={props.status.mediaType}
-          mp4Alpha={props.status.mp4Alpha}
-          onClose={this.toggleDisplayCtrl}
-          onRequestOptions={props.requestOptions}
-          sensitivity={props.status.visualizer.sensitivity}
-          ui={props.ui}
-          visualizerPresetName={props.status.visualizer.presetName}
-        />
-      </div>
-    )
-  }
-}
 
 const handleFullscreen = () => {
   if (screenfull.isEnabled) {
@@ -93,3 +15,75 @@ const handleFullscreen = () => {
     screenfull.request(el)
   }
 }
+
+const PlaybackCtrl = props => {
+  const isAdmin = useSelector(state => state.user.isAdmin)
+  const isInRoom = useSelector(state => state.user.roomId !== null)
+  const isPlayer = history.location.pathname.startsWith('/player')
+  const status = useSelector(state => state.status)
+  const ui = useSelector(state => state.ui)
+
+  const dispatch = useDispatch()
+  const handleOptions = useCallback(opts => dispatch(requestOptions(opts)), [dispatch])
+  const handlePause = useCallback(() => dispatch(requestPause()), [dispatch])
+  const handlePlay = useCallback(() => dispatch(requestPlay()), [dispatch])
+  const handlePlayNext = useCallback(() => dispatch(requestPlayNext()), [dispatch])
+  const handleVolume = useCallback(val => dispatch(requestVolume(val)), [dispatch])
+
+  const [isDisplayCtrlVisible, toggleDisplayCtrl] = useState(false)
+
+  if (!status.isPlayerPresent) {
+    return (isAdmin && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
+  }
+
+  return (
+    <div styleName='container'>
+      {status.isPlaying &&
+        <div onClick={handlePause} styleName='pause'>
+          <Icon icon='PAUSE' size={44}/>
+        </div>
+      }
+      {!status.isPlaying &&
+        <div onClick={handlePlay} styleName='play'>
+          <Icon icon='PLAY' size={44}/>
+        </div>
+      }
+
+      <div onClick={handlePlayNext} styleName='next'>
+        <Icon icon='PLAY_NEXT' size={48}/>
+      </div>
+
+      <VolumeSlider
+        volume={status.volume}
+        onVolumeChange={handleVolume}
+      />
+
+      <div onClick={() => toggleDisplayCtrl(!isDisplayCtrlVisible)} styleName='displayCtrl'>
+        <Icon icon='TUNE' size={44}/>
+      </div>
+
+      {isPlayer && screenfull.isEnabled &&
+        <div onClick={handleFullscreen} styleName='fullscreen'>
+          <Icon icon='FULLSCREEN' size={48}/>
+        </div>
+      }
+
+      <DisplayCtrl
+        cdgAlpha={status.cdgAlpha}
+        cdgSize={status.cdgSize}
+        isVisible={isDisplayCtrlVisible}
+        isVisualizerEnabled={status.visualizer.isEnabled}
+        isWebGLEnabled={status.isWebGLEnabled}
+        mediaType={status.mediaType}
+        mp4Alpha={status.mp4Alpha}
+        onClose={toggleDisplayCtrl}
+        onRequestOptions={handleOptions}
+        sensitivity={status.visualizer.sensitivity}
+        ui={ui}
+        visualizerPresetName={status.visualizer.presetName}
+      />
+    </div>
+  )
+}
+
+export default PlaybackCtrl
