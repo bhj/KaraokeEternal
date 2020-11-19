@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { useEffect, useLayoutEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import About from '../components/About'
 import Account from '../components/Account'
 import Login from '../components/Login'
@@ -9,8 +9,10 @@ import Rooms from '../components/Rooms'
 import { fetchPrefs } from 'store/modules/prefs'
 import './AccountView.css'
 
-const AccountView = (props) => {
-  const { isAdmin, isLoggedIn } = props
+const AccountView = props => {
+  const { isAdmin, userId } = useSelector(state => state.user)
+  const isLoggedIn = userId !== null
+  const ui = useSelector(state => state.ui)
   const dispatch = useDispatch()
 
   useLayoutEffect(() => props.setHeader(null))
@@ -22,13 +24,13 @@ const AccountView = (props) => {
 
   return (
     <div styleName='container' style={{
-      paddingTop: props.ui.headerHeight,
-      paddingBottom: props.ui.footerHeight,
-      width: props.ui.contentWidth,
-      height: props.ui.innerHeight,
+      paddingTop: ui.headerHeight,
+      paddingBottom: ui.footerHeight,
+      width: ui.contentWidth,
+      height: ui.innerHeight,
     }}>
       {isAdmin &&
-        <Rooms ui={props.ui}/>
+        <Rooms ui={ui}/>
       }
 
       {isAdmin &&
@@ -40,7 +42,7 @@ const AccountView = (props) => {
       }
 
       {!isLoggedIn &&
-        <Login style={{ maxWidth: Math.max(340, props.ui.contentWidth * 0.66) }}/>
+        <Login style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}/>
       }
 
       {isLoggedIn &&
@@ -51,10 +53,7 @@ const AccountView = (props) => {
 }
 
 AccountView.propTypes = {
-  isAdmin: PropTypes.bool.isRequired,
-  isLoggedIn: PropTypes.bool.isRequired,
   setHeader: PropTypes.func.isRequired,
-  ui: PropTypes.object.isRequired,
 }
 
 export default AccountView

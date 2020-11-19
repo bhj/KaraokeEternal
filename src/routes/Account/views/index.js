@@ -1,3 +1,3 @@
-import AccountViewContainer from './AccountViewContainer'
+import AccountView from './AccountView'
 
-export default AccountViewContainer
+export default AccountView
