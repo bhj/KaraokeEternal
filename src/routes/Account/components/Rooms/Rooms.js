@@ -1,102 +1,93 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import { formatDateTime } from 'lib/dateTime'
-import Modal from 'components/Modal'
-import EditRoom from './EditRoom'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Column, Table } from 'react-virtualized'
+import { useDispatch, useSelector } from 'react-redux'
+import { formatDateTime } from 'lib/dateTime'
+import EditRoom from './EditRoom'
+import { closeRoomEditor, fetchRooms, openRoomEditor, toggleShowAll } from 'store/modules/rooms'
+import getRoomList from '../../selectors/getRoomList'
 import style from './Rooms.css'
 
-export default class Rooms extends Component {
-  static propTypes = {
-    rooms: PropTypes.object.isRequired,
-    isEditing: PropTypes.bool.isRequired,
-    isShowingAll: PropTypes.bool.isRequired,
-    editingRoom: PropTypes.object,
-    ui: PropTypes.object.isRequired,
-    // Actions
-    closeRoomEditor: PropTypes.func.isRequired,
-    fetchRooms: PropTypes.func.isRequired,
-    openRoomEditor: PropTypes.func.isRequired,
-    toggleShowAll: PropTypes.func.isRequired,
-    updateRoom: PropTypes.func.isRequired,
-  }
+const Rooms = props => {
+  const [editorRoom, setEditorRoom] = useState(null)
 
-  table = React.createRef()
+  const { isEditorOpen, isShowingAll } = useSelector(state => state.rooms)
+  const rooms = useSelector(getRoomList)
+  const ui = useSelector(state => state.ui)
 
-  componentDidMount () {
-    this.props.fetchRooms()
-  }
+  const dispatch = useDispatch()
+  const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
+  const handleOpen = useCallback(roomId => {
+    setEditorRoom(rooms.entities[roomId])
+    dispatch(openRoomEditor())
+  }, [dispatch, rooms])
+  const handleToggle = useCallback(() => dispatch(toggleShowAll()), [dispatch])
 
-  render () {
-    return (
-      <div styleName='container'>
-        <div styleName='titleContainer'>
-          <h1 styleName='title'>Rooms</h1>
-          <label styleName='showAll'>
-            <input type='checkbox'
-              checked={this.props.isShowingAll}
-              onChange={this.props.toggleShowAll}
-              styleName='showAll'
-            /> Show all
-          </label>
-        </div>
-        <div styleName='content'>
-          <Table
-            width={this.props.ui.contentWidth}
-            height={this.props.rooms.result.length * 30 + 20}
-            headerHeight={20}
-            rowHeight={30}
-            rowCount={this.props.rooms.result.length}
-            rowGetter={this.getRow}
-            headerClassName={style.tableHeader}
-            rowClassName={style.tableRow}
-            ref={this.table}
-            styleName='table'
-          >
-            <Column
-              label='Name'
-              dataKey='name'
-              width={this.props.ui.contentWidth * 0.40}
-              styleName='tableCol'
-              cellRenderer={({ rowData }) => (
-                <a onClick={() => this.props.openRoomEditor(rowData.roomId)}>{rowData.name}</a>
-              )}
-            />
-            <Column
-              label='Status'
-              dataKey='status'
-              width={this.props.ui.contentWidth * 0.20}
-              styleName='tableCol'
-              cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
-            />
-            <Column
-              label='Created'
-              dataKey='dateCreated'
-              width={this.props.ui.contentWidth * 0.40}
-              styleName='tableCol'
-              cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
-            />
-          </Table>
+  useEffect(() => {
+    dispatch(fetchRooms())
+  }, []) // once per mount
 
-          <br />
-          <button onClick={() => this.props.openRoomEditor()} className='primary'>
-            Create Room
-          </button>
+  const tableRef = React.createRef()
+  const getRow = ({ index }) => rooms.entities[rooms.result[index]]
 
-          <Modal
-            isVisible={this.props.isEditing}
-            onClose={this.props.closeRoomEditor}
-            title={this.props.editingRoom ? 'Edit Room' : 'Create Room'}
-            style={{ minWidth: '300px' }}
-          >
-            {this.props.isEditing &&
-              <EditRoom room={this.props.editingRoom }/>
-            }
-          </Modal>
-        </div>
+  return (
+    <div styleName='container'>
+      <div styleName='titleContainer'>
+        <h1 styleName='title'>Rooms</h1>
+        <label styleName='showAll'>
+          <input type='checkbox'
+            checked={isShowingAll}
+            onChange={handleToggle}
+            styleName='showAll'
+          /> Show all
+        </label>
       </div>
-    )
-  }
+      <div styleName='content'>
+        <Table
+          width={ui.contentWidth}
+          height={rooms.result.length * 30 + 20}
+          headerHeight={20}
+          rowHeight={30}
+          rowCount={rooms.result.length}
+          rowGetter={getRow}
+          headerClassName={style.tableHeader}
+          rowClassName={style.tableRow}
+          ref={tableRef}
+          styleName='table'
+        >
+          <Column
+            label='Name'
+            dataKey='name'
+            width={ui.contentWidth * 0.40}
+            styleName='tableCol'
+            cellRenderer={({ rowData }) => (
+              <a onClick={() => handleOpen(rowData.roomId)}>{rowData.name}</a>
+            )}
+          />
+          <Column
+            label='Status'
+            dataKey='status'
+            width={ui.contentWidth * 0.20}
+            styleName='tableCol'
+            cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
+          />
+          <Column
+            label='Created'
+            dataKey='dateCreated'
+            width={ui.contentWidth * 0.40}
+            styleName='tableCol'
+            cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
+          />
+        </Table>
 
-  getRow = ({ index }) => this.props.rooms.entities[this.props.rooms.result[index]]
+        <br />
+        <button onClick={handleOpen} className='primary'>
+          Create Room
+        </button>
+
+        <EditRoom isVisible={isEditorOpen} onClose={handleClose} room={editorRoom} />
+      </div>
+    </div>
+  )
 }
+
+export default Rooms

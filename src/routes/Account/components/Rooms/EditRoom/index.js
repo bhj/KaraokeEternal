@@ -1,3 +1,3 @@
-import EditRoomContainer from './EditRoomContainer'
+import EditRoom from './EditRoom'
 
-export default EditRoomContainer
+export default EditRoom

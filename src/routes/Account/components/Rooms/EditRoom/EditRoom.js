@@ -1,112 +1,115 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
+import { createRoom, updateRoom, removeRoom } from 'store/modules/rooms'
+import Modal from 'components/Modal'
 import './EditRoom.css'
 
-export default class EditRoom extends Component {
-  static propTypes = {
-    room: PropTypes.object,
-    // actions
-    closeRoomEditor: PropTypes.func.isRequired,
-    createRoom: PropTypes.func.isRequired,
-    updateRoom: PropTypes.func.isRequired,
-    removeRoom: PropTypes.func.isRequired,
-  }
+let isPasswordDirty = false
 
-  state = {
-    isPasswordDirty: false,
-  }
+const EditRoom = props => {
+  const checkbox = useRef(null)
+  const nameInput = useRef(null)
+  const passwordInput = useRef(null)
 
-  checkbox = React.createRef()
-  nameInput = React.createRef()
-  passwordInput = React.createRef()
+  const dispatch = useDispatch()
+  const handleCreateClick = useCallback(() => {
+    dispatch(createRoom({
+      name: nameInput.current.value,
+      password: passwordInput.current.value,
+      status: checkbox.current.checked ? 'open' : 'closed',
+    }))
+  }, [dispatch])
 
-  handleCreateClick = () => {
-    this.props.createRoom({
-      name: this.nameInput.current.value,
-      password: this.passwordInput.current.value,
-      status: this.checkbox.current.checked ? 'open' : 'closed',
-    })
-  }
+  const handleUpdateClick = useCallback(() => {
+    dispatch(updateRoom(props.room.roomId, {
+      name: nameInput.current.value,
+      password: isPasswordDirty ? passwordInput.current.value : undefined,
+      status: checkbox.current.checked ? 'open' : 'closed',
+    }))
+  }, [dispatch, props.room, isPasswordDirty])
 
-  handleUpdateClick = () => {
-    this.props.updateRoom(this.props.room.roomId, {
-      name: this.nameInput.current.value,
-      password: this.state.isPasswordDirty ? this.passwordInput.current.value : undefined,
-      status: this.checkbox.current.checked ? 'open' : 'closed',
-    })
-  }
-
-  handleRemoveClick = () => {
-    if (confirm(`Remove room "${this.props.room.name}" and its queue?`)) {
-      this.props.removeRoom(this.props.room.roomId)
+  const handleRemoveClick = useCallback(() => {
+    if (confirm(`Remove room "${props.room.name}" and its queue?`)) {
+      dispatch(removeRoom(props.room.roomId))
     }
-  }
+  }, [dispatch, props.room])
 
-  handleKeyPress = (e) => {
+  const handleKeyPress = useCallback((e) => {
     if (e.charCode === 13) {
-      this.props.room ? this.handleUpdateClick() : this.handleCreateClick()
+      props.room ? handleUpdateClick() : handleCreateClick()
     }
-  }
+  }, [props.room])
 
-  handlePasswordChange = (e) => {
-    this.setState({ isPasswordDirty: true })
-  }
+  // reset dirty flag when the editor "closes"
+  useEffect(() => {
+    if (props.isVisible === false) isPasswordDirty = false
+  }, [props.isVisible])
 
-  render () {
-    const { room, closeRoomEditor } = this.props
+  return (
+    <Modal
+      isVisible={props.isVisible}
+      onClose={props.onClose}
+      title={props.room ? 'Edit Room' : 'Create Room'}
+      style={{ minWidth: '300px' }}
+    >
+      <input type='text'
+        autoComplete='off'
+        autoFocus={typeof props.room === 'undefined'}
+        defaultValue={props.room ? props.room.name : ''}
+        onKeyPress={handleKeyPress}
+        placeholder='room name'
+        ref={nameInput}
+        styleName='field'
+      />
 
-    return (
-      <>
-        <input type='text'
-          autoComplete='off'
-          autoFocus={typeof room === 'undefined'}
-          defaultValue={room ? room.name : ''}
-          onKeyPress={this.handleKeyPress}
-          placeholder='room name'
-          ref={this.nameInput}
-          styleName='field'
-        />
+      <input type='password'
+        autoComplete='off'
+        defaultValue={props.room && props.room.hasPassword ? '*'.repeat(32) : ''}
+        onChange={() => {isPasswordDirty = true}}
+        onKeyPress={handleKeyPress}
+        placeholder='room password (optional)'
+        ref={passwordInput}
+        styleName='field'
+      />
 
-        <input type='password'
-          autoComplete='off'
-          defaultValue={room && room.hasPassword ? '*'.repeat(32) : ''}
-          onChange={this.handlePasswordChange}
-          onKeyPress={this.handleKeyPress}
-          placeholder='room password (optional)'
-          ref={this.passwordInput}
-          styleName='field'
-        />
+      <label>
+        <input type='checkbox'
+          defaultChecked={!props.room || props.room.status === 'open'}
+          ref={checkbox}
+        /> Open
+      </label>
 
-        <label>
-          <input type='checkbox'
-            defaultChecked={!room || room.status === 'open'}
-            ref={this.checkbox}
-          /> Open
-        </label>
+      <br />
+      <br />
 
-        <br />
-        <br />
+      {!props.room &&
+        <button onClick={handleCreateClick} className='primary' styleName='btn'>
+          Create Room
+        </button>
+      }
 
-        {!room &&
-          <button onClick={this.handleCreateClick} className='primary' styleName='btn'>
-            Create Room
-          </button>
-        }
+      {props.room &&
+        <button onClick={handleUpdateClick} className='primary' styleName='btn'>
+          Update Room
+        </button>
+      }
 
-        {room &&
-          <button onClick={this.handleUpdateClick} className='primary' styleName='btn'>
-            Update Room
-          </button>
-        }
+      {props.room &&
+        <button onClick={handleRemoveClick} styleName='btn'>
+          Remove Room
+        </button>
+      }
 
-        {room &&
-          <button onClick={this.handleRemoveClick} styleName='btn'>
-            Remove Room
-          </button>
-        }
-
-        <button onClick={closeRoomEditor}>Cancel</button>
-      </>
-    )
-  }
+      <button onClick={props.onClose}>Cancel</button>
+    </Modal>
+  )
 }
+
+EditRoom.propTypes = {
+  room: PropTypes.object,
+  isVisible: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+}
+
+export default EditRoom

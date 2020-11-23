@@ -136,21 +136,18 @@ export function removeRoom (roomId) {
 export function closeRoomEditor () {
   return {
     type: ROOM_EDITOR_CLOSE,
-    payload: null
   }
 }
 
-export function openRoomEditor (roomId) {
+export function openRoomEditor () {
   return {
     type: ROOM_EDITOR_OPEN,
-    payload: roomId,
   }
 }
 
 export function toggleShowAll () {
   return {
     type: ROOM_TOGGLE_SHOW_ALL,
-    payload: null
   }
 }
 
@@ -164,13 +161,11 @@ const ACTION_HANDLERS = {
   }),
   [ROOM_EDITOR_OPEN]: (state, { payload }) => ({
     ...state,
-    isEditing: true,
-    editingRoomId: payload,
+    isEditorOpen: true,
   }),
   [ROOM_EDITOR_CLOSE]: (state, { payload }) => ({
     ...state,
-    isEditing: false,
-    editingRoomId: null,
+    isEditorOpen: false,
   }),
   [ROOM_TOGGLE_SHOW_ALL]: (state, { payload }) => ({
     ...state,
@@ -184,9 +179,8 @@ const ACTION_HANDLERS = {
 const initialState = {
   result: [],
   entities: {},
-  isEditing: false,
+  isEditorOpen: false,
   isShowingAll: false,
-  editingRoomId: null,
 }
 
 export default function rooms (state = initialState, action) {
