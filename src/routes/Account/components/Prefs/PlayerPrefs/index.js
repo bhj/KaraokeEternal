@@ -1,3 +1,3 @@
-import PlayerPrefsContainer from './PlayerPrefsContainer'
+import PlayerPrefs from './PlayerPrefs'
 
-export default PlayerPrefsContainer
+export default PlayerPrefs

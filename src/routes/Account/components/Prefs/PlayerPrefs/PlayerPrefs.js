@@ -1,48 +1,42 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useCallback, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'components/Icon'
+import { setPref } from 'store/modules/prefs'
 import './PlayerPrefs.css'
 
-export default class PlayerPrefs extends React.Component {
-  static propTypes = {
-    isReplayGainEnabled: PropTypes.bool.isRequired,
-    // actions
-    setPref: PropTypes.func.isRequired,
-  }
+const PlayerPrefs = props => {
+  const [isExpanded, setExpanded] = useState(false)
+  const isReplayGainEnabled = useSelector(state => state.prefs.isReplayGainEnabled)
+  const toggleExpanded = useCallback(() => {
+    setExpanded(!isExpanded)
+  }, [isExpanded])
 
-  state = {
-    isExpanded: false,
-  }
+  const dispatch = useDispatch()
+  const toggleCheckbox = useCallback((e) => {
+    dispatch(setPref(e.target.name, e.target.checked))
+  }, [dispatch])
 
-  toggleExpanded = () => {
-    this.setState({ isExpanded: !this.state.isExpanded })
-  }
-
-  toggleCheckbox = (e) => {
-    this.props.setPref(e.target.name, !this.props[e.target.name])
-  }
-
-  render () {
-    return (
-      <div styleName='container'>
-        <div styleName='heading' onClick={this.toggleExpanded}>
-          <Icon icon='TELEVISION_PLAY' size={28} styleName='icon' />
-          <div styleName='title'>Player</div>
-          <div>
-            <Icon icon={this.state.isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} styleName='icon' />
-          </div>
-        </div>
-
-        <div styleName='content' style={{ display: this.state.isExpanded ? 'block' : 'none' }}>
-          <label>
-            <input type='checkbox'
-              checked={this.props.isReplayGainEnabled}
-              onChange={this.toggleCheckbox}
-              name='isReplayGainEnabled'
-            /> ReplayGain (clip-safe)
-          </label>
+  return (
+    <div styleName='container'>
+      <div styleName='heading' onClick={toggleExpanded}>
+        <Icon icon='TELEVISION_PLAY' size={28} styleName='icon' />
+        <div styleName='title'>Player</div>
+        <div>
+          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} styleName='icon' />
         </div>
       </div>
-    )
-  }
+
+      <div styleName='content' style={{ display: isExpanded ? 'block' : 'none' }}>
+        <label>
+          <input type='checkbox'
+            checked={isReplayGainEnabled}
+            onChange={toggleCheckbox}
+            name='isReplayGainEnabled'
+          /> ReplayGain (clip-safe)
+        </label>
+      </div>
+    </div>
+  )
 }
+
+export default PlayerPrefs
