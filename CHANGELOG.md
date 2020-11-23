@@ -7,6 +7,7 @@
 - **(server)** Uses one less process/helper
 - **(server)** Media scanner process is restricted to read-only database access
 - **(server)** Fixed potential SQLITE_BUSY errors while scanning media
+- **(server)** Fixed error message when no artist/title delimiter in filename
 
 ## v0.8.0 (2020-07-03)
 
