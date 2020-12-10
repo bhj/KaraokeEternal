@@ -72,7 +72,8 @@ class MP4Player extends React.Component {
     const screenAspect = this.props.width / this.props.height
     const videoAspect = this.state.videoWidth / this.state.videoHeight
     const scale = screenAspect > videoAspect
-      ? this.props.height / this.state.videoHeight : this.props.width / this.state.videoWidth
+      ? this.props.height / this.state.videoHeight
+      : this.props.width / this.state.videoWidth
 
     return (
       <canvas

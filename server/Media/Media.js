@@ -15,7 +15,8 @@ class Media {
       entities: {}
     }
 
-    const whereClause = typeof filter !== 'object' ? sql`true`
+    const whereClause = typeof filter !== 'object'
+      ? sql`true`
       : sql`${sql.tuple(Object.keys(filter).map(sql.column))} = ${sql.tuple(Object.values(filter))}`
 
     const query = sql`

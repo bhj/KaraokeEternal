@@ -66,7 +66,7 @@ const EditRoom = props => {
       <input type='password'
         autoComplete='off'
         defaultValue={props.room && props.room.hasPassword ? '*'.repeat(32) : ''}
-        onChange={() => {isPasswordDirty = true}}
+        onChange={() => { isPasswordDirty = true }}
         onKeyPress={handleKeyPress}
         placeholder='room password (optional)'
         ref={passwordInput}
