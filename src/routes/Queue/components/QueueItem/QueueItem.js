@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Swipeable } from 'react-swipeable'
+import Buttons from 'components/Buttons'
 import Icon from 'components/Icon'
+import Swipeable from 'components/Swipeable'
 import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
-import Buttons from 'components/Buttons'
 import './QueueItem.css'
 
 class QueueItem extends React.Component {

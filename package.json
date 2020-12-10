@@ -123,7 +123,7 @@
     "react-redux": "^7.2.2",
     "react-responsive-modal": "^5.2.6",
     "react-router-dom": "^5.2.0",
-    "react-swipeable": "^5.5.1",
+    "react-swipeable": "^6.0.1",
     "react-transition-group": "^4.4.1",
     "react-virtualized": "^9.22.2",
     "redbox-react": "^1.6.0",

@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Swipeable } from 'react-swipeable'
-import Icon from 'components/Icon'
-import ToggleAnimation from 'components/ToggleAnimation'
-import Buttons from 'components/Buttons'
-import { formatDuration } from 'lib/dateTime'
 import Highlighter from 'react-highlight-words'
+import Buttons from 'components/Buttons'
+import Icon from 'components/Icon'
+import Swipeable from 'components/Swipeable'
+import ToggleAnimation from 'components/ToggleAnimation'
+import { formatDuration } from 'lib/dateTime'
 import './SongItem.css'
 
 let ignoreMouseup = false
