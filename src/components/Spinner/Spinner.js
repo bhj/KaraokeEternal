@@ -1,7 +1,7 @@
 import React from 'react'
 import './Spinner.css'
 
-export const Spinner = () => (
+const Spinner = () => (
   <div styleName='container'>
     <div styleName='spinner'></div>
     <div styleName='spinner rect2'></div>

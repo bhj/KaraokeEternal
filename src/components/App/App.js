@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/es/integration/react'
 import { Router } from 'react-router-dom'
 import CoreLayout from './CoreLayout'
+import Spinner from '../Spinner'
 import history from 'lib/history'
 
 class App extends Component {
@@ -15,8 +16,8 @@ class App extends Component {
   render () {
     return (
       <Provider store={this.props.store}>
-        <PersistGate loading={null} persistor={this.props.persistor}>
-          <React.Suspense fallback={<p>Loading...</p>}>
+        <PersistGate loading={<Spinner/>} persistor={this.props.persistor}>
+          <React.Suspense fallback={<Spinner/>}>
             <Router history={history}>
               <CoreLayout />
             </Router>
