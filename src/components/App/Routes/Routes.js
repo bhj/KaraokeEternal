@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import requireAuth from 'lib/requireAuth'
@@ -28,5 +29,9 @@ const Routes = (props) => (
     </Route>
   </Switch>
 )
+
+Routes.propTypes = {
+  setHeader: PropTypes.func.isRequired,
+}
 
 export default Routes
