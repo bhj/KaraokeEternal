@@ -1,3 +1,3 @@
-import PathPrefsContainer from './PathPrefsContainer'
+import PathPrefs from './PathPrefs'
 
-export default PathPrefsContainer
+export default PathPrefs
