@@ -30,7 +30,10 @@ const PlaybackCtrl = props => {
   const handlePlayNext = useCallback(() => dispatch(requestPlayNext()), [dispatch])
   const handleVolume = useCallback(val => dispatch(requestVolume(val)), [dispatch])
 
-  const [isDisplayCtrlVisible, toggleDisplayCtrl] = useState(false)
+  const [isDisplayCtrlVisible, setDisplayCtrlVisible] = useState(false)
+  const toggleDisplayCtrl = useCallback(() => {
+    setDisplayCtrlVisible(!isDisplayCtrlVisible)
+  }, [isDisplayCtrlVisible])
 
   if (!status.isPlayerPresent) {
     return (isAdmin && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
@@ -58,7 +61,7 @@ const PlaybackCtrl = props => {
         onVolumeChange={handleVolume}
       />
 
-      <div onClick={() => toggleDisplayCtrl(!isDisplayCtrlVisible)} styleName='displayCtrl'>
+      <div onClick={toggleDisplayCtrl} styleName='displayCtrl'>
         <Icon icon='TUNE' size={44}/>
       </div>
 
