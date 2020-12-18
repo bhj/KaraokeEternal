@@ -1,37 +1,33 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchAccount, updateAccount, logout } from 'store/modules/user'
 import AccountForm from './AccountForm'
 import './Account.css'
 
-export default class Account extends Component {
-  static propTypes = {
-    user: PropTypes.object.isRequired,
-    // actions
-    fetchAccount: PropTypes.func.isRequired,
-    updateAccount: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired,
-  }
+const Account = props => {
+  const user = useSelector(state => state.user)
 
-  componentDidMount () {
-    this.props.fetchAccount()
-  }
+  // once per mount
+  useEffect(() => dispatch(fetchAccount()), [])
 
-  render () {
-    const { user } = this.props
+  const dispatch = useDispatch()
+  const handleUpdateAccount = useCallback(data => dispatch(updateAccount(data)), [dispatch])
+  const handleSignOut = useCallback(() => dispatch(logout()), [dispatch])
 
-    return (
-      <div styleName='container'>
-        <h1 styleName='title'>My Account</h1>
-        <div styleName='content'>
-          <p>Signed in as <strong>{user.username}</strong></p>
+  return (
+    <div styleName='container'>
+      <h1 styleName='title'>My Account</h1>
+      <div styleName='content'>
+        <p>Signed in as <strong>{user.username}</strong></p>
 
-          <AccountForm user={user} onSubmitClick={this.props.updateAccount} showRoom={false} />
+        <AccountForm user={user} onSubmitClick={handleUpdateAccount} showRoom={false} />
 
-          <button onClick={this.props.logout} styleName='signOut'>
-            Sign Out
-          </button>
-        </div>
+        <button onClick={handleSignOut} styleName='signOut'>
+          Sign Out
+        </button>
       </div>
-    )
-  }
+    </div>
+  )
 }
+
+export default Account

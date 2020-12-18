@@ -1,3 +1,3 @@
-import AccountContainer from './AccountContainer'
+import Account from './Account'
 
-export default AccountContainer
+export default Account

@@ -2,10 +2,6 @@
   margin: 0 auto;
   overflow: hidden;
   padding: var(--container-padding);
-
-  /* fixes panel disappearing in iOS 11 due to overflow: scroll on parent
-  container and -webkit-overflow-scrolling: touch on parent */
-  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .heading {

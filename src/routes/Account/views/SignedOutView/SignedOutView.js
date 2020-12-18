@@ -1,17 +1,17 @@
-import PropTypes from 'prop-types'
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Logo from 'components/Logo'
-import LoginForm from './LoginForm'
-import AccountForm from '../Account/AccountForm'
+import LoginForm from '../../components/Account/LoginForm'
+import AccountForm from '../../components/Account/AccountForm'
 import { login, createAccount } from 'store/modules/user'
-import './Login.css'
+import './SignedOutView.css'
 
-const Login = props => {
+const SignedOutView = props => {
   const [isCreating, setCreating] = useState(false)
   const toggleCreate = useCallback(() => setCreating(!isCreating))
 
   const isFirstRun = useSelector(state => state.prefs.isFirstRun === true)
+  const ui = useSelector(state => state.ui)
   const user = useSelector(state => state.user)
 
   const dispatch = useDispatch()
@@ -19,7 +19,7 @@ const Login = props => {
   const handleCreate = useCallback(data => dispatch(createAccount(data)), [dispatch])
 
   return (
-    <div styleName='container' style={props.style}>
+    <div styleName='container' style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
       <Logo styleName='logo'/>
 
       {!isFirstRun && !isCreating &&
@@ -55,8 +55,4 @@ const Login = props => {
   )
 }
 
-Login.propTypes = {
-  style: PropTypes.object,
-}
-
-export default Login
+export default SignedOutView
