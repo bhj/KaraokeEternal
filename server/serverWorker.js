@@ -171,7 +171,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   })
 
   // create socket.io server and attach handlers
-  const io = new SocketIO(server)
+  const io = SocketIO(server, { serveClient: false })
   socketActions(io, jwtKey)
 
   // attach IPC action handlers

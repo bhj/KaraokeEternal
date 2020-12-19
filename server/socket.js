@@ -56,21 +56,20 @@ module.exports = function (io, jwtKey) {
         sock.user.name, sock.id, reason
       )
 
-      // beyond this point assumes there is a room
-      if (typeof sock.user.roomId !== 'number') {
-        return
-      }
+      if (typeof sock.user.roomId !== 'number') return
 
-      const room = sock.adapter.rooms[Rooms.prefix(sock.user.roomId)] || []
+      // beyond this point assumes there is a room
 
       log.verbose('%s (%s) left room %s (%s; %s in room)',
-        sock.user.name, sock.id, sock.user.roomId, reason, room.length
+        sock.user.name, sock.id, sock.user.roomId, reason, sock.adapter.rooms.size
       )
 
       // any players left in room?
-      if (room.length && !Object
-        .keys(room.sockets)
-        .some(id => io.sockets.sockets[id] && !!io.sockets.sockets[id]._lastPlayerStatus)) {
+      for (const s of io.of('/').sockets.values()) {
+        if (s.user && s.user.roomId === sock.user.roomId && s._lastPlayerStatus) {
+          break
+        }
+
         io.to(Rooms.prefix(sock.user.roomId)).emit('action', {
           type: PLAYER_LEAVE,
         })
@@ -148,21 +147,22 @@ module.exports = function (io, jwtKey) {
 
     // add user to room
     sock.join(Rooms.prefix(sock.user.roomId))
-    const room = sock.adapter.rooms[Rooms.prefix(sock.user.roomId)]
 
     // if there's a player in room, emit its last known status
-    const lastStatusSocket = Object.keys(room.sockets)
-      .find(id => !!io.sockets.sockets[id] && !!io.sockets.sockets[id]._lastPlayerStatus)
+    // @todo this just emits the first status found
+    for (const s of io.of('/').sockets.values()) {
+      if (s.user && s.user.roomId === sock.user.roomId && s._lastPlayerStatus) {
+        io.to(sock.id).emit('action', {
+          type: PLAYER_STATUS,
+          payload: s._lastPlayerStatus,
+        })
 
-    if (lastStatusSocket) {
-      io.to(sock.id).emit('action', {
-        type: PLAYER_STATUS,
-        payload: io.sockets.sockets[lastStatusSocket]._lastPlayerStatus,
-      })
+        break
+      }
     }
 
     log.verbose('%s (%s) joined room %s (%s in room)',
-      sock.user.name, sock.id, sock.user.roomId, room.length
+      sock.user.name, sock.id, sock.user.roomId, sock.adapter.rooms.size
     )
 
     // send room's queue

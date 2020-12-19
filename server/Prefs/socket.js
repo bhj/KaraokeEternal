@@ -19,12 +19,16 @@ const ACTION_HANDLERS = {
     await Prefs.set(payload.key, payload.data)
 
     // only push to admins
-    const admins = Object.keys(sock.server.sockets.connected)
-      .filter(id => sock.server.sockets.connected[id].user.isAdmin)
+    const admins = []
+
+    for (const s of sock.server.sockets.sockets.values()) {
+      if (s.user && s.user.isAdmin) {
+        admins.push(s.id)
+        sock.server.to(s.id)
+      }
+    }
 
     if (admins.length) {
-      admins.forEach(id => sock.server.to(id))
-
       sock.server.emit('action', {
         type: PREFS_PUSH,
         payload: await Prefs.get(),
