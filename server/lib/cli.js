@@ -9,12 +9,14 @@ const env = {
 
 const yargs = require('yargs')
   .version(false) // disable default handler
-  .command('scanonly', 'Only run the media scanner, then exit when finished')
   .option('p', {
     alias: 'port',
     describe: 'Web server port (default=auto)',
     number: true,
     requiresArg: true,
+  })
+  .option('scan', {
+    describe: 'Run the media scanner at startup',
   })
   .option('scannerConsoleLevel', {
     describe: 'Media scanner console level (default=4)',
@@ -61,17 +63,17 @@ if (argv.version) {
   process.exit(0)
 }
 
-if (argv._.includes('scanonly')) {
-  env.KF_SERVER_SCAN_ONLY = true
+if (argv.scan) {
+  env.KF_SERVER_SCAN = true
 }
 
 // settings via CLI take precendence over env vars
 const opts = {
+  port: 'KF_SERVER_PORT',
   scannerConsoleLevel: 'KF_SCANNER_CONSOLE_LEVEL',
   scannerLogLevel: 'KF_SCANNER_LOG_LEVEL',
   serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
   serverLogLevel: 'KF_SERVER_LOG_LEVEL',
-  port: 'KF_SERVER_PORT',
 }
 
 Object.keys(opts).forEach(key => {

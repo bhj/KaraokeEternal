@@ -264,6 +264,7 @@ Karaoke Forever Server supports the following command line options:
 | --- | --- | --- |
 | <span style="white-space: nowrap;">`-l, --loglevel <number>`</span>| Log file level (**0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug) | 3 |
 | <span style="white-space: nowrap;">`-p, --port <number>`</span>| Web server port. To use low ports such as 80 you may need to run with elevated privileges (not recommended) | 0 (auto) |
+| <span style="white-space: nowrap;">`--scan`</span>| Run the media scanner at startup | |
 | <span style="white-space: nowrap;">`-v, --version`</span>| Output the Karaoke Forever Server version and exit | |
 
 ### File Locations
