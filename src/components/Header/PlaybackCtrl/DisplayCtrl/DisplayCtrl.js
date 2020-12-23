@@ -53,8 +53,6 @@ export default class DisplayCtrl extends React.Component {
   })
 
   render () {
-    const isBGEnabled = this.props.mediaType && typeof this.props[this.props.mediaType + 'Alpha'] === 'number'
-
     return (
       <Modal
         isVisible={this.props.isVisible}
@@ -78,7 +76,7 @@ export default class DisplayCtrl extends React.Component {
               </label>
             </legend>
 
-            {this.props.isWebGLSupported &&
+            {this.props.isWebGLSupported && this.props.mediaType === 'cdg' &&
             <>
               <div styleName='presetBtnContainer'>
                 <button styleName='btnPreset' onClick={this.handlePresetPrev}>
@@ -106,6 +104,10 @@ export default class DisplayCtrl extends React.Component {
             </>
             }
 
+            {this.props.isWebGLSupported && this.props.mediaType !== 'cdg' &&
+              <p styleName='unsupported'>Not available for this media type</p>
+            }
+
             {!this.props.isWebGLSupported &&
               <p styleName='unsupported'>WebGL not supported</p>
             }
@@ -128,11 +130,7 @@ export default class DisplayCtrl extends React.Component {
                 handle={handle}
                 styleName='slider'
               />
-            </>
-            }
 
-            {isBGEnabled &&
-            <>
               <label styleName='field'>Background</label>
               <OptimisticSlider
                 min={0}
@@ -146,7 +144,7 @@ export default class DisplayCtrl extends React.Component {
             </>
             }
 
-            {!isBGEnabled && this.props.mediaType !== 'cdg' &&
+            {this.props.mediaType !== 'cdg' &&
               <p styleName='unsupported'>No options available</p>
             }
           </fieldset>
