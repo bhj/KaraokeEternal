@@ -34,7 +34,7 @@ const mapStateToProps = (state) => {
     isPlayingNext: player.isPlayingNext,
     isQueueEmpty: queue.result.length === 0,
     isReplayGainEnabled: prefs.isReplayGainEnabled,
-    isWebGLEnabled: player.isWebGLEnabled,
+    isWebGLSupported: player.isWebGLSupported,
     mp4Alpha: player.mp4Alpha,
     queue: getOrderedQueue(state),
     queueId: player.queueId,

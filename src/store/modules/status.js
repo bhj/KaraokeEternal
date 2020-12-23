@@ -82,6 +82,7 @@ const initialState = {
   isErrored: false,
   isPlayerPresent: false,
   isPlaying: false,
+  isWebGLSupported: false,
   mediaType: null,
   mp4Alpha: 1,
   position: 0,

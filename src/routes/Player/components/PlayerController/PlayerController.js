@@ -15,7 +15,7 @@ class PlayerController extends React.Component {
     isPlayingNext: PropTypes.bool.isRequired,
     isQueueEmpty: PropTypes.bool.isRequired,
     isReplayGainEnabled: PropTypes.bool.isRequired,
-    isWebGLEnabled: PropTypes.bool.isRequired,
+    isWebGLSupported: PropTypes.bool.isRequired,
     mp4Alpha: PropTypes.number.isRequired,
     queue: PropTypes.object.isRequired,
     queueId: PropTypes.number.isRequired,
@@ -131,7 +131,7 @@ class PlayerController extends React.Component {
           isPlaying={props.isPlaying}
           isVisible={!!state.queueItem && !props.isErrored && !props.isAtQueueEnd}
           isReplayGainEnabled={props.isReplayGainEnabled}
-          isWebGLEnabled={props.isWebGLEnabled}
+          isWebGLSupported={props.isWebGLSupported}
           mediaId={state.queueItem ? state.queueItem.mediaId : null}
           mediaKey={state.queueItem ? state.queueItem.queueId : null}
           mediaType={state.queueItem ? state.queueItem.mediaType : null}

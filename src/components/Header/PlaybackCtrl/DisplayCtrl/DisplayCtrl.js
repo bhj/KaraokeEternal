@@ -11,7 +11,7 @@ export default class DisplayCtrl extends React.Component {
     cdgSize: PropTypes.number.isRequired,
     isVisible: PropTypes.bool.isRequired,
     isVisualizerEnabled: PropTypes.bool.isRequired,
-    isWebGLEnabled: PropTypes.bool.isRequired,
+    isWebGLSupported: PropTypes.bool.isRequired,
     mediaType: PropTypes.string,
     mp4Alpha: PropTypes.number.isRequired,
     sensitivity: PropTypes.number.isRequired,
@@ -71,14 +71,14 @@ export default class DisplayCtrl extends React.Component {
               <label>
                 <input type='checkbox'
                   checked={this.props.isVisualizerEnabled}
-                  disabled={!this.props.isWebGLEnabled}
+                  disabled={!this.props.isWebGLSupported}
                   onChange={this.handleToggleVisualizer}
                   ref={this.checkbox}
                 /> Visualizer
               </label>
             </legend>
 
-            {this.props.isWebGLEnabled &&
+            {this.props.isWebGLSupported &&
             <>
               <div styleName='presetBtnContainer'>
                 <button styleName='btnPreset' onClick={this.handlePresetPrev}>
@@ -106,7 +106,7 @@ export default class DisplayCtrl extends React.Component {
             </>
             }
 
-            {!this.props.isWebGLEnabled &&
+            {!this.props.isWebGLSupported &&
               <p styleName='unsupported'>WebGL not supported</p>
             }
           </fieldset>
