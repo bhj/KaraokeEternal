@@ -27,7 +27,7 @@ const mapStateToProps = (state) => {
   return {
     cdgAlpha: player.cdgAlpha,
     cdgSize: player.cdgSize,
-    historyJSON: state.status.historyJSON, // @TODO use state.player instead?
+    historyJSON: player.historyJSON,
     isAtQueueEnd: player.isAtQueueEnd,
     isErrored: player.isErrored,
     isPlaying: player.isPlaying,
