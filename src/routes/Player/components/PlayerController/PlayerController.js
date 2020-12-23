@@ -148,7 +148,7 @@ class PlayerController extends React.Component {
           width={props.width}
           height={props.height}
         />
-        {state.audioSourceNode && props.visualizer.isSupported && props.visualizer.isEnabled &&
+        {state.audioSourceNode && props.visualizer.isSupported && props.visualizer.isEnabled && state.queueItem && state.queueItem.mediaType === 'cdg' &&
           <PlayerVisualizer
             audioSourceNode={state.audioSourceNode}
             isPlaying={props.isPlaying}
