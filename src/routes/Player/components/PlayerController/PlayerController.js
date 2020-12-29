@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Player from '../Player'
 import PlayerTextOverlay from '../PlayerTextOverlay'
-import PlayerVisualizer from '../PlayerVisualizer'
 
 class PlayerController extends React.Component {
   static propTypes = {
@@ -31,11 +30,9 @@ class PlayerController extends React.Component {
     playerLoad: PropTypes.func.isRequired,
     playerPlay: PropTypes.func.isRequired,
     playerStatus: PropTypes.func.isRequired,
-    playerVisualizerError: PropTypes.func.isRequired,
   }
 
   state = {
-    audioSourceNode: null,
     queueItem: null,
   }
 
@@ -74,10 +71,6 @@ class PlayerController extends React.Component {
     }
 
     this.handleStatus()
-  }
-
-  handleAudioSourceNode = (source) => {
-    this.setState({ audioSourceNode: source })
   }
 
   handleError = (msg) => {
@@ -136,7 +129,6 @@ class PlayerController extends React.Component {
           mediaKey={state.queueItem ? state.queueItem.queueId : null}
           mediaType={state.queueItem ? state.queueItem.mediaType : null}
           mp4Alpha={props.mp4Alpha}
-          onAudioSourceNode={this.handleAudioSourceNode}
           onEnd={this.handleLoadNext}
           onError={this.handleError}
           onLoad={props.playerLoad}
@@ -144,21 +136,11 @@ class PlayerController extends React.Component {
           onStatus={this.handleStatus}
           rgTrackGain={state.queueItem ? state.queueItem.rgTrackGain : null}
           rgTrackPeak={state.queueItem ? state.queueItem.rgTrackPeak : null}
+          visualizer={props.visualizer}
           volume={props.volume}
           width={props.width}
           height={props.height}
         />
-        {state.audioSourceNode && props.visualizer.isSupported && props.visualizer.isEnabled && state.queueItem && state.queueItem.mediaType === 'cdg' &&
-          <PlayerVisualizer
-            audioSourceNode={state.audioSourceNode}
-            isPlaying={props.isPlaying}
-            onError={props.playerVisualizerError}
-            presetKey={props.visualizer.presetKey}
-            sensitivity={props.visualizer.sensitivity}
-            width={props.width}
-            height={props.height}
-          />
-        }
         <PlayerTextOverlay
           queueItem={state.queueItem}
           isAtQueueEnd={props.isAtQueueEnd}

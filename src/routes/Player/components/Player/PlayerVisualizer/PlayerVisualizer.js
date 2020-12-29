@@ -27,7 +27,7 @@ class PlayerVisualizer extends React.Component {
         height: this.props.height,
       })
     } catch (err) {
-      this.props.onError(err)
+      this.props.onError(err.message) // @todo pass error object instead of msg only
       return
     }
 

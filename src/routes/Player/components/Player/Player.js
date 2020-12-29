@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import CDGPlayer from './CDGPlayer'
 import MP4Player from './MP4Player'
+const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer'))
 
 const players = {
   CDGPlayer,
@@ -22,10 +23,10 @@ class Player extends React.Component {
     mp4Alpha: PropTypes.number.isRequired,
     rgTrackGain: PropTypes.number,
     rgTrackPeak: PropTypes.number,
+    visualizer: PropTypes.object.isRequired,
     volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    onAudioSourceNode: PropTypes.func.isRequired,
     // media events
     onEnd: PropTypes.func.isRequired,
     onError: PropTypes.func.isRequired,
@@ -38,6 +39,10 @@ class Player extends React.Component {
   audioGainNode = this.audioCtx.createGain()
   audioSourceNode = null
   isFetching = false // internal
+
+  state = {
+    visualizerAudioSourceNode: this.audioCtx.createGain(),
+  }
 
   componentDidMount () {
     this.updateVolume()
@@ -70,7 +75,7 @@ class Player extends React.Component {
 
     // hand back copy of original audio source
     const sourceNodeCopy = this.audioSourceNode
-    this.props.onAudioSourceNode(sourceNodeCopy)
+    this.setState({ visualizerAudioSourceNode: sourceNodeCopy })
   }
 
   handlePlay = () => {
@@ -104,12 +109,27 @@ class Player extends React.Component {
       return null
     }
 
+    const isVisualizerActive = this.props.mediaType === 'cdg' && this.props.isWebGLSupported && this.props.visualizer.isEnabled
+
     return (
-      <PlayerComponent
-        {...this.props}
-        onAudioElement={this.handleAudioElement}
-        onPlay={this.handlePlay}
-      />
+      <>
+        <PlayerComponent
+          {...this.props}
+          onAudioElement={this.handleAudioElement}
+          onPlay={this.handlePlay}
+        />
+        {isVisualizerActive &&
+          <PlayerVisualizer
+            audioSourceNode={this.state.visualizerAudioSourceNode}
+            isPlaying={this.props.isPlaying}
+            onError={this.props.onError}
+            presetKey={this.props.visualizer.presetKey}
+            sensitivity={this.props.visualizer.sensitivity}
+            width={this.props.width}
+            height={this.props.height}
+          />
+        }
+      </>
     )
   }
 }
