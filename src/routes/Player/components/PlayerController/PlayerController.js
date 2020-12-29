@@ -157,7 +157,6 @@ class PlayerController extends React.Component {
             sensitivity={props.visualizer.sensitivity}
             width={props.width}
             height={props.height}
-            volume={props.volume}
           />
         }
         <PlayerTextOverlay

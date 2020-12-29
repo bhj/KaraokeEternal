@@ -11,7 +11,6 @@ class PlayerVisualizer extends React.Component {
     onError: PropTypes.func.isRequired,
     presetKey: PropTypes.string.isRequired,
     sensitivity: PropTypes.number.isRequired,
-    volume: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
   }
