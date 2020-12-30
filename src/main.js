@@ -32,41 +32,11 @@ window._persistor = persistStore(store, null, () => {
 })
 
 // ========================================================
-// Render Setup
+// Go!
 // ========================================================
 const MOUNT_NODE = document.getElementById('root')
 
-let render = () => {
-  ReactDOM.render(
-    <App store={store} persistor={window._persistor} />,
-    MOUNT_NODE
-  )
-}
-
-// This code is excluded from production bundle
-if (__DEV__) {
-  if (module.hot) {
-    // Development render functions
-    const renderApp = render
-    const renderError = (error) => {
-      const RedBox = require('redbox-react').default
-
-      ReactDOM.render(<RedBox error={error} />, MOUNT_NODE)
-    }
-
-    // Wrap render in try/catch
-    render = () => {
-      try {
-        renderApp()
-      } catch (error) {
-        console.error(error)
-        renderError(error)
-      }
-    }
-  }
-}
-
-// ========================================================
-// Go!
-// ========================================================
-render()
+ReactDOM.render(
+  <App store={store} persistor={window._persistor} />,
+  MOUNT_NODE
+)

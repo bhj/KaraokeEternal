@@ -126,7 +126,6 @@
     "react-swipeable": "^6.0.1",
     "react-transition-group": "^4.4.1",
     "react-virtualized": "^9.22.3",
-    "redbox-react": "^1.6.0",
     "redux": "^4.0.5",
     "redux-auth-wrapper": "^3.0.0",
     "redux-optimistic-ui": "^3.1.0",
