@@ -126,9 +126,6 @@ config.module.rules.push({
   test : /(global)\.css$/,
   use  : [{
     loader : MiniCssExtractPlugin.loader,
-    options: {
-      hmr: __DEV__,
-    },
   }, {
     loader  : 'css-loader',
     options : {
@@ -145,9 +142,6 @@ config.module.rules.push({
   use: [
     {
       loader : MiniCssExtractPlugin.loader,
-      options: {
-        hmr: __DEV__,
-      }
     }, {
       loader: 'css-loader',
       options: {
