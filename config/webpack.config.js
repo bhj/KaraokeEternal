@@ -40,7 +40,6 @@ const config = {
   module: { rules: [] },
   plugins: [
     new webpack.DefinePlugin(Object.assign({
-      'process.env': { NODE_ENV: JSON.stringify(NODE_ENV) },
       __DEV__,
       __TEST__,
       __PROD__,
