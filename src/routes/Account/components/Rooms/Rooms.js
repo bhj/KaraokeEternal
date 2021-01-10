@@ -1,23 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Column, Table } from 'react-virtualized'
 import { useDispatch, useSelector } from 'react-redux'
 import { formatDateTime } from 'lib/dateTime'
 import EditRoom from './EditRoom'
 import { closeRoomEditor, fetchRooms, openRoomEditor, toggleShowAll } from 'store/modules/rooms'
 import getRoomList from '../../selectors/getRoomList'
-import style from './Rooms.css'
+import './Rooms.css'
 
 const Rooms = props => {
   const [editorRoom, setEditorRoom] = useState(null)
 
   const { isEditorOpen, isShowingAll } = useSelector(state => state.rooms)
   const rooms = useSelector(getRoomList)
-  const ui = useSelector(state => state.ui)
 
   const dispatch = useDispatch()
   const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
-  const handleOpen = useCallback(roomId => {
-    setEditorRoom(rooms.entities[roomId])
+  const handleOpen = useCallback(e => {
+    setEditorRoom(rooms.entities[e.target.dataset.roomId])
     dispatch(openRoomEditor())
   }, [dispatch, rooms])
   const handleToggle = useCallback(() => dispatch(toggleShowAll()), [dispatch])
@@ -26,8 +24,16 @@ const Rooms = props => {
     dispatch(fetchRooms())
   }, []) // once per mount
 
-  const tableRef = React.createRef()
-  const getRow = ({ index }) => rooms.entities[rooms.result[index]]
+  const rows = rooms.result.map(roomId => {
+    const room = rooms.entities[roomId]
+    return (
+      <tr key={roomId}>
+        <td><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
+        <td>{room.status + (room.numUsers ? ` (${room.numUsers})` : '')}</td>
+        <td>{formatDateTime(new Date(room.dateCreated * 1000))}</td>
+      </tr>
+    )
+  })
 
   return (
     <div styleName='container'>
@@ -42,42 +48,18 @@ const Rooms = props => {
         </label>
       </div>
       <div styleName='content'>
-        <Table
-          width={ui.contentWidth}
-          height={rooms.result.length * 30 + 20}
-          headerHeight={20}
-          rowHeight={30}
-          rowCount={rooms.result.length}
-          rowGetter={getRow}
-          headerClassName={style.tableHeader}
-          rowClassName={style.tableRow}
-          ref={tableRef}
-          styleName='table'
-        >
-          <Column
-            label='Name'
-            dataKey='name'
-            width={ui.contentWidth * 0.40}
-            styleName='tableCol'
-            cellRenderer={({ rowData }) => (
-              <a onClick={() => handleOpen(rowData.roomId)}>{rowData.name}</a>
-            )}
-          />
-          <Column
-            label='Status'
-            dataKey='status'
-            width={ui.contentWidth * 0.20}
-            styleName='tableCol'
-            cellRenderer={({ rowData }) => rowData.status + (rowData.numUsers ? ` (${rowData.numUsers})` : '')}
-          />
-          <Column
-            label='Created'
-            dataKey='dateCreated'
-            width={ui.contentWidth * 0.40}
-            styleName='tableCol'
-            cellRenderer={({ rowData }) => formatDateTime(new Date(rowData.dateCreated * 1000))}
-          />
-        </Table>
+        <table styleName='table'>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows}
+          </tbody>
+        </table>
 
         <br />
         <button onClick={handleOpen} className='primary'>

@@ -26,23 +26,35 @@
   padding: var(--container-padding);
 }
 
+.table {
+  width: 100%;
+}
+
 .table > * {
   outline: none;
 }
 
-.tableHeader {
-  align-items: center;
+.table th {
   color: hsl(var(--hue-blue), 10%, 60%);
-  display: flex;
-  flex-direction: row;
+  font-weight: normal;
+  text-align: left;
 }
 
-.tableRow {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.table th:first-child {
+  width: 100%;
 }
 
-.tableCol {
+.table th:nth-child(2) {
+  min-width: 70px;
+}
+
+.table td {
+  height: 25px;
+  overflow: hidden;
   white-space: nowrap;
+}
+
+.table td:first-child  {
+  text-overflow: ellipsis;
+  max-width: 0;
 }
