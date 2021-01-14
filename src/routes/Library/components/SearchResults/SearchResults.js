@@ -29,14 +29,15 @@ class SearchResults extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (this.list) {
-      this.list.recomputeRowHeights()
+      // @todo: clear size cache starting from the toggled artist
+      this.list.resetAfterIndex(0)
     }
   }
 
   render () {
     return (
       <PaddedList
-        rowCount={this.props.artistsResult.length + 3} // both headers + SongList
+        numRows={this.props.artistsResult.length + 3} // both headers + SongList
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         paddingTop={this.props.ui.headerHeight}
@@ -49,13 +50,13 @@ class SearchResults extends React.Component {
     )
   }
 
-  rowRenderer = ({ index, key, style }) => {
+  rowRenderer = ({ index, style }) => {
     const { artistsResult, songsResult, filterStarred } = this.props
 
     // # artist results heading
     if (index === 0) {
       return (
-        <div key={key} style={style} styleName='artistsHeading'>
+        <div key={'artistsHeading'} style={style} styleName='artistsHeading'>
           {artistsResult.length} {filterStarred ? 'starred ' : ''}
           {artistsResult.length === 1 ? 'artist' : 'artists'}
         </div>
@@ -79,7 +80,7 @@ class SearchResults extends React.Component {
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
           filterKeywords={this.props.filterKeywords}
           onArtistClick={this.props.toggleArtistResultExpanded}
-          key={key}
+          key={artistId}
           style={style}
         />
       )
@@ -88,7 +89,7 @@ class SearchResults extends React.Component {
     // # song results heading
     if (index === artistsResult.length + 1) {
       return (
-        <div key={key} style={style} styleName='songsHeading'>
+        <div key={'songsHeading'} style={style} styleName='songsHeading'>
           {songsResult.length} {filterStarred ? 'starred ' : ''}
           {songsResult.length === 1 ? 'song' : 'songs'}
         </div>
@@ -97,7 +98,7 @@ class SearchResults extends React.Component {
 
     // song results
     return (
-      <div style={style} key={key}>
+      <div style={style} key={'songs'}>
         <SongList
           songIds={songsResult}
           showArtist
@@ -108,7 +109,7 @@ class SearchResults extends React.Component {
     )
   }
 
-  rowHeight = ({ index }) => {
+  rowHeight = index => {
     // artists heading
     if (index === 0) return ARTIST_HEADER_HEIGHT
 

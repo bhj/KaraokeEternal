@@ -79,10 +79,6 @@ button:focus {
   outline: none;
 }
 
-.ReactVirtualized__List:focus {
-  outline: none;
-}
-
 input[type="text"],
 input[type="email"],
 input[type="password"],

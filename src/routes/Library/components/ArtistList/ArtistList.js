@@ -29,7 +29,7 @@ class ArtistList extends React.Component {
     return (
       <div>
         <PaddedList
-          rowCount={this.props.artistsResult.length}
+          numRows={this.props.artistsResult.length}
           rowHeight={this.rowHeight}
           rowRenderer={this.rowRenderer}
           onScroll={this.handleScroll}
@@ -39,7 +39,6 @@ class ArtistList extends React.Component {
           paddingBottom={this.props.ui.footerHeight}
           width={this.props.ui.innerWidth}
           height={this.props.ui.innerHeight}
-          scrollToAlignment='start'
         />
         <AlphaPicker
           onPick={this.handleAlphaPick}
@@ -57,10 +56,12 @@ class ArtistList extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (!this.list) return
-    this.list.recomputeRowHeights()
+
+    // @todo: clear size cache starting from the toggled artist
+    this.list.resetAfterIndex(0)
   }
 
-  rowRenderer = ({ index, key, style }) => {
+  rowRenderer = ({ index, style }) => {
     const { artists, artistsResult, expandedArtists } = this.props
     const artist = artists[artistsResult[index]]
 
@@ -70,7 +71,7 @@ class ArtistList extends React.Component {
         artistSongIds={artist.songIds} // "children"
         filterKeywords={this.props.filterKeywords}
         isExpanded={expandedArtists.includes(artist.artistId)}
-        key={key}
+        key={artist.artistId}
         name={artist.name}
         numStars={this.props.starredArtistCounts[artist.artistId] || 0}
         onArtistClick={this.props.toggleArtistExpanded}
@@ -82,7 +83,7 @@ class ArtistList extends React.Component {
     )
   }
 
-  rowHeight = ({ index }) => {
+  rowHeight = index => {
     const artistId = this.props.artistsResult[index]
     let rows = 1
 
@@ -93,21 +94,21 @@ class ArtistList extends React.Component {
     return rows * ROW_HEIGHT
   }
 
-  handleScroll = ({ scrollTop }) => {
-    this.lastScrollTop = scrollTop
+  handleScroll = ({ scrollOffset }) => {
+    this.lastScrollTop = scrollOffset
   }
 
   handleAlphaPick = (char) => {
     const row = this.props.alphaPickerMap[char]
 
     if (typeof row !== 'undefined') {
-      this.list.scrollToRow(row > 0 ? row - 1 : row)
+      this.list.scrollToItem(row > 0 ? row - 1 : row, 'start')
     }
   }
 
   handleRef = r => {
     this.list = r
-    this.list.scrollToPosition(this.props.scrollTop)
+    this.list.scrollTo(this.props.scrollTop)
   }
 }
 

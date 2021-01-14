@@ -1,23 +1,20 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { List } from 'react-virtualized'
+import { VariableSizeList as List } from 'react-window'
+import './PaddedList.css'
 
 class PaddedList extends React.Component {
   static propTypes = {
-    rowRenderer: PropTypes.func.isRequired,
-    rowCount: PropTypes.number.isRequired,
-    rowHeight: PropTypes.func.isRequired,
+    numRows: PropTypes.number.isRequired,
     onScroll: PropTypes.func,
     onRef: PropTypes.func,
     paddingTop: PropTypes.number.isRequired,
     paddingRight: PropTypes.number,
     paddingBottom: PropTypes.number.isRequired,
+    rowRenderer: PropTypes.func.isRequired,
+    rowHeight: PropTypes.func.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-  }
-
-  state = {
-    scrollBarSize: 0,
   }
 
   componentDidMount () {
@@ -28,60 +25,53 @@ class PaddedList extends React.Component {
 
   render () {
     return (
-      <div style={{ width: this.props.width, overflow: 'hidden' }}>
-        <List
-          {...this.props}
-          width={this.props.width + this.state.scrollBarSize} // clips scrollbar offscreen
-          rowCount={this.props.rowCount + 2} // top & bottom spacer
-          overscanRowCount={10}
-          onScroll={this.props.onScroll}
-          onScrollbarPresenceChange={this.handleScrollBar}
-          ref={this.setRef}
-          // facades
-          rowHeight={this.rowHeight}
-          rowRenderer={this.rowRenderer}
-        />
-      </div>
+      <List
+        itemCount={this.props.numRows + 2} // top & bottom spacer
+        itemSize={this.getItemSize}
+        onScroll={this.props.onScroll}
+        overscanCount={10}
+        ref={this.setRef}
+        styleName='container'
+        width={this.props.width}
+        height={this.props.height}
+      >
+        {this.rowRenderer}
+      </List>
     )
   }
 
   componentDidUpdate (prevProps) {
     const { paddingTop, paddingBottom } = this.props
     if (paddingTop !== prevProps.paddingTop || paddingBottom !== prevProps.paddingBottom) {
-      this.list.recomputeRowHeights()
+      this.list.resetAfterIndex(0)
     }
   }
 
-  rowRenderer = ({ index, key, style }) => {
+  rowRenderer = ({ index, style }) => {
     // top & bottom spacer
-    if (index === 0 || index === this.props.rowCount + 1) {
+    if (index === 0 || index === this.props.numRows + 1) {
       return (
-        <div key={key} style={style} />
+        <div key={index === 0 ? 'top' : 'bottom'} style={style} />
       )
     }
 
     return this.props.rowRenderer({
       index: --index,
-      key,
       style: { ...style, paddingRight: this.props.paddingRight }
     })
   }
 
-  rowHeight = ({ index }) => {
+  getItemSize = index => {
     // top & bottom spacer
     if (index === 0) {
       return this.props.paddingTop
-    } else if (index === this.props.rowCount + 1) {
+    } else if (index === this.props.numRows + 1) {
       return this.props.paddingBottom
     } else {
       index--
     }
 
-    return this.props.rowHeight({ index })
-  }
-
-  handleScrollBar = ({ size }) => {
-    this.setState({ scrollBarSize: size })
+    return this.props.rowHeight(index)
   }
 
   setRef = (ref) => {

@@ -1,0 +1,8 @@
+ .container {
+   overflow: hidden auto !important; /* allow scrolling on Y-axis only */
+   scrollbar-width: none; /* Firefox */
+ }
+
+.container::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+}
