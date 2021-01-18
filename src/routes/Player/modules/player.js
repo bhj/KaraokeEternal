@@ -149,7 +149,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   cdgAlpha: 0,
-  cdgSize: 0.7,
+  cdgSize: 0.8,
   errorMessage: '',
   historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,

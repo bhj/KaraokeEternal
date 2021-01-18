@@ -122,7 +122,7 @@ export default class DisplayCtrl extends React.Component {
             <>
               <label styleName='field'>Size</label>
               <OptimisticSlider
-                min={0.4}
+                min={0.6}
                 max={1}
                 step={0.01}
                 value={this.props.cdgSize}
