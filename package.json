@@ -24,7 +24,7 @@
     "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "NODE_ENV=development nodemon --ignore build --ignore dist --ignore src -- -p3000",
-    "build": "rimraf build && webpack -c config/webpack.config.js",
+    "build": "rimraf build && webpack --config config/webpack.config.js",
     "serve": "node server/main.js",
     "serve:docs": "hugo serve --source docs -b http://$(hostname) --bind 0.0.0.0",
     "server": "npm run serve",
