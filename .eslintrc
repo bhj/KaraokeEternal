@@ -1,11 +1,16 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "babelOptions": {
+      "configFile": "./config/babel.config.json",
+    },
+  },
   "extends": [
     "standard",
     "plugin:react/recommended"
   ],
   "plugins": [
-    "babel",
+    "@babel",
     "react",
     "promise"
   ],
