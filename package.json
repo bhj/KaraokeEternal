@@ -90,7 +90,7 @@
     "butterchurn": "^2.6.7",
     "butterchurn-presets": "^2.4.7",
     "case-sensitive-paths-webpack-plugin": "^2.3.0",
-    "cdgraphics": "^5.0.0",
+    "cdgraphics": "^6.0.0",
     "css-loader": "^3.6.0",
     "electron": "^11.2.1",
     "electron-builder": "^22.9.1",

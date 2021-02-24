@@ -148,7 +148,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  cdgAlpha: 0,
+  cdgAlpha: 0.5,
   cdgSize: 0.8,
   errorMessage: '',
   historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
