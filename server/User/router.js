@@ -191,7 +191,7 @@ router.post('/setup', async (ctx, next) => {
 })
 
 // get own account (helps sync account changes across devices)
-router.get('/user', async (ctx, next) => {
+router.get('/account', async (ctx, next) => {
   if (typeof ctx.user.userId !== 'number') {
     ctx.throw(401)
   }

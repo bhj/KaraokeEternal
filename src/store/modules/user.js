@@ -248,7 +248,7 @@ export function fetchAccount () {
   return (dispatch, getState) => {
     dispatch(requestAccount())
 
-    return api('GET', 'user')
+    return api('GET', 'account')
       .then(user => {
         dispatch(receiveAccount(user))
       })
