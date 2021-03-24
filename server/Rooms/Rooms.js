@@ -6,13 +6,13 @@ class Rooms {
   /**
    * Get all rooms
    *
-   * @param  {Boolean}  onlyOpen  Whether to restrict query to open rooms only
+   * @param  {Boolean}  closed  Whether to include rooms with status "closed"
    * @return {Promise}
    */
-  static async get (onlyOpen = true) {
+  static async get (closed = false) {
     const result = []
     const entities = {}
-    const whereClause = onlyOpen ? sql`status = "open"` : sql`true`
+    const whereClause = closed ? sql`true` : sql`status = "open"`
 
     const query = sql`
       SELECT * FROM rooms

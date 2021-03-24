@@ -15,7 +15,7 @@ const STATUSES = ['open', 'closed']
 // list rooms
 router.get('/rooms', async (ctx, next) => {
   // non-admins can only see open rooms
-  const res = await Rooms.get(!ctx.user.isAdmin)
+  const res = await Rooms.get(ctx.user.isAdmin)
 
   res.result.forEach(roomId => {
     const room = ctx.io.sockets.adapter.rooms[Rooms.prefix(roomId)]
@@ -62,7 +62,7 @@ router.post('/rooms', async (ctx, next) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(false)
+  ctx.body = await Rooms.get(true)
 })
 
 // update room
@@ -108,7 +108,7 @@ router.put('/rooms/:roomId', async (ctx, next) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(false)
+  ctx.body = await Rooms.get(true)
 })
 
 // remove room
@@ -145,7 +145,7 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(false)
+  ctx.body = await Rooms.get(true)
 })
 
 module.exports = router
