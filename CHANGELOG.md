@@ -6,6 +6,7 @@
 - **(app)** Summary is now shown following a media scan
 - **(server)** Uses one less process/helper
 - **(server)** Media scanner process is restricted to read-only database access
+- **(server)** Fixed potential error when a non-admin user tries to remove one of their queued songs
 - **(server)** Fixed potential SQLITE_BUSY errors while scanning media
 - **(server)** Fixed error message when no artist/title delimiter in filename
 

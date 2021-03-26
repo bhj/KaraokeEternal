@@ -52,7 +52,7 @@ const ACTION_HANDLERS = {
 
     // admins can remove any
     if (!sock.user.isAdmin) {
-      whereClause += sql` AND userId = ${sock.user.userId}`
+      whereClause = sql`${whereClause} AND userId = ${sock.user.userId}`
     }
 
     const query = sql`
