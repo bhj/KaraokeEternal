@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import RoomSelect from '../RoomSelect'
 import UserImage from './UserImage'
 import './AccountForm.css'
 
 export default class AccountForm extends Component {
   static propTypes = {
+    children: PropTypes.node,
     user: PropTypes.object.isRequired,
-    showRoom: PropTypes.bool.isRequired,
-    onSubmitClick: PropTypes.func.isRequired,
+    onDirtyChange: PropTypes.func,
+    requirePassword: PropTypes.bool,
   }
 
   state = {
@@ -21,6 +21,10 @@ export default class AccountForm extends Component {
     if (prevProps.user.dateUpdated !== this.props.user.dateUpdated) {
       this.setState({ isDirty: false })
     }
+
+    if (this.props.onDirtyChange && prevState.isDirty !== this.state.isDirty) {
+      this.props.onDirtyChange(this.state.isDirty)
+    }
   }
 
   render () {
@@ -31,7 +35,7 @@ export default class AccountForm extends Component {
         <input type='email'
           autoComplete='off'
           autoFocus={!isUser}
-          onChange={this.updateVisible}
+          onChange={this.updateDirty}
           placeholder={isUser ? 'change username (optional)' : 'username or email'}
           ref={r => { this.username = r }}
           styleName='field'
@@ -39,7 +43,7 @@ export default class AccountForm extends Component {
 
         <input type='password'
           autoComplete='new-password'
-          onChange={this.updateVisible}
+          onChange={this.updateDirty}
           placeholder={isUser ? 'change password (optional)' : 'password'}
           ref={r => { this.newPassword = r }}
           styleName='field'
@@ -61,14 +65,14 @@ export default class AccountForm extends Component {
           />
           <input type='text'
             defaultValue={isUser ? this.props.user.name : ''}
-            onChange={this.updateVisible}
+            onChange={this.updateDirty}
             placeholder='display name'
             ref={r => { this.name = r }}
             styleName='field name'
           />
         </div>
 
-        {this.state.isDirty && isUser &&
+        {isUser && this.props.requirePassword &&
           <>
             <br />
             <input type='password'
@@ -80,35 +84,15 @@ export default class AccountForm extends Component {
           </>
         }
 
-        {this.props.showRoom &&
-          <RoomSelect
-            onSelectRef={this.handleRoomSelectRef}
-            onPasswordRef={this.handleRoomPasswordRef}
-            styleName='field roomSelect'
-          />
-        }
-
-        {(this.state.isDirty || !isUser) &&
-          <button onClick={this.handleSubmit} className='primary'>
-            {isUser ? 'Update Account' : 'Create Account'}
-          </button>
-        }
+        {this.props.children}
       </form>
     )
   }
 
-  handleSubmit = (event) => {
-    event.preventDefault()
-
+  getData = () => {
     const data = new FormData()
 
     if (this.curPassword) {
-      if (!this.curPassword.value) {
-        alert('Please enter your current password to make changes')
-        this.curPassword.focus()
-        return
-      }
-
       data.append('password', this.curPassword.value)
     }
 
@@ -129,34 +113,17 @@ export default class AccountForm extends Component {
       data.append('image', this.state.userImage)
     }
 
-    if (this.roomSelect) {
-      if (!this.roomSelect.value) {
-        alert('Please select a room')
-        this.roomSelect.focus()
-        return
-      }
-
-      data.append('roomId', this.roomSelect.value)
-
-      if (this.roomPassword) {
-        data.append('roomPassword', this.roomPassword.value)
-      }
-    }
-
-    this.props.onSubmitClick(data)
+    return data
   }
 
-  handleUserImageChange = (blob) => {
+  handleUserImageChange = blob => {
     this.setState({
       userImage: blob,
       isDirty: true,
     })
   }
 
-  handleRoomSelectRef = r => { this.roomSelect = r }
-  handleRoomPasswordRef = r => { this.roomPassword = r }
-
-  updateVisible = () => {
+  updateDirty = () => {
     if (this.props.user.userId === null) return
 
     this.setState({

@@ -4,23 +4,6 @@
   padding: var(--container-padding);
 }
 
-.heading {
-  align-items: baseline;
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: var(--container-padding);
-  color: hsl(var(--hue-blue), 10%, 60%);
-}
-
-.heading h1 {
-  flex: 1;
-  margin: 0 1em 0 0;
-  font-size: 32px;
-  font-family: var(--font-family-custom);
-  white-space: nowrap;
-  color: hsl(var(--hue-blue), 10%, 80%);
-}
-
 .logo {
   margin: 2rem 0;
   text-align: center;
