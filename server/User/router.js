@@ -148,7 +148,7 @@ router.put('/user/:userId', async (ctx, next) => {
 })
 
 // create account
-router.post('/account', async (ctx, next) => {
+router.post('/user', async (ctx, next) => {
   // validate room info first
   const { roomId, roomPassword } = ctx.request.body
 
@@ -161,8 +161,9 @@ router.post('/account', async (ctx, next) => {
   // create user
   const creds = await _create(ctx, false) // non-admin
 
-  // log them in automatically
-  await _login(ctx, { ...creds, roomId, roomPassword })
+  // success
+  ctx.status = 200
+  ctx.body = {}
 })
 
 // first-time setup

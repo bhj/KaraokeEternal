@@ -25,7 +25,7 @@ const locationHelper = locationHelperBuilder({})
 function requestLogin (creds) {
   return {
     type: LOGIN,
-    payload: creds
+    payload: creds,
   }
 }
 
@@ -45,12 +45,12 @@ function loginError (err) {
 
 // calls api endpoint that should set an httpOnly cookie with
 // our JWT, then establish the sockiet.io connection
-export function login (data) {
+export function login (creds) {
   return (dispatch, getState) => {
-    dispatch(requestLogin(data))
+    dispatch(requestLogin(creds))
 
     return api('POST', 'login', {
-      body: data
+      body: creds
     })
       .then(user => {
         // user object in response body
@@ -58,7 +58,6 @@ export function login (data) {
         dispatch(connectSocket())
         window._socket.open()
 
-        // update preferences
         if (user.isAdmin) {
           dispatch(fetchPrefs())
         }
@@ -67,12 +66,7 @@ export function login (data) {
         const redirect = locationHelper.getRedirectQueryParam(history)
 
         if (redirect) {
-          return history.push(redirect)
-        }
-
-        // default redirect if not an admin
-        if (!user.isAdmin) {
-          history.push('/library')
+          history.push(redirect)
         }
       })
       .catch(err => {
@@ -87,14 +81,12 @@ export function login (data) {
 function requestLogout () {
   return {
     type: LOGOUT,
-    payload: null
   }
 }
 
 function receiveLogout () {
   return {
     type: LOGOUT + _SUCCESS,
-    payload: null
   }
 }
 
@@ -131,17 +123,16 @@ export function logout () {
 // ------------------------------------
 // Create account
 // ------------------------------------
-function requestCreate (user) {
+function requestCreate (data) {
+  // FormData is browser-native and not coercible for display as the payload
   return {
     type: CREATE_ACCOUNT,
-    payload: user
   }
 }
 
-function receiveCreate (user) {
+function createSuccess () {
   return {
     type: CREATE_ACCOUNT + _SUCCESS,
-    payload: user
   }
 }
 
@@ -152,27 +143,24 @@ function createError (err) {
   }
 }
 
-export function createAccount (user, isFirstRun) {
+export function createAccount (data, isFirstRun) {
   return (dispatch, getState) => {
-    dispatch(requestCreate(user))
+    dispatch(requestCreate(data))
 
     const isFirstRun = !!getState().prefs.isFirstRun
 
-    return api('POST', isFirstRun ? 'setup' : 'account', {
-      body: user
+    return api('POST', isFirstRun ? 'setup' : 'user', {
+      body: data
     })
-      .then(user => {
-        dispatch(receiveCreate(user))
-        dispatch(connectSocket())
-        window._socket.open()
+      .then(() => {
+        dispatch(createSuccess())
 
-        if (!user.isAdmin) {
-          // default redirect
-          history.push('/library')
-          return
-        }
-
-        dispatch(fetchPrefs())
+        return dispatch(login({
+          username: data.get('username'),
+          password: data.get('newPassword'),
+          roomId: data.get('roomId'),
+          roomPassword: data.get('roomPassword'),
+        }))
       })
       .catch(err => {
         dispatch(createError(err))
