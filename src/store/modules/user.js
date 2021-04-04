@@ -183,17 +183,17 @@ export function createAccount (user, isFirstRun) {
 // ------------------------------------
 // Update account
 // ------------------------------------
-function requestUpdate (user) {
+function requestUpdate (data) {
+  // FormData is browser-native and not coercible for display as the payload
   return {
     type: UPDATE_ACCOUNT,
-    payload: user
   }
 }
 
 function receiveUpdate (response) {
   return {
     type: UPDATE_ACCOUNT + _SUCCESS,
-    payload: response
+    payload: response,
   }
 }
 
@@ -206,9 +206,11 @@ function updateError (err) {
 
 export function updateAccount (data) {
   return (dispatch, getState) => {
-    dispatch(requestUpdate(data))
+    const { userId } = getState().user
 
-    return api('PUT', 'account', {
+    dispatch(requestUpdate())
+
+    return api('PUT', `user/${userId}`, {
       body: data
     })
       .then(user => {

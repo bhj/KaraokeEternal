@@ -37,23 +37,27 @@ router.get('/logout', async (ctx, next) => {
   ctx.body = {}
 })
 
-// update account
-router.put('/account', async (ctx, next) => {
+// update a user account
+router.put('/user/:userId', async (ctx, next) => {
+  const targetId = parseInt(ctx.params.userId, 10)
   const user = await User.getById(ctx.user.userId, true)
 
-  if (!user) {
+  // must be admin if updating another user
+  if (!user || (targetId !== user.userId && !user.isAdmin)) {
     ctx.throw(401)
   }
 
   let { name, username, password, newPassword, newPasswordConfirm } = ctx.request.body
 
-  // validate current password
-  if (!password) {
-    ctx.throw(422, 'Current password is required')
-  }
+  // validate current password if updating own account
+  if (targetId === user.userId) {
+    if (!password) {
+      ctx.throw(422, 'Current password is required')
+    }
 
-  if (!await bcrypt.compare(password, user.password)) {
-    ctx.throw(401, 'Incorrect current password')
+    if (!await bcrypt.compare(password, user.password)) {
+      ctx.throw(401, 'Incorrect current password')
+    }
   }
 
   // validated
@@ -112,9 +116,13 @@ router.put('/account', async (ctx, next) => {
   const query = sql`
     UPDATE users
     SET ${sql.tuple(Array.from(fields.keys()).map(sql.column))} = ${sql.tuple(Array.from(fields.values()))}
-    WHERE userId = ${ctx.user.userId}
+    WHERE userId = ${targetId}
   `
-  await db.run(String(query), query.parameters)
+  const res = await db.run(String(query), query.parameters)
+
+  if (!res.changes) {
+    ctx.throw(404, `userId ${targetId} not found`)
+  }
 
   // notify room?
   if (ctx.user.roomId) {
@@ -124,7 +132,14 @@ router.put('/account', async (ctx, next) => {
     })
   }
 
-  // get updated token
+  // we're done if updating another account
+  if (targetId !== user.userId) {
+    ctx.status = 200
+    ctx.body = {}
+    return
+  }
+
+  // send updated token if updating own account
   await _login(ctx, {
     username: username || user.username,
     password: newPassword || password,
