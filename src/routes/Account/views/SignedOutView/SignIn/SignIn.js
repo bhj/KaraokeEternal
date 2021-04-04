@@ -19,7 +19,7 @@ const SignIn = props => {
       username: usernameRef.current.value.trim(),
       password: passwordRef.current.value,
       roomId: roomSelectRef.select.current.value,
-      roomPassword: roomSelectRef.password ? roomSelectRef.password.current.value : undefined,
+      roomPassword: roomSelectRef.password.current ? roomSelectRef.password.current.value : undefined,
     }))
   }, [dispatch])
 

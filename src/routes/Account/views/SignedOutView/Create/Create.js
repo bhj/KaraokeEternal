@@ -27,7 +27,7 @@ const Create = props => {
 
     data.append('roomId', roomSelectRef.select.current.value)
 
-    if (roomSelectRef.password) {
+    if (roomSelectRef.password.current) {
       data.append('roomPassword', roomSelectRef.password.current.value)
     }
 
