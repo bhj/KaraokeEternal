@@ -6,14 +6,14 @@ import './UserImage.css'
 
 export default class AccountForm extends Component {
   static propTypes = {
-    user: PropTypes.object.isRequired,
+    user: PropTypes.object,
     onSelect: PropTypes.func.isRequired,
   }
 
   state = {
     isLoading: true,
-    imageURL: this.props.user.userId !== null
-      ? `/api/user/image/${this.props.user.userId}?v=${this.props.user.dateUpdated}`
+    imageURL: this.props.user && this.props.user.userId !== null
+      ? `/api/user/${this.props.user.userId}/image?v=${this.props.user.dateUpdated}`
       : null,
   }
 

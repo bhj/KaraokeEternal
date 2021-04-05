@@ -225,7 +225,7 @@ router.get('/account', async (ctx, next) => {
 })
 
 // get a user's image
-router.get('/user/image/:userId', async (ctx, next) => {
+router.get('/user/:userId/image', async (ctx, next) => {
   const userId = parseInt(ctx.params.userId, 10)
   const user = await User.getById(userId)
 
