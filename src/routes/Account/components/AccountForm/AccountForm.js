@@ -6,19 +6,20 @@ import './AccountForm.css'
 export default class AccountForm extends Component {
   static propTypes = {
     children: PropTypes.node,
-    user: PropTypes.object.isRequired,
     onDirtyChange: PropTypes.func,
     requirePassword: PropTypes.bool,
+    showRole: PropTypes.bool,
+    user: PropTypes.object,
   }
 
   state = {
     isDirty: false,
-    isChangingPassword: this.props.user.userId === null,
+    isChangingPassword: !this.props.user || this.props.user.userId === null,
     userImage: undefined,
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.user.dateUpdated !== this.props.user.dateUpdated) {
+    if (this.props.user && prevProps.user.dateUpdated !== this.props.user.dateUpdated) {
       this.setState({ isDirty: false })
     }
 
@@ -28,7 +29,7 @@ export default class AccountForm extends Component {
   }
 
   render () {
-    const isUser = this.props.user.userId !== null
+    const isUser = this.props.user && this.props.user.userId !== null
 
     return (
       <form styleName='container'>
@@ -58,7 +59,7 @@ export default class AccountForm extends Component {
           />
         }
 
-        <div styleName='userDisplayContainer' style={{ order: isUser ? -1 : 0 }}>
+        <div styleName='userDisplayContainer'>
           <UserImage
             user={this.props.user}
             onSelect={this.handleUserImageChange}
@@ -72,16 +73,17 @@ export default class AccountForm extends Component {
           />
         </div>
 
-        {isUser && this.props.requirePassword &&
-          <>
-            <br />
-            <input type='password'
-              autoComplete='current-password'
-              placeholder='current password'
-              ref={r => { this.curPassword = r }}
-              styleName='field'
-            />
-          </>
+        {this.props.showRole &&
+          <select
+            defaultValue={isUser && this.props.user.isAdmin ? '1' : '0'}
+            onChange={this.updateDirty}
+            ref={r => { this.role = r }}
+            styleName='field'
+          >
+            <option key={'choose'} value='' disabled>select role...</option>
+            <option key={'std'} value='0'>Standard</option>
+            <option key={'admin'} value='1'>Administrator</option>
+          </select>
         }
 
         {this.props.children}
@@ -91,10 +93,6 @@ export default class AccountForm extends Component {
 
   getData = () => {
     const data = new FormData()
-
-    if (this.curPassword) {
-      data.append('password', this.curPassword.value)
-    }
 
     if (this.name.value.trim()) {
       data.append('name', this.name.value.trim())
@@ -113,6 +111,10 @@ export default class AccountForm extends Component {
       data.append('image', this.state.userImage)
     }
 
+    if (this.role) {
+      data.append('role', this.role.value)
+    }
+
     return data
   }
 
@@ -124,11 +126,12 @@ export default class AccountForm extends Component {
   }
 
   updateDirty = () => {
-    if (this.props.user.userId === null) return
+    if (!this.props.user || this.props.user.userId === null) return
 
     this.setState({
       isDirty: !!this.username.value || !!this.newPassword.value ||
-        this.name.value !== this.props.user.name,
+        this.name.value !== this.props.user.name ||
+        this.role.value !== (this.props.user.isAdmin ? '1' : '0'),
       isChangingPassword: !!this.newPassword.value,
     })
   }

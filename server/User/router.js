@@ -37,6 +37,51 @@ router.get('/logout', async (ctx, next) => {
   ctx.body = {}
 })
 
+// list all users (admin only)
+router.get('/users', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  const userRooms = {} // { userId: [roomId, roomId, ...]}
+
+  for (const s of ctx.io.of('/').sockets.values()) {
+    if (s.user && typeof s.user.roomId === 'number') {
+      if (userRooms[s.user.userId]) {
+        userRooms[s.user.userId].push(s.user.roomId)
+      } else {
+        userRooms[s.user.userId] = [s.user.roomId]
+      }
+    }
+  }
+
+  // get all users
+  const users = await User.get()
+
+  users.result.forEach(userId => {
+    users.entities[userId].rooms = userRooms[userId] || []
+  })
+
+  ctx.body = users
+})
+
+// delete a user (admin only)
+router.delete('/user/:userId', async (ctx, next) => {
+  const targetId = parseInt(ctx.params.userId, 10)
+
+  if (!ctx.user.isAdmin || targetId === ctx.user.userId) {
+    ctx.throw(403)
+  }
+
+  User.remove(targetId)
+
+  // @todo push updated queue(s)
+
+  // success
+  ctx.status = 200
+  ctx.body = {}
+})
+
 // update a user account
 router.put('/user/:userId', async (ctx, next) => {
   const targetId = parseInt(ctx.params.userId, 10)
@@ -111,6 +156,17 @@ router.put('/user/:userId', async (ctx, next) => {
     fields.set('image', null)
   }
 
+  // changing role?
+  if (ctx.request.body.role) {
+    // @todo since we're not ensuring there'd be at least one admin
+    // remaining, changing one's own role is currently disallowed
+    if (!user.isAdmin || targetId === user.userId) {
+      ctx.throw(403)
+    }
+
+    fields.set('isAdmin', parseInt(ctx.request.body.role, 10))
+  }
+
   fields.set('dateUpdated', Math.floor(Date.now() / 1000))
 
   const query = sql`
@@ -149,17 +205,27 @@ router.put('/user/:userId', async (ctx, next) => {
 
 // create account
 router.post('/user', async (ctx, next) => {
-  // validate room info first
-  const { roomId, roomPassword } = ctx.request.body
+  if (!ctx.user.isAdmin) {
+    // already signed in as non-admin?
+    if (ctx.user.userId !== null) {
+      ctx.throw(403, 'You are already signed in')
+    }
 
-  try {
-    await Rooms.validate(roomId, roomPassword)
-  } catch (err) {
-    ctx.throw(401, err.message)
+    // trying to specify a role?
+    if (ctx.request.body.role) {
+      ctx.throw(403)
+    }
+
+    // new users must choose a room at the same time
+    try {
+      await Rooms.validate(ctx.request.body.roomId, ctx.request.body.roomPassword)
+    } catch (err) {
+      ctx.throw(401, err.message)
+    }
   }
 
   // create user
-  const creds = await _create(ctx, false) // non-admin
+  await _create(ctx, ctx.request.body.role === '1')
 
   // success
   ctx.status = 200
@@ -244,7 +310,7 @@ router.get('/user/:userId/image', async (ctx, next) => {
 
 module.exports = router
 
-async function _create (ctx, isAdmin = 0) {
+async function _create (ctx, isAdmin = false) {
   let { name, username, newPassword, newPasswordConfirm } = ctx.request.body
 
   if (!username || !name || !newPassword || !newPasswordConfirm) {
@@ -280,7 +346,7 @@ async function _create (ctx, isAdmin = 0) {
   fields.set('password', await bcrypt.hash(newPassword, BCRYPT_ROUNDS))
   fields.set('name', name)
   fields.set('dateCreated', Math.floor(Date.now() / 1000))
-  fields.set('isAdmin', isAdmin)
+  fields.set('isAdmin', isAdmin ? 1 : 0)
 
   // user image?
   if (ctx.request.files.image) {

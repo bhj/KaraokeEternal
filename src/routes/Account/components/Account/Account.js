@@ -5,25 +5,27 @@ import AccountForm from '../AccountForm'
 import './Account.css'
 
 const Account = props => {
+  const curPassword = useRef(null)
+  const formRef = useRef(null)
+
   const user = useSelector(state => state.user)
   const [isDirty, setDirty] = useState(false)
-  const formRef = useRef(null)
 
   // once per mount
   useEffect(() => dispatch(fetchAccount()), [])
 
   const dispatch = useDispatch()
-  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty)) // @todo add deps?
+  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty))
   const handleSignOut = useCallback(() => dispatch(logout()), [dispatch])
   const handleSubmit = useCallback(() => {
-    const data = formRef.current.getData()
-
-    if (!data.get('password')) {
-      alert('Please enter your current password to make changes')
-      formRef.current.curPassword.focus()
+    if (!curPassword.current.value.trim()) {
+      alert('Please enter your current password to make changes.')
+      curPassword.current.focus()
       return
     }
 
+    const data = formRef.current.getData()
+    data.append('password', curPassword.current.value)
     dispatch(updateAccount(data))
   }, [dispatch])
 
@@ -36,9 +38,20 @@ const Account = props => {
         <AccountForm
           user={user}
           onDirtyChange={handleDirtyChange}
-          requirePassword={isDirty}
           ref={formRef}
-        />
+        >
+          {isDirty &&
+            <>
+              <br />
+              <input type='password'
+                autoComplete='current-password'
+                placeholder='current password'
+                ref={curPassword}
+                // styleName='field'
+              />
+            </>
+          }
+        </AccountForm>
 
         {isDirty &&
           <button onClick={handleSubmit} className='primary'>
