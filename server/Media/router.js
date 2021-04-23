@@ -82,7 +82,7 @@ router.all('/:mediaId/prefer', async (ctx, next) => {
   ctx.status = 200
 
   // emit (potentially) updated queues to each room
-  for (const room of Object.keys(ctx.io.sockets.adapter.rooms)) {
+  for (const room of ctx.io.sockets.adapter.rooms.keys()) {
     // ignore auto-generated per-user rooms
     if (room.startsWith(Rooms.prefix())) {
       const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
