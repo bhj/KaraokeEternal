@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchAccount, updateAccount, logout } from 'store/modules/user'
+import { updateAccount, logout } from 'store/modules/user'
 import AccountForm from '../AccountForm'
 import './Account.css'
 
@@ -10,9 +10,6 @@ const Account = props => {
 
   const user = useSelector(state => state.user)
   const [isDirty, setDirty] = useState(false)
-
-  // once per mount
-  useEffect(() => dispatch(fetchAccount()), [])
 
   const dispatch = useDispatch()
   const handleDirtyChange = useCallback(isDirty => setDirty(isDirty))

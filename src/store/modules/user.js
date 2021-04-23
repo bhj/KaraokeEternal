@@ -212,43 +212,6 @@ export function updateAccount (data) {
 }
 
 // ------------------------------------
-// Request account (does not refresh JWT)
-// ------------------------------------
-function requestAccount () {
-  return {
-    type: REQUEST_ACCOUNT,
-  }
-}
-
-function receiveAccount (response) {
-  return {
-    type: REQUEST_ACCOUNT + _SUCCESS,
-    payload: response
-  }
-}
-
-function requestAccountError (err) {
-  return {
-    type: REQUEST_ACCOUNT + _ERROR,
-    payload: err.message, // silent (don't set error property)
-  }
-}
-
-export function fetchAccount () {
-  return (dispatch, getState) => {
-    dispatch(requestAccount())
-
-    return api('GET', 'account')
-      .then(user => {
-        dispatch(receiveAccount(user))
-      })
-      .catch(err => {
-        dispatch(requestAccountError(err))
-      })
-  }
-}
-
-// ------------------------------------
 // Socket actions
 // ------------------------------------
 function requestSocketConnect (query) {

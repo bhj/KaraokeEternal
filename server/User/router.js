@@ -272,24 +272,6 @@ router.post('/setup', async (ctx, next) => {
   await _login(ctx, creds)
 })
 
-// get own account (helps sync account changes across devices)
-router.get('/account', async (ctx, next) => {
-  if (typeof ctx.user.userId !== 'number') {
-    ctx.throw(401)
-  }
-
-  const user = await User.getById(ctx.user.userId)
-
-  if (!user) {
-    ctx.throw(404)
-  }
-
-  // no need to include in response
-  delete user.image
-
-  ctx.body = user
-})
-
 // get a user's image
 router.get('/user/:userId/image', async (ctx, next) => {
   const userId = parseInt(ctx.params.userId, 10)
@@ -408,10 +390,11 @@ async function _login (ctx, creds, validateRoomPassword = true) {
 
   // encrypt JWT based on subset of user object
   const token = jwtSign({
-    userId: user.userId,
+    dateUpdated: user.dateUpdated,
     isAdmin: user.isAdmin,
     name: user.name,
     roomId: user.roomId,
+    userId: user.userId,
   }, ctx.jwtKey)
 
   // set JWT as an httpOnly cookie
