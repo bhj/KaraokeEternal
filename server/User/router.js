@@ -73,9 +73,27 @@ router.delete('/user/:userId', async (ctx, next) => {
     ctx.throw(403)
   }
 
-  User.remove(targetId)
+  await User.remove(targetId)
 
-  // @todo push updated queue(s)
+  // disconnect their socket session(s)
+  for (const s of ctx.io.of('/').sockets.values()) {
+    if (s.user && s.user.userId === targetId) {
+      s.disconnect()
+    }
+  }
+
+  // emit (potentially) updated queues to each room
+  for (const room of ctx.io.sockets.adapter.rooms.keys()) {
+    // ignore auto-generated per-user rooms
+    if (room.startsWith(Rooms.prefix())) {
+      const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
+
+      ctx.io.to(room).emit('action', {
+        type: QUEUE_PUSH,
+        payload: await Queue.get(roomId),
+      })
+    }
+  }
 
   // success
   ctx.status = 200
