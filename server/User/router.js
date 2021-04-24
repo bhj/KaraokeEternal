@@ -198,12 +198,17 @@ router.put('/user/:userId', async (ctx, next) => {
     ctx.throw(404, `userId ${targetId} not found`)
   }
 
-  // notify room?
-  if (ctx.user.roomId) {
-    ctx.io.to(Rooms.prefix(ctx.user.roomId)).emit('action', {
-      type: QUEUE_PUSH,
-      payload: await Queue.get(ctx.user.roomId)
-    })
+  // emit (potentially) updated queues to each room
+  for (const room of ctx.io.sockets.adapter.rooms.keys()) {
+    // ignore auto-generated per-user rooms
+    if (room.startsWith(Rooms.prefix())) {
+      const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
+
+      ctx.io.to(room).emit('action', {
+        type: QUEUE_PUSH,
+        payload: await Queue.get(roomId),
+      })
+    }
   }
 
   // we're done if updating another account
