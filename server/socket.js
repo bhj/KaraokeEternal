@@ -1,6 +1,7 @@
 const log = require('./lib/Log').getLogger(`server[${process.pid}]`)
 const jwtVerify = require('jsonwebtoken').verify
 
+const parseCookie = require('./lib/parseCookie')
 const Library = require('./Library')
 const LibrarySocket = require('./Library/socket')
 const PlayerSocket = require('./Player/socket')
@@ -9,7 +10,7 @@ const PrefsSocket = require('./Prefs/socket')
 const Rooms = require('./Rooms')
 const Queue = require('./Queue')
 const QueueSocket = require('./Queue/socket')
-const parseCookie = require('./lib/parseCookie')
+const User = require('./User')
 const {
   LIBRARY_PUSH,
   QUEUE_PUSH,
@@ -38,6 +39,15 @@ module.exports = function (io, jwtKey) {
     // authenticate the JWT sent via cookie in http handshake
     try {
       sock.user = jwtVerify(kfToken, jwtKey)
+
+      // has account been modified since JWT was generated?
+      const user = await User.getById(sock.user.userId)
+
+      if (!user || user.dateUpdated !== sock.user.dateUpdated) {
+        throw new Error('account modtime mismatch')
+      }
+
+      // success
       log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)
     } catch (err) {
       io.to(sock.id).emit('action', {
