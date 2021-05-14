@@ -17,13 +17,15 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 - [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain){{% icon-external %}} volume normalization support
 - Singers prioritized by time since each last sang
 - Multiple simultaneous rooms/queues (optionally password-protected)
-- No telemetry; all data stored locally
+- No ads or telemetry; all data stored locally
 
 Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the <a href='{{< ref "faq.md/#whats-the-recommended-audio-setup" >}}'>F.A.Q.</a> for more information.
 
-## Download
+## Download & Install
 
-If you'll be running the <a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>server</a> on macOS or Windows, you probably want <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}}. You can also easily install it on <a href='{{< ref "docs/index.md/#any-os-with-nodejs" >}}'>any OS with Node.js</a>.
+See <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}} available for your OS, as well as the <a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>installation documentation</a>.
+
+Please note that the main branch is actively developed and is not guaranteed to be stable.
 
 ## Getting Started
 
