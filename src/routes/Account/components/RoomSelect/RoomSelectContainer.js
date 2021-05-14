@@ -12,4 +12,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapActionCreators)(RoomSelect)
+export default connect(mapStateToProps, mapActionCreators, null, { forwardRef: true })(RoomSelect)

@@ -15,6 +15,7 @@ const koaRange = require('koa-range')
 const koaStatic = require('koa-static')
 
 const Prefs = require('./Prefs')
+const User = require('./User')
 const libraryRouter = require('./Library/router')
 const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
@@ -71,24 +72,44 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
 
   // all http requests
   app.use(async (ctx, next) => {
-    ctx.io = io
-    ctx.jwtKey = jwtKey
-    ctx.startScanner = startScanner
-    ctx.stopScanner = stopScanner
+    ctx.jwtKey = jwtKey // used by login route
 
-    // verify jwt
+    // skip JWT/session validation if non-API request or logging in/out
+    // @todo support custom public path
+    if (!ctx.request.path.startsWith('/api/') ||
+      ctx.request.path === '/api/login' ||
+      ctx.request.path === '/api/logout') {
+      return next()
+    }
+
+    // verify JWT
     try {
       const { kfToken } = parseCookie(ctx.request.header.cookie)
       ctx.user = jwtVerify(kfToken, jwtKey)
     } catch (err) {
       ctx.user = {
+        dateUpdated: null,
+        isAdmin: false,
+        name: null,
+        roomId: null,
         userId: null,
         username: null,
-        name: null,
-        isAdmin: false,
-        roomId: null,
       }
     }
+
+    // has account been modified since JWT was generated?
+    if (typeof ctx.user.userId === 'number') {
+      const user = await User.getById(ctx.user.userId)
+
+      if (!user || user.dateUpdated !== ctx.user.dateUpdated) {
+        ctx.throw(409, 'Session expired. Please sign in again.')
+      }
+    }
+
+    // validated
+    ctx.io = io
+    ctx.startScanner = startScanner
+    ctx.stopScanner = stopScanner
 
     await next()
   })
@@ -100,8 +121,8 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   app.use(roomsRouter.routes())
   app.use(userRouter.routes())
 
-  // @todo these could be read dynamically from src/routes
-  // but should probably wait for react-router upgrade?
+  // URL rewriting and static asset handling
+  // @todo support custom public path
   const rewriteRoutes = ['account', 'library', 'queue', 'player']
   const indexFile = path.join(env.KF_SERVER_PATH_WEBROOT, 'index.html')
 

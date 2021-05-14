@@ -1,0 +1,17 @@
+.heading {
+  align-items: baseline;
+  color: hsl(var(--hue-blue), 10%, 60%);
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
+}
+
+.heading h2 {
+  color: hsl(var(--hue-blue), 10%, 80%);
+  flex: 1;
+  margin: 0 1em 0 0;
+  font-size: 32px;
+  font-family: var(--font-family-custom);
+  font-weight: 200;
+  white-space: nowrap;
+}

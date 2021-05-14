@@ -37,23 +37,90 @@ router.get('/logout', async (ctx, next) => {
   ctx.body = {}
 })
 
-// update account
-router.put('/account', async (ctx, next) => {
+// list all users (admin only)
+router.get('/users', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  const userRooms = {} // { userId: [roomId, roomId, ...]}
+
+  for (const s of ctx.io.of('/').sockets.values()) {
+    if (s.user && typeof s.user.roomId === 'number') {
+      if (userRooms[s.user.userId]) {
+        userRooms[s.user.userId].push(s.user.roomId)
+      } else {
+        userRooms[s.user.userId] = [s.user.roomId]
+      }
+    }
+  }
+
+  // get all users
+  const users = await User.get()
+
+  users.result.forEach(userId => {
+    users.entities[userId].rooms = userRooms[userId] || []
+  })
+
+  ctx.body = users
+})
+
+// delete a user (admin only)
+router.delete('/user/:userId', async (ctx, next) => {
+  const targetId = parseInt(ctx.params.userId, 10)
+
+  if (!ctx.user.isAdmin || targetId === ctx.user.userId) {
+    ctx.throw(403)
+  }
+
+  await User.remove(targetId)
+
+  // disconnect their socket session(s)
+  for (const s of ctx.io.of('/').sockets.values()) {
+    if (s.user && s.user.userId === targetId) {
+      s.disconnect()
+    }
+  }
+
+  // emit (potentially) updated queues to each room
+  for (const room of ctx.io.sockets.adapter.rooms.keys()) {
+    // ignore auto-generated per-user rooms
+    if (room.startsWith(Rooms.prefix())) {
+      const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
+
+      ctx.io.to(room).emit('action', {
+        type: QUEUE_PUSH,
+        payload: await Queue.get(roomId),
+      })
+    }
+  }
+
+  // success
+  ctx.status = 200
+  ctx.body = {}
+})
+
+// update a user account
+router.put('/user/:userId', async (ctx, next) => {
+  const targetId = parseInt(ctx.params.userId, 10)
   const user = await User.getById(ctx.user.userId, true)
 
-  if (!user) {
+  // must be admin if updating another user
+  if (!user || (targetId !== user.userId && !user.isAdmin)) {
     ctx.throw(401)
   }
 
   let { name, username, password, newPassword, newPasswordConfirm } = ctx.request.body
 
-  // validate current password
-  if (!password) {
-    ctx.throw(422, 'Current password is required')
-  }
+  // validate current password if updating own account
+  if (targetId === user.userId) {
+    if (!password) {
+      ctx.throw(422, 'Current password is required')
+    }
 
-  if (!await bcrypt.compare(password, user.password)) {
-    ctx.throw(401, 'Incorrect current password')
+    if (!await bcrypt.compare(password, user.password)) {
+      ctx.throw(401, 'Incorrect current password')
+    }
   }
 
   // validated
@@ -107,24 +174,51 @@ router.put('/account', async (ctx, next) => {
     fields.set('image', null)
   }
 
+  // changing role?
+  if (ctx.request.body.role) {
+    // @todo since we're not ensuring there'd be at least one admin
+    // remaining, changing one's own role is currently disallowed
+    if (!user.isAdmin || targetId === user.userId) {
+      ctx.throw(403)
+    }
+
+    fields.set('isAdmin', parseInt(ctx.request.body.role, 10))
+  }
+
   fields.set('dateUpdated', Math.floor(Date.now() / 1000))
 
   const query = sql`
     UPDATE users
     SET ${sql.tuple(Array.from(fields.keys()).map(sql.column))} = ${sql.tuple(Array.from(fields.values()))}
-    WHERE userId = ${ctx.user.userId}
+    WHERE userId = ${targetId}
   `
-  await db.run(String(query), query.parameters)
+  const res = await db.run(String(query), query.parameters)
 
-  // notify room?
-  if (ctx.user.roomId) {
-    ctx.io.to(Rooms.prefix(ctx.user.roomId)).emit('action', {
-      type: QUEUE_PUSH,
-      payload: await Queue.get(ctx.user.roomId)
-    })
+  if (!res.changes) {
+    ctx.throw(404, `userId ${targetId} not found`)
   }
 
-  // get updated token
+  // emit (potentially) updated queues to each room
+  for (const room of ctx.io.sockets.adapter.rooms.keys()) {
+    // ignore auto-generated per-user rooms
+    if (room.startsWith(Rooms.prefix())) {
+      const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
+
+      ctx.io.to(room).emit('action', {
+        type: QUEUE_PUSH,
+        payload: await Queue.get(roomId),
+      })
+    }
+  }
+
+  // we're done if updating another account
+  if (targetId !== user.userId) {
+    ctx.status = 200
+    ctx.body = {}
+    return
+  }
+
+  // send updated token if updating own account
   await _login(ctx, {
     username: username || user.username,
     password: newPassword || password,
@@ -133,21 +227,32 @@ router.put('/account', async (ctx, next) => {
 })
 
 // create account
-router.post('/account', async (ctx, next) => {
-  // validate room info first
-  const { roomId, roomPassword } = ctx.request.body
+router.post('/user', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    // already signed in as non-admin?
+    if (ctx.user.userId !== null) {
+      ctx.throw(403, 'You are already signed in')
+    }
 
-  try {
-    await Rooms.validate(roomId, roomPassword)
-  } catch (err) {
-    ctx.throw(401, err.message)
+    // trying to specify a role?
+    if (ctx.request.body.role) {
+      ctx.throw(403)
+    }
+
+    // new users must choose a room at the same time
+    try {
+      await Rooms.validate(ctx.request.body.roomId, ctx.request.body.roomPassword)
+    } catch (err) {
+      ctx.throw(401, err.message)
+    }
   }
 
   // create user
-  const creds = await _create(ctx, false) // non-admin
+  await _create(ctx, ctx.request.body.role === '1')
 
-  // log them in automatically
-  await _login(ctx, { ...creds, roomId, roomPassword })
+  // success
+  ctx.status = 200
+  ctx.body = {}
 })
 
 // first-time setup
@@ -190,26 +295,8 @@ router.post('/setup', async (ctx, next) => {
   await _login(ctx, creds)
 })
 
-// get own account (helps sync account changes across devices)
-router.get('/user', async (ctx, next) => {
-  if (typeof ctx.user.userId !== 'number') {
-    ctx.throw(401)
-  }
-
-  const user = await User.getById(ctx.user.userId)
-
-  if (!user) {
-    ctx.throw(404)
-  }
-
-  // no need to include in response
-  delete user.image
-
-  ctx.body = user
-})
-
 // get a user's image
-router.get('/user/image/:userId', async (ctx, next) => {
+router.get('/user/:userId/image', async (ctx, next) => {
   const userId = parseInt(ctx.params.userId, 10)
   const user = await User.getById(userId)
 
@@ -228,7 +315,7 @@ router.get('/user/image/:userId', async (ctx, next) => {
 
 module.exports = router
 
-async function _create (ctx, isAdmin = 0) {
+async function _create (ctx, isAdmin = false) {
   let { name, username, newPassword, newPasswordConfirm } = ctx.request.body
 
   if (!username || !name || !newPassword || !newPasswordConfirm) {
@@ -264,7 +351,7 @@ async function _create (ctx, isAdmin = 0) {
   fields.set('password', await bcrypt.hash(newPassword, BCRYPT_ROUNDS))
   fields.set('name', name)
   fields.set('dateCreated', Math.floor(Date.now() / 1000))
-  fields.set('isAdmin', isAdmin)
+  fields.set('isAdmin', isAdmin ? 1 : 0)
 
   // user image?
   if (ctx.request.files.image) {
@@ -326,10 +413,11 @@ async function _login (ctx, creds, validateRoomPassword = true) {
 
   // encrypt JWT based on subset of user object
   const token = jwtSign({
-    userId: user.userId,
+    dateUpdated: user.dateUpdated,
     isAdmin: user.isAdmin,
     name: user.name,
     roomId: user.roomId,
+    userId: user.userId,
   }, ctx.jwtKey)
 
   // set JWT as an httpOnly cookie

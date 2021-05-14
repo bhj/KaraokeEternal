@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import './RoomSelect.css'
 
 export default class RoomSelect extends Component {
   static propTypes = {
     rooms: PropTypes.object.isRequired,
-    onSelectRef: PropTypes.func.isRequired,
-    onPasswordRef: PropTypes.func.isRequired,
     className: PropTypes.string,
     // actions
     fetchRooms: PropTypes.func.isRequired,
@@ -14,6 +13,9 @@ export default class RoomSelect extends Component {
   state = {
     hasPassword: false,
   }
+
+  select = React.createRef()
+  password = React.createRef()
 
   componentDidMount () {
     this.props.fetchRooms()
@@ -24,7 +26,7 @@ export default class RoomSelect extends Component {
 
     // if there's only one open room, select it by default
     if (rooms !== prevProps.rooms && rooms.result.length === 1) {
-      this.select.value = rooms.result[0]
+      this.select.current.value = rooms.result[0]
     }
   }
 
@@ -33,18 +35,8 @@ export default class RoomSelect extends Component {
     const hasPassword = this.props.rooms.entities[roomId].hasPassword
 
     this.setState({ hasPassword }, () => {
-      if (this.state.hasPassword) this.input.focus()
+      if (this.state.hasPassword) this.password.current.focus()
     })
-  }
-
-  handleInputRef = r => {
-    this.input = r
-    this.props.onPasswordRef(r)
-  }
-
-  handleSelectRef = r => {
-    this.select = r
-    this.props.onSelectRef(r)
   }
 
   render () {
@@ -58,10 +50,10 @@ export default class RoomSelect extends Component {
     return (
       <>
         <select
-          className={this.props.className}
           defaultValue=''
           onChange={this.handleSelectChange}
-          ref={this.handleSelectRef}
+          ref={this.select}
+          styleName='field select'
         >
           {roomOpts}
         </select>
@@ -71,7 +63,8 @@ export default class RoomSelect extends Component {
             autoComplete='off'
             className={this.props.className}
             placeholder='room password (required)'
-            ref={this.handleInputRef}
+            ref={this.password}
+            styleName='field'
           />
         }
       </>

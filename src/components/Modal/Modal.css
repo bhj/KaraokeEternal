@@ -44,6 +44,8 @@
 .title {
   font-family: var(--font-family-custom);
   margin: 0 0 1rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .content {
