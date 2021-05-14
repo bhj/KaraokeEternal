@@ -18,8 +18,8 @@ router.get('/rooms', async (ctx, next) => {
   const res = await Rooms.get(ctx.user.isAdmin)
 
   res.result.forEach(roomId => {
-    const room = ctx.io.sockets.adapter.rooms[Rooms.prefix(roomId)]
-    res.entities[roomId].numUsers = room ? room.length : 0
+    const room = ctx.io.sockets.adapter.rooms.get(Rooms.prefix(roomId))
+    res.entities[roomId].numUsers = room ? room.size : 0
   })
 
   ctx.body = res
