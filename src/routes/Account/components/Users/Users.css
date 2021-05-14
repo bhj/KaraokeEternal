@@ -6,9 +6,15 @@
 }
 
 .titleContainer {
+  align-items: center;
   display: flex;
   padding: var(--panel-title-padding);
   background-color: var(--panel-title-bg-color);
+}
+
+.titleContainer select {
+  padding: 1px;
+  max-width: 33%;
 }
 
 .title {

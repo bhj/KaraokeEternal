@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { formatDateTime } from 'lib/dateTime'
 import EditRoom from './EditRoom'
 import { closeRoomEditor, fetchRooms, openRoomEditor, toggleShowAll } from 'store/modules/rooms'
+import { filterByRoom } from '../../modules/users'
 import getRoomList from '../../selectors/getRoomList'
 import './Rooms.css'
 
@@ -14,6 +15,7 @@ const Rooms = props => {
 
   const dispatch = useDispatch()
   const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
+  const handleFilter = useCallback(e => dispatch(filterByRoom(parseInt(e.target.dataset.roomId, 10))), [dispatch])
   const handleOpen = useCallback(e => {
     setEditorRoom(rooms.entities[e.target.dataset.roomId])
     dispatch(openRoomEditor())
@@ -29,7 +31,12 @@ const Rooms = props => {
     return (
       <tr key={roomId}>
         <td><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
-        <td>{room.status + (room.numUsers ? ` (${room.numUsers})` : '')}</td>
+        <td>
+          {room.status}
+          {room.numUsers > 0 &&
+            <>&nbsp;<a data-room-id={roomId} onClick={handleFilter}>({room.numUsers})</a></>
+          }
+        </td>
         <td>{formatDateTime(new Date(room.dateCreated * 1000))}</td>
       </tr>
     )

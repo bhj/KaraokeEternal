@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import EditUser from './EditUser'
 import { formatDateTime } from 'lib/dateTime'
-import { closeUserEditor, fetchUsers, openUserEditor } from '../../modules/users'
+import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor } from '../../modules/users'
 import getUsers from '../../selectors/getUsers'
 import './Users.css'
 
@@ -10,11 +10,17 @@ const Users = props => {
   const [editorUser, setEditorUser] = useState(null)
 
   const curUserId = useSelector(state => state.user.userId)
-  const { isEditorOpen, isShowingAll } = useSelector(state => state.users)
+  const { isEditorOpen, filterOnline, filterRoomId } = useSelector(state => state.users)
+  const rooms = useSelector(state => state.rooms)
   const users = useSelector(getUsers)
 
   const dispatch = useDispatch()
   const handleClose = useCallback(() => dispatch(closeUserEditor()), [dispatch])
+  const handleFilterChange = useCallback(e => {
+    if (e.target.value === 'all') dispatch(filterByOnline(false))
+    else if (e.target.value === 'online') dispatch(filterByOnline(true))
+    else dispatch(filterByRoom(parseInt(e.target.value, 10)))
+  }, [dispatch, rooms, users])
   const handleOpen = useCallback(e => {
     setEditorUser(users.entities[e.target.dataset.userId])
     dispatch(openUserEditor())
@@ -40,10 +46,21 @@ const Users = props => {
     )
   })
 
+  const roomOpts = rooms.result
+    .filter(roomId => !!rooms.entities[roomId].numUsers)
+    .map(roomId => <option key={roomId} value={roomId}>{rooms.entities[roomId].name}</option>)
+
   return (
     <div styleName='container'>
       <div styleName='titleContainer'>
         <h1 styleName='title'>Users</h1>
+        <select onChange={handleFilterChange} value={filterOnline ? 'online' : filterRoomId || 'all'}>
+          <option key='all' value={'all'}>All</option>
+          <option key='online' value={'online'}>Online</option>
+          <optgroup label='Online in...'>
+            {roomOpts}
+          </optgroup>
+        </select>
       </div>
       <div styleName='content'>
         <table styleName='table'>

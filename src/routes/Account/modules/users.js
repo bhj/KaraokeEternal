@@ -3,6 +3,8 @@ import {
   USERS_CREATE,
   USERS_EDITOR_CLOSE,
   USERS_EDITOR_OPEN,
+  USERS_FILTER_ONLINE,
+  USERS_FILTER_ROOM_ID,
   USERS_RECEIVE,
   USERS_REMOVE,
   USERS_REQUEST,
@@ -178,6 +180,20 @@ export function openUserEditor () {
   }
 }
 
+export function filterByOnline (bool) {
+  return {
+    type: USERS_FILTER_ONLINE,
+    payload: bool,
+  }
+}
+
+export function filterByRoom (roomId) {
+  return {
+    type: USERS_FILTER_ROOM_ID,
+    payload: roomId,
+  }
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -198,6 +214,16 @@ const ACTION_HANDLERS = {
     ...state,
     isEditorOpen: false,
   }),
+  [USERS_FILTER_ONLINE]: (state, { payload }) => ({
+    ...state,
+    filterOnline: payload,
+    filterRoomId: null,
+  }),
+  [USERS_FILTER_ROOM_ID]: (state, { payload }) => ({
+    ...state,
+    filterOnline: false,
+    filterRoomId: payload,
+  }),
   [USERS_REMOVE + _SUCCESS]: (state, { payload }) => ({
     ...state,
     isEditorOpen: false,
@@ -214,6 +240,8 @@ const ACTION_HANDLERS = {
 const initialState = {
   result: [],
   entities: {},
+  filterOnline: true,
+  filterRoomId: null,
   isEditorOpen: false,
 }
 
