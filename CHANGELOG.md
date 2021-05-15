@@ -1,14 +1,19 @@
 ## TBD
 
+### New
+- **(app)** User management interface!
+- **(app)** CD+Graphics backgrounds are now content-aware for better visuals and readability
+- **(app)** Summary is now shown following a media scan
+
 ### Changed
 
 - **(app)** **(breaking)** Browsers without the [ResizeObserver API](https://caniuse.com/#feat=mdn-api_resizeobserver) are no longer supported
-- **(app)** Summary is now shown following a media scan
 - **(server)** Uses one less process/helper
 - **(server)** Media scanner process is restricted to read-only database access
 - **(server)** Fixed potential error when a non-admin user tries to remove one of their queued songs
 - **(server)** Fixed potential SQLITE_BUSY errors while scanning media
 - **(server)** Fixed error message when no artist/title delimiter in filename
+- **(server)** Idle client socket connections no longer bounce
 
 ## v0.8.0 (2020-07-03)
 
