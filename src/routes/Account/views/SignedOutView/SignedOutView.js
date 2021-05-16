@@ -4,7 +4,7 @@ import Logo from 'components/Logo'
 import Create from './Create'
 import FirstRun from './FirstRun'
 import SignIn from './SignIn'
-import './SignedOutView.css'
+import styles from './SignedOutView.css'
 
 const SignedOutView = props => {
   const [isCreating, setCreating] = useState(false)
@@ -14,8 +14,8 @@ const SignedOutView = props => {
   const ui = useSelector(state => state.ui)
 
   return (
-    <div styleName='container' style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
-      <Logo styleName='logo'/>
+    <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
+      <Logo className={styles.logo}/>
 
       {isCreating &&
         <Create onToggle={toggleCreate}/>

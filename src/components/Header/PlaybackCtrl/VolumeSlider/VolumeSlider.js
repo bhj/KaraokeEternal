@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import OptimisticSlider from 'components/OptimisticSlider'
 import Icon from 'components/Icon'
-import './VolumeSlider.css'
+import styles from './VolumeSlider.css'
 // depends on styles/global/rc-slider
 
 export default class VolumeSlider extends React.Component {
@@ -20,7 +20,7 @@ export default class VolumeSlider extends React.Component {
         value={this.props.volume}
         onChange={this.props.onVolumeChange}
         handle={handle}
-        styleName='slider'
+        className={styles.slider}
       />
     )
   }
@@ -36,7 +36,7 @@ const handle = (props) => {
   else if (value < 0.7) icon = 'VOLUME_DOWN'
 
   return (
-    <Icon icon={icon} size={42} styleName='handle' style={{
+    <Icon icon={icon} size={42} className={styles.handle} style={{
       left: `calc(${props.offset}% - 18px)`, // eslint-disable-line react/prop-types
     }}/>
   )

@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import './TextOverlay.css'
+import styles from './TextOverlay.css'
 
 export const TextOverlay = props => (
-  <div styleName='container'>
-    <div styleName='text' className={props.className}>
+  <div className={styles.container}>
+    <div className={`${styles.text} ${props.className}`}>
       {props.children}
     </div>
   </div>

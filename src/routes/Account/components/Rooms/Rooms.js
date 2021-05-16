@@ -5,7 +5,7 @@ import EditRoom from './EditRoom'
 import { closeRoomEditor, fetchRooms, openRoomEditor, toggleShowAll } from 'store/modules/rooms'
 import { filterByRoom } from '../../modules/users'
 import getRoomList from '../../selectors/getRoomList'
-import './Rooms.css'
+import styles from './Rooms.css'
 
 const Rooms = props => {
   const [editorRoom, setEditorRoom] = useState(null)
@@ -43,19 +43,19 @@ const Rooms = props => {
   })
 
   return (
-    <div styleName='container'>
-      <div styleName='titleContainer'>
-        <h1 styleName='title'>Rooms</h1>
-        <label styleName='showAll'>
+    <div className={styles.container}>
+      <div className={styles.titleContainer}>
+        <h1 className={styles.title}>Rooms</h1>
+        <label className={styles.showAll}>
           <input type='checkbox'
             checked={isShowingAll}
             onChange={handleToggle}
-            styleName='showAll'
+            className={styles.showAll}
           /> Show all
         </label>
       </div>
-      <div styleName='content'>
-        <table styleName='table'>
+      <div className={styles.content}>
+        <table className={styles.table}>
           <thead>
             <tr>
               <th>Name</th>

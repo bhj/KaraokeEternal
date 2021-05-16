@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { VariableSizeList as List } from 'react-window'
-import './PaddedList.css'
+import styles from './PaddedList.css'
 
 class PaddedList extends React.Component {
   static propTypes = {
@@ -31,7 +31,7 @@ class PaddedList extends React.Component {
         onScroll={this.props.onScroll}
         overscanCount={10}
         ref={this.setRef}
-        styleName='container'
+        className={styles.container}
         width={this.props.width}
         height={this.props.height}
       >

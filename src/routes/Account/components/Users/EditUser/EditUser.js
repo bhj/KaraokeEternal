@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { createUser, removeUser, updateUser } from '../../../modules/users'
 import Modal from 'components/Modal'
 import AccountForm from '../../AccountForm'
-import './EditUser.css'
+import styles from './EditUser.css'
 
 const EditUser = props => {
   const [isDirty, setDirty] = useState(false)
@@ -48,19 +48,19 @@ const EditUser = props => {
       />
       <br/>
       {!props.user &&
-        <button onClick={handleCreateClick} className='primary' styleName='btn'>
+        <button onClick={handleCreateClick} className={`${styles.btn} primary`}>
           Create User
         </button>
       }
 
       {props.user && isDirty &&
-        <button onClick={handleUpdateClick} className='primary' styleName='btn'>
+        <button onClick={handleUpdateClick} className={`${styles.btn} primary`}>
           Update User
         </button>
       }
 
       {props.user &&
-        <button onClick={handleRemoveClick} styleName='btn'>
+        <button onClick={handleRemoveClick} className={styles.btn}>
           Remove User
         </button>
       }

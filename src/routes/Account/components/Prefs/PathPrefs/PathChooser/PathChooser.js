@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PathItem from './PathItem'
 import Modal from 'components/Modal'
 import HttpApi from 'lib/HttpApi'
-import './PathChooser.css'
+import styles from './PathChooser.css'
 const api = new HttpApi('prefs/path')
 
 const PathChooser = props => {
@@ -41,12 +41,12 @@ const PathChooser = props => {
         height: '100%',
       }}
     >
-      <div styleName='container'>
-        <div styleName='folderCurrent'>
+      <div className={styles.container}>
+        <div className={styles.folderCurrent}>
           {pathInfo.current || '\u00a0'}
         </div>
 
-        <div styleName='folderList' ref={listRef}>
+        <div className={styles.folderList} ref={listRef}>
           {pathInfo.parent !== false &&
             <strong><PathItem path={'..'} onSelect={() => ls(pathInfo.parent)} /></strong>
           }
@@ -57,10 +57,10 @@ const PathChooser = props => {
         </div>
 
         <div style={{ display: 'flex' }}>
-          <button styleName='submit' className='primary' onClick={handleChoose}>
+          <button className={`${styles.submit} primary`} onClick={handleChoose}>
               Add Folder
           </button>
-          <button styleName='cancel' onClick={props.onCancel}>
+          <button className={styles.cancel} onClick={props.onCancel}>
             Cancel
           </button>
         </div>

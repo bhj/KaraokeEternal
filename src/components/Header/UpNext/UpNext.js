@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { formatSeconds } from 'lib/dateTime'
-import './UpNext.css'
+import styles from './UpNext.css'
 
 const UpNext = props => {
   if (props.isUpNow) {
     return (
-      <div styleName='upNow'>
-        <p styleName='msg'>
+      <div className={styles.upNow}>
+        <p className={styles.msg}>
           You&rsquo;re up <strong>now</strong>
         </p>
       </div>
@@ -16,8 +16,8 @@ const UpNext = props => {
 
   if (props.isUpNext) {
     return (
-      <div styleName='upNext'>
-        <p styleName='msg'>
+      <div className={styles.upNext}>
+        <p className={styles.msg}>
           You&rsquo;re up <strong>next</strong>{props.wait ? ` in ${formatSeconds(props.wait, true)}` : ''}
         </p>
       </div>
@@ -26,8 +26,8 @@ const UpNext = props => {
 
   if (props.wait) {
     return (
-      <div styleName='inQueue'>
-        <p styleName='msg'>
+      <div className={styles.inQueue}>
+        <p className={styles.msg}>
           You&rsquo;re up in {formatSeconds(props.wait, true)}
         </p>
       </div>

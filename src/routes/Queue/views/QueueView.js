@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import QueueList from '../components/QueueList'
 import Spinner from 'components/Spinner'
 import TextOverlay from 'components/TextOverlay'
-import './QueueView.css'
+import styles from './QueueView.css'
 
 const QueueView = (props) => {
   React.useLayoutEffect(() => props.setHeader(null))
@@ -16,7 +16,7 @@ const QueueView = (props) => {
   const queue = useSelector(state => ensureState(state.queue))
 
   return (
-    <div styleName='container' style={{
+    <div className={styles.container} style={{
       paddingTop: headerHeight,
       paddingBottom: footerHeight,
       width: innerWidth,

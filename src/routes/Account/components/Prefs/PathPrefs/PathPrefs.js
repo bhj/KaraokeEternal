@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import PathChooser from './PathChooser'
 import Icon from 'components/Icon'
-import './PathPrefs.css'
+import styles from './PathPrefs.css'
 import HttpApi from 'lib/HttpApi'
 import { receivePrefs, requestScan } from 'store/modules/prefs'
 const api = new HttpApi('prefs/path')
@@ -45,26 +45,26 @@ const PathPrefs = props => {
   }, [dispatch, paths])
 
   return (
-    <div styleName='container'>
-      <div styleName='heading' onClick={toggleExpanded}>
-        <Icon icon='FOLDER_MUSIC' size={28} styleName='icon' />
-        <div styleName='title'>Media Folders</div>
+    <div className={styles.container}>
+      <div className={styles.heading} onClick={toggleExpanded}>
+        <Icon icon='FOLDER_MUSIC' size={28} className={styles.icon} />
+        <div className={styles.title}>Media Folders</div>
         <div>
-          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} styleName='icon' />
+          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} className={styles.icon} />
         </div>
       </div>
 
-      <div styleName='content' style={{ display: isExpanded ? 'block' : 'none' }}>
+      <div className={styles.content} style={{ display: isExpanded ? 'block' : 'none' }}>
         {paths.result.length === 0 &&
           <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>
         }
 
         {paths.result.map(id =>
-          <div key={id} styleName='pathItem'>
-            <div styleName='pathName'>
+          <div key={id} className={styles.pathItem}>
+            <div className={styles.pathName}>
               {paths.entities[id].path}
             </div>
-            <div onClick={() => handleRemovePath(id)} styleName='btnClear'>
+            <div onClick={() => handleRemovePath(id)} className={styles.btnClear}>
               <Icon icon='CLEAR' size={32} />
             </div>
           </div>

@@ -1,13 +1,13 @@
 import React from 'react'
-import './Spinner.css'
+import styles from './Spinner.css'
 
 const Spinner = () => (
-  <div styleName='container'>
-    <div styleName='spinner'></div>
-    <div styleName='spinner rect2'></div>
-    <div styleName='spinner rect3'></div>
-    <div styleName='spinner rect4'></div>
-    <div styleName='spinner rect5'></div>
+  <div className={styles.container}>
+    <div className={styles.spinner}></div>
+    <div className={`${styles.spinner} ${styles.rect2}`}></div>
+    <div className={`${styles.spinner} ${styles.rect3}`}></div>
+    <div className={`${styles.spinner} ${styles.rect4}`}></div>
+    <div className={`${styles.spinner} ${styles.rect5}`}></div>
   </div>
 )
 

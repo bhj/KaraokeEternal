@@ -36,7 +36,7 @@ class UpNow extends React.Component {
 
   render () {
     return (
-      <div styleName='styles.container'>
+      <div className={styles.container}>
         <CSSTransition
           unmountOnExit
           in={this.state.show}
@@ -49,7 +49,7 @@ class UpNow extends React.Component {
             exit: styles.fadeExit,
             exitActive: styles.fadeExitActive,
           }}>
-          <div styleName='styles.textContainer'>
+          <div className={styles.textContainer}>
             <UserImage
               userId={this.props.queueItem.userId}
               dateUpdated={this.props.queueItem.dateUpdated}

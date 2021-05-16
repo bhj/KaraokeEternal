@@ -6,7 +6,7 @@ import Icon from 'components/Icon'
 import Swipeable from 'components/Swipeable'
 import ToggleAnimation from 'components/ToggleAnimation'
 import { formatDuration } from 'lib/dateTime'
-import './SongItem.css'
+import styles from './SongItem.css'
 
 let ignoreMouseup = false
 
@@ -42,33 +42,33 @@ export default class SongItem extends React.Component {
         preventDefaultTouchmoveEvent
         trackMouse
         style={{ height: props.artist ? 60 : 44 }}
-        styleName={props.isQueued ? 'containerQueued' : 'container'}
+        className={props.isQueued ? styles.containerQueued : styles.container}
       >
 
-        <ToggleAnimation toggle={props.isQueued} styleName='animateGlow'>
-          <div styleName='duration'>
+        <ToggleAnimation toggle={props.isQueued} className={styles.animateGlow}>
+          <div className={styles.duration}>
             {formatDuration(props.duration)}
           </div>
-          <div onClick={this.handleClick} styleName='primary'>
-            <div styleName='title'>
+          <div onClick={this.handleClick} className={styles.primary}>
+            <div className={styles.title}>
               <Highlighter autoEscape textToHighlight={props.title} searchWords={props.filterKeywords} />
               {props.isAdmin && props.numMedia > 1 && <i> ({props.numMedia})</i>}
-              {props.artist && <div styleName='artist'>{props.artist}</div>}
+              {props.artist && <div className={styles.artist}>{props.artist}</div>}
             </div>
           </div>
         </ToggleAnimation>
 
         <Buttons btnWidth={50} isExpanded={state.isExpanded}>
-          <div onClick={this.handleStarClick} styleName='btn star'>
-            <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
-              <Icon size={44} icon={'STAR_FULL'} styleName={props.isStarred ? 'starStarred' : 'star'}/>
+          <div onClick={this.handleStarClick} className={`${styles.btn} ${styles.star}`}>
+            <ToggleAnimation toggle={props.isStarred} className={styles.animateStar}>
+              <Icon size={44} icon={'STAR_FULL'} className={props.isStarred ? styles.starStarred : styles.star}/>
             </ToggleAnimation>
-            <div styleName={props.isStarred ? 'starCountStarred' : 'starCount'}>
+            <div className={props.isStarred ? styles.starCountStarred : styles.starCount}>
               {props.numStars ? props.numStars : ''}
             </div>
           </div>
-          <div onClick={this.handleInfoClick} styleName='btn' data-hide>
-            <Icon size={44} icon='INFO_OUTLINE' styleName='btn info' />
+          <div onClick={this.handleInfoClick} className={styles.btn} data-hide>
+            <Icon size={44} icon='INFO_OUTLINE' className={`${styles.btn} ${styles.info}`}/>
           </div>
         </Buttons>
       </Swipeable>

@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AccountForm from '../../../components/AccountForm'
 import { createAccount } from 'store/modules/user'
-import './FirstRun.css'
+import styles from './FirstRun.css'
 
 const FirstRun = props => {
   const user = useSelector(state => state.user)
@@ -15,7 +15,7 @@ const FirstRun = props => {
 
   return (
     <>
-      <div styleName='heading'>
+      <div className={styles.heading}>
         <h2>Welcome</h2>
         <p>Create your <b>admin</b> account to get started. All data is locally stored and never shared.</p>
       </div>

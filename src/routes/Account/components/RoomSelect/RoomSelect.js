@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import './RoomSelect.css'
+import styles from './RoomSelect.css'
 
 export default class RoomSelect extends Component {
   static propTypes = {
@@ -53,7 +53,7 @@ export default class RoomSelect extends Component {
           defaultValue=''
           onChange={this.handleSelectChange}
           ref={this.select}
-          styleName='field select'
+          className={`${styles.field} ${styles.select}`}
         >
           {roomOpts}
         </select>
@@ -61,10 +61,9 @@ export default class RoomSelect extends Component {
         {this.state.hasPassword &&
           <input type='password'
             autoComplete='off'
-            className={this.props.className}
+            className={`${styles.field} ${this.props.className}`}
             placeholder='room password (required)'
             ref={this.password}
-            styleName='field'
           />
         }
       </>

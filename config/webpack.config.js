@@ -103,12 +103,6 @@ config.module.rules.push({
     options: {
       cacheDirectory: __DEV__,
       configFile: path.join(baseDir, 'config', 'babel.config.json'),
-      plugins: [
-        ['react-css-modules', {
-          webpackHotModuleReloading: __DEV__,
-          generateScopedName : '[name]__[local]___[hash:base64:5]',
-        }]
-      ],
     },
   }],
 })

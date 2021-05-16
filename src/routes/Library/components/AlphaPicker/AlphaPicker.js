@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { lockScrolling } from 'store/modules/ui'
-import './AlphaPicker.css'
+import styles from './AlphaPicker.css'
 
 class AlphaPicker extends React.Component {
   alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
@@ -15,7 +15,7 @@ class AlphaPicker extends React.Component {
   render () {
     return (
       <div
-        styleName='container'
+        className={styles.container}
         style={{ height: this.props.height, top: this.props.top }}
         onTouchStart={this.handleTouchStart}
         onTouchMove={this.handleTouch}

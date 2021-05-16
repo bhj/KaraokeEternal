@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import CDGraphics from 'cdgraphics'
 import HttpApi from 'lib/HttpApi'
-import './CDGPlayer.css'
+import styles from './CDGPlayer.css'
 
 const api = new HttpApi('media')
 const BACKDROP_PADDING = 5 // px at 1:1 scale
@@ -85,8 +85,8 @@ class CDGPlayer extends React.Component {
     }
 
     return (
-      <div styleName='container'>
-        <div styleName='backdrop' style={{
+      <div className={styles.container}>
+        <div className={styles.backdrop} style={{
           backdropFilter: this.supportsFilters && cdgAlpha !== 1 ? filters.join(' ') : 'none',
           backgroundColor: this.supportsFilters && cdgAlpha !== 1 ? 'transparent' : `rgba(${r},${g},${b},${cdgAlpha})`,
           borderRadius: BORDER_RADIUS * scale,
@@ -97,7 +97,7 @@ class CDGPlayer extends React.Component {
         }}></div>
         <canvas
           ref={this.canvas}
-          styleName='canvas'
+          className={styles.canvas}
           width={300 * scale}
           height={216 * scale}
         />

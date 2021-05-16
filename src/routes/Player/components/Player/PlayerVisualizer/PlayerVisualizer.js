@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import butterchurn from 'butterchurn'
 import butterchurnPresets from 'butterchurn-presets'
-import './PlayerVisualizer.css'
+import styles from './PlayerVisualizer.css'
 
 class PlayerVisualizer extends React.Component {
   static propTypes = {
@@ -76,7 +76,7 @@ class PlayerVisualizer extends React.Component {
     const { width, height } = this.props
 
     return (
-      <div style={{ width, height }} styleName='container'>
+      <div style={{ width, height }} className={styles.container}>
         <canvas
           width={width}
           height={height}

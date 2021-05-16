@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import Modal from 'components/Modal'
 import { formatDuration } from 'lib/dateTime'
 import { closeSongInfo, setPreferred } from 'store/modules/songInfo'
-import './SongInfo.css'
+import styles from './SongInfo.css'
 
 const SongInfo = (props) => {
   const { isLoading, isVisible, songId, media } = useSelector(state => state.songInfo)
@@ -18,11 +18,11 @@ const SongInfo = (props) => {
     const isPreferred = !!item.isPreferred
 
     return (
-      <div key={item.mediaId} styleName='media'>
+      <div key={item.mediaId} className={styles.media}>
         {item.path + (item.path.indexOf('/') === 0 ? '/' : '\\') + item.relPath}<br />
-        <span styleName='label'>Duration: </span>{formatDuration(item.duration)}<br />
-        <span styleName='label'>Media ID: </span>{mediaId}<br />
-        <span styleName='label'>Preferred: </span>
+        <span className={styles.label}>Duration: </span>{formatDuration(item.duration)}<br />
+        <span className={styles.label}>Media ID: </span>{mediaId}<br />
+        <span className={styles.label}>Preferred: </span>
         {isPreferred &&
           <span><strong>Yes</strong>&nbsp;
             <a onClick={() => handleRemovePrefer(mediaId)}>(Unset)</a>
@@ -46,8 +46,8 @@ const SongInfo = (props) => {
       style={{ width: '100%', height: '100%' }}
     >
       <p>
-        <span styleName='label'>Song ID: </span>{songId}<br />
-        <span styleName='label'>Media Files: </span>{isLoading ? '?' : media.result.length}
+        <span className={styles.label}>Song ID: </span>{songId}<br />
+        <span className={styles.label}>Media Files: </span>{isLoading ? '?' : media.result.length}
       </p>
       {isLoading ? <p>Loading...</p> : mediaDetails}
     </Modal>

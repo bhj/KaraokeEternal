@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'components/Icon'
 import { setPref } from 'store/modules/prefs'
-import './PlayerPrefs.css'
+import styles from './PlayerPrefs.css'
 
 const PlayerPrefs = props => {
   const [isExpanded, setExpanded] = useState(false)
@@ -17,16 +17,16 @@ const PlayerPrefs = props => {
   }, [dispatch])
 
   return (
-    <div styleName='container'>
-      <div styleName='heading' onClick={toggleExpanded}>
-        <Icon icon='TELEVISION_PLAY' size={28} styleName='icon' />
-        <div styleName='title'>Player</div>
+    <div className={styles.container}>
+      <div className={styles.heading} onClick={toggleExpanded}>
+        <Icon icon='TELEVISION_PLAY' size={28} className={styles.icon} />
+        <div className={styles.title}>Player</div>
         <div>
-          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} styleName='icon' />
+          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} className={styles.icon} />
         </div>
       </div>
 
-      <div styleName='content' style={{ display: isExpanded ? 'block' : 'none' }}>
+      <div className={styles.content} style={{ display: isExpanded ? 'block' : 'none' }}>
         <label>
           <input type='checkbox'
             checked={isReplayGainEnabled}

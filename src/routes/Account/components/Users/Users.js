@@ -4,7 +4,7 @@ import EditUser from './EditUser'
 import { formatDateTime } from 'lib/dateTime'
 import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor } from '../../modules/users'
 import getUsers from '../../selectors/getUsers'
-import './Users.css'
+import styles from './Users.css'
 
 const Users = props => {
   const [editorUser, setEditorUser] = useState(null)
@@ -51,9 +51,9 @@ const Users = props => {
     .map(roomId => <option key={roomId} value={roomId}>{rooms.entities[roomId].name}</option>)
 
   return (
-    <div styleName='container'>
-      <div styleName='titleContainer'>
-        <h1 styleName='title'>Users</h1>
+    <div className={styles.container}>
+      <div className={styles.titleContainer}>
+        <h1 className={styles.title}>Users</h1>
         <select onChange={handleFilterChange} value={filterOnline ? 'online' : filterRoomId || 'all'}>
           <option key='all' value={'all'}>All</option>
           <option key='online' value={'online'}>Online</option>
@@ -62,8 +62,8 @@ const Users = props => {
           </optgroup>
         </select>
       </div>
-      <div styleName='content'>
-        <table styleName='table'>
+      <div className={styles.content}>
+        <table className={styles.table}>
           <thead>
             <tr>
               <th>Username</th>

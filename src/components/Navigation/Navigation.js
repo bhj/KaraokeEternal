@@ -4,15 +4,15 @@ import Icon from 'components/Icon'
 import styles from './Navigation.css'
 
 const Navigation = React.forwardRef((props, ref) => (
-  <div styleName='container' className='bg-blur' ref={ref}>
-    <NavLink to='/library' styleName='styles.btn' activeClassName={styles.btnActive}>
-      <Icon icon='NAV_LIBRARY' size={42} styleName='styles.shadow'/>
+  <div className={`${styles.container} bg-blur`} ref={ref}>
+    <NavLink to='/library' className={styles.btn} activeClassName={styles.btnActive}>
+      <Icon icon='NAV_LIBRARY' size={42} className={styles.shadow}/>
     </NavLink>
-    <NavLink to='/queue' styleName='styles.btn' activeClassName={styles.btnActive}>
-      <Icon icon='NAV_SUBSCRIPTIONS' size={42} styleName='styles.shadow'/>
+    <NavLink to='/queue' className={styles.btn} activeClassName={styles.btnActive}>
+      <Icon icon='NAV_SUBSCRIPTIONS' size={42} className={styles.shadow}/>
     </NavLink>
-    <NavLink to='/account' styleName='styles.btn' activeClassName={styles.btnActive}>
-      <Icon icon='NAV_ACCOUNT' size={42} styleName='styles.shadow'/>
+    <NavLink to='/account' className={styles.btn} activeClassName={styles.btnActive}>
+      <Icon icon='NAV_ACCOUNT' size={42} className={styles.shadow}/>
     </NavLink>
   </div>
 ))

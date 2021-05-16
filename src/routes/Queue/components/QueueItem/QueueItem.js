@@ -5,7 +5,7 @@ import Icon from 'components/Icon'
 import Swipeable from 'components/Swipeable'
 import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
-import './QueueItem.css'
+import styles from './QueueItem.css'
 
 class QueueItem extends React.Component {
   static propTypes = {
@@ -50,53 +50,53 @@ class QueueItem extends React.Component {
         preventDefaultTouchmoveEvent
         trackMouse
         style={{ backgroundSize: (props.isCurrent && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
-        styleName='container'
+        className={styles.container}
       >
-        <div styleName='content'>
-          <div styleName={props.isPlayed ? 'imageContainer greyed' : 'imageContainer'}>
-            <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={72} styleName='image'/>
-            <div styleName='waitContainer'>
+        <div className={styles.content}>
+          <div className={`${styles.imageContainer} ${props.isPlayed ? styles.greyed : ''}`}>
+            <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={72} className={styles.image}/>
+            <div className={styles.waitContainer}>
               {props.isUpcoming &&
-                <div styleName={props.isOwner ? 'wait isOwner' : 'wait'}>
+                <div className={`${styles.wait} ${props.isOwner ? styles.isOwner : ''}`}>
                   {props.wait}
                 </div>
               }
             </div>
           </div>
 
-          <div styleName={props.isPlayed ? 'primary greyed' : 'primary'}>
-            <div styleName='innerPrimary'>
-              <div styleName='title'>{props.title}</div>
-              <div styleName='artist'>{props.artist}</div>
+          <div className={`${styles.primary} ${props.isPlayed ? styles.greyed : ''}`}>
+            <div className={styles.innerPrimary}>
+              <div className={styles.title}>{props.title}</div>
+              <div className={styles.artist}>{props.artist}</div>
             </div>
-            <div styleName={props.isOwner ? 'user isOwner' : 'user'}>
+            <div className={`${styles.user} ${props.isOwner ? styles.isOwner : ''}`}>
               {props.userDisplayName}
             </div>
           </div>
 
           <Buttons btnWidth={50} isExpanded={state.isExpanded}>
             {props.isErrored &&
-              <div onClick={this.handleErrorInfoClick} styleName='btn danger'>
+              <div onClick={this.handleErrorInfoClick} className={`${styles.btn} ${styles.danger}`}>
                 <Icon icon='INFO_OUTLINE' size={44} />
               </div>
             }
-            <div onClick={this.handleStarClick} styleName={props.isStarred ? 'btn active' : 'btn'}>
-              <ToggleAnimation toggle={props.isStarred} styleName='animateStar'>
+            <div onClick={this.handleStarClick} className={`${styles.btn} ${props.isStarred ? styles.active : ''}`}>
+              <ToggleAnimation toggle={props.isStarred} className={styles.animateStar}>
                 <Icon size={44} icon={'STAR_FULL'}/>
               </ToggleAnimation>
             </div>
             {props.isInfoable &&
-              <div onClick={this.handleInfoClick} styleName='btn active' data-hide>
+              <div onClick={this.handleInfoClick} className={`${styles.btn} ${styles.active}`} data-hide>
                 <Icon icon='INFO_OUTLINE' size={44} />
               </div>
             }
             {props.isRemovable &&
-              <div onClick={this.handleRemoveClick} styleName='btn danger' data-hide>
+              <div onClick={this.handleRemoveClick} className={`${styles.btn} ${styles.danger}`} data-hide>
                 <Icon icon='CLEAR' size={44} />
               </div>
             }
             {props.isSkippable &&
-              <div onClick={props.onSkipClick} styleName='btn danger' data-hide>
+              <div onClick={props.onSkipClick} className={`${styles.btn} ${styles.danger}`} data-hide>
                 <Icon icon='PLAY_NEXT' size={44} />
               </div>
             }

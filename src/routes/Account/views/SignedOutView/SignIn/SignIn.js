@@ -3,7 +3,7 @@ import React, { useCallback, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import RoomSelect from '../../../components/RoomSelect'
 import { login } from 'store/modules/user'
-import './SignIn.css'
+import styles from './SignIn.css'
 
 let roomSelectRef
 
@@ -25,7 +25,7 @@ const SignIn = props => {
 
   return (
     <>
-      <div styleName='heading'>
+      <div className={styles.heading}>
         <h2>Sign In</h2>
         <span><a onClick={props.onToggle}>Don&rsquo;t have an account?</a></span>
       </div>
@@ -36,13 +36,13 @@ const SignIn = props => {
           autoFocus
           placeholder='username or email'
           ref={usernameRef}
-          styleName='field'
+          className={styles.field}
         />
         <input type='password'
           autoComplete='current-password'
           placeholder='password'
           ref={passwordRef}
-          styleName='field'
+          className={styles.field}
         />
 
         <RoomSelect ref={roomSelectRefCB}/>

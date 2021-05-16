@@ -27,16 +27,16 @@ const CustomModal = (props) => {
         }
       }}
     >
-      <div styleName='styles.container'>
-        <h1 styleName='styles.title'>
+      <div className={styles.container}>
+        <h1 className={styles.title}>
           {props.title}
         </h1>
-        <div styleName='styles.content'>
+        <div className={styles.content}>
           {props.children}
         </div>
 
         {props.buttons &&
-          <div styleName='styles.buttons'>
+          <div className={styles.buttons}>
             {props.buttons}
           </div>
         }

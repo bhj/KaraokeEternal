@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Icon from 'components/Icon'
-import './UserImage.css'
+import styles from './UserImage.css'
 
 class UserImage extends React.Component {
   static propTypes = {
@@ -22,15 +22,14 @@ class UserImage extends React.Component {
     return (
       <>
         {(state.isLoading || state.isErrored) && props.height &&
-          <Icon icon='ACCOUNT' size={props.height} styleName='placeholder'/>
+          <Icon icon='ACCOUNT' size={props.height} className={styles.placeholder}/>
         }
 
         {!state.isErrored &&
           <img src={`/api/user/${props.userId}/image?v=${props.dateUpdated}`}
             onLoad={this.handleImgLoad}
             onError={this.handleImgError}
-            className={props.className}
-            styleName='image'
+            className={`${styles.image} ${props.className}`}
             style={{
               display: state.isLoading ? 'none' : 'initial',
               height: props.height ? props.height : null,

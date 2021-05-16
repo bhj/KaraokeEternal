@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import ColorCycle from './ColorCycle'
 import UpNow from './UpNow'
-import './PlayerTextOverlay.css'
+import styles from './PlayerTextOverlay.css'
 
 class PlayerTextOverlay extends React.Component {
   static propTypes = {
@@ -19,21 +19,21 @@ class PlayerTextOverlay extends React.Component {
     let Component
 
     if (this.props.isQueueEmpty || this.props.isAtQueueEnd) {
-      Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' styleName='backdrop'/>
+      Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' className={styles.backdrop}/>
     } else if (!queueItem) {
-      Component = <ColorCycle text='PRESS PLAY TO BEGIN' styleName='backdrop'/>
+      Component = <ColorCycle text='PRESS PLAY TO BEGIN' className={styles.backdrop}/>
     } else if (this.props.isErrored) {
       const offset = Math.random() * -300
       Component = <>
-        <ColorCycle text='OOPS...' offset={offset} styleName='backdrop'/>
-        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} styleName='backdrop'/>
+        <ColorCycle text='OOPS...' offset={offset} className={styles.backdrop}/>
+        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} className={styles.backdrop}/>
       </>
     } else {
       Component = <UpNow queueItem={queueItem} />
     }
 
     return (
-      <div style={{ width, height }} styleName='container'>
+      <div style={{ width, height }} className={styles.container}>
         {Component}
       </div>
     )

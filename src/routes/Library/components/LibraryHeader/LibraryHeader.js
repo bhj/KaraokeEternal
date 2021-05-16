@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Icon from 'components/Icon'
-import './LibraryHeader.css'
+import styles from './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
   static propTypes = {
@@ -36,24 +36,24 @@ class LibraryHeader extends React.Component {
     const { filterStr, filterStarred } = this.props
 
     return (
-      <div styleName='container'>
-        <div onClick={this.handleMagnifierClick} styleName={filterStr ? 'btnActive' : 'btn'}>
+      <div className={styles.container}>
+        <div onClick={this.handleMagnifierClick} className={filterStr ? styles.btnActive : styles.btn}>
           <Icon icon='MAGNIFIER' size={40}/>
         </div>
         <input type='search'
-          styleName='searchInput'
+          className={styles.searchInput}
           placeholder='search'
           value={this.state.value}
           onChange={this.handleChange}
           ref={this.searchInput}
         />
         {filterStr &&
-          <div onClick={this.clearSearch} styleName='btnActive'>
+          <div onClick={this.clearSearch} className={styles.btnActive}>
             <Icon icon='CLEAR' size={40}/>
           </div>
         }
 
-        <div onClick={this.props.toggleFilterStarred} styleName={filterStarred ? 'btnActive' : 'btn'}>
+        <div onClick={this.props.toggleFilterStarred} className={filterStarred ? styles.btnActive : styles.btn}>
           <Icon icon='STAR_FULL' size={44}/>
         </div>
       </div>

@@ -4,7 +4,7 @@ import SongList from '../SongList'
 import Icon from 'components/Icon'
 import Highlighter from 'react-highlight-words'
 import ToggleAnimation from 'components/ToggleAnimation'
-import './ArtistItem.css'
+import styles from './ArtistItem.css'
 
 class ArtistItem extends React.Component {
   static propTypes = {
@@ -28,20 +28,20 @@ class ArtistItem extends React.Component {
 
     return (
       <div style={props.style}>
-        <div onClick={this.handleArtistClick} styleName={props.isExpanded ? 'containerExpanded' : 'container'}>
-          <div styleName={isChildStarred ? 'folderStarred' : 'folder'}>
+        <div onClick={this.handleArtistClick} className={props.isExpanded ? styles.containerExpanded : styles.container}>
+          <div className={isChildStarred ? styles.folderStarred : styles.folder}>
             <Icon icon='FOLDER' size={44}/>
             {props.isExpanded &&
-              <div styleName={isChildStarred ? 'iconExpandedStarred' : 'iconExpanded'}>
+              <div className={isChildStarred ? styles.iconExpandedStarred : styles.iconExpanded}>
                 <Icon icon='CHEVRON_DOWN' size={24} />
               </div>
             }
             {!props.isExpanded &&
-              <div styleName='count'>{props.artistSongIds.length}</div>
+              <div className={styles.count}>{props.artistSongIds.length}</div>
             }
           </div>
-          <ToggleAnimation toggle={isChildQueued} styleName='animateGlow'>
-            <div styleName={isChildQueued ? 'name isChildQueued' : 'name'}>
+          <ToggleAnimation toggle={isChildQueued} className={styles.animateGlow}>
+            <div className={`${styles.name} ${isChildQueued ? styles.isChildQueued : ''}`}>
               <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
             </div>
           </ToggleAnimation>

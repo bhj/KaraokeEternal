@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateAccount, logout } from 'store/modules/user'
 import AccountForm from '../AccountForm'
-import './Account.css'
+import styles from './Account.css'
 
 const Account = props => {
   const curPassword = useRef(null)
@@ -27,9 +27,9 @@ const Account = props => {
   }, [dispatch])
 
   return (
-    <div styleName='container'>
-      <h1 styleName='title'>My Account</h1>
-      <div styleName='content'>
+    <div className={styles.container}>
+      <h1 className={styles.title}>My Account</h1>
+      <div className={styles.content}>
         <p>Signed in as <strong>{user.username}</strong></p>
 
         <AccountForm
@@ -44,7 +44,6 @@ const Account = props => {
                 autoComplete='current-password'
                 placeholder='current password'
                 ref={curPassword}
-                // styleName='field'
               />
             </>
           }
@@ -56,7 +55,7 @@ const Account = props => {
           </button>
         }
 
-        <button onClick={handleSignOut} styleName='signOut'>
+        <button onClick={handleSignOut} className={styles.signOut}>
           Sign Out
         </button>
       </div>

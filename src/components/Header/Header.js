@@ -8,7 +8,7 @@ import history from 'lib/history'
 import PlaybackCtrl from './PlaybackCtrl'
 import ProgressBar from './ProgressBar'
 import UpNext from './UpNext'
-import './Header.css'
+import styles from './Header.css'
 
 // selectors
 const getIsAtQueueEnd = (state) => state.status.isAtQueueEnd
@@ -69,7 +69,7 @@ const Header = React.forwardRef((props, ref) => {
   const cancelScan = useCallback(() => dispatch(requestScanStop()), [dispatch])
 
   return (
-    <div styleName='container' className='bg-blur' ref={ref}>
+    <div className={`${styles.container} bg-blur`} ref={ref}>
       {!isPlayer && isPlayerPresent &&
         <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />
       }

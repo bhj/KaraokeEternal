@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import AccountForm from '../../../components/AccountForm'
 import RoomSelect from '../../../components/RoomSelect'
 import { createAccount } from 'store/modules/user'
-import './Create.css'
+import styles from './Create.css'
 
 let roomSelectRef
 
@@ -36,7 +36,7 @@ const Create = props => {
 
   return (
     <>
-      <div styleName='heading'>
+      <div className={styles.heading}>
         <h2>Create Account</h2>
         <span><a onClick={props.onToggle}>Already have an account?</a></span>
       </div>

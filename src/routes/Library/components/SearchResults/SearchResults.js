@@ -3,7 +3,7 @@ import React from 'react'
 import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongList from '../SongList'
-import './SearchResults.css'
+import styles from './SearchResults.css'
 
 const ARTIST_HEADER_HEIGHT = 22
 const ARTIST_RESULT_HEIGHT = 44
@@ -56,7 +56,7 @@ class SearchResults extends React.Component {
     // # artist results heading
     if (index === 0) {
       return (
-        <div key={'artistsHeading'} style={style} styleName='artistsHeading'>
+        <div key={'artistsHeading'} style={style} className={styles.artistsHeading}>
           {artistsResult.length} {filterStarred ? 'starred ' : ''}
           {artistsResult.length === 1 ? 'artist' : 'artists'}
         </div>
@@ -89,7 +89,7 @@ class SearchResults extends React.Component {
     // # song results heading
     if (index === artistsResult.length + 1) {
       return (
-        <div key={'songsHeading'} style={style} styleName='songsHeading'>
+        <div key={'songsHeading'} style={style} className={styles.songsHeading}>
           {songsResult.length} {filterStarred ? 'starred ' : ''}
           {songsResult.length === 1 ? 'song' : 'songs'}
         </div>

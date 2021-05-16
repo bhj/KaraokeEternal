@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './NoPlayer.css'
+import styles from './NoPlayer.css'
 
 const NoPlayer = (props) => (
-  <div styleName='container'>
-    <p styleName='msg'>
+  <div className={styles.container}>
+    <p className={styles.msg}>
       No player in room (<Link to='/player'>Start Player</Link>)
     </p>
   </div>

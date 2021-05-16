@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchPrefs } from 'store/modules/prefs'
 import SignedInView from './SignedInView'
 import SignedOutView from './SignedOutView'
-import './AccountView.css'
+import styles from './AccountView.css'
 
 const AccountView = props => {
   useLayoutEffect(() => props.setHeader(null))
@@ -19,7 +19,7 @@ const AccountView = props => {
   }, []) // once per mount
 
   return (
-    <div styleName='container' style={{
+    <div className={styles.container} style={{
       paddingTop: ui.headerHeight,
       paddingBottom: ui.footerHeight,
       width: ui.contentWidth,

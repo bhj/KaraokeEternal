@@ -7,7 +7,7 @@ import Icon from 'components/Icon'
 import VolumeSlider from './VolumeSlider'
 import NoPlayer from './NoPlayer'
 import DisplayCtrl from './DisplayCtrl'
-import './PlaybackCtrl.css'
+import styles from './PlaybackCtrl.css'
 
 const handleFullscreen = () => {
   if (screenfull.isEnabled) {
@@ -40,19 +40,19 @@ const PlaybackCtrl = props => {
   }
 
   return (
-    <div styleName='container'>
+    <div className={styles.container}>
       {status.isPlaying &&
-        <div onClick={handlePause} styleName='pause'>
+        <div onClick={handlePause} className={styles.pause}>
           <Icon icon='PAUSE' size={44}/>
         </div>
       }
       {!status.isPlaying &&
-        <div onClick={handlePlay} styleName='play'>
+        <div onClick={handlePlay} className={styles.play}>
           <Icon icon='PLAY' size={44}/>
         </div>
       }
 
-      <div onClick={handlePlayNext} styleName='next'>
+      <div onClick={handlePlayNext} className={styles.next}>
         <Icon icon='PLAY_NEXT' size={48}/>
       </div>
 
@@ -61,12 +61,12 @@ const PlaybackCtrl = props => {
         onVolumeChange={handleVolume}
       />
 
-      <div onClick={toggleDisplayCtrl} styleName='displayCtrl'>
+      <div onClick={toggleDisplayCtrl} className={styles.displayCtrl}>
         <Icon icon='TUNE' size={44}/>
       </div>
 
       {isPlayer && screenfull.isEnabled &&
-        <div onClick={handleFullscreen} styleName='fullscreen'>
+        <div onClick={handleFullscreen} className={styles.fullscreen}>
           <Icon icon='FULLSCREEN' size={48}/>
         </div>
       }

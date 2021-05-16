@@ -7,7 +7,7 @@ import playerVisualizerReducer from '../modules/playerVisualizer'
 
 import PlayerController from '../components/PlayerController'
 import screenfull from 'screenfull'
-import './PlayerView.css'
+import styles from './PlayerView.css'
 
 const PlayerView = (props) => {
   const { innerWidth, innerHeight, headerHeight, footerHeight } = useSelector(state => state.ui)
@@ -25,7 +25,7 @@ const PlayerView = (props) => {
     <div style={{ overflow: 'hidden' }}>
       <div
         id='player-fs-container'
-        styleName='container'
+        className={styles.container}
         style={{
           top: screenfull.isFullscreen ? 0 : headerHeight,
           width: innerWidth,

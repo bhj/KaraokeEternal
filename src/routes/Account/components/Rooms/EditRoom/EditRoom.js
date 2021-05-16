@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { createRoom, updateRoom, removeRoom } from 'store/modules/rooms'
 import Modal from 'components/Modal'
-import './EditRoom.css'
+import styles from './EditRoom.css'
 
 let isPasswordDirty = false
 
@@ -60,7 +60,7 @@ const EditRoom = props => {
         onKeyPress={handleKeyPress}
         placeholder='room name'
         ref={nameInput}
-        styleName='field'
+        className={styles.field}
       />
 
       <input type='password'
@@ -70,7 +70,7 @@ const EditRoom = props => {
         onKeyPress={handleKeyPress}
         placeholder='room password (optional)'
         ref={passwordInput}
-        styleName='field'
+        className={styles.field}
       />
 
       <label>
@@ -84,19 +84,19 @@ const EditRoom = props => {
       <br />
 
       {!props.room &&
-        <button onClick={handleCreateClick} className='primary' styleName='btn'>
+        <button onClick={handleCreateClick} className={`${styles.btn} primary`}>
           Create Room
         </button>
       }
 
       {props.room &&
-        <button onClick={handleUpdateClick} className='primary' styleName='btn'>
+        <button onClick={handleUpdateClick} className={`${styles.btn} primary`}>
           Update Room
         </button>
       }
 
       {props.room &&
-        <button onClick={handleRemoveClick} styleName='btn'>
+        <button onClick={handleRemoveClick} className={styles.btn}>
           Remove Room
         </button>
       }

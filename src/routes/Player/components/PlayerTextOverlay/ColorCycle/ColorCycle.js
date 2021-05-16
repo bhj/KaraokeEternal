@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import './ColorCycle.css'
+import styles from './ColorCycle.css'
 
 const framerate = 33 // ms
 
@@ -25,7 +25,7 @@ class ColorCycle extends React.Component {
 
       return (
         <span key={this.props.text + i}
-          styleName='char'
+          className={styles.char}
           style={{ animationDelay: `${delay}ms` }}>
           {char}
         </span>
@@ -33,7 +33,7 @@ class ColorCycle extends React.Component {
     })
 
     return (
-      <div styleName='container' className={this.props.className}>
+      <div className={`${styles.container} ${this.props.className}`}>
         {text}
       </div>
     )

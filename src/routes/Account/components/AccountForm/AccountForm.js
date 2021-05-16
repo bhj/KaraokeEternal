@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import UserImage from './UserImage'
-import './AccountForm.css'
+import styles from './AccountForm.css'
 
 export default class AccountForm extends Component {
   static propTypes = {
@@ -32,14 +32,14 @@ export default class AccountForm extends Component {
     const isUser = this.props.user && this.props.user.userId !== null
 
     return (
-      <form styleName='container'>
+      <form className={styles.container}>
         <input type='email'
           autoComplete='off'
           autoFocus={!isUser}
           onChange={this.updateDirty}
           placeholder={isUser ? 'change username (optional)' : 'username or email'}
           ref={r => { this.username = r }}
-          styleName='field'
+          className={styles.field}
         />
 
         <input type='password'
@@ -47,7 +47,7 @@ export default class AccountForm extends Component {
           onChange={this.updateDirty}
           placeholder={isUser ? 'change password (optional)' : 'password'}
           ref={r => { this.newPassword = r }}
-          styleName='field'
+          className={styles.field}
         />
 
         {this.state.isChangingPassword &&
@@ -55,11 +55,11 @@ export default class AccountForm extends Component {
             autoComplete='new-password'
             placeholder={isUser ? 'new password confirm' : 'confirm password'}
             ref={r => { this.newPasswordConfirm = r }}
-            styleName='field'
+            className={styles.field}
           />
         }
 
-        <div styleName='userDisplayContainer'>
+        <div className={styles.userDisplayContainer}>
           <UserImage
             user={this.props.user}
             onSelect={this.handleUserImageChange}
@@ -69,7 +69,7 @@ export default class AccountForm extends Component {
             onChange={this.updateDirty}
             placeholder='display name'
             ref={r => { this.name = r }}
-            styleName='field name'
+            className={`${styles.field} ${styles.name}`}
           />
         </div>
 
@@ -78,7 +78,7 @@ export default class AccountForm extends Component {
             defaultValue={isUser && this.props.user.isAdmin ? '1' : '0'}
             onChange={this.updateDirty}
             ref={r => { this.role = r }}
-            styleName='field'
+            className={styles.field}
           >
             <option key={'choose'} value='' disabled>select role...</option>
             <option key={'std'} value='0'>Standard</option>

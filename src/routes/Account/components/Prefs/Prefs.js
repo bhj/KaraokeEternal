@@ -1,14 +1,14 @@
 import React from 'react'
 import PathPrefs from './PathPrefs'
 import PlayerPrefs from './PlayerPrefs'
-import './Prefs.css'
+import styles from './Prefs.css'
 
 export default class Prefs extends React.Component {
   render () {
     return (
-      <div styleName='container'>
-        <h1 styleName='title'>Preferences</h1>
-        <div styleName='content'>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Preferences</h1>
+        <div className={styles.content}>
           <PathPrefs />
           <PlayerPrefs />
         </div>

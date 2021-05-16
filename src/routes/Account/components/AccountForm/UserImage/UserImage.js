@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import Icon from 'components/Icon'
 import loadImage from 'blueimp-load-image'
-import './UserImage.css'
+import styles from './UserImage.css'
 
 export default class AccountForm extends Component {
   static propTypes = {
@@ -25,9 +25,9 @@ export default class AccountForm extends Component {
 
   render () {
     return (
-      <div styleName='container'>
+      <div className={styles.container}>
         {!this.state.imageURL &&
-          <Icon icon='ACCOUNT_BOX' size={72} styleName='placeholder'/>
+          <Icon icon='ACCOUNT_BOX' size={72} className={styles.placeholder}/>
         }
 
         {this.state.imageURL &&
@@ -38,10 +38,10 @@ export default class AccountForm extends Component {
         }
 
         {this.state.imageURL && !this.state.isLoading &&
-            <Icon icon='CLEAR' size={32} onClick={this.handleImgClear} styleName='btnClear'/>
+            <Icon icon='CLEAR' size={32} onClick={this.handleImgClear} className={styles.btnClear}/>
         }
 
-        <input type='file' accept='image/*' onChange={this.handleChoose} styleName='fileInput' tabIndex='-1'/>
+        <input type='file' accept='image/*' onChange={this.handleChoose} className={styles.fileInput} tabIndex='-1'/>
       </div>
     )
   }
