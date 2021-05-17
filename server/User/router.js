@@ -383,7 +383,7 @@ async function _create (ctx, isAdmin = false) {
 
 async function _login (ctx, creds, validateRoomPassword = true) {
   const { username, password, roomPassword } = creds
-  const roomId = parseInt(creds.roomId, 10) || undefined
+  const roomId = parseInt(creds.roomId, 10) || null
 
   if (!username || !password) {
     ctx.throw(422, 'Username/email and password are required')
