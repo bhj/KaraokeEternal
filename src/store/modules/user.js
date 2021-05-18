@@ -53,6 +53,10 @@ export function login (creds) {
       body: creds
     })
       .then(user => {
+        // signing in can cause additional reducers to be injected and
+        // trigger rehydration with stale data, so purge here first
+        window._persistor.purge()
+
         // user object in response body
         dispatch(receiveLogin(user))
         dispatch(connectSocket())
