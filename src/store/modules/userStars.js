@@ -98,7 +98,7 @@ const ACTION_HANDLERS = {
   }),
   [REHYDRATE]: (state, { payload }) => ({
     ...state,
-    userId: payload && typeof payload.userId === 'number' ? payload.userId : null,
+    userId: payload && typeof payload.userId === 'number' ? payload.userId : state.userId,
   }),
   [LOGOUT + _SUCCESS]: (state, { payload }) => ({
     ...initialState,
