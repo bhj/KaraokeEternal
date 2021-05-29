@@ -9,6 +9,7 @@
 
 - **(app)** **(breaking)** Browsers without the [ResizeObserver API](https://caniuse.com/#feat=mdn-api_resizeobserver) are no longer supported
 - **(server)** Uses one less process/helper
+- **(server)** Media scanner performance is greatly improved when adding media
 - **(server)** Media scanner process is restricted to read-only database access
 - **(server)** Fixed potential error when a non-admin user tries to remove one of their queued songs
 - **(server)** Fixed potential SQLITE_BUSY errors while scanning media

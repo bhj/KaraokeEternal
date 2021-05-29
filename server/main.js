@@ -18,6 +18,10 @@ const {
 
 Object.keys(env).forEach(key => log.verbose(`${key} = ${env[key]}`))
 
+// close db before exiting (can't do async in the 'exit' handler)
+process.on('SIGTERM', shutdown)
+process.on('SIGINT', shutdown)
+
 // make sure child processes don't hang around
 process.on('exit', function () {
   if (refs.scanner) refs.scanner.kill()
@@ -25,7 +29,7 @@ process.on('exit', function () {
 
 // debug: log stack trace for unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
-  log.error('Unhandled Rejection at: Promise', p, 'reason:', reason)
+  log.error('Unhandled Rejection:', p, 'reason:', reason)
 })
 
 // detect electron
@@ -79,4 +83,13 @@ function stopScanner () {
   if (refs.scanner) {
     IPC.send({ type: SCANNER_CMD_STOP })
   }
+}
+
+function shutdown (signal) {
+  log.info('Received signal %s', signal)
+
+  Database.close().then(() => {
+    log.info('Goodbye for now...')
+    process.exit(0)
+  })
 }

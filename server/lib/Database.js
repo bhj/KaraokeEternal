@@ -6,7 +6,16 @@ let _db
 
 class Database {
   static async close () {
-    // @todo
+    // depending on how the node process was started, it can receive
+    // multiple SIGINTs or SIGTERMs in the same tick, so we clear the
+    // reference first to avoid calling close() multiple times
+    if (_db) {
+      const db = _db
+      _db = null
+
+      log.info('Closing database file %s', db.config.filename)
+      await db.close()
+    }
   }
 
   static async open ({ readonly = true, env = process.env } = {}) {
@@ -25,6 +34,8 @@ class Database {
       await db.migrate({
         migrationsPath: path.join(__dirname, 'schemas'),
       })
+
+      await db.run('PRAGMA journal_mode = WAL;')
     }
 
     _db = db
