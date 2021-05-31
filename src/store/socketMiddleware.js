@@ -1,5 +1,4 @@
 import { BEGIN, COMMIT, REVERT } from 'redux-optimistic-ui'
-import history from 'lib/history'
 
 // optimistic actions need a transaction id to match BEGIN to COMMIT/REVERT
 let transactionID = 0
@@ -7,16 +6,7 @@ let transactionID = 0
 export default function createSocketMiddleware (socket, prefix) {
   return store => {
     // attach handler for incoming actions (from server)
-    socket.on('action', action => {
-      const { type } = action
-
-      // can ignore player commands if we're not an active player
-      if (type && type.startsWith('player/') && !history.location.pathname.startsWith('/player')) {
-        return
-      }
-
-      store.dispatch(action)
-    })
+    socket.on('action', action => store.dispatch(action))
 
     return next => action => {
       const { type, meta } = action
