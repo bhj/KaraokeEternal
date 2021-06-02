@@ -1,6 +1,5 @@
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import locationHelperBuilder from 'redux-auth-wrapper/history4/locationHelper'
 import { fetchPrefs } from './prefs'
 import HttpApi from 'lib/HttpApi'
 import history from 'lib/history'
@@ -17,7 +16,6 @@ import {
 } from 'shared/actionTypes'
 
 const api = new HttpApi('')
-const locationHelper = locationHelperBuilder({})
 
 // ------------------------------------
 // Login
@@ -67,7 +65,7 @@ export function login (creds) {
         }
 
         // redirect in query string?
-        const redirect = locationHelper.getRedirectQueryParam(history)
+        const redirect = new URLSearchParams(history.location.search).get('redirect')
 
         if (redirect) {
           history.push(redirect)
