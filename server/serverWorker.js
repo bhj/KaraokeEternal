@@ -64,10 +64,8 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     IPC.use(IPCLibraryActions(io))
     IPC.use(IPCMediaActions(io))
 
-    log.info(`Starting web server (host=${env.KF_SERVER_HOST}; port=${env.KF_SERVER_PORT})`)
-
     // success callback in 3rd arg
-    server.listen(env.KF_SERVER_PORT, env.KF_SERVER_HOST, () => {
+    server.listen(env.KF_SERVER_PORT, () => {
       const port = server.address().port
       const url = `http://${getIPAddress()}${port === 80 ? '' : ':' + port}${urlPath}`
       log.info(`Web server running at ${url}`)
