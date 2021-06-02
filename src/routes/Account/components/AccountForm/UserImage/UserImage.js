@@ -13,7 +13,7 @@ export default class AccountForm extends Component {
   state = {
     isLoading: true,
     imageURL: this.props.user && this.props.user.userId !== null
-      ? `/api/user/${this.props.user.userId}/image?v=${this.props.user.dateUpdated}`
+      ? `${document.baseURI}api/user/${this.props.user.userId}/image?v=${this.props.user.dateUpdated}`
       : null,
   }
 

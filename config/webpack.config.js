@@ -22,7 +22,6 @@ const config = {
   output: {
     path: path.join(baseDir, 'build'),
     filename: __DEV__ ? '[name].js' : '[name].[hash].js',
-    publicPath: '/',
   },
   resolve: {
     modules: [
@@ -88,7 +87,7 @@ if (__PROD__) {
 // HTML Template
 config.plugins.push(new HtmlWebpackPlugin({
   template: './src/index.html',
-  inject: true,
+  base: '/',
 }))
 
 // Loaders

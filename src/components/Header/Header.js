@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { requestScanStop } from 'store/modules/prefs'
 import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
-import history from 'lib/history'
 import PlaybackCtrl from './PlaybackCtrl'
 import ProgressBar from './ProgressBar'
 import UpNext from './UpNext'
@@ -57,13 +57,15 @@ const Header = React.forwardRef((props, ref) => {
   const CustomHeader = props.customHeader
 
   const isAdmin = useSelector(state => state.user.isAdmin)
-  const isPlayer = history.location.pathname.startsWith('/player')
   const isPlayerPresent = useSelector(state => state.status.isPlayerPresent)
   const isScanning = useSelector(state => state.prefs.isScanning)
   const scannerText = useSelector(state => state.prefs.scannerText)
   const scannerPct = useSelector(state => state.prefs.scannerPct)
   const { isUpNext, isUpNow } = useSelector(getStatusProps)
   const wait = useSelector(getUserWait)
+
+  const location = useLocation()
+  const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const dispatch = useDispatch()
   const cancelScan = useCallback(() => dispatch(requestScanStop()), [dispatch])
@@ -78,7 +80,7 @@ const Header = React.forwardRef((props, ref) => {
         <PlaybackCtrl />
       }
 
-      {isAdmin &&
+      {isAdmin && !isPlayer &&
         <ProgressBar
           isActive={isScanning}
           onCancel={cancelScan}

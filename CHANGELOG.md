@@ -4,6 +4,7 @@
 - **(app)** User management interface!
 - **(app)** CD+Graphics backgrounds are now content-aware for better visuals and readability
 - **(app)** Summary is now shown following a media scan
+- **(server)** Support for custom URL base path (see `--urlPath` CLI option)
 
 ### Changed
 

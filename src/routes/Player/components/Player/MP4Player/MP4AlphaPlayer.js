@@ -93,7 +93,7 @@ class MP4Player extends React.Component {
 
   updateSources = () => {
     this.stopChroma()
-    this.video.src = `/api/media/${this.props.mediaId}?type=video`
+    this.video.src = `${document.baseURI}api/media/${this.props.mediaId}?type=video`
     this.video.load()
   }
 

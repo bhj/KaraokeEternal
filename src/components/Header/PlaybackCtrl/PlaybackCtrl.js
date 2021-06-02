@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import screenfull from 'screenfull'
-import history from 'lib/history'
 import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolume } from 'store/modules/status'
 import Icon from 'components/Icon'
 import VolumeSlider from './VolumeSlider'
@@ -19,9 +19,11 @@ const handleFullscreen = () => {
 const PlaybackCtrl = props => {
   const isAdmin = useSelector(state => state.user.isAdmin)
   const isInRoom = useSelector(state => state.user.roomId !== null)
-  const isPlayer = history.location.pathname.startsWith('/player')
   const status = useSelector(state => state.status)
   const ui = useSelector(state => state.ui)
+
+  const location = useLocation()
+  const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const dispatch = useDispatch()
   const handleOptions = useCallback(opts => dispatch(requestOptions(opts)), [dispatch])

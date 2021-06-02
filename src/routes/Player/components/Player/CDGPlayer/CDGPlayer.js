@@ -124,7 +124,7 @@ class CDGPlayer extends React.Component {
       .then(res => res.arrayBuffer())
       .then(buffer => {
         this.cdg.load(buffer)
-        this.audio.current.src = `/api/media/${this.props.mediaId}?type=audio`
+        this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
         this.audio.current.load()
       }).catch(err => {
         this.props.onError(err.message)

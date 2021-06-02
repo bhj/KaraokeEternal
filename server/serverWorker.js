@@ -7,6 +7,7 @@ const { promisify } = require('util')
 const parseCookie = require('./lib/parseCookie')
 const jwtVerify = require('jsonwebtoken').verify
 const Koa = require('koa')
+const koaRouter = require('koa-router')
 const koaBody = require('koa-body')
 const koaFavicon = require('koa-favicon')
 const koaLogger = require('koa-logger')
@@ -32,8 +33,55 @@ const {
 } = require('../shared/actionTypes')
 
 async function serverWorker ({ env, startScanner, stopScanner }) {
+  const indexFile = path.join(env.KF_SERVER_PATH_WEBROOT, 'index.html')
+  const urlPath = env.KF_SERVER_URL_PATH.replace(/\/?$/, '/') // force trailing slash
   const jwtKey = await Prefs.getJwtKey()
   const app = new Koa()
+  let server, io
+
+  // called when middleware is finalized
+  function createServer () {
+    server = http.createServer(app.callback())
+
+    // http server error handler
+    server.on('error', function (err) {
+      log.error(err)
+
+      process.emit('serverWorker', {
+        type: SERVER_WORKER_ERROR,
+        error: err.message,
+      })
+
+      // not much we can do without a working server
+      process.exit(1)
+    })
+
+    // create socket.io server and attach handlers
+    io = SocketIO(server, { serveClient: false })
+    socketActions(io, jwtKey)
+
+    // attach IPC action handlers
+    IPC.use(IPCLibraryActions(io))
+    IPC.use(IPCMediaActions(io))
+
+    log.info(`Starting web server (host=${env.KF_SERVER_HOST}; port=${env.KF_SERVER_PORT})`)
+
+    // success callback in 3rd arg
+    server.listen(env.KF_SERVER_PORT, env.KF_SERVER_HOST, () => {
+      const port = server.address().port
+      const url = `http://${getIPAddress()}${port === 80 ? '' : ':' + port}${urlPath}`
+      log.info(`Web server running at ${url}`)
+
+      process.emit('serverWorker', {
+        type: SERVER_WORKER_STATUS,
+        payload: { url },
+      })
+    })
+  }
+
+  // --------------------
+  // Begin Koa middleware
+  // --------------------
 
   // server error handler
   app.on('error', (err, ctx) => {
@@ -75,10 +123,9 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     ctx.jwtKey = jwtKey // used by login route
 
     // skip JWT/session validation if non-API request or logging in/out
-    // @todo support custom public path
-    if (!ctx.request.path.startsWith('/api/') ||
-      ctx.request.path === '/api/login' ||
-      ctx.request.path === '/api/logout') {
+    if (!ctx.request.path.startsWith(`${urlPath}api/`) ||
+      ctx.request.path === `${urlPath}api/login` ||
+      ctx.request.path === `${urlPath}api/logout`) {
       return next()
     }
 
@@ -114,104 +161,84 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     await next()
   })
 
-  // http api (koa-router) endpoints
-  app.use(libraryRouter.routes())
-  app.use(mediaRouter.routes())
-  app.use(prefsRouter.routes())
-  app.use(roomsRouter.routes())
-  app.use(userRouter.routes())
+  // http api endpoints
+  const baseRouter = koaRouter({
+    prefix: urlPath.replace(/\/$/, '') // avoid double slashes with /api prefix
+  })
 
-  // URL rewriting and static asset handling
-  // @todo support custom public path
-  const rewriteRoutes = ['account', 'library', 'queue', 'player']
-  const indexFile = path.join(env.KF_SERVER_PATH_WEBROOT, 'index.html')
+  baseRouter.use(libraryRouter.routes())
+  baseRouter.use(mediaRouter.routes())
+  baseRouter.use(prefsRouter.routes())
+  baseRouter.use(roomsRouter.routes())
+  baseRouter.use(userRouter.routes())
+  app.use(baseRouter.routes())
 
-  if (env.NODE_ENV === 'development') {
-    log.info('Enabling webpack dev and HMR middleware')
-    const webpack = require('webpack')
-    const webpackConfig = require('../config/webpack.config')
-    const compiler = webpack(webpackConfig)
-    const koaWebpack = require('koa-webpack')
+  // serve index.html with dynamic base tag at the main SPA routes
+  const createIndexMiddleware = content => {
+    const indexRoutes = [
+      urlPath,
+      ...['account', 'library', 'queue', 'player'].map(r => urlPath + r + '/')
+    ]
 
-    koaWebpack({ compiler })
-      .then((middleware) => {
-        // webpack-dev-middleware and webpack-hot-client
-        app.use(middleware)
+    content = content.replace('<base href="/">', `<base href="${urlPath}">`)
 
-        // serve /assets since webpack-dev-server is unaware of this folder
-        app.use(koaMount('/assets', koaStatic(env.KF_SERVER_PATH_ASSETS)))
+    return async (ctx, next) => {
+      // use a trailing slash for matching purposes
+      const reqPath = ctx.request.path.replace(/\/?$/, '/')
 
-        // "rewrite" top level SPA routes to index.html
-        app.use(async (ctx, next) => {
-          const route = ctx.request.path.substring(1).split('/')[0]
-          if (!rewriteRoutes.includes(route)) return next()
+      if (!indexRoutes.includes(reqPath)) {
+        return next()
+      }
 
-          ctx.body = await new Promise(function (resolve, reject) {
-            compiler.outputFileSystem.readFile(indexFile, (err, result) => {
-              if (err) { return reject(err) }
-              return resolve(result)
-            })
-          })
-          ctx.set('content-type', 'text/html')
-          ctx.status = 200
-        })
-      })
-  } else {
-    // production mode
-    // serve build folder as webroot
-    app.use(koaStatic(env.KF_SERVER_PATH_WEBROOT))
-    app.use(koaMount('/assets', koaStatic(env.KF_SERVER_PATH_ASSETS)))
-
-    // "rewrite" top level SPA routes to index.html
-    const readFile = promisify(fs.readFile)
-
-    app.use(async (ctx, next) => {
-      const route = ctx.request.path.substring(1).split('/')[0]
-      if (!rewriteRoutes.includes(route)) return next()
-
-      ctx.body = await readFile(indexFile)
       ctx.set('content-type', 'text/html')
+      ctx.body = content
       ctx.status = 200
+    }
+  }
+
+  if (env.NODE_ENV !== 'development') {
+    // make sure we handle index.html before koaStatic,
+    // otherwise it'll be served without dynamic base tag
+    app.use(createIndexMiddleware(await promisify(fs.readFile)(indexFile, 'utf8')))
+
+    // serve build and asset folders
+    app.use(koaMount(urlPath, koaStatic(env.KF_SERVER_PATH_WEBROOT)))
+    app.use(koaMount(`${urlPath}assets`, koaStatic(env.KF_SERVER_PATH_ASSETS)))
+
+    createServer()
+    return
+  }
+
+  // ----------------------
+  // Development middleware
+  // ----------------------
+  log.info('Enabling webpack dev and HMR middleware')
+  const webpack = require('webpack')
+  const webpackConfig = require('../config/webpack.config')
+  const koaWebpack = require('koa-webpack')
+  const compiler = webpack(webpackConfig)
+
+  compiler.hooks.done.tap('indexPlugin', async (params) => {
+    const indexContent = await new Promise((resolve, reject) => {
+      compiler.outputFileSystem.readFile(indexFile, 'utf8', (err, result) => {
+        if (err) return reject(err)
+        return resolve(result)
+      })
     })
-  } // end if
 
-  // create http server
-  const server = http.createServer(app.callback())
-
-  // http server error handler
-  server.on('error', function (err) {
-    log.error(err)
-
-    process.emit('serverWorker', {
-      type: SERVER_WORKER_ERROR,
-      error: err.message,
-    })
-
-    // not much we can do without a working server
-    process.exit(1)
+    // @todo make this less hacky
+    if (!server) {
+      app.use(createIndexMiddleware(indexContent))
+      createServer()
+    }
   })
 
-  // create socket.io server and attach handlers
-  const io = SocketIO(server, { serveClient: false })
-  socketActions(io, jwtKey)
+  // webpack-dev-middleware and webpack-hot-client
+  const middleware = await koaWebpack({ compiler, devMiddleware: { publicPath: urlPath } })
+  app.use(middleware)
 
-  // attach IPC action handlers
-  IPC.use(IPCLibraryActions(io))
-  IPC.use(IPCMediaActions(io))
-
-  log.info(`Starting web server (host=${env.KF_SERVER_HOST}; port=${env.KF_SERVER_PORT})`)
-
-  // success callback in 3rd arg
-  server.listen(env.KF_SERVER_PORT, env.KF_SERVER_HOST, () => {
-    const port = server.address().port
-    const url = `http://${getIPAddress()}` + (port === 80 ? '' : ':' + port)
-    log.info(`Web server running at ${url}`)
-
-    process.emit('serverWorker', {
-      type: SERVER_WORKER_STATUS,
-      payload: { url },
-    })
-  })
+  // serve assets since webpack-dev-server is unaware of this folder
+  app.use(koaMount(`${urlPath}assets`, koaStatic(env.KF_SERVER_PATH_ASSETS)))
 }
 
 module.exports = serverWorker

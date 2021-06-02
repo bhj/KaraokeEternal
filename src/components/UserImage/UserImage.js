@@ -26,7 +26,7 @@ class UserImage extends React.Component {
         }
 
         {!state.isErrored &&
-          <img src={`/api/user/${props.userId}/image?v=${props.dateUpdated}`}
+          <img src={`${document.baseURI}api/user/${props.userId}/image?v=${props.dateUpdated}`}
             onLoad={this.handleImgLoad}
             onError={this.handleImgError}
             className={`${styles.image} ${props.className}`}

@@ -1,3 +1,5 @@
 import { createBrowserHistory } from 'history'
 
-export default createBrowserHistory()
+const basename = new URL(document.baseURI).pathname
+
+export default createBrowserHistory({ basename })

@@ -5,6 +5,7 @@ const env = {
   KF_SERVER_PATH_DATA: baseDir,
   KF_SERVER_PATH_ASSETS: path.join(baseDir, 'assets'),
   KF_SERVER_PATH_WEBROOT: path.join(baseDir, 'build'),
+  KF_SERVER_URL_PATH: '/',
 }
 
 const yargs = require('yargs')
@@ -14,6 +15,11 @@ const yargs = require('yargs')
     describe: 'Web server port (default=auto)',
     number: true,
     requiresArg: true,
+  })
+  .option('urlPath', {
+    describe: 'Web server URL base path (default=/)',
+    requiresArg: true,
+    type: 'string',
   })
   .option('scan', {
     describe: 'Run the media scanner at startup',
@@ -70,6 +76,7 @@ if (argv.scan) {
 // settings via CLI take precendence over env vars
 const opts = {
   port: 'KF_SERVER_PORT',
+  urlPath: 'KF_SERVER_URL_PATH',
   scannerConsoleLevel: 'KF_SCANNER_CONSOLE_LEVEL',
   scannerLogLevel: 'KF_SCANNER_LOG_LEVEL',
   serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
