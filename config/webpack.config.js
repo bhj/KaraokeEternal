@@ -1,6 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -16,12 +17,13 @@ const config = {
   mode: __PROD__ ? 'production' : 'development',
   entry: {
     main: [
-      './src/main.js'
-    ],
+      './src/main.js',
+      __DEV__ && 'webpack-hot-middleware/client', // https://github.com/pmmmwh/react-refresh-webpack-plugin/issues/213
+    ].filter(Boolean),
   },
   output: {
     path: path.join(baseDir, 'build'),
-    filename: __DEV__ ? '[name].js' : '[name].[hash].js',
+    filename: __DEV__ ? '[name].js' : '[name].[fullhash].js',
   },
   resolve: {
     modules: [
@@ -51,10 +53,12 @@ const config = {
     })),
     new CaseSensitivePathsPlugin(),
     new MiniCssExtractPlugin({
-      filename: __DEV__ ? '[name].css' : '[name].[hash].css',
-      chunkFilename: __DEV__ ? '[id].css' : '[id].[hash].css',
+      filename: __DEV__ ? '[name].css' : '[name].[fullhash].css',
+      chunkFilename: __DEV__ ? '[id].css' : '[id].[fullhash].css',
     }),
-  ],
+    __DEV__ && new webpack.HotModuleReplacementPlugin(),
+    __DEV__ && new ReactRefreshWebpackPlugin(),
+  ].filter(Boolean),
   optimization: {
     splitChunks: {
       chunks: 'all',
@@ -102,6 +106,9 @@ config.module.rules.push({
     options: {
       cacheDirectory: __DEV__,
       configFile: path.join(baseDir, 'config', 'babel.config.json'),
+      plugins: [
+        __DEV__ && require.resolve('react-refresh/babel'),
+      ].filter(Boolean),
     },
   }],
 })
@@ -131,7 +138,7 @@ config.module.rules.push({
       loader: 'css-loader',
       options: {
         modules: {
-          localIdentName: '[name]__[local]___[hash:base64:5]',
+          localIdentName: '[name]__[local]___[fullhash:base64:5]',
         }
       }
     }
