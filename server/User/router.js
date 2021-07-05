@@ -265,7 +265,7 @@ router.post('/setup', async (ctx, next) => {
   }
 
   // create admin user
-  const creds = await _create(ctx, true)
+  await _create(ctx, true)
 
   // create default room
   const fields = new Map()
@@ -279,8 +279,9 @@ router.post('/setup', async (ctx, next) => {
   `
   const res = await db.run(String(query), query.parameters)
 
-  // sign in to the new room
-  creds.roomId = res.lastID
+  if (typeof res.lastID !== 'number') {
+    ctx.throw(500, 'Invalid default room lastID')
+  }
 
   // unset isFirstRun
   {
@@ -292,7 +293,11 @@ router.post('/setup', async (ctx, next) => {
     await db.run(String(query))
   }
 
-  await _login(ctx, creds)
+  // success
+  ctx.status = 200
+  ctx.body = {
+    roomId: res.lastID,
+  }
 })
 
 // get a user's image
@@ -373,12 +378,6 @@ async function _create (ctx, isAdmin = false) {
   `
 
   await db.run(String(query), query.parameters)
-
-  // success! return the (cleaned) credentials for sign-in
-  return {
-    username,
-    password: newPassword,
-  }
 }
 
 async function _login (ctx, creds, validateRoomPassword = true) {

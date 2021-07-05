@@ -149,18 +149,23 @@ export function createAccount (data, isFirstRun) {
   return (dispatch, getState) => {
     dispatch(requestCreate(data))
 
-    const isFirstRun = !!getState().prefs.isFirstRun
+    const isFirstRun = getState().prefs.isFirstRun
 
     return api('POST', isFirstRun ? 'setup' : 'user', {
       body: data
     })
-      .then(() => {
+      .then(res => {
+        // if firstRun, response should contain the newly-created room's id
+        if (isFirstRun && typeof res.roomId !== 'number') {
+          throw new Error('firstRun: No roomId in response')
+        }
+
         dispatch(createSuccess())
 
         return dispatch(login({
           username: data.get('username'),
           password: data.get('newPassword'),
-          roomId: data.get('roomId'),
+          roomId: isFirstRun ? res.roomId : data.get('roomId'),
           roomPassword: data.get('roomPassword'),
         }))
       })
