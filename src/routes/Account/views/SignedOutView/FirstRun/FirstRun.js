@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AccountForm from '../../../components/AccountForm'
 import { createAccount } from 'store/modules/user'
@@ -6,11 +6,10 @@ import styles from './FirstRun.css'
 
 const FirstRun = props => {
   const user = useSelector(state => state.user)
-  const formRef = useRef(null)
 
   const dispatch = useDispatch()
-  const handleCreate = useCallback(() => {
-    dispatch(createAccount(formRef.current.getData()))
+  const handleCreate = useCallback(data => {
+    dispatch(createAccount(data))
   }, [dispatch])
 
   return (
@@ -20,11 +19,10 @@ const FirstRun = props => {
         <p>Create your <b>admin</b> account to get started. All data is locally stored and never shared.</p>
       </div>
 
-      <AccountForm user={user} ref={formRef}/>
+      <AccountForm user={user} onSubmit={handleCreate}>
+        <button className='primary'>Create Account</button>
+      </AccountForm>
 
-      <button onClick={handleCreate} className='primary'>
-        Create Account
-      </button>
     </>
   )
 }

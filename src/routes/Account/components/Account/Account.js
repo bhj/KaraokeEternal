@@ -6,7 +6,6 @@ import styles from './Account.css'
 
 const Account = props => {
   const curPassword = useRef(null)
-  const formRef = useRef(null)
 
   const user = useSelector(state => state.user)
   const [isDirty, setDirty] = useState(false)
@@ -14,14 +13,13 @@ const Account = props => {
   const dispatch = useDispatch()
   const handleDirtyChange = useCallback(isDirty => setDirty(isDirty))
   const handleSignOut = useCallback(() => dispatch(logout()), [dispatch])
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(data => {
     if (!curPassword.current.value.trim()) {
       alert('Please enter your current password to make changes.')
       curPassword.current.focus()
       return
     }
 
-    const data = formRef.current.getData()
     data.append('password', curPassword.current.value)
     dispatch(updateAccount(data))
   }, [dispatch])
@@ -32,11 +30,7 @@ const Account = props => {
       <div className={styles.content}>
         <p>Signed in as <strong>{user.username}</strong></p>
 
-        <AccountForm
-          user={user}
-          onDirtyChange={handleDirtyChange}
-          ref={formRef}
-        >
+        <AccountForm user={user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit}>
           {isDirty &&
             <>
               <br />
@@ -45,15 +39,12 @@ const Account = props => {
                 placeholder='current password'
                 ref={curPassword}
               />
+              <button className={`primary ${styles.updateAccount}`}>
+                Update Account
+              </button>
             </>
           }
         </AccountForm>
-
-        {isDirty &&
-          <button onClick={handleSubmit} className='primary'>
-            Update Account
-          </button>
-        }
 
         <button onClick={handleSignOut} className={styles.signOut}>
           Sign Out
