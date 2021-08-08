@@ -131,7 +131,12 @@ MP4 videos will be played verbatim, while media with CD+Graphics have additional
 
 ## Karaoke Forever Server
 
-The server software hosts the "web" app and your media files on your local network. Built on [Node.js](https://nodejs.org){{% icon-external %}} and [SQLite](https://www.sqlite.org){{% icon-external %}}, it can run on relatively minimal hardware (Raspberry Pi 3B+).
+The server hosts the app and your media files, and can run on relatively minimal hardware (Raspberry Pi 3B+). [Player(s)](#player) don't need to be on the same system as the server.
+
+<aside class="info">
+  {{% icon-info %}}
+  <p>The server chooses a random port at each startup unless otherwise [specified](#command-line-options).</p>
+</aside>
 
 ### Installation
 
