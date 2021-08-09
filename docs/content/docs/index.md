@@ -120,12 +120,12 @@ The player is a part of the [app](#karaoke-forever-the-web-app) that's designed 
 
 <div class="row">
   {{% img srcset="app-player.jpg 2x" src="app-player.jpg" alt="Player view" %}}
-  {{% img srcset="app-displayctrl.png 2x" src="app-displayctrl.png" alt="Display options (remote-controllable)" %}}
+  {{% img srcset="app-displayctrl.png 2x" src="app-displayctrl.png" alt="Display options" %}}
 </div>
 
-To start a player, sign in to the desired room as an admin and a player link will appear at the top. If you don't see a link, fullscreen support wasn't detected, but you can still manually navigate to `/player`.
+To start a player, sign in to the desired room as an admin and a player link will appear at the top. If you don't see a link that means fullscreen support wasn't detected, but you can still manually navigate to `/player`.
 
-MP4 videos will be played verbatim, while media with CD+Graphics have additional display options, including [MilkDrop](https://en.wikipedia.org/wiki/MilkDrop){{% icon-external %}}-style visualizations. As with the playback controls, admins and the currently-up singer have access to these options.
+Once a player is in the room, playback and display controls appear at the top of the app for the currently-up singer as well as admins, who always have access to these.
 
 <hr>
 
@@ -179,11 +179,11 @@ Karaoke Forever Server requires [Node.js](https://nodejs.org){{% icon-external %
 
 ### Media Files
 
-The following media formats are supported:
+The following types are supported:
 
-- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (.cdg and .mp3 files must be named the same; if .m4a is present it will be used instead)
+- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (.cdg and .mp3 files must be named the same; also supports an .m4a instead of .mp3). Supports background visualizations.
 
-- MP4 video (since .mp4/.m4a files are only containers, codec support can vary depending on the browser running the [player](#player))
+- MP4 video (codec support can vary depending on the browser running the [player](#player)). Does not support background visualizations (videos are played as-is).
 
 Media filenames are expected to be in "Artist - Title" format by default, but this can be configured per-folder using a `_kfconfig.js` file. When this file is encountered in a folder it applies to all files and subfolders. If any subfolders have their own `_kfconfig.js`, that will take precedence.
 
