@@ -202,7 +202,7 @@ router.get('/testffmpeg', async (ctx, next) => {
       let version = result.substr(15)
       version = version.substr(0, version.search(/\s/g)).trim()
 
-      if (version.startsWith('3.')) {
+      if (version.startsWith('3.') || version.startsWith('4.')) {
         ctx.body = {
           success: true,
           message: 'FFMPEG ' + version + ' was found!'
@@ -210,7 +210,7 @@ router.get('/testffmpeg', async (ctx, next) => {
       } else {
         ctx.body = {
           success: false,
-          message: 'FFMPEG ' + version + ' was found. This might work, but we expected v3.x.x'
+          message: 'FFMPEG ' + version + ' was found. This might work, but we expected v3.x.x or v4.x.x'
         }
       }
     } else {
