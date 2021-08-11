@@ -1,6 +1,7 @@
 @import './variables.css';
 @import './fonts.css';
 @import './rc-slider.css';
+@import '~react-toastify/dist/ReactToastify.css'; /* necessary to import from here to be loaded late in main.css, instead of early in vendors.css */
 
 *,
 *:before,
@@ -53,6 +54,7 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="search"],
+input[type="number"],
 select {
   display: block;
   width: 100%;
@@ -100,7 +102,7 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 /* Buttons */
-button {
+button:not(.Toastify__close-button) {
   background-color: var(--btn-default-bg-color);
   border: none;
   border-radius: var(--border-radius);

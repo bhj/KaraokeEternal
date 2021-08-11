@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('dotenv').config()
 const childProcess = require('child_process')
 const path = require('path')
 const env = require('./lib/cli')
@@ -8,6 +9,7 @@ const log = require('./lib/Log')
   .getLogger(`main[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
+const YoutubeProcessManager = require('./Youtube/YoutubeProcessManager')
 const refs = {}
 const {
   SCANNER_CMD_START,
@@ -25,6 +27,7 @@ process.on('SIGINT', shutdown)
 // make sure child processes don't hang around
 process.on('exit', function () {
   if (refs.scanner) refs.scanner.kill()
+  YoutubeProcessManager.killYoutubeProcess()
 })
 
 // debug: log stack trace for unhandled promise rejections
@@ -63,9 +66,14 @@ Database.open({ readonly: false, env }).then(db => {
 function startScanner () {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
-    refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
-      env: { ...env, KF_CHILD_PROCESS: 'scanner' }
-    })
+
+    // workaround to get debugging in child processes
+    let options = { env: { ...env, KF_CHILD_PROCESS: 'scanner' } }
+    if (process.env.NODE_ENV === 'development') {
+      options.execArgv = ['--inspect=5723']
+    }
+
+    refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], options)
 
     refs.scanner.on('exit', (code, signal) => {
       log.info(`Media scanner exited (${signal || code})`)

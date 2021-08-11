@@ -2,11 +2,13 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import CDGPlayer from './CDGPlayer'
 import MP4Player from './MP4Player'
+import YOUTUBEPlayer from './YOUTUBEPlayer'
 const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer'))
 
 const players = {
   CDGPlayer,
   MP4Player,
+  YOUTUBEPlayer,
 }
 
 class Player extends React.Component {
@@ -20,6 +22,9 @@ class Player extends React.Component {
     mediaId: PropTypes.number,
     mediaKey: PropTypes.number,
     mediaType: PropTypes.string,
+    youtubeVideoId: PropTypes.string,
+    youtubeAlignedLyrics: PropTypes.array,
+    youtubeVideoDuration: PropTypes.number,
     mp4Alpha: PropTypes.number.isRequired,
     rgTrackGain: PropTypes.number,
     rgTrackPeak: PropTypes.number,
@@ -100,7 +105,7 @@ class Player extends React.Component {
   }
 
   render () {
-    if (!this.props.isVisible || typeof this.props.mediaId !== 'number') return null
+    if (!this.props.isVisible || (typeof this.props.mediaId !== 'number' && !this.props.youtubeVideoId)) return null
 
     const PlayerComponent = players[this.props.mediaType.toUpperCase() + 'Player']
 

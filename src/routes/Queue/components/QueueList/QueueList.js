@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import QueueItem from '../QueueItem'
+import QueueYoutubeItem from '../QueueYoutubeItem'
 import { formatSeconds } from 'lib/dateTime'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styles from './QueueList.css'
@@ -46,8 +47,53 @@ class QueueList extends React.Component {
     const items = props.queue.result.map(queueId => {
       const item = props.queue.entities[queueId]
 
-      if (item.isOptimistic ||
-          !props.songs.entities[item.songId] ||
+      if (item.isOptimistic) return null
+
+      if (item.youtubeVideoId) {
+        if (!item.youtubeVideoStatus) return null
+
+        const isCurrent = (queueId === props.queueId) && !props.isAtQueueEnd
+        const isUpcoming = queueId !== props.queueId && !props.playerHistory.includes(queueId)
+        const isOwner = item.userId === props.user.userId
+
+        return (
+          <CSSTransition
+            key={queueId}
+            timeout={800}
+            unmountOnExit={false}
+            classNames={{
+              appear: '',
+              appearActive: '',
+              enter: styles.fadeEnter,
+              enterActive: styles.fadeEnterActive,
+              exit: styles.itemExit,
+              exitActive: styles.itemExitActive,
+            }}
+          >
+            <QueueYoutubeItem {...item}
+              artist={item.youtubeVideoArtist}
+              errorMessage={isCurrent && props.errorMessage ? props.errorMessage : ''}
+              isCurrent={isCurrent}
+              isErrored={isCurrent && props.isErrored}
+              isOwner={isOwner}
+              isPlayed={!isUpcoming && !isCurrent}
+              isRemovable={isUpcoming && (isOwner || props.user.isAdmin)}
+              isSkippable={isCurrent && (isOwner || props.user.isAdmin)}
+              isUpcoming={isUpcoming}
+              pctPlayed={isCurrent ? props.position / item.youtubeVideoDuration * 100 : 0}
+              title={item.youtubeVideoTitle}
+              wait={formatSeconds(props.waits[queueId], true)} // fuzzy
+              status={item.youtubeVideoStatus}
+              // actions
+              onErrorInfoClick={props.showErrorMessage}
+              onRemoveClick={props.removeItem}
+              onSkipClick={props.requestPlayNext}
+            />
+          </CSSTransition>
+        )
+      }
+
+      if (!props.songs.entities[item.songId] ||
           !props.artists.entities[props.songs.entities[item.songId].artistId]) return null
 
       const duration = props.songs.entities[item.songId].duration

@@ -6,13 +6,24 @@ import {
   _SUCCESS,
 } from 'shared/actionTypes'
 
-// add to queue
+// add song to queue
 export function queueSong (songId) {
   return (dispatch, getState) => {
     dispatch({
       type: QUEUE_ADD,
       meta: { isOptimistic: true },
       payload: { songId },
+    })
+  }
+}
+
+// add youtube video to queue
+export function queueYoutubeVideo (youtubeVideoId, thumbnail, url, duration, artist, title, lyrics, karaoke) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: QUEUE_ADD,
+      meta: { isOptimistic: true },
+      payload: { youtubeVideoId, thumbnail, url, duration, artist, title, lyrics, karaoke },
     })
   }
 }

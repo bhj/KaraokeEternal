@@ -1,0 +1,45 @@
+.container {
+  background-color: var(--panel-title-bg-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  margin-top: var(--container-padding);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  padding: 3px 5px;
+}
+
+.title {
+  flex: 1;
+  margin-left: 5px;
+}
+
+.content {
+  padding: var(--container-padding);
+  margin-left: 20px;
+}
+
+.content label {
+  padding-left: var(--container-padding);
+}
+
+.icon {
+  fill: var(--text-color);
+}
+
+.tip {
+	margin-left:10px;
+	font-size:14px;
+	color: #a49920;
+}
+
+.testSuccess {
+	color: #33ce2e;
+	font-weight:bold;
+}
+
+.testFailed {
+	color: #ce3537;
+}

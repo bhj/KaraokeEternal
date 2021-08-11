@@ -1,6 +1,16 @@
 const db = require('../lib/Database').db
 const sql = require('sqlate')
 const log = require('../lib/Log').getLogger('Media')
+const Toast = require('../lib/Toast')
+const Queue = require('../Queue')
+const Rooms = require('../Rooms')
+const Prefs = require('../Prefs')
+const rimraf = require('rimraf')
+const path = require('path')
+
+const {
+  QUEUE_PUSH,
+} = require('../../shared/actionTypes')
 
 class Media {
   /**
@@ -174,6 +184,94 @@ class Media {
     }
 
     return songId
+  }
+
+  /**
+   * Update media item
+   *
+   * @param  {Object}  media Media object
+   * @return {Promise}
+   */
+  static async updateYoutubeVideo (data, io) {
+    const { video } = data
+    const youtubeVideoId = video.youtubeVideoId
+
+    if (!Number.isInteger(video.id)) {
+      throw new Error(`invalid video ID: ${video.id}`)
+    }
+
+    // get the queue entries that use this video...
+    const queueQuery = sql`
+      SELECT *
+      FROM queue
+      WHERE youtubeVideoId = ${youtubeVideoId}
+    `
+    const queueRows = await db.all(String(queueQuery), queueQuery.parameters)
+    const roomIds = queueRows.map(row => row.roomId)
+
+    // there's not much to do if the video is no longer queued anywhere
+    if (queueRows.length) {
+      // we sometimes do something special for status updates, like send toast notifications...
+      if (Object.prototype.hasOwnProperty.call(data, 'status')) {
+        const userIds = queueRows.map(row => row.userId)
+        if (data.status === 'failed') {
+          Toast.sendToUser(io, userIds, {
+            content: '😥 A karaoke mix for "' + data.video.title + '" by ' + data.video.artist + ' could not be created. Let your host know, and maybe try a pre-made karaoke mix for now.',
+            type: 'error'
+          })
+
+          // also remove this failed video from all queues...
+          const deleteQuery = sql`
+            DELETE FROM queue
+            WHERE youtubeVideoId = ${youtubeVideoId}
+          `
+          await db.run(String(deleteQuery), deleteQuery.parameters)
+        } else if (data.status === 'ready') {
+          if (data.video.karaoke) {
+            Toast.sendToUser(io, userIds, {
+              content: '🤩 "' + data.video.title + '" by ' + data.video.artist + ' downloaded successfully!'
+            })
+          } else {
+            Toast.sendToUser(io, userIds, {
+              content: '🤩 The karaoke mix for "' + data.video.title + '" by ' + data.video.artist + ' is ready!'
+            })
+          }
+        }
+      }
+
+      // currently uses an Object instead of Map
+      delete data.video
+
+      if (Object.keys(data).length) {
+        const query = sql`
+          UPDATE youtubeVideos
+          SET ${sql.tuple(Object.keys(data).map(sql.column))} = ${sql.tuple(Object.values(data))}
+          WHERE id = ${video.id}
+        `
+        await db.run(String(query), query.parameters)
+      }
+
+      // update the applicable rooms...
+      roomIds.forEach(async roomId => {
+        io.to(Rooms.prefix(roomId)).emit('action', {
+          type: QUEUE_PUSH,
+          payload: await Queue.get(roomId)
+        })
+      })
+    }
+
+    // if the video is no longer queued anywhere, delete it and cleanup the tmp folder...
+    if (!queueRows.length || data.status === 'failed') {
+      const deleteQuery = sql`
+        DELETE FROM youtubeVideos
+        WHERE youtubeVideoId = ${youtubeVideoId}
+      `
+      await db.run(String(deleteQuery), deleteQuery.parameters)
+
+      // delete the video's tmp folder...
+      const prefs = await Prefs.get()
+      rimraf(path.join(prefs.tmpOutputPath, youtubeVideoId), () => { })
+    }
   }
 }
 

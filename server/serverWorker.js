@@ -17,11 +17,13 @@ const koaStatic = require('koa-static')
 
 const Prefs = require('./Prefs')
 const User = require('./User')
+const YoutubeProcessManager = require('./Youtube/YoutubeProcessManager')
 const libraryRouter = require('./Library/router')
 const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
 const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
+const youtubeRouter = require('./Youtube/router')
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
 const IPC = require('./lib/IPCBridge')
@@ -63,6 +65,9 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     // attach IPC action handlers
     IPC.use(IPCLibraryActions(io))
     IPC.use(IPCMediaActions(io))
+
+    // start YouTube processing on startup (in case we shutdown in the middle of processing)...
+    YoutubeProcessManager.startYoutubeProcessor()
 
     // success callback in 3rd arg
     server.listen(env.KF_SERVER_PORT, () => {
@@ -169,6 +174,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   baseRouter.use(prefsRouter.routes())
   baseRouter.use(roomsRouter.routes())
   baseRouter.use(userRouter.routes())
+  baseRouter.use(youtubeRouter.routes())
   app.use(baseRouter.routes())
 
   // serve index.html with dynamic base tag at the main SPA routes

@@ -1,0 +1,141 @@
+.container {
+  background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-to-bg-color));
+  background-repeat: no-repeat;
+  height: var(--queue-item-height);
+  overflow: hidden;
+  padding-right: 4px;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  margin-top: var(--container-padding);
+  margin-right: 0;
+  margin-bottom: var(--container-padding);
+  margin-left: var(--container-padding);
+  overflow: hidden;
+}
+
+.greyed {
+  opacity: .5;
+}
+
+.imageContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 72px;
+}
+
+.image {
+  max-width: 96px;
+  max-height: 72px;
+}
+
+.waitContainer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-top-left-radius: var(--border-radius);
+}
+
+.wait {
+  color: #ccc;
+  font-size: 15px;
+  padding: 3px 3px;
+}
+
+.primary {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--container-padding);
+  overflow: hidden;
+  padding: 3px 0;
+}
+
+.innerPrimary {
+  flex: 1;
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.title {
+  composes: ellipsis;
+  font-size: 19px;
+}
+
+.artist {
+  composes: ellipsis;
+  color: #aaa;
+  font-size: 17px;
+  display:flex;
+	margin-right: 10px;
+}
+
+.artistName {
+	composes: ellipsis;
+}
+
+.status {
+	text-align:right;
+	margin-left: 10px;
+	color:var(--song-item-btn-bg-color);
+	flex-shrink: 0;
+	flex-grow: 1;
+}
+
+.user {
+  font-size: 15px;
+  /*  for some reason composes: ellipsis; isn't working here */
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #777;
+}
+
+.isOwner {
+  color: var(--queued-item-color);
+  text-shadow: var(--text-shadow-glow);
+}
+
+/* Buttons */
+.btn {
+  cursor: pointer;
+  fill: var(--song-item-btn-bg-color);
+  margin-right: var(--btn-margin);
+  transition: opacity .3s;
+}
+
+.active {
+  fill: var(--song-item-btn-active-bg-color);
+  filter: var(--song-item-btn-active-filter);
+}
+
+.danger {
+  fill: var(--btn-danger-bg-color);
+  filter: var(--btn-danger-filter);
+}
+
+.animateStar {
+  animation: var(--animation-bounce);
+}
+
+/* Spinner */
+.loader {
+	margin-right: var(--btn-margin);
+	fill:var(--song-item-btn-bg-color);
+	animation: spin 1500ms ease-in-out infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(180deg); }
+}

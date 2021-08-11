@@ -1,0 +1,91 @@
+.container {
+	font-family: var(--font-family-custom);
+	position: absolute;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.backdrop {
+	background-color: var(--chrome-bg-color);
+	border-radius: var(--border-radius);
+	padding: 1rem 2rem;
+}
+
+.error {
+	font-size:20px;
+	padding: 20px;
+	background-color: rgb(121, 42, 36);
+	color: white;
+	margin: 20px;
+	border-radius: 15px;
+}
+
+.info {
+	font-size:20px;
+	padding: 20px;
+	background-color: rgb(158, 114, 49);
+	color: white;
+	margin: 20px;
+	border-radius: 15px;
+}
+
+.success {
+	font-size:20px;
+	padding: 20px;
+	background-color: rgb(45, 116, 90);
+	color: white;
+	margin: 20px;
+	border-radius: 15px;
+}
+
+.btn {
+	flex: 1;
+	padding: 12px !important;
+	text-align: center;
+	fill: var(--nav-link-color);
+}
+
+.btnLink {
+	flex: 1;
+	padding-top: 4px;
+	padding-bottom: 8px;
+	text-align: center;
+	color: var(--btn-primary-bg-color) !important;
+	background:none !important;
+}
+
+.label {
+	font-size:20px;
+	font-weight:bold;
+	width: 100%;
+	padding: 0 20px 15px 20px;
+}
+
+.input {
+	font-size:20px;
+	width:100%;
+}
+
+.lyricsContainer {
+	overflow-x:hidden;
+	overflow-y:scroll;
+	white-space: pre-line;
+	width:100%;
+}
+
+.title {
+	font-size: 18px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.artist {
+	color: #aaa;
+	font-size: 15px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}

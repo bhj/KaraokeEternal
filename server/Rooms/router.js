@@ -5,6 +5,7 @@ const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api' })
 const log = require('../lib/Log').getLogger('Rooms')
 const Rooms = require('../Rooms')
+const Media = require('../Media')
 
 const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1
@@ -133,12 +134,27 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
     log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
   }
 
+  // get all youtube videos that were queued in this room...
+  const queueYoutubeItemsQuery = sql`
+    SELECT DISTINCT youtubeVideos.*
+    FROM youtubeVideos
+    JOIN queue on queue.youtubeVideoId = youtubeVideos.youtubeVideoId
+    WHERE queue.youtubeVideoId IS NOT NULL AND queue.roomId = ${roomId}
+  `
+  const queueYoutubeItems = await db.all(String(queueYoutubeItemsQuery), queueYoutubeItemsQuery.parameters)
+
   // remove room's queue
   query = sql`
     DELETE FROM queue
     WHERE roomId = ${roomId}
   `
   res = await db.run(String(query), query.parameters)
+
+  // do an update on all the youtube videos that are no longer queued anywhere.
+  // this will cause them to be cleaned up and deleted...
+  queueYoutubeItems.forEach(video => {
+    Media.updateYoutubeVideo({ video }, ctx.io)
+  })
 
   if (res.changes) {
     log.verbose('removed %s queue item(s) for roomId %s', res.changes, roomId)

@@ -35,7 +35,10 @@ class Database {
         migrationsPath: path.join(__dirname, 'schemas'),
       })
 
-      await db.run('PRAGMA journal_mode = WAL;')
+      // SQLite locking via WAL doesn't seem to work under WSL...
+      if (!Object.prototype.hasOwnProperty.call(process.env, 'WSL_DISTRO_NAME')) {
+        await db.run('PRAGMA journal_mode = WAL;')
+      }
     }
 
     _db = db

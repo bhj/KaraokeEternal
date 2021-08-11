@@ -102,7 +102,7 @@ module.exports = function (io, jwtKey) {
       }
 
       try {
-        await handlers[type](sock, action, acknowledge)
+        await handlers[type](sock, action, acknowledge, io)
       } catch (err) {
         log.error(err)
 

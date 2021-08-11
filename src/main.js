@@ -5,6 +5,7 @@ import App from './components/App'
 import { persistStore } from 'redux-persist'
 import io from 'socket.io-client'
 import { connectSocket } from './store/modules/user'
+import { toast } from 'react-toastify'
 
 // the "socket" side of the api requires authentication, so
 // we only want to attempt socket connection if we think we
@@ -14,6 +15,26 @@ window._socket = io({ autoConnect: false })
 
 window._socket.on('reconnect_attempt', () => {
   store.dispatch(connectSocket())
+})
+
+// toast functionality...
+// TODO: If a user isn't around when a toast comes in, it's possible they'll miss it.
+//  Might want to add a mechanism to save notifications to the DB and send recent ones to the user when they login.
+//  The toasts currently aren't all that vital, though, so probably more trouble than it's worth atm.
+window._socket.on('toast', (data) => {
+  const defaultOptions = {
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  }
+
+  const content = data.content
+  delete data.content
+
+  toast(content, { ...defaultOptions, ...data })
 })
 
 // ========================================================

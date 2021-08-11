@@ -33,6 +33,19 @@ export function formatDuration (sec) {
   return `${m}:${s < 10 ? '0' + s : s}`
 }
 
+export function durationToSeconds (str) {
+  const p = str.split(':')
+  let s = 0
+  let m = 1
+
+  while (p.length > 0) {
+    s += m * parseInt(p.pop(), 10)
+    m *= 60
+  }
+
+  return s
+}
+
 export function formatSeconds (sec, fuzzy = false) {
   if (sec >= 60 && fuzzy) return Math.round(sec / 60) + 'm'
 

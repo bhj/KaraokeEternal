@@ -1,0 +1,15 @@
+.container {
+	font-family: var(--font-family-custom);
+	position: absolute;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.backdrop {
+	background-color: var(--chrome-bg-color);
+	border-radius: var(--border-radius);
+	padding: 1rem 2rem;
+}

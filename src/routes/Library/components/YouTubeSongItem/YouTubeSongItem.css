@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.thumbnailContainer {
+	position: relative;
+	height:50px;
+	padding-left:5px;
+}
+
+.thumbnailContainer img {
+	height:50px;
+	max-width:50px;
+	width:auto;
+	border-radius:5px;
+	object-fit:cover;
+}
+
+.primary {
+  cursor: pointer;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-left: var(--btn-margin);
+}
+
+.title {
+  font-size: 18px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.artist {
+	color: #aaa;
+	font-size: 15px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}

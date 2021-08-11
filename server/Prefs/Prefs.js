@@ -3,6 +3,7 @@ const db = require('../lib/Database').db
 const sql = require('sqlate')
 const crypto = require('crypto')
 const log = require('../lib/Log').getLogger('Prefs')
+const YoutubeProcessManager = require('../Youtube/YoutubeProcessManager')
 
 class Prefs {
   /**
@@ -10,6 +11,24 @@ class Prefs {
    * @return {Promise} Prefs object
    */
   static async get () {
+    const defaultPrefs = {
+      isScanning: false,
+      isReplayGainEnabled: false,
+      paths: { result: [], entities: {} },
+      scannerPct: 0,
+      scannerText: '',
+      isYouTubeEnabled: false,
+      isKaraokeGeneratorEnabled: false,
+      isConcurrentAlignmentEnabled: false,
+      spleeterPath: 'spleeter',
+      autoLyrixHost: 'http://localhost:3000',
+      ffmpegPath: 'ffmpeg',
+      upcomingLyricsColor: '#fff',
+      playedLyricsColor: '#d9a000',
+      tmpOutputPath: 'tmp',
+      maxYouTubeProcesses: 3,
+    }
+
     const prefs = {
       paths: { result: [], entities: {} }
     }
@@ -41,6 +60,13 @@ class Prefs {
       }
     }
 
+    // set defaults for any missing preferences...
+    for (const [key, value] of Object.entries(defaultPrefs)) {
+      if (!Object.prototype.hasOwnProperty.call(prefs, key)) {
+        prefs[key] = value
+      }
+    }
+
     return prefs
   }
 
@@ -56,6 +82,10 @@ class Prefs {
       VALUES (${key}, ${JSON.stringify(data)})
     `
     const res = await db.run(String(query), query.parameters)
+
+    // in case one of the youtube prefs was updated, update the processor (if it's running)...
+    YoutubeProcessManager.updateYoutubeProcessor()
+
     return res.changes === 1
   }
 

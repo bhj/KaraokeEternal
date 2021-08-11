@@ -1,7 +1,7 @@
 import PlayerController from './PlayerController'
 import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
-import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
+import getReadyQueue from 'routes/Queue/selectors/getReadyQueue'
 import {
   playerLeave,
   playerError,
@@ -36,7 +36,7 @@ const mapStateToProps = (state) => {
     isReplayGainEnabled: prefs.isReplayGainEnabled,
     isWebGLSupported: player.isWebGLSupported,
     mp4Alpha: player.mp4Alpha,
-    queue: getOrderedQueue(state),
+    queue: getReadyQueue(state),
     queueId: player.queueId,
     volume: player.volume,
     visualizer: playerVisualizer,

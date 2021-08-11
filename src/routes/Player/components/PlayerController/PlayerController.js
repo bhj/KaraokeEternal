@@ -128,6 +128,9 @@ class PlayerController extends React.Component {
           mediaId={state.queueItem ? state.queueItem.mediaId : null}
           mediaKey={state.queueItem ? state.queueItem.queueId : null}
           mediaType={state.queueItem ? state.queueItem.mediaType : null}
+          youtubeVideoId={state.queueItem ? state.queueItem.youtubeVideoId : null}
+          youtubeAlignedLyrics={state.queueItem ? state.queueItem.youtubeAlignedLyrics : null}
+          youtubeVideoDuration={state.queueItem ? state.queueItem.youtubeVideoDuration : null}
           mp4Alpha={props.mp4Alpha}
           onEnd={this.handleLoadNext}
           onError={this.handleError}

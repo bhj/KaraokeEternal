@@ -5,3 +5,10 @@
   font-size: 18px;
   text-align: center;
 }
+.youtubeButtonContainer {
+	text-align:center;
+}
+.youtubeButton {
+	margin:20px 0;
+	width:90%;
+}

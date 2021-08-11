@@ -11,6 +11,7 @@ import SongInfo from 'components/SongInfo'
 import useObserver from 'lib/useObserver'
 import Routes from '../Routes'
 import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
+import { ToastContainer } from 'react-toastify'
 
 const CoreLayout = (props) => {
   const dispatch = useDispatch()
@@ -49,6 +50,8 @@ const CoreLayout = (props) => {
       >
         <p>{ui.errorMessage}</p>
       </Modal>
+
+      <ToastContainer />
     </>
   )
 }

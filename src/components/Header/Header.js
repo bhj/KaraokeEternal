@@ -21,10 +21,16 @@ const getUserWait = createSelector(
   [getOrderedQueue, getSongs, getQueueId, getPosition, getUserId],
   (queue, songs, queueId, pos, userId) => {
     if (!queue.entities[queueId]) return // queueItem not found
-    if (!songs.entities[queue.entities[queueId].songId]) return // song not found
+    let duration = 0
+    if (queue.entities[queueId].youtubeVideoId) {
+      duration = queue.entities[queueId].youtubeVideoDuration
+    } else {
+      if (!songs.entities[queue.entities[queueId].songId]) return // song not found
+      duration = songs.entities[queue.entities[queueId].songId].duration
+    }
 
     // current song's remaining time
-    let wait = Math.round(songs.entities[queue.entities[queueId].songId].duration - pos)
+    let wait = Math.round(duration - pos)
 
     const curIdx = queue.result.indexOf(queueId)
 
@@ -33,7 +39,7 @@ const getUserWait = createSelector(
         return wait
       }
 
-      wait += songs.entities[queue.entities[queue.result[i]].songId].duration
+      wait += duration
     }
   }
 )

@@ -31,15 +31,17 @@ const getWaits = createSelector(
 
     queue.result.forEach((queueId, i) => {
       const songId = queue.entities[queueId].songId
-      if (!songs.entities[songId]) return
+      let duration = 0
+      if (queue.entities[queueId].youtubeVideoId) duration = queue.entities[queueId].youtubeVideoDuration
+      else if (songs.entities[songId]) duration = songs.entities[songId].duration
 
       if (i === curIdx) {
         // currently playing
-        nextWait = Math.round(songs.entities[songId].duration - position)
+        nextWait = Math.round(duration - position)
       } else if (i > curIdx) {
         // upcoming
         curWait += nextWait
-        nextWait = songs.entities[songId].duration
+        nextWait = duration
       }
 
       waits[queueId] = curWait

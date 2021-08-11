@@ -4,9 +4,14 @@ dist/
 docs/public/
 docs/resources/
 node_modules/
+.idea/
+private/
+pretrained_models/
+tmp/
 
 .DS_Store
 *.log
 *.sqlite3
 *.sqlite3-shm
 *.sqlite3-wal
+.env

@@ -1,10 +1,12 @@
 const path = require('path')
+const axios = require('axios')
 const log = require('../lib/Log').getLogger('Prefs')
 const KoaRouter = require('koa-router')
 const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
 const getWindowsDrives = require('../lib/getWindowsDrives')
 const Prefs = require('./Prefs')
+const shell = require('../lib/Shell')
 
 // start media scan
 router.get('/scan', async (ctx, next) => {
@@ -117,6 +119,110 @@ router.get('/path/ls', async (ctx, next) => {
         path: p,
         label: p.replace(current + path.sep, '')
       })).filter(c => !(c.label.startsWith('.') || c.label.startsWith('/.')))
+    }
+  }
+})
+
+// tests that the spleeter command is working
+router.get('/testspleeter', async (ctx, next) => {
+  const { spleeterPath } = await Prefs.get()
+  try {
+    const result = await shell.promisifiedExec(spleeterPath + ' --version')
+
+    // make sure the version is good...
+    if (result.toLowerCase().startsWith('spleeter version: ')) {
+      const version = result.substr(18)
+      if (version.startsWith('2.')) {
+        ctx.body = {
+          success: true,
+          message: 'Spleeter ' + version + ' was found!'
+        }
+      } else {
+        ctx.body = {
+          success: false,
+          message: 'Spleeter ' + version + ' was found. This might work, but we expected v2.x.x'
+        }
+      }
+    } else {
+      ctx.body = {
+        success: false,
+        message: 'Something\'s wrong... ' + result
+      }
+    }
+  } catch (err) {
+    ctx.body = {
+      success: false,
+      message: err.message
+    }
+  }
+})
+
+// tests that the AutoLyrixAlign Service
+router.get('/testautolyrix', async (ctx, next) => {
+  const { autoLyrixHost } = await Prefs.get()
+  try {
+    const result = await axios.get(autoLyrixHost + '/version')
+
+    // make sure the version is good...
+    if (result && result.status == 200 && result.data.toLowerCase().startsWith('autolyrixalignservice ')) {
+      const version = result.data.substr(22)
+      if (version.startsWith('1.')) {
+        ctx.body = {
+          success: true,
+          message: 'AutoLyrixAlign Service ' + version + ' was found!'
+        }
+      } else {
+        ctx.body = {
+          success: false,
+          message: 'AutoLyrixAlign Service ' + version + ' was found. This might work, but we expected v1.x.x'
+        }
+      }
+    } else {
+      ctx.body = {
+        success: false,
+        message: 'The request succeeded, but this doesn\'t look like AutoLyrixAlign Service. Here\'s what we got... ' + result.data
+      }
+    }
+  } catch (err) {
+    ctx.body = {
+      success: false,
+      message: err.message
+    }
+  }
+})
+
+// tests that the spleeter command is working
+router.get('/testffmpeg', async (ctx, next) => {
+  const { ffmpegPath } = await Prefs.get()
+  try {
+    const result = await shell.promisifiedExec(ffmpegPath + ' -version')
+
+    // make sure the version is good...
+    if (result.toLowerCase().startsWith('ffmpeg version ')) {
+      let version = result.substr(15)
+      version = version.substr(0, version.search(/\s/g)).trim()
+
+      if (version.startsWith('3.')) {
+        ctx.body = {
+          success: true,
+          message: 'FFMPEG ' + version + ' was found!'
+        }
+      } else {
+        ctx.body = {
+          success: false,
+          message: 'FFMPEG ' + version + ' was found. This might work, but we expected v3.x.x'
+        }
+      }
+    } else {
+      ctx.body = {
+        success: false,
+        message: 'Something\'s wrong... ' + result
+      }
+    }
+  } catch (err) {
+    ctx.body = {
+      success: false,
+      message: err.message
     }
   }
 })

@@ -1,0 +1,95 @@
+.video {
+  object-position: 50% 50%;
+  object-fit: contain;
+}
+
+.lyricsContainer {
+	position: absolute;
+	overflow: hidden;
+	opacity: 0;
+	transition: opacity 1s ease 1s;
+}
+
+.lyricsScrollContainer {
+	position: absolute;
+	overflow: hidden;
+	transition: top 500ms ease;
+}
+
+.lyrics {
+	position: relative;
+	font-size: 3vw;
+	text-rendering: optimizeLegibility;
+	text-align:center;
+}
+
+.upcomingLyrics {
+	text-shadow: 0.2vw 0.2vw 0.3vw #000, 0 0 0.2vw #000, 0.2vw 0.2vw 0.3vw #000, 0 0 0.2vw #000;
+}
+
+.playedLyrics {
+}
+
+.line {
+	min-height: 2vw;
+	transition: opacity 500ms ease;
+}
+
+.playedLyrics .wordContainer {
+	display: inline-block;
+	margin: 0 0.5vw;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.playedLyrics .word {
+	overflow: hidden;
+	display: block;
+	line-height: 4vw;
+	transition: width 100ms linear;
+}
+
+.upcomingLyrics .wordContainer {
+	display: inline-block;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.upcomingLyrics .word {
+	margin: 0 0.5vw;
+	display: block;
+	line-height: 4vw;
+}
+
+.wordIgnore {
+	opacity: 0.5;
+	filter: saturate(50%);
+}
+
+.endNotice {
+	margin-top: 2vw;
+	position: relative;
+	font-size: 4vw;
+	text-align:center;
+	padding-bottom: 50px;
+}
+
+.progressBarContainer {
+	background-color: rgb(44, 46, 46);
+	border-radius: 1vw;
+	height:1vw;
+	box-shadow: 0 0 0.3vw #000;
+	position: absolute;
+	overflow: hidden;
+	opacity:0;
+	transition: opacity 1s ease 1s;
+}
+
+.progressBar {
+	background-color: var(--transport-btn-bg-color);
+	border-radius: 1vw;
+	height:100%;
+	width: 0%;
+	box-shadow: 0 0 0.3vw #000;
+	transition: width 100ms linear;
+}

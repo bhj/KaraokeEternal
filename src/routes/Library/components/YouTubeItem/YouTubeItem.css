@@ -1,0 +1,102 @@
+.container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.containerQueued {
+  composes: container;
+  color: var(--queued-item-color);
+  text-shadow: var(--queued-item-text-shadow);
+  cursor: pointer;
+}
+
+.container:hover, .containerQueued:hover {
+  opacity:0.8;
+}
+
+.animateGlow {
+  animation: var(--animation-text-shadow-glow);
+}
+
+.thumbnailContainer {
+	position: relative;
+	height:50px;
+	padding-left:5px;
+}
+
+.thumbnailContainer img {
+	height:50px;
+	width:auto;
+	border-radius:5px;
+}
+
+.duration {
+	color: #bbb !important;
+	font-size: 12px;
+	text-align: center;
+	padding:2px;
+	border-radius:2px;
+	position:absolute;
+	right:5px;
+	bottom:5px;
+	background:rgba(0,0,0,0.6) !important;
+}
+
+.mixtypeicon {
+	fill: #fff !important;
+	opacity: 0.7;
+	font-size: 12px;
+	text-align: center;
+	padding:2px;
+	border-radius:2px;
+	position:absolute;
+	left:0;
+	right:0;
+	bottom:5px;
+	filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, 1));
+}
+
+.primary {
+  cursor: pointer;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-left: var(--btn-margin);
+}
+
+.title {
+  font-size: 18px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.channel {
+	color: #333;
+	font-size: 13px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.mixtype {
+	color: #aaa;
+	fill: #aaa;
+	font-size: 15px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.mixtype svg {
+	vertical-align: baseline;
+}
+
+.spin {
+	animation: spin 1500ms ease-in-out infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(180deg); }
+}
