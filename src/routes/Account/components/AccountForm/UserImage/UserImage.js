@@ -4,7 +4,7 @@ import Icon from 'components/Icon'
 import loadImage from 'blueimp-load-image'
 import styles from './UserImage.css'
 
-export default class AccountForm extends Component {
+export default class UserImage extends Component {
   static propTypes = {
     user: PropTypes.object,
     onSelect: PropTypes.func.isRequired,

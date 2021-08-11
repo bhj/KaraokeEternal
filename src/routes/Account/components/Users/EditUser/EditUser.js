@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { createUser, removeUser, updateUser } from '../../../modules/users'
 import Modal from 'components/Modal'
@@ -8,7 +8,6 @@ import styles from './EditUser.css'
 
 const EditUser = props => {
   const [isDirty, setDirty] = useState(false)
-  const formRef = useRef(null)
   const handleDirtyChange = useCallback(isDirty => setDirty(isDirty))
 
   // reset dirty flag when the editor "closes"
@@ -17,14 +16,8 @@ const EditUser = props => {
   }, [props.isVisible])
 
   const dispatch = useDispatch()
-  const handleCreateClick = useCallback(() => {
-    const data = formRef.current.getData()
-    dispatch(createUser(data))
-  }, [dispatch])
-
-  const handleUpdateClick = useCallback(() => {
-    const data = formRef.current.getData()
-    dispatch(updateUser(props.user.userId, data))
+  const handleSubmit = useCallback(data => {
+    props.user ? dispatch(updateUser(props.user.userId, data)) : dispatch(createUser(data))
   }, [dispatch, props.user])
 
   const handleRemoveClick = useCallback(() => {
@@ -40,24 +33,20 @@ const EditUser = props => {
       title={props.user ? props.user.username : 'Create User'}
       style={{ minWidth: '300px' }}
     >
-      <AccountForm
-        user={props.user}
-        onDirtyChange={handleDirtyChange}
-        ref={formRef}
-        showRole
-      />
-      <br/>
-      {!props.user &&
-        <button onClick={handleCreateClick} className={`${styles.btn} primary`}>
-          Create User
-        </button>
-      }
+      <AccountForm user={props.user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit} showRole>
+        <br/>
+        {!props.user &&
+          <button className={`${styles.btn} primary`}>
+            Create User
+          </button>
+        }
 
-      {props.user && isDirty &&
-        <button onClick={handleUpdateClick} className={`${styles.btn} primary`}>
-          Update User
-        </button>
-      }
+        {props.user && isDirty &&
+          <button className={`${styles.btn} primary`}>
+            Update User
+          </button>
+        }
+      </AccountForm>
 
       {props.user &&
         <button onClick={handleRemoveClick} className={styles.btn}>

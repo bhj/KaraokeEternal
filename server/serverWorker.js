@@ -219,7 +219,6 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   log.info('Enabling webpack dev and HMR middleware')
   const webpack = require('webpack')
   const webpackConfig = require('../config/webpack.config')
-  const koaWebpack = require('koa-webpack')
   const compiler = webpack(webpackConfig)
 
   compiler.hooks.done.tap('indexPlugin', async (params) => {
@@ -237,9 +236,11 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     }
   })
 
-  // webpack-dev-middleware and webpack-hot-client
-  const middleware = await koaWebpack({ compiler, devMiddleware: { publicPath: urlPath } })
-  app.use(middleware)
+  const devMiddleware = require('./lib/getDevMiddleware')(compiler, { publicPath: urlPath })
+  app.use(devMiddleware)
+
+  const hotMiddleware = require('./lib/getHotMiddleware')(compiler)
+  app.use(hotMiddleware)
 
   // serve assets since webpack-dev-server is unaware of this folder
   app.use(koaMount(`${urlPath}assets`, koaStatic(env.KF_SERVER_PATH_ASSETS)))

@@ -7,6 +7,7 @@ export default class AccountForm extends Component {
   static propTypes = {
     children: PropTypes.node,
     onDirtyChange: PropTypes.func,
+    onSubmit: PropTypes.func.isRequired,
     requirePassword: PropTypes.bool,
     showRole: PropTypes.bool,
     user: PropTypes.object,
@@ -32,7 +33,7 @@ export default class AccountForm extends Component {
     const isUser = this.props.user && this.props.user.userId !== null
 
     return (
-      <form className={styles.container}>
+      <form onSubmit={this.handleSubmit} className={styles.container} noValidate>
         <input type='email'
           autoComplete='off'
           autoFocus={!isUser}
@@ -91,7 +92,8 @@ export default class AccountForm extends Component {
     )
   }
 
-  getData = () => {
+  handleSubmit = e => {
+    e.preventDefault()
     const data = new FormData()
 
     if (this.name.value.trim()) {
@@ -115,7 +117,7 @@ export default class AccountForm extends Component {
       data.append('role', this.role.value)
     }
 
-    return data
+    this.props.onSubmit(data)
   }
 
   handleUserImageChange = blob => {
