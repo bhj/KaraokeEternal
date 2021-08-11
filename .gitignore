@@ -4,6 +4,7 @@ dist/
 docs/public/
 docs/resources/
 node_modules/
+/youtubedl/
 
 .DS_Store
 *.log

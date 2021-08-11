@@ -64,6 +64,11 @@ module.exports = {
   PREFS_PUSH: 'prefs/PREFS_PUSH',
   PREFS_REQ_SCANNER_START: 'prefs/REQ_SCANNER_START',
   PREFS_REQ_SCANNER_STOP: 'prefs/REQ_SCANNER_STOP',
+
+  // add from youtube
+  ADD_FROM_YOUTUBE: 'prefs/ADD_FROM_YOUTUBE',
+  ADD_FROM_YOUTUBE_RECEIVE: 'prefs/RECEIVE_ADD_FROM_YOUTUBE',
+
   // user management
   USERS_CREATE: 'users/CREATE',
   USERS_EDITOR_OPEN: 'users/EDITOR_OPEN',

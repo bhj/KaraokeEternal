@@ -5,6 +5,8 @@ const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
 const getWindowsDrives = require('../lib/getWindowsDrives')
 const Prefs = require('./Prefs')
+const ytdl = require('ytdl-core')
+const fs = require('fs')
 
 // start media scan
 router.get('/scan', async (ctx, next) => {
@@ -58,6 +60,87 @@ router.post('/path', async (ctx, next) => {
 
   // respond with updated prefs
   ctx.body = await Prefs.get()
+
+  // update library
+  ctx.startScanner()
+})
+
+// add youtube video
+router.post('/youtube', async (ctx, next) => {
+  const { url, version } = ctx.request.body
+
+  log.verbose(`youtube link: ${url}`)
+  log.verbose(`version: ${version}`)
+
+  const requireAdmin = false
+
+  if (requireAdmin && !ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  // required
+  if (!url) {
+    ctx.throw(422, 'Missing url')
+  }
+
+  if (!ytdl.validateURL(url)) {
+    ctx.throw(422, 'Invalid url')
+  }
+
+  let info
+  let title
+  try {
+    info = await ytdl.getInfo(url)
+    title = info.videoDetails.title
+  } catch (e) {
+    log.error(JSON.stringify(e, null, 2))
+    ctx.throw(400, 'Error getting video info')
+  }
+
+  false && log.verbose(JSON.stringify(info, null, 2))
+  const artist = info.videoDetails?.author?.media?.artist
+  if (artist) {
+    if (!RegExp(`^${artist} *[-•] *`, 'i').test(title) && !RegExp(` in the style of +${artist}`, 'i').text(title)) {
+      title = `${artist} - ${title}`
+    }
+  }
+  if (version) {
+    title = `${title} <${version}>`
+  }
+  const filename = `${title}.mp4`
+  log.verbose(`Filename: ${filename}`)
+
+  // TODO: get this dynamically
+  const downloadDir = './youtubedl'
+  const downloadPath = path.join(downloadDir, filename)
+  if (fs.existsSync(downloadPath)) {
+    ctx.throw(400, `"${title}" already exists - enter the "Version" if this is a different video`)
+  }
+
+  try {
+    await new Promise((resolve, error) => {
+      const readStream = ytdl.downloadFromInfo(info)
+      const writeStream = fs.createWriteStream(downloadPath)
+
+      writeStream.on('finish', resolve)
+      readStream.on('error', error)
+      writeStream.on('error', error)
+
+      readStream.pipe(writeStream)
+    })
+  } catch (e) {
+    log.error(JSON.stringify(e, null, 2))
+    try {
+      fs.unlinkSync(downloadPath)
+    } catch (e) {
+      log.error(JSON.stringify(e, null, 2))
+    }
+    ctx.throw(400, 'Error saving video')
+  }
+
+  ctx.body = {
+    title,
+  }
 
   // update library
   ctx.startScanner()

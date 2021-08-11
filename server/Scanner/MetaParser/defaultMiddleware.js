@@ -25,7 +25,7 @@ m.set('split', (ctx, next) => {
   const inTheStyleOf = ctx.name.match(/ in the style of /i)
 
   ctx.cfg = {
-    delimiter: inTheStyleOf ? inTheStyleOf[0] : '-',
+    delimiter: inTheStyleOf ? inTheStyleOf[0] : / ?[-•] ?/,
     artistOnLeft: !inTheStyleOf,
     ...ctx.cfg,
   }
@@ -36,15 +36,17 @@ m.set('split', (ctx, next) => {
   const d = ctx.cfg.delimiter instanceof RegExp ? ctx.cfg.delimiter : new RegExp(` ?${ctx.cfg.delimiter} ?`, 'g')
   const matches = ctx.name.match(d)
 
-  if (!matches) {
-    throw new Error('no artist/title delimiter in filename')
+  if (matches) {
+    const longest = matches.reduce((a, b) => a.length > b.length ? a : b)
+    ctx.parts = ctx.name.split(longest)
+  } else {
+    ctx.parts = []
   }
 
-  const longest = matches.reduce((a, b) => a.length > b.length ? a : b)
-  ctx.parts = ctx.name.split(longest)
-
   if (ctx.parts.length < 2) {
-    throw new Error('no artist/title delimiter in filename')
+    console.error('no artist/title delimiter in filename')
+    ctx.artist = ' '
+    ctx.title = ctx.name
   }
 
   next()
@@ -59,21 +61,21 @@ m.set('clean parts', cleanParts([
 // set title
 m.set('set title', (ctx, next) => {
   // skip if already set
-  if (ctx.title) return next()
-
-  // @todo this assumes delimiter won't appear in title
-  ctx.title = ctx.cfg.artistOnLeft ? ctx.parts.pop() : ctx.parts.shift()
-  ctx.title = ctx.title.trim()
+  if (!ctx.title) {
+    // @todo this assumes delimiter won't appear in title
+    ctx.title = ctx.cfg.artistOnLeft ? ctx.parts.pop() : ctx.parts.shift()
+  }
+  ctx.title = ctx.title.trim() || 'Untitled'
   next()
 })
 
 // set arist
 m.set('set artist', (ctx, next) => {
   // skip if already set
-  if (ctx.artist) return next()
-
-  ctx.artist = ctx.parts.join(ctx.cfg.delimiter)
-  ctx.artist = ctx.artist.trim()
+  if (!ctx.artist) {
+    ctx.artist = ctx.parts.join(ctx.cfg.delimiter)
+  }
+  ctx.artist = ctx.artist.trim() || 'Unknown'
   next()
 })
 

@@ -1,0 +1,11 @@
+.heading {
+  align-items: baseline;
+  color: hsl(var(--hue-blue), 10%, 60%);
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: var(--container-padding);
+}
+
+.field {
+  margin-bottom: var(--input-margin);
+}
