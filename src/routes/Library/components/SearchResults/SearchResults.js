@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import { connect } from 'react-redux'
 import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongList from '../SongList'
@@ -58,7 +59,7 @@ class SearchResults extends React.Component {
 
     return (
       <PaddedList
-        numRows={this.props.artistsResult.length + 4} // both headers + SongList + YouTube button
+        numRows={this.props.artistsResult.length + 3 + (this.props.isYouTubeEnabled * 1)} // both headers + SongList + YouTube button
         rowHeight={this.rowHeight}
         rowRenderer={this.rowRenderer}
         paddingTop={this.props.ui.headerHeight}
@@ -75,14 +76,18 @@ class SearchResults extends React.Component {
     const { artistsResult, songsResult, filterStarred } = this.props
 
     // YouTube search button
-    if (index === 0) {
-      return (
-        <div style={style} className={styles.youtubeButtonContainer}>
-          <button onClick={this.searchYouTube} className={`${styles.btn} primary ${styles.youtubeButton}`}>
-            Search YouTube for <strong>{this.props.filterKeywords.join(' ')}</strong>
-          </button>
-        </div>
-      )
+    if (this.props.isYouTubeEnabled) {
+      if (index === 0) {
+        return (
+          <div style={style} className={styles.youtubeButtonContainer}>
+            <button onClick={this.searchYouTube} className={`${styles.btn} primary ${styles.youtubeButton}`}>
+              Search YouTube for <strong>{this.props.filterKeywords.join(' ')}</strong>
+            </button>
+          </div>
+        )
+      }
+    } else {
+      index++
     }
 
     // # artist results heading
@@ -142,8 +147,12 @@ class SearchResults extends React.Component {
   }
 
   rowHeight = index => {
-    // artists heading
-    if (index === 0) return YOUTUBE_SEARCH_BUTTON_HEIGHT
+    // youtube search button
+    if (this.props.isYouTubeEnabled) {
+      if (index === 0) return YOUTUBE_SEARCH_BUTTON_HEIGHT
+    } else {
+      index++
+    }
 
     // artists heading
     if (index === 1) return ARTIST_HEADER_HEIGHT
@@ -180,4 +189,11 @@ class SearchResults extends React.Component {
   }
 }
 
-export default SearchResults
+const mapStateToProps = state =>
+{
+	return {
+		isYouTubeEnabled: state.prefs.isYouTubeEnabled
+	}
+}
+
+export default connect(mapStateToProps)(SearchResults)
