@@ -28,6 +28,8 @@ class SearchResults extends React.Component {
     ui: PropTypes.object.isRequired,
     // actions
     toggleArtistResultExpanded: PropTypes.func.isRequired,
+
+    isYouTubeEnabled: PropTypes.bool,
   }
 
   state = {
@@ -189,11 +191,10 @@ class SearchResults extends React.Component {
   }
 }
 
-const mapStateToProps = state =>
-{
-	return {
-		isYouTubeEnabled: state.prefs.isYouTubeEnabled
-	}
+const mapStateToProps = state => {
+  return {
+    isYouTubeEnabled: state.prefs.isYouTubeEnabled
+  }
 }
 
 export default connect(mapStateToProps)(SearchResults)
