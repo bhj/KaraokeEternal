@@ -258,7 +258,7 @@ class YoutubeProcessor extends Youtube {
   }
 
   async alignLyrics (outputDir, video) {
-    log.info('Aligning lyrics for video #' + video.id + '...')
+    log.info('testAligning lyrics for video #' + video.id + '...')
 
     const form = new FormData()
     form.append('audio_file', fs.createReadStream(outputDir + '/audio.mp3'))
@@ -270,6 +270,8 @@ class YoutubeProcessor extends Youtube {
       form,
       {
         headers: form.getHeaders(),
+		maxContentLength: Infinity,
+		maxBodyLength: Infinity,
         transformResponse: []
       }
     )
