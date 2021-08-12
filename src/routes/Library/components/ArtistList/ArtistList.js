@@ -76,6 +76,7 @@ class ArtistList extends React.Component {
         numStars={this.props.starredArtistCounts[artist.artistId] || 0}
         onArtistClick={this.props.toggleArtistExpanded}
         queuedSongs={this.props.queuedSongs}
+        playedSongs={this.props.playedSongs}
         starredSongs={this.props.starredSongs}
         songs={this.props.songs}
         style={style}

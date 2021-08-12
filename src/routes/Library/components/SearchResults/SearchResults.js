@@ -76,6 +76,7 @@ class SearchResults extends React.Component {
           numStars={this.props.starredArtistCounts[artistId] || 0}
           artistSongIds={artist.songIds} // "children"
           queuedSongs={this.props.queuedSongs}
+          playedSongs={this.props.playedSongs}
           starredSongs={this.props.starredSongs}
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
           filterKeywords={this.props.filterKeywords}
@@ -104,6 +105,7 @@ class SearchResults extends React.Component {
           showArtist
           filterKeywords={this.props.filterKeywords}
           queuedSongs={this.props.queuedSongs}
+          playedSongs={this.props.playedSongs}
         />
       </div>
     )

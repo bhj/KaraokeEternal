@@ -28,6 +28,18 @@ const getUpcomingSongs = createSelector(
   }
 )
 
+const getPlayedSongs = createSelector(
+  [getQueue, getCurrentQueueId, getPlayerHistoryJSON],
+  (queue, curId, history) => {
+    history = JSON.parse(history)
+
+    // not (re)ordering since it doesn't currently matter in library view
+    return queue.result
+      .filter(queueId => history.includes(queueId))
+      .map(queueId => queue.entities[queueId].songId)
+  }
+)
+
 const getFilterKeywords = createSelector(
   [getFilterStr],
   (str) => str.length ? str.split(' ') : []
@@ -117,6 +129,7 @@ const mapStateToProps = (state) => {
     songs: state.songs.entities,
     starredArtistCounts: state.starCounts.artists,
     queuedSongs: getUpcomingSongs(state),
+    playedSongs: getPlayedSongs(state),
     starredSongs: getStarredSongs(state),
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),

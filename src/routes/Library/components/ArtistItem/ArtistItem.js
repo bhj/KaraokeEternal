@@ -53,6 +53,7 @@ class ArtistItem extends React.Component {
             showArtist={false}
             filterKeywords={props.filterKeywords}
             queuedSongs={props.queuedSongs}
+            playedSongs={props.playedSongs}
           />
         }
       </div>
