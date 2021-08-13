@@ -77,7 +77,7 @@ class QueueList extends React.Component {
             isInfoable={props.user.isAdmin}
             isOwner={isOwner}
             isPlayed={!isUpcoming && !isCurrent}
-            isRemovable={isUpcoming && (isOwner || props.user.isAdmin)}
+            isRemovable={(isUpcoming && isOwner) || (props.user.isAdmin && !isCurrent)}
             isSkippable={isCurrent && (isOwner || props.user.isAdmin)}
             isStarred={props.starredSongs.includes(item.songId)}
             isUpcoming={isUpcoming}
