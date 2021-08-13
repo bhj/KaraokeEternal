@@ -19,7 +19,8 @@ module.exports = function (io) {
 
       // scanner finished?
       if (action.payload.isScanning === false) {
-        Library.setLibraryVersion()
+        // invalidate cache
+        Library.cache.version = null
 
         io.emit('action', {
           type: LIBRARY_PUSH,

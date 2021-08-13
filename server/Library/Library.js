@@ -1,11 +1,13 @@
 const db = require('../lib/Database').db
 const sql = require('sqlate')
 const log = require('../lib/Log').getLogger('Library')
+const { performance } = require('perf_hooks')
 const Media = require('../Media')
-let _libraryVersion = Date.now()
-let _starCountsVersion = Date.now()
 
 class Library {
+  static cache = { version: null }
+  static starCountsCache = { version: null }
+
   /**
   * Get artists and songs in a format suitable for sending to clients.
   * Should not include songs or artists for which there are no media.
@@ -13,6 +15,11 @@ class Library {
   * @return {Promise} Object with artists and songs normalized
   */
   static async get () {
+    // already cached?
+    if (this.cache.version) return this.cache
+
+    const startTime = performance.now()
+
     const SongIdsByArtist = {}
     const artists = {
       result: [],
@@ -68,11 +75,16 @@ class Library {
       }
     }
 
-    return {
+    log.info('built library cache in %sms', (performance.now() - startTime).toFixed(3))
+
+    // cache result
+    this.cache = {
       artists,
       songs,
-      version: Library.getLibraryVersion(),
+      version: Date.now(),
     }
+
+    return this.cache
   }
 
   /**
@@ -197,7 +209,7 @@ class Library {
   * @param  {Number}  userId
   * @return {Object}
   */
-  static async getStars (userId) {
+  static async getUserStars (userId) {
     let starredArtists, starredSongs
 
     // get starred artists
@@ -228,11 +240,64 @@ class Library {
   }
 
   /**
+  * Add a user's star to a song
+  *
+  * @param  {Number}  songId
+  * @param  {Number}  userId
+  * @return {Promise} Number of rows affected
+  */
+  static async starSong (songId, userId) {
+    const fields = new Map()
+    fields.set('songId', songId)
+    fields.set('userId', userId)
+
+    const query = sql`
+      INSERT OR IGNORE INTO songStars ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = await db.run(String(query), query.parameters)
+
+    if (res.changes) {
+      // invalidate cache
+      this.starCountsCache.version = null
+    }
+
+    return res.changes
+  }
+
+  /**
+  * Remove a user's star from a song
+  *
+  * @param  {Number}  songId
+  * @param  {Number}  userId
+  * @return {Promise} Number of rows affected
+  */
+  static async unstarSong (songId, userId) {
+    const query = sql`
+      DELETE FROM songStars
+      WHERE userId = ${userId} AND songId = ${songId}
+    `
+    const res = await db.run(String(query), query.parameters)
+
+    if (res.changes) {
+      // invalidate cache
+      this.starCountsCache.version = null
+    }
+
+    return res.changes
+  }
+
+  /**
   * Gets artist and song star counts
   *
   * @return {Object}
   */
   static async getStarCounts () {
+    // already cached?
+    if (this.starCountsCache.version) return this.starCountsCache
+
+    const startTime = performance.now()
+
     const artists = {}
     const songs = {}
 
@@ -260,17 +325,16 @@ class Library {
       rows.forEach(row => { songs[row.songId] = row.count })
     }
 
-    return {
+    log.info('built star count cache in %sms', (performance.now() - startTime).toFixed(3))
+
+    this.starCountsCache = {
       artists,
       songs,
-      version: Library.getStarCountsVersion(),
+      version: Date.now(),
     }
-  }
 
-  static getLibraryVersion () { return _libraryVersion }
-  static setLibraryVersion () { _libraryVersion = Date.now() }
-  static getStarCountsVersion () { return _starCountsVersion }
-  static setStarCountsVersion () { _starCountsVersion = Date.now() }
+    return this.starCountsCache
+  }
 }
 
 module.exports = Library

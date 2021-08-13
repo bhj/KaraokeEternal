@@ -14,7 +14,6 @@ const ACTION_HANDLERS = {
       ...state.songs,
       [payload.songId]: ++state.songs[payload.songId] || 1,
     },
-    version: payload.version,
   }),
   [SONG_UNSTARRED]: (state, { payload }) => ({
     ...state,
@@ -22,7 +21,6 @@ const ACTION_HANDLERS = {
       ...state.songs,
       [payload.songId]: Math.max(--state.songs[payload.songId], 0),
     },
-    version: payload.version,
   }),
   [STAR_COUNTS_PUSH]: (state, { payload }) => ({
     ...payload,

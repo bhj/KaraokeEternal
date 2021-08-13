@@ -123,9 +123,9 @@ module.exports = function (io, jwtKey) {
     }
 
     // push library (only if client's is outdated)
-    if (clientLibraryVersion !== Library.getLibraryVersion()) {
+    if (clientLibraryVersion !== Library.cache.version) {
       log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
-        sock.user.name, sock.id, clientLibraryVersion, Library.getLibraryVersion())
+        sock.user.name, sock.id, clientLibraryVersion, Library.cache.version)
 
       io.to(sock.id).emit('action', {
         type: LIBRARY_PUSH,
@@ -136,13 +136,13 @@ module.exports = function (io, jwtKey) {
     // push user's stars
     io.to(sock.id).emit('action', {
       type: STARS_PUSH,
-      payload: await Library.getStars(sock.user.userId),
+      payload: await Library.getUserStars(sock.user.userId),
     })
 
     // push star counts (only if client's is outdated)
-    if (clientStarsVersion !== Library.getStarCountsVersion()) {
+    if (clientStarsVersion !== Library.starCountsCache.version) {
       log.verbose('pushing star counts to %s (%s) (client=%s, server=%s)',
-        sock.user.name, sock.id, clientStarsVersion, Library.getStarCountsVersion())
+        sock.user.name, sock.id, clientStarsVersion, Library.starCountsCache.version)
 
       io.to(sock.id).emit('action', {
         type: STAR_COUNTS_PUSH,
