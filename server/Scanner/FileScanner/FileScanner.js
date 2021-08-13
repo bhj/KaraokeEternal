@@ -16,6 +16,7 @@ const {
   MEDIA_REMOVE,
   MEDIA_UPDATE,
 } = require('../../../shared/actionTypes')
+const { getVideoDurationInSeconds } = require('get-video-duration')
 
 const searchExts = ['mp4', 'm4a', 'mp3']
 const searchExtPerms = searchExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
@@ -112,7 +113,20 @@ class FileScanner extends Scanner {
     })
 
     if (!tags.format.duration) {
+      log.warn('could not determine duration from tags')
       throw new Error('could not determine duration')
+      try {
+        tags.format.duration = await getVideoDurationInSeconds(item.file)
+      } catch(e) {
+        // do nothing
+      }
+      if (!tags.format.duration) {
+        log.warn('could not determine duration using getVideoDurationInSeconds()')
+        throw new Error('could not determine duration')
+
+        log.warn('using average length of song (3m30s) as song duration')
+        tags.format.duration = 210
+      }
     }
 
     log.verbose('  => duration: %s:%s',
