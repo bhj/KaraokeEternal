@@ -8,6 +8,7 @@ const AddFromYouTube = props => {
   const {
     isAddingFromYouTube,
     lastAddedFromYouTube,
+    searchFilterString,
   } = props;
 
   false && console.log('isAddingFromYouTube', isAddingFromYouTube)
@@ -51,44 +52,79 @@ const AddFromYouTube = props => {
   const youTubePrefixes = [youTubePrefix, 'https://youtu.be/']
   const isValidLink = youTubePrefixes.some(prefix => url.startsWith(prefix) && url.length > prefix.length)
 
+  const showToggleLink = true
+
   return (
     <>
-      <div className={styles.heading}>
-        <span><a onClick={toggle}>Can&rsquo;t find your song? Add it from YouTube</a></span>
-        {lastAddedFromYouTube && (
-          <span><i>&nbsp; You added "{lastAddedFromYouTube.title}"</i></span>
-        )}
-      </div>
+      {showToggleLink && (
+        <div className={styles.heading} style={{ justifyContent: 'center' }}>
+          <span><a onClick={toggle}>Add song from YouTube</a></span>
+        </div>
+      )}
 
       {showInputs && (
-        <form noValidate>
-          <input type='text'
-            placeholder={`${youTubePrefix}... (YouTube Link)`}
-            disabled={isAddingFromYouTube}
-            onChange={() => setUrl(urlRef.current.value.trim())}
-            ref={urlRef}
-            className={styles.field}
-          />
+        <div style={{
+          maxHeight: '25vh',
+          overflowX: 'auto',
+        }}>
+          {!isValidLink && (
+            <div className={styles.heading} style={{ justifyContent: 'center' }}>
+              <span style={{ textAlign: 'center' }}>
+                <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${searchFilterString} karaoke`)}`} target="blank">Open YouTube</a>
+                {' '}
+                and search for the song by title or artist.
+                <br />Include the word "karaoke" in the search.
+                <br />When you find the video you want, open it and click SHARE.
+                <br />Click COPY to copy the video link to the clipboard.
+                <br />Return here and paste the link below.
+              </span>
+            </div>
+          )}
 
-          {isValidLink && (
+          <form noValidate>
             <input type='text'
-              placeholder={`Version (Optional. e.g., "Dave's version")`}
-              disabled={!isValidLink || isAddingFromYouTube}
-              ref={versionRef}
+              placeholder="YouTube video link"
+              disabled={isAddingFromYouTube}
+              onChange={() => setUrl(urlRef.current.value.trim())}
+              ref={urlRef}
               className={styles.field}
             />
-          )}
 
-          {isValidLink && !isAddingFromYouTube && (
-            <button
-              onClick={handleSubmit}
-              disabled={!isValidLink || isAddingFromYouTube}
-              className='primary'
-            >
-              Add Song from YouTube
-            </button>
-          )}
-        </form>
+            {isValidLink && (
+              <>
+                <div className={styles.heading} style={{ justifyContent: 'center' }}>
+                  <span style={{ textAlign: 'center' }}>
+                    Optionally, enter the song version (e.g., "Jim's version").
+                  </span>
+                </div>
+                <input type='text'
+                  placeholder="song version (optional)"
+                  disabled={!isValidLink || isAddingFromYouTube}
+                  ref={versionRef}
+                  className={styles.field}
+                />
+              </>
+            )}
+
+            {isValidLink && (
+              <div className={styles.heading} style={{ justifyContent: 'center' }}>
+                <span style={{ textAlign: 'center' }}>
+                  Click GET SONG to import the video.
+                </span>
+              </div>
+            )}
+
+            {isValidLink && !isAddingFromYouTube && (
+              <button
+                onClick={handleSubmit}
+                disabled={!isValidLink || isAddingFromYouTube}
+                className='primary'
+              >
+                Get Song
+              </button>
+            )}
+          </form>
+        </div>
       )}
 
       {isAddingFromYouTube &&

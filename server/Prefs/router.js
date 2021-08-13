@@ -114,7 +114,7 @@ router.post('/youtube', async (ctx, next) => {
   const downloadDir = './youtubedl'
   const downloadPath = path.join(downloadDir, filename)
   if (fs.existsSync(downloadPath)) {
-    ctx.throw(400, `"${title}" already exists - enter the "Version" if this is a different video`)
+    ctx.throw(400, `"${title}" already exists - enter the "song version" if this is a different video`)
   }
 
   try {
