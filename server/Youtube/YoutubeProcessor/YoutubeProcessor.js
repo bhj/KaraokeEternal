@@ -140,7 +140,7 @@ class YoutubeProcessor extends Youtube {
       await Promise.all([
         shell.promisifiedPipe(ytdl(video.url, { quality: 'highestaudio', filter:'audioonly' }),
           fs.createWriteStream(outputDir + '/audio.mp3')),
-        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo', filter:'video' }),
+        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo', filter:'videoonly' }),
           fs.createWriteStream(outputDir + '/video.mp4'))
       ])
 
