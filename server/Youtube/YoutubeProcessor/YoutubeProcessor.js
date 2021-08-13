@@ -138,9 +138,9 @@ class YoutubeProcessor extends Youtube {
       // download the audio and video separately at the same time...
       log.info('Downloading video #' + video.id + '...')
       await Promise.all([
-        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestaudio' }),
+        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestaudio', filter:'audioonly' }),
           fs.createWriteStream(outputDir + '/audio.mp3')),
-        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo' }),
+        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo', filter:'video' }),
           fs.createWriteStream(outputDir + '/video.mp4'))
       ])
 
@@ -270,8 +270,8 @@ class YoutubeProcessor extends Youtube {
       form,
       {
         headers: form.getHeaders(),
-		maxContentLength: Infinity,
-		maxBodyLength: Infinity,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
         transformResponse: []
       }
     )

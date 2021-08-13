@@ -16,6 +16,18 @@ resources:
 - src: 'app-player.jpg'
   params:
     galleryOrder: 5
+- src: 'app-youtube.png'
+  params:
+    galleryOrder: 6
+- src: 'app-youtube2.png'
+  params:
+    galleryOrder: 7
+- src: 'app-youtubesearch.png'
+  params:
+    galleryOrder: 8
+- src: 'app-youtubesearch2.png'
+  params:
+    galleryOrder: 9
 ---
 
 ## Quick Start
@@ -31,9 +43,13 @@ resources:
 
 3. Create your **admin** account at the welcome page.
 
-4. In the Preferences panel, tap Media Folders and add your [supported media](#media-files).
+4. Add some songs and/or enable YouTube search.
 
-5. Once the media scanner finishes, head to the [library](#library) and add some songs by tapping an artist, then tapping a song title. A glowing song means it's upcoming in the queue.
+    - If you already have karaoke songs, go to the Preferences panel, tap Media Folders, and add your [supported media](#media-files). Wait for the media scanner to finish indexing your library.
+   
+    - If you want users to be able to search YouTube for karaoke songs, install FFMPEG and [enable YouTube search](#youtube-setup).
+
+5. Head to the [library](#library) to queue some songs. You can tap an artist and then a song title to add songs from your local library. A glowing song means it's upcoming in the queue. If YouTube search is enabled, you can use the search bar to search YouTube.
 
 6. Now we just need a [player](#player). On the system that will output the room's audio/video, browse to the **server URL**, sign in with your admin account, and tap the **Start Player** link at the top. If you don't see a link, your current browser doesn't support fullscreen mode, but you can still navigate to `/player`.
 
@@ -49,16 +65,29 @@ Karaoke Forever is a modern mobile browser app that lets everyone join quickly, 
 
 ### Library
 
-The library view lists available songs organized by artist. The search area at the top allows filtering by artist name, song title and/or your starred songs:
+The library view lists available songs organized by artist. The search area at the top allows filtering by artist name, song title and/or your starred songs.
 
 <div class="row">
   {{% img srcset="app-library.png 2x" src="app-library.png" alt="Library view" %}}
   {{% img srcset="app-library2.png 2x" src="app-library2.png" alt="Library search/filter view" %}}
 </div>
 
-Tap to expand an artist, then tap a song's title to queue it. You can also tap its star to save it for later. A glowing song indicates that it's upcoming in the queue. Artists will also glow to show that they contain queued or starred songs.
+To queue a song from the local library, tap to expand an artist, then tap a song's title. You can also tap its star to save it for later. A glowing song indicates that it's upcoming in the queue. Artists will also glow to show that they contain queued or starred songs.
 
 If there are multiple versions (media files) of a song, admins will see an italicized number in parentheses after the title, and the version in the folder highest in the [Media Folders](#preferences-admin-only) list will be used by default. Admins can also reveal additional options for a song, such as Get Info, by swiping left on it.
+
+##### Searching YouTube
+
+<div class="row">
+  {{% img srcset="app-youtubesearch.png 2x" src="app-youtubesearch.png" alt="YouTube search results" %}}
+  {{% img srcset="app-youtubesearch2.png 2x" src="app-youtubesearch2.png" alt="Clarification for lyrics" %}}
+</div>
+
+If YouTube search is enabled, the search bar is also used to search YouTube. Behind-the-scenes, we'll add "Karaoke" to the search query to help find pre-made karaoke mixes on YouTube. If you've setup automatic karaoke mix generation, we'll also run the search as it was entered and mix the two results together.
+
+Pre-made karaoke mixes are noted with a microphone. These videos just need to be downloaded before being played, so they should be ready very quickly. Tap on one to add it to the queue. We'll download it in the background, and it will be played as-is.
+
+If you've enabled automatic karaoke mix generation, you'll also see videos with an hourglass in the results. These are non-karaoke videos that need to be processed before being played, which can take a few minutes. You'll also need to help identify the lyrics for these videos, which usually just involves correcting the artist/song title or selecting from a few potential matches. For extremely unknown songs, you can even enter the lyrics manually.
 
 ### Queue
 
@@ -71,6 +100,8 @@ The queue view shows your room's previous, current and upcoming songs:
 Singers are prioritized by time since each last sang, so those joining later in the session aren't penalized and will get right to the front of the queue.
 
 To remove an upcoming song, swipe left and tap X. Normal users can only remove their own songs, but admins can remove anyone's upcoming song. Admins will also see additional options when swiping left, such as Get Info.
+
+YouTube videos that are still being processed are also shown in the queue with an hourglass icon. Wait times are estimated with the assumption that these videos will be ready by the time they're up. However, if a YouTube video isn't ready when it's time to be played, we'll skip it and move onto that singer's next ready song (or to the next singer if they have no songs ready).
 
 ### Account
 
@@ -125,7 +156,9 @@ The player is a part of the [app](#karaoke-forever-the-web-app) that's designed 
 
 To start a player, sign in to the desired room as an admin and a player link will appear at the top. If you don't see a link that means fullscreen support wasn't detected, but you can still manually navigate to `/player`.
 
-Once a player is in the room, playback and display controls appear at the top of the app for the currently-up singer as well as admins, who always have access to these.
+MP4 videos will be played verbatim, while media with CD+Graphics have additional display options, including [MilkDrop](https://en.wikipedia.org/wiki/MilkDrop){{% icon-external %}}-style visualizations. As with the playback controls, admins and the currently-up singer have access to these options.
+
+Pre-made karaoke mixes from YouTube will be played as-is. Auto-generated karaoke mixes from YouTube will have had their vocals removed, and lyrics will be displayed using a custom-built lyrics renderer.
 
 <hr>
 
@@ -176,6 +209,40 @@ Karaoke Forever Server requires [Node.js](https://nodejs.org){{% icon-external %
 {{< /highlight >}}
 
 3. Watch the output for "Web server running at..." and browse to the **server URL**
+
+### YouTube Setup
+
+In addition to (or instead of) using local media files, you can allow users to search for karaoke songs on YouTube. Doing so requires [FFMPEG](https://www.ffmpeg.org){{% icon-external %}} to be installed on the server, along with an Internet connection. Follow the instructions to install FFMPEG on your OS.
+
+To enable YouTube search, login to the webapp with your admin account. Then, switch to the Account tab and check the box under the YouTube preferences...  
+
+<div class="row">
+  {{% img srcset="app-youtube.png 2x" src="app-youtube.png" alt="YouTube Settings" %}}
+</div>
+
+If FFMPEG isn't in your global PATH, fill in the full path to the executable. Then tap "Test FFMPEG" to make sure it's working.
+
+Congrats! Now users can search YouTube for pre-made karaoke mixes.
+
+#### Automatic vocals removal and lyric alignment
+
+<aside class="info">
+  {{% icon-info %}}
+  <p>This requires more technical ability than the rest of the setup. If you don't have server admin experience, you might consider skipping this or seeking help.</p>
+</aside>
+
+With some extra setup, we can turn almost ANY song or music video from YouTube into a karaoke mix--complete with the vocals removed and synchronized lyrics. This requires spleeter, AutoLyrixAlign Service, and a good computer with several Gigs of storage space and lots of RAM.
+
+- [AutoLyrixAlign Service](https://github.com/gazugafan/AutoLyrixAlignService){{% icon-external %}}: Follow the installation instructions. Note that it requires around 15GB of RAM, 16GB of storage space, and runs best on Linux. It can be installed on a separate server from the one Karaoke Forever is installed on, as long as the Karaoke Forever server can reach it via HTTP(s).
+- [Spleeter](https://github.com/deezer/spleeter){{% icon-external %}}: This requires [Python](https://www.python.org){{% icon-external %}} v3.6 - v3.8 (v3.9 will NOT work). You should already have FFMPEG, and you do NOT need `libsndfile`. You may need to install [tensorflow](https://www.tensorflow.org){{% icon-external %}} v2.3.0 separately. You should end up with a `spleeter` executable that can be run from the same server Karaoke Forever is installed on.
+
+<div class="row">
+  {{% img srcset="app-youtube2.png 2x" src="app-youtube2.png" alt="Additional Settings" %}}
+</div>
+
+With spleeter installed and the AutoLyrixAlign Service listening, you can complete the setup by checking the box to automatically create karaoke mixes. Then, enter the full path to the spleeter executable (if it's not available on the global PATH), and the IP/domain (and port) to where the AutoLyrixAlign Service is listening. Tap the "test" links below these fields to test that everything is working correctly.
+
+Finally, keep in mind that isolating vocals and aligning lyrics takes a significant amount of processing power and RAM. It may take a few minutes to fully process a single song. To keep things moving along when people start adding lots of songs, you can configure Karaoke Forever to process multiple songs at the same time, and to run the vocal isolation and lyric alignment tasks at the same time. However, this will slow down a low-powered computer. Pay attention to the "Align lyrics concurrently" and "Maximum processing threads" settings to control how much processing power will end up devoted to these tasks.
 
 ### Media Files
 

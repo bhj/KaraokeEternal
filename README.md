@@ -1,6 +1,6 @@
 # Karaoke Forever
 
-Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The player is also browser-based with support for MP3+G, MP4 video and WebGL visualizations. The server is self-hosted with no internet connection required.
+Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. Use your own database of karaoke songs, or enable YouTube search with automatic vocal removal and lyrics alignment. The player is also browser-based with support for MP3+G, MP4 video and WebGL visualizations. The server is self-hosted with no internet connection required (unless YouTube search is enabled).
 
 [![Karaoke Forever](/docs/assets/images/README.jpg?raw=true)](/docs/assets/images/README.jpg?raw=true)
 
@@ -11,6 +11,7 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 ## Features
 
 - [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG) and MP4 video support
+- YouTube search with automatic vocal removal and accurate word-level lyrics alignment
 - [MilkDrop](https://en.wikipedia.org/wiki/MilkDrop)-style visualizations via [Butterchurn](https://github.com/jberg/butterchurn) (requires WebGL 2)
 - [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) volume normalization support
 - Singers prioritized by time since each last sang
