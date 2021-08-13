@@ -66,6 +66,7 @@
     "koa-static": "^5.0.0",
     "music-metadata": "^7.8.6",
     "rimraf": "^3.0.2",
+    "sanitize-filename": "^1.6.3",
     "socket.io": "^4.1.2",
     "sqlate": "^2.1.0",
     "sqlite": "^4.0.23",

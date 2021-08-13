@@ -7,6 +7,7 @@ const getWindowsDrives = require('../lib/getWindowsDrives')
 const Prefs = require('./Prefs')
 const ytdl = require('ytdl-core')
 const fs = require('fs')
+const sanitizeFilename = require('sanitize-filename')
 
 // start media scan
 router.get('/scan', async (ctx, next) => {
@@ -107,7 +108,7 @@ router.post('/youtube', async (ctx, next) => {
   if (version) {
     title = `${title} <${version}>`
   }
-  const filename = `${title}.mp4`
+  const filename = `${sanitizeFilename(title, { replacement: '!' })}.mp4`
   log.verbose(`Filename: ${filename}`)
 
   // TODO: get this dynamically
