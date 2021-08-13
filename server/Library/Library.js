@@ -45,6 +45,7 @@ class Library {
 
       for (const row of rows) {
         delete row.isPreferred
+        false && log.verbose(JSON.stringify(row, null, 2))
         songs.entities[row.songId] = row
         songs.result.push(row.songId)
 

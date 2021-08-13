@@ -65,7 +65,7 @@ m.set('set title', (ctx, next) => {
     // @todo this assumes delimiter won't appear in title
     ctx.title = ctx.cfg.artistOnLeft ? ctx.parts.pop() : ctx.parts.shift()
   }
-  ctx.title = ctx.title.trim() || 'Untitled'
+  ctx.title = ctx.title.trim()
   next()
 })
 
@@ -75,7 +75,7 @@ m.set('set artist', (ctx, next) => {
   if (!ctx.artist) {
     ctx.artist = ctx.parts.join(ctx.cfg.delimiter)
   }
-  ctx.artist = ctx.artist.trim() || 'Unknown'
+  ctx.artist = ctx.artist.trim()
   next()
 })
 
@@ -105,6 +105,12 @@ m.set('artist tweaks', (ctx, next) => {
 m.set('move leading articles', (ctx, next) => {
   ctx.artist = moveArticles(ctx.artist, ctx.cfg.articles)
   ctx.title = moveArticles(ctx.title, ctx.cfg.articles)
+  next()
+})
+
+m.set('replace empty', (ctx, next) => {
+  ctx.artist = ctx.artist || 'Unknown'
+  ctx.title = ctx.title || 'Untitled'
   next()
 })
 
