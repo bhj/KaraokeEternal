@@ -54,6 +54,7 @@ class ArtistItem extends React.Component {
             filterKeywords={props.filterKeywords}
             queuedSongs={props.queuedSongs}
             playedSongs={props.playedSongs}
+            onModal={props.onModal}
           />
         }
       </div>

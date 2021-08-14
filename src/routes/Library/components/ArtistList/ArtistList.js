@@ -80,6 +80,7 @@ class ArtistList extends React.Component {
         starredSongs={this.props.starredSongs}
         songs={this.props.songs}
         style={style}
+        onModal={this.props.onModal}
       />
     )
   }

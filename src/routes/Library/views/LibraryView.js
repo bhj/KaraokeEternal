@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import LibraryHeader from '../components/LibraryHeader'
 import ArtistList from '../components/ArtistList'
@@ -7,19 +7,29 @@ import SearchResults from '../components/SearchResults'
 import TextOverlay from 'components/TextOverlay'
 import Spinner from 'components/Spinner'
 import styles from './LibraryView.css'
+import Modal from 'components/Modal'
 
 const LibraryView = (props) => {
-  const { isAdmin, isEmpty, isLoading, isSearching } = props
+  const {
+    isAdmin,
+    isEmpty,
+    isLoading,
+    isSearching,
+  } = props
   React.useLayoutEffect(() => props.setHeader(LibraryHeader))
+
+  const [modal, setModal] = useState()
+
+  const onModal = modal => setModal(modal)
 
   return (
     <>
       {!isSearching &&
-        <ArtistList {...props} />
+        <ArtistList {...props} onModal={onModal} />
       }
 
       {isSearching &&
-        <SearchResults {...props} />
+        <SearchResults {...props} onModal={onModal} />
       }
 
       {isLoading &&
@@ -34,6 +44,16 @@ const LibraryView = (props) => {
           }
         </TextOverlay>
       }
+
+      <Modal
+        isVisible={!!modal}
+        onClose={modal?.onClose || (() => setModal())}
+        title={modal?.title}
+        buttons={modal?.buttons}
+        style={{ width: '100%', height: '100%' }}
+      >
+        {modal?.content}
+      </Modal>
     </>
   )
 }

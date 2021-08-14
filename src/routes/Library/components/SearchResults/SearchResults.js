@@ -106,6 +106,7 @@ class SearchResults extends React.Component {
           filterKeywords={this.props.filterKeywords}
           queuedSongs={this.props.queuedSongs}
           playedSongs={this.props.playedSongs}
+          onModal={this.props.onModal}
         />
       </div>
     )

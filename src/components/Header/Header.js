@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { requestScanStop } from 'store/modules/prefs'
@@ -66,14 +66,24 @@ const Header = React.forwardRef((props, ref) => {
   const { isUpNext, isUpNow } = useSelector(getStatusProps)
   const wait = useSelector(getUserWait)
 
+  const { userDisplayName } = props
+
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const dispatch = useDispatch()
   const cancelScan = useCallback(() => dispatch(requestScanStop()), [dispatch])
 
+  const showUserDisplayName = false
+
   return (
     <div className={`${styles.container} bg-blur`} ref={ref}>
+      {userDisplayName && showUserDisplayName && (
+        <div>
+          <span>Welcome, {userDisplayName}!</span>
+        </div>
+      )}
+
       {!isPlayer && isPlayerPresent &&
         <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />
       }
@@ -103,4 +113,6 @@ Header.propTypes = {
   customHeader: PropTypes.object,
 }
 
-export default Header
+export default connect(state => ({
+  userDisplayName: state.user.name,
+}), null, null, { forwardRef: true })(Header)

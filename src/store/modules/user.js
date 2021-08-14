@@ -55,6 +55,8 @@ export function login (creds) {
         // trigger rehydration with stale data, so purge here first
         window._persistor.purge()
 
+        window.localStorage.setItem('signedIn', 'true')
+
         // user object in response body
         dispatch(receiveLogin(user))
         dispatch(connectSocket())
@@ -162,6 +164,8 @@ export function createAccount (data, isFirstRun) {
 
         dispatch(createSuccess())
 
+        window.localStorage.setItem('createdAccount', 'true')
+
         return dispatch(login({
           username: data.get('username'),
           password: data.get('newPassword'),
@@ -173,6 +177,14 @@ export function createAccount (data, isFirstRun) {
         dispatch(createError(err))
       })
   }
+}
+
+export function hasCreatedAccountHereBefore () {
+  return window.localStorage.getItem('createdAccount', 'true')
+}
+
+export function hasSignedInHereBefore () {
+  return window.localStorage.getItem('signedIn', 'true')
 }
 
 // ------------------------------------
