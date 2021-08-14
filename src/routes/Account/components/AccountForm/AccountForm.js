@@ -133,7 +133,7 @@ export default class AccountForm extends Component {
     this.setState({
       isDirty: !!this.username.value || !!this.newPassword.value ||
         this.name.value !== this.props.user.name ||
-        this.role.value !== (this.props.user.isAdmin ? '1' : '0'),
+        this.role?.value !== (this.props.user.isAdmin ? '1' : '0'),
       isChangingPassword: !!this.newPassword.value,
     })
   }
