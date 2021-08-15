@@ -3,6 +3,7 @@
 ### New
 - **(app)** User management interface!
 - **(app)** CD+Graphics backgrounds are now content-aware for better visuals and readability
+- **(app)** Media folders can now be prioritized via drag-and-drop
 - **(app)** Summary is now shown following a media scan
 - **(server)** Support for custom URL base path (see `--urlPath` CLI option)
 - **(server)** Reduced load and improved client connection speed via library caching

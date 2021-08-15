@@ -2,6 +2,7 @@ import {
   PREFS_REQUEST,
   PREFS_RECEIVE,
   PREFS_SET,
+  PREFS_SET_PATH_PRIORITY,
   PREFS_PUSH,
   PREFS_REQ_SCANNER_START,
   PREFS_REQ_SCANNER_STOP,
@@ -17,6 +18,13 @@ export function setPref (key, data) {
   return {
     type: PREFS_SET,
     payload: { key, data },
+  }
+}
+
+export function setPathPriority (pathIds) {
+  return {
+    type: PREFS_SET_PATH_PRIORITY,
+    payload: pathIds,
   }
 }
 

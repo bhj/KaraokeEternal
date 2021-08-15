@@ -105,6 +105,37 @@ class Prefs {
   }
 
   /**
+   * Set media path priorities (not async!)
+   * @param  {Array}  pathIds
+   * @return {undefined}
+   */
+  static setPathPriority (pathIds) {
+    if (!Array.isArray(pathIds)) {
+      throw new Error('pathIds must be an array')
+    }
+
+    // using the raw database instance here so that the UPDATEs
+    // run in a single transaction without async/await (which
+    // would defeat the purpose of the transaction)
+    // see https://github.com/mapbox/node-sqlite3/issues/304
+    const rawDb = db.getDatabaseInstance()
+    rawDb.exec('BEGIN TRANSACTION')
+
+    pathIds.forEach((pathId, priority) => {
+      if (typeof pathId !== 'number') {
+        throw new Error('Invalid pathId')
+      }
+
+      const query = sql`UPDATE paths SET priority = ${priority} WHERE pathId = ${pathId}`
+      rawDb.run(String(query), query.parameters, err => {
+        if (err) log.error(err.message)
+      })
+    })
+
+    rawDb.exec('COMMIT')
+  }
+
+  /**
    * Get JWT secret key from db
    * @return {Promise}  jwtKey (string)
    */

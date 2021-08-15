@@ -15,28 +15,15 @@
   margin-left: 5px;
 }
 
-.content {
-  padding: var(--container-padding);
-}
-
 .icon {
   fill: var(--text-color);
 }
 
-.pathItem {
+.content {
+  padding: var(--container-padding);
+}
+
+.btnContainer {
   display: flex;
-  align-items: center;
-  background-color: var(--panel-bg-color);
-  padding: 3px 5px 3px 10px;
-  margin: 5px 0;
-  border-radius: var(--border-radius);
-}
-
-.pathName {
-  flex: 1;
-  user-select: text;
-}
-
-.btnClear {
-  fill: var(--btn-danger-bg-color);
+  margin-top: var(--container-padding);
 }
