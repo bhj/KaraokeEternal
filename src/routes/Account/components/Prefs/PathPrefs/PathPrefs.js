@@ -54,6 +54,9 @@ const PathPrefs = props => {
       return
     }
 
+    // optimistically update local state
+    setPriority(priority.filter(id => id !== pathId))
+
     api('DELETE', `/${pathId}`)
       .then(res => {
         dispatch(receivePrefs(res))
