@@ -123,6 +123,7 @@ class Prefs {
 
     pathIds.forEach((pathId, priority) => {
       if (typeof pathId !== 'number') {
+        rawDb.exec('ROLLBACK TRANSACTION')
         throw new Error('Invalid pathId')
       }
 
