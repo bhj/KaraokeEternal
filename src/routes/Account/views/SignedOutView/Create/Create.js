@@ -5,25 +5,25 @@ import AccountForm from '../../../components/AccountForm'
 import RoomSelect from '../../../components/RoomSelect'
 import { createAccount } from 'store/modules/user'
 import styles from './Create.css'
-
-let roomSelectRef
+let roomSelectRef, roomPasswordRef
 
 const Create = props => {
   const user = useSelector(state => state.user)
-  const roomSelectRefCB = useCallback(node => { roomSelectRef = node }, [])
+  const roomSelectRefCB = useCallback(r => { roomSelectRef = r }, [])
+  const roomPasswordRefCB = useCallback(r => { roomPasswordRef = r }, [])
 
   const dispatch = useDispatch()
   const handleSubmit = useCallback(data => {
-    if (!roomSelectRef.select.current.value) {
+    if (!roomSelectRef.value) {
       alert('Please select a room')
-      roomSelectRef.select.current.focus()
+      roomSelectRef.focus()
       return
     }
 
-    data.append('roomId', roomSelectRef.select.current.value)
+    data.append('roomId', roomSelectRef.value)
 
-    if (roomSelectRef.password.current) {
-      data.append('roomPassword', roomSelectRef.password.current.value)
+    if (roomPasswordRef) {
+      data.append('roomPassword', roomPasswordRef.value)
     }
 
     dispatch(createAccount(data))
@@ -37,7 +37,7 @@ const Create = props => {
       </div>
 
       <AccountForm user={user} onSubmit={handleSubmit}>
-        <RoomSelect ref={roomSelectRefCB}/>
+        <RoomSelect onSelectRef={roomSelectRefCB} onPasswordRef={roomPasswordRefCB} />
         <button className='primary'>Create Account</button>
       </AccountForm>
     </>

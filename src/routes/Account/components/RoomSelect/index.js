@@ -1,3 +1,3 @@
-import RoomSelectContainer from './RoomSelectContainer'
+import RoomSelect from './RoomSelect'
 
-export default RoomSelectContainer
+export default RoomSelect
