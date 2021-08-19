@@ -12,19 +12,25 @@ const api = new HttpApi('prefs/path')
 
 const PathPrefs = props => {
   const paths = useSelector(state => state.prefs.paths)
-
-  const [isExpanded, setExpanded] = useState(true)
+  const [isExpanded, setExpanded] = useState(false)
   const [isChoosing, setChoosing] = useState(false)
-
-  // local state for immediate UI updates
   const [priority, setPriority] = useState(paths.result)
-  useEffect(() => { setPriority(paths.result) }, [paths])
 
   const toggleExpanded = useCallback(() => setExpanded(!isExpanded))
   const handleCloseChooser = useCallback(() => setChoosing(false))
   const handleOpenChooser = useCallback(() => setChoosing(true))
 
+  useEffect(() => {
+    // local state for immediate UI updates
+    setPriority(paths.result)
+
+    if (paths.result.length === 0) {
+      setExpanded(true)
+    }
+  }, [paths])
+
   const dispatch = useDispatch()
+  const handleRefresh = useCallback(() => dispatch(requestScan()), [dispatch])
   const handleDragEnd = useCallback(dnd => {
     // dropped outside the list?
     if (!dnd.destination) return
@@ -65,8 +71,6 @@ const PathPrefs = props => {
       })
   }, [dispatch, paths])
 
-  const handleRefresh = useCallback(() => dispatch(requestScan()), [dispatch])
-
   return (
     <div className={styles.container}>
       <div className={styles.heading} onClick={toggleExpanded}>
@@ -77,7 +81,7 @@ const PathPrefs = props => {
         </div>
       </div>
 
-      <div className={styles.content} style={{ display: isExpanded || paths.result.length === 0 ? 'block' : 'none' }}>
+      <div className={styles.content} style={{ display: isExpanded ? 'block' : 'none' }}>
         {paths.result.length === 0 &&
           <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>
         }
