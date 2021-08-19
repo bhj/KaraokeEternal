@@ -56,10 +56,9 @@ export function fetchRooms () {
 // ------------------------------------
 export function createRoom (data) {
   return (dispatch, getState) => {
-    // informational
+    // FormData is browser-native and not coercible for display as the payload
     dispatch({
       type: ROOM_CREATE,
-      payload: { data },
     })
 
     return api('POST', '', {
@@ -83,10 +82,10 @@ export function createRoom (data) {
 // ------------------------------------
 export function updateRoom (roomId, data) {
   return (dispatch, getState) => {
-    // informational
+    // FormData is browser-native and not coercible for display as the payload
     dispatch({
       type: ROOM_UPDATE,
-      payload: { roomId, ...data },
+      payload: { roomId },
     })
 
     return api('PUT', `/${roomId}`, {
