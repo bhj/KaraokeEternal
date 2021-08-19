@@ -2,10 +2,10 @@ import {
   REQUEST_ROOMS,
   ROOM_EDITOR_OPEN,
   ROOM_EDITOR_CLOSE,
+  ROOM_FILTER_STATUS,
   ROOM_UPDATE,
   ROOM_CREATE,
   ROOM_REMOVE,
-  ROOM_TOGGLE_SHOW_ALL,
   _SUCCESS,
   _ERROR,
 } from 'shared/actionTypes'
@@ -145,9 +145,10 @@ export function openRoomEditor () {
   }
 }
 
-export function toggleShowAll () {
+export function filterByStatus (status) {
   return {
-    type: ROOM_TOGGLE_SHOW_ALL,
+    type: ROOM_FILTER_STATUS,
+    payload: status,
   }
 }
 
@@ -167,9 +168,9 @@ const ACTION_HANDLERS = {
     ...state,
     isEditorOpen: false,
   }),
-  [ROOM_TOGGLE_SHOW_ALL]: (state, { payload }) => ({
+  [ROOM_FILTER_STATUS]: (state, { payload }) => ({
     ...state,
-    isShowingAll: !state.isShowingAll,
+    filterStatus: payload,
   }),
 }
 
@@ -179,8 +180,8 @@ const ACTION_HANDLERS = {
 const initialState = {
   result: [],
   entities: {},
+  filterStatus: 'open',
   isEditorOpen: false,
-  isShowingAll: false,
 }
 
 export default function rooms (state = initialState, action) {

@@ -13,8 +13,10 @@
 }
 
 .titleContainer select {
-  padding: 1px;
+  font-size: 16px;
+  height: 24px; /* --panel-title-font size + top/bottom padding */
   max-width: 33%;
+  padding: 0;
 }
 
 .title {
