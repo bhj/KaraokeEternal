@@ -138,7 +138,7 @@ config.module.rules.push({
       loader: 'css-loader',
       options: {
         modules: {
-          localIdentName: '[name]__[local]___[fullhash:base64:5]',
+          localIdentName: __DEV__ ? '[path][name]__[local]__' : '[hash:base64]',
         }
       }
     }
