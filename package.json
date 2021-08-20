@@ -134,6 +134,7 @@
     "screenfull": "^5.1.0",
     "socket.io-client": "^4.1.2",
     "url-loader": "^4.1.1",
+    "use-resize-observer": "^7.0.1",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.2",
     "webpack-dev-middleware": "^5.0.0",

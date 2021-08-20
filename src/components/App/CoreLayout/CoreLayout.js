@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import useResizeObserver from 'use-resize-observer'
 // global stylesheets should be imported before any
 // components that will import their own modular css
 import 'normalize.css'
@@ -8,24 +9,23 @@ import Header from 'components/Header'
 import Navigation from 'components/Navigation'
 import Modal from 'components/Modal'
 import SongInfo from 'components/SongInfo'
-import useObserver from 'lib/useObserver'
 import Routes from '../Routes'
 import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
 
 const CoreLayout = (props) => {
   const dispatch = useDispatch()
   const [header, setHeader] = React.useState(null)
-  const headRef = React.useRef(null)
-  const navRef = React.useRef(null)
+  const headerRef = React.useRef()
+  const navRef = React.useRef()
 
-  useObserver({
-    callback: () => dispatch(setHeaderHeight(headRef.current?.clientHeight)),
-    element: headRef,
+  useResizeObserver({
+    onResize: ({ width, height }) => { dispatch(setHeaderHeight(height)) },
+    ref: headerRef,
   })
 
-  useObserver({
-    callback: () => dispatch(setFooterHeight(navRef.current?.clientHeight)),
-    element: navRef,
+  useResizeObserver({
+    onResize: ({ width, height }) => { dispatch(setFooterHeight(height)) },
+    ref: navRef,
   })
 
   const ui = useSelector(state => state.ui)
@@ -33,7 +33,7 @@ const CoreLayout = (props) => {
 
   return (
     <>
-      <Header customHeader={header} ref={headRef} />
+      <Header customHeader={header} ref={headerRef} />
 
       <Routes setHeader={setHeader} />
 
