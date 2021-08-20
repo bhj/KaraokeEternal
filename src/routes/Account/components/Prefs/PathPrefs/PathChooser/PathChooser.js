@@ -25,7 +25,7 @@ const PathChooser = props => {
   // get initial list when chooser first becomes visible
   useEffect(() => {
     if (isVisible) ls(pathInfo.current || '.')
-  }, [isVisible, ls, pathInfo])
+  }, [isVisible]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // scroll to top when changing dirs
   useEffect(() => {
