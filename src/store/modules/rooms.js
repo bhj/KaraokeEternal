@@ -1,4 +1,5 @@
 import {
+  LOGOUT,
   REQUEST_ROOMS,
   ROOM_EDITOR_OPEN,
   ROOM_EDITOR_CLOSE,
@@ -155,6 +156,9 @@ export function filterByStatus (status) {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [LOGOUT + _SUCCESS]: (state, { payload }) => ({
+    ...initialState,
+  }),
   [REQUEST_ROOMS + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
