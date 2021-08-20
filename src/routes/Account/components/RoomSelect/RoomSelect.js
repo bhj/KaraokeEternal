@@ -6,19 +6,20 @@ import styles from './RoomSelect.css'
 let passwordRef
 
 const RoomSelect = props => {
+  const { onSelectRef, onPasswordRef } = props
   const rooms = useSelector(state => state.rooms)
   const [selectedRoomId, setSelectedRoomId] = useState('')
   const dispatch = useDispatch()
 
-  const handleSelectChange = useCallback(e => { setSelectedRoomId(e.target.value) })
-  const handleSelectRef = useCallback(r => { props.onSelectRef(r) }, [props.onSelectRef])
+  const handleSelectChange = useCallback(e => { setSelectedRoomId(e.target.value) }, [])
+  const handleSelectRef = useCallback(r => { onSelectRef(r) }, [onSelectRef])
   const handlePasswordRef = useCallback(r => {
     passwordRef = r
-    props.onPasswordRef(r)
-  }, [props.onPasswordRef])
+    onPasswordRef(r)
+  }, [onPasswordRef])
 
   // once per mount
-  useEffect(() => dispatch(fetchRooms()), [])
+  useEffect(() => dispatch(fetchRooms()), [dispatch])
 
   // if there's only one open room, select it automatically
   useEffect(() => {
@@ -32,7 +33,7 @@ const RoomSelect = props => {
     if (rooms.result.length > 1 && selectedRoomId && rooms.entities[selectedRoomId].hasPassword) {
       passwordRef.focus()
     }
-  }, [selectedRoomId])
+  }, [rooms, selectedRoomId])
 
   return (
     <>

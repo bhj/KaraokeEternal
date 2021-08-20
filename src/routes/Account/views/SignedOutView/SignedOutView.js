@@ -8,7 +8,7 @@ import styles from './SignedOutView.css'
 
 const SignedOutView = props => {
   const [isCreating, setCreating] = useState(false)
-  const toggleCreate = useCallback(() => setCreating(!isCreating))
+  const toggleCreate = useCallback(() => setCreating(prevState => !prevState), [])
 
   const isFirstRun = useSelector(state => state.prefs.isFirstRun === true)
   const ui = useSelector(state => state.ui)

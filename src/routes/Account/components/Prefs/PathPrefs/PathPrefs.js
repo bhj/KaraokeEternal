@@ -16,9 +16,9 @@ const PathPrefs = props => {
   const [isChoosing, setChoosing] = useState(false)
   const [priority, setPriority] = useState(paths.result)
 
-  const toggleExpanded = useCallback(() => setExpanded(!isExpanded))
-  const handleCloseChooser = useCallback(() => setChoosing(false))
-  const handleOpenChooser = useCallback(() => setChoosing(true))
+  const toggleExpanded = useCallback(() => setExpanded(prevState => !prevState), [])
+  const handleCloseChooser = useCallback(() => setChoosing(false), [])
+  const handleOpenChooser = useCallback(() => setChoosing(true), [])
 
   useEffect(() => {
     // local state for immediate UI updates
@@ -69,7 +69,7 @@ const PathPrefs = props => {
       }).catch(err => {
         alert(err)
       })
-  }, [dispatch, paths])
+  }, [dispatch, paths, priority])
 
   return (
     <div className={styles.container}>

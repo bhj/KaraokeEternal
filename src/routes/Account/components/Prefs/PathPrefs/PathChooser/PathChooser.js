@@ -7,6 +7,7 @@ import styles from './PathChooser.css'
 const api = new HttpApi('prefs/path')
 
 const PathChooser = props => {
+  const { onCancel, onChoose, isVisible } = props
   const listRef = useRef()
   const [pathInfo, setPathInfo] = useState({
     current: null,
@@ -14,27 +15,27 @@ const PathChooser = props => {
     children: [],
   })
 
-  const handleChoose = useCallback(() => props.onChoose(pathInfo.current), [pathInfo.current])
+  const handleChoose = useCallback(() => { onChoose(pathInfo.current) }, [onChoose, pathInfo])
   const ls = useCallback(dir => {
     api('GET', `/ls?dir=${encodeURIComponent(dir)}`)
       .then(res => setPathInfo(res))
       .catch(err => alert(err))
-  })
+  }, [])
 
   // get initial list when chooser first becomes visible
   useEffect(() => {
-    if (props.isVisible) ls(pathInfo.current || '.')
-  }, [props.isVisible])
+    if (isVisible) ls(pathInfo.current || '.')
+  }, [isVisible, ls, pathInfo])
 
   // scroll to top when changing dirs
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = 0
-  }, [pathInfo.current])
+  }, [])
 
   return (
     <Modal
-      isVisible={props.isVisible}
-      onClose={props.onCancel}
+      isVisible={isVisible}
+      onClose={onCancel}
       title='Add Folder'
       style={{
         width: '100%',
@@ -60,7 +61,7 @@ const PathChooser = props => {
           <button className={`${styles.submit} primary`} onClick={handleChoose}>
               Add Folder
           </button>
-          <button className={styles.cancel} onClick={props.onCancel}>
+          <button className={styles.cancel} onClick={onCancel}>
             Cancel
           </button>
         </div>

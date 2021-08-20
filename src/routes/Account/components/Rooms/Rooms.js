@@ -18,16 +18,17 @@ const Rooms = props => {
   const handleFilterChange = useCallback(e => {
     if (e.target.value === 'all') dispatch(filterByStatus(false))
     else dispatch(filterByStatus(e.target.value))
-  }, [dispatch, rooms])
+  }, [dispatch])
   const handleFilterUsers = useCallback(e => dispatch(filterByRoom(parseInt(e.target.dataset.roomId, 10))), [dispatch])
   const handleOpen = useCallback(e => {
     setEditorRoom(rooms.entities[e.target.dataset.roomId])
     dispatch(openRoomEditor())
   }, [dispatch, rooms])
 
+  // once per mount
   useEffect(() => {
     dispatch(fetchRooms())
-  }, []) // once per mount
+  }, [dispatch])
 
   const rows = rooms.result.map(roomId => {
     const room = rooms.entities[roomId]

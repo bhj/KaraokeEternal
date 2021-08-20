@@ -13,10 +13,11 @@ const AccountView = props => {
   const ui = useSelector(state => state.ui)
   const dispatch = useDispatch()
 
-  // do this here instead of Prefs component to detect firstRun
+  // once per mount
+  // (do this here instead of Prefs component to detect firstRun)
   useEffect(() => {
     dispatch(fetchPrefs())
-  }, []) // once per mount
+  }, [dispatch])
 
   return (
     <div className={styles.container} style={{

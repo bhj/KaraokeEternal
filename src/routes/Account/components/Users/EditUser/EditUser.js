@@ -8,7 +8,7 @@ import styles from './EditUser.css'
 
 const EditUser = props => {
   const [isDirty, setDirty] = useState(false)
-  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty))
+  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty), [])
 
   // reset dirty flag when the editor "closes"
   useEffect(() => {
