@@ -77,12 +77,12 @@ const EditRoom = props => {
         </button>
 
         {props.room &&
-          <button onClick={handleRemoveClick} className={styles.btn}>
+          <button type='button' onClick={handleRemoveClick} className={styles.btn}>
             Remove Room
           </button>
         }
 
-        <button onClick={props.onClose}>Cancel</button>
+        <button type='button' onClick={props.onClose}>Cancel</button>
       </form>
     </Modal>
   )
