@@ -23,10 +23,6 @@ const PathPrefs = props => {
   useEffect(() => {
     // local state for immediate UI updates
     setPriority(paths.result)
-
-    if (paths.result.length === 0) {
-      setExpanded(true)
-    }
   }, [paths])
 
   const dispatch = useDispatch()
