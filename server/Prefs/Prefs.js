@@ -6,11 +6,20 @@ const log = require('../lib/Log').getLogger('Prefs')
 const YoutubeProcessManager = require('../Youtube/YoutubeProcessManager')
 
 class Prefs {
+  // prefs that we'll send to non-admin users...
+  static publicPrefs = [
+    'isYouTubeEnabled',
+    'isKaraokeGeneratorEnabled',
+    'upcomingLyricsColor',
+    'playedLyricsColor'
+  ]
+
   /**
    * Gets prefs (includes media paths, does not inlcude JWT secret key)
+   * @param publicOnly If true, only public prefs will be returned
    * @return {Promise} Prefs object
    */
-  static async get () {
+  static async get (publicOnly = false) {
     const defaultPrefs = {
       isScanning: false,
       isReplayGainEnabled: false,
@@ -65,6 +74,12 @@ class Prefs {
       if (!Object.prototype.hasOwnProperty.call(prefs, key)) {
         prefs[key] = value
       }
+    }
+
+    // only return public prefs if requested...
+    if (publicOnly) {
+      return Object.fromEntries(
+        Object.entries(prefs).filter(([key, value]) => Prefs.publicPrefs.includes(key)))
     }
 
     return prefs

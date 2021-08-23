@@ -113,14 +113,12 @@ module.exports = function (io, jwtKey) {
       }
     })
 
-    // push prefs (admin only)
-    if (sock.user.isAdmin) {
-      log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
-      io.to(sock.id).emit('action', {
-        type: PREFS_PUSH,
-        payload: await Prefs.get(),
-      })
-    }
+    // push prefs (only public prefs if the user is not an admin)
+    log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
+    io.to(sock.id).emit('action', {
+      type: PREFS_PUSH,
+      payload: await Prefs.get(!sock.user.isAdmin),
+    })
 
     // push library (only if client's is outdated)
     if (clientLibraryVersion !== Library.getLibraryVersion()) {

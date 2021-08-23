@@ -32,15 +32,12 @@ router.get('/scan/stop', async (ctx, next) => {
 router.get('/', async (ctx, next) => {
   const prefs = await Prefs.get()
 
-  // must be admin or firstrun
-  if (prefs.isFirstRun || ctx.user.isAdmin) {
+  // only include public prefs if not an admin or first-run...
+  if (!prefs.isFirstRun && !ctx.user.isAdmin) {
+    ctx.body = await Prefs.get(true)
+  } else {
     ctx.body = prefs
-    return
   }
-
-  // there are no non-admin prefs but we don't want to
-  // trigger a fetch error on the frontend
-  ctx.body = {}
 })
 
 // add media file path
