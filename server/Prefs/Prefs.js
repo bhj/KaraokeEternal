@@ -55,8 +55,8 @@ class Prefs {
       })
     }
 
-    // include media paths
-    {
+    // include media paths, if necessary...
+    if (!publicOnly || Prefs.publicPrefs.includes('paths')) {
       const query = sql`
         SELECT * FROM paths
         ORDER BY priority
