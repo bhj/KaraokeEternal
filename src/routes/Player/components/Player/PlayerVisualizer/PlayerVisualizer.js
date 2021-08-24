@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import butterchurn from 'butterchurn'
-import butterchurnPresets from 'butterchurn-presets'
+import presets from 'butterchurn-presets/all'
+import imageData from 'butterchurn-presets/imageData'
 import styles from './PlayerVisualizer.css'
 
 class PlayerVisualizer extends React.Component {
@@ -18,7 +19,6 @@ class PlayerVisualizer extends React.Component {
   audioGainNode = null
   canvas = React.createRef()
   frameId = null
-  presets = butterchurnPresets.getPresets()
 
   componentDidMount () {
     try {
@@ -26,6 +26,8 @@ class PlayerVisualizer extends React.Component {
         width: this.props.width,
         height: this.props.height,
       })
+
+      this.visualizer.loadExtraImages(imageData)
     } catch (err) {
       this.props.onError(err.message) // @todo pass error object instead of msg only
       return
@@ -34,7 +36,7 @@ class PlayerVisualizer extends React.Component {
     // @todo
     // this.visualizer.setOutputAA(true)
 
-    const preset = this.presets[this.props.presetKey]
+    const preset = presets[this.props.presetKey]
 
     if (preset) {
       this.visualizer.loadPreset(preset, 0.0) // 2nd arg is # of seconds to blend presets
@@ -60,7 +62,7 @@ class PlayerVisualizer extends React.Component {
     }
 
     if (props.presetKey !== prevProps.presetKey) {
-      this.visualizer.loadPreset(this.presets[props.presetKey], 1) // 2nd arg is # of seconds to blend presets
+      this.visualizer.loadPreset(presets[props.presetKey], 1) // 2nd arg is # of seconds to blend presets
     }
 
     if (this.audioGainNode && props.sensitivity !== prevProps.sensitivity) {
