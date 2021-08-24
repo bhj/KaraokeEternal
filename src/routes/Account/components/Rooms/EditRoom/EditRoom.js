@@ -8,38 +8,28 @@ import styles from './EditRoom.css'
 let isPasswordDirty = false
 
 const EditRoom = props => {
-  const checkbox = useRef(null)
-  const nameInput = useRef(null)
-  const passwordInput = useRef(null)
-
+  const formRef = useRef(null)
   const dispatch = useDispatch()
-  const handleCreateClick = useCallback(() => {
-    dispatch(createRoom({
-      name: nameInput.current.value,
-      password: passwordInput.current.value,
-      status: checkbox.current.checked ? 'open' : 'closed',
-    }))
-  }, [dispatch])
 
-  const handleUpdateClick = useCallback(() => {
-    dispatch(updateRoom(props.room.roomId, {
-      name: nameInput.current.value,
-      password: isPasswordDirty ? passwordInput.current.value : undefined,
-      status: checkbox.current.checked ? 'open' : 'closed',
-    }))
-  }, [dispatch, props.room, isPasswordDirty])
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault()
+
+    const data = new FormData(formRef.current)
+    data.set('status', data.get('status') ? 'open' : 'closed')
+
+    if (props.room) {
+      if (!isPasswordDirty) data.delete('password')
+      dispatch(updateRoom(props.room.roomId, data))
+    } else {
+      dispatch(createRoom(data))
+    }
+  }, [dispatch, props.room])
 
   const handleRemoveClick = useCallback(() => {
     if (confirm(`Remove room "${props.room.name}" and its queue?`)) {
       dispatch(removeRoom(props.room.roomId))
     }
   }, [dispatch, props.room])
-
-  const handleKeyPress = useCallback((e) => {
-    if (e.charCode === 13) {
-      props.room ? handleUpdateClick() : handleCreateClick()
-    }
-  }, [props.room])
 
   // reset dirty flag when the editor "closes"
   useEffect(() => {
@@ -53,55 +43,47 @@ const EditRoom = props => {
       title={props.room ? 'Edit Room' : 'Create Room'}
       style={{ minWidth: '300px' }}
     >
-      <input type='text'
-        autoComplete='off'
-        autoFocus={typeof props.room === 'undefined'}
-        defaultValue={props.room ? props.room.name : ''}
-        onKeyPress={handleKeyPress}
-        placeholder='room name'
-        ref={nameInput}
-        className={styles.field}
-      />
+      <form onSubmit={handleSubmit} ref={formRef} className={styles.form}>
+        <input type='text'
+          autoComplete='off'
+          autoFocus={typeof props.room === 'undefined'}
+          className={styles.field}
+          defaultValue={props.room ? props.room.name : ''}
+          name='name'
+          placeholder='room name'
+        />
 
-      <input type='password'
-        autoComplete='off'
-        defaultValue={props.room && props.room.hasPassword ? '*'.repeat(32) : ''}
-        onChange={() => { isPasswordDirty = true }}
-        onKeyPress={handleKeyPress}
-        placeholder='room password (optional)'
-        ref={passwordInput}
-        className={styles.field}
-      />
+        <input type='password'
+          autoComplete='new-password'
+          className={styles.field}
+          defaultValue={props.room && props.room.hasPassword ? '*'.repeat(32) : ''}
+          name='password'
+          onChange={() => { isPasswordDirty = true }}
+          placeholder='room password (optional)'
+        />
 
-      <label>
-        <input type='checkbox'
-          defaultChecked={!props.room || props.room.status === 'open'}
-          ref={checkbox}
-        /> Open
-      </label>
+        <label>
+          <input type='checkbox'
+            defaultChecked={!props.room || props.room.status === 'open'}
+            name='status'
+          />
+           Open
+        </label>
+        <br/>
+        <br/>
 
-      <br />
-      <br />
-
-      {!props.room &&
-        <button onClick={handleCreateClick} className={`${styles.btn} primary`}>
-          Create Room
+        <button type='submit' className={`${styles.btn} primary`}>
+          {props.room ? 'Update Room' : 'Create Room'}
         </button>
-      }
 
-      {props.room &&
-        <button onClick={handleUpdateClick} className={`${styles.btn} primary`}>
-          Update Room
-        </button>
-      }
+        {props.room &&
+          <button type='button' onClick={handleRemoveClick} className={styles.btn}>
+            Remove Room
+          </button>
+        }
 
-      {props.room &&
-        <button onClick={handleRemoveClick} className={styles.btn}>
-          Remove Room
-        </button>
-      }
-
-      <button onClick={props.onClose}>Cancel</button>
+        <button type='button' onClick={props.onClose}>Cancel</button>
+      </form>
     </Modal>
   )
 }

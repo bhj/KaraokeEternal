@@ -11,7 +11,7 @@ const Account = props => {
   const [isDirty, setDirty] = useState(false)
 
   const dispatch = useDispatch()
-  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty))
+  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty), [])
   const handleSignOut = useCallback(() => dispatch(logout()), [dispatch])
   const handleSubmit = useCallback(data => {
     if (!curPassword.current.value.trim()) {

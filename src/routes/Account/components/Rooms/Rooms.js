@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { formatDateTime } from 'lib/dateTime'
 import EditRoom from './EditRoom'
-import { closeRoomEditor, fetchRooms, openRoomEditor, toggleShowAll } from 'store/modules/rooms'
+import { closeRoomEditor, fetchRooms, filterByStatus, openRoomEditor } from 'store/modules/rooms'
 import { filterByRoom } from '../../modules/users'
 import getRoomList from '../../selectors/getRoomList'
 import styles from './Rooms.css'
@@ -10,21 +10,25 @@ import styles from './Rooms.css'
 const Rooms = props => {
   const [editorRoom, setEditorRoom] = useState(null)
 
-  const { isEditorOpen, isShowingAll } = useSelector(state => state.rooms)
+  const { isEditorOpen, filterStatus } = useSelector(state => state.rooms)
   const rooms = useSelector(getRoomList)
 
   const dispatch = useDispatch()
   const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
-  const handleFilter = useCallback(e => dispatch(filterByRoom(parseInt(e.target.dataset.roomId, 10))), [dispatch])
+  const handleFilterChange = useCallback(e => {
+    if (e.target.value === 'all') dispatch(filterByStatus(false))
+    else dispatch(filterByStatus(e.target.value))
+  }, [dispatch])
+  const handleFilterUsers = useCallback(e => dispatch(filterByRoom(parseInt(e.target.dataset.roomId, 10))), [dispatch])
   const handleOpen = useCallback(e => {
     setEditorRoom(rooms.entities[e.target.dataset.roomId])
     dispatch(openRoomEditor())
   }, [dispatch, rooms])
-  const handleToggle = useCallback(() => dispatch(toggleShowAll()), [dispatch])
 
+  // once per mount
   useEffect(() => {
     dispatch(fetchRooms())
-  }, []) // once per mount
+  }, [dispatch])
 
   const rows = rooms.result.map(roomId => {
     const room = rooms.entities[roomId]
@@ -34,7 +38,7 @@ const Rooms = props => {
         <td>
           {room.status}
           {room.numUsers > 0 &&
-            <>&nbsp;<a data-room-id={roomId} onClick={handleFilter}>({room.numUsers})</a></>
+            <>&nbsp;<a data-room-id={roomId} onClick={handleFilterUsers}>({room.numUsers})</a></>
           }
         </td>
         <td>{formatDateTime(new Date(room.dateCreated * 1000))}</td>
@@ -46,13 +50,11 @@ const Rooms = props => {
     <div className={styles.container}>
       <div className={styles.titleContainer}>
         <h1 className={styles.title}>Rooms</h1>
-        <label className={styles.showAll}>
-          <input type='checkbox'
-            checked={isShowingAll}
-            onChange={handleToggle}
-            className={styles.showAll}
-          /> Show all
-        </label>
+        <select onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus}>
+          <option key='all' value={'all'}>All</option>
+          <option key='open' value={'open'}>Open</option>
+          <option key='closed' value={'closed'}>Closed</option>
+        </select>
       </div>
       <div className={styles.content}>
         <table className={styles.table}>

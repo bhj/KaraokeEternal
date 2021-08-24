@@ -134,7 +134,7 @@ It's best to create a new room before each session so that you start with an emp
 The Preferences panel allows admins to set these global preferences:
 
 - **Media Folders**
-  - Add folders with [supported media files](#media-files) to scan them into the library. When multiple folders contain a version of the same song, the version in the folder highest in this list will be used. Karaoke Forever Server does not automatically look for changes to media folders; tap Refresh to re-scan.
+  - Add folders with [supported media files](#media-files) to scan them into the library. You can re-arrange the folder order by dragging and dropping, and when songs have multiple versions the one in the folder highest in the list will be used.
 - **Player**
   - **ReplayGain (clip-safe)**: [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain){{% icon-external %}} metadata tags allow the player to automatically minimize volume differences between songs, resulting in a better experience for all, and without affecting the dynamic range of each song (no compression). This option should generally only be enabled when you know all of your media is properly tagged. It normally reduces the player's overall volume significantly, so just turn your output up, and/or your mics down.
 

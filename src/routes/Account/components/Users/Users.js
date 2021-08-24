@@ -20,15 +20,16 @@ const Users = props => {
     if (e.target.value === 'all') dispatch(filterByOnline(false))
     else if (e.target.value === 'online') dispatch(filterByOnline(true))
     else dispatch(filterByRoom(parseInt(e.target.value, 10)))
-  }, [dispatch, rooms, users])
+  }, [dispatch])
   const handleOpen = useCallback(e => {
     setEditorUser(users.entities[e.target.dataset.userId])
     dispatch(openUserEditor())
   }, [dispatch, users])
 
+  // once per mount
   useEffect(() => {
     dispatch(fetchUsers())
-  }, []) // once per mount
+  }, [dispatch])
 
   const rows = users.result.map(userId => {
     const user = users.entities[userId]

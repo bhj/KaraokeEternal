@@ -1,72 +1,70 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchRooms } from 'store/modules/rooms'
 import styles from './RoomSelect.css'
+let passwordRef
 
-export default class RoomSelect extends Component {
-  static propTypes = {
-    rooms: PropTypes.object.isRequired,
-    className: PropTypes.string,
-    // actions
-    fetchRooms: PropTypes.func.isRequired,
-  }
+const RoomSelect = props => {
+  const { onSelectRef, onPasswordRef } = props
+  const rooms = useSelector(state => state.rooms)
+  const [selectedRoomId, setSelectedRoomId] = useState('')
+  const dispatch = useDispatch()
 
-  state = {
-    hasPassword: false,
-  }
+  const handleSelectChange = useCallback(e => { setSelectedRoomId(e.target.value) }, [])
+  const handleSelectRef = useCallback(r => { onSelectRef(r) }, [onSelectRef])
+  const handlePasswordRef = useCallback(r => {
+    passwordRef = r
+    onPasswordRef(r)
+  }, [onPasswordRef])
 
-  select = React.createRef()
-  password = React.createRef()
+  // once per mount
+  useEffect(() => dispatch(fetchRooms()), [dispatch])
 
-  componentDidMount () {
-    this.props.fetchRooms()
-  }
-
-  componentDidUpdate (prevProps, prevState) {
-    const { rooms } = this.props
-
-    // if there's only one open room, select it by default
-    if (rooms !== prevProps.rooms && rooms.result.length === 1) {
-      this.select.current.value = rooms.result[0]
+  // if there's only one open room, select it automatically
+  useEffect(() => {
+    if (rooms.result.length === 1) {
+      setSelectedRoomId(rooms.result[0])
     }
-  }
+  }, [rooms])
 
-  handleSelectChange = e => {
-    const roomId = e.target.value
-    const hasPassword = this.props.rooms.entities[roomId].hasPassword
+  // focus room password when a room is manually selected
+  useEffect(() => {
+    if (rooms.result.length > 1 && selectedRoomId && rooms.entities[selectedRoomId].hasPassword) {
+      passwordRef.focus()
+    }
+  }, [rooms, selectedRoomId])
 
-    this.setState({ hasPassword }, () => {
-      if (this.state.hasPassword) this.password.current.focus()
-    })
-  }
+  return (
+    <>
+      <select
+        value={selectedRoomId}
+        onChange={handleSelectChange}
+        ref={handleSelectRef}
+        className={`${styles.field} ${styles.select}`}
+      >
+        <option key='choose' value='' disabled>select room...</option>
+        {rooms.result.map(roomId => (
+          <option key={roomId} value={roomId}>{rooms.entities[roomId].name}</option>
+        ))}
+      </select>
 
-  render () {
-    const roomOpts = this.props.rooms.result.map(roomId => {
-      const room = this.props.rooms.entities[roomId]
-      return <option key={roomId} value={roomId}>{room.name}</option>
-    })
-
-    roomOpts.unshift(<option key='choose' value='' disabled>select room...</option>)
-
-    return (
-      <>
-        <select
-          defaultValue=''
-          onChange={this.handleSelectChange}
-          ref={this.select}
-          className={`${styles.field} ${styles.select}`}
-        >
-          {roomOpts}
-        </select>
-
-        {this.state.hasPassword &&
-          <input type='password'
-            autoComplete='off'
-            className={`${styles.field} ${this.props.className}`}
-            placeholder='room password (required)'
-            ref={this.password}
-          />
-        }
-      </>
-    )
-  }
+      {selectedRoomId && rooms.entities[selectedRoomId].hasPassword &&
+        <input type='password'
+          autoComplete='off'
+          className={`${styles.field} ${props.className}`}
+          placeholder='room password (required)'
+          ref={handlePasswordRef}
+        />
+      }
+    </>
+  )
 }
+
+RoomSelect.propTypes = {
+  className: PropTypes.string,
+  onSelectRef: PropTypes.func.isRequired,
+  onPasswordRef: PropTypes.func.isRequired,
+}
+
+export default RoomSelect

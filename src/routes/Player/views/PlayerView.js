@@ -15,8 +15,8 @@ const PlayerView = (props) => {
   React.useLayoutEffect(() => props.setHeader(null))
 
   // @todo: find better place for this?
+  const store = useStore()
   if (!useSelector(state => state.player)) {
-    const store = useStore()
     injectReducer(store, { key: 'player', reducer: playerReducer })
     injectReducer(store, { key: 'playerVisualizer', reducer: playerVisualizerReducer })
   }

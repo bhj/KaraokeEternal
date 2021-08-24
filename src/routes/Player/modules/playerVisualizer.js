@@ -1,11 +1,11 @@
-import butterchurnPresets from 'butterchurn-presets'
+import presets from 'butterchurn-presets/all'
 import {
   PLAYER_CMD_OPTIONS,
   PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
 } from 'shared/actionTypes'
 
-const _presetKeys = Object.keys(butterchurnPresets.getPresets())
+const _presetKeys = Object.keys(presets)
 
 export function playerVisualizerError (err) {
   return {

@@ -6,9 +6,17 @@
 }
 
 .titleContainer {
+  align-items: center;
   display: flex;
   padding: var(--panel-title-padding);
   background-color: var(--panel-title-bg-color);
+}
+
+.titleContainer select {
+  font-size: 16px;
+  height: 24px; /* --panel-title-font size + top/bottom padding */
+  max-width: 33%;
+  padding: 0;
 }
 
 .title {

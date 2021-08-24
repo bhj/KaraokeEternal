@@ -10,9 +10,10 @@ import Users from '../../components/Users'
 
 const SignedInView = props => {
   const { isAdmin } = useSelector(state => state.user)
+  const sliceExists = !!useSelector(state => state.users)
+  const store = useStore()
 
-  if (isAdmin && !useSelector(state => state.users)) {
-    const store = useStore()
+  if (isAdmin && !sliceExists) {
     injectReducer(store, { key: 'users', reducer: usersReducer })
   }
 

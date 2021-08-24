@@ -1,23 +1,43 @@
-import React, { useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import PathChooser from './PathChooser'
-import Icon from 'components/Icon'
-import styles from './PathPrefs.css'
+import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 import HttpApi from 'lib/HttpApi'
-import { receivePrefs, requestScan } from 'store/modules/prefs'
+import Icon from 'components/Icon'
+import PathChooser from './PathChooser'
+import PathItem from './PathItem'
+import styles from './PathPrefs.css'
+import { receivePrefs, requestScan, setPathPriority } from 'store/modules/prefs'
+
 const api = new HttpApi('prefs/path')
 
 const PathPrefs = props => {
+  const paths = useSelector(state => state.prefs.paths)
   const [isExpanded, setExpanded] = useState(false)
   const [isChoosing, setChoosing] = useState(false)
-  const paths = useSelector(state => state.prefs.paths)
+  const [priority, setPriority] = useState(paths.result)
 
-  const handleOpenChooser = useCallback(() => setChoosing(true))
-  const handleCloseChooser = useCallback(() => setChoosing(false))
-  const toggleExpanded = useCallback(() => setExpanded(!isExpanded))
+  const toggleExpanded = useCallback(() => setExpanded(prevState => !prevState), [])
+  const handleCloseChooser = useCallback(() => setChoosing(false), [])
+  const handleOpenChooser = useCallback(() => setChoosing(true), [])
+
+  useEffect(() => {
+    // local state for immediate UI updates
+    setPriority(paths.result)
+  }, [paths])
 
   const dispatch = useDispatch()
   const handleRefresh = useCallback(() => dispatch(requestScan()), [dispatch])
+  const handleDragEnd = useCallback(dnd => {
+    // dropped outside the list?
+    if (!dnd.destination) return
+
+    const res = priority.slice() // copy
+    const [removed] = res.splice(dnd.source.index, 1)
+    res.splice(dnd.destination.index, 0, removed)
+
+    setPriority(res)
+    dispatch(setPathPriority(res))
+  }, [dispatch, priority])
 
   const handleAddPath = useCallback(dir => {
     api('POST', `/?dir=${encodeURIComponent(dir)}`)
@@ -29,12 +49,15 @@ const PathPrefs = props => {
       })
   }, [dispatch])
 
-  const handleRemovePath = useCallback(pathId => {
-    const { path } = paths.entities[pathId]
+  const handleRemovePath = useCallback(e => {
+    const { path, pathId } = paths.entities[e.currentTarget.dataset.pathId]
 
     if (!confirm(`Remove folder from library?\n\n${path}`)) {
       return
     }
+
+    // optimistically update local state
+    setPriority(priority.filter(id => id !== pathId))
 
     api('DELETE', `/${pathId}`)
       .then(res => {
@@ -42,7 +65,7 @@ const PathPrefs = props => {
       }).catch(err => {
         alert(err)
       })
-  }, [dispatch, paths])
+  }, [dispatch, paths, priority])
 
   return (
     <div className={styles.container}>
@@ -59,18 +82,21 @@ const PathPrefs = props => {
           <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>
         }
 
-        {paths.result.map(id =>
-          <div key={id} className={styles.pathItem}>
-            <div className={styles.pathName}>
-              {paths.entities[id].path}
-            </div>
-            <div onClick={() => handleRemovePath(id)} className={styles.btnClear}>
-              <Icon icon='CLEAR' size={32} />
-            </div>
-          </div>
-        )}
-        <br />
-        <div style={{ display: 'flex' }}>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId='droppable'>
+            {(provided, snapshot) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                {priority.map((pathId, i) =>
+                  <PathItem index={i} key={pathId} path={paths.entities[pathId]} onRemove={handleRemovePath}/>
+                )}
+
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+
+        <div className={styles.btnContainer}>
           <button className='primary' style={{ flex: 1, width: 'auto' }} onClick={handleOpenChooser}>
             Add Folder
           </button>

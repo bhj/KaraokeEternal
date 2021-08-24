@@ -146,7 +146,7 @@ class CDGPlayer extends React.Component {
   */
   handleEnded = (el) => {
     this.props.onEnd()
-    this.cdg.pause()
+    this.stopCDG()
   }
 
   handleError = (el) => {

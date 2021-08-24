@@ -8,6 +8,7 @@
   "extends": [
     "standard",
     "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "plugin:promise/recommended"
   ],
   "plugins": [

@@ -4,13 +4,13 @@ import { useDispatch } from 'react-redux'
 import RoomSelect from '../../../components/RoomSelect'
 import { login } from 'store/modules/user'
 import styles from './SignIn.css'
-
-let roomSelectRef
+let roomSelectRef, roomPasswordRef
 
 const SignIn = props => {
   const usernameRef = useRef(null)
   const passwordRef = useRef(null)
-  const roomSelectRefCB = useCallback(node => { roomSelectRef = node }, [])
+  const roomSelectRefCB = useCallback(r => { roomSelectRef = r }, [])
+  const roomPasswordRefCB = useCallback(r => { roomPasswordRef = r }, [])
 
   const dispatch = useDispatch()
   const handleSubmit = useCallback(e => {
@@ -18,8 +18,8 @@ const SignIn = props => {
     dispatch(login({
       username: usernameRef.current.value.trim(),
       password: passwordRef.current.value,
-      roomId: roomSelectRef.select.current.value,
-      roomPassword: roomSelectRef.password.current ? roomSelectRef.password.current.value : undefined,
+      roomId: roomSelectRef.value,
+      roomPassword: roomPasswordRef ? roomPasswordRef.value : undefined,
     }))
   }, [dispatch])
 
@@ -45,7 +45,7 @@ const SignIn = props => {
           className={styles.field}
         />
 
-        <RoomSelect ref={roomSelectRefCB}/>
+        <RoomSelect onSelectRef={roomSelectRefCB} onPasswordRef={roomPasswordRefCB} />
 
         <button onClick={handleSubmit} className='primary'>
           Sign In

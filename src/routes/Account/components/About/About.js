@@ -7,7 +7,7 @@ import styles from './About.css'
 
 const About = props => {
   const [isChangelogVisible, setChangelogVisible] = useState(false)
-  const toggleChangelog = useCallback(() => setChangelogVisible(!isChangelogVisible))
+  const toggleChangelog = useCallback(() => setChangelogVisible(prevState => !prevState), [])
 
   return (
     <div className={styles.container}>

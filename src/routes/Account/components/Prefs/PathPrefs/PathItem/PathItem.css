@@ -1,0 +1,23 @@
+.pathItem {
+  display: flex;
+  align-items: center;
+  background-color: var(--panel-bg-color);
+  padding: 3px;
+  margin: 0 0 5px 0;
+  border-radius: var(--border-radius);
+}
+
+.pathName {
+  flex: 1;
+  user-select: text;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.btnClear {
+  fill: var(--btn-danger-bg-color);
+}
+
+.btnDrag {
+  fill: var(--btn-bg-color);
+}

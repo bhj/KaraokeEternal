@@ -1,11 +1,12 @@
 import {
+  LOGOUT,
   REQUEST_ROOMS,
   ROOM_EDITOR_OPEN,
   ROOM_EDITOR_CLOSE,
+  ROOM_FILTER_STATUS,
   ROOM_UPDATE,
   ROOM_CREATE,
   ROOM_REMOVE,
-  ROOM_TOGGLE_SHOW_ALL,
   _SUCCESS,
   _ERROR,
 } from 'shared/actionTypes'
@@ -56,10 +57,9 @@ export function fetchRooms () {
 // ------------------------------------
 export function createRoom (data) {
   return (dispatch, getState) => {
-    // informational
+    // FormData is browser-native and not coercible for display as the payload
     dispatch({
       type: ROOM_CREATE,
-      payload: { data },
     })
 
     return api('POST', '', {
@@ -83,10 +83,10 @@ export function createRoom (data) {
 // ------------------------------------
 export function updateRoom (roomId, data) {
   return (dispatch, getState) => {
-    // informational
+    // FormData is browser-native and not coercible for display as the payload
     dispatch({
       type: ROOM_UPDATE,
-      payload: { roomId, ...data },
+      payload: { roomId },
     })
 
     return api('PUT', `/${roomId}`, {
@@ -145,9 +145,10 @@ export function openRoomEditor () {
   }
 }
 
-export function toggleShowAll () {
+export function filterByStatus (status) {
   return {
-    type: ROOM_TOGGLE_SHOW_ALL,
+    type: ROOM_FILTER_STATUS,
+    payload: status,
   }
 }
 
@@ -155,6 +156,9 @@ export function toggleShowAll () {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [LOGOUT + _SUCCESS]: (state, { payload }) => ({
+    ...initialState,
+  }),
   [REQUEST_ROOMS + _SUCCESS]: (state, { payload }) => ({
     ...state,
     ...payload,
@@ -167,9 +171,9 @@ const ACTION_HANDLERS = {
     ...state,
     isEditorOpen: false,
   }),
-  [ROOM_TOGGLE_SHOW_ALL]: (state, { payload }) => ({
+  [ROOM_FILTER_STATUS]: (state, { payload }) => ({
     ...state,
-    isShowingAll: !state.isShowingAll,
+    filterStatus: payload,
   }),
 }
 
@@ -179,8 +183,8 @@ const ACTION_HANDLERS = {
 const initialState = {
   result: [],
   entities: {},
+  filterStatus: 'open',
   isEditorOpen: false,
-  isShowingAll: false,
 }
 
 export default function rooms (state = initialState, action) {
