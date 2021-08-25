@@ -34,7 +34,11 @@ window._socket.on('toast', (data) => {
   const content = data.content
   delete data.content
 
-  toast(content, { ...defaultOptions, ...data })
+  // don't show the toast on the player...
+  const isPlayer = window.location.pathname.replace(/\/$/, '').endsWith('/player')
+  if (!isPlayer) {
+    toast(content, { ...defaultOptions, ...data })
+  }
 })
 
 // ========================================================
