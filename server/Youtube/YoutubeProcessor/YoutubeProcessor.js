@@ -137,12 +137,40 @@ class YoutubeProcessor extends Youtube {
 
       // download the audio and video separately at the same time...
       log.info('Downloading video #' + video.id + '...')
-      await Promise.all([
-        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestaudio', filter:'audioonly' }),
-          fs.createWriteStream(outputDir + '/audio.mp3')),
-        shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo', filter:'videoonly' }),
-          fs.createWriteStream(outputDir + '/video.mp4'))
-      ])
+      try {
+        await Promise.all([
+          shell.promisifiedPipe(ytdl(video.url, { quality: 'highestaudio', filter:'audioonly' }),
+            fs.createWriteStream(outputDir + '/audio.mp3')),
+          shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo', filter:'videoonly' }),
+            fs.createWriteStream(outputDir + '/video.mp4'))
+        ])
+      } catch (e) {
+        // if something went wrong, it's possible there just isn't a separate audio/video stream to download.
+        // so let's try downloading a combined stream and then separating it. This is not preferable because
+        // the combined streams are usually of lower quality, but it's better than nothing as a fallback...
+
+        // delete any audio/video files that might have partially downloaded before leading to the download error...
+        fs.unlinkSync(outputDir + '/audio.mp3')
+        fs.unlinkSync(outputDir + '/video.mp4')
+
+        // download a combined audio/video file...
+        await shell.promisifiedPipe(ytdl(video.url, { quality: 'highest', filter:'audioandvideo' }),
+          fs.createWriteStream(outputDir + '/combined.mp4'))
+
+        // ensure we got the combined file...
+        if (!fs.existsSync(outputDir + '/combined.mp4') || fs.statSync(outputDir + '/combined.mp4').size < 1000) {
+          throw new Error('Problem downloading combined audio and video file from YouTube')
+        }
+
+        // separate the audio and video...
+        await Promise.all([
+          shell.promisifiedExec(this.ffmpegPath + ' -y -nostdin -i "' + outputDir + '/combined.mp4" -vn -acodec copy -f mp3 "' + outputDir + '/audio.mp3"'),
+          shell.promisifiedExec(this.ffmpegPath + ' -y -nostdin -i "' + outputDir + '/combined.mp4" -an -vcodec copy "' + outputDir + '/video.mp4"')
+        ])
+
+        // delete the unnecessary combined file...
+        fs.unlinkSync(outputDir + '/combined.mp4')
+      }
 
       // ensure we got the audio file...
       if (!fs.existsSync(outputDir + '/audio.mp3') || fs.statSync(outputDir + '/audio.mp3').size < 1000) {
