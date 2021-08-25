@@ -152,7 +152,9 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
       const user = await User.getById(ctx.user.userId)
 
       if (!user || user.dateUpdated !== ctx.user.dateUpdated) {
-        ctx.throw(409, 'Session expired. Please sign in again.')
+        // this seems to lead to an infinite loop, where no rooms are loaded, so you can't sign back in
+        // ctx.throw(409, 'Session expired. Please sign in again.')
+        // todo: send a message another way without causing no rooms to be returned?
       }
     }
 

@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
 import React, { useCallback, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import RoomSelect from '../../../components/RoomSelect'
 import { login } from 'store/modules/user'
 import styles from './SignIn.css'
 let roomSelectRef, roomPasswordRef
 
 const SignIn = props => {
+  const isPasswordRequired = useSelector(state => state.prefs.isPasswordRequired)
   const usernameRef = useRef(null)
   const passwordRef = useRef(null)
   const roomSelectRefCB = useCallback(r => { roomSelectRef = r }, [])
@@ -40,7 +41,7 @@ const SignIn = props => {
         />
         <input type='password'
           autoComplete='current-password'
-          placeholder='password'
+          placeholder={isPasswordRequired ? 'password' : 'password (optional)'}
           ref={passwordRef}
           className={styles.field}
         />

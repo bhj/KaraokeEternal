@@ -2,8 +2,9 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import UserImage from './UserImage'
 import styles from './AccountForm.css'
+import { connect } from 'react-redux'
 
-export default class AccountForm extends Component {
+class AccountForm extends Component {
   static propTypes = {
     children: PropTypes.node,
     onDirtyChange: PropTypes.func,
@@ -11,11 +12,14 @@ export default class AccountForm extends Component {
     requirePassword: PropTypes.bool,
     showRole: PropTypes.bool,
     user: PropTypes.object,
+
+    isUsernameRequired: PropTypes.bool,
+    isPasswordRequired: PropTypes.bool,
   }
 
   state = {
     isDirty: false,
-    isChangingPassword: !this.props.user || this.props.user.userId === null,
+    isChangingPassword: (!this.props.user || this.props.user.userId === null) && this.props.isPasswordRequired,
     userImage: undefined,
   }
 
@@ -34,22 +38,26 @@ export default class AccountForm extends Component {
 
     return (
       <form onSubmit={this.handleSubmit} className={styles.container} noValidate>
-        <input type='email'
-          autoComplete='off'
-          autoFocus={!isUser}
-          onChange={this.updateDirty}
-          placeholder={isUser ? 'change username (optional)' : 'username or email'}
-          ref={r => { this.username = r }}
-          className={styles.field}
-        />
+        {this.props.isUsernameRequired &&
+          <input type='email'
+            autoComplete='off'
+            autoFocus={!isUser}
+            onChange={this.updateDirty}
+            placeholder={isUser ? 'change username (optional)' : 'username or email'}
+            ref={r => { this.username = r }}
+            className={styles.field}
+          />
+        }
 
-        <input type='password'
-          autoComplete='new-password'
-          onChange={this.updateDirty}
-          placeholder={isUser ? 'change password (optional)' : 'password'}
-          ref={r => { this.newPassword = r }}
-          className={styles.field}
-        />
+        {(this.props.isPasswordRequired || (this.props.showRole && this.role && this.role.value === '1')) &&
+          <input type='password'
+            autoComplete='new-password'
+            onChange={this.updateDirty}
+            placeholder={isUser ? 'change password (optional)' : 'password'}
+            ref={r => { this.newPassword = r }}
+            className={styles.field}
+          />
+        }
 
         {this.state.isChangingPassword &&
           <input type='password'
@@ -60,7 +68,7 @@ export default class AccountForm extends Component {
           />
         }
 
-        <div className={styles.userDisplayContainer}>
+        <div className={styles.userDisplayContainer} style={{ order: this.props.isUsernameRequired ? '' : '-1' }}>
           <UserImage
             user={this.props.user}
             onSelect={this.handleUserImageChange}
@@ -100,11 +108,11 @@ export default class AccountForm extends Component {
       data.append('name', this.name.value.trim())
     }
 
-    if (this.username.value.trim()) {
+    if (this.username && this.username.value.trim()) {
       data.append('username', this.username.value.trim())
     }
 
-    if (this.state.isChangingPassword) {
+    if (this.state.isChangingPassword && this.newPassword && this.newPasswordConfirm) {
       data.append('newPassword', this.newPassword.value)
       data.append('newPasswordConfirm', this.newPasswordConfirm.value)
     }
@@ -128,13 +136,28 @@ export default class AccountForm extends Component {
   }
 
   updateDirty = () => {
-    if (!this.props.user || this.props.user.userId === null) return
-
-    this.setState({
-      isDirty: !!this.username.value || !!this.newPassword.value ||
-        this.name.value !== this.props.user.name ||
-        this.role.value !== (this.props.user.isAdmin ? '1' : '0'),
-      isChangingPassword: !!this.newPassword.value,
-    })
+    if (!this.props.user || this.props.user.userId === null) {
+      this.setState({
+        isDirty: true,
+        isChangingPassword: this.newPassword && !!this.newPassword.value,
+      })
+    } else {
+      this.setState({
+        isDirty: (this.username && !!this.username.value) ||
+          (this.newPassword && !!this.newPassword.value) ||
+          this.name.value !== this.props.user.name ||
+          this.role.value !== (this.props.user.isAdmin ? '1' : '0'),
+        isChangingPassword: this.newPassword && !!this.newPassword.value,
+      })
+    }
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    isUsernameRequired: state.prefs.isUsernameRequired,
+    isPasswordRequired: state.prefs.isPasswordRequired,
+  }
+}
+
+export default connect(mapStateToProps)(AccountForm)

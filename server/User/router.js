@@ -102,8 +102,14 @@ router.delete('/user/:userId', async (ctx, next) => {
 
 // update a user account
 router.put('/user/:userId', async (ctx, next) => {
+  const prefs = await Prefs.get()
   const targetId = parseInt(ctx.params.userId, 10)
   const user = await User.getById(ctx.user.userId, true)
+  const updatingUser = await User.getById(targetId, true)
+
+  if (!updatingUser) {
+    ctx.throw(404, `userId ${targetId} not found`)
+  }
 
   // must be admin if updating another user
   if (!user || (targetId !== user.userId && !user.isAdmin)) {
@@ -112,8 +118,13 @@ router.put('/user/:userId', async (ctx, next) => {
 
   let { name, username, password, newPassword, newPasswordConfirm } = ctx.request.body
 
-  // validate current password if updating own account
-  if (targetId === user.userId) {
+  // if username is not required, default to the display name if it's being updated...
+  if (!prefs.isUsernameRequired && !username && name && name.trim() !== updatingUser.name) {
+    username = name
+  }
+
+  // validate current password if updating own password-protected account
+  if (targetId === user.userId && user.password !== '') {
     if (!password) {
       ctx.throw(422, 'Current password is required')
     }
@@ -182,6 +193,13 @@ router.put('/user/:userId', async (ctx, next) => {
       ctx.throw(403)
     }
 
+    // if changing to an admin, require a password...
+    if (parseInt(ctx.request.body.role, 10)) {
+      if (!newPassword && updatingUser.password === '') {
+        ctx.throw(400, 'Administrators need a password')
+      }
+    }
+
     fields.set('isAdmin', parseInt(ctx.request.body.role, 10))
   }
 
@@ -248,11 +266,11 @@ router.post('/user', async (ctx, next) => {
   }
 
   // create user
-  await _create(ctx, ctx.request.body.role === '1')
+  const userData = await _create(ctx, ctx.request.body.role === '1')
 
   // success
   ctx.status = 200
-  ctx.body = {}
+  ctx.body = userData
 })
 
 // first-time setup
@@ -265,7 +283,7 @@ router.post('/setup', async (ctx, next) => {
   }
 
   // create admin user
-  await _create(ctx, true)
+  const userData = await _create(ctx, true)
 
   // create default room
   const fields = new Map()
@@ -295,9 +313,8 @@ router.post('/setup', async (ctx, next) => {
 
   // success
   ctx.status = 200
-  ctx.body = {
-    roomId: res.lastID,
-  }
+  ctx.body = userData
+  ctx.body.roomId = res.lastID
 })
 
 // get a user's image
@@ -321,11 +338,17 @@ router.get('/user/:userId/image', async (ctx, next) => {
 module.exports = router
 
 async function _create (ctx, isAdmin = false) {
+  const prefs = await Prefs.get()
+  const passwordRequired = isAdmin || prefs.isPasswordRequired
   let { name, username, newPassword, newPasswordConfirm } = ctx.request.body
 
-  if (!username || !name || !newPassword || !newPasswordConfirm) {
-    ctx.throw(422, 'All fields are required')
-  }
+  // if username is not required, default to the display name...
+  if (!prefs.isUsernameRequired && !username) username = name
+
+  if (!name) ctx.throw(422, 'Display name is required')
+  if (!username) ctx.throw(422, 'Username is required')
+  if (passwordRequired && !newPassword) ctx.throw(422, 'Password is required')
+  if (passwordRequired && !newPasswordConfirm) ctx.throw(422, 'Password confirmation is required')
 
   username = username.trim()
   name = name.trim()
@@ -334,7 +357,7 @@ async function _create (ctx, isAdmin = false) {
     ctx.throw(400, `Username or email must have ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters`)
   }
 
-  if (newPassword.length < PASSWORD_MIN_LENGTH) {
+  if (passwordRequired && newPassword.length < PASSWORD_MIN_LENGTH) {
     ctx.throw(400, `Password must have at least ${PASSWORD_MIN_LENGTH} characters`)
   }
 
@@ -351,9 +374,12 @@ async function _create (ctx, isAdmin = false) {
     ctx.throw(409, 'Username or email is not available')
   }
 
+  let passwordHash = ''
+  if (newPassword !== undefined) passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS)
+
   const fields = new Map()
   fields.set('username', username)
-  fields.set('password', await bcrypt.hash(newPassword, BCRYPT_ROUNDS))
+  fields.set('password', passwordHash)
   fields.set('name', name)
   fields.set('dateCreated', Math.floor(Date.now() / 1000))
   fields.set('isAdmin', isAdmin ? 1 : 0)
@@ -378,19 +404,21 @@ async function _create (ctx, isAdmin = false) {
   `
 
   await db.run(String(query), query.parameters)
+
+  return { name, username }
 }
 
 async function _login (ctx, creds, validateRoomPassword = true) {
+  const prefs = await Prefs.get()
   const { username, password, roomPassword } = creds
   const roomId = parseInt(creds.roomId, 10) || null
 
-  if (!username || !password) {
-    ctx.throw(422, 'Username/email and password are required')
-  }
+  if (!username) ctx.throw(422, 'Username is required')
+  if (prefs.isPasswordRequired && !password) ctx.throw(422, 'Password is required')
 
   const user = await User.getByUsername(username, true)
 
-  if (!user || !await bcrypt.compare(password, user.password)) {
+  if (!user || (user.password !== '' && !await bcrypt.compare(password, user.password))) {
     ctx.throw(401, 'Incorrect username/email or password')
   }
 

@@ -1,0 +1,30 @@
+.container {
+  background-color: var(--panel-title-bg-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  margin-top: var(--container-padding);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  padding: 3px 5px;
+}
+
+.title {
+  flex: 1;
+  margin-left: 5px;
+}
+
+.content {
+  padding: var(--container-padding);
+  margin-left: 20px;
+}
+
+.content label {
+  padding: var(--container-padding);
+}
+
+.icon {
+  fill: var(--text-color);
+}

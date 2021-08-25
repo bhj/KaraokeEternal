@@ -163,7 +163,7 @@ export function createAccount (data, isFirstRun) {
         dispatch(createSuccess())
 
         return dispatch(login({
-          username: data.get('username'),
+          username: res.username,
           password: data.get('newPassword'),
           roomId: isFirstRun ? res.roomId : data.get('roomId'),
           roomPassword: data.get('roomPassword'),

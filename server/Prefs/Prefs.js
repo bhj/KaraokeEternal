@@ -11,7 +11,9 @@ class Prefs {
     'isYouTubeEnabled',
     'isKaraokeGeneratorEnabled',
     'upcomingLyricsColor',
-    'playedLyricsColor'
+    'playedLyricsColor',
+    'isUsernameRequired',
+    'isPasswordRequired',
   ]
 
   /**
@@ -23,6 +25,8 @@ class Prefs {
     const defaultPrefs = {
       isScanning: false,
       isReplayGainEnabled: false,
+      isUsernameRequired: true,
+      isPasswordRequired: true,
       paths: { result: [], entities: {} },
       scannerPct: 0,
       scannerText: '',

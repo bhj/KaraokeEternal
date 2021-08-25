@@ -132,6 +132,8 @@ const ACTION_HANDLERS = {
 const initialState = {
   isScanning: false,
   isReplayGainEnabled: false,
+  isUsernameRequired: true,
+  isPasswordRequired: true,
   paths: { result: [], entities: {} },
   scannerPct: 0,
   scannerText: '',
