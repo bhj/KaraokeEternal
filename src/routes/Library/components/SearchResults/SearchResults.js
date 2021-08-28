@@ -81,6 +81,7 @@ class SearchResults extends React.Component {
           isExpanded={this.props.expandedArtistResults.includes(artistId)}
           filterKeywords={this.props.filterKeywords}
           onArtistClick={this.props.toggleArtistResultExpanded}
+          onModal={this.props.onModal}
           key={artistId}
           style={style}
         />
