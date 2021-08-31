@@ -75,7 +75,7 @@ class SearchResults extends React.Component {
   }
 
   rowRenderer = ({ index, style }) => {
-    const { artistsResult, songsResult, filterStarred } = this.props
+    const { artistsResult, songsResult, filterStarred, songs } = this.props
 
     // YouTube search button
     if (this.props.isYouTubeEnabled) {
@@ -87,6 +87,8 @@ class SearchResults extends React.Component {
             </button>
           </div>
         )
+      } else if (Object.keys(songs).length === 0) {
+        return <div></div>
       }
     } else {
       index++
