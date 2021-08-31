@@ -23,6 +23,18 @@ class LibraryHeader extends React.Component {
     this.props.setFilterStr(event.target.value)
   }
 
+  // a bit of a kludge to search youtube after pressing enter or the mobile search button.
+  // if youtube search is disabled or the local media library is not empty, the button will not exist
+  // and nothing will happen.
+  onKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      event.stopPropagation()
+      const youtubeSearchButton = document.getElementById('youtubeSearchButton')
+      if (youtubeSearchButton) youtubeSearchButton.click()
+    }
+  }
+
   handleMagnifierClick = () => {
     this.state.value.trim() ? this.clearSearch() : this.searchInput.current.focus()
   }
@@ -45,6 +57,7 @@ class LibraryHeader extends React.Component {
           placeholder='search'
           value={this.state.value}
           onChange={this.handleChange}
+          onKeyDown={this.onKeyDown}
           ref={this.searchInput}
         />
         {filterStr &&
