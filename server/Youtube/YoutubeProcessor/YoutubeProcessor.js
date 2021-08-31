@@ -164,7 +164,7 @@ class YoutubeProcessor extends Youtube {
 
         // separate the audio and video...
         await Promise.all([
-          shell.promisifiedExec(this.ffmpegPath + ' -y -nostdin -i "' + outputDir + '/combined.mp4" -vn -acodec copy -f mp3 "' + outputDir + '/audio.mp3"'),
+          shell.promisifiedExec(this.ffmpegPath + ' -y -nostdin -i "' + outputDir + '/combined.mp4" -vn "' + outputDir + '/audio.mp3"'),
           shell.promisifiedExec(this.ffmpegPath + ' -y -nostdin -i "' + outputDir + '/combined.mp4" -an -vcodec copy "' + outputDir + '/video.mp4"')
         ])
 
