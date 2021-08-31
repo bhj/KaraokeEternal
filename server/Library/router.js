@@ -127,8 +127,8 @@ router.post('/youtubeidentify', async (ctx, next) => {
   const parts = []
 
   // but overwrite what we just did with any supplied artist or title
-  if (ctx.request.body.artist) artist = ctx.request.body.artist
-  if (ctx.request.body.title) title = ctx.request.body.title
+  if (ctx.request.body.artist !== undefined) artist = ctx.request.body.artist
+  if (ctx.request.body.title !== undefined) title = ctx.request.body.title
 
   // join them back together in a standard "Artist - Title" form.
   if (artist) parts.push(artist)

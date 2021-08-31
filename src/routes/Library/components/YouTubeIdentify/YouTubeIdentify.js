@@ -45,17 +45,22 @@ class YouTubeIdentify extends React.Component {
   handleLyricsChange (event) { this.setState({ lyrics: event.target.value }) }
 
   componentDidMount () {
-    this.performIdentification()
+    this.performIdentification(null, false)
   }
 
-  performIdentification = (songID = null) => {
+  performIdentification = (songID = null, includeArtistTitle = true) => {
+    const body = {
+      video: this.props.video,
+      songID: songID,
+    }
+
+    if (includeArtistTitle) {
+      body.artist = this.state.artist
+      body.title = this.state.title
+    }
+
     api('POST', 'youtubeidentify', {
-      body: {
-        video: this.props.video,
-        artist: this.state.artist,
-        title: this.state.title,
-        songID: songID,
-      }
+      body
     })
       .then((response) => {
         this.setState({
