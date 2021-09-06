@@ -2,16 +2,15 @@
 
 ### New
 - **(app)** User management interface!
-- **(app)** CD+Graphics backgrounds are now content-aware for better visuals and readability
-- **(app)** Media folders can now be prioritized via drag-and-drop
-- **(app)** Summary is now shown following a media scan
+- **(app)** CD+Graphics background size is content-aware
+- **(app)** Media folders can be prioritized via drag-and-drop
 - **(app)** Added ~370 visualizer presets (now 472 total)
+- **(app)** Summary is shown following a media scan
 - **(server)** Support for custom URL base path (see `--urlPath` CLI option)
 - **(server)** Reduced load and improved client connection speed via library caching
 
 ### Changed
 
-- **(app)** **(breaking)** Browsers without the [ResizeObserver API](https://caniuse.com/#feat=mdn-api_resizeobserver) are no longer supported
 - **(server)** Uses one less process/helper
 - **(server)** Media scanner performance is greatly improved when adding media
 - **(server)** Media scanner process is restricted to read-only database access
