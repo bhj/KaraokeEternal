@@ -1,3 +1,4 @@
+/* eslint-disable promise/no-nesting */
 const path = require('path')
 const fs = require('fs')
 const { promisify } = require('util')

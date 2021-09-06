@@ -58,6 +58,9 @@ Database.open({ readonly: false, env }).then(db => {
   if (env.KF_SERVER_SCAN) {
     startScanner()
   }
+}).catch(err => {
+  log.error(err.message)
+  process.exit(1)
 })
 
 function startScanner () {
@@ -91,5 +94,8 @@ function shutdown (signal) {
   Database.close().then(() => {
     log.info('Goodbye for now...')
     process.exit(0)
+  }).catch(err => {
+    log.error(err.message)
+    process.exit(1)
   })
 }

@@ -31,6 +31,9 @@ Database.open({ readonly: true, log: log.info }).then(db => {
   })
 
   startScan()
+}).catch(err => {
+  log.error(err.message)
+  process.exit(1)
 })
 
 async function startScan () {
@@ -44,7 +47,7 @@ async function startScan () {
     await _Scanner.scan()
   } // end while
 
-  process.exit()
+  process.exit(0)
 }
 
 function cancelScan () {

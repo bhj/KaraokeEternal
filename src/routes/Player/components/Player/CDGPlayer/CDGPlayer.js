@@ -198,6 +198,7 @@ class CDGPlayer extends React.Component {
         this.lastBitmap = bitmap // cache for re-painting if canvas size changes
         this.paintCDG(bitmap)
       })
+      .catch(err => this.props.onError(err.message))
   }
 
   stopCDG = () => cancelAnimationFrame(this.frameId)

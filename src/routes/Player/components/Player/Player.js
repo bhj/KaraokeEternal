@@ -109,7 +109,9 @@ class Player extends React.Component {
       return null
     }
 
-    const isVisualizerActive = this.props.mediaType === 'cdg' && this.props.isWebGLSupported && this.props.visualizer.isEnabled
+    const isVisualizerActive = this.props.mediaType === 'cdg' &&
+      this.props.isWebGLSupported &&
+      this.props.visualizer.isEnabled
 
     return (
       <>
