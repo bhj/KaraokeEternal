@@ -31,8 +31,7 @@ const ACTION_HANDLERS = {
       })
     }
 
-    // not async!
-    Prefs.setPathPriority(payload)
+    await Prefs.setPathPriority(payload)
     log.info('%s re-prioritized media folders; pushing library to all', sock.user.name)
 
     await pushPrefs(sock)
