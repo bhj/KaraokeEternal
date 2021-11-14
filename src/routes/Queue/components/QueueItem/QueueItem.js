@@ -28,6 +28,7 @@ const QueueItem = props => {
   const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(props.errorMessage)), [dispatch, props.errorMessage])
   const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
   const handleStarClick = useCallback(() => dispatch(toggleSongStarred(props.songId)), [dispatch, props.songId])
+  const handleMoveClick = useCallback(() => props.onMoveClick(props.queueId), [dispatch, props.onMoveClick, props.queueId])
   const handleInfoClick = useCallback(() => dispatch(showSongInfo(props.songId)), [dispatch, props.songId])
   const handleRemoveClick = useCallback(() => dispatch(removeItem(props.queueId)), [dispatch, props.queueId])
 
@@ -73,6 +74,11 @@ const QueueItem = props => {
               <Icon size={44} icon={'STAR_FULL'}/>
             </ToggleAnimation>
           </div>
+          {props.isMovable &&
+            <div onClick={handleMoveClick} className={`${styles.btn} ${styles.active}`} data-hide>
+              <Icon icon='MOVE_TOP' size={44} />
+            </div>
+          }
           {props.isInfoable &&
             <div onClick={handleInfoClick} className={`${styles.btn} ${styles.active}`} data-hide>
               <Icon icon='INFO_OUTLINE' size={44} />
@@ -101,6 +107,7 @@ QueueItem.propTypes = {
   isCurrent: PropTypes.bool.isRequired,
   isErrored: PropTypes.bool.isRequired,
   isInfoable: PropTypes.bool.isRequired,
+  isMovable: PropTypes.bool.isRequired,
   isOwner: PropTypes.bool.isRequired,
   isPlayed: PropTypes.bool.isRequired,
   isRemovable: PropTypes.bool.isRequired,
@@ -114,6 +121,8 @@ QueueItem.propTypes = {
   userId: PropTypes.number.isRequired,
   userDisplayName: PropTypes.string.isRequired,
   wait: PropTypes.string,
+  // actions
+  onMoveClick: PropTypes.func.isRequired,
 }
 
 export default React.memo(QueueItem)

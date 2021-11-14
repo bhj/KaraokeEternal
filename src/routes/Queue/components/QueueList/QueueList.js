@@ -5,6 +5,8 @@ import QueueItem from '../QueueItem'
 import { formatSeconds } from 'lib/dateTime'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
+import { moveItem } from '../../modules/queue'
+
 import getPlayerHistory from '../../selectors/getPlayerHistory'
 import getRoundRobinQueue from '../../selectors/getRoundRobinQueue'
 import getWaits from '../../selectors/getWaits'
@@ -32,6 +34,10 @@ const QueueList = props => {
       containerRef.current.parentNode.scrollTop = QUEUE_ITEM_HEIGHT * i
     }
   }, [queue.result, queueId])
+
+  // actions
+  const dispatch = useDispatch()
+  const handleMoveClick = useCallback(qId => dispatch(moveItem(qId, queueId)), [dispatch, queueId])
 
   // build children array
   const items = queue.result.map(qId => {
@@ -66,6 +72,7 @@ const QueueList = props => {
           isCurrent={isCurrent}
           isErrored={isCurrent && isErrored}
           isInfoable={user.isAdmin}
+          isMovable={isUpcoming && (isOwner || user.isAdmin)}
           isOwner={isOwner}
           isPlayed={!isUpcoming && !isCurrent}
           isRemovable={isUpcoming && (isOwner || user.isAdmin)}
@@ -75,6 +82,8 @@ const QueueList = props => {
           pctPlayed={isCurrent ? position / duration * 100 : 0}
           title={songs.entities[item.songId].title}
           wait={formatSeconds(waits[qId], true)} // fuzzy
+          // actions
+          onMoveClick={handleMoveClick}
         />
       </CSSTransition>
     )

@@ -1,10 +1,19 @@
 import {
   LOGOUT,
   QUEUE_ADD,
+  QUEUE_MOVE,
   QUEUE_PUSH,
   QUEUE_REMOVE,
   _SUCCESS,
 } from 'shared/actionTypes'
+
+// set an item's prevQueueId
+export function moveItem (queueId, prevQueueId) {
+  return {
+    type: QUEUE_MOVE,
+    payload: { queueId, prevQueueId },
+  }
+}
 
 // add to queue
 export function queueSong (songId) {

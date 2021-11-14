@@ -5,6 +5,7 @@ const Rooms = require('../Rooms')
 
 const {
   QUEUE_ADD,
+  QUEUE_MOVE,
   QUEUE_REMOVE,
   QUEUE_PUSH,
 } = require('../../shared/actionTypes')
@@ -51,6 +52,33 @@ const ACTION_HANDLERS = {
     acknowledge({ type: QUEUE_ADD + '_SUCCESS' })
 
     // to all in room
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: QUEUE_PUSH,
+      payload: await Queue.get(sock.user.roomId)
+    })
+  },
+  [QUEUE_MOVE]: async (sock, { payload }, acknowledge) => {
+    const { queueId, prevQueueId } = payload
+
+    try {
+      await Rooms.validate(sock.user.roomId, null, { validatePassword: false })
+    } catch (err) {
+      return acknowledge({
+        type: QUEUE_MOVE + '_ERROR',
+        error: err.message,
+      })
+    }
+
+    await Queue.move({
+      prevQueueId,
+      queueId,
+      roomId: sock.user.roomId,
+    })
+
+    // success
+    acknowledge({ type: QUEUE_MOVE + '_SUCCESS' })
+
+    // tell room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
       payload: await Queue.get(sock.user.roomId)

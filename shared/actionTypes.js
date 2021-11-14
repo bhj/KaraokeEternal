@@ -15,8 +15,9 @@ module.exports = {
   LIBRARY_PUSH: 'library/PUSH',
   LIBRARY_PUSH_SONG: 'library/PUSH_SONG',
   // queue
-  QUEUE_PUSH: 'queue/PUSH',
   QUEUE_ADD: 'server/QUEUE_ADD',
+  QUEUE_MOVE: 'server/QUEUE_MOVE',
+  QUEUE_PUSH: 'queue/PUSH',
   QUEUE_REMOVE: 'server/QUEUE_REMOVE',
   // player internal
   PLAYER_UPDATE: 'player/UPDATE',
