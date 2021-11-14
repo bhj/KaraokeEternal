@@ -115,14 +115,14 @@ config.module.rules.push({
 
 // Global Style
 config.module.rules.push({
-  test : /(global)\.css$/,
-  use  : [{
-    loader : MiniCssExtractPlugin.loader,
+  test: /(global)\.css$/,
+  use: [{
+    loader: MiniCssExtractPlugin.loader,
   }, {
-    loader  : 'css-loader',
-    options : {
-      modules   : false,
-      sourceMap : false,
+    loader: 'css-loader',
+    options: {
+      modules: false,
+      sourceMap: false,
     }
   }],
 })
@@ -130,10 +130,10 @@ config.module.rules.push({
 // CSS Modules
 config.module.rules.push({
   test: /\.css$/,
-  exclude : /(global)\.css$/,
+  exclude: /(global)\.css$/,
   use: [
     {
-      loader : MiniCssExtractPlugin.loader,
+      loader: MiniCssExtractPlugin.loader,
     }, {
       loader: 'css-loader',
       options: {
@@ -148,26 +148,26 @@ config.module.rules.push({
 // Files
 config.module.rules.push(
   {
-    test    : /\.woff2(\?.*)?$/,
-    loader  : 'url-loader',
-    options : {
-      limit    : '10000',
-      mimetype : 'application/font-woff2'
+    test: /\.woff2(\?.*)?$/,
+    loader: 'url-loader',
+    options: {
+      limit: '10000',
+      mimetype: 'application/font-woff2'
     }
   },
   {
-    test    : /\.svg(\?.*)?$/,
-    loader  : 'url-loader',
-    options : {
-      limit    : '10000',
-      mimetype : 'image/svg+xml'
+    test: /\.svg(\?.*)?$/,
+    loader: 'url-loader',
+    options: {
+      limit: '10000',
+      mimetype: 'image/svg+xml'
     }
   },
   {
-    test    : /\.(png|jpg|gif)$/,
-    loader  : 'url-loader',
-    options : {
-      limit : '8192'
+    test: /\.(png|jpg|gif)$/,
+    loader: 'url-loader',
+    options: {
+      limit: '8192'
     }
   }
 )
