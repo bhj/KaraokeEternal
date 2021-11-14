@@ -36,6 +36,7 @@ class Database {
       })
 
       await db.run('PRAGMA journal_mode = WAL;')
+      await db.run('PRAGMA foreign_keys = ON;')
     }
 
     _db = db
