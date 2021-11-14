@@ -16,7 +16,7 @@ import { toggleSongStarred } from 'store/modules/userStars'
 import { showErrorMessage } from 'store/modules/ui'
 
 const QueueItem = props => {
-  const [isExpanded, setExpanded] = useState(true)
+  const [isExpanded, setExpanded] = useState(false)
 
   const handleSwipedLeft = useCallback(() => {
     setExpanded(props.isErrored || props.isInfoable || props.isRemovable || props.isSkippable)
