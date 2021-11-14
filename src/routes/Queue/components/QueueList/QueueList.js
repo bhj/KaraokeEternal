@@ -6,7 +6,7 @@ import { formatSeconds } from 'lib/dateTime'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import getPlayerHistory from '../../selectors/getPlayerHistory'
-import getOrderedQueue from '../../selectors/getOrderedQueue'
+import getRoundRobinQueue from '../../selectors/getRoundRobinQueue'
 import getWaits from '../../selectors/getWaits'
 
 import styles from './QueueList.css'
@@ -19,7 +19,7 @@ const QueueList = props => {
   const { errorMessage, isAtQueueEnd, isErrored, position, queueId } = useSelector(state => state.status)
 
   const playerHistory = useSelector(getPlayerHistory)
-  const queue = useSelector(getOrderedQueue)
+  const queue = useSelector(getRoundRobinQueue)
   const songs = useSelector(state => state.songs)
   const starredSongs = useSelector(state => ensureState(state.userStars).starredSongs)
   const user = useSelector(state => state.user)

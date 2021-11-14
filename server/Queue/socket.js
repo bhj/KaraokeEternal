@@ -27,6 +27,15 @@ const ACTION_HANDLERS = {
     fields.set('roomId', sock.user.roomId)
     fields.set('songId', payload.songId)
     fields.set('userId', sock.user.userId)
+    fields.set('prevQueueId', sql`(
+      SELECT queueId
+      FROM queue
+      WHERE roomId = ${sock.user.roomId} AND queueId NOT IN (
+        SELECT prevQueueId
+        FROM queue
+        WHERE prevQueueId IS NOT NULL
+      )
+    )`)
 
     const query = sql`
       INSERT INTO queue ${sql.tuple(Array.from(fields.keys()).map(sql.column))}

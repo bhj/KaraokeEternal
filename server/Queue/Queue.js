@@ -14,7 +14,7 @@ class Queue {
     const entities = {}
 
     const query = sql`
-      SELECT queueId, songId, userId,
+      SELECT queueId, songId, userId, prevQueueId,
         media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
         users.name AS userDisplayName, users.dateUpdated,
         MAX(isPreferred) AS isPreferred

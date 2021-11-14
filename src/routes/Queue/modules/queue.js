@@ -36,15 +36,19 @@ const ACTION_HANDLERS = {
   }),
   [QUEUE_ADD]: (state, { payload }) => {
     // optimistic
-    // @todo: should probably use a result.length + rand index to avoid possible collision?
-    const fakeQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 0
+    const nextQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 1
 
     return {
       ...state,
-      result: [...state.result, fakeQueueId],
+      result: [...state.result, nextQueueId],
       entities: {
         ...state.entities,
-        [fakeQueueId]: { ...payload, isOptimistic: true },
+        [nextQueueId]: {
+          ...payload,
+          queueId: nextQueueId,
+          prevQueueId: nextQueueId - 1 || null,
+          isOptimistic: true
+        },
       }
     }
   },
