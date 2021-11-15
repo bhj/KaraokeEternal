@@ -7,11 +7,10 @@ UPDATE queue
 SET prevQueueId = (
 	SELECT MAX(q.queueId)
 	FROM queue q
-	WHERE q.queueId < queue.queueId
-	  AND q.roomId = queue.roomId
-  )
+	WHERE q.queueId < queue.queueId AND q.roomId = queue.roomId
+);
 
 -- Down
-DROP INDEX IF EXISTS idxPrevQueueId
+DROP INDEX IF EXISTS idxPrevQueueId;
 
-ALTER TABLE "queue" DROP COLUMN "prevQueueId"
+ALTER TABLE "queue" DROP COLUMN "prevQueueId";
