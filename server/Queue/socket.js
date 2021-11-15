@@ -85,25 +85,13 @@ const ACTION_HANDLERS = {
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
-    let whereClause = sql`queueId = ${payload.queueId} AND roomId = ${sock.user.roomId}`
+    const { queueId } = payload
 
-    // admins can remove any
-    if (!sock.user.isAdmin) {
-      whereClause = sql`${whereClause} AND userId = ${sock.user.userId}`
-    }
-
-    const query = sql`
-      DELETE FROM queue
-      WHERE ${whereClause}
-    `
-    const res = await db.run(String(query), query.parameters)
-
-    if (!res.changes) {
-      return acknowledge({
-        type: QUEUE_REMOVE + '_ERROR',
-        error: 'Could not remove queueId: ' + payload.queueId,
-      })
-    }
+    await Queue.remove({
+      queueId,
+      roomId: sock.user.roomId,
+      userId: sock.user.isAdmin ? undefined : sock.user.userId,
+    })
 
     // success
     acknowledge({ type: QUEUE_REMOVE + '_SUCCESS' })

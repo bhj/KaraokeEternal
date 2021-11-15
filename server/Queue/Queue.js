@@ -41,6 +41,11 @@ class Queue {
     return { result, entities }
   }
 
+  /**
+   * Move a queue item
+   * @param  {object}      prevQueueId, queueId, roomId
+   * @return {Promise}     undefined
+   */
   static async move ({ prevQueueId, queueId, roomId }) {
     if (queueId === prevQueueId) {
       throw new Error('Invalid prevQueueId')
@@ -78,6 +83,51 @@ class Queue {
       WHERE roomId = ${roomId}
     `
     await db.run(String(query), query.parameters)
+  }
+
+  /**
+   * Delete a queue item
+   * @param  {object}      queueId, roomId, userId
+   * @return {Promise}     undefined
+   */
+  static async remove ({ queueId, roomId, userId }) {
+    // close the soon-to-be gap first
+    // @todo: once RETURNING is supported we could do the
+    // deletion first and get the deleted item's prevQueueId
+    const updateQuery = sql`
+      UPDATE queue
+      SET prevQueueId = curParent
+      FROM (
+        SELECT
+          (
+            SELECT prevQueueId
+            FROM queue
+            WHERE queueId = ${queueId}
+          ) AS curParent,
+          (
+            SELECT queueId
+            FROM queue
+            WHERE prevQueueId = ${queueId}
+          ) AS curChild
+      )
+      WHERE queueId = curChild
+        AND roomId = ${roomId}
+        ${typeof userId === 'number' ? sql`AND userId = ${userId}` : sql``}
+    `
+    await db.run(String(updateQuery), updateQuery.parameters)
+
+    // delete item
+    const deleteQuery = sql`
+      DELETE FROM queue
+      WHERE queueId = ${queueId}
+        AND roomId = ${roomId}
+        ${typeof userId === 'number' ? sql`AND userId = ${userId}` : sql``}
+    `
+    const deleteRes = await db.run(String(deleteQuery), deleteQuery.parameters)
+
+    if (!deleteRes.changes) {
+      throw new Error(`Could not remove queueId: ${queueId}`)
+    }
   }
 
   /**

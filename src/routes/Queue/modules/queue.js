@@ -30,7 +30,6 @@ export function queueSong (songId) {
 export function removeItem (queueId) {
   return {
     type: QUEUE_REMOVE,
-    meta: { isOptimistic: true },
     payload: { queueId },
   }
 }
@@ -59,16 +58,6 @@ const ACTION_HANDLERS = {
           isOptimistic: true
         },
       }
-    }
-  },
-  [QUEUE_REMOVE]: (state, { payload }) => {
-    // optimistic
-    const result = state.result.slice()
-    result.splice(result.indexOf(payload.queueId), 1)
-
-    return {
-      ...state,
-      result,
     }
   },
   [QUEUE_PUSH]: (state, { payload }) => ({
