@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { requestScanStop } from 'store/modules/prefs'
-import getOrderedQueue from 'routes/Queue/selectors/getOrderedQueue'
+import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import PlaybackCtrl from './PlaybackCtrl'
 import ProgressBar from './ProgressBar'
 import UpNext from './UpNext'
@@ -18,7 +18,7 @@ const getSongs = (state) => state.songs
 const getUserId = (state) => state.user.userId
 
 const getUserWait = createSelector(
-  [getOrderedQueue, getSongs, getQueueId, getPosition, getUserId],
+  [getRoundRobinQueue, getSongs, getQueueId, getPosition, getUserId],
   (queue, songs, queueId, pos, userId) => {
     if (!queue.entities[queueId]) return // queueItem not found
     if (!songs.entities[queue.entities[queueId].songId]) return // song not found
@@ -39,7 +39,7 @@ const getUserWait = createSelector(
 )
 
 const getStatusProps = createSelector(
-  [getOrderedQueue, getQueueId, getIsAtQueueEnd, getUserId],
+  [getRoundRobinQueue, getQueueId, getIsAtQueueEnd, getUserId],
   (queue, queueId, isAtQueueEnd, userId) => {
     const { result, entities } = queue
     const curIdx = result.indexOf(queueId)

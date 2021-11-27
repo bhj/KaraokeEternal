@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect'
-import getOrderedQueue from './getOrderedQueue'
+import getRoundRobinQueue from './getRoundRobinQueue'
 
 const getPosition = (state) => state.status.position
-const getQueue = (state) => getOrderedQueue(state)
+const getQueue = (state) => getRoundRobinQueue(state)
 const getQueueId = (state) => state.status.queueId
 const getSongs = (state) => state.songs
 
