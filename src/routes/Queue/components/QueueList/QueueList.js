@@ -37,7 +37,20 @@ const QueueList = props => {
 
   // actions
   const dispatch = useDispatch()
-  const handleMoveClick = useCallback(qId => dispatch(moveItem(qId, queueId)), [dispatch, queueId])
+  const handleMoveClick = useCallback(qId => {
+    // reference user's last-played item as the new prevQueueId
+    const userId = queue.entities[qId].userId
+    let lastPlayed = queueId // default in case user has no played items
+
+    for (let i = queue.result.indexOf(queueId); i >= 0; i--) {
+      if (queue.entities[queue.result[i]].userId === userId) {
+        lastPlayed = queue.result[i]
+        break
+      }
+    }
+
+    dispatch(moveItem(qId, lastPlayed))
+  }, [dispatch, queueId, queue.entities, queue.result])
 
   // build children array
   const items = queue.result.map(qId => {
