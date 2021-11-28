@@ -7,9 +7,6 @@ const getQueueId = (state) => state.status.queueId
 const getRoundRobinQueue = createSelector(
   [getOrderedQueue, getPlayerHistory, getQueueId],
   ({ result, entities }, history, curId) => {
-    // consider the current item played
-    if (curId !== -1) history.push(curId)
-
     // in case queue hasn't been pushed yet,
     // or history references non-existent items
     history = history.filter(queueId => result.includes(queueId))
