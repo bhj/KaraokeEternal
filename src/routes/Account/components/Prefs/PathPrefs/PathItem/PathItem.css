@@ -15,6 +15,7 @@
 }
 
 .btnClear {
+  cursor: pointer;
   fill: var(--btn-danger-bg-color);
 }
 

@@ -34,8 +34,9 @@
 
 .folderStarred {
   composes: folder;
-  color: var(  --artist-folder-starred-color);
+  color: var(--artist-folder-starred-color);
   fill: var(--artist-folder-starred-bg-color);
+  filter: var(--artist-folder-starred-filter);
 }
 
 .count {

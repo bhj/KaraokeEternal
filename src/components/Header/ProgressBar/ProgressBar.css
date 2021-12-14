@@ -22,11 +22,13 @@
 }
 
 .cancel {
+  composes: btn;
   fill: var(--btn-danger-bg-color);
   filter: var(--btn-danger-filter);
 }
 
 .close {
+  composes: btn;
   fill: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }

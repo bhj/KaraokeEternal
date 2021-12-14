@@ -23,9 +23,18 @@
 
   --btn-bg-color: hsl(var(--hue-blue), 40%, 30%);
   --btn-active-bg-color: var(--link-color);
-  --btn-active-filter: none;
+  --btn-active-filter: drop-shadow(0 0 10px hsla(var(--hue-blue), 100%, 100%, .5));
+  --btn-activate-filter:
+    drop-shadow(-5px 0 10px var(--btn-active-bg-color))
+    drop-shadow(5px 0 10px var(--btn-active-bg-color))
+    drop-shadow(0 0 10px var(--btn-active-bg-color));
+
   --btn-danger-bg-color: hsl(var(--hue-pink), 60%, 57%);
-   --btn-danger-filter: none;
+  --btn-danger-filter: drop-shadow(0 0 10px hsla(var(--hue-pink), 100%, 100%, .5));
+  --btn-danger-activate-filter:
+    drop-shadow(-5px 0 10px hsl(var(--hue-pink), 60%, 70%))
+    drop-shadow(5px 0 10px hsl(var(--hue-pink), 60%, 70%))
+    drop-shadow(0 0 10px hsl(var(--hue-pink), 60%, 70%));
 
   /* UI chrome (header/footer) */
   --chrome-bg-color: hsla(var(--hue-blue), 100%, 5%, .8);
@@ -37,6 +46,7 @@
   --nav-link-color: var(--btn-bg-color);
   --nav-active-color: var(--link-color);
   --nav-active-filter: var(--btn-active-filter);
+  --animation-nav-activate: var(--animation-btn-activate);
 
   /* Library */
   --artist-item-height: 44px;
@@ -44,6 +54,7 @@
   --artist-folder-bg-color: hsl(var(--hue-blue), 90%, 25%);
   --artist-folder-starred-color: #000;
   --artist-folder-starred-bg-color: var(--link-color);
+  --artist-folder-starred-filter: var(--btn-active-filter);
 
   --song-item-btn-width: 44px;
   --song-item-btn-height: 44px;
@@ -102,8 +113,8 @@
   --function-ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
   --animation-bounce: bounce .25s ease-out;
   --animation-text-shadow-glow: glow .25s ease-out;
-
-  /* Glow */
+  --animation-btn-activate: btn-activate .15s ease-out;
+  --animation-btn-danger-activate: btn-danger-activate .15s ease-out;
   --text-shadow-glow: 0 0 .25em hsl(var(--hue-pink), 100%, 50%), 0 0 .5em hsl(var(--hue-pink), 100%, 50%);
 }
 
@@ -118,4 +129,14 @@
   from { text-shadow: none; }
   25% { text-shadow: 0 0 4px hsl(var(--hue-pink), 100%, 100%), 0 0 8px hsl(var(--hue-pink), 100%, 100%), 0 0 12px hsl(var(--hue-pink), 100%, 100%); }
   to { text-shadow: var(--text-shadow-glow); }
+}
+
+@keyframes btn-activate {
+  from { filter: var(--btn-activate-filter); }
+  to { filter: none; }
+}
+
+@keyframes btn-danger-activate {
+  from { filter: var(--btn-danger-activate-filter); }
+  to { filter: none; }
 }

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { Draggable } from 'react-beautiful-dnd'
+import Button from 'components/Button'
 import Icon from 'components/Icon'
 import styles from './PathItem.css'
 
@@ -17,14 +18,18 @@ const PathItem = props => {
           {...provided.draggableProps}
         >
           <div {...provided.dragHandleProps}>
-            <Icon icon={'DRAG_INDICATOR'} size={24} className={styles.btnDrag} />
+            <Icon icon='DRAG_INDICATOR' size={24} className={styles.btnDrag} />
           </div>
           <div className={styles.pathName}>
             {path}
           </div>
-          <div data-path-id={pathId} onClick={props.onRemove} className={styles.btnClear}>
-            <Icon icon='CLEAR' size={32} />
-          </div>
+          <Button
+            className={styles.btnClear}
+            data-path-id={pathId}
+            icon='CLEAR'
+            onClick={props.onRemove}
+            size={32}
+          />
         </div>
       )}
     </Draggable>

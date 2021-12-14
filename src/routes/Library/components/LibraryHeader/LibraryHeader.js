@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Icon from 'components/Icon'
+import Button from 'components/Button'
 import styles from './LibraryHeader.css'
 
 class LibraryHeader extends React.Component {
@@ -37,9 +37,12 @@ class LibraryHeader extends React.Component {
 
     return (
       <div className={styles.container}>
-        <div onClick={this.handleMagnifierClick} className={filterStr ? styles.btnActive : styles.btn}>
-          <Icon icon='MAGNIFIER' size={40}/>
-        </div>
+        <Button
+          className={filterStr ? styles.btnActive : styles.btn}
+          icon='MAGNIFIER'
+          onClick={this.handleMagnifierClick}
+          size={40}
+        />
         <input type='search'
           className={styles.searchInput}
           placeholder='search'
@@ -48,14 +51,20 @@ class LibraryHeader extends React.Component {
           ref={this.searchInput}
         />
         {filterStr &&
-          <div onClick={this.clearSearch} className={styles.btnActive}>
-            <Icon icon='CLEAR' size={40}/>
-          </div>
+          <Button
+            icon='CLEAR'
+            onClick={this.clearSearch}
+            className={styles.btnActive}
+            size={40}
+          />
         }
-
-        <div onClick={this.props.toggleFilterStarred} className={filterStarred ? styles.btnActive : styles.btn}>
-          <Icon icon='STAR_FULL' size={44}/>
-        </div>
+        <Button
+          animateClassName={styles.btnAnimate}
+          className={filterStarred ? styles.btnActive : styles.btn}
+          icon='STAR_FULL'
+          onClick={this.props.toggleFilterStarred}
+          size={44}
+        />
       </div>
     )
   }

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import Button from 'components/Button'
 import Icon from 'components/Icon'
 import loadImage from 'blueimp-load-image'
 import styles from './UserImage.css'
@@ -31,17 +32,28 @@ export default class UserImage extends Component {
         }
 
         {this.state.imageURL &&
-            <img src={this.state.imageURL} width={96} height={72}
-              onLoad={this.handleImgLoad}
-              onError={this.handleImgError}
-            />
+          <img src={this.state.imageURL} width={96} height={72}
+            onLoad={this.handleImgLoad}
+            onError={this.handleImgError}
+          />
         }
 
         {this.state.imageURL && !this.state.isLoading &&
-            <Icon icon='CLEAR' size={32} onClick={this.handleImgClear} className={styles.btnClear}/>
+          <Button
+            className={styles.btnClear}
+            icon='CLEAR'
+            onClick={this.handleImgClear}
+            size={32}
+          />
         }
 
-        <input type='file' accept='image/*' onChange={this.handleChoose} className={styles.fileInput} tabIndex='-1'/>
+        <input
+          type='file'
+          accept='image/*'
+          onChange={this.handleChoose}
+          className={styles.fileInput}
+          tabIndex='-1'
+        />
       </div>
     )
   }

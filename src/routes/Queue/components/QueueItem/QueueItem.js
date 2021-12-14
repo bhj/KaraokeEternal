@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import Button from 'components/Button'
 import Buttons from 'components/Buttons'
 import Icon from 'components/Icon'
 import Swipeable from 'components/Swipeable'
@@ -64,29 +65,46 @@ const QueueItem = props => {
 
         <Buttons btnWidth={50} isExpanded={isExpanded}>
           {props.isErrored &&
-            <div onClick={handleErrorInfoClick} className={`${styles.btn} ${styles.danger}`}>
-              <Icon icon='INFO_OUTLINE' size={44} />
-            </div>
+            <Button
+              className={`${styles.btn} ${styles.danger}`}
+              icon='INFO_OUTLINE'
+              onClick={handleErrorInfoClick}
+              size={44}
+            />
           }
-          <div onClick={handleStarClick} className={`${styles.btn} ${props.isStarred ? styles.active : ''}`}>
-            <ToggleAnimation toggle={props.isStarred} className={styles.animateStar}>
-              <Icon size={44} icon={'STAR_FULL'}/>
-            </ToggleAnimation>
-          </div>
+          <Button
+            animateClassName={styles.animateStar}
+            className={`${styles.btn} ${props.isStarred ? styles.active : ''}`}
+            icon={'STAR_FULL'}
+            onClick={handleStarClick}
+            size={44}
+          />
           {props.isInfoable &&
-            <div onClick={handleInfoClick} className={`${styles.btn} ${styles.active}`} data-hide>
-              <Icon icon='INFO_OUTLINE' size={44} />
-            </div>
+            <Button
+              className={`${styles.btn} ${styles.active}`}
+              data-hide
+              icon='INFO_OUTLINE'
+              onClick={handleInfoClick}
+              size={44}
+            />
           }
           {props.isRemovable &&
-            <div onClick={handleRemoveClick} className={`${styles.btn} ${styles.danger}`} data-hide>
-              <Icon icon='CLEAR' size={44} />
-            </div>
+            <Button
+              className={`${styles.btn} ${styles.danger}`}
+              data-hide
+              icon='CLEAR'
+              onClick={handleRemoveClick}
+              size={44}
+            />
           }
           {props.isSkippable &&
-            <div onClick={handleSkipClick} className={`${styles.btn} ${styles.danger}`} data-hide>
-              <Icon icon='PLAY_NEXT' size={44} />
-            </div>
+            <Button
+              className={`${styles.btn} ${styles.danger}`}
+              data-hide
+              icon='PLAY_NEXT'
+              onClick={handleSkipClick}
+              size={44}
+            />
           }
         </Buttons>
       </div>

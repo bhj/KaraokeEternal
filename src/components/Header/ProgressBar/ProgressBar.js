@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import Icon from 'components/Icon'
+import Button from 'components/Button'
 import styles from './ProgressBar.css'
 
 export default class ProgressBar extends React.Component {
@@ -41,9 +41,12 @@ export default class ProgressBar extends React.Component {
     return (
       <div className={styles.container} style={{ backgroundSize: props.pct + '% 100%' }}>
         <p className={styles.text}>{state.isCanceling ? 'Stopping...' : props.text}</p>
-        <div className={styles.btn} onClick={this.handleCancelClick}>
-          <Icon icon='CLEAR' size={40} className={props.isActive ? styles.cancel : styles.close} />
-        </div>
+        <Button
+          className={props.isActive ? styles.cancel : styles.close}
+          icon='CLEAR'
+          onClick={this.handleCancelClick}
+          size={40}
+        />
       </div>
     )
   }

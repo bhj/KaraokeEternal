@@ -23,6 +23,10 @@
   filter: var(--nav-active-filter);
 }
 
+.btnAnimate {
+  animation: var(--animation-nav-activate);
+}
+
 .shadow {
   filter: drop-shadow(0px 1px 0px hsl(var(--hue-blue), 100%, 30%));
 }

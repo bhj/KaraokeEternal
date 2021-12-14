@@ -81,4 +81,5 @@
 
 .info {
   fill: var(--song-item-btn-active-bg-color);
+  filter: var(--song-item-btn-active-filter);
 }

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import Highlighter from 'react-highlight-words'
+import Button from 'components/Button'
 import Buttons from 'components/Buttons'
-import Icon from 'components/Icon'
 import Swipeable from 'components/Swipeable'
 import ToggleAnimation from 'components/ToggleAnimation'
 import { formatDuration } from 'lib/dateTime'
@@ -59,17 +59,24 @@ export default class SongItem extends React.Component {
         </ToggleAnimation>
 
         <Buttons btnWidth={50} isExpanded={state.isExpanded}>
-          <div onClick={this.handleStarClick} className={`${styles.btn} ${styles.star}`}>
-            <ToggleAnimation toggle={props.isStarred} className={styles.animateStar}>
-              <Icon size={44} icon={'STAR_FULL'} className={props.isStarred ? styles.starStarred : styles.star}/>
-            </ToggleAnimation>
+          <Button
+            animateClassName={styles.animateStar}
+            className={`${styles.btn} ${props.isStarred ? styles.starStarred : styles.star}`}
+            onClick={this.handleStarClick}
+            icon='STAR_FULL'
+            size={44}
+          >
             <div className={props.isStarred ? styles.starCountStarred : styles.starCount}>
               {props.numStars ? props.numStars : ''}
             </div>
-          </div>
-          <div onClick={this.handleInfoClick} className={styles.btn} data-hide>
-            <Icon size={44} icon='INFO_OUTLINE' className={`${styles.btn} ${styles.info}`}/>
-          </div>
+          </Button>
+          <Button
+            className={`${styles.btn} ${styles.info}`}
+            data-hide
+            icon='INFO_OUTLINE'
+            onClick={this.handleInfoClick}
+            size={44}
+          />
         </Buttons>
       </Swipeable>
     )

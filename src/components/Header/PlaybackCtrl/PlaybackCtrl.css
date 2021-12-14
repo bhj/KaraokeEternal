@@ -10,6 +10,10 @@
   filter: var(--transport-btn-filter);
 }
 
+.btnAnimate {
+  animation: var(--animation-btn-danger-activate);
+}
+
 .play {
   composes: btn;
 }
@@ -26,9 +30,11 @@
 .displayCtrl {
   composes: btn;
   fill: var(--btn-active-bg-color);
+  filter: var(--btn-active-filter);
 }
 
 .fullscreen {
   composes: btn;
   fill: var(--btn-active-bg-color);
+  filter: var(--btn-active-filter);
 }
