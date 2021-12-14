@@ -27,7 +27,6 @@
   },
   "rules": {
     "comma-dangle"         : [0, "always-multiline"],
-    "max-len"              : [2, 120, 2],
     "promise/always-return": 0,
   },
   "settings": {
