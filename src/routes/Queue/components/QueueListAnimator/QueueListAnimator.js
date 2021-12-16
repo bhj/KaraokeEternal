@@ -15,6 +15,8 @@ const handleExit = (el, i, removeEl) => {
   el.classList.add(styles.itemExit)
 }
 
+const handleShouldFlip = (prev, cur) => cur === prev
+
 const QueueListAnimator = ({ children }) => {
   const headerHeight = useSelector(state => state.ui.headerHeight)
 
@@ -25,7 +27,7 @@ const QueueListAnimator = ({ children }) => {
         key={child.key}
         onAppear={handleEnter}
         onExit={handleExit}
-        shouldFlip={(prev, cur) => cur === prev}
+        shouldFlip={handleShouldFlip}
         stagger
       >
         <div>
