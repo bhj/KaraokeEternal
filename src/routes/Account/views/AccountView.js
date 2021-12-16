@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types'
-import React, { useEffect, useLayoutEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchPrefs } from 'store/modules/prefs'
 import SignedInView from './SignedInView'
@@ -7,8 +6,6 @@ import SignedOutView from './SignedOutView'
 import styles from './AccountView.css'
 
 const AccountView = props => {
-  useLayoutEffect(() => props.setHeader(null))
-
   const isSignedIn = useSelector(state => state.user.userId !== null)
   const ui = useSelector(state => state.ui)
   const dispatch = useDispatch()
@@ -35,10 +32,6 @@ const AccountView = props => {
       }
     </div>
   )
-}
-
-AccountView.propTypes = {
-  setHeader: PropTypes.func.isRequired,
 }
 
 export default AccountView

@@ -1,10 +1,10 @@
-import PropTypes from 'prop-types'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { Route, useLocation } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { requestScanStop } from 'store/modules/prefs'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
+import LibraryHeader from 'routes/Library/components/LibraryHeader'
 import PlaybackCtrl from './PlaybackCtrl'
 import ProgressBar from './ProgressBar'
 import UpNext from './UpNext'
@@ -54,8 +54,6 @@ const getStatusProps = createSelector(
 
 // component
 const Header = React.forwardRef((props, ref) => {
-  const CustomHeader = props.customHeader
-
   const isAdmin = useSelector(state => state.user.isAdmin)
   const isPlayerPresent = useSelector(state => state.status.isPlayerPresent)
   const isScanning = useSelector(state => state.prefs.isScanning)
@@ -89,16 +87,13 @@ const Header = React.forwardRef((props, ref) => {
         />
       }
 
-      {props.customHeader &&
-        <CustomHeader/>
-      }
+      <Route exact path='/library'>
+        <LibraryHeader/>
+      </Route>
     </div>
   )
 })
 
 Header.displayName = 'Header'
-Header.propTypes = {
-  customHeader: PropTypes.object,
-}
 
 export default Header

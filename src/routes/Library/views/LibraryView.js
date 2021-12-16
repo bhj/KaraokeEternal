@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import LibraryHeader from '../components/LibraryHeader'
 import ArtistList from '../components/ArtistList'
 import SearchResults from '../components/SearchResults'
 import TextOverlay from 'components/TextOverlay'
@@ -10,7 +9,6 @@ import styles from './LibraryView.css'
 
 const LibraryView = (props) => {
   const { isAdmin, isEmpty, isLoading, isSearching } = props
-  React.useLayoutEffect(() => props.setHeader(LibraryHeader))
 
   return (
     <>
@@ -43,7 +41,6 @@ LibraryView.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isSearching: PropTypes.bool.isRequired,
   isEmpty: PropTypes.bool.isRequired,
-  setHeader: PropTypes.func.isRequired,
 }
 
 export default LibraryView

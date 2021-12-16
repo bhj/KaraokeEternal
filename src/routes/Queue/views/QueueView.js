@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
@@ -9,8 +8,6 @@ import TextOverlay from 'components/TextOverlay'
 import styles from './QueueView.css'
 
 const QueueView = (props) => {
-  React.useLayoutEffect(() => props.setHeader(null))
-
   const { innerWidth, innerHeight, headerHeight, footerHeight } = useSelector(state => state.ui)
   const isInRoom = useSelector(state => !!state.user.roomId)
   const queue = useSelector(state => ensureState(state.queue))
@@ -43,10 +40,6 @@ const QueueView = (props) => {
       <QueueList />
     </div>
   )
-}
-
-QueueView.propTypes = {
-  setHeader: PropTypes.func.isRequired,
 }
 
 export default QueueView
