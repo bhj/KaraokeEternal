@@ -1,5 +1,7 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 import { Flipper, Flipped } from 'react-flip-toolkit'
+import { useSelector } from 'react-redux'
 import styles from './QueueListAnimator.css'
 
 const handleEnter = (el, i) => {
@@ -14,13 +16,16 @@ const handleExit = (el, i, removeEl) => {
 }
 
 const QueueListAnimator = ({ children }) => {
+  const headerHeight = useSelector(state => state.ui.headerHeight)
+
   const items = React.Children.map(children, child => {
     return (
       <Flipped
-        key={child.key}
         flipId={child.key}
+        key={child.key}
         onAppear={handleEnter}
         onExit={handleExit}
+        shouldFlip={(prev, cur) => cur === prev}
         stagger
       >
         <div>
@@ -31,10 +36,18 @@ const QueueListAnimator = ({ children }) => {
   })
 
   return (
-    <Flipper flipKey={children} applyTransformOrigin={false}>
+    <Flipper
+      applyTransformOrigin={false}
+      decisionData={headerHeight}
+      flipKey={children}
+    >
       {items}
     </Flipper>
   )
+}
+
+QueueListAnimator.propTypes = {
+  children: PropTypes.node,
 }
 
 export default QueueListAnimator
