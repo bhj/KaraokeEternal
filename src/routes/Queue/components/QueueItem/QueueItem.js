@@ -28,9 +28,13 @@ const QueueItem = props => {
   const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(props.errorMessage)), [dispatch, props.errorMessage])
   const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
   const handleStarClick = useCallback(() => dispatch(toggleSongStarred(props.songId)), [dispatch, props.songId])
-  const handleMoveClick = useCallback(() => props.onMoveClick(props.queueId), [dispatch, props.onMoveClick, props.queueId])
   const handleInfoClick = useCallback(() => dispatch(showSongInfo(props.songId)), [dispatch, props.songId])
   const handleRemoveClick = useCallback(() => dispatch(removeItem(props.queueId)), [dispatch, props.queueId])
+
+  const handleMoveClick = useCallback(() => {
+    props.onMoveClick(props.queueId)
+    setExpanded(false)
+  }, [dispatch, props.onMoveClick, props.queueId])
 
   return (
     <Swipeable
