@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useSwipeable } from 'react-swipeable'
 
 import Buttons from 'components/Buttons'
 import Icon from 'components/Icon'
-import Swipeable from 'components/Swipeable'
 import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
 import styles from './QueueItem.css'
@@ -15,92 +15,114 @@ import { queueSong, removeItem } from '../../modules/queue'
 import { toggleSongStarred } from 'store/modules/userStars'
 import { showErrorMessage } from 'store/modules/ui'
 
-const QueueItem = props => {
+const QueueItem = ({
+  artist,
+  dateUpdated,
+  errorMessage,
+  isCurrent,
+  isErrored,
+  isInfoable,
+  isMovable,
+  isOwner,
+  isPlayed,
+  isRemovable,
+  isSkippable,
+  isStarred,
+  isUpcoming,
+  onMoveClick,
+  pctPlayed,
+  queueId,
+  songId,
+  title,
+  userId,
+  userDisplayName,
+  wait,
+  ...props
+}) => {
   const [isExpanded, setExpanded] = useState(false)
 
-  const handleSwipedLeft = useCallback(() => {
-    setExpanded(props.isErrored || props.isInfoable || props.isRemovable || props.isSkippable)
-  }, [props.isErrored, props.isInfoable, props.isRemovable, props.isSkippable])
-
-  const handleSwipedRight = useCallback(() => setExpanded(false), [])
-
   const dispatch = useDispatch()
-  const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(props.errorMessage)), [dispatch, props.errorMessage])
+  const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(errorMessage)), [dispatch, errorMessage])
   const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
-  const handleStarClick = useCallback(() => dispatch(toggleSongStarred(props.songId)), [dispatch, props.songId])
-  const handleInfoClick = useCallback(() => dispatch(showSongInfo(props.songId)), [dispatch, props.songId])
-  const handleRemoveClick = useCallback(() => dispatch(removeItem(props.queueId)), [dispatch, props.queueId])
-
+  const handleStarClick = useCallback(() => dispatch(toggleSongStarred(songId)), [dispatch, songId])
+  const handleInfoClick = useCallback(() => dispatch(showSongInfo(songId)), [dispatch, songId])
+  const handleRemoveClick = useCallback(() => dispatch(removeItem(queueId)), [dispatch, queueId])
   const handleMoveClick = useCallback(() => {
-    props.onMoveClick(props.queueId)
+    onMoveClick(queueId)
     setExpanded(false)
-  }, [dispatch, props.onMoveClick, props.queueId])
+  }, [onMoveClick, queueId])
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: useCallback(() => {
+      setExpanded(isErrored || isInfoable || isRemovable || isSkippable)
+    }, [isErrored, isInfoable, isRemovable, isSkippable]),
+    onSwipedRight: useCallback(() => setExpanded(false), []),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  })
 
   return (
-    <Swipeable
-      onSwipedLeft={handleSwipedLeft}
-      onSwipedRight={handleSwipedRight}
-      preventDefaultTouchmoveEvent
-      trackMouse
-      style={{ backgroundSize: (props.isCurrent && props.pctPlayed < 2 ? 2 : props.pctPlayed) + '% 100%' }}
+    <div
+      {...swipeHandlers}
       className={styles.container}
+      style={{ backgroundSize: (isCurrent && pctPlayed < 2 ? 2 : pctPlayed) + '% 100%' }}
     >
       <div className={styles.content}>
-        <div className={`${styles.imageContainer} ${props.isPlayed ? styles.greyed : ''}`}>
-          <UserImage userId={props.userId} dateUpdated={props.dateUpdated} height={72} className={styles.image}/>
+        <div className={`${styles.imageContainer} ${isPlayed ? styles.greyed : ''}`}>
+          <UserImage userId={userId} dateUpdated={dateUpdated} height={72} className={styles.image}/>
           <div className={styles.waitContainer}>
-            {props.isUpcoming &&
-              <div className={`${styles.wait} ${props.isOwner ? styles.isOwner : ''}`}>
-                {props.wait}
+            {isUpcoming &&
+              <div className={`${styles.wait} ${isOwner ? styles.isOwner : ''}`}>
+                {wait}
               </div>
             }
           </div>
         </div>
 
-        <div className={`${styles.primary} ${props.isPlayed ? styles.greyed : ''}`}>
+        <div className={`${styles.primary} ${isPlayed ? styles.greyed : ''}`}>
           <div className={styles.innerPrimary}>
-            <div className={styles.title}>{props.title}</div>
-            <div className={styles.artist}>{props.artist}</div>
+            <div className={styles.title}>{title}</div>
+            <div className={styles.artist}>{artist}</div>
           </div>
-          <div className={`${styles.user} ${props.isOwner ? styles.isOwner : ''}`}>
-            {props.userDisplayName}
+          <div className={`${styles.user} ${isOwner ? styles.isOwner : ''}`}>
+            {userDisplayName}
           </div>
         </div>
 
         <Buttons btnWidth={50} isExpanded={isExpanded}>
-          {props.isErrored &&
+          {isErrored &&
             <div onClick={handleErrorInfoClick} className={`${styles.btn} ${styles.danger}`}>
               <Icon icon='INFO_OUTLINE' size={44} />
             </div>
           }
-          <div onClick={handleStarClick} className={`${styles.btn} ${props.isStarred ? styles.active : ''}`}>
-            <ToggleAnimation toggle={props.isStarred} className={styles.animateStar}>
+          <div onClick={handleStarClick} className={`${styles.btn} ${isStarred ? styles.active : ''}`}>
+            <ToggleAnimation toggle={isStarred} className={styles.animateStar}>
               <Icon size={44} icon={'STAR_FULL'}/>
             </ToggleAnimation>
           </div>
-          {props.isMovable &&
+          {isMovable &&
             <div onClick={handleMoveClick} className={`${styles.btn} ${styles.active}`} data-hide>
               <Icon icon='MOVE_TOP' size={44} />
             </div>
           }
-          {props.isInfoable &&
+          {isInfoable &&
             <div onClick={handleInfoClick} className={`${styles.btn} ${styles.active}`} data-hide>
               <Icon icon='INFO_OUTLINE' size={44} />
             </div>
           }
-          {props.isRemovable &&
+          {isRemovable &&
             <div onClick={handleRemoveClick} className={`${styles.btn} ${styles.danger}`} data-hide>
               <Icon icon='CLEAR' size={44} />
             </div>
           }
-          {props.isSkippable &&
+          {isSkippable &&
             <div onClick={handleSkipClick} className={`${styles.btn} ${styles.danger}`} data-hide>
               <Icon icon='PLAY_NEXT' size={44} />
             </div>
           }
         </Buttons>
       </div>
-    </Swipeable>
+    </div>
   )
 }
 

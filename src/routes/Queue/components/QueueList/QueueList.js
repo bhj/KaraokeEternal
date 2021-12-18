@@ -53,7 +53,8 @@ const QueueList = props => {
     const isOwner = item.userId === user.userId
 
     return (
-      <QueueItem {...item}
+      <QueueItem
+        {...item}
         artist={artists.entities[songs.entities[item.songId].artistId].name}
         errorMessage={isCurrent && errorMessage ? errorMessage : ''}
         isCurrent={isCurrent}
