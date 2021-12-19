@@ -31,7 +31,6 @@ const QueueListAnimator = ({ children }) => {
         onAppear={handleEnter}
         onExit={handleExit}
         shouldFlip={handleShouldFlip}
-        stagger
         translate
       >
         <div>
