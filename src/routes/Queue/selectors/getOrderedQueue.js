@@ -11,6 +11,9 @@ const getOrderedQueue = createSelector(
     const orderedResult = []
     let curQueueId = null
 
+    // ignore optimistic items
+    result = result.filter(queueId => !entities[queueId].isOptimistic)
+
     // create map indexed by prevQueueId
     result.forEach(queueId => {
       if (entities[queueId].prevQueueId === null) {
