@@ -123,6 +123,9 @@ class CDGPlayer extends React.Component {
     api('GET', `/${this.props.mediaId}?type=cdg`)
       .then(res => res.arrayBuffer())
       .then(buffer => {
+        // in case we've unmounted by this point
+        if (!this.audio.current) return
+
         this.cdg.load(buffer)
         this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
         this.audio.current.load()
