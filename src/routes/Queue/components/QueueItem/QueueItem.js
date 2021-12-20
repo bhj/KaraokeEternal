@@ -5,8 +5,6 @@ import { useSwipeable } from 'react-swipeable'
 
 import Button from 'components/Button'
 import Buttons from 'components/Buttons'
-import Icon from 'components/Icon'
-import ToggleAnimation from 'components/ToggleAnimation'
 import UserImage from 'components/UserImage'
 import styles from './QueueItem.css'
 
@@ -91,7 +89,7 @@ const QueueItem = ({
         </div>
 
         <Buttons btnWidth={50} isExpanded={isExpanded}>
-          {props.isErrored &&
+          {isErrored &&
             <Button
               className={`${styles.btn} ${styles.danger}`}
               icon='INFO_OUTLINE'
@@ -101,12 +99,12 @@ const QueueItem = ({
           }
           <Button
             animateClassName={styles.animateStar}
-            className={`${styles.btn} ${props.isStarred ? styles.active : ''}`}
+            className={`${styles.btn} ${isStarred ? styles.active : ''}`}
             icon={'STAR_FULL'}
             onClick={handleStarClick}
             size={44}
           />
-          {props.isInfoable &&
+          {isInfoable &&
             <Button
               className={`${styles.btn} ${styles.active}`}
               data-hide
@@ -115,7 +113,7 @@ const QueueItem = ({
               size={44}
             />
           }
-          {props.isRemovable &&
+          {isRemovable &&
             <Button
               className={`${styles.btn} ${styles.danger}`}
               data-hide
@@ -124,7 +122,7 @@ const QueueItem = ({
               size={44}
             />
           }
-          {props.isSkippable &&
+          {isSkippable &&
             <Button
               className={`${styles.btn} ${styles.danger}`}
               data-hide
