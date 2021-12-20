@@ -14,7 +14,6 @@ import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modul
 
 const CoreLayout = (props) => {
   const dispatch = useDispatch()
-  const [header, setHeader] = React.useState(null)
   const headerRef = React.useRef()
   const navRef = React.useRef()
 
@@ -33,11 +32,11 @@ const CoreLayout = (props) => {
 
   return (
     <>
-      <Header customHeader={header} ref={headerRef} />
+      <Header ref={headerRef}/>
 
-      <Routes setHeader={setHeader} />
+      <Routes/>
 
-      <Navigation ref={navRef} />
+      <Navigation ref={navRef}/>
 
       <SongInfo/>
 

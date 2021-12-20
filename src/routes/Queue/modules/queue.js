@@ -1,10 +1,19 @@
 import {
   LOGOUT,
   QUEUE_ADD,
+  QUEUE_MOVE,
   QUEUE_PUSH,
   QUEUE_REMOVE,
   _SUCCESS,
 } from 'shared/actionTypes'
+
+// set an item's prevQueueId
+export function moveItem (queueId, prevQueueId) {
+  return {
+    type: QUEUE_MOVE,
+    payload: { queueId, prevQueueId },
+  }
+}
 
 // add to queue
 export function queueSong (songId) {
@@ -21,7 +30,6 @@ export function queueSong (songId) {
 export function removeItem (queueId) {
   return {
     type: QUEUE_REMOVE,
-    meta: { isOptimistic: true },
     payload: { queueId },
   }
 }
@@ -36,26 +44,20 @@ const ACTION_HANDLERS = {
   }),
   [QUEUE_ADD]: (state, { payload }) => {
     // optimistic
-    // @todo: should probably use a result.length + rand index to avoid possible collision?
-    const fakeQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 0
+    const nextQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 1
 
     return {
       ...state,
-      result: [...state.result, fakeQueueId],
+      result: [...state.result, nextQueueId],
       entities: {
         ...state.entities,
-        [fakeQueueId]: { ...payload, isOptimistic: true },
+        [nextQueueId]: {
+          ...payload,
+          queueId: nextQueueId,
+          prevQueueId: nextQueueId - 1 || null,
+          isOptimistic: true
+        },
       }
-    }
-  },
-  [QUEUE_REMOVE]: (state, { payload }) => {
-    // optimistic
-    const result = state.result.slice()
-    result.splice(result.indexOf(payload.queueId), 1)
-
-    return {
-      ...state,
-      result,
     }
   },
   [QUEUE_PUSH]: (state, { payload }) => ({
