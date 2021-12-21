@@ -7,9 +7,13 @@ const getQueueId = (state) => state.status.queueId
 const getRoundRobinQueue = createSelector(
   [getOrderedQueue, getPlayerHistory, getQueueId],
   ({ result, entities }, history, curId) => {
-    // in case queue hasn't been pushed yet,
-    // or history references non-existent items
+    // in case history references non-existent items or queue is still loading
     history = history.filter(queueId => result.includes(queueId))
+
+    // consider current item played (we don't want to re-order it)
+    if (entities[curId] && history.lastIndexOf(curId) === -1) {
+      history.push(curId)
+    }
 
     // map queueIds to userIds
     const resultByUser = []

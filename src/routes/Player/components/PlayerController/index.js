@@ -1,3 +1,3 @@
-import PlayerControllerContainer from './PlayerControllerContainer'
+import PlayerController from './PlayerController'
 
-export default PlayerControllerContainer
+export default PlayerController
