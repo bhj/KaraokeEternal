@@ -104,6 +104,15 @@ const QueueItem = ({
             onClick={handleStarClick}
             size={44}
           />
+          {isMovable &&
+            <Button
+              className={`${styles.btn} ${styles.active}`}
+              data-hide
+              icon='MOVE_TOP'
+              onClick={handleMoveClick}
+              size={44}
+            />
+          }
           {isInfoable &&
             <Button
               className={`${styles.btn} ${styles.active}`}
