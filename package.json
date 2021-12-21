@@ -52,6 +52,7 @@
   "dependencies": {
     "@babel/runtime": "^7.15.4",
     "@jcoreio/async-throttle": "^1.4.3",
+    "@vscode/sqlite3": "^5.0.7",
     "bcrypt": "^5.0.1",
     "ctx-compose": "^3.0.0",
     "electron-log": "^4.4.1",
@@ -69,7 +70,6 @@
     "socket.io": "^4.3.1",
     "sqlate": "^2.2.0",
     "sqlite": "^4.0.23",
-    "sqlite3": "^5.0.2",
     "strip-ansi": "^6.0.1",
     "vm2": "^3.9.4",
     "yargs": "^17.2.1"

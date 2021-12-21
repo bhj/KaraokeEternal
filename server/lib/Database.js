@@ -1,6 +1,6 @@
 const log = require('./Log').getLogger(`${process.env.KF_CHILD_PROCESS || 'main'}[${process.pid}]`)
 const path = require('path')
-const sqlite3 = require('sqlite3')
+const sqlite3 = require('@vscode/sqlite3')
 const { open } = require('sqlite')
 let _db
 
