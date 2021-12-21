@@ -2,8 +2,10 @@ import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, useLocation } from 'react-router-dom'
 import { createSelector } from 'reselect'
+
 import { requestScanStop } from 'store/modules/prefs'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
+import getWaits from 'routes/Queue/selectors/getWaits'
 import LibraryHeader from 'routes/Library/components/LibraryHeader'
 import PlaybackCtrl from './PlaybackCtrl'
 import ProgressBar from './ProgressBar'
@@ -12,28 +14,18 @@ import styles from './Header.css'
 
 // selectors
 const getIsAtQueueEnd = (state) => state.status.isAtQueueEnd
-const getPosition = (state) => state.status.position
 const getQueueId = (state) => state.status.queueId
-const getSongs = (state) => state.songs
 const getUserId = (state) => state.user.userId
 
 const getUserWait = createSelector(
-  [getRoundRobinQueue, getSongs, getQueueId, getPosition, getUserId],
-  (queue, songs, queueId, pos, userId) => {
-    if (!queue.entities[queueId]) return // queueItem not found
-    if (!songs.entities[queue.entities[queueId].songId]) return // song not found
-
-    // current song's remaining time
-    let wait = Math.round(songs.entities[queue.entities[queueId].songId].duration - pos)
-
+  [getRoundRobinQueue, getQueueId, getUserId, getWaits],
+  (queue, queueId, userId, waits) => {
     const curIdx = queue.result.indexOf(queueId)
 
     for (let i = curIdx + 1; i < queue.result.length; i++) {
-      if (queue.entities[queue.result[i]] && queue.entities[queue.result[i]].userId === userId) {
-        return wait
+      if (queue.entities[queue.result[i]].userId === userId) {
+        return waits[queue.result[i]]
       }
-
-      wait += songs.entities[queue.entities[queue.result[i]].songId].duration
     }
   }
 )
