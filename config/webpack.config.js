@@ -149,26 +149,15 @@ config.module.rules.push({
 config.module.rules.push(
   {
     test: /\.woff2(\?.*)?$/,
-    loader: 'url-loader',
-    options: {
-      limit: '10000',
-      mimetype: 'application/font-woff2'
-    }
+    type: 'asset/resource',
   },
   {
     test: /\.svg(\?.*)?$/,
-    loader: 'url-loader',
-    options: {
-      limit: '10000',
-      mimetype: 'image/svg+xml'
-    }
+    type: 'asset',
   },
   {
     test: /\.(png|jpg|gif)$/,
-    loader: 'url-loader',
-    options: {
-      limit: '8192'
-    }
+    type: 'asset',
   }
 )
 
