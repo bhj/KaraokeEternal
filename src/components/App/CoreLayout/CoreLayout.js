@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import useResizeObserver from 'use-resize-observer'
 // global stylesheets should be imported before any
 // components that will import their own modular css
-import 'normalize.css'
 import '../../../styles/global.css'
 import Header from 'components/Header'
 import Navigation from 'components/Navigation'

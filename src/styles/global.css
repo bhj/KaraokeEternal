@@ -1,15 +1,9 @@
+@import '~modern-normalize/modern-normalize.css';
 @import './variables.css';
 @import './fonts.css';
 @import './rc-slider.css';
 
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
-
 html {
-  box-sizing: border-box;
   height: 100%;
   touch-action: manipulation;
   -webkit-user-select: none;
