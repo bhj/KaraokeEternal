@@ -132,7 +132,7 @@
     "redux-throttle": "^0.1.1",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
-    "screenfull": "^5.1.0",
+    "screenfull": "^6.0.0",
     "socket.io-client": "^4.3.2",
     "use-resize-observer": "^8.0.0",
     "webpack": "^5.58.2",
