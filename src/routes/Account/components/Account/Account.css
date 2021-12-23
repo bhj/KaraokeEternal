@@ -3,10 +3,6 @@
   border-radius: var(--border-radius);
   margin: 10px 0;
   overflow: hidden;
-
-  /* fixes panel disappearing in iOS 11 due to overflow: scroll on parent
-  container and -webkit-overflow-scrolling: touch on parent */
-  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .title {
