@@ -1,28 +1,28 @@
-import React from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
+import React from 'react'
 import { Modal } from 'react-responsive-modal'
 import styles from './Modal.css'
 
 const CustomModal = (props) => {
-  const ui = useSelector(state => state.ui)
-
+  // disabling blockScroll for now due to
+  // https://github.com/pradel/react-responsive-modal/issues/468
   return (
     <Modal
+      blockScroll={false}
       animationDuration={167}
       open={props.isVisible}
       onClose={props.onClose}
       closeOnEsc
       closeOnOverlayClick
       classNames={{
-        overlay: styles.overlay,
+        root: styles.modalRoot,
+        overlay: styles.modalOverlay,
         modal: styles.modal,
-        closeButton: styles.closeButton,
+        modalContainer: styles.modalContainer,
+        closeButton: styles.modalCloseButton,
       }}
       styles={{
         modal: {
-          maxWidth: ui.contentWidth * 0.85,
-          maxHeight: ui.innerHeight * 0.9,
           ...props.style,
         }
       }}
@@ -31,6 +31,7 @@ const CustomModal = (props) => {
         <h1 className={styles.title}>
           {props.title}
         </h1>
+
         <div className={styles.content}>
           {props.children}
         </div>
@@ -54,4 +55,4 @@ CustomModal.propTypes = {
   title: PropTypes.string.isRequired,
 }
 
-export default CustomModal
+export default React.memo(CustomModal)

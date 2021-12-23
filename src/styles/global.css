@@ -88,17 +88,6 @@ input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
 
-/* Modal dialog */
-@keyframes react-responsive-modal-fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes react-responsive-modal-fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
 /* Buttons */
 button {
   background-color: var(--btn-default-bg-color);

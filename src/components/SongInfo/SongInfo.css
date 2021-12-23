@@ -1,3 +1,15 @@
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.mediaContainer {
+  flex: 1;
+  margin: .5rem 0;
+  overflow: scroll;
+}
+
 .media {
   margin-bottom: 1em;
   overflow-wrap: break-word;
