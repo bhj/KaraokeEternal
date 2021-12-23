@@ -19,6 +19,7 @@
 }
 
 .btnActive {
+  composes: btn;
   fill: var(--nav-active-color);
   filter: var(--nav-active-filter);
 }

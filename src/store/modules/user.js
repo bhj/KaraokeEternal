@@ -16,6 +16,7 @@ import {
 } from 'shared/actionTypes'
 
 const api = new HttpApi('')
+const basename = new URL(document.baseURI).pathname
 
 // ------------------------------------
 // Login
@@ -68,7 +69,7 @@ export function login (creds) {
         const redirect = new URLSearchParams(history.location.search).get('redirect')
 
         if (redirect) {
-          history.push(redirect)
+          history.push(basename.replace(/\/$/, '') + redirect)
         }
       })
       .catch(err => {

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
 import { requestScanStop } from 'store/modules/prefs'
@@ -79,9 +79,9 @@ const Header = React.forwardRef((props, ref) => {
         />
       }
 
-      <Route exact path='/library'>
-        <LibraryHeader/>
-      </Route>
+      <Routes>
+        <Route path='/library' element={<LibraryHeader/>}/>
+      </Routes>
     </div>
   )
 })
