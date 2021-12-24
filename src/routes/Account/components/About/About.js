@@ -26,13 +26,29 @@ const About = props => {
       </div>
 
       <Modal
+        title={'Changelog & Sponsors'}
         isVisible={isChangelogVisible}
         onClose={toggleChangelog}
-        title={'Changelog & Sponsors'}
-        buttons=<button onClick={toggleChangelog}>Done</button>
-        style={{ height: '100%' }}
+        focusTrapped={false}
+        style={{
+          width: '90%',
+          height: '90%',
+        }}
       >
-        <div dangerouslySetInnerHTML={{ __html: html }}></div>
+        <div className={styles.changelogContainer}>
+          <div className={styles.changelogContent}>
+            {/* @todo: without this anchor the changelog gets scrolled to
+                the first "real" link, even with focusTrapped=false */}
+            <a href=""></a>
+            <div dangerouslySetInnerHTML={{ __html: html }}>
+            </div>
+          </div>
+          <div>
+            <button className='primary' onClick={toggleChangelog}>
+                Done
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   )

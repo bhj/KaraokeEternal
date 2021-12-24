@@ -31,3 +31,15 @@
 .pseudolink {
   text-decoration: underline;
 }
+
+.changelogContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.changelogContent {
+  flex: 1;
+  margin: .5rem 0;
+  overflow: scroll;
+}
