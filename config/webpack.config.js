@@ -1,11 +1,10 @@
 const path = require('path')
-const fs = require('fs')
 const webpack = require('webpack')
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const { LicenseWebpackPlugin } = require('license-webpack-plugin')
+const applyLicenseConfig = require('./webpack.license.config')
 
 const NODE_ENV = process.env.NODE_ENV || 'production'
 const __DEV__ = NODE_ENV === 'development'
@@ -65,27 +64,6 @@ const config = {
     },
   },
   stats: 'minimal',
-}
-
-if (__PROD__) {
-  config.plugins.push(new LicenseWebpackPlugin({
-    addBanner: true,
-    outputFilename: 'licenses.txt',
-    perChunkOutput: false,
-    renderLicenses: (modules) => {
-      let txt = ''
-
-      modules.forEach(m => {
-        if (!m.licenseText) return
-
-        txt += '\n' + '*'.repeat(71) + '\n\n'
-        txt += m.packageJson.name + '\n'
-        txt += m.licenseText.replace(/(\S)\n(\S)/gm, '$1 $2')
-      })
-
-      return 'Karaoke Forever\n' + fs.readFileSync('./LICENSE', 'utf8') + txt
-    },
-  }))
 }
 
 // HTML Template
@@ -162,18 +140,16 @@ config.module.rules.push(
 )
 
 // Markdown
-config.module.rules.push(
-  {
-    test: /\.md$/,
-    use: [
-      {
-        loader: 'html-loader'
-      },
-      {
-        loader: 'markdown-loader',
-      }
-    ]
-  },
-)
+config.module.rules.push({
+  test: /\.md$/,
+  use: [
+    {
+      loader: 'html-loader',
+    },
+    {
+      loader: 'markdown-loader',
+    }
+  ]
+})
 
-module.exports = config
+module.exports = __PROD__ ? applyLicenseConfig(config) : config
