@@ -4,6 +4,38 @@ const sql = require('sqlate')
 
 class Queue {
   /**
+   * Add a songId to a room's queue
+   *
+   * @param  {object}      roomId, songId, userId
+   * @return {Promise}
+   */
+  static async add ({ roomId, songId, userId }) {
+    const fields = new Map()
+    fields.set('roomId', roomId)
+    fields.set('songId', songId)
+    fields.set('userId', userId)
+    fields.set('prevQueueId', sql`(
+      SELECT queueId
+      FROM queue
+      WHERE roomId = ${roomId} AND queueId NOT IN (
+        SELECT prevQueueId
+        FROM queue
+        WHERE prevQueueId IS NOT NULL
+      )
+    )`)
+
+    const query = sql`
+      INSERT INTO queue ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = await db.run(String(query), query.parameters)
+
+    if (res.changes !== 1) {
+      throw new Error('Could not add song to queue')
+    }
+  }
+
+  /**
    * Get queued items for a given room
    *
    * @param  {Number}  roomId

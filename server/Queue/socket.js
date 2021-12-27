@@ -1,5 +1,3 @@
-const db = require('../lib/Database').db
-const sql = require('sqlate')
 const Queue = require('./Queue')
 const Rooms = require('../Rooms')
 
@@ -15,6 +13,8 @@ const {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: async (sock, { payload }, acknowledge) => {
+    const { songId } = payload
+
     try {
       await Rooms.validate(sock.user.roomId, null, { validatePassword: false })
     } catch (err) {
@@ -24,29 +24,11 @@ const ACTION_HANDLERS = {
       })
     }
 
-    const fields = new Map()
-    fields.set('roomId', sock.user.roomId)
-    fields.set('songId', payload.songId)
-    fields.set('userId', sock.user.userId)
-    fields.set('prevQueueId', sql`(
-      SELECT queueId
-      FROM queue
-      WHERE roomId = ${sock.user.roomId} AND queueId NOT IN (
-        SELECT prevQueueId
-        FROM queue
-        WHERE prevQueueId IS NOT NULL
-      )
-    )`)
-
-    const query = sql`
-      INSERT INTO queue ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
-      VALUES ${sql.tuple(Array.from(fields.values()))}
-    `
-    const res = await db.run(String(query), query.parameters)
-
-    if (res.changes !== 1) {
-      throw new Error('Could not add song to queue')
-    }
+    await Queue.add({
+      roomId: sock.user.roomId,
+      songId,
+      userId: sock.user.userId,
+    })
 
     // success
     acknowledge({ type: QUEUE_ADD + '_SUCCESS' })
