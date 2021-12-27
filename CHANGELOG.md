@@ -1,19 +1,20 @@
 ## TBD
 
 ### New
-- **(app)** User management interface!
-- **(app)** CD+Graphics background size is content-aware
+- **(app)** User management interface
+- **(app)** "Make user's next" button for upcoming songs
 - **(app)** "Re-queue" button for played songs
+- **(app)** Content-aware CD+Graphics backgrounds
 - **(app)** Media folders can be prioritized via drag-and-drop
 - **(app)** Added ~370 visualizer presets (now 472 total)
 - **(app)** Summary is shown following a media scan
-- **(server)** Support for custom URL base path (see `--urlPath` CLI option)
-- **(server)** Reduced load and improved client connection speed via library caching
+- **(server)** Custom URL path support (see `--urlPath` CLI option)
 
 ### Changed
 
 - **(server)** Uses one less process/helper
 - **(server)** Media scanner performance is greatly improved when adding media
+- **(server)** Improved client connection speed via library caching
 - **(server)** Media scanner process is restricted to read-only database access
 - **(server)** Fixed potential error when a non-admin user tries to remove one of their queued songs
 - **(server)** Fixed potential SQLITE_BUSY errors while scanning media
