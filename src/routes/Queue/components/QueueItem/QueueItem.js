@@ -42,14 +42,18 @@ const QueueItem = ({
 
   const dispatch = useDispatch()
   const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(errorMessage)), [dispatch, errorMessage])
-  const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
-  const handleStarClick = useCallback(() => dispatch(toggleSongStarred(songId)), [dispatch, songId])
   const handleInfoClick = useCallback(() => dispatch(showSongInfo(songId)), [dispatch, songId])
-  const handleRemoveClick = useCallback(() => dispatch(removeItem(queueId)), [dispatch, queueId])
   const handleMoveClick = useCallback(() => {
     onMoveClick(queueId)
     setExpanded(false)
   }, [onMoveClick, queueId])
+  const handleRequeueClick = useCallback(() => {
+    dispatch(queueSong(songId))
+    setExpanded(false)
+  }, [dispatch, songId])
+  const handleRemoveClick = useCallback(() => dispatch(removeItem(queueId)), [dispatch, queueId])
+  const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
+  const handleStarClick = useCallback(() => dispatch(toggleSongStarred(songId)), [dispatch, songId])
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: useCallback(() => {
@@ -104,6 +108,15 @@ const QueueItem = ({
             onClick={handleStarClick}
             size={44}
           />
+          {isPlayed &&
+            <Button
+              className={`${styles.btn} ${styles.active}`}
+              data-hide
+              icon='REFRESH'
+              onClick={handleRequeueClick}
+              size={48}
+            />
+          }
           {isMovable &&
             <Button
               className={`${styles.btn} ${styles.active}`}

@@ -3,6 +3,7 @@
 ### New
 - **(app)** User management interface!
 - **(app)** CD+Graphics background size is content-aware
+- **(app)** "Re-queue" button for played songs
 - **(app)** Media folders can be prioritized via drag-and-drop
 - **(app)** Added ~370 visualizer presets (now 472 total)
 - **(app)** Summary is shown following a media scan
