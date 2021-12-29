@@ -42,11 +42,6 @@ const QueueList = props => {
   // build children array
   const items = queue.result.map(qId => {
     const item = queue.entities[qId]
-
-    if (item.isOptimistic ||
-        !songs.entities[item.songId] ||
-        !artists.entities[songs.entities[item.songId].artistId]) return null
-
     const duration = songs.entities[item.songId].duration
     const isCurrent = (qId === queueId) && !isAtQueueEnd
     const isUpcoming = qId !== queueId && !playerHistory.includes(qId)

@@ -44,6 +44,8 @@ class Queue {
   static async get (roomId) {
     const result = []
     const entities = {}
+    const map = new Map()
+    let curQueueId = null
 
     const query = sql`
       SELECT queueId, songId, userId, prevQueueId,
@@ -52,8 +54,8 @@ class Queue {
         MAX(isPreferred) AS isPreferred
       FROM queue
         INNER JOIN users USING(userId)
-        INNER JOIN media USING (songId)
-        INNER JOIN paths USING (pathId)
+        INNER JOIN media USING(songId)
+        INNER JOIN paths USING(pathId)
       WHERE roomId = ${roomId}
       GROUP BY queueId
       ORDER BY queueId, paths.priority ASC
@@ -61,13 +63,28 @@ class Queue {
     const rows = await db.all(String(query), query.parameters)
 
     for (const row of rows) {
-      result.push(row.queueId)
       entities[row.queueId] = row
       entities[row.queueId].mediaType = this.getType(row.relPath)
 
       // don't send over the wire
       delete entities[row.queueId].relPath
       delete entities[row.queueId].isPreferred
+
+      if (row.prevQueueId === null) {
+        // found the first item
+        result.push(row.queueId)
+        curQueueId = row.queueId
+      } else {
+        // map indexed by prevQueueId
+        map.set(row.prevQueueId, row.queueId)
+      }
+    }
+
+    while (result.length < rows.length) {
+      // get the item whose prevQueueId references the current one
+      const nextQueueId = entities[map.get(curQueueId)].queueId
+      result.push(nextQueueId)
+      curQueueId = nextQueueId
     }
 
     return { result, entities }
