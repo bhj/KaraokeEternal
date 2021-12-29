@@ -72,6 +72,26 @@ class Rooms {
   static prefix (roomId = '') {
     return `KF_ROOM_ID_${roomId}`
   }
+
+  /**
+   * Utility method to list active rooms on a socket.io instance
+   *
+   * @param  {Object}  io  The socket.io instance
+   * @return {Array}       Array of objects as { room, roomId }
+   */
+  static getActive (io) {
+    const rooms = []
+
+    for (const room of io.sockets.adapter.rooms.keys()) {
+      // ignore auto-generated per-user rooms
+      if (room.startsWith(Rooms.prefix())) {
+        const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
+        rooms.push({ room, roomId })
+      }
+    }
+
+    return rooms
+  }
 }
 
 module.exports = Rooms
