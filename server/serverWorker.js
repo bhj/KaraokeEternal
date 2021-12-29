@@ -22,6 +22,7 @@ const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
 const roomsRouter = require('./Rooms/router')
 const userRouter = require('./User/router')
+const pushQueuesAndLibrary = require('./lib/pushQueuesAndLibrary')
 const SocketIO = require('socket.io')
 const socketActions = require('./socket')
 const IPC = require('./lib/IPCBridge')
@@ -74,6 +75,9 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
         type: SERVER_WORKER_STATUS,
         payload: { url },
       })
+
+      // scanning on startup?
+      if (env.KF_SERVER_SCAN) startScanner(() => pushQueuesAndLibrary(io))
     })
   }
 
@@ -153,7 +157,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
 
     // validated
     ctx.io = io
-    ctx.startScanner = startScanner
+    ctx.startScanner = () => startScanner(() => pushQueuesAndLibrary(io))
     ctx.stopScanner = stopScanner
 
     await next()

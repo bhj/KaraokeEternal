@@ -53,17 +53,12 @@ Database.open({ readonly: false, env }).then(db => {
 
   // start web server
   require('./serverWorker.js')({ env, startScanner, stopScanner })
-
-  // scanning on startup?
-  if (env.KF_SERVER_SCAN) {
-    startScanner()
-  }
 }).catch(err => {
   log.error(err.message)
   process.exit(1)
 })
 
-function startScanner () {
+function startScanner (onExit) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
     refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
@@ -74,6 +69,8 @@ function startScanner () {
       log.info(`Media scanner exited (${signal || code})`)
       IPC.removeChild(refs.scanner)
       delete refs.scanner
+
+      if (typeof onExit === 'function') onExit()
     })
 
     IPC.addChild(refs.scanner)
