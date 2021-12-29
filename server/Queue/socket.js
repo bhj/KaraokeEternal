@@ -71,7 +71,6 @@ const ACTION_HANDLERS = {
 
     await Queue.remove({
       queueId,
-      roomId: sock.user.roomId,
       userId: sock.user.isAdmin ? undefined : sock.user.userId,
     })
 

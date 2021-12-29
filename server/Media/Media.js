@@ -1,6 +1,7 @@
 const db = require('../lib/Database').db
 const sql = require('sqlate')
 const log = require('../lib/Log').getLogger('Media')
+const Queue = require('../Queue')
 
 class Media {
   /**
@@ -129,6 +130,14 @@ class Media {
     `)
     log.info(`cleanup: ${res.changes} media in nonexistent paths`)
 
+    // remove songs without associated media
+    res = await db.run(`
+      DELETE FROM songs WHERE songId IN (
+        SELECT songs.songId FROM songs LEFT JOIN media USING(songId) WHERE media.mediaId IS NULL
+      )
+    `)
+    log.info(`cleanup: ${res.changes} songs with no associated media`)
+
     // remove stars for nonexistent songs
     res = await db.run(`
       DELETE FROM songStars WHERE songId IN (
@@ -136,6 +145,17 @@ class Media {
       )
     `)
     log.info(`cleanup: ${res.changes} stars for nonexistent songs`)
+
+    // remove queue items for nonexistent songs
+    const rows = await db.all(`
+      SELECT queue.queueId FROM queue LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
+    `)
+
+    for (const row of rows) {
+      await Queue.remove({ queueId: row.queueId })
+    }
+
+    log.info(`cleanup: ${rows.length} queue items for nonexistent songs`)
 
     log.info('cleanup: vacuuming database')
     await db.run('VACUUM')
