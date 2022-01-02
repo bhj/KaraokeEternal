@@ -83,16 +83,11 @@ router.delete('/user/:userId', async (ctx, next) => {
   }
 
   // emit (potentially) updated queues to each room
-  for (const room of ctx.io.sockets.adapter.rooms.keys()) {
-    // ignore auto-generated per-user rooms
-    if (room.startsWith(Rooms.prefix())) {
-      const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
-
-      ctx.io.to(room).emit('action', {
-        type: QUEUE_PUSH,
-        payload: await Queue.get(roomId),
-      })
-    }
+  for (const { room, roomId } of Rooms.getActive(ctx.io)) {
+    ctx.io.to(room).emit('action', {
+      type: QUEUE_PUSH,
+      payload: await Queue.get(roomId),
+    })
   }
 
   // success
@@ -199,16 +194,11 @@ router.put('/user/:userId', async (ctx, next) => {
   }
 
   // emit (potentially) updated queues to each room
-  for (const room of ctx.io.sockets.adapter.rooms.keys()) {
-    // ignore auto-generated per-user rooms
-    if (room.startsWith(Rooms.prefix())) {
-      const roomId = parseInt(room.substring(Rooms.prefix().length), 10)
-
-      ctx.io.to(room).emit('action', {
-        type: QUEUE_PUSH,
-        payload: await Queue.get(roomId),
-      })
-    }
+  for (const { room, roomId } of Rooms.getActive(ctx.io)) {
+    ctx.io.to(room).emit('action', {
+      type: QUEUE_PUSH,
+      payload: await Queue.get(roomId),
+    })
   }
 
   // we're done if updating another account
