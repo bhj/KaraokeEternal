@@ -1,42 +1,40 @@
 .container {
   position: absolute;
-  left: 0;
+  left: 100vw;
   top: 0;
 }
 
-.textContainer {
+.innerContainer {
+  margin-top: 2vh;
+  margin-right: 2vh;
+  padding: 2vh;
   background-color: var(--chrome-bg-color);
-  border-radius: 0 0 0 var(--border-radius);
+  border: 1px solid var(--chrome-border-color);
+  border-radius: var(--border-radius);
   text-align: center;
-  padding: 20px;
 }
 
 @supports (backdrop-filter: saturate(50%) blur(20px)) or (-webkit-backdrop-filter: saturate(50%) blur(20px)) {
-  .textContainer {
+  .innerContainer {
     background-color: transparent !important;
     -webkit-backdrop-filter: saturate(50%) blur(20px);
     backdrop-filter: saturate(50%) blur(20px);
   }
 }
 
-.fadeEnter {
-  opacity: 0.01;
+.enterActive {
+  animation: slide-in .25s ease-out;
+  animation-fill-mode: forwards;
+  animation-delay: .25s;
 }
 
-.fadeEnterActive {
-  composes: fadeEnter;
-  opacity: 1;
-  transition: opacity 1000ms ease-in;
+.enterDone {
+  transform: translateX(-100%);
 }
 
-.fadeExit {
-  opacity: 1;
-}
-
-.fadeExitActive {
-  composes: fadeExit;
-  opacity: 0.01;
-  transition: opacity 1000ms ease-in;
+.exitActive {
+  animation: slide-out .25s ease-in;
+  animation-fill-mode: forwards;
 }
 
 .user {
@@ -47,4 +45,14 @@
 
 .userImage {
   height: 20vh;
+}
+
+@keyframes slide-in {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes slide-out {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0%); }
 }

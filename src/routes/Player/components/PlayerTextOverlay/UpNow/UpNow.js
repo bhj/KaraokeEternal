@@ -36,31 +36,28 @@ class UpNow extends React.Component {
 
   render () {
     return (
-      <div className={styles.container}>
         <CSSTransition
           unmountOnExit
           in={this.state.show}
-          timeout={1000}
+          timeout={500}
           classNames={{
-            appear: '',
-            appearActive: '',
-            enter: styles.fadeEnter,
-            enterActive: styles.fadeEnterActive,
-            exit: styles.fadeExit,
-            exitActive: styles.fadeExitActive,
+            enterActive: styles.enterActive,
+            enterDone: styles.enterDone,
+            exitActive: styles.exitActive,
           }}>
-          <div className={styles.textContainer}>
-            <UserImage
-              userId={this.props.queueItem.userId}
-              dateUpdated={this.props.queueItem.dateUpdated}
-              className={styles.userImage}
-            />
-            <div className={styles.user}>
-              {this.props.queueItem.userDisplayName}
+          <div className={styles.container}>
+            <div className={styles.innerContainer}>
+              <UserImage
+                userId={this.props.queueItem.userId}
+                dateUpdated={this.props.queueItem.dateUpdated}
+                className={styles.userImage}
+              />
+              <div className={styles.user}>
+                {this.props.queueItem.userDisplayName}
+              </div>
             </div>
           </div>
         </CSSTransition>
-      </div>
     )
   }
 }
