@@ -40,13 +40,6 @@ module.exports = function (io, jwtKey) {
     try {
       sock.user = jwtVerify(kfToken, jwtKey)
 
-      // has account been modified since JWT was generated?
-      const user = await User.getById(sock.user.userId)
-
-      if (!user || user.dateUpdated !== sock.user.dateUpdated) {
-        throw new Error('account modtime mismatch')
-      }
-
       // success
       log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)
     } catch (err) {

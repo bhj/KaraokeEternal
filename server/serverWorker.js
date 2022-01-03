@@ -16,7 +16,6 @@ const koaRange = require('koa-range')
 const koaStatic = require('koa-static')
 
 const Prefs = require('./Prefs')
-const User = require('./User')
 const libraryRouter = require('./Library/router')
 const mediaRouter = require('./Media/router')
 const prefsRouter = require('./Prefs/router')
@@ -143,15 +142,6 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
         roomId: null,
         userId: null,
         username: null,
-      }
-    }
-
-    // has account been modified since JWT was generated?
-    if (typeof ctx.user.userId === 'number') {
-      const user = await User.getById(ctx.user.userId)
-
-      if (!user || user.dateUpdated !== ctx.user.dateUpdated) {
-        ctx.throw(409, 'Session expired. Please sign in again.')
       }
     }
 
