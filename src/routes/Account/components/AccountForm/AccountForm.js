@@ -33,7 +33,12 @@ export default class AccountForm extends Component {
     const isUser = this.props.user && this.props.user.userId !== null
 
     return (
-      <form onSubmit={this.handleSubmit} className={styles.container} noValidate>
+      <form
+        className={styles.container}
+        key={this.props.user?.dateUpdated}
+        noValidate
+        onSubmit={this.handleSubmit}
+      >
         <input type='email'
           autoComplete='off'
           autoFocus={!isUser}
