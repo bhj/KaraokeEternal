@@ -75,7 +75,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   cdgAlpha: 0,
-  cdgSize: 0.7,
+  cdgSize: 0.8,
   errorMessage: '',
   historyJSON: '[]', // queueIds in JSON array
   isAtQueueEnd: false,
