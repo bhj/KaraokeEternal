@@ -128,7 +128,9 @@ class Prefs {
    * Get JWT secret key from db
    * @return {Promise}  jwtKey (string)
    */
-  static async getJwtKey () {
+  static async getJwtKey (forceRotate = false) {
+    if (forceRotate) return this.rotateJwtKey()
+
     const query = sql`
       SELECT * FROM prefs
       WHERE key = "jwtKey"
@@ -137,20 +139,17 @@ class Prefs {
 
     if (row && row.data) {
       const jwtKey = JSON.parse(row.data)
-
-      if (jwtKey.length === 64) {
-        return jwtKey
-      }
+      if (jwtKey.length === 64) return jwtKey
     }
 
-    return this.jwtKeyRefresh()
+    return this.rotateJwtKey()
   }
 
   /**
    * Create or rotate JWT secret key
    * @return {Promise}  jwtKey (string)
    */
-  static async jwtKeyRefresh () {
+  static async rotateJwtKey () {
     const jwtKey = crypto.randomBytes(48).toString('base64') // 64 char
     log.info('Rotating JWT secret key (length=%s)', jwtKey.length)
 
@@ -159,7 +158,6 @@ class Prefs {
       VALUES ("jwtKey", ${JSON.stringify(jwtKey)})
     `
     const res = await db.run(String(query), query.parameters)
-
     if (res.changes) return jwtKey
   }
 }

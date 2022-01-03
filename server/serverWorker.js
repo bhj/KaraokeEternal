@@ -36,7 +36,7 @@ const {
 async function serverWorker ({ env, startScanner, stopScanner }) {
   const indexFile = path.join(env.KF_SERVER_PATH_WEBROOT, 'index.html')
   const urlPath = env.KF_SERVER_URL_PATH.replace(/\/?$/, '/') // force trailing slash
-  const jwtKey = await Prefs.getJwtKey()
+  const jwtKey = await Prefs.getJwtKey(env.KF_SERVER_ROTATE_KEY)
   const app = new Koa()
   let server, io
 

@@ -16,13 +16,16 @@ const yargs = require('yargs')
     number: true,
     requiresArg: true,
   })
+  .option('rotateKey', {
+    describe: 'Rotate the session key at startup',
+  })
+  .option('scan', {
+    describe: 'Run the media scanner at startup',
+  })
   .option('urlPath', {
     describe: 'Web server URL base path (default=/)',
     requiresArg: true,
     type: 'string',
-  })
-  .option('scan', {
-    describe: 'Run the media scanner at startup',
   })
   .option('scannerConsoleLevel', {
     describe: 'Media scanner console level (default=4)',
@@ -71,6 +74,10 @@ if (argv.version) {
 
 if (argv.scan) {
   env.KF_SERVER_SCAN = true
+}
+
+if (argv.rotateKey) {
+  env.KF_SERVER_ROTATE_KEY = true
 }
 
 // settings via CLI take precendence over env vars
