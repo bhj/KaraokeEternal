@@ -4,15 +4,15 @@ import { fetchPrefs } from './prefs'
 import HttpApi from 'lib/HttpApi'
 import history from 'lib/history'
 import {
+  CREATE_ACCOUNT,
   LOGIN,
   LOGOUT,
-  CREATE_ACCOUNT,
-  UPDATE_ACCOUNT,
   REQUEST_ACCOUNT,
+  SOCKET_AUTH_ERROR,
+  SOCKET_REQUEST_CONNECT,
+  UPDATE_ACCOUNT,
   _SUCCESS,
   _ERROR,
-  SOCKET_REQUEST_CONNECT,
-  SOCKET_AUTH_ERROR,
 } from 'shared/actionTypes'
 
 const api = new HttpApi('')
@@ -215,6 +215,43 @@ export function updateAccount (data) {
       })
       .catch(err => {
         dispatch(updateError(err))
+      })
+  }
+}
+
+// ------------------------------------
+// Request account (does not refresh JWT)
+// ------------------------------------
+function requestAccount () {
+  return {
+    type: REQUEST_ACCOUNT,
+  }
+}
+
+function receiveAccount (response) {
+  return {
+    type: REQUEST_ACCOUNT + _SUCCESS,
+    payload: response
+  }
+}
+
+function requestAccountError (err) {
+  return {
+    type: REQUEST_ACCOUNT + _ERROR,
+    payload: err.message, // silent (don't set error property)
+  }
+}
+
+export function fetchAccount () {
+  return (dispatch, getState) => {
+    dispatch(requestAccount())
+
+    return api('GET', 'user')
+      .then(user => {
+        dispatch(receiveAccount(user))
+      })
+      .catch(err => {
+        dispatch(requestAccountError(err))
       })
   }
 }

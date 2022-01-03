@@ -37,6 +37,26 @@ router.get('/logout', async (ctx, next) => {
   ctx.body = {}
 })
 
+// get own account (helps sync account changes across devices)
+router.get('/user', async (ctx, next) => {
+  if (typeof ctx.user.userId !== 'number') {
+    ctx.throw(401)
+  }
+
+  // include credentials since their username may have changed
+  const user = await User.getById(ctx.user.userId, true)
+
+  if (!user) {
+    ctx.throw(404)
+  }
+
+  // don't include in response
+  delete user.image
+  delete user.password
+
+  ctx.body = user
+})
+
 // list all users (admin only)
 router.get('/users', async (ctx, next) => {
   if (!ctx.user.isAdmin) {

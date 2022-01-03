@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { injectReducer } from 'store/reducers'
-import { useSelector, useStore } from 'react-redux'
+import { useDispatch, useSelector, useStore } from 'react-redux'
+import { fetchAccount } from 'store/modules/user'
 import usersReducer from '../../modules/users'
 import About from '../../components/About'
 import Account from '../../components/Account'
@@ -12,10 +13,14 @@ const SignedInView = props => {
   const { isAdmin } = useSelector(state => state.user)
   const sliceExists = !!useSelector(state => state.users)
   const store = useStore()
+  const dispatch = useDispatch()
 
   if (isAdmin && !sliceExists) {
     injectReducer(store, { key: 'users', reducer: usersReducer })
   }
+
+  // once per mount
+  useEffect(() => dispatch(fetchAccount()), [dispatch])
 
   // this is a workaround for iOS 15 where content is left weirdly
   // scrolled once the keyboard disappears after signing in/creating
