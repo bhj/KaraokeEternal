@@ -2,10 +2,11 @@ const path = require('path')
 const baseDir = path.resolve(path.dirname(require.main.filename), '..')
 const env = {
   NODE_ENV: process.env.NODE_ENV,
-  KF_SERVER_PATH_DATA: baseDir,
-  KF_SERVER_PATH_ASSETS: path.join(baseDir, 'assets'),
-  KF_SERVER_PATH_WEBROOT: path.join(baseDir, 'build'),
-  KF_SERVER_URL_PATH: '/',
+  KF_SERVER_PATH_DATA: process.env.KF_SERVER_PATH_DATA || baseDir,
+  KF_SERVER_PATH_ASSETS: process.env.KF_SERVER_PATH_ASSETS || path.join(baseDir, 'assets'),
+  KF_SERVER_PATH_WEBROOT: process.env.KF_SERVER_PATH_WEBROOT || path.join(baseDir, 'build'),
+  KF_SERVER_PORT: parseInt(process.env.KF_SERVER_PORT, 10) || 0,
+  KF_SERVER_URL_PATH: process.env.KF_SERVER_URL_PATH || '/',
 }
 
 const yargs = require('yargs')
@@ -90,13 +91,11 @@ const opts = {
   serverLogLevel: 'KF_SERVER_LOG_LEVEL',
 }
 
-Object.keys(opts).forEach(key => {
-  if (typeof argv[key] !== 'undefined') {
-    env[opts[key]] = argv[key]
-    process.env[opts[key]] = argv[key]
-  } else if (process.env[opts[key]]) {
-    env[opts[key]] = process.env[opts[key]]
+for (const opt in opts) {
+  if (typeof argv[opt] !== 'undefined') {
+    env[opts[opt]] = argv[opt]
+    process.env[opts[opt]] = argv[opt]
   }
-})
+}
 
 module.exports = env
