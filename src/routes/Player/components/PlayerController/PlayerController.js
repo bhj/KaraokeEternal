@@ -12,6 +12,8 @@ const PlayerController = props => {
   const player = useSelector(state => state.player)
   const playerVisualizer = useSelector(state => state.playerVisualizer)
   const prefs = useSelector(state => state.prefs)
+  const queueItem = queue.entities[player.queueId]
+  const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
   const dispatch = useDispatch()
   const handleStatus = useCallback(status => dispatch(playerStatus(status)), [dispatch])
@@ -21,11 +23,6 @@ const PlayerController = props => {
     dispatch(playerError(msg))
     handleStatus()
   }, [dispatch, handleStatus])
-
-  const queueItem = queue.entities[player.queueId]
-  const nextQueueItem = queueItem
-    ? queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
-    : queue.entities[queue.result[0]]
 
   const handleLoadNext = useCallback(() => {
     const history = JSON.parse(player.historyJSON)
@@ -56,10 +53,23 @@ const PlayerController = props => {
       mediaType: nextQueueItem.mediaType,
       position: 0,
       queueId: nextQueueItem.queueId,
+      nextUserId: null,
     })
   }, [handleStatus, nextQueueItem, player.historyJSON, queueItem])
 
-  // emit status when one of these changes
+  // "lock in" the next user that isn't the currently up user, if possible
+  useEffect(() => {
+    if (!player.nextUserId || queueItem?.userId === nextQueueItem?.userId) {
+      for (let i = queue.result.indexOf(queueItem?.queueId) + 1; i < queue.result.length; i++) {
+        if (queueItem?.userId !== queue.entities[queue.result[i]].userId) {
+          handleStatus({ nextUserId: queue.entities[queue.result[i]].userId })
+          return
+        }
+      }
+    }
+  }, [handleStatus, nextQueueItem, player.nextUserId, queue, queueItem])
+
+  // always emit status when any of these change
   useEffect(() => handleStatus(), [
     handleStatus,
     player.cdgAlpha,

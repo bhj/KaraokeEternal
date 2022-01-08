@@ -5,16 +5,27 @@ import getPlayerHistory from './getPlayerHistory'
 const getResult = (state) => ensureState(state.queue).result
 const getEntities = (state) => ensureState(state.queue).entities
 const getQueueId = (state) => state.status.queueId
+const getNextUserId = (state) => state.status.nextUserId
 
 const getRoundRobinQueue = createSelector(
-  [getResult, getEntities, getPlayerHistory, getQueueId],
-  (result, entities, history, curId) => {
+  [getResult, getEntities, getPlayerHistory, getQueueId, getNextUserId],
+  (result, entities, history, curId, nextUserId) => {
     // in case history references non-existent items or queue is still loading
     history = history.filter(queueId => result.includes(queueId))
 
-    // consider current item played (we don't want to re-order it)
+    // consider current item played (don't re-order it)
     if (entities[curId] && history.lastIndexOf(curId) === -1) {
       history.push(curId)
+    }
+
+    // "lock in" next user's item (don't re-order it)
+    if (nextUserId !== null) {
+      for (const queueId of result) {
+        if (!history.includes(queueId) && entities[queueId].userId === nextUserId) {
+          history.push(queueId)
+          break
+        }
+      }
     }
 
     const map = new Map()
@@ -24,8 +35,6 @@ const getRoundRobinQueue = createSelector(
     result.forEach(queueId => {
       if (history.includes(queueId) || // only concerned with upcoming songs
         entities[queueId].isOptimistic // ignore optimisic items
-      // !songs[entities[queueId].songId] ||
-      // !artists[songs[entities[queueId].songId].artistId]
       ) return
 
       const userId = entities[queueId].userId

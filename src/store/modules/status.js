@@ -85,6 +85,7 @@ const initialState = {
   isWebGLSupported: false,
   mediaType: null,
   mp4Alpha: 1,
+  nextUserId: null,
   position: 0,
   queueId: -1,
   visualizer: {},
