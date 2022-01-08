@@ -29,14 +29,9 @@ log.transports.file.format = (msg) => {
 
 class Log {
   static set (transport, userLevel, defaultLevel) {
-    if (typeof userLevel !== 'number') userLevel = parseInt(userLevel, 10)
-
-    // resolve level by using the default if the user-provided value is invalid
-    if (isNaN(userLevel) || typeof _levels[userLevel] === 'undefined') {
-      log.transports[transport].level = _levels[defaultLevel]
-    } else {
-      log.transports[transport].level = _levels[userLevel]
-    }
+    log.transports[transport].level = typeof _levels[userLevel] === 'undefined'
+      ? _levels[defaultLevel]
+      : _levels[userLevel]
 
     return this
   }

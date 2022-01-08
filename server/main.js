@@ -16,7 +16,10 @@ const {
   SERVER_WORKER_STATUS,
 } = require('../shared/actionTypes')
 
-Object.keys(env).forEach(key => log.verbose(`${key} = ${env[key]}`))
+// log non-default settings
+for (const key in env) {
+  if (process.env[key]) log.verbose(`${key}=${process.env[key]}`)
+}
 
 // close db before exiting (can't do async in the 'exit' handler)
 process.on('SIGTERM', shutdown)

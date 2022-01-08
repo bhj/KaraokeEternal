@@ -2,10 +2,16 @@ const path = require('path')
 const baseDir = path.resolve(path.dirname(require.main.filename), '..')
 const env = {
   NODE_ENV: process.env.NODE_ENV,
+  KF_SERVER_CONSOLE_LEVEL: parseInt(process.env.KF_SERVER_CONSOLE_LEVEL, 10),
+  KF_SERVER_LOG_LEVEL: parseInt(process.env.KF_SERVER_LOG_LEVEL, 10),
+  KF_SERVER_PATH_ASSETS: path.join(baseDir, 'assets'),
   KF_SERVER_PATH_DATA: process.env.KF_SERVER_PATH_DATA || baseDir,
-  KF_SERVER_PATH_ASSETS: process.env.KF_SERVER_PATH_ASSETS || path.join(baseDir, 'assets'),
-  KF_SERVER_PATH_WEBROOT: process.env.KF_SERVER_PATH_WEBROOT || path.join(baseDir, 'build'),
+  KF_SERVER_PATH_WEBROOT: path.join(baseDir, 'build'),
   KF_SERVER_PORT: parseInt(process.env.KF_SERVER_PORT, 10) || 0,
+  KF_SERVER_ROTATE_KEY: ['1', 'true'].includes(process.env.KF_SERVER_ROTATE_KEY?.toLowerCase()),
+  KF_SERVER_SCAN: ['1', 'true'].includes(process.env.KF_SERVER_SCAN?.toLowerCase()),
+  KF_SERVER_SCAN_CONSOLE_LEVEL: parseInt(process.env.KF_SERVER_SCAN_CONSOLE_LEVEL, 10),
+  KF_SERVER_SCAN_LOG_LEVEL: parseInt(process.env.KF_SERVER_SCAN_LOG_LEVEL, 10),
   KF_SERVER_URL_PATH: process.env.KF_SERVER_URL_PATH || '/',
 }
 
@@ -73,6 +79,7 @@ if (argv.version) {
   process.exit(0)
 }
 
+// CLI options take precendence over env vars
 if (argv.scan) {
   env.KF_SERVER_SCAN = true
 }
@@ -81,14 +88,13 @@ if (argv.rotateKey) {
   env.KF_SERVER_ROTATE_KEY = true
 }
 
-// settings via CLI take precendence over env vars
 const opts = {
+  consoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
+  logLevel: 'KF_SERVER_LOG_LEVEL',
   port: 'KF_SERVER_PORT',
+  scanConsoleLevel: 'KF_SERVER_SCAN_CONSOLE_LEVEL',
+  scanLogLevel: 'KF_SERVER_SCAN_LOG_LEVEL',
   urlPath: 'KF_SERVER_URL_PATH',
-  scannerConsoleLevel: 'KF_SERVER_SCAN_CONSOLE_LEVEL',
-  scannerLogLevel: 'KF_SERVER_SCAN_LOG_LEVEL',
-  serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
-  serverLogLevel: 'KF_SERVER_LOG_LEVEL',
 }
 
 for (const opt in opts) {
