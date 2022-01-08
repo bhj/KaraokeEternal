@@ -10,7 +10,6 @@ const PrefsSocket = require('./Prefs/socket')
 const Rooms = require('./Rooms')
 const Queue = require('./Queue')
 const QueueSocket = require('./Queue/socket')
-const User = require('./User')
 const {
   LIBRARY_PUSH,
   QUEUE_PUSH,
@@ -68,13 +67,10 @@ module.exports = function (io, jwtKey) {
       )
 
       // any players left in room?
-      for (const s of io.of('/').sockets.values()) {
-        if (s.user && s.user.roomId === sock.user.roomId && s._lastPlayerStatus) {
-          break
-        }
-
+      if (!Rooms.isPlayerPresent(io, sock.user.roomId)) {
         io.to(Rooms.prefix(sock.user.roomId)).emit('action', {
           type: PLAYER_LEAVE,
+          payload: { socketId: sock.id },
         })
       }
     })

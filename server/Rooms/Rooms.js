@@ -92,6 +92,23 @@ class Rooms {
 
     return rooms
   }
+
+  /**
+   * Utility method to determine if a player is in a room
+   *
+   * @param  {Object}  io  The socket.io instance
+   * @param  {Object}  roomId  Room to check
+   * @return {Boolean}
+   */
+  static isPlayerPresent (io, roomId) {
+    for (const sock of io.of('/').sockets.values()) {
+      if (sock.user && sock.user.roomId === roomId && sock._lastPlayerStatus) {
+        return true
+      }
+    }
+
+    return false
+  }
 }
 
 module.exports = Rooms
