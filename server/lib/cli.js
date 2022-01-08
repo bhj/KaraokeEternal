@@ -17,6 +17,11 @@ const env = {
 
 const yargs = require('yargs')
   .version(false) // disable default handler
+  .option('data', {
+    describe: 'Absolute path for database file(s)',
+    requiresArg: true,
+    type: 'string',
+  })
   .option('p', {
     alias: 'port',
     describe: 'Web server port (default=auto)',
@@ -29,21 +34,6 @@ const yargs = require('yargs')
   .option('scan', {
     describe: 'Run the media scanner at startup',
   })
-  .option('urlPath', {
-    describe: 'Web server URL base path (default=/)',
-    requiresArg: true,
-    type: 'string',
-  })
-  .option('consoleLevel', {
-    describe: 'Web server console log level (default=4)',
-    number: true,
-    requiresArg: true,
-  })
-  .option('logLevel', {
-    describe: 'Web server file log level (default=3)',
-    number: true,
-    requiresArg: true,
-  })
   .option('scanConsoleLevel', {
     describe: 'Media scanner console log level (default=4)',
     number: true,
@@ -53,6 +43,21 @@ const yargs = require('yargs')
     describe: 'Media scanner file log level (default=3)',
     number: true,
     requiresArg: true,
+  })
+  .option('serverConsoleLevel', {
+    describe: 'Web server console log level (default=4)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('serverLogLevel', {
+    describe: 'Web server file log level (default=3)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('urlPath', {
+    describe: 'Web server URL base path (default=/)',
+    requiresArg: true,
+    type: 'string',
   })
   .option('v', {
     alias: 'version',
@@ -89,11 +94,12 @@ if (argv.rotateKey) {
 }
 
 const opts = {
-  consoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
-  logLevel: 'KF_SERVER_LOG_LEVEL',
+  data: 'KF_SERVER_PATH_DATA',
   port: 'KF_SERVER_PORT',
   scanConsoleLevel: 'KF_SERVER_SCAN_CONSOLE_LEVEL',
   scanLogLevel: 'KF_SERVER_SCAN_LOG_LEVEL',
+  serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
+  serverLogLevel: 'KF_SERVER_LOG_LEVEL',
   urlPath: 'KF_SERVER_URL_PATH',
 }
 
