@@ -107,7 +107,7 @@
     "html-loader": "^3.0.1",
     "html-webpack-plugin": "^5.4.0",
     "license-webpack-plugin": "^4.0.0",
-    "markdown-loader": "^6.0.0",
+    "markdown-loader": "^8.0.0",
     "mini-css-extract-plugin": "^2.4.5",
     "modern-normalize": "^1.1.0",
     "nodemon": "^2.0.13",
