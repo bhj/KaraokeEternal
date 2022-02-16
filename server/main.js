@@ -21,6 +21,17 @@ for (const key in env) {
   if (process.env[key]) log.verbose(`${key}=${process.env[key]}`)
 }
 
+// support PUID/PGID convention (group MUST be set before user!)
+if (Number.isInteger(env.KF_SERVER_PGID)) {
+  log.verbose(`PGID=${env.KF_SERVER_PGID}`)
+  process.setgid(env.KF_SERVER_PGID)
+}
+
+if (Number.isInteger(env.KF_SERVER_PUID)) {
+  log.verbose(`PUID=${env.KF_SERVER_PUID}`)
+  process.setuid(env.KF_SERVER_PUID)
+}
+
 // close db before exiting (can't do async in the 'exit' handler)
 process.on('SIGTERM', shutdown)
 process.on('SIGINT', shutdown)
@@ -65,7 +76,9 @@ function startScanner (onExit) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
     refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
-      env: { ...env, KF_CHILD_PROCESS: 'scanner' }
+      env: { ...env, KF_CHILD_PROCESS: 'scanner' },
+      gid: Number.isInteger(env.KF_SERVER_PGID) ? env.KF_SERVER_PGID : undefined,
+      uid: Number.isInteger(env.KF_SERVER_PUID) ? env.KF_SERVER_PUID : undefined,
     })
 
     refs.scanner.on('exit', (code, signal) => {

@@ -13,6 +13,9 @@ const env = {
   KF_SERVER_SCAN_CONSOLE_LEVEL: parseInt(process.env.KF_SERVER_SCAN_CONSOLE_LEVEL, 10),
   KF_SERVER_SCAN_LOG_LEVEL: parseInt(process.env.KF_SERVER_SCAN_LOG_LEVEL, 10),
   KF_SERVER_URL_PATH: process.env.KF_SERVER_URL_PATH || '/',
+  // support PUID/PGID convention
+  KF_SERVER_PUID: parseInt(process.env.PUID, 10),
+  KF_SERVER_PGID: parseInt(process.env.PGID, 10),
 }
 
 const yargs = require('yargs')
