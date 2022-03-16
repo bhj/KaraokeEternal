@@ -1,6 +1,6 @@
 const db = require('../lib/Database').db
 const sql = require('sqlate')
-const log = require('../lib/Log').getLogger('Library')
+const log = require('../lib/Log')('Library')
 const { performance } = require('perf_hooks')
 const Media = require('../Media')
 

@@ -1,50 +1,71 @@
-const log = require('electron-log')
-const _levels = [false, 'error', 'warn', 'info', 'verbose', 'debug']
 const util = require('util')
-const stripAnsi = require('strip-ansi')
-const colors = {
-  error: '\x1b[1;31m', // red
-  warn: '\x1b[1;33m', // yellow
-  info: '\x1b[1;34m', // blue
-  verbose: '',
-  debug: '',
-  reset: '\x1b[0m',
-}
-
-// console defaults
-log.transports.console.level = 'debug'
-log.transports.console.format = function (msg) {
-  const text = util.format.apply(null, msg.data)
-  const lvl = ('[' + msg.level + ']').padStart(9, ' ')
-  return `${colors[msg.level]}${msg.date.toLocaleString()} ${lvl}${colors.reset} ${text}`
-}
-
-// file defaults
-log.transports.file.level = false
-log.transports.file.fileName = (process.env.KF_CHILD_PROCESS || 'server') + '.log'
-log.transports.file.format = (msg) => {
-  const text = stripAnsi(util.format.apply(null, msg.data))
-  return `${msg.date.toLocaleString()} [${msg.level}] ${text}`
-}
+const _levels = [false, 'error', 'warn', 'info', 'verbose', 'debug']
+let _defaultInstance
 
 class Log {
-  static set (transport, userLevel, defaultLevel) {
-    log.transports[transport].level = typeof _levels[userLevel] === 'undefined'
-      ? _levels[defaultLevel]
-      : _levels[userLevel]
+  constructor (logId, cfg) {
+    this.logger = require('electron-log').create(logId)
 
+    // defaults
+    this.logger.transports.console.level = 'debug'
+    this.logger.transports.file.level = false
+    this.logger.transports.file.fileName = logId + '.log'
+
+    for (const transport in cfg) {
+      this.logger.transports[transport].level = cfg[transport]
+    }
+  }
+
+  setDefaultInstance () {
+    _defaultInstance = this
     return this
   }
 
-  static getLogger (prefix) {
+  static resolve (userLevel, defaultLevel) {
+    return typeof _levels[userLevel] === 'undefined'
+      ? _levels[defaultLevel]
+      : _levels[userLevel]
+  }
+}
+
+class IPCLog {
+  constructor (scope = '') {
+    const IPC = require('./IPCBridge')
+    const { SCANNER_WORKER_LOG } = require('../../shared/actionTypes')
+    const send = (level, str, ...args) => {
+      IPC.send({
+        type: SCANNER_WORKER_LOG,
+        payload: {
+          level,
+          msg: `${scope ? scope + ': ' : ''}${util.format(str, ...args)}`,
+        },
+        meta: {
+          noAck: true,
+        }
+      })
+    }
+
     return {
-      error: (txt, ...args) => log.error(prefix + ': ' + txt, ...args),
-      warn: (txt, ...args) => log.warn(prefix + ': ' + txt, ...args),
-      info: (txt, ...args) => log.info(prefix + ': ' + txt, ...args),
-      verbose: (txt, ...args) => log.verbose(prefix + ': ' + txt, ...args),
-      debug: (txt, ...args) => log.debug(prefix + ': ' + txt, ...args),
+      error: send.bind(this, 'error'),
+      warn: send.bind(this, 'warn'),
+      info: send.bind(this, 'info'),
+      verbose: send.bind(this, 'verbose'),
+      debug: send.bind(this, 'debug'),
     }
   }
 }
 
-module.exports = Log
+function getLogger (scope = '') {
+  if (!_defaultInstance) throw new Error('no default logger instance')
+  return _defaultInstance.logger.scope(scope)
+}
+
+function getIPCLogger (scope = '') {
+  return new IPCLog(scope)
+}
+
+// default export
+module.exports = process.env.KF_CHILD_PROCESS ? getIPCLogger : getLogger
+
+// used by main.js to instantiate the loggers
+module.exports.Log = Log

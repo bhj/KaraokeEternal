@@ -2,10 +2,18 @@
 const childProcess = require('child_process')
 const path = require('path')
 const env = require('./lib/cli')
-const log = require('./lib/Log')
-  .set('console', env.KF_SERVER_CONSOLE_LEVEL, env.NODE_ENV === 'development' ? 5 : 4)
-  .set('file', env.KF_SERVER_LOG_LEVEL, env.NODE_ENV === 'development' ? 0 : 3)
-  .getLogger(`main[${process.pid}]`)
+const { Log } = require('./lib/Log')
+
+const log = new Log('server', {
+  console: Log.resolve(env.KF_SERVER_CONSOLE_LEVEL, env.NODE_ENV === 'development' ? 5 : 4),
+  file: Log.resolve(env.KF_SERVER_LOG_LEVEL, env.NODE_ENV === 'development' ? 0 : 3),
+}).setDefaultInstance().logger.scope(`main[${process.pid}]`)
+
+const scannerLog = new Log('scanner', {
+  console: Log.resolve(process.env.KF_SERVER_SCAN_CONSOLE_LEVEL, process.env.NODE_ENV === 'development' ? 5 : 4),
+  file: Log.resolve(process.env.KF_SERVER_SCAN_LOG_LEVEL, process.env.NODE_ENV === 'development' ? 0 : 3),
+}).logger.scope('scanner')
+
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
 const refs = {}
@@ -13,8 +21,17 @@ const {
   SCANNER_CMD_START,
   SCANNER_CMD_STOP,
   SERVER_WORKER_ERROR,
+  SCANNER_WORKER_LOG,
   SERVER_WORKER_STATUS,
 } = require('../shared/actionTypes')
+
+// handle scanner logs
+// @todo: this doesn't need to be async
+IPC.use({
+  [SCANNER_WORKER_LOG]: async (action) => {
+    scannerLog[action.payload.level](action.payload.msg)
+  }
+})
 
 // log non-default settings
 for (const key in env) {
@@ -32,12 +49,15 @@ if (Number.isInteger(env.KF_SERVER_PUID)) {
   process.setuid(env.KF_SERVER_PUID)
 }
 
+log.verbose(JSON.stringify(require('os').userInfo()))
+
 // close db before exiting (can't do async in the 'exit' handler)
 process.on('SIGTERM', shutdown)
 process.on('SIGINT', shutdown)
 
 // make sure child processes don't hang around
 process.on('exit', function () {
+  if (refs.server) refs.server.kill()
   if (refs.scanner) refs.scanner.kill()
 })
 
@@ -102,7 +122,7 @@ function stopScanner () {
 }
 
 function shutdown (signal) {
-  log.info('Received signal %s', signal)
+  log.info('Received %s', signal)
 
   Database.close().then(() => {
     log.info('Goodbye for now...')

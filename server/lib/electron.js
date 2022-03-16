@@ -1,6 +1,6 @@
 const { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
-const log = require('./Log').getLogger(`main:electron[${process.pid}]`)
+const log = require('./Log')(`main:electron[${process.pid}]`)
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

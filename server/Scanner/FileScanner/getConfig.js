@@ -1,5 +1,5 @@
 const path = require('path')
-const log = require('../../lib/Log').getLogger('FileScanner')
+const log = require('../../lib/Log')('FileScanner')
 const fs = require('fs')
 const { NodeVM } = require('vm2')
 const KF_CONFIG = '_kfconfig.js'

@@ -1,4 +1,4 @@
-const log = require('./Log').getLogger('IPC')
+const log = require('./Log')('IPCBridge')
 const {
   _ERROR,
   _SUCCESS,

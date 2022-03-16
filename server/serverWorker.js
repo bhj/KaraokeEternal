@@ -1,4 +1,4 @@
-const log = require('./lib/Log').getLogger(`server[${process.pid}]`)
+const log = require('./lib/Log')('server')
 const path = require('path')
 const getIPAddress = require('./lib/getIPAddress')
 const http = require('http')

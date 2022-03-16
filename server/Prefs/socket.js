@@ -1,4 +1,4 @@
-const log = require('../lib/Log').getLogger(`server[${process.pid}]`)
+const log = require('../lib/Log')(`server[${process.pid}]`)
 const Library = require('../Library')
 const Prefs = require('./Prefs')
 const {

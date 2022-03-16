@@ -1,7 +1,4 @@
-const log = require('./lib/Log')
-  .set('console', process.env.KF_SERVER_SCAN_CONSOLE_LEVEL, process.env.NODE_ENV === 'development' ? 5 : 4)
-  .set('file', process.env.KF_SERVER_SCAN_LOG_LEVEL, process.env.NODE_ENV === 'development' ? 0 : 3)
-  .getLogger(`scanner[${process.pid}]`)
+const log = require('./lib/Log')(`scanner[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
 const {

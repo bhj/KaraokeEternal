@@ -88,6 +88,7 @@ module.exports = {
   // IPC messages
   SCANNER_CMD_START: 'scannerWorker/CMD_START',
   SCANNER_CMD_STOP: 'scannerWorker/CMD_STOP',
+  SCANNER_WORKER_LOG: 'scannerWorker/LOG',
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
   SERVER_WORKER_ERROR: 'serverWorker/ERROR',

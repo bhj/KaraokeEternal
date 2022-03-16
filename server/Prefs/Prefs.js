@@ -2,7 +2,7 @@ const path = require('path')
 const db = require('../lib/Database').db
 const sql = require('sqlate')
 const crypto = require('crypto')
-const log = require('../lib/Log').getLogger('Prefs')
+const log = require('../lib/Log')('Prefs')
 
 class Prefs {
   /**
