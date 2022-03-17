@@ -49,8 +49,6 @@ if (Number.isInteger(env.KF_SERVER_PUID)) {
   process.setuid(env.KF_SERVER_PUID)
 }
 
-log.verbose(JSON.stringify(require('os').userInfo()))
-
 // close db before exiting (can't do async in the 'exit' handler)
 process.on('SIGTERM', shutdown)
 process.on('SIGINT', shutdown)

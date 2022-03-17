@@ -113,7 +113,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   })
 
   // http request/response logging
-  app.use(koaLogger((str, args) => (args.length === 6 && args[3] >= 500) ? log.error(str) : log.verbose(str)))
+  app.use(koaLogger((str, args) => (args.length === 6 && args[3] >= 500) ? log.error(str) : log.debug(str)))
 
   app.use(koaFavicon(path.join(env.KF_SERVER_PATH_ASSETS, 'favicon.ico')))
   app.use(koaRange)
