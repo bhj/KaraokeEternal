@@ -11,9 +11,10 @@ const config = {
     '!**/node_modules/bcrypt/build${/*}',
     '!**/node_modules/bcrypt/examples${/*}',
     '!**/node_modules/bcrypt/test${/*}',
-    '!**/node_modules/@vscode/sqlite3/lib/binding/node-*${/*}',
-    '!**/node_modules/@vscode/sqlite3/build',
+    '!**/node_modules/@vscode/sqlite3/build/deps',
+    '!**/node_modules/@vscode/sqlite3/build/Release/*.a',
     '!**/node_modules/@vscode/sqlite3/deps',
+    '!**/node_modules/@vscode/sqlite3/src',
     '!**/node_modules/@vscode/sqlite3/tools',
   ],
   mac: {
