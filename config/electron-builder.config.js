@@ -18,7 +18,10 @@ const config = {
     '!**/node_modules/@vscode/sqlite3/tools',
   ],
   mac: {
-    target: 'dmg',
+    target: {
+      target: 'dmg',
+      arch: ['x64'],
+    },
     icon: 'assets/app.png',
   },
   win: {
