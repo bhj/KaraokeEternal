@@ -1,7 +1,7 @@
 /* eslint-disable max-len, no-template-curly-in-string */
 const manifest = require('../package.json')
 const config = {
-  appId: 'com.RadRootLLC.KaraokeForeverServer',
+  appId: 'com.RadRoot.KaraokeForeverServer',
   files: [
     ...manifest.files,
     '!**/node_modules/**/{CONTRIBUTORS,CNAME,AUTHOR,TODO,CONTRIBUTING,COPYING,INSTALL,NEWS,PORTING,Dockerfile,Makefile,htdocs,CHANGELOG,ChangeLog,changelog,README,Readme,readme,test,sample,example,demo,composer.json,tsconfig.json,jsdoc.json,tslint.json,typings.json,gulpfile,bower.json,package-lock,Gruntfile,CMakeLists,karma.conf,yarn.lock}*',
