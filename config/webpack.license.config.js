@@ -44,7 +44,7 @@ const applyLicenseConfig = config => {
 
 const karaokeForever = {
   packageJson: {
-    name: 'Karaoke Forever',
+    name: 'Karaoke Eternal',
   },
   licenseText: fs.readFileSync('./LICENSE', 'utf8'),
 }

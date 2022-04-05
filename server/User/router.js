@@ -32,7 +32,7 @@ router.post('/login', async (ctx, next) => {
 // logout
 router.get('/logout', async (ctx, next) => {
   // @todo force socket room leave
-  ctx.cookies.set('kfToken', '')
+  ctx.cookies.set('keToken', '')
   ctx.status = 200
   ctx.body = {}
 })
@@ -430,7 +430,7 @@ async function _login (ctx, creds, validateRoomPassword = true) {
   }, ctx.jwtKey)
 
   // set JWT as an httpOnly cookie
-  ctx.cookies.set('kfToken', token, {
+  ctx.cookies.set('keToken', token, {
     httpOnly: true,
   })
 

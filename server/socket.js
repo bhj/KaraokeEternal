@@ -31,13 +31,13 @@ const handlers = {
 
 module.exports = function (io, jwtKey) {
   io.on('connection', async (sock) => {
-    const { kfToken } = parseCookie(sock.handshake.headers.cookie)
+    const { keToken } = parseCookie(sock.handshake.headers.cookie)
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
     const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
 
     // authenticate the JWT sent via cookie in http handshake
     try {
-      sock.user = jwtVerify(kfToken, jwtKey)
+      sock.user = jwtVerify(keToken, jwtKey)
 
       // success
       log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)

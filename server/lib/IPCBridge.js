@@ -4,11 +4,11 @@ const {
   _SUCCESS,
 } = require('../../shared/actionTypes')
 
-const PROCESS_NAME = process.env.KF_CHILD_PROCESS || 'main'
+const PROCESS_NAME = process.env.KE_CHILD_PROCESS || 'main'
 const children = []
 let handlers = {}
 const reqs = {}
-const isParent = typeof process.env.KF_CHILD_PROCESS === 'undefined' // @todo
+const isParent = typeof process.env.KE_CHILD_PROCESS === 'undefined' // @todo
 const isChild = !isParent
 let actionId = 0
 
