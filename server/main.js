@@ -94,7 +94,7 @@ function startScanner (onExit) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
     refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
-      env: { ...env, KE_CHILD_PROCESS: 'scanner' },
+      env: { ...env, KES_CHILD_PROCESS: 'scanner' },
       gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
       uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
     })
