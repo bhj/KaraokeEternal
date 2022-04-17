@@ -4,7 +4,6 @@
   <link rel="shortcut icon" href='{{ (resources.Get "images/favicon.ico").Permalink }}'>
   <link rel="apple-touch-icon" href='{{ (resources.Get "images/logo_mic.png").Permalink }}'>
   <title>{{ .Title }} | {{ .Site.Title }}</title>
-
   <style>
     @font-face {
       font-family: 'Raleway';
@@ -14,11 +13,11 @@
            url('{{ (resources.Get "fonts/raleway-v14-latin-200.woff2").Permalink }}') format('woff2');
     }
     @font-face {
-      font-family: 'Raleway';
+      font-family: 'Beon';
       font-style: normal;
-      font-weight: 700;
-      src: local('Raleway Bold'), local('Raleway-Bold'),
-           url('{{ (resources.Get "fonts/raleway-v14-latin-700.woff2").Permalink }}') format('woff2');
+      font-weight: normal;
+      src: local('Beon'),
+           url('{{ (resources.Get "fonts/beon.woff2").Permalink }}') format('woff2');
     }
   </style>
   {{ $style := resources.Get "css/style.scss" | toCSS | minify | fingerprint }}

@@ -1,5 +1,6 @@
 @import "variables.scss";
 @import "poole.scss";
+@import "logo.scss";
 
 html {
   font: 16px/1.5 sans-serif;
@@ -70,11 +71,11 @@ hr { border-color: #777; }
  * Container
  */
 .content {
-  padding-top: 1rem;
+  padding-top: 0.5rem;
   padding-bottom: 4rem;
 }
 
-@media (min-width: 50rem) {
+@media (min-width: 60rem) {
   .content {
     padding-top: 6rem;
     max-width: 80rem;
@@ -86,7 +87,7 @@ hr { border-color: #777; }
 /*
  * Sidebar
  */
-@media (min-width: 50rem) {
+@media (min-width: 60rem) {
   .sidebar {
     position: fixed;
     top: 0;
@@ -99,6 +100,7 @@ hr { border-color: #777; }
     nav {
       display: block;
       margin: 1.5rem;
+      padding: 0;
     }
   }
 
@@ -110,14 +112,11 @@ hr { border-color: #777; }
 /*
  * Navigation
  */
-header {
- display: flex;
-}
-
 #btn-nav {
-  box-sizing: content-box;
+  max-width: 40rem;
+  padding: 0 1rem;
+  margin: 0 auto;
   fill: var(--btn-bg-color);
-  padding: 1.5rem 1rem 0 0;
   cursor: pointer;
 }
 
@@ -128,13 +127,22 @@ header {
 #btn-nav .icon {
   width: 48px;
   height: 48px;
+  display: block;
+  float: right;
+  position: relative;
+  top: 1.75rem;
 }
 
 nav {
   display: none;
-  margin: 1em;
+  max-width: 40rem;
+  margin: 3rem auto 1rem auto;
+  padding: 0 4rem 0 1rem;
 }
-nav.active { display: block}
+
+nav.active {
+  display: block;
+}
 
 nav a.active,
 nav li.active {
@@ -161,77 +169,14 @@ a.nav-item:focus {
 }
 
 .github {
-  margin: 0;
+  margin-top: 0.5rem;
+  padding: 0;
+  text-align: center;
+  list-style-type: none;
 }
 
 .github li span {
-  display: inline-table;
-  vertical-align: middle;
-}
-
-/*
- * Logo
- */
-.logo {
-  font-family: 'Raleway', sans-serif;
-  font-size: 2rem;
-  white-space: nowrap;
-  padding-top: .5rem;
-  flex: 1;
-}
-
-.logo-forever {
-  font-weight: 700;
-}
-
-.logo img {
-  margin: 0;
-  width: 3rem;
-  position: relative;
-  display: inline-block;
-  top: -.25rem;
-  right: -1.5rem;
-}
-
-.logo h1 {
-  border: none;
-  color: var(--logo-color);
-  display: inline-block;
-  font-weight: 200;
-  font-size: 2rem;
-  margin-bottom: 0;
-  text-shadow: var(--text-shadow-glow);
-}
-
-.logo .description {
-  text-align: center;
-  display: none;
-  font-weight: 200;
-  text-shadow: var(--text-shadow-glow);
-}
-
-.nospace {
-  font-size: 0;
-}
-
-@media (min-width: 50rem) {
-  .logo {
-    font-size: 36px;
-  }
-
-  .logo img {
-    top: -32px;
-    right: -26px;
-  }
-
-  .logo h1 {
-    margin-bottom: 1rem;
-  }
-
-  .logo .description {
-    display: block;
-    font-size: 1rem;
-  }
+  padding: 0 0.15rem;
 }
 
 /*
@@ -354,7 +299,7 @@ figure {
   height: auto;
 }
 
-@media (min-width: 50rem) {
+@media (min-width: 60rem) {
   .overlay img {
     max-width: 66vh !important;
     max-height: 66vh !important;

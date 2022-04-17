@@ -2,7 +2,7 @@
 title: Overview
 ---
 
-Host awesome karaoke parties where everyone can easily find and queue songs from their phone's web browser. The player is also browser-based with support for MP3+G, MP4 video and WebGL visualizations. The server is self-hosted with no internet connection required.
+Host awesome karaoke parties where everyone can easily find and queue songs from their phone's browser. The player is also browser-based with support for MP3+G, MP4 video and WebGL visualizations. The server is self-hosted with no internet connection required.
 
 {{< screenshots >}}
 
@@ -19,25 +19,25 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 - Multiple simultaneous rooms/queues (optionally password-protected)
 - No ads or telemetry; all data stored locally
 
-Karaoke Forever assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the <a href='{{< ref "faq.md/#whats-the-recommended-audio-setup" >}}'>F.A.Q.</a> for more information.
+Karaoke Eternal assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the <a href='{{< ref "faq.md/#whats-the-recommended-audio-setup" >}}'>F.A.Q.</a> for more information.
 
 ## Download & Install
 
-See <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}} available for your OS, as well as the <a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>installation documentation</a>.
+See <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}} available for your OS, as well as the <a href='{{< ref "docs/index.md/#karaoke-eternal-server" >}}'>installation documentation</a>.
 
 Please note that the main branch is actively developed and is not guaranteed to be stable.
 
 ## Getting Started
 
- Karaoke Forever basically has 3 parts. You can jump to the documentation for each below, or <a href='{{< ref "docs/index.md/#quick-start" >}}'>Quick Start</a> to get up and running step-by-step.
+ Karaoke Eternal basically has 3 parts. You can jump to the documentation for each below, or <a href='{{< ref "docs/index.md/#quick-start" >}}'>Quick Start</a> to get up and running step-by-step.
 
-- **<a href='{{< ref "docs/index.md/#karaoke-forever-server" >}}'>Server:</a>** Runs on almost any OS to serve the app and your media files
-- **<a href='{{< ref "docs/index.md/#karaoke-forever-the-web-app" >}}'>App:</a>** Fast, modern mobile browser app designed for "karaoke conditions"
+- **<a href='{{< ref "docs/index.md/#karaoke-eternal-server" >}}'>Server:</a>** Runs on almost any OS to serve the app and your media files
+- **<a href='{{< ref "docs/index.md/#karaoke-eternal-the-app" >}}'>App:</a>** Fast, modern mobile browser app designed for "karaoke conditions"
 - **<a href='{{< ref "docs/index.md/#player" >}}'>Player:</a>** Just another part of the app, designed to run fullscreen on the system handling audio/video for a <a href='{{< ref "docs/index.md/#rooms-admin-only" >}}'>room</a>
 
 ## Discord / Support
 
-Join the [Karaoke Forever Discord Server](https://discord.gg/PgqVtFq){{% icon-external %}} for general support and development chat, or just to say hi!
+Join the [Karaoke Eternal Discord Server](https://discord.gg/PgqVtFq){{% icon-external %}} for general support and development chat, or just to say hi!
 
 ## Contributing & Development
 

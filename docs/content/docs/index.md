@@ -20,9 +20,9 @@ resources:
 
 ## Quick Start
 
-1. Install and run [Karaoke Forever Server](#karaoke-forever-server) on the system that will serve the app and media on your local network.
+1. Install and run [Karaoke Eternal Server](#karaoke-eternal-server) on the system that will serve the app and media on your local network.
 
-2. Browse to the [app](#karaoke-forever-the-web-app) at the **server URL**. You can copy the URL or open it in your default browser using the Karaoke Forever Server menu bar or tray icon in macOS or Windows.
+2. Browse to the [app](#karaoke-eternal-the-app) at the **server URL**. You can copy the URL or open it in your default browser using the Karaoke Eternal Server menu bar or tray icon in macOS or Windows.
 
 <aside class="info">
   {{% icon-info %}}
@@ -43,9 +43,9 @@ Congratulations, you are now ready to press play and party!
 
 <hr>
 
-## Karaoke Forever (the "web" app)
+## Karaoke Eternal (the "web" app)
 
-Karaoke Forever is a modern mobile browser app that lets everyone join quickly, without having to install anything on their phones. It's built for touch, but a mouse is supported in desktop browsers (click and drag to emulate swipe gestures).
+Karaoke Eternal is a modern mobile browser app that lets everyone join quickly, without having to install anything on their phones. It's built for touch, but a mouse is supported in desktop browsers (click and drag to emulate swipe gestures).
 
 ### Library
 
@@ -84,7 +84,7 @@ The account view lets users manage their account, while admins will see addition
 
 The Rooms panel allows admins to create, edit or remove rooms.
 
-Karaoke Forever uses "rooms" to organize sessions by time and space (spacetime?) Users choose an open room when signing in, and each room has its own queue.
+Karaoke Eternal uses "rooms" to organize sessions by time and space (spacetime?) Users choose an open room when signing in, and each room has its own queue.
 
 Rooms can have one of the following statuses:
 
@@ -113,7 +113,7 @@ The My Account panel allows users to change their username, password, display na
 
 ### Player
 
-The player is a part of the [app](#karaoke-forever-the-web-app) that's designed to run fullscreen on the system handling audio/video for a [room](#rooms-admin-only). The latest versions of these browsers are officially supported:
+The player is a part of the [app](#karaoke-eternal-the-app) that's designed to run fullscreen on the system handling audio/video for a [room](#rooms-admin-only). The latest versions of these browsers are officially supported:
 
   - Firefox
   - Chromium/Chrome/Edge
@@ -129,7 +129,7 @@ Once a player is in the room, playback and display controls appear at the top of
 
 <hr>
 
-## Karaoke Forever Server
+## Karaoke Eternal Server
 
 The server hosts the app and your media files, and can run on relatively minimal hardware (Raspberry Pi 3B+). [Player(s)](#player) don't need to be on the same system as the server.
 
@@ -142,26 +142,26 @@ The server hosts the app and your media files, and can run on relatively minimal
 
 #### macOS or Windows
 
-<a href="{{% baseurl %}}download">Download</a>{{% icon-external %}} and install the latest release. Karaoke Forever Server runs in the menu bar or tray:
+<a href="{{% baseurl %}}download">Download</a>{{% icon-external %}} and install the latest release. Karaoke Eternal Server runs in the menu bar or tray:
 
 <div class="row">
-  {{< img src="server-macos.png" alt="Karaoke Forever Server (macOS)" caption="macOS" >}}
-  {{< img src="server-windows.png" alt="Karaoke Forever Server (Windows)" caption="Windows" >}}
+  {{< img src="server-macos.png" alt="Karaoke Eternal Server (macOS)" caption="macOS" >}}
+  {{< img src="server-windows.png" alt="Karaoke Eternal Server (Windows)" caption="Windows" >}}
 </div>
 
 <aside class="info">
   {{% icon-info %}}
-  <p>Beta versions of Karaoke Forever Server are not currently signed, so macOS Gatekeeper and Windows SmartScreen will likely complain. On macOS, <strong>do not disable Gatekeeper</strong>, simply right-click <code>Karaoke Forever Server.app</code> in your Applications folder and choose Open. On Windows, click More Info and then Run Anyway.</p>
+  <p>Beta versions of Karaoke Eternal Server are not currently signed, so macOS Gatekeeper and Windows SmartScreen will likely complain. On macOS, <strong>do not disable Gatekeeper</strong>, simply right-click <code>Karaoke Eternal Server.app</code> in your Applications folder and choose Open. On Windows, click More Info and then Run Anyway.</p>
 </aside>
 
 #### Any OS with Node.js
 
-Karaoke Forever Server requires [Node.js](https://nodejs.org){{% icon-external %}} 12 or later.
+Karaoke Eternal Server requires [Node.js](https://nodejs.org){{% icon-external %}} 12 or later.
 
 1. Install via ```npm```
 
 {{< highlight shell >}}
-  $ npm i -g karaoke-forever
+  $ npm i -g karaoke-eternal
 {{< /highlight >}}
 
 <aside class="info">
@@ -172,7 +172,7 @@ Karaoke Forever Server requires [Node.js](https://nodejs.org){{% icon-external %
 2. Start the server
 
 {{< highlight shell >}}
-  $ karaoke-forever-server
+  $ karaoke-eternal-server
 {{< /highlight >}}
 
 3. Watch the output for "Web server running at..." and browse to the **server URL**
@@ -185,13 +185,13 @@ The following types are supported:
 
 - MP4 video (codec support can vary depending on the browser running the [player](#player)). Does not support background visualizations (videos are played as-is).
 
-Media filenames are expected to be in "Artist - Title" format by default, but this can be configured per-folder using a `_kfconfig.js` file. When this file is encountered in a folder it applies to all files and subfolders. If any subfolders have their own `_kfconfig.js`, that will take precedence.
+Media filenames are expected to be in "Artist - Title" format by default, but this can be configured per-folder using a `_keconfig.js` file. When this file is encountered in a folder it applies to all files and subfolders. If any subfolders have their own `_keconfig.js`, that will take precedence.
 
 Media with filenames that couldn't be parsed are [logged to a file](#file-locations) (to change the level of logging, see [Command Line Options](#command-line-options)) and won't appear in the library view.
 
 #### Configuring the Metadata Parser
 
-You can configure the default metadata parser by returning an object with the options you want to override. For example, if a folder has filenames in the format "Title - Artist" instead, you could add this `_kfconfig.js` file:
+You can configure the default metadata parser by returning an object with the options you want to override. For example, if a folder has filenames in the format "Title - Artist" instead, you could add this `_keconfig.js` file:
 
 {{< highlight js >}}
 return {
@@ -216,7 +216,7 @@ return {
 
 #### Creating a Metadata Parser (Experimental)
 
-Your `_kfconfig.js` can also return a *parser creator* instead of a configuration object. A parser creator returns a function (parser) that can be called for each media file. The [default parser](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js){{% icon-external %}} is still available so you don't have to reinvent the wheel.
+Your `_keconfig.js` can also return a *parser creator* instead of a configuration object. A parser creator returns a function that can be called for each media file. The [default parser](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js){{% icon-external %}} is still available so you don't have to reinvent the wheel.
 
 The following example creates a parser that removes the word 'junk' from each filename before handing off to the default parser:
 
@@ -263,7 +263,7 @@ It's important that each middleware calls `next` unless you don't want the chain
 
 ### Command Line Options
 
-Karaoke Forever Server supports the following command line options:
+Karaoke Eternal Server supports the following command line options:
 
 | Option | Description | Default |
 | --- | --- | --- |
@@ -271,21 +271,21 @@ Karaoke Forever Server supports the following command line options:
 | <span style="white-space: nowrap;">`-p, --port <number>`</span>| Web server port. To use low ports such as 80 you may need to run with elevated privileges (not recommended) | 0 (auto) |
 | <span style="white-space: nowrap;">`--urlPath <string>`</span>| Web server URL base path. Must begin with a forward slash. | "/" |
 | <span style="white-space: nowrap;">`--scan`</span>| Run the media scanner at startup | |
-| <span style="white-space: nowrap;">`-v, --version`</span>| Output the Karaoke Forever Server version and exit | |
+| <span style="white-space: nowrap;">`-v, --version`</span>| Output the Karaoke Eternal Server version and exit | |
 
 ### File Locations
 
 #### macOS
 
- - Database: `~/Library/Application Support/Karaoke Forever Server/database.sqlite3`
- - Media Scanner Log: `~/Library/Logs/Karaoke Forever Server/scanner.log`
- - Server Log: `~/Library/Logs/Karaoke Forever Server/server.log`
+ - Database: `~/Library/Application Support/Karaoke Eternal Server/database.sqlite3`
+ - Media Scanner Log: `~/Library/Logs/Karaoke Eternal Server/scanner.log`
+ - Server Log: `~/Library/Logs/Karaoke Eternal Server/server.log`
 
 #### Windows
 
-- Database: `%APPDATA%\Karaoke Forever Server\database.sqlite3`
-- Media Scanner Log: `%APPDATA%\Karaoke Forever Server\scanner.log`
-- Server Log: `%APPDATA%\Karaoke Forever Server\server.log`
+- Database: `%APPDATA%\Karaoke Eternal Server\database.sqlite3`
+- Media Scanner Log: `%APPDATA%\Karaoke Eternal Server\scanner.log`
+- Server Log: `%APPDATA%\Karaoke Eternal Server\server.log`
 
 <hr>
 
@@ -293,5 +293,4 @@ Karaoke Forever Server supports the following command line options:
 
 - [David Zukowski](https://zuko.me){{% icon-external %}}: react-redux-starter-kit, which this project began as a fork of (all contributors up until it was detached to its own project are listed on the Contributors page)
 - [Luke Tucker](https://github.com/ltucker/){{% icon-external %}}: the original JavaScript CD+Graphics implementation
-- Stuart Albert: the name, originally a reference to Duke Nukem Forever, given the development time and almost vaporware status
 - B&W mic icon by [Freepik](https://www.freepik.com/){{% icon-external %}} from [flaticon.com](https://www.flaticon.com/){{% icon-external %}}

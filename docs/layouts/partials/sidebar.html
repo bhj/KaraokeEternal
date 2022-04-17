@@ -2,11 +2,16 @@
 <div class="sidebar">
   <header>
     <div class="logo">
-      <img src='{{ (resources.Get "images/logo_mic.png").Permalink }}' alt="microphone">
-      <h1>Karaoke<span class="nospace"> </span><span class="logo-forever">Forever</span>
-        <span class="description">Open karaoke party system</span>
-      </h1>
+      <h1>Karaoke<span class="logo-eternal">Eterna<span class="logo-lastChar">l</span></span></h1>
+      <div class="description">Open karaoke party system</div>
     </div>
+    <ul class="github">
+      <li>
+        <a class="github-button" href="https://github.com/bhj/KaraokeEternal/releases" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-cloud-download" data-size="large" aria-label="Download Karaoke Eternal on GitHub">Download</a>
+        <a class="github-button" href="https://github.com/bhj/KaraokeEternal" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-star" aria-label="Star Karaoke Eternal on GitHub">Star</a>
+        <a class="github-button" href="https://github.com/sponsors/bhj" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-heart" aria-label="Sponsor @bhj on GitHub">Sponsor</a>
+      </li>
+    </ul>
     <div id="btn-nav" class="active" onclick="toggleNav()">
       <svg class="icon" viewBox="0 0 24 24">
         <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
@@ -19,18 +24,11 @@
     <a class="nav-item{{ if eq $lastSeg "faq"}} active{{ end }}" href="{{ .Site.BaseURL }}faq">F.A.Q.</a>
 
     <span class="nav-item">
-      <a rel="external" target="_blank" href="https://github.com/bhj/karaoke-forever">GitHub</a>
+      <a rel="external" target="_blank" href="https://github.com/bhj/KaraokeEternal">GitHub</a>
       <svg class="icon external" viewBox="0 0 24 24">
         <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
       </svg>
     </span>
-    <ul class="github">
-      <li>
-        <a class="github-button" href="https://github.com/bhj/karaoke-forever/releases" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-cloud-download" data-size="large" aria-label="Download bhj/karaoke-forever on GitHub">Download</a>
-        <a class="github-button" href="https://github.com/sponsors/bhj" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-heart" aria-label="Sponsor @bhj on GitHub">Sponsor</a>
-        <a class="github-button" href="https://github.com/bhj/karaoke-forever/issues" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-issue-opened" aria-label="Issue bhj/karaoke-forever on GitHub">Issue</a>
-      </li>
-    </ul>
 
     <a class="nav-item" rel="external" target="_blank" href="{{ .Site.BaseURL }}discord">Discord
       <svg class="icon external" viewBox="0 0 24 24">
@@ -41,7 +39,7 @@
     <a class="nav-item{{ if eq $lastSeg "docs"}} active{{ end }}" href="{{ .Site.BaseURL }}docs">Documentation</a>
     <ul id="doc-toc">
       <li><a href="{{ .Site.BaseURL }}docs/#quick-start">Quick Start</a></li>
-      <li><a href="{{ .Site.BaseURL }}docs/#karaoke-forever-the-web-app">Karaoke Forever</a> (the "web" app)
+      <li><a href="{{ .Site.BaseURL }}docs/#karaoke-eternal-the-app">Karaoke Eternal</a> (the app)
         <ul>
           <li><a href="{{ .Site.BaseURL }}docs/#library">Library</a></li>
           <li><a href="{{ .Site.BaseURL }}docs/#queue">Queue</a></li>
@@ -50,7 +48,7 @@
           <li><a href="{{ .Site.BaseURL }}docs/#player">Player</a></li>
         </ul>
       </li>
-      <li><a href="{{ .Site.BaseURL }}docs/#karaoke-forever-server">Karaoke Forever Server</a>
+      <li><a href="{{ .Site.BaseURL }}docs/#karaoke-eternal-server">Karaoke Eternal Server</a>
         <ul>
           <li><a href="{{ .Site.BaseURL }}docs/#installation">Installation</a></li>
           <li><a href="{{ .Site.BaseURL }}docs/#media-files">Media Files</a>
