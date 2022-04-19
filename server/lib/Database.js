@@ -1,6 +1,6 @@
 const log = require('./Log')('db')
 const path = require('path')
-const sqlite3 = require('@vscode/sqlite3')
+const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
 let _db
 
