@@ -1,5 +1,6 @@
 const db = require('../lib/Database').db
 const sql = require('sqlate')
+const Queue = require('../Queue')
 
 class User {
   /**
@@ -69,21 +70,24 @@ class User {
       throw new Error('userId must be a number')
     }
 
-    let res, query
-
-    query = sql`
-      DELETE FROM queue
+    const queueQuery = sql`
+      SELECT queueId
+      FROM queue
       WHERE userId = ${userId}
     `
-    res = await db.run(String(query), query.parameters)
+    const queueRows = await db.all(String(queueQuery), queueQuery.parameters)
 
-    query = sql`
+    for (const row of queueRows) {
+      await Queue.remove(row.queueId)
+    }
+
+    const usersQuery = sql`
       DELETE FROM users
       WHERE userId = ${userId}
     `
-    res = await db.run(String(query), query.parameters)
+    const usersQueryRes = await db.run(String(usersQuery), usersQuery.parameters)
 
-    if (!res.changes) {
+    if (!usersQueryRes.changes) {
       throw new Error(`unable to remove userId: ${userId}`)
     }
   }

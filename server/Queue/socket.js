@@ -69,10 +69,7 @@ const ACTION_HANDLERS = {
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
     const { queueId } = payload
 
-    await Queue.remove({
-      queueId,
-      userId: sock.user.isAdmin ? undefined : sock.user.userId,
-    })
+    await Queue.remove(queueId)
 
     // success
     acknowledge({ type: QUEUE_REMOVE + '_SUCCESS' })

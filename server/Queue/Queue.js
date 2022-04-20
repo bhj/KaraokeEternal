@@ -139,7 +139,7 @@ class Queue {
    * @param  {object}      queueId, userId
    * @return {Promise}     undefined
    */
-  static async remove ({ queueId, userId }) {
+  static async remove (queueId) {
     // close the soon-to-be gap first
     // @todo: once RETURNING is supported we could do the
     // deletion first and get the deleted item's prevQueueId
@@ -160,7 +160,6 @@ class Queue {
           ) AS curChild
       )
       WHERE queueId = curChild
-        ${typeof userId === 'number' ? sql`AND userId = ${userId}` : sql``}
     `
     await db.run(String(updateQuery), updateQuery.parameters)
 
@@ -168,7 +167,6 @@ class Queue {
     const deleteQuery = sql`
       DELETE FROM queue
       WHERE queueId = ${queueId}
-        ${typeof userId === 'number' ? sql`AND userId = ${userId}` : sql``}
     `
     const deleteRes = await db.run(String(deleteQuery), deleteQuery.parameters)
 
