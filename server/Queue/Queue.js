@@ -180,6 +180,22 @@ class Queue {
   }
 
   /**
+   * Check if a user owns a queue item
+   * @param  {number} userId
+   * @param  {number} queueId
+   * @return {boolean}
+   */
+  static async isOwner (userId, queueId) {
+    const query = sql`
+      SELECT COUNT(*) AS count
+      FROM queue
+      WHERE userId = ${userId} AND queueId = ${queueId}
+    `
+    const res = await db.get(String(query), query.parameters)
+    return res.count === 1
+  }
+
+  /**
    * Get media type from file extension
    * @param  {string} file filename
    * @return {string}      player component

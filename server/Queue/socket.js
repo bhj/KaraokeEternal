@@ -51,6 +51,13 @@ const ACTION_HANDLERS = {
       })
     }
 
+    if (!sock.user.isAdmin && !await Queue.isOwner(sock.user.userId, queueId)) {
+      return acknowledge({
+        type: QUEUE_MOVE + '_ERROR',
+        error: 'Cannot move another user\'s song',
+      })
+    }
+
     await Queue.move({
       prevQueueId,
       queueId,
@@ -68,6 +75,13 @@ const ACTION_HANDLERS = {
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
     const { queueId } = payload
+
+    if (!sock.user.isAdmin && !await Queue.isOwner(sock.user.userId, queueId)) {
+      return acknowledge({
+        type: QUEUE_REMOVE + '_ERROR',
+        error: 'Cannot remove another user\'s song',
+      })
+    }
 
     await Queue.remove(queueId)
 
