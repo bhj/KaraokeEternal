@@ -1,5 +1,5 @@
 -- Up
-ALTER TABLE "queue" ADD COLUMN "prevQueueId" INTEGER REFERENCES queue(queueId);
+ALTER TABLE "queue" ADD COLUMN "prevQueueId" INTEGER REFERENCES queue(queueId) DEFERRABLE INITIALLY DEFERRED;
 
 CREATE INDEX IF NOT EXISTS idxPrevQueueId ON "queue" ("prevQueueId" ASC);
 

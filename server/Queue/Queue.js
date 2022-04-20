@@ -136,13 +136,17 @@ class Queue {
 
   /**
    * Delete a queue item
+   *
+   * We could DELETE first and get the deleted item's prevQueueId using
+   * RETURNING, but the DELETE and UPDATE need to be wrapped in a transaction
+   * (so the prevQueueId foreign key check is deferred). Also, v0.9 betas didn't
+   * have prevQueueId DEFFERABLE, and so will still error at DELETE (do we care?)
+   *
    * @param  {object}      queueId, userId
    * @return {Promise}     undefined
    */
   static async remove (queueId) {
     // close the soon-to-be gap first
-    // @todo: once RETURNING is supported we could do the
-    // deletion first and get the deleted item's prevQueueId
     const updateQuery = sql`
       UPDATE queue
       SET prevQueueId = curParent
