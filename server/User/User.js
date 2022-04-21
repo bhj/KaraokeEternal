@@ -70,6 +70,7 @@ class User {
       throw new Error('userId must be a number')
     }
 
+    // remove user's queue items
     const queueQuery = sql`
       SELECT queueId
       FROM queue
@@ -81,6 +82,21 @@ class User {
       await Queue.remove(row.queueId)
     }
 
+    // remove user's song stars
+    const songStarsQuery = sql`
+      DELETE FROM songStars
+      WHERE userId = ${userId}
+    `
+    await db.run(String(songStarsQuery), songStarsQuery.parameters)
+
+    // remove user's artist stars
+    const artistStarsQuery = sql`
+      DELETE FROM artistStars
+      WHERE userId = ${userId}
+    `
+    await db.run(String(artistStarsQuery), artistStarsQuery.parameters)
+
+    // remove the user
     const usersQuery = sql`
       DELETE FROM users
       WHERE userId = ${userId}
