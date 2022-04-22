@@ -152,7 +152,7 @@ class Media {
     `)
 
     for (const row of rows) {
-      await Queue.remove({ queueId: row.queueId })
+      await Queue.remove(row.queueId)
     }
 
     log.info(`cleanup: ${rows.length} queue items for nonexistent songs`)
