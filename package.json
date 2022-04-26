@@ -111,7 +111,7 @@
     "modern-normalize": "^1.1.0",
     "nodemon": "^2.0.13",
     "prop-types": "^15.7.2",
-    "rc-slider": "^9.7.5",
+    "rc-slider": "^10.0.0",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^17.0.2",

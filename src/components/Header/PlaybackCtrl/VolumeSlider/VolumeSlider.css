@@ -10,4 +10,5 @@
   position: absolute;
   top: -18px;
   touch-action: 'pan-x';
+  outline: none;
 }

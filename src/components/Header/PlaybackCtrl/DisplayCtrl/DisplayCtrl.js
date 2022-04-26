@@ -155,8 +155,9 @@ export default class DisplayCtrl extends React.Component {
 }
 
 // slider handle/grabber
-const handle = (props) => (
-  <Icon icon='CIRCLE' size={36} className={styles.handle} style={{
-    left: `calc(${props.offset}% - 18px)`, // eslint-disable-line react/prop-types
-  }}/>
-)
+const handle = (node, props) => {
+  // rc-slider passes a node (div) to which we add style and children
+  return React.cloneElement(node, { className: styles.handle }, (
+    <Icon icon={'CIRCLE'} size={36}/>
+  ))
+}

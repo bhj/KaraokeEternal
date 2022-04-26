@@ -14,20 +14,20 @@ export default class VolumeSlider extends React.Component {
   render () {
     return (
       <OptimisticSlider
+        className={styles.slider}
+        handle={handle}
         min={0}
         max={1}
+        onChange={this.props.onVolumeChange}
         step={0.01}
         value={this.props.volume}
-        onChange={this.props.onVolumeChange}
-        handle={handle}
-        className={styles.slider}
       />
     )
   }
 }
 
 // volume slider handle/grabber
-const handle = (props) => {
+const handle = (node, props) => {
   const { value } = props // eslint-disable-line react/prop-types
 
   let icon = 'VOLUME_UP'
@@ -35,9 +35,8 @@ const handle = (props) => {
   else if (value < 0.4) icon = 'VOLUME_MUTE'
   else if (value < 0.7) icon = 'VOLUME_DOWN'
 
-  return (
-    <Icon icon={icon} size={42} className={styles.handle} style={{
-      left: `calc(${props.offset}% - 18px)`, // eslint-disable-line react/prop-types
-    }}/>
-  )
+  // rc-slider passes a node (div) to which we add style and children
+  return React.cloneElement(node, { className: styles.handle }, (
+    <Icon icon={icon} size={42} />
+  ))
 }

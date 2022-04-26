@@ -76,4 +76,5 @@
   position: absolute;
   top: -15px;
   touch-action: 'pan-x';
+  outline: none;
 }
