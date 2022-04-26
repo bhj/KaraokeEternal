@@ -40,7 +40,7 @@ class UserImage extends React.Component {
     )
   }
 
-  handleImgLoad= e => {
+  handleImgLoad = e => {
     this.setState({ isLoading: false })
   }
 
