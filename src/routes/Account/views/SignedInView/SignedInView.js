@@ -22,15 +22,6 @@ const SignedInView = props => {
   // once per mount
   useEffect(() => dispatch(fetchAccount()), [dispatch])
 
-  // this is a workaround for iOS 15 where content is left weirdly
-  // scrolled once the keyboard disappears after signing in/creating
-  // an account. putting the fix here works for the other views since
-  // this SignedInView is briefly rendered prior to any redirects.
-  useEffect(() => {
-    window.scrollTo(0, 0)
-    document.body.scrollTop = 0
-  }, [])
-
   return (
     <>
       {isAdmin &&

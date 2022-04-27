@@ -4,7 +4,7 @@
 @import './rc-slider.css';
 
 html {
-  height: 100vh;
+  height: 100%;
   touch-action: manipulation;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -17,7 +17,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: var(--font-family);
-  height: 100vh;
+  height: 100%;
   margin: 0;
   padding: 0;
 }
