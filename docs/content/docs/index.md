@@ -135,7 +135,7 @@ The server hosts the app and your media files, and can run on relatively minimal
 
 <aside class="info">
   {{% icon-info %}}
-  <p>The server chooses a random port at each startup unless otherwise [specified](#command-line-options).</p>
+  <p>The server chooses a random port at each startup unless otherwise <a href="#cli--env">specified</a>.</p>
 </aside>
 
 ### Installation
@@ -187,7 +187,7 @@ The following types are supported:
 
 Media filenames are expected to be in "Artist - Title" format by default, but this can be configured per-folder using a `_keconfig.js` file. When this file is encountered in a folder it applies to all files and subfolders. If any subfolders have their own `_keconfig.js`, that will take precedence.
 
-Media with filenames that couldn't be parsed are [logged to a file](#file-locations) (to change the level of logging, see [Command Line Options](#command-line-options)) and won't appear in the library view.
+Media with filenames that couldn't be parsed are [logged to a file](#file-locations) (to change the level of logging, see [Command Line Options](#cli--env)) and won't appear in the library view.
 
 #### Configuring the Metadata Parser
 
@@ -261,17 +261,22 @@ It's important that each middleware calls `next` unless you don't want the chain
   <p>Media duration is handled automatically and cannot be set from a parser.</p>
 </aside>
 
-### Command Line Options
+### CLI & ENV
 
-Karaoke Eternal Server supports the following command line options:
+Karaoke Eternal Server supports the following Command Line Options and Environment Variables. Those accepting a numeric level use the following: **0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug
 
-| Option | Description | Default |
-| --- | --- | --- |
-| <span style="white-space: nowrap;">`-l, --loglevel <number>`</span>| Log file level (**0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug) | 3 |
-| <span style="white-space: nowrap;">`-p, --port <number>`</span>| Web server port. To use low ports such as 80 you may need to run with elevated privileges (not recommended) | 0 (auto) |
-| <span style="white-space: nowrap;">`--urlPath <string>`</span>| Web server URL base path. Must begin with a forward slash. | "/" |
-| <span style="white-space: nowrap;">`--scan`</span>| Run the media scanner at startup | |
-| <span style="white-space: nowrap;">`-v, --version`</span>| Output the Karaoke Eternal Server version and exit | |
+| Option | ENV | Description | Default |
+| --- | --- | --- | --- |
+| <span style="white-space: nowrap;">`--consoleLevel <number>`</span>| <span style="white-space: nowrap;">`KES_CONSOLE_LEVEL`</span> | Web server console output level | 4 |
+| <span style="white-space: nowrap;">`--data <string>`</span>| <span style="white-space: nowrap;">`KES_PATH_DATA`</span> | Absolute path for database files | |
+| <span style="white-space: nowrap;">`--logLevel <number>`</span>| <span style="white-space: nowrap;">`KES_LOG_LEVEL`</span> | Web server log file level | 3 |
+| <span style="white-space: nowrap;">`-p, --port <number>`</span>| <span style="white-space: nowrap;">`KES_PORT`</span> | Web server port | auto |
+| <span style="white-space: nowrap;">`--rotateKey`</span>| <span style="white-space: nowrap;">`KES_ROTATE_KEY`</span> | Rotate the session key at startup | |
+| <span style="white-space: nowrap;">`--scan`</span>| <span style="white-space: nowrap;">`KES_SCAN`</span> | Run the media scanner at startup | |
+| <span style="white-space: nowrap;">`--scanConsoleLevel <number>`</span>| `KES_SCAN_CONSOLE_LEVEL` | Media scanner console output level (default=4) | 4 |
+| <span style="white-space: nowrap;">`--scanLogLevel <number>`</span>| <span style="white-space: nowrap;">`KES_SCAN_LOG_LEVEL`</span> | Media scanner log file level | 3 |
+| <span style="white-space: nowrap;">`--urlPath <string>`</span>| <span style="white-space: nowrap;">`KES_URL_PATH`</span> | Web server base URL path (must begin with a forward slash) | / |
+| <span style="white-space: nowrap;">`-v, --version`</span>| | Show version and exit | |
 
 ### File Locations
 
