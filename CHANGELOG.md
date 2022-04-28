@@ -1,6 +1,7 @@
 ## TBD
 
 ### New
+
 - **(app)** User management interface
 - **(app)** "Make user's next" button for upcoming songs
 - **(app)** "Re-queue" button for played songs
@@ -8,10 +9,15 @@
 - **(app)** Media folders can be prioritized via drag-and-drop
 - **(app)** Added ~370 visualizer presets (now 472 total)
 - **(app)** Summary is shown following a media scan
-- **(server)** Custom URL path support (see `--urlPath` CLI option)
+- **(server)** Custom URL path (subfolder) support (see `--urlPath` CLI option)
+- **(server)** Custom database file path support (see `--data` CLI option)
+- **(server)** Session key can be rotated on startup (see `--rotateKey` CLI option)
+- **(server)** All CLI options now have equivalent environment variables
+- **(server)** PUID and PGID environment variable support
 
 ### Changed
 
+- **(app)** Next-up singer's place is now reserved and won't be pre-empted
 - **(server)** Uses one less process/helper
 - **(server)** Media scanner performance is greatly improved when adding media
 - **(server)** Improved client connection speed via library caching
@@ -29,11 +35,11 @@
 
 Massive thanks to this release's sponsors: [fulldecent](https://github.com/fulldecent), [vze22jjw](https://github.com/vze22jjw)
 
-If you have fun with it, consider [sponsoring](https://github.com/sponsors/bhj) as we roll down [the road to v1.0](https://github.com/bhj/karaoke-forever/issues/13).
+If you have fun with it, consider [sponsoring](https://github.com/sponsors/bhj) as we roll down [the road to v1.0](https://github.com/bhj/KaraokeEternal/issues/13).
 
 ### New
 
-- **(app)** [ReplayGain support](http://www.karaoke-forever.com/docs/#preferences-admin-only). No more scrambling for the volume when a new song starts! With properly tagged media, the player can automatically minimize volume differences between songs.
+- **(app)** [ReplayGain support](http://www.karaoke-eternal.com/docs/#preferences-admin-only). No more scrambling for the volume when a new song starts! With properly tagged media, the player can automatically minimize volume differences between songs.
 - **(app)** Rooms can now be password-protected
 - **(player)** CD+Graphics now have shadows, can be resized, and use less CPU
 - **(player)** **(breaking)** Web Audio API support is now required (only for browsers running the player)
@@ -52,7 +58,7 @@ If you have fun with it, consider [sponsoring](https://github.com/sponsors/bhj) 
 
 ## v0.7.4 (2019-12-30)
 
-- Initial release on [npm](https://www.npmjs.com/package/karaoke-forever)
+- Initial release on [npm](https://www.npmjs.com/package/karaoke-eternal)
 - **(app)** Improved sign in/first run form
 - **(app)** Added About panel with version and licenses
 - **(app)** General style improvements
