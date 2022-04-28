@@ -91,6 +91,7 @@ button {
   color: var(--btn-default-color);
   cursor: pointer;
   display: inline-block;
+  font-weight: inherit;
   padding: 16px;
   width: 100%;
 }
