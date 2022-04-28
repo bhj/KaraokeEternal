@@ -20,14 +20,24 @@ const env = {
 
 const yargs = require('yargs')
   .version(false) // disable default handler
+  .option('consoleLevel', {
+    describe: 'Web server console output level (default=4)',
+    number: true,
+    requiresArg: true,
+  })
   .option('data', {
-    describe: 'Absolute path for database file(s)',
+    describe: 'Absolute path for database files',
     requiresArg: true,
     type: 'string',
   })
+  .option('logLevel', {
+    describe: 'Web server log file level (default=3)',
+    number: true,
+    requiresArg: true,
+  })
   .option('p', {
     alias: 'port',
-    describe: 'Web server port (default=auto)',
+    describe: 'Web server port (default=0/auto)',
     number: true,
     requiresArg: true,
   })
@@ -38,22 +48,12 @@ const yargs = require('yargs')
     describe: 'Run the media scanner at startup',
   })
   .option('scanConsoleLevel', {
-    describe: 'Media scanner console log level (default=4)',
+    describe: 'Media scanner console output level (default=4)',
     number: true,
     requiresArg: true,
   })
   .option('scanLogLevel', {
-    describe: 'Media scanner file log level (default=3)',
-    number: true,
-    requiresArg: true,
-  })
-  .option('serverConsoleLevel', {
-    describe: 'Web server console log level (default=4)',
-    number: true,
-    requiresArg: true,
-  })
-  .option('serverLogLevel', {
-    describe: 'Web server file log level (default=3)',
+    describe: 'Media scanner log file level (default=3)',
     number: true,
     requiresArg: true,
   })
