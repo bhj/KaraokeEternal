@@ -43,38 +43,48 @@ Congratulations, you are now ready to press play and party!
 
 <hr>
 
-## Karaoke Eternal (the "web" app)
+## Karaoke Eternal (the app)
 
-Karaoke Eternal is a modern mobile browser app that lets everyone join quickly, without having to install anything on their phones. It's built for touch, but a mouse is supported in desktop browsers (click and drag to emulate swipe gestures).
+Karaoke Eternal is a modern mobile browser app that lets everyone join without having to install anything on their phones. It's built for touch, but a mouse is supported in desktop browsers (click and drag to emulate swipe gestures).
 
 ### Library
 
-The library view lists available songs organized by artist. The search area at the top allows filtering by artist name, song title and/or your starred songs:
+The library view lists available songs organized by artist, with search and filtering options at the top.
 
 <div class="row">
   {{% img srcset="app-library.png 2x" src="app-library.png" alt="Library view" %}}
   {{% img srcset="app-library2.png 2x" src="app-library2.png" alt="Library search/filter view" %}}
 </div>
 
-Tap to expand an artist, then tap a song's title to queue it. You can also tap its star to save it for later. A glowing song indicates that it's upcoming in the queue. Artists will also glow to show that they contain queued or starred songs.
+Tap to expand an artist, then tap a song's title to queue it. A glowing song and artist indicate they're upcoming in the queue.
 
-If there are multiple versions (media files) of a song, admins will see an italicized number in parentheses after the title, and the version in the folder highest in the [Media Folders](#preferences-admin-only) list will be used by default. Admins can also reveal additional options for a song, such as Get Info, by swiping left on it.
+Swiping left on a song reveals the following options:
+
+  - Song Info (admin only): Shows underlying media and allows setting a preferred version.
+
+When a song has multiple versions (media files), admins see an italicized number after the title, and media in the folder highest in the [Media Folders](#preferences-admin-only) list will be used unless specifically set (see Song Info above).
 
 ### Queue
 
-The queue view shows your room's previous, current and upcoming songs:
+The queue view shows your room's previous, current and upcoming songs.
 
 <div class="row">
   {{% img srcset="app-queue.png 2x" src="app-queue.png" alt="Queue view" %}}
 </div>
 
-Singers are prioritized by time since each last sang, so those joining later in the session aren't penalized and will get right to the front of the queue.
+Singers are prioritized by how long they've gone without singing, so those joining later in the party aren't penalized and will jump near the front of the queue.
 
-To remove an upcoming song, swipe left and tap X. Normal users can only remove their own songs, but admins can remove anyone's upcoming song. Admins will also see additional options when swiping left, such as Get Info.
+Swiping left on a queued song reveals the following options:
+
+- Make User's Next: Moves the song to become the next one that user sings. Does *not* affect that user's place in the queue.
+- Song Info (admin only): Shows underlying media and allows setting a preferred version.
+- Remove: Removes the song from the queue.
+
+Normal users can only manage their own queued songs, but admins can manage anyone's.
 
 ### Account
 
-The account view lets users manage their account, while admins will see additional panels:
+The account view lets users manage their account, while admins will see additional panels.
 
 <div class="row">
   {{% img srcset="app-account.png 2x" src="app-account.png" alt="Account view" %}}
@@ -125,17 +135,17 @@ The player is a part of the [app](#karaoke-eternal-the-app) that's designed to r
 
 To start a player, sign in to the desired room as an admin and a player link will appear at the top. If you don't see a link that means fullscreen support wasn't detected, but you can still manually navigate to `/player`.
 
-Once a player is in the room, playback and display controls appear at the top of the app for the currently-up singer as well as admins, who always have access to these.
+Once a player is in the room, playback and display controls will appear. These are available to the currently-up singer for the duration of the song, and are always available to admins.
 
 <hr>
 
 ## Karaoke Eternal Server
 
-The server hosts the app and your media files, and can run on relatively minimal hardware (Raspberry Pi 3B+). [Player(s)](#player) don't need to be on the same system as the server.
+The server hosts the app and your media files, and can run on relatively minimal hardware (Raspberry Pi 3B+). Note that [players](#player) don't need to run on the same system as the server.
 
 <aside class="info">
   {{% icon-info %}}
-  <p>The server chooses a random port at each startup unless otherwise <a href="#cli--env">specified</a>.</p>
+  <p>The server chooses a random port at startup unless <a href="#cli--env">otherwise specified</a>.</p>
 </aside>
 
 ### Installation
@@ -156,7 +166,7 @@ The server hosts the app and your media files, and can run on relatively minimal
 
 #### Any OS with Node.js
 
-Karaoke Eternal Server requires [Node.js](https://nodejs.org){{% icon-external %}} 12 or later.
+Karaoke Eternal Server is available as an `npm` package for systems running [Node.js](https://nodejs.org){{% icon-external %}} 16 or later.
 
 1. Install via ```npm```
 
@@ -175,7 +185,7 @@ Karaoke Eternal Server requires [Node.js](https://nodejs.org){{% icon-external %
   $ karaoke-eternal-server
 {{< /highlight >}}
 
-3. Watch the output for "Web server running at..." and browse to the **server URL**
+3. Watch the output for "Web server running at..." and browse to the **server URL**. See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
 
 ### Media Files
 
@@ -263,12 +273,12 @@ It's important that each middleware calls `next` unless you don't want the chain
 
 ### CLI & ENV
 
-Karaoke Eternal Server supports the following Command Line Options and Environment Variables. Those accepting a numeric level use the following: **0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug
+Karaoke Eternal Server supports the following CLI options and environment variables. The numeric levels used for logs/console are: **0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug
 
 | Option | ENV | Description | Default |
 | --- | --- | --- | --- |
 | <span style="white-space: nowrap;">`--consoleLevel <number>`</span>| <span style="white-space: nowrap;">`KES_CONSOLE_LEVEL`</span> | Web server console output level | 4 |
-| <span style="white-space: nowrap;">`--data <string>`</span>| <span style="white-space: nowrap;">`KES_PATH_DATA`</span> | Absolute path for database files | |
+| <span style="white-space: nowrap;">`--data <string>`</span>| <span style="white-space: nowrap;">`KES_PATH_DATA`</span> | Absolute path to folder for database files | |
 | <span style="white-space: nowrap;">`--logLevel <number>`</span>| <span style="white-space: nowrap;">`KES_LOG_LEVEL`</span> | Web server log file level | 3 |
 | <span style="white-space: nowrap;">`-p, --port <number>`</span>| <span style="white-space: nowrap;">`KES_PORT`</span> | Web server port | auto |
 | <span style="white-space: nowrap;">`--rotateKey`</span>| <span style="white-space: nowrap;">`KES_ROTATE_KEY`</span> | Rotate the session key at startup | |
@@ -292,10 +302,14 @@ Karaoke Eternal Server supports the following Command Line Options and Environme
 - Media Scanner Log: `%APPDATA%\Karaoke Eternal Server\scanner.log`
 - Server Log: `%APPDATA%\Karaoke Eternal Server\server.log`
 
+#### Installed via `npm`
+
+- Database: `$ npm -g root` to show the location of global modules. The `karaoke-eternal` folder will be inside this.
+
 <hr>
 
 ## Acknowledgements
 
 - [David Zukowski](https://zuko.me){{% icon-external %}}: react-redux-starter-kit, which this project began as a fork of (all contributors up until it was detached to its own project are listed on the Contributors page)
 - [Luke Tucker](https://github.com/ltucker/){{% icon-external %}}: the original JavaScript CD+Graphics implementation
-- B&W mic icon by [Freepik](https://www.freepik.com/){{% icon-external %}} from [flaticon.com](https://www.flaticon.com/){{% icon-external %}}
+- Mic favicon by [Freepik](https://www.freepik.com/){{% icon-external %}} from [flaticon.com](https://www.flaticon.com/){{% icon-external %}}
