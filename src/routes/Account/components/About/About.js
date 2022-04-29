@@ -17,12 +17,13 @@ const About = props => {
           <Logo className={styles.logo}/>
         </a>
         <p className={styles.sm}>
-          v{__KE_VERSION__} &nbsp;&nbsp;&copy;{__KE_COPYRIGHT__} {/* eslint-disable-line no-undef */}
+          &copy;{__KE_COPYRIGHT__}<br/> {/* eslint-disable-line no-undef */}
+          v{__KE_VERSION__} {/* eslint-disable-line no-undef */}
         </p>
         <p><a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}
         <GitHubButton href={__KE_URL_REPO__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>GitHub</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
+        <GitHubButton data-icon='octicon-star' href={__KE_URL_REPO__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Star</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
         <GitHubButton data-icon='octicon-heart' href={__KE_URL_SPONSOR__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Sponsor</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
-        <GitHubButton data-icon='octicon-issue-opened' href={__KE_URL_REPO__ + 'issues'} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Issue</GitHubButton> {/* eslint-disable-line no-undef, max-len */}
       </div>
 
       <Modal
