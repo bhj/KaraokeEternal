@@ -43,3 +43,12 @@ return ({ compose, getDefaultParser, defaultMiddleware }) => {
   }
 }
 {{< /highlight >}}
+
+## Karaoke Eternal isn't quite what I'm looking for. What else is out there?
+
+- [Karaoke Mugen](https://mugen.karaokes.moe/en/): Friends of K.E., Karaoke Mugen is geared toward anime and cons, with a large library of downloadable songs.
+- [OpenKJ](https://openkj.org): "A collection of applications and services intended to make life easier for karaoke DJs."
+- [Ultrastar Deluxe](https://usdx.eu): "A free open source karaoke game for your PC. The gameplay experience is similar to that of the commercial product SingStar™ by Sony Computer Entertainment."
+- [Vocaluxe](https://www.vocaluxe.org): "A free and open source singing game, inspired by SingStar™ and the great Ultrastar Deluxe project."
+
+(Are we missing something? Submit a PR on GitHub!)
