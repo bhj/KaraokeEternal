@@ -10,12 +10,14 @@
 }
 
 .name {
+  color: var(--artist-name-color);
   flex: 1;
   font-size: 20px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   padding-left: 3px;
+  cursor: pointer;
 }
 
 .isChildQueued {

@@ -5,8 +5,11 @@
 
 .containerQueued {
   composes: container;
-  color: var(--queued-item-color);
   text-shadow: var(--queued-item-text-shadow);
+}
+
+.containerQueued .title {
+  color: var(--queued-item-color);
 }
 
 .animateGlow {
@@ -14,10 +17,10 @@
 }
 
 .duration {
-  color: #888;
+  color: var(--song-duration-color);
   font-size: 12px;
-  text-align: center;
-  width: 44px;
+  text-align: right;
+  width: 40px;
 }
 
 .primary {
@@ -25,10 +28,11 @@
   flex: 1;
   overflow: hidden;
   white-space: nowrap;
-  margin-left: var(--btn-margin);
+  margin-left: 14px;
 }
 
 .title {
+  color: var(--song-title-color);
   font-size: 18px;
   text-overflow: ellipsis;
   overflow: hidden;
