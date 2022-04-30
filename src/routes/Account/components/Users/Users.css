@@ -12,6 +12,10 @@
   background-color: var(--panel-title-bg-color);
 }
 
+.titleContainer h1 {
+  color: var(--panel-title-color);
+}
+
 .titleContainer select {
   font-size: 16px;
   height: 24px; /* --panel-title-font size + top/bottom padding */

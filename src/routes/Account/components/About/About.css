@@ -10,6 +10,7 @@
   font: var(--panel-title-font);
   margin: 0;
   padding: var(--panel-title-padding);
+  color: var(--panel-title-color);
 }
 
 .content {

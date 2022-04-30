@@ -78,7 +78,7 @@
 
   /* Account panels */
   --panel-bg-color: hsl(var(--hue-blue), 20%, 10%);
-  --panel-title-color: var(--text-color);
+  --panel-title-color: hsl(var(--hue-blue), 10%, 92%);
   --panel-title-bg-color: hsl(var(--hue-blue), 5%, 30%);
   --panel-title-size: 20px;
   --panel-title-padding: 6px;
