@@ -5,7 +5,7 @@ import HttpApi from 'lib/HttpApi'
 import styles from './CDGPlayer.css'
 
 const api = new HttpApi('media')
-const BACKDROP_PADDING = 5 // px at 1:1 scale
+const BACKDROP_PADDING = 10 // px at 1:1 scale
 const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue('--border-radius'))
 
 class CDGPlayer extends React.Component {
