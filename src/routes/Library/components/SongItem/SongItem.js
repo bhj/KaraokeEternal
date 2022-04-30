@@ -43,7 +43,7 @@ const SongItem = ({
       ignoreMouseup = event.type === 'mouseup'
       setExpanded(false)
     }, []),
-    preventDefaultTouchmoveEvent: true,
+    preventScrollOnSwipe: true,
     trackMouse: true,
   })
 

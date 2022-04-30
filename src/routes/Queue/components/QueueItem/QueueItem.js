@@ -60,7 +60,7 @@ const QueueItem = ({
       setExpanded(isErrored || isInfoable || isRemovable || isSkippable)
     }, [isErrored, isInfoable, isRemovable, isSkippable]),
     onSwipedRight: useCallback(() => setExpanded(false), []),
-    preventDefaultTouchmoveEvent: true,
+    preventScrollOnSwipe: true,
     trackMouse: true,
   })
 
