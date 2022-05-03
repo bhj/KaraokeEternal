@@ -31,7 +31,7 @@ export function setHeaderHeight (height) {
 
     dispatch({
       type: HEADER_HEIGHT_CHANGE,
-      payload: height,
+      payload: height || 0, // height might be undefined if Header renders nothing
     })
   }
 }
@@ -42,7 +42,7 @@ export function setFooterHeight (height) {
 
     dispatch({
       type: FOOTER_HEIGHT_CHANGE,
-      payload: height,
+      payload: height || 0, // height might be undefined if Footer renders nothing
     })
   }
 }
