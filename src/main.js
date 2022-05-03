@@ -10,7 +10,10 @@ import { connectSocket } from './store/modules/user'
 // we only want to attempt socket connection if we think we
 // have a valid session (via JWT in cookie). the socket.io
 // handshake (http) will then include the JWT/cookie
-window._socket = io({ autoConnect: false })
+window._socket = io({
+  autoConnect: false,
+  path: new URL(document.baseURI).pathname + 'socket.io',
+})
 
 window._socket.on('reconnect_attempt', () => {
   store.dispatch(connectSocket())

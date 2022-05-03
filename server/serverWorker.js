@@ -56,8 +56,13 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
       process.exit(1)
     })
 
-    // create socket.io server and attach handlers
-    io = SocketIO(server, { serveClient: false })
+    // create socket.io server
+    io = SocketIO(server, {
+      path: urlPath + 'socket.io',
+      serveClient: false,
+    })
+
+    // attach socket.io handlers
     socketActions(io, jwtKey)
 
     // attach IPC action handlers
