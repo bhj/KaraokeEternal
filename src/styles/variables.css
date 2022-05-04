@@ -64,7 +64,7 @@
   --song-item-btn-active-bg-color: var(--btn-active-bg-color);
   --song-item-btn-active-filter: var(--btn-active-filter);
   --song-duration-color: hsl(var(--hue-blue), 10%, 45%);
-  --song-title-color: hsl(var(--hue-blue), 10%, 75%);
+  --song-title-color: hsl(var(--hue-blue), 10%, 80%);
 
   --alpha-picker-color: var(--artist-folder-bg-color);
   --queued-item-color: hsl(var(--hue-pink), 70%, 80%);

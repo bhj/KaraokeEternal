@@ -1,7 +1,6 @@
 .container {
   background-color: var(--panel-title-bg-color);
   border-radius: var(--border-radius);
-  cursor: pointer;
   margin-top: var(--container-padding);
 }
 
@@ -9,6 +8,7 @@
   display: flex;
   align-items: center;
   padding: 3px 5px;
+  cursor: pointer;
 }
 
 .title {
@@ -23,6 +23,7 @@
 
 .content label {
   padding: var(--container-padding);
+  cursor: pointer;
 }
 
 .icon {
