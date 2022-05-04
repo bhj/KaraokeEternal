@@ -46,9 +46,9 @@ const config = {
       __KE_VERSION__: JSON.stringify(process.env.npm_package_version),
       __KE_URL_HOME__: JSON.stringify('https://www.karaoke-eternal.com'),
       __KE_URL_LICENSE__: JSON.stringify('/licenses.txt'),
-      __KE_URL_REPO__: JSON.stringify('https://github.com/bhj/KaraokeEternal/'),
-      __KE_URL_SPONSOR__: JSON.stringify('https://github.com/sponsors/bhj/'),
-      __KE_COPYRIGHT__: JSON.stringify(`2019-${new Date().getFullYear()} RadRoot LLC`),
+      __KE_URL_REPO__: JSON.stringify('https://www.karaoke-eternal.com/repo'),
+      __KE_URL_SPONSOR__: JSON.stringify('https://www.karaoke-eternal.com/sponsor'),
+      __KE_COPYRIGHT__: JSON.stringify(`2019-${new Date().getFullYear()}`),
     })),
     new CaseSensitivePathsPlugin(),
     new MiniCssExtractPlugin({

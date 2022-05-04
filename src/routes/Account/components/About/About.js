@@ -17,7 +17,7 @@ const About = props => {
           <Logo className={styles.logo}/>
         </a>
         <p className={styles.sm}>
-          &copy;{__KE_COPYRIGHT__}<br/> {/* eslint-disable-line no-undef */}
+          &copy;{__KE_COPYRIGHT__} <a href='https://www.radroot.com' target='blank'>RadRoot LLC</a><br/> {/* eslint-disable-line no-undef */}
           v{__KE_VERSION__} {/* eslint-disable-line no-undef */}
         </p>
         <p><a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}

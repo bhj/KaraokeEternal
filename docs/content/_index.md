@@ -38,7 +38,7 @@ See <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}} availabl
 
 ## Discord / Support
 
-Join the [Karaoke Eternal Discord Server](https://discord.gg/PgqVtFq){{% icon-external %}} for general support and development chat, or just to say hi!
+Join the <a href="{{ .Site.BaseURL }}discord" rel="noopener">Karaoke Eternal Discord Server</a>{{% icon-external %}} for general support and development chat, or just to say hi!
 
 ## Contributing & Development
 

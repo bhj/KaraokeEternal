@@ -7,9 +7,9 @@
     </div>
     <ul class="github">
       <li>
-        <a class="github-button" href="https://github.com/bhj/KaraokeEternal/releases" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-cloud-download" data-size="large" aria-label="Download Karaoke Eternal on GitHub">Download</a>
-        <a class="github-button" href="https://github.com/bhj/KaraokeEternal" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-star" aria-label="Star Karaoke Eternal on GitHub">Star</a>
-        <a class="github-button" href="https://github.com/sponsors/bhj" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-heart" aria-label="Sponsor @bhj on GitHub">Sponsor</a>
+        <a class="github-button" href="{{ .Site.BaseURL }}download" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-cloud-download" data-size="large" aria-label="Download Karaoke Eternal on GitHub">Download</a>
+        <a class="github-button" href="{{ .Site.BaseURL }}repo" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-star" aria-label="Star Karaoke Eternal on GitHub">Star</a>
+        <a class="github-button" href="{{ .Site.BaseURL }}sponsor" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-heart" aria-label="Sponsor @bhj on GitHub">Sponsor</a>
       </li>
     </ul>
     <div id="btn-nav" class="active" onclick="toggleNav()">
@@ -24,7 +24,7 @@
     <a class="nav-item{{ if eq $lastSeg "faq"}} active{{ end }}" href="{{ .Site.BaseURL }}faq">F.A.Q.</a>
 
     <span class="nav-item">
-      <a rel="external" target="_blank" href="https://github.com/bhj/KaraokeEternal">GitHub</a>
+      <a rel="external" target="_blank" href="{{ .Site.BaseURL }}repo">GitHub</a>
       <svg class="icon external" viewBox="0 0 24 24">
         <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
       </svg>
