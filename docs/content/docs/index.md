@@ -161,8 +161,12 @@ The server hosts the app and your media files, and can run on relatively minimal
 
 <aside class="info">
   {{% icon-info %}}
-  <p>Beta versions of Karaoke Eternal Server are not currently signed, so macOS Gatekeeper and Windows SmartScreen will likely complain. On macOS, <strong>do not disable Gatekeeper</strong>, simply right-click <code>Karaoke Eternal Server.app</code> in your Applications folder and choose Open. On Windows, click More Info and then Run Anyway.</p>
+  <p>These packages are not currently signed. On macOS, <strong>do not</strong> disable Gatekeeper; simply right-click <code>Karaoke Eternal Server.app</code> in your Applications folder and choose Open. On Windows, click More Info and then Run Anyway.</p>
 </aside>
+
+#### Docker
+
+[Official Docker images](https://hub.docker.com/r/radrootllc/karaoke-eternal) are available for x64. Support for additional architectures is planned.
 
 #### Any OS with Node.js
 

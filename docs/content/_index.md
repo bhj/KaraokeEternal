@@ -24,10 +24,6 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 
 Karaoke Eternal assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the <a href='{{< ref "faq.md/#whats-the-recommended-audio-setup" >}}'>F.A.Q.</a> for more information.
 
-## Download & Install
-
-See <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}} available for your OS and the <a href='{{< ref "docs/index.md/#karaoke-eternal-server" >}}'>installation instructions</a>.
-
 ## Getting Started
 
  Karaoke Eternal basically has 3 parts. You can jump to the documentation for each below, or <a href='{{< ref "docs/index.md/#quick-start" >}}'>Quick Start</a> to get up and running step-by-step.
@@ -35,6 +31,10 @@ See <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}} availabl
 - **<a href='{{< ref "docs/index.md/#karaoke-eternal-server" >}}'>Server:</a>** Runs on almost any OS to serve the app and your media files
 - **<a href='{{< ref "docs/index.md/#karaoke-eternal-the-app" >}}'>App:</a>** Fast, modern mobile browser app designed for "karaoke conditions"
 - **<a href='{{< ref "docs/index.md/#player" >}}'>Player:</a>** Just another part of the app, designed to run fullscreen on the system handling audio/video for a <a href='{{< ref "docs/index.md/#rooms-admin-only" >}}'>room</a>
+
+## Download & Install
+
+See <a href="{{% baseurl %}}download">Releases</a>{{% icon-external %}} and check out the <a href='{{< ref "docs/index.md/#karaoke-eternal-server" >}}'>installation instructions</a>.
 
 ## Discord / Support
 

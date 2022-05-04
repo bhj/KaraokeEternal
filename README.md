@@ -22,7 +22,7 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 
 Karaoke Eternal assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the [F.A.Q.](https://www.karaoke-eternal.com/faq#whats-the-recommended-audio-setup) for more information.
 
-## Overview
+## Getting Started
 
  Karaoke Eternal basically has 3 parts. You can jump to the documentation for each below, or [Quick Start](https://www.karaoke-eternal.com/docs/#quick-start) to get up and running step-by-step.
 
@@ -32,7 +32,7 @@ Karaoke Eternal assumes its player will be mixed with any microphones (either in
 
 ## Download & Install
 
-See <a href="https://github.com/bhj/KaraokeEternal/releases">Releases</a> available for your OS and the [installation instructions](https://www.karaoke-eternal.com/docs/#karaoke-eternal-server).
+See <a href="https://github.com/bhj/KaraokeEternal/releases">Releases</a> and check out the [installation instructions](https://www.karaoke-eternal.com/docs/#karaoke-eternal-server).
 
 ## Discord / Support
 
