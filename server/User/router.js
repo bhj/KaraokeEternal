@@ -183,8 +183,8 @@ router.put('/user/:userId', async (ctx, next) => {
 
   // changing user image?
   if (ctx.request.files.image) {
-    fields.set('image', await readFile(ctx.request.files.image.path))
-    await deleteFile(ctx.request.files.image.path)
+    fields.set('image', await readFile(ctx.request.files.image.filepath))
+    await deleteFile(ctx.request.files.image.filepath)
   } else if (ctx.request.body.image === 'null') {
     fields.set('image', null)
   }
@@ -370,8 +370,8 @@ async function _create (ctx, isAdmin = false) {
 
   // user image?
   if (ctx.request.files.image) {
-    const img = await readFile(ctx.request.files.image.path)
-    await deleteFile(ctx.request.files.image.path)
+    const img = await readFile(ctx.request.files.image.filepath)
+    await deleteFile(ctx.request.files.image.filepath)
 
     // client should resize before uploading to be
     // well below this limit, but just in case...
