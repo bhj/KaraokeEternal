@@ -67,7 +67,7 @@ const EditRoom = props => {
             defaultChecked={!props.room || props.room.status === 'open'}
             name='status'
           />
-           Open
+           &nbsp;Open
         </label>
         <br/>
         <br/>
