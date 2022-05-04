@@ -70,7 +70,7 @@ class Rooms {
   }
 
   static prefix (roomId = '') {
-    return `KF_ROOM_ID_${roomId}`
+    return `ROOM_ID_${roomId}`
   }
 
   /**

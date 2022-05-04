@@ -2,20 +2,20 @@ const path = require('path')
 const baseDir = path.resolve(path.dirname(require.main.filename), '..')
 const env = {
   NODE_ENV: process.env.NODE_ENV,
-  KF_SERVER_CONSOLE_LEVEL: parseInt(process.env.KF_SERVER_CONSOLE_LEVEL, 10),
-  KF_SERVER_LOG_LEVEL: parseInt(process.env.KF_SERVER_LOG_LEVEL, 10),
-  KF_SERVER_PATH_ASSETS: path.join(baseDir, 'assets'),
-  KF_SERVER_PATH_DATA: process.env.KF_SERVER_PATH_DATA || baseDir,
-  KF_SERVER_PATH_WEBROOT: path.join(baseDir, 'build'),
-  KF_SERVER_PORT: parseInt(process.env.KF_SERVER_PORT, 10) || 0,
-  KF_SERVER_ROTATE_KEY: ['1', 'true'].includes(process.env.KF_SERVER_ROTATE_KEY?.toLowerCase()),
-  KF_SERVER_SCAN: ['1', 'true'].includes(process.env.KF_SERVER_SCAN?.toLowerCase()),
-  KF_SERVER_SCAN_CONSOLE_LEVEL: parseInt(process.env.KF_SERVER_SCAN_CONSOLE_LEVEL, 10),
-  KF_SERVER_SCAN_LOG_LEVEL: parseInt(process.env.KF_SERVER_SCAN_LOG_LEVEL, 10),
-  KF_SERVER_URL_PATH: process.env.KF_SERVER_URL_PATH || '/',
+  KES_CONSOLE_LEVEL: parseInt(process.env.KES_CONSOLE_LEVEL, 10),
+  KES_LOG_LEVEL: parseInt(process.env.KES_LOG_LEVEL, 10),
+  KES_PATH_ASSETS: path.join(baseDir, 'assets'),
+  KES_PATH_DATA: process.env.KES_PATH_DATA || baseDir,
+  KES_PATH_WEBROOT: path.join(baseDir, 'build'),
+  KES_PORT: parseInt(process.env.KES_PORT, 10) || 0,
+  KES_ROTATE_KEY: ['1', 'true'].includes(process.env.KES_ROTATE_KEY?.toLowerCase()),
+  KES_SCAN: ['1', 'true'].includes(process.env.KES_SCAN?.toLowerCase()),
+  KES_SCAN_CONSOLE_LEVEL: parseInt(process.env.KES_SCAN_CONSOLE_LEVEL, 10),
+  KES_SCAN_LOG_LEVEL: parseInt(process.env.KES_SCAN_LOG_LEVEL, 10),
+  KES_URL_PATH: process.env.KES_URL_PATH || '/',
   // support PUID/PGID convention
-  KF_SERVER_PUID: parseInt(process.env.PUID, 10),
-  KF_SERVER_PGID: parseInt(process.env.PGID, 10),
+  KES_PUID: parseInt(process.env.PUID, 10),
+  KES_PGID: parseInt(process.env.PGID, 10),
 }
 
 const yargs = require('yargs')
@@ -64,7 +64,7 @@ const yargs = require('yargs')
   })
   .option('v', {
     alias: 'version',
-    describe: 'Output the Karaoke Forever Server version and exit',
+    describe: 'Output the Karaoke Eternal Server version and exit',
   })
   .usage('$0')
   .usage('  Logging options use the following numeric levels:')
@@ -89,21 +89,21 @@ if (argv.version) {
 
 // CLI options take precendence over env vars
 if (argv.scan) {
-  env.KF_SERVER_SCAN = true
+  env.KES_SCAN = true
 }
 
 if (argv.rotateKey) {
-  env.KF_SERVER_ROTATE_KEY = true
+  env.KES_ROTATE_KEY = true
 }
 
 const opts = {
-  data: 'KF_SERVER_PATH_DATA',
-  port: 'KF_SERVER_PORT',
-  scanConsoleLevel: 'KF_SERVER_SCAN_CONSOLE_LEVEL',
-  scanLogLevel: 'KF_SERVER_SCAN_LOG_LEVEL',
-  serverConsoleLevel: 'KF_SERVER_CONSOLE_LEVEL',
-  serverLogLevel: 'KF_SERVER_LOG_LEVEL',
-  urlPath: 'KF_SERVER_URL_PATH',
+  data: 'KES_PATH_DATA',
+  port: 'KES_PORT',
+  scanConsoleLevel: 'KES_SCAN_CONSOLE_LEVEL',
+  scanLogLevel: 'KES_SCAN_LOG_LEVEL',
+  serverConsoleLevel: 'KES_CONSOLE_LEVEL',
+  serverLogLevel: 'KES_LOG_LEVEL',
+  urlPath: 'KES_URL_PATH',
 }
 
 for (const opt in opts) {

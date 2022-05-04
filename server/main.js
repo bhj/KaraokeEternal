@@ -5,13 +5,13 @@ const env = require('./lib/cli')
 const { Log } = require('./lib/Log')
 
 const log = new Log('server', {
-  console: Log.resolve(env.KF_SERVER_CONSOLE_LEVEL, env.NODE_ENV === 'development' ? 5 : 4),
-  file: Log.resolve(env.KF_SERVER_LOG_LEVEL, env.NODE_ENV === 'development' ? 0 : 3),
+  console: Log.resolve(env.KES_CONSOLE_LEVEL, env.NODE_ENV === 'development' ? 5 : 4),
+  file: Log.resolve(env.KES_LOG_LEVEL, env.NODE_ENV === 'development' ? 0 : 3),
 }).setDefaultInstance().logger.scope(`main[${process.pid}]`)
 
 const scannerLog = new Log('scanner', {
-  console: Log.resolve(process.env.KF_SERVER_SCAN_CONSOLE_LEVEL, process.env.NODE_ENV === 'development' ? 5 : 4),
-  file: Log.resolve(process.env.KF_SERVER_SCAN_LOG_LEVEL, process.env.NODE_ENV === 'development' ? 0 : 3),
+  console: Log.resolve(process.env.KES_SCAN_CONSOLE_LEVEL, process.env.NODE_ENV === 'development' ? 5 : 4),
+  file: Log.resolve(process.env.KES_SCAN_LOG_LEVEL, process.env.NODE_ENV === 'development' ? 0 : 3),
 }).logger.scope('scanner')
 
 const Database = require('./lib/Database')
@@ -39,14 +39,14 @@ for (const key in env) {
 }
 
 // support PUID/PGID convention (group MUST be set before user!)
-if (Number.isInteger(env.KF_SERVER_PGID)) {
-  log.verbose(`PGID=${env.KF_SERVER_PGID}`)
-  process.setgid(env.KF_SERVER_PGID)
+if (Number.isInteger(env.KES_PGID)) {
+  log.verbose(`PGID=${env.KES_PGID}`)
+  process.setgid(env.KES_PGID)
 }
 
-if (Number.isInteger(env.KF_SERVER_PUID)) {
-  log.verbose(`PUID=${env.KF_SERVER_PUID}`)
-  process.setuid(env.KF_SERVER_PUID)
+if (Number.isInteger(env.KES_PUID)) {
+  log.verbose(`PUID=${env.KES_PUID}`)
+  process.setuid(env.KES_PUID)
 }
 
 // close db before exiting (can't do async in the 'exit' handler)
@@ -67,7 +67,7 @@ process.on('unhandledRejection', (reason, p) => {
 // detect electron
 if (process.versions.electron) {
   refs.electron = require('./lib/electron.js')({ env })
-  env.KF_SERVER_PATH_DATA = refs.electron.app.getPath('userData')
+  env.KES_PATH_DATA = refs.electron.app.getPath('userData')
 }
 
 Database.open({ readonly: false, env }).then(db => {
@@ -94,9 +94,9 @@ function startScanner (onExit) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
     refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
-      env: { ...env, KF_CHILD_PROCESS: 'scanner' },
-      gid: Number.isInteger(env.KF_SERVER_PGID) ? env.KF_SERVER_PGID : undefined,
-      uid: Number.isInteger(env.KF_SERVER_PUID) ? env.KF_SERVER_PUID : undefined,
+      env: { ...env, KES_CHILD_PROCESS: 'scanner' },
+      gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
+      uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
     })
 
     refs.scanner.on('exit', (code, signal) => {

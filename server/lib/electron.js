@@ -28,14 +28,14 @@ module.exports = ({ env }) => {
 
     if (process.platform === 'win32') {
       // white 32x32
-      tray = new Tray(path.join(env.KF_SERVER_PATH_ASSETS, 'mic-white@2x.png'))
+      tray = new Tray(path.join(env.KES_PATH_ASSETS, 'mic-white@2x.png'))
     } else {
       // blackish 32x32 (template works in light and dark macOS modes)
-      tray = new Tray(path.join(env.KF_SERVER_PATH_ASSETS, 'mic-blackTemplate.png'))
-      tray.setPressedImage(path.join(env.KF_SERVER_PATH_ASSETS, 'mic-white.png'))
+      tray = new Tray(path.join(env.KES_PATH_ASSETS, 'mic-blackTemplate.png'))
+      tray.setPressedImage(path.join(env.KES_PATH_ASSETS, 'mic-white.png'))
     }
 
-    tray.setToolTip('Karaoke Forever Server v' + app.getVersion())
+    tray.setToolTip('Karaoke Eternal Server v' + app.getVersion())
     tray.on('double-click', launchBrowser)
     updateMenu()
 
@@ -53,7 +53,7 @@ module.exports = ({ env }) => {
   }
 
   function setError (msg) {
-    dialog.showErrorBox('Karaoke Forever Server', `Error: ${msg}`)
+    dialog.showErrorBox('Karaoke Eternal Server', `Error: ${msg}`)
   }
 
   function setStatus (key, val) {
@@ -65,13 +65,13 @@ module.exports = ({ env }) => {
     if (!tray) return
 
     const menu = [
-      { label: 'Karaoke Forever Server v' + app.getVersion(), enabled: false },
+      { label: 'Karaoke Eternal Server v' + app.getVersion(), enabled: false },
       { label: status.url, enabled: false },
       { type: 'separator' },
       { label: 'Open in browser', click: launchBrowser },
       { label: 'Copy URL', click: () => clipboard.writeText(status.url) },
       { type: 'separator' },
-      { label: 'Quit Karaoke Forever Server', role: 'quit' },
+      { label: 'Quit Karaoke Eternal Server', role: 'quit' },
     ]
 
     tray.setContextMenu(Menu.buildFromTemplate(menu))

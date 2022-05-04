@@ -1,6 +1,6 @@
 baseURL: /
 languageCode: en-us
-title: Karaoke Forever
+title: Karaoke Eternal
 permalinks:
   page: "/:slug/"
 pygmentsStyle: solarized-dark256

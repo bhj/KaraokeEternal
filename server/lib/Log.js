@@ -65,7 +65,7 @@ function getIPCLogger (scope = '') {
 }
 
 // default export
-module.exports = process.env.KF_CHILD_PROCESS ? getIPCLogger : getLogger
+module.exports = process.env.KES_CHILD_PROCESS ? getIPCLogger : getLogger
 
 // used by main.js to instantiate the loggers
 module.exports.Log = Log

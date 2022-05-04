@@ -1,16 +1,19 @@
-.container {
-  font-family: Beon;
+.logo {
+  font-size: 2rem;
+  line-height: 1.15; // from app's <html> style
+  text-align: center;
   white-space: nowrap;
-  flex: 1;
+  padding-top: .5rem;
 }
 
-.title {
+.logo h1 {
+  font-family: 'Beon', sans-serif;
   border: none;
   color: hsl(var(--hue-blue), 10%, 80%);
   display: inline-block;
   font-size: 200%;
   text-transform: uppercase;
-  margin: 0;
+  margin: 1.75rem 0;
   text-shadow:
     0 0 .1em hsl(var(--hue-pink), 100%, 100%),
     0 0 .5em hsl(var(--hue-pink), 100%, 100%),
@@ -24,7 +27,7 @@
     0 0 9em hsl(var(--hue-pink), 100%, 50%);
 }
 
-.eternal {
+.logo-eternal {
   font-size: 40%;
   text-transform: uppercase;
   display: block;
@@ -46,6 +49,24 @@
     inset 0 0 .75em hsl(var(--hue-blue), 100%, 50%);
 }
 
-.lastChar {
+.logo-lastChar {
   letter-spacing: normal;
+}
+
+.logo .description {
+  font-family: 'Raleway', sans-serif;
+  font-size: 1rem;
+  font-weight: 200;
+  text-align: center;
+  text-shadow: var(--text-shadow-glow);
+}
+
+@media (min-width: 60rem) {
+  .logo {
+    font-size: 36px;
+  }
+
+  .logo h1 {
+    margin-top: 0;
+  }
 }

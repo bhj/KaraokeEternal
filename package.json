@@ -1,5 +1,5 @@
 {
-  "name": "karaoke-forever",
+  "name": "karaoke-eternal",
   "version": "0.0.0-dev.0",
   "description": "Open karaoke party system",
   "keywords": [
@@ -13,7 +13,7 @@
     "mp4",
     "webgl"
   ],
-  "homepage": "https://www.karaoke-forever.com",
+  "homepage": "https://www.karaoke-eternal.com",
   "main": "./server/main.js",
   "engines": {
     "node": ">=16.0.0",
@@ -40,13 +40,13 @@
     "project.config.js"
   ],
   "bin": {
-    "karaoke-forever-server": "./server/main.js"
+    "karaoke-eternal-server": "./server/main.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bhj/karaoke-forever.git"
+    "url": "git+https://github.com/bhj/KaraokeEternal.git"
   },
-  "productName": "Karaoke Forever Server",
+  "productName": "Karaoke Eternal Server",
   "author": "RadRoot LLC",
   "license": "ISC",
   "dependencies": {
