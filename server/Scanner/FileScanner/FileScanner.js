@@ -106,18 +106,18 @@ class FileScanner extends Scanner {
   }
 
   async process (item, pathId) {
-    const tags = await musicMeta.parseFile(item.file, {
+    const data = await musicMeta.parseFile(item.file, {
       duration: true,
       skipCovers: true,
     })
 
-    if (!tags.format.duration) {
+    if (!data.format.duration) {
       throw new Error('could not determine duration')
     }
 
     log.verbose('  => duration: %s:%s',
-      Math.floor(tags.format.duration / 60),
-      Math.round(tags.format.duration % 60, 10).toString().padStart(2, '0')
+      Math.floor(data.format.duration / 60),
+      Math.round(data.format.duration % 60, 10).toString().padStart(2, '0')
     )
 
     // run MetaParser
@@ -126,7 +126,7 @@ class FileScanner extends Scanner {
       dir: pathInfo.dir,
       dirSep: path.sep,
       name: pathInfo.name,
-      tags: tags.common,
+      data: data.common,
     })
 
     // get artistId and songId
@@ -137,9 +137,9 @@ class FileScanner extends Scanner {
       pathId,
       // normalize relPath to forward slashes with no leading slash
       relPath: item.file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
-      duration: Math.round(tags.format.duration),
-      rgTrackGain: tags.common.replaygain_track_gain ? tags.common.replaygain_track_gain.dB : null,
-      rgTrackPeak: tags.common.replaygain_track_peak ? tags.common.replaygain_track_peak.ratio : null,
+      duration: Math.round(data.format.duration),
+      rgTrackGain: data.common.replaygain_track_gain ? data.common.replaygain_track_gain.dB : null,
+      rgTrackPeak: data.common.replaygain_track_peak ? data.common.replaygain_track_peak.ratio : null,
     }
 
     // need to look for .cdg if this is an audio-only file

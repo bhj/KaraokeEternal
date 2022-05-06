@@ -259,7 +259,7 @@ When a media file is scanned, the parser is called with a context object `ctx` h
 - `dir` (string) full path of the containing folder
 - `dirSep` (string) path segment separator used by the current OS (`/` or `\`)
 - `name` (string) media filename (without extension)
-- `tags` (object) media file's [tags/metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md){{% icon-external %}}
+- `data` (object) media file's [metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md){{% icon-external %}}
 
 Middleware may mutate `ctx` as required. Once finished, the following properties on it will be used:
 
