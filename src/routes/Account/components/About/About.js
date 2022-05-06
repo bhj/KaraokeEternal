@@ -13,17 +13,17 @@ const About = props => {
     <div className={styles.container}>
       <h1 className={styles.title}>About</h1>
       <div className={styles.content}>
-        <a href={__KE_URL_HOME__} target='blank'> {/* eslint-disable-line no-undef */}
+        <a href={__KE_URL_HOME__} target='_blank' rel='noreferrer'> {/* eslint-disable-line no-undef */}
           <Logo className={styles.logo}/>
         </a>
         <p className={styles.sm}>
-          &copy;{__KE_COPYRIGHT__} <a href='https://www.radroot.com' target='blank'>RadRoot LLC</a><br/> {/* eslint-disable-line no-undef */}
+          &copy;{__KE_COPYRIGHT__} <a href='https://www.radroot.com' target='_blank' rel='noreferrer'>RadRoot LLC</a><br/> {/* eslint-disable-line no-undef */}
           v{__KE_VERSION__} {/* eslint-disable-line no-undef */}
         </p>
-        <p><a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}
-        <GitHubButton href={__KE_URL_REPO__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>GitHub</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
-        <GitHubButton data-icon='octicon-star' href={__KE_URL_REPO__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Star</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
-        <GitHubButton data-icon='octicon-heart' href={__KE_URL_SPONSOR__} data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Sponsor</GitHubButton>&nbsp; {/* eslint-disable-line no-undef, max-len */}
+        <p><a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='_blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}
+        <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'><GitHubButton data-size='large' data-color-scheme='no-preference: dark; light: dark;'>GitHub</GitHubButton></a>&nbsp; {/* eslint-disable-line no-undef, max-len */}
+        <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'><GitHubButton data-icon='octicon-star' data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Star</GitHubButton></a>&nbsp; {/* eslint-disable-line no-undef, max-len */}
+        <a href={__KE_URL_SPONSOR__} target='_blank' rel='noreferrer'><GitHubButton data-icon='octicon-heart' data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Sponsor</GitHubButton></a> {/* eslint-disable-line no-undef, max-len */}
       </div>
 
       <Modal
