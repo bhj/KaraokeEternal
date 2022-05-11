@@ -26,7 +26,7 @@ const yargs = require('yargs')
     requiresArg: true,
   })
   .option('data', {
-    describe: 'Absolute path to folder for database files',
+    describe: 'Absolute path of folder for database files',
     requiresArg: true,
     type: 'string',
   })
