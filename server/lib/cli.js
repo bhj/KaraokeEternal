@@ -1,11 +1,13 @@
+const os = require('os')
 const path = require('path')
 const baseDir = path.resolve(path.dirname(require.main.filename), '..')
+
 const env = {
   NODE_ENV: process.env.NODE_ENV,
   KES_CONSOLE_LEVEL: parseInt(process.env.KES_CONSOLE_LEVEL, 10),
   KES_LOG_LEVEL: parseInt(process.env.KES_LOG_LEVEL, 10),
   KES_PATH_ASSETS: path.join(baseDir, 'assets'),
-  KES_PATH_DATA: process.env.KES_PATH_DATA || baseDir,
+  KES_PATH_DATA: process.env.KES_PATH_DATA || getAppPath('Karaoke Eternal Server'),
   KES_PATH_WEBROOT: path.join(baseDir, 'build'),
   KES_PORT: parseInt(process.env.KES_PORT, 10) || 0,
   KES_ROTATE_KEY: ['1', 'true'].includes(process.env.KES_ROTATE_KEY?.toLowerCase()),
@@ -114,3 +116,21 @@ for (const opt in opts) {
 }
 
 module.exports = env
+
+function getAppPath (appName) {
+  const home = os.homedir ? os.homedir() : process.env.HOME
+
+  switch (process.platform) {
+    case 'darwin': {
+      return path.join(home, 'Library', 'Application Support', appName)
+    }
+
+    case 'win32': {
+      return process.env.APPDATA || path.join(home, 'AppData', 'Roaming', appName)
+    }
+
+    default: {
+      return process.env.XDG_CONFIG_HOME || path.join(home, '.config', appName)
+    }
+  }
+}

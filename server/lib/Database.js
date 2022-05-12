@@ -1,7 +1,8 @@
-const log = require('./Log')('db')
 const path = require('path')
+const fse = require('fs-extra')
 const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
+const log = require('./Log')('db')
 let _db
 
 class Database {
@@ -18,19 +19,21 @@ class Database {
     }
   }
 
-  static async open ({ readonly = true, env = process.env } = {}) {
+  static async open ({ file, ro = true } = {}) {
     if (_db) throw new Error('Database already open')
 
-    const dbPath = path.resolve(env.KES_PATH_DATA, 'database.sqlite3')
-    log.info('Opening database file %s %s', readonly ? '(read-only)' : '(writeable)', dbPath)
+    log.info('Opening database file %s %s', ro ? '(read-only)' : '(writeable)', file)
+
+    // create path if it doesn't exist
+    fse.ensureDirSync(path.dirname(file))
 
     const db = await open({
-      filename: dbPath,
+      filename: file,
       driver: sqlite3.Database,
-      mode: readonly ? sqlite3.OPEN_READONLY : null,
+      mode: ro ? sqlite3.OPEN_READONLY : null,
     })
 
-    if (!readonly) {
+    if (!ro) {
       await db.migrate({
         migrationsPath: path.join(__dirname, 'schemas'),
       })

@@ -1,3 +1,4 @@
+const path = require('path')
 const log = require('./lib/Log')(`scanner[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
@@ -10,7 +11,10 @@ let FileScanner, Prefs
 let _Scanner
 let _isScanQueued = true
 
-Database.open({ readonly: true, log: log.info }).then(db => {
+Database.open({
+  file: path.join(process.env.KES_PATH_DATA, 'database.sqlite3'),
+  ro: true,
+}).then(db => {
   Prefs = require('./Prefs')
   FileScanner = require('./Scanner/FileScanner')
 

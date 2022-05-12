@@ -294,21 +294,22 @@ Karaoke Eternal Server supports the following CLI options and environment variab
 
 ### File Locations
 
+The default locations for the database (`database.sqlite3`), web server log (`server.log`) and media scanner log (`scanner.log`) are as follows:
+
 #### macOS
 
- - Database: `~/Library/Application Support/Karaoke Eternal Server/database.sqlite3`
- - Media Scanner Log: `~/Library/Logs/Karaoke Eternal Server/scanner.log`
- - Server Log: `~/Library/Logs/Karaoke Eternal Server/server.log`
+ - Database: `~/Library/Application Support/Karaoke Eternal Server`
+ - Logs: `~/Library/Logs/Karaoke Eternal Server`
 
 #### Windows
 
-- Database: `%APPDATA%\Karaoke Eternal Server\database.sqlite3`
-- Media Scanner Log: `%APPDATA%\Karaoke Eternal Server\scanner.log`
-- Server Log: `%APPDATA%\Karaoke Eternal Server\server.log`
+- Database: `%USERPROFILE%\AppData\Roaming\Karaoke Eternal Server`
+- Logs: `%USERPROFILE%\AppData\Roaming\Karaoke Eternal Server\logs`
 
-#### Installed via `npm`
+#### Linux
 
-- Database: `$ npm -g root` to show the location of global modules. The `karaoke-eternal` folder will be inside this.
+- Database: `~/.config/Karaoke Eternal Server`
+- Logs: `~/.config/Karaoke Eternal Server/logs`
 
 <hr>
 

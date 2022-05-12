@@ -70,7 +70,10 @@ if (process.versions.electron) {
   env.KES_PATH_DATA = refs.electron.app.getPath('userData')
 }
 
-Database.open({ readonly: false, env }).then(db => {
+Database.open({
+  file: path.join(env.KES_PATH_DATA, 'database.sqlite3'),
+  ro: false,
+}).then(db => {
   if (refs.electron) {
     process.on('serverWorker', action => {
       const { type, payload } = action
