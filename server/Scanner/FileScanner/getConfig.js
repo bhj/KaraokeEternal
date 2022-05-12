@@ -2,7 +2,7 @@ const path = require('path')
 const log = require('../../lib/Log')('FileScanner')
 const fs = require('fs')
 const { NodeVM } = require('vm2')
-const CONFIG = '_kes.config.js'
+const CONFIG = '_kes.v1.js'
 
 // search each folder from dir up to baseDir
 function getConfig (dir, baseDir) {

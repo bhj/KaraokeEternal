@@ -195,17 +195,16 @@ Karaoke Eternal Server is available as an `npm` package for systems running [Nod
 
 The following types are supported:
 
-- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (.cdg and .mp3 files must be named the same; also supports an .m4a instead of .mp3). Supports background visualizations.
+- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (.cdg and .mp3 files must be named the same; also supports an .m4a instead of .mp3)
+- MP4 video (codec support can vary depending on the browser running the [player](#player)).
 
-- MP4 video (codec support can vary depending on the browser running the [player](#player)). Does not support background visualizations (videos are played as-is).
-
-Media filenames are expected to be in "Artist - Title" format by default, but this can be configured per-folder using a `_keconfig.js` file. When this file is encountered in a folder it applies to all files and subfolders. If any subfolders have their own `_keconfig.js`, that will take precedence.
-
-Media with filenames that couldn't be parsed are [logged to a file](#file-locations) (to change the level of logging, see [Command Line Options](#cli--env)) and won't appear in the library view.
+Your media files should be named in **"Artist - Title" format** by default (you can [configure this](#configuring-the-metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
 
 #### Configuring the Metadata Parser
 
-You can configure the default metadata parser by returning an object with the options you want to override. For example, if a folder has filenames in the format "Title - Artist" instead, you could add this `_keconfig.js` file:
+The media metadata parser can be customized using a `_kes.v1.js` file. When this file is encountered in a media folder it applies to all files and subfolders (if any subfolders have their own `_kes.v1.js`, it will take precedence).
+
+You can configure the default metadata parser by returning an object with the options you want to override. For example, if a folder has filenames in the format "Title - Artist", you could add this `_kes.v1.js` file:
 
 {{< highlight js >}}
 return {
@@ -230,7 +229,7 @@ return {
 
 #### Creating a Metadata Parser (Experimental)
 
-Your `_keconfig.js` can also return a *parser creator* instead of a configuration object. A parser creator returns a function that can be called for each media file. The [default parser](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js){{% icon-external %}} is still available so you don't have to reinvent the wheel.
+Your `_kes.v1.js` file can also return a *parser creator* instead of a configuration object. A parser creator returns a function that can be called for each media file. The [default parser](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js){{% icon-external %}} is still available so you don't have to reinvent the wheel.
 
 The following example creates a parser that removes the word 'junk' from each filename before handing off to the default parser:
 
@@ -251,7 +250,7 @@ return ({ compose, getDefaultParser, defaultMiddleware }) => {
 Your parser creator is passed an object with the following properties:
 
 - `compose` (function) accepts functions (or arrays of functions) as arguments and returns a single composed function that can be used as a parser
-- `getDefaultParser` (function) gets an instance of the default parser, which itself can be used as middleware. Note that the method must be called because you can optionally pass a [configuration object](#configuring-the-metadata-parser) when getting an instance
+- `getDefaultParser` (function) gets an instance of the default parser, which itself can be used as middleware. Note that the method must be called because you can optionally pass a [configuration object](#configuring-the-metadata-parser)
 - `defaultMiddleware` [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map){{% icon-external %}} containing the [default middleware](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js){{% icon-external %}} in order. This can be used to recompose the middleware in your custom parser
 
 When a media file is scanned, the parser is called with a context object `ctx` having the following properties:
@@ -268,7 +267,7 @@ Middleware may mutate `ctx` as required. Once finished, the following properties
 - `title` (string) song's title as it will be shown in the library
 - `titleNorm` (string) normalized version of the song's title; used for matching and sorting (`title` if not set)
 
-It's important that each middleware calls `next` unless you don't want the chain to continue (for instance, if you've set `artist` and `title` manually and want to use them as-is).
+It's important that each middleware call `next` unless you're done or don't want the chain to continue.
 
 <aside class="info">
   {{% icon-info %}}
