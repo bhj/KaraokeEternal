@@ -45,7 +45,9 @@ const CoreLayout = (props) => {
         title='Oops...'
         buttons=<button onClick={closeError}>OK</button>
       >
-        <p>{ui.errorMessage}</p>
+        <p style={{ '-webkit-user-select': 'text', userSelect: 'text' }}>
+          {ui.errorMessage}
+        </p>
       </Modal>
     </>
   )
