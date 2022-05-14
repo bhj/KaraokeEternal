@@ -170,7 +170,7 @@ The server hosts the app and your media files, and can run on relatively minimal
 
 #### Any OS with Node.js
 
-Karaoke Eternal Server is available as an `npm` package for systems running [Node.js](https://nodejs.org){{% icon-external %}} 16 or later.
+Karaoke Eternal is available as an `npm` package for systems running [Node.js](https://nodejs.org){{% icon-external %}} 16 or later.
 
 1. Install via ```npm```
 
@@ -198,7 +198,7 @@ The following types are supported:
 - [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (.cdg and .mp3 files must be named the same; also supports an .m4a instead of .mp3)
 - MP4 video (codec support can vary depending on the browser running the [player](#player)).
 
-Your media files should be named in **"Artist - Title" format** by default (you can [configure this](#configuring-the-metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
+Your media files should be named in **"Artist - Title"** format by default (you can [configure this](#configuring-the-metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
 
 #### Configuring the Metadata Parser
 
