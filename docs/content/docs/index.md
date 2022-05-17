@@ -164,11 +164,67 @@ The server hosts the app and your media files, and can run on relatively minimal
   <p>These packages are not currently signed. On macOS, <strong>do not</strong> disable Gatekeeper; simply right-click <code>Karaoke Eternal Server.app</code> in your Applications folder and choose Open. On Windows, click More Info and then Run Anyway.</p>
 </aside>
 
-#### Docker
+
+#### Docker (Synology)
+
+1. In the Registry section of DSM's Docker package, search for and download the `radrootllc/karaoke-eternal` image.
+2. In the Image section, double-click the newly downloaded image.
+3. At the container creation dialog, click Advanced Settings and configure the following tabs/sections:
+  - **Advanced Settings**
+    - `Enable auto-restart` if desired.
+  - **Volume**
+    - Click Add Folder, select `docker` and create a new `karaoke-eternal` subfolder. Select that subfolder and click Select, then enter the mount path `/config` and click Apply. This path is used to store the database.
+    - Click Add Folder again, and this time add your media folder(s). For their mount paths, enter something easy like `/mnt/karaoke`, etc. Later, once inside the app, you'll add these mount path(s) as [Media Folders](#preferences-admin-only).
+  - **Port Settings**
+    - Set the Local Port to `8080` or something else if desired.
+  - **Environment Variables**
+    - Optionally add `PUID`, `PGID` and `TZ`.
+4. Click Apply to finish the advanced settings, then click Next, and finally click Done.
+5. Karaoke Eternal Server should now be running and reachable at `http://<your_synology_ip>:8080`. See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
+
+#### Docker (CLI and docker-compose)
 
 [Official Docker images](https://hub.docker.com/r/radrootllc/karaoke-eternal) are available for x64. Support for additional architectures is planned.
 
-#### Any OS with Node.js
+These images are modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers):
+
+  - `/config` should be mapped to a host volume (the database will be stored here)
+  - media folder(s) should be mapped to host volume(s) (these will be added as [Media Folders](#preferences-admin-only) in the app)
+  - port `80` should be published to the desired host port
+  - optional `PUID` and `PGID` environment variables
+
+Example CLI usage:
+
+{{< highlight shell >}}
+  $ docker run \
+    --name=karaoke-eternal \
+    -v <path_to_database>:/config \
+    -v <path_to_media>:/mnt/karaoke \
+    -p <host_port>:80 \
+    --restart unless-stopped \
+    radrootllc/karaoke-eternal
+{{< /highlight >}}  
+
+Example `docker-compose` usage:
+
+{{< highlight yaml >}}
+---
+version: "2.1"
+services:
+  karaoke-eternal:
+    image: radrootllc/karaoke-eternal
+    container_name: karaoke-eternal
+    volumes:
+      - <path_to_database>:/config
+      - <path_to_media>:/mnt/karaoke
+    ports:
+      - <host_port>:80
+    restart: unless-stopped
+{{< /highlight >}}  
+
+See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
+
+#### NPM
 
 Karaoke Eternal is available as an `npm` package for systems running [Node.js](https://nodejs.org){{% icon-external %}} 16 or later.
 
