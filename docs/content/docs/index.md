@@ -18,31 +18,6 @@ resources:
     galleryOrder: 5
 ---
 
-## Quick Start
-
-1. Install and run [Karaoke Eternal Server](#karaoke-eternal-server) on the system that will serve the app and media on your local network.
-
-2. Browse to the [app](#karaoke-eternal-the-app) at the **server URL**. You can copy the URL or open it in your default browser using the Karaoke Eternal Server menu bar or tray icon in macOS or Windows.
-
-<aside class="info">
-  {{% icon-info %}}
-  <p>Since the app is designed for mobile, use your phone for the best experience.</p>
-</aside>
-
-3. Create your **admin** account at the welcome page.
-
-4. In the Preferences panel, tap Media Folders and add your [supported media](#media-files).
-
-5. Once the media scanner finishes, head to the [library](#library) and add some songs by tapping an artist, then tapping a song title. A glowing song means it's upcoming in the queue.
-
-6. Now we just need a [player](#player). On the system that will output the room's audio/video, browse to the **server URL**, sign in with your admin account, and tap the **Start Player** link at the top. If you don't see a link, your current browser doesn't support fullscreen mode, but you can still navigate to `/player`.
-
-7. Playback and display controls will appear on all your devices now that there's a player in the room. The current singer sees these during their turn; admins always see these.
-
-Congratulations, you are now ready to press play and party!
-
-<hr>
-
 ## Karaoke Eternal (the app)
 
 Karaoke Eternal is a modern mobile browser app that lets everyone join without having to install anything on their phones. It's built for touch, but a mouse is supported in desktop browsers (click and drag to emulate swipe gestures).
@@ -143,11 +118,6 @@ Once a player is in the room, playback and display controls will appear. These a
 
 The server hosts the app and your media files, and can run on relatively minimal hardware (Raspberry Pi 3B+). Note that [players](#player) don't need to run on the same system as the server.
 
-<aside class="info">
-  {{% icon-info %}}
-  <p>The server chooses a random port at startup unless <a href="#cli--env">otherwise specified</a>.</p>
-</aside>
-
 ### Installation
 
 #### macOS or Windows
@@ -164,6 +134,12 @@ The server hosts the app and your media files, and can run on relatively minimal
   <p>These packages are not currently signed. On macOS, <strong>do not</strong> disable Gatekeeper; simply right-click <code>Karaoke Eternal Server.app</code> in your Applications folder and choose Open. On Windows, click More Info and then Run Anyway.</p>
 </aside>
 
+<aside class="info">
+  {{% icon-info %}}
+  <p>The server chooses a random port at startup unless <a href="#cli--env">otherwise specified</a>.</p>
+</aside>
+
+See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
 
 #### Docker (Synology)
 
@@ -233,11 +209,6 @@ Karaoke Eternal is available as an `npm` package for systems running [Node.js](h
 {{< highlight shell >}}
   $ npm i -g karaoke-eternal
 {{< /highlight >}}
-
-<aside class="info">
-  {{% icon-info %}}
-  <p>Depending on availability of pre-built modules (specifically SQLite and bcrypt) for your architecture, compilation tools may need to be present (see the requirements for <a href="https://github.com/nodejs/node-gyp#installation">node-gyp</a>)</p>
-</aside>
 
 2. Start the server
 
@@ -365,6 +336,31 @@ The default locations for the database (`database.sqlite3`), web server log (`se
 
 - Database: `~/.config/Karaoke Eternal Server`
 - Logs: `~/.config/Karaoke Eternal Server/logs`
+
+<hr>
+
+## Quick Start
+
+1. Install and run [Karaoke Eternal Server](#karaoke-eternal-server) on the system that will serve the app and media on your local network.
+
+2. Browse to the [app](#karaoke-eternal-the-app) at the **server URL**. You can copy the URL or open it in your default browser using the Karaoke Eternal Server menu bar or tray icon in macOS or Windows.
+
+<aside class="info">
+  {{% icon-info %}}
+  <p>Since the app is designed for mobile, use your phone for the best experience.</p>
+</aside>
+
+3. Create your **admin** account at the welcome page.
+
+4. In the Preferences panel, tap Media Folders and add your [supported media](#media-files).
+
+5. Once the media scanner finishes, head to the [library](#library) and add some songs by tapping an artist, then tapping a song title. A glowing song means it's upcoming in the queue.
+
+6. Now we just need a [player](#player). On the system that will output the room's audio/video, browse to the **server URL**, sign in with your admin account, and tap the **Start Player** link at the top. If you don't see a link, your current browser doesn't support fullscreen mode, but you can still navigate to `/player`.
+
+7. Playback and display controls will appear on all your devices now that there's a player in the room. The current singer sees these during their turn; admins always see these.
+
+Congratulations, you are now ready to press play and party!
 
 <hr>
 

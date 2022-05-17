@@ -2,6 +2,7 @@
 
 ### New
 
+- **Name**: Karaoke Forever is now Karaoke Eternal
 - **(app)** User management interface
 - **(app)** "Make user's next" button for upcoming songs
 - **(app)** "Re-queue" button for played songs
@@ -13,7 +14,6 @@
 - **(server)** Custom database file path support (see `--data` CLI option)
 - **(server)** Session key can be rotated on startup (see `--rotateKey` CLI option)
 - **(server)** All CLI options now have equivalent environment variables
-- **(server)** PUID and PGID environment variable support
 
 ### Changed
 
@@ -33,9 +33,7 @@
 
 ### Sponsors
 
-Massive thanks to this release's sponsors: [fulldecent](https://github.com/fulldecent), [vze22jjw](https://github.com/vze22jjw)
-
-If you have fun with it, consider [sponsoring](https://github.com/sponsors/bhj) as we roll down [the road to v1.0](https://github.com/bhj/KaraokeEternal/issues/13).
+Massive thanks to this release's sponsors: [fulldecent](https://github.com/fulldecent), [vze22jjw](https://github.com/vze22jjw). If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
 
 ### New
 
