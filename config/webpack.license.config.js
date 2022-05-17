@@ -9,7 +9,7 @@ const applyLicenseConfig = config => {
     outputFilename: 'licenses.txt',
     perChunkOutput: false,
     renderLicenses: (modules) => {
-      modules.unshift(karaokeForever)
+      modules.unshift(karaokeEternal)
       modules.push(materialDesignIcons)
 
       return modules.reduce((txt, m, i) => {
@@ -42,7 +42,7 @@ const applyLicenseConfig = config => {
   return config
 }
 
-const karaokeForever = {
+const karaokeEternal = {
   packageJson: {
     name: 'Karaoke Eternal',
   },
