@@ -1,4 +1,6 @@
-## TBD
+## v1.0.0 (2022-05-17)
+
+Sponsored by: [consolecwby](https://github.com/consolecwby), [vze22jjw](https://github.com/vze22jjw). Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
 
 ### New
 
