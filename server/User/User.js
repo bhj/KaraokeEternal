@@ -94,13 +94,11 @@ class User {
    * @param  {Bool}  creds  whether to include username and password in result
    * @return {Promise}      user object
    */
-  static async _get ({ userId, username }, creds) {
-    if (username) username = username.toLowerCase()
-
+  static async _get ({ userId, username }, creds = false) {
     const query = sql`
       SELECT *
       FROM users
-      WHERE ${typeof userId === 'number' ? sql`userId = ${userId}` : sql`LOWER(username) = ${username}`}
+      WHERE ${typeof userId === 'number' ? sql`userId = ${userId}` : sql`LOWER(username) = ${username.toLowerCase()}`}
     `
 
     const user = await db.get(String(query), query.parameters)
