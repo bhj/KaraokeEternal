@@ -6,6 +6,7 @@ sitemap:
 ---
 
 - [General](#general)
+- [Networking](#networking)
 - [Troubleshooting](#troubleshooting)
 
 ### General
@@ -39,6 +40,27 @@ Karaoke tracks require original recording and production. Please support the cre
 - [Vocaluxe](https://www.vocaluxe.org){{% icon-external %}}: "A free and open source singing game, inspired by SingStar™ and the great Ultrastar Deluxe project."
 
 (Are we missing something? Submit a PR!)
+
+### Networking
+
+#### Serving with NGINX (reverse proxy + custom path)
+
+If you want to host the app at `/karaoke` for example, run Karaoke Eternal Server with the `--urlPath /karaoke` option, then use an NGINX config similar to the following, replacing `<your_server_ip>` and `<your_server_port>`:
+
+```
+  location /karaoke {
+    proxy_pass http://192.168.1.11:8090/karaoke;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Proto $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Port $server_port;
+}
+```
 
 ### Troubleshooting
 
