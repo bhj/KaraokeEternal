@@ -47,7 +47,7 @@ The queue view shows your room's previous, current and upcoming songs.
   {{% img srcset="app-queue.png 2x" src="app-queue.png" alt="Queue view" %}}
 </div>
 
-Singers are prioritized by how long they've gone without singing, so those joining later in the party aren't penalized and will jump near the front of the queue.
+Karaoke Eternal automatically arranges the queue using a round-robin method for fairness, without penalizing those joining later in the party. For example, a latecomer will be able to sing right after the next-up singer regardless of how long the queue is.
 
 Swiping left on a queued song reveals the following options:
 
@@ -110,7 +110,12 @@ The player is a part of the [app](#karaoke-eternal-the-app) that's designed to r
 
 To start a player, sign in to the desired room as an admin and a player link will appear at the top. If you don't see a link that means fullscreen support wasn't detected, but you can still manually navigate to `/player`.
 
-Once a player is in the room, playback and display controls will appear. These are available to the currently-up singer for the duration of the song, and are always available to admins.
+Once a player is in the room, playback and display controls will appear. Admins always see these, as well as the current singer during their turn.
+
+<aside class="info">
+  {{% icon-info %}}
+  <p>Starting playback inside the player (rather than on a remote device) helps avoid browser auto-play restrictions. These can also be disabled.</p>
+</aside>
 
 <hr>
 
@@ -165,9 +170,9 @@ See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
 These images are modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers):
 
   - `/config` should be mapped to a host volume (the database will be stored here)
-  - media folder(s) should be mapped to host volume(s) (these will be added as [Media Folders](#preferences-admin-only) in the app)
-  - port `80` should be published to the desired host port
-  - optional `PUID` and `PGID` environment variables
+  - media folder(s) should be mapped to host volume(s) (once inside the app, you'll add these as [Media Folders](#preferences-admin-only))
+  - port `8080` should be published to the desired host port
+  - `PUID`, `PGID` and `TZ` are optional
 
 Example CLI usage:
 
@@ -176,7 +181,7 @@ Example CLI usage:
     --name=karaoke-eternal \
     -v <path_to_database>:/config \
     -v <path_to_media>:/mnt/karaoke \
-    -p <host_port>:80 \
+    -p <host_port>:8080 \
     --restart unless-stopped \
     radrootllc/karaoke-eternal
 {{< /highlight >}}  
@@ -194,7 +199,7 @@ services:
       - <path_to_database>:/config
       - <path_to_media>:/mnt/karaoke
     ports:
-      - <host_port>:80
+      - <host_port>:8080
     restart: unless-stopped
 {{< /highlight >}}  
 
@@ -341,9 +346,9 @@ The default locations for the database (`database.sqlite3`), web server log (`se
 
 ## Quick Start
 
-1. Install and run [Karaoke Eternal Server](#karaoke-eternal-server) on the system that will serve the app and media on your local network.
+1. Install and run [Karaoke Eternal Server](#karaoke-eternal-server) on the system that will serve the app and your media. Note that [players](#player) don't need to run on the same system as the server.
 
-2. Browse to the [app](#karaoke-eternal-the-app) at the **server URL**. You can copy the URL or open it in your default browser using the Karaoke Eternal Server menu bar or tray icon in macOS or Windows.
+2. Browse to the **server URL**. In macOS or Windows you can open the URL using the Karaoke Eternal Server menu bar or tray icon.
 
 <aside class="info">
   {{% icon-info %}}
@@ -352,15 +357,20 @@ The default locations for the database (`database.sqlite3`), web server log (`se
 
 3. Create your **admin** account at the welcome page.
 
-4. In the Preferences panel, tap Media Folders and add your [supported media](#media-files).
+4. In the [account view](#account) you'll see Preferences. Expand the Media Folders section and add your [supported media](#media-files).
 
 5. Once the media scanner finishes, head to the [library](#library) and add some songs by tapping an artist, then tapping a song title. A glowing song means it's upcoming in the queue.
 
-6. Now we just need a [player](#player). On the system that will output the room's audio/video, browse to the **server URL**, sign in with your admin account, and tap the **Start Player** link at the top. If you don't see a link, your current browser doesn't support fullscreen mode, but you can still navigate to `/player`.
+6. Now we just need a [player](#player). On the system that will output audio/video, browse to the **server URL**, sign in with your admin account, and tap the **Start Player** link at the top. If you don't see a link, your current browser doesn't support fullscreen mode, but you can still navigate to `/player`.
 
-7. Playback and display controls will appear on all your devices now that there's a player in the room. The current singer sees these during their turn; admins always see these.
+7. In the player, press play and party!
 
-Congratulations, you are now ready to press play and party!
+<aside class="info">
+  {{% icon-info %}}
+  <p>Starting playback inside the player (rather than on a remote device) helps avoid browser auto-play restrictions. These can also be disabled.</p>
+</aside>
+
+Now that there's a player in the room, playback and display controls will appear on all your devices. Admins always see these, as well as the current singer during their turn.
 
 <hr>
 
