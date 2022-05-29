@@ -149,19 +149,18 @@ See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
 #### Docker (Synology)
 
 1. In the Registry section of DSM's Docker package, search for and download the `radrootllc/karaoke-eternal` image.
-2. In the Image section, double-click the newly downloaded image.
-3. At the container creation dialog, click Advanced Settings and configure the following tabs/sections:
-  - **Advanced Settings**
-    - `Enable auto-restart` if desired.
-  - **Volume**
-    - Click Add Folder, select `docker` and create a new `karaoke-eternal` subfolder. Select that subfolder and click Select, then enter the mount path `/config` and click Apply. This path is used to store the database.
-    - Click Add Folder again, and this time add your media folder(s). For their mount paths, enter something easy like `/mnt/karaoke`, etc. Later, once inside the app, you'll add these mount path(s) as [Media Folders](#preferences-admin-only).
+2. In the Image section, double-click to launch the image.
+3. The container creation dialog has the following sections:
+  - **Network**
+    - No changes (click Next)
+  - **General**
+    - `Enable auto-restart` (if desired)
   - **Port Settings**
-    - Set the Local Port to `8080` or something else if desired.
-  - **Environment Variables**
-    - Optionally add `PUID`, `PGID` and `TZ`.
-4. Click Apply to finish the advanced settings, then click Next, and finally click Done.
-5. Karaoke Eternal Server should now be running and reachable at `http://<your_synology_ip>:8080`. See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
+    - Set the Local Port to `8080` (or something else if desired)
+  - **Volume Settings**
+    - Click Add Folder, select `docker` and create a new `karaoke-eternal` subfolder. Select that subfolder and click Select, then enter the mount path `/config`. This path is used to store the database.
+    - Click Add Folder, and this time select your media folder(s). For their mount paths, enter something easy like `/mnt/karaoke`, etc. Once inside the app, you'll add these mount paths as [Media Folders](#preferences-admin-only).
+4. Click Done. Karaoke Eternal Server should now be running and reachable at `http://<your_synology_ip>:8080`. See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
 
 #### Docker (CLI and docker-compose)
 
