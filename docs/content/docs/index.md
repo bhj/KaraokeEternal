@@ -165,9 +165,7 @@ See [Quick Start](#quick-start) if you're new to Karaoke Eternal.
 
 #### Docker (CLI and docker-compose)
 
-[Official Docker images](https://hub.docker.com/r/radrootllc/karaoke-eternal) are available for x64. Support for additional architectures is planned.
-
-These images are modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers):
+The [Karaoke Eternal docker image](https://hub.docker.com/r/radrootllc/karaoke-eternal) supports `amd64`, `arm64` and `arm/v7`. The image is modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers):
 
   - `/config` should be mapped to a host volume (the database will be stored here)
   - media folder(s) should be mapped to host volume(s) (once inside the app, you'll add these as [Media Folders](#preferences-admin-only))
