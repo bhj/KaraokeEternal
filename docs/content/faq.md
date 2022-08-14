@@ -1,8 +1,6 @@
 ---
 title: F.A.Q.
-sitemap:
-  changefreq: monthly
-  priority: 0.5
+description: Frequently asked questions for Karaoke Eternal (the app) and Karaoke Eternal Server
 ---
 
 - [General](#general)

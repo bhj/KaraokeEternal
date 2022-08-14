@@ -1,4 +1,4 @@
-baseURL: /
+baseURL: https://www.karaoke-eternal.com/
 languageCode: en-us
 title: Karaoke Eternal
 permalinks:
@@ -8,3 +8,4 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+disableKinds: ["taxonomyTerm", "RSS"]
