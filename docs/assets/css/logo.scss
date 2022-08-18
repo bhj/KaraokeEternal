@@ -6,13 +6,14 @@
   padding-top: .5rem;
 }
 
-.logo h1 {
+.logo a {
   font-family: 'Beon', sans-serif;
   border: none;
-  color: hsl(var(--hue-blue), 10%, 80%);
+  color: hsl(var(--hue-blue), 10%, 80%) !important;
   display: inline-block;
   font-size: 200%;
   text-transform: uppercase;
+  text-decoration: none;
   margin: 1.75rem 0;
   text-shadow:
     0 0 .1em hsl(var(--hue-pink), 100%, 100%),
@@ -53,7 +54,7 @@
   letter-spacing: normal;
 }
 
-.logo .description {
+.logo .tagline {
   font-family: 'Raleway', sans-serif;
   font-size: 1rem;
   font-weight: 200;
@@ -66,7 +67,7 @@
     font-size: 36px;
   }
 
-  .logo h1 {
+  .logo a {
     margin-top: 0;
   }
 }
