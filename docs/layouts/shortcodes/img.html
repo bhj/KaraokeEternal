@@ -1,12 +1,14 @@
+{{ $img := $.Page.Resources.GetMatch (.Get 0)}}
+{{ $density := default "2x" (.Get 2) }}
 <figure>
-  <a href="#{{ anchorize (.Get "src") }}">
-    <img {{ if .Get "srcset" }}srcset="{{.Get "srcset" }}"{{ end }} src="{{.Get "src" }}" alt="{{.Get "alt" }}" />
+  <a href="#{{ anchorize $img.RelPermalink }}">
+    <img srcset="{{ $img.RelPermalink }} {{ $density }}" src="{{ $img.RelPermalink }}" alt="{{ (.Get 1) }}" />
   </a>
-  <a href="#_" class="overlay" id="{{ anchorize (.Get "src") }}">
-    <img {{ if .Get "srcset" }}srcset="{{.Get "srcset" }}"{{ end }} src="{{.Get "src" }}" alt="{{.Get "alt" }}" />
+  <a href="#_" class="overlay" id="{{ anchorize $img.RelPermalink }}">
+    <img srcset="{{ $img.RelPermalink }} {{ $density }}" src="{{ $img.RelPermalink }}" alt="{{ (.Get 1) }}" />
   </a>
   <figcaption>
-    <p>{{.Get "alt" }}</p>
+    <p>{{ (.Get 1) }}</p>
   </figcaption>
 </figure>
 {{ .Inner }}

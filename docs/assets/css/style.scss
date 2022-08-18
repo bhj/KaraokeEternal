@@ -228,28 +228,24 @@ aside.warn {
  * Screenshots
  */
 ul.screenshots {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid; 
+  grid-template-columns: repeat(4, 1fr); 
+  grid-template-rows: repeat(2, 1fr); 
   list-style: none;
   margin-bottom: .5rem;
   padding: 0;
 
-  li {
-    height: 20vh;
-    flex-grow: 1;
+  li:last-child {
+    grid-column: 1 / -1;
   }
 
   img {
-    max-height: 100%;
-    min-width: 100%;
+    height: 20vw;
+    width: 100%;
     object-fit: cover;
     vertical-align: bottom;
+    margin: 0;
     padding: .5rem;
-  }
-
-  ::after {
-    content:"";
-    flex-grow: 10;
   }
 }
 
@@ -292,26 +288,32 @@ figure {
 }
 
 .overlay img {
-  max-width: 90vh !important;
+  max-width: 90vw !important;
   max-height: 90vh !important;
-  margin: auto;
-  width: auto;
-  height: auto;
+  margin: auto !important;
+  width: auto !important;;
+  height: auto !important;
+  object-fit: contain;
 }
 
 @media (min-width: 60rem) {
+  ul.screenshots {
+    margin-left: 5vw;
+    margin-right: 5vw;
+
+    img {
+      object-fit: contain;
+    }
+  }
+
   .overlay img {
-    max-width: 66vh !important;
+    max-width: 66vw !important;
     max-height: 66vh !important;
   }
 }
+
 .overlay:target {
   visibility: visible;
   outline: none;
   opacity: 1;
-}
-
-.overlay:target img {
-  width: 100%;
-  object-fit: contain;
 }

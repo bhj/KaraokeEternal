@@ -28,8 +28,8 @@ Karaoke Eternal is a modern mobile browser app that lets everyone join without h
 The library view lists available songs organized by artist, with search and filtering options at the top.
 
 <div class="row">
-  {{% img srcset="app-library.png 2x" src="app-library.png" alt="Library view" %}}
-  {{% img srcset="app-library2.png 2x" src="app-library2.png" alt="Library search/filter view" %}}
+  {{% img "app-library.png" "Library view" %}}
+  {{% img "app-library2.png" "Library search/filter view" %}}
 </div>
 
 Tap to expand an artist, then tap a song's title to queue it. A glowing song and artist indicate they're upcoming in the queue.
@@ -45,7 +45,7 @@ When a song has multiple versions (media files), admins see an italicized number
 The queue view shows your room's previous, current and upcoming songs.
 
 <div class="row">
-  {{% img srcset="app-queue.png 2x" src="app-queue.png" alt="Queue view" %}}
+  {{% img "app-queue.png" "Queue view" %}}
 </div>
 
 Karaoke Eternal automatically arranges the queue using a round-robin method for fairness, without penalizing those joining later in the party. For example, a latecomer will be able to sing right after the next-up singer regardless of how long the queue is.
@@ -63,7 +63,7 @@ Normal users can only manage their own queued songs, but admins can manage anyon
 The account view lets users manage their account, while admins will see additional panels.
 
 <div class="row">
-  {{% img srcset="app-account.png 2x" src="app-account.png" alt="Account view" %}}
+  {{% img "app-account.png" "Account view" %}}
 </div>
 
 #### Rooms (admin only)
@@ -105,8 +105,8 @@ The player is a part of the [app](#karaoke-eternal-the-app) that's designed to r
   - Chromium/Chrome/Edge
 
 <div class="row">
-  {{% img srcset="app-player.jpg 2x" src="app-player.jpg" alt="Player view" %}}
-  {{% img srcset="app-displayctrl.png 2x" src="app-displayctrl.png" alt="Display options" %}}
+  {{% img "app-player.jpg" "Player view" %}}
+  {{% img "app-displayctrl.png" "Display options" %}}
 </div>
 
 To start a player, sign in to the desired room as an admin and a player link will appear at the top. If you don't see a link that means fullscreen support wasn't detected, but you can still manually navigate to `/player`.
@@ -131,8 +131,8 @@ The server hosts the app and your media files, and can run on relatively minimal
 <a href="{{% baseurl %}}download">Download</a>{{% icon-external %}} and install the latest release. Karaoke Eternal Server runs in the menu bar or tray:
 
 <div class="row">
-  {{< img src="server-macos.png" alt="Karaoke Eternal Server (macOS)" caption="macOS" >}}
-  {{< img src="server-windows.png" alt="Karaoke Eternal Server (Windows)" caption="Windows" >}}
+  {{< img "server-macos.png" "Karaoke Eternal Server (macOS)" "1x">}}
+  {{< img "server-windows.png" "Karaoke Eternal Server (Windows)" "1x">}}
 </div>
 
 <aside class="info">
