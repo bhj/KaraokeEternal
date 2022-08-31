@@ -1,7 +1,7 @@
 const bcrypt = require('../lib/bcrypt')
 const db = require('../lib/Database').db
 const sql = require('sqlate')
-const KoaRouter = require('koa-router')
+const KoaRouter = require('@koa/router')
 const router = KoaRouter({ prefix: '/api' })
 const log = require('../lib/Log')('Rooms')
 const Rooms = require('../Rooms')

@@ -1,4 +1,4 @@
-const KoaRouter = require('koa-router')
+const KoaRouter = require('@koa/router')
 const router = KoaRouter({ prefix: '/api' })
 const Media = require('../Media')
 

@@ -1,6 +1,6 @@
 const path = require('path')
 const log = require('../lib/Log')('Prefs')
-const KoaRouter = require('koa-router')
+const KoaRouter = require('@koa/router')
 const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
 const getWindowsDrives = require('../lib/getWindowsDrives')
