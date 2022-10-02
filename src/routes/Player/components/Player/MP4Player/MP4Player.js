@@ -66,7 +66,6 @@ class MP4Player extends React.Component {
       legacyWorkerUrl: `${document.baseURI}libass/subtitles-octopus-worker-legacy.js`
     }
     this.assInstance = new SubtitlesOctopus(this.options)
-    console.log(this.assInstance)
   }
 
   updateIsPlaying = () => {
