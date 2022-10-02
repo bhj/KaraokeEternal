@@ -237,6 +237,9 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
 
   // serve assets since webpack-dev-server is unaware of this folder
   app.use(koaMount(`${urlPath}assets`, koaStatic(env.KES_PATH_ASSETS)))
+
+  // serve libass files statically
+  app.use(koaMount(`${urlPath}libass`, koaStatic(env.KES_PATH_LIBASS)))
 }
 
 module.exports = serverWorker

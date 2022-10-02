@@ -2,3 +2,6 @@
   object-position: 50% 50%;
   object-fit: contain;
 }
+body {
+  overflow: hidden; /* Hide scrollbars */
+}

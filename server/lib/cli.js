@@ -7,6 +7,7 @@ const env = {
   KES_CONSOLE_LEVEL: parseInt(process.env.KES_CONSOLE_LEVEL, 10),
   KES_LOG_LEVEL: parseInt(process.env.KES_LOG_LEVEL, 10),
   KES_PATH_ASSETS: path.join(baseDir, 'assets'),
+  KES_PATH_LIBASS: path.join(baseDir, 'node_modules', 'libass-wasm', 'dist', 'js'),
   KES_PATH_DATA: process.env.KES_PATH_DATA || getAppPath('Karaoke Eternal Server'),
   KES_PATH_WEBROOT: path.join(baseDir, 'build'),
   KES_PORT: parseInt(process.env.KES_PORT, 10) || 0,

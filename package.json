@@ -52,6 +52,7 @@
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "@jcoreio/async-throttle": "^1.4.3",
+    "libass-wasm": "^4.0.0",
     "@koa/router": "^12.0.0",
     "bcrypt": "^5.0.1",
     "ctx-compose": "^3.0.0",

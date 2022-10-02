@@ -51,6 +51,8 @@ router.get('/:mediaId', async (ctx, next) => {
     if (!file) {
       ctx.throw(404, 'The .cdg file could not be found')
     }
+  } else if (type === 'ass') {
+    file = `${file.slice(0, -4)}.ass`
   }
 
   // get file info
