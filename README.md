@@ -15,26 +15,26 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
   - MP4 videos
   - ReplayGain tags for volume normalization
 - Fast, modern mobile browser app designed for "karaoke conditions"
-- Multiple simultaneous [rooms/queues](https://www.karaoke-eternal.com/docs/#rooms-admin-only) (optionally password-protected)
+- Multiple simultaneous rooms/queues (optionally password-protected)
 - Dynamic queues keep parties fair, fun and no-fuss
 - Fully self-hosted
 - No ads or telemetry
 
-Karaoke Eternal assumes its player will be mixed with any microphones (either in software or an outboard mixer). See the [F.A.Q.](https://www.karaoke-eternal.com/faq#whats-the-recommended-audiomicrophone-setup) for more information.
+Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the [F.A.Q.](https://www.karaoke-eternal.com/faq/#whats-the-recommended-audiomicrophone-setup) for more information.
 
 ## Getting Started
 
- Karaoke Eternal basically has 3 parts. You can jump to the documentation for each below, or [Quick Start](https://www.karaoke-eternal.com/docs/#quick-start) to get up and running step-by-step.
+ Karaoke Eternal basically has 3 parts. See [Getting Started](https://www.karaoke-eternal.com/docs/getting-started/) to get up and running step-by-step, or jump to the documentation for each part below:
+ 
+- **[Server:](https://www.karaoke-eternal.com/docs/karaoke-eternal-server/)** Runs on pretty much anything to serve the web app and your media files, including a Windows PC, Mac, or a dedicated server like a Raspberry Pi or Synology NAS.
+- **[App:](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/)** Fast, modern mobile web app designed for "karaoke conditions".
+- **[Player:](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/#player)** Just another part of the app, but meant to run fullscreen on the system handling audio/video for a [room](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/#rooms-admin-only)
 
-- **[App:](https://www.karaoke-eternal.com/docs/#karaoke-eternal-the-web-app)** Fast, modern mobile browser app designed for "karaoke conditions"
-- **[Player:](https://www.karaoke-eternal.com/docs/#player)** Just another part of the browser app, but meant to run fullscreen on the system handling audio/video for a [room](https://www.karaoke-eternal.com/docs/#rooms-admin-only)
-- **[Server:](https://www.karaoke-eternal.com/docs/#karaoke-eternal-server)** Runs on almost any OS and hardware to serve the app and your media files
+## Installation
 
-## Download & Install
+There are several [installation methods](https://www.karaoke-eternal.com/docs/karaoke-eternal-server/#installation) available for Karaoke Eternal Server.
 
-See <a href="https://github.com/bhj/KaraokeEternal/releases">Releases</a> and check out the [installation instructions](https://www.karaoke-eternal.com/docs/#karaoke-eternal-server).
-
-## Discord / Support
+## Discord & Support
 
 Join the [Karaoke Eternal Discord Server](https://discord.gg/PgqVtFq) for general support and development chat, or just to say hi!
 

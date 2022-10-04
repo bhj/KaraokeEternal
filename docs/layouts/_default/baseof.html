@@ -4,26 +4,22 @@
   <body>
     {{ partial "sidebar.html" . }}
     <div class="content container">
-      {{ block "main" . }}{{ end }}
+      {{ block "main" . }}
+      {{ end }}
     </div>
     <script src='{{ (resources.Get "js/buttons.min.js").Permalink }}'></script>
     <script src='{{ (resources.Get "js/gumshoe.min.js").Permalink }}'></script>
     <script>
-      const cur = window.location.href
-        .replace(/^http(s?):\/\//i, '') // remove http(s):// from start
-        .replace(/\/(|#.*)$/i, '') // remove trailing slash and/or hash fragment
-        .replace(/\.html$/i, '') // remove .html extensions
-
-      const seg = cur.lastIndexOf('/') === -1 ? 'index' : cur.substring(cur.lastIndexOf('/') + 1)
+      const segs = new URL(document.URL).pathname.split('/').filter(s => !!s)
       let btn, nav
 
-      document.addEventListener("DOMContentLoaded", function(event) {
+      document.addEventListener("DOMContentLoaded", e => {
         btn = document.getElementById('btn-nav')
         nav = document.getElementsByTagName('nav')[0]
         toggleNav()
 
-        // init ToC highlighter in sidebar if we're in docs
-        if (seg === 'docs') new Gumshoe('#doc-toc a')
+        // init nav highlighter if we're in docs
+        if (segs[0] === 'docs') new Gumshoe(`#${segs[1]}-toc a`)
       })
 
       function toggleNav () {

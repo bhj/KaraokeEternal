@@ -20,6 +20,7 @@ Karaoke Eternal makes no assumptions about audio input so that it can work with 
 
 Below is a non-exhaustive, probably U.S.-centric list of sources for licensed MP3+G or MP4 files (additions welcome):
 
+- [KaraokeNerds](https://www.karaokenerds.com){{% icon-external %}}
 - [SunFly Karaoke](https://www.sunflykaraoke.com){{% icon-external %}}
 - [PartyTyme Karaoke](https://www.partytyme.net){{% icon-external %}}
 - [Karaoke Version](https://www.karaoke-version.com){{% icon-external %}}
@@ -64,11 +65,11 @@ If you want to host the app at `/karaoke` for example, run Karaoke Eternal Serve
 
 #### The media scanner stops before scanning all my files?
 
-Check the <a href="{{< ref "docs/index.md/#file-locations" >}}">scanner log</a> (or console output) and look for the last file the scanner encountered - typically it will be corrupt and should be removed.
+Check the <a href="{{< ref "docs/karaoke-eternal-server/#file-locations" >}}">scanner log</a> (or console output) and look for the last file the scanner encountered - typically it will be corrupt and should be removed.
 
 #### My files have correct artist & title metadata tags; can they be used instead of filenames?
 
-Yes, just place the following <a href='{{< ref "docs/index.md#configuring-the-metadata-parser" >}}'>_kes.v1.js</a> file in the applicable media folder:
+Yes, just place the following <a href='{{< ref "docs/karaoke-eternal-server/#configuring-the-metadata-parser" >}}'>_kes.v1.js</a> file in the applicable media folder:
 
 {{< highlight js >}}
 return ({ compose, getDefaultParser, defaultMiddleware }) => {

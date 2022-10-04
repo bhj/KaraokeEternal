@@ -1,5 +1,5 @@
 <ul class="screenshots">
-{{ with .Site.GetPage "docs" }}
+{{ with .Site.GetPage "docs/karaoke-eternal-app" }}
   {{ range sort ((.Resources.ByType "image").Match "app-*") ".Params.galleryOrder" }}
     {{ if .Params.galleryOrder }}
       <li>
