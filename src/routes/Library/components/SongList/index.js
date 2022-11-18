@@ -1,3 +1,3 @@
-import SongListContainer from './SongListContainer'
+import SongList from './SongList'
 
-export default SongListContainer
+export default SongList
