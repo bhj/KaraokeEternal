@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import styles from './MP4Player.css'
+import SubtitlesOctopus from 'libass-wasm'
 
 class MP4Player extends React.Component {
   static propTypes = {
@@ -40,6 +41,7 @@ class MP4Player extends React.Component {
 
     return (
       <video className={styles.video}
+        id='video'
         preload='auto'
         width={width}
         height={height}
@@ -57,6 +59,13 @@ class MP4Player extends React.Component {
   updateSources = () => {
     this.video.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=video`
     this.video.current.load()
+    this.options = {
+      video: document.getElementById('video'),
+      subUrl: `${document.baseURI}api/media/${this.props.mediaId}?type=ass`,
+      workerUrl: `${document.baseURI}libass/subtitles-octopus-worker.js`,
+      legacyWorkerUrl: `${document.baseURI}libass/subtitles-octopus-worker-legacy.js`
+    }
+    this.assInstance = new SubtitlesOctopus(this.options)
   }
 
   updateIsPlaying = () => {
@@ -82,6 +91,10 @@ class MP4Player extends React.Component {
     this.props.onStatus({
       position: this.video.current.currentTime,
     })
+    // This is a hack. Without this, the lyrics go to the right of the video.
+    // There must be a better way to do this.
+    this.assInstance.canvas.parentElement.style.position='absolute'
+    this.assInstance.canvas.style.position = ''
   }
 }
 
