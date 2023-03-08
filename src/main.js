@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import createStore from './store/createStore'
 import App from './components/App'
 import { persistStore } from 'redux-persist'
@@ -38,8 +38,8 @@ window._persistor = persistStore(store, null, () => {
 // Go!
 // ========================================================
 const MOUNT_NODE = document.getElementById('root')
+const root = createRoot(MOUNT_NODE)
 
-ReactDOM.render(
-  <App store={store} persistor={window._persistor} />,
-  MOUNT_NODE
+root.render(
+  <App store={store} persistor={window._persistor}/>
 )

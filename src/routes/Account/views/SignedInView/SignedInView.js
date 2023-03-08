@@ -20,7 +20,9 @@ const SignedInView = props => {
   }
 
   // once per mount
-  useEffect(() => dispatch(fetchAccount()), [dispatch])
+  useEffect(() => {
+    (async () => dispatch(fetchAccount()))()
+  }, [dispatch])
 
   return (
     <>
