@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Player from '../Player'
 import PlayerTextOverlay from '../PlayerTextOverlay'
+import PlayerRemoteControlQR from '../PlayerRemoteControlQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus } from '../../modules/player'
 
@@ -11,6 +12,7 @@ const PlayerController = props => {
   const queue = useSelector(getRoundRobinQueue)
   const player = useSelector(state => state.player)
   const playerVisualizer = useSelector(state => state.playerVisualizer)
+  const playerRemoteControlQR = useSelector(state => state.playerRemoteControlQR)
   const prefs = useSelector(state => state.prefs)
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
@@ -78,6 +80,7 @@ const PlayerController = props => {
     player.mp4Alpha,
     player.volume,
     playerVisualizer,
+    playerRemoteControlQR
   ])
 
   // on unmount
@@ -138,6 +141,11 @@ const PlayerController = props => {
         width={props.width}
         height={props.height}
       />
+      {playerRemoteControlQR.isEnabled &&
+        <PlayerRemoteControlQR
+          width={props.width}
+        />
+      }
     </>
   )
 }

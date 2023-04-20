@@ -46,7 +46,7 @@ export function playerStatus (status = {}, deferEmit = false) {
       payload: status,
     })
 
-    const { player, playerVisualizer } = getState()
+    const { player, playerVisualizer, playerRemoteControlQR } = getState()
 
     dispatch({
       type: PLAYER_EMIT_STATUS,
@@ -66,6 +66,7 @@ export function playerStatus (status = {}, deferEmit = false) {
         queueId: player.queueId,
         volume: player.volume,
         visualizer: playerVisualizer,
+        remoteControlQR: playerRemoteControlQR,
       },
       meta: {
         throttle: {

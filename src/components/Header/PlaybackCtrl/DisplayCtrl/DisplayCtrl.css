@@ -4,7 +4,7 @@
   margin-top: var(--container-padding);
 }
 
-.visualizer {
+.visualizer, .remoteControlQR {
   composes: section;
 }
 
@@ -13,17 +13,20 @@
 }
 
 .visualizer legend,
-.lyrics legend {
+.lyrics legend,
+.remoteControlQR legend {
   margin-left: -.5em;
 }
 
-.visualizer legend label {
+.visualizer legend label,
+.remoteControlQR legend label {
   display: flex;
   align-items: center;
   cursor: pointer;
 }
 
-.visualizer legend input[type="checkbox"] {
+.visualizer legend input[type="checkbox"],
+.remoteControlQR legend input[type="checkbox"] {
   margin-right: .25em;
 }
 

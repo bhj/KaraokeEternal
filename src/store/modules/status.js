@@ -89,6 +89,7 @@ const initialState = {
   position: 0,
   queueId: -1,
   visualizer: {},
+  remoteControlQR: {},
   volume: 1,
 }
 
