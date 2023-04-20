@@ -143,7 +143,7 @@ const PlayerController = props => {
       />
       {playerRemoteControlQR.isEnabled &&
         <PlayerRemoteControlQR
-          width={props.width}
+          
         />
       }
     </>
