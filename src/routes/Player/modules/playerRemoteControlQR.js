@@ -28,7 +28,9 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   isEnabled: true,
-  test: 123,
+  size: 64,
+  opacity: 0.9,
+  offset: 16,
 }
 
 export default function playerRemoteControlQR (state = initialState, action) {
