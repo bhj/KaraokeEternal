@@ -85,8 +85,6 @@ const PlaybackCtrl = props => {
         cdgSize={status.cdgSize}
         isVisible={isDisplayCtrlVisible}
         isVisualizerEnabled={status.visualizer.isEnabled}
-        isRemoteControlQREnabled={status.remoteControlQR.isEnabled}
-        isRemoteControlQRAlternateEnabled={status.remoteControlQR.alternate}
         isWebGLSupported={status.isWebGLSupported}
         mediaType={status.mediaType}
         mp4Alpha={status.mp4Alpha}
@@ -95,6 +93,9 @@ const PlaybackCtrl = props => {
         sensitivity={status.visualizer.sensitivity}
         ui={ui}
         visualizerPresetName={status.visualizer.presetName}
+        isRemoteControlQREnabled={status.remoteControlQR.isEnabled}
+        isRemoteControlQRAlternateEnabled={status.remoteControlQR.alternate}
+        remoteControlTranslucency={status.remoteControlQR.opacity}
       />
     </div>
   )

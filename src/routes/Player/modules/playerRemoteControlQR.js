@@ -17,8 +17,7 @@ const ACTION_HANDLERS = {
     
     return {
       ...state,
-      isEnabled: typeof remoteControlQR.isEnabled === 'boolean' ? remoteControlQR.isEnabled : state.isEnabled,
-      alternate: typeof remoteControlQR.alternate === 'boolean' ? remoteControlQR.alternate : state.alternate,
+      ...remoteControlQR
     }
   },
 }
@@ -30,7 +29,7 @@ const initialState = {
   isEnabled: true,
   alternate: true,
   size: 64,
-  opacity: 0.9,
+  opacity: 0.8,
   offset: 16,
 }
 

@@ -10,7 +10,6 @@ class PlayerRemoteControlQR extends React.Component {
     alternate: PropTypes.bool.isRequired,
     size: PropTypes.number.isRequired,
     opacity: PropTypes.number.isRequired,
-    offset: PropTypes.number.isRequired,
   }
   state = {
     position: "bottomLeft",
@@ -65,12 +64,13 @@ class PlayerRemoteControlQR extends React.Component {
       position: "absolute",
       backgroundColor: "#fff",
       padding: "2px",
-      opacity: 0.8
     };
     const position = this.state.position;
     const positionStyles = this.positions[position];
 
     let styles = { ...baseStyles, ...positionStyles };
+
+    styles.opacity = this.props.opacity;
 
 
     return (

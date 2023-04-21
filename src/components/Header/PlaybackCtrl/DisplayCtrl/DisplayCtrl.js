@@ -50,6 +50,11 @@ export default class DisplayCtrl extends React.Component {
     remoteControlQR: { alternate: !this.props.isRemoteControlQRAlternateEnabled }
   })
 
+  handleRemoteControlTranslucency = val => this.props.onRequestOptions({
+    remoteControlQR: { opacity: val }
+  })
+  
+
 
   handlePresetNext = () => this.props.onRequestOptions({
     visualizer: { nextPreset: true }
@@ -171,13 +176,26 @@ export default class DisplayCtrl extends React.Component {
               </label>
             </legend>
             {this.props.isRemoteControlQREnabled &&
-              <label>
-                <input type='checkbox'
-                  checked={this.props.isRemoteControlQRAlternateEnabled}
-                  onChange={this.handleToggleRemoteControlQRAlternate}
-                  ref={this.checkbox}
-                /> Alternate Position (Prevents Burn-in)
-              </label>
+              <>
+                <label>
+                  <input type='checkbox'
+                    checked={this.props.isRemoteControlQRAlternateEnabled}
+                    onChange={this.handleToggleRemoteControlQRAlternate}
+                    ref={this.checkbox}
+                  /> Alternate Position (Prevents Burn-in)
+                </label>
+
+                <label className={styles.field}>Translucency</label>
+                <OptimisticSlider
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={this.props.remoteControlTranslucency}
+                  onChange={this.handleRemoteControlTranslucency}
+                  handle={handle}
+                  className={styles.slider}
+                />
+              </>
             }
             {!this.props.isRemoteControlQREnabled &&
               <p className={styles.unsupported}>Enable to view options</p>
