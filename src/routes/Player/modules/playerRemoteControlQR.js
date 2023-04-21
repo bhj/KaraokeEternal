@@ -14,11 +14,11 @@ const ACTION_HANDLERS = {
   [PLAYER_CMD_OPTIONS]: (state, { payload }) => {
     const { remoteControlQR } = payload
     if (typeof remoteControlQR !== 'object') return state
-
     
     return {
       ...state,
       isEnabled: typeof remoteControlQR.isEnabled === 'boolean' ? remoteControlQR.isEnabled : state.isEnabled,
+      alternate: typeof remoteControlQR.alternate === 'boolean' ? remoteControlQR.alternate : state.alternate,
     }
   },
 }
@@ -28,6 +28,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   isEnabled: true,
+  alternate: true,
   size: 64,
   opacity: 0.9,
   offset: 16,

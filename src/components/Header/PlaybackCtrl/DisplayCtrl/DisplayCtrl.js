@@ -12,6 +12,7 @@ export default class DisplayCtrl extends React.Component {
     isVisible: PropTypes.bool.isRequired,
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isRemoteControlQREnabled: PropTypes.bool.isRequired,
+    isRemoteControlQRAlternateEnabled: PropTypes.bool.isRequired,
     isWebGLSupported: PropTypes.bool.isRequired,
     mediaType: PropTypes.string,
     mp4Alpha: PropTypes.number.isRequired,
@@ -43,6 +44,10 @@ export default class DisplayCtrl extends React.Component {
 
   handleToggleRemoteControlQR = () => this.props.onRequestOptions({
     remoteControlQR: { isEnabled: !this.props.isRemoteControlQREnabled }
+  })
+
+  handleToggleRemoteControlQRAlternate = () => this.props.onRequestOptions({
+    remoteControlQR: { alternate: !this.props.isRemoteControlQRAlternateEnabled }
   })
 
 
@@ -165,6 +170,18 @@ export default class DisplayCtrl extends React.Component {
                 /> Remote Control QR
               </label>
             </legend>
+            {this.props.isRemoteControlQREnabled &&
+              <label>
+                <input type='checkbox'
+                  checked={this.props.isRemoteControlQRAlternateEnabled}
+                  onChange={this.handleToggleRemoteControlQRAlternate}
+                  ref={this.checkbox}
+                /> Alternate Position (Prevents Burn-in)
+              </label>
+            }
+            {!this.props.isRemoteControlQREnabled &&
+              <p className={styles.unsupported}>Enable to view options</p>
+            }
           </fieldset>
         </div>
       </Modal>

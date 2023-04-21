@@ -7,6 +7,7 @@ import QRCode from "react-qr-code";
 class PlayerRemoteControlQR extends React.Component {
   static propTypes = {
     // width: PropTypes.number.isRequired,
+    alternate: PropTypes.bool.isRequired,
     size: PropTypes.number.isRequired,
     opacity: PropTypes.number.isRequired,
     offset: PropTypes.number.isRequired,
@@ -29,14 +30,22 @@ class PlayerRemoteControlQR extends React.Component {
 
 
   componentDidMount() {
+    this.maybeSetupInterval();
+  }
+
+  maybeSetupInterval() {
     // on mount, setup a interval to update the position of the QR code
-    this.interval = setInterval(() => {
-      this.setState({position: this.state.position === "bottomLeft" ? "bottomRight" : "bottomLeft"});
-    }, 5 * 60 * 1000);
+    if (this.props.alternate && !this.interval) {
+      this.interval = setInterval(() => {
+        this.setState({ position: this.state.position === "bottomLeft" ? "bottomRight" : "bottomLeft" });
+      }, 5 * 60 * 1000);
+    } else if (!this.props.alternate && this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-
+    this.maybeSetupInterval();
   }
 
   componentWillUnmount() {
@@ -61,7 +70,7 @@ class PlayerRemoteControlQR extends React.Component {
     const position = this.state.position;
     const positionStyles = this.positions[position];
 
-    let styles = {...baseStyles, ...positionStyles};
+    let styles = { ...baseStyles, ...positionStyles };
 
 
     return (

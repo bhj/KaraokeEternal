@@ -86,6 +86,7 @@ const PlaybackCtrl = props => {
         isVisible={isDisplayCtrlVisible}
         isVisualizerEnabled={status.visualizer.isEnabled}
         isRemoteControlQREnabled={status.remoteControlQR.isEnabled}
+        isRemoteControlQRAlternateEnabled={status.remoteControlQR.alternate}
         isWebGLSupported={status.isWebGLSupported}
         mediaType={status.mediaType}
         mp4Alpha={status.mp4Alpha}
