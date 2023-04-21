@@ -13,6 +13,8 @@ export default class DisplayCtrl extends React.Component {
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isRemoteControlQREnabled: PropTypes.bool.isRequired,
     isRemoteControlQRAlternateEnabled: PropTypes.bool.isRequired,
+    remoteControlQRSize: PropTypes.number.isRequired,
+    remoteControlQRTranslucency: PropTypes.number.isRequired,
     isWebGLSupported: PropTypes.bool.isRequired,
     mediaType: PropTypes.string,
     mp4Alpha: PropTypes.number.isRequired,
@@ -52,6 +54,10 @@ export default class DisplayCtrl extends React.Component {
 
   handleRemoteControlTranslucency = val => this.props.onRequestOptions({
     remoteControlQR: { opacity: val }
+  })
+
+  handleRemoteControlSize = val => this.props.onRequestOptions({
+    remoteControlQR: { size: val }
   })
   
 
@@ -192,6 +198,16 @@ export default class DisplayCtrl extends React.Component {
                   step={0.01}
                   value={this.props.remoteControlTranslucency}
                   onChange={this.handleRemoteControlTranslucency}
+                  handle={handle}
+                  className={styles.slider}
+                />
+                <label className={styles.field}>Size</label>
+                <OptimisticSlider
+                  min={0.05}
+                  max={0.25}
+                  step={0.01}
+                  value={this.props.remoteControlSize}
+                  onChange={this.handleRemoteControlSize}
                   handle={handle}
                   className={styles.slider}
                 />

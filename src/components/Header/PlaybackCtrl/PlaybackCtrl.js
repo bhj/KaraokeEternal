@@ -96,6 +96,7 @@ const PlaybackCtrl = props => {
         isRemoteControlQREnabled={status.remoteControlQR.isEnabled}
         isRemoteControlQRAlternateEnabled={status.remoteControlQR.alternate}
         remoteControlTranslucency={status.remoteControlQR.opacity}
+        remoteControlSize={status.remoteControlQR.size}
       />
     </div>
   )

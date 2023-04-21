@@ -28,7 +28,7 @@ const ACTION_HANDLERS = {
 const initialState = {
   isEnabled: true,
   alternate: true,
-  size: 64,
+  size: 0.08,
   opacity: 0.8,
   offset: 16,
 }

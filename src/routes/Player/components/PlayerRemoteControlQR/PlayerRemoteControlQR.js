@@ -57,30 +57,28 @@ class PlayerRemoteControlQR extends React.Component {
     const qrValue = document.baseURI;
 
     const baseStyles = {
-      height: "auto",
-      margin: "0 auto",
-      maxWidth: 82,
-      width: "100%",
-      position: "absolute",
-      backgroundColor: "#fff",
-      padding: "2px",
+
     };
     const position = this.state.position;
     const positionStyles = this.positions[position];
 
-    let styles = { ...baseStyles, ...positionStyles };
+    let myStyles = { ...baseStyles, ...positionStyles };
 
-    styles.opacity = this.props.opacity;
-
+    myStyles.opacity = this.props.opacity;
+    myStyles.width = (this.props.size * 100) + "%";
+    myStyles.height = "auto";
 
     return (
-      <div className={styles.container} style={styles} >
-        <QRCode
-          size={256}
-          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-          value={qrValue}
-          viewBox={`0 0 256 256`}
-        />
+      <div className={styles.container} style={myStyles} >
+        <div className={styles.inner}>
+          <QRCode
+            size={256}
+            className={styles.qr}
+            style={{ width: "100%", height: "auto" }}
+            value={qrValue}
+            viewBox={`0 0 256 256`}
+          />
+        </div>
       </div>
     )
   }
