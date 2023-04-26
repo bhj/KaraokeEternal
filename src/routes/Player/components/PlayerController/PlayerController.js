@@ -14,6 +14,7 @@ const PlayerController = props => {
   const playerVisualizer = useSelector(state => state.playerVisualizer)
   const playerRemoteControlQR = useSelector(state => state.playerRemoteControlQR)
   const prefs = useSelector(state => state.prefs)
+  const user = useSelector(state => state.user)
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
@@ -146,6 +147,7 @@ const PlayerController = props => {
           alternate={playerRemoteControlQR.alternate}
           size={playerRemoteControlQR.size}
           opacity={playerRemoteControlQR.opacity}
+          roomId={user.roomId}
         />
       }
     </>

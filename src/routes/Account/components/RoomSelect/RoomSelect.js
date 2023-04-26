@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchRooms } from 'store/modules/rooms'
+import { useSearchParams } from "react-router-dom";
 import styles from './RoomSelect.css'
 let passwordRef
 
@@ -10,6 +11,9 @@ const RoomSelect = props => {
   const rooms = useSelector(state => state.rooms)
   const [selectedRoomId, setSelectedRoomId] = useState('')
   const dispatch = useDispatch()
+
+  const [searchParams] = useSearchParams();
+
 
   const handleSelectChange = useCallback(e => { setSelectedRoomId(e.target.value) }, [])
   const handleSelectRef = useCallback(r => { onSelectRef(r) }, [onSelectRef])
@@ -27,6 +31,15 @@ const RoomSelect = props => {
   useEffect(() => {
     if (rooms.result.length === 1) {
       setSelectedRoomId(rooms.result[0])
+    }
+  }, [rooms])
+
+  useEffect(() => {
+    // If roomId is set, select it
+    if (searchParams.get('roomId')) {
+      if (rooms.result.length >= 1) {
+        setSelectedRoomId(searchParams.get('roomId'));
+      }
     }
   }, [rooms])
 

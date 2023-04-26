@@ -8,27 +8,31 @@ import LibraryView from 'routes/Library/views'
 import QueueView from 'routes/Queue/views/QueueView'
 const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
 
-const AppRoutes = (props) => (
-  <Routes>
-    <Route path='/account' element={<AccountView/>}/>
-    <Route path='/library' element={
-      <RequireAuth path='/library' redirectTo='/account'>
-        <LibraryView/>
-      </RequireAuth>
-    }/>
-    <Route path='/queue' element={
-      <RequireAuth path='/queue' redirectTo='/account'>
-        <QueueView/>
-      </RequireAuth>
-    }/>
-    <Route path='/player' element={
-      <RequireAuth path='/player' redirectTo='/account'>
-        <PlayerView/>
-      </RequireAuth>
-    }/>
-    <Route path='/' element={<Navigate to='/library'/>}/>
-  </Routes>
-)
+function AppRoutes(props) {
+  const location = useLocation().search;
+  const libraryLocation = '/library'+location
+  return (
+    <Routes>
+      <Route path='/account' element={<AccountView />} />
+      <Route path='/library' element={
+        <RequireAuth path='/library' redirectTo='/account'>
+          <LibraryView />
+        </RequireAuth>
+      } />
+      <Route path='/queue' element={
+        <RequireAuth path='/queue' redirectTo='/account'>
+          <QueueView />
+        </RequireAuth>
+      } />
+      <Route path='/player' element={
+        <RequireAuth path='/player' redirectTo='/account'>
+          <PlayerView />
+        </RequireAuth>
+      } />
+      <Route path='/' element={<Navigate to={libraryLocation} />} />
+    </Routes>
+  )
+}
 
 export default AppRoutes
 
@@ -39,7 +43,8 @@ const RequireAuth = ({ children, path, redirectTo }) => {
   if (!isAuthenticated) {
     // set their originally-desired location in query parameter
     const params = new URLSearchParams(location.search)
-    params.set('redirect', path)
+    params.set('redirect', path);
+    
 
     return <Navigate to={redirectTo + '?' + params.toString() }/>
   }

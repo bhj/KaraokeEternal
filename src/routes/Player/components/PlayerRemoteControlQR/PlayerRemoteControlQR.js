@@ -10,10 +10,12 @@ class PlayerRemoteControlQR extends React.Component {
     alternate: PropTypes.bool.isRequired,
     size: PropTypes.number.isRequired,
     opacity: PropTypes.number.isRequired,
+    roomId: PropTypes.number.isRequired,
   }
   state = {
     position: "bottomLeft",
   };
+
 
   frameId = null
   positions = {
@@ -54,10 +56,13 @@ class PlayerRemoteControlQR extends React.Component {
 
   render() {
     // const { width } = this.props
-    const qrValue = document.baseURI;
+    let qrValue = document.baseURI;
+    qrValue += "?roomId="+this.props.roomId;
+
 
     const baseStyles = {
-
+      padding: "3px",
+      backgroundColor: "#fff"
     };
     const position = this.state.position;
     const positionStyles = this.positions[position];
