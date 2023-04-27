@@ -3,6 +3,9 @@ import React from 'react'
 import styles from './PlayerRemoteControlQR.css'
 import QRCode from "react-qr-code";
 
+import HttpApi from 'lib/HttpApi'
+const api = new HttpApi('rooms')
+
 
 class PlayerRemoteControlQR extends React.Component {
   static propTypes = {
@@ -14,6 +17,7 @@ class PlayerRemoteControlQR extends React.Component {
   }
   state = {
     position: "bottomLeft",
+    room: false,
   };
 
 
@@ -30,7 +34,18 @@ class PlayerRemoteControlQR extends React.Component {
   };
 
 
+  fetchRoom() {
+    return api('GET', '/'+this.props.roomId)
+      .then(res => {
+        this.setState({ room: res.entity });
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
   componentDidMount() {
+    this.fetchRoom();
     this.maybeSetupInterval();
   }
 
@@ -59,6 +74,9 @@ class PlayerRemoteControlQR extends React.Component {
     let qrValue = document.baseURI;
     qrValue += "?roomId="+this.props.roomId;
 
+    if (this.state.room) {
+      qrValue += "&roomToken="+encodeURIComponent(this.state.room.token);
+    }
 
     const baseStyles = {
       padding: "3px",

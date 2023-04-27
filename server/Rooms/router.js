@@ -66,14 +66,14 @@ router.post('/rooms', async (ctx, next) => {
 })
 
 // get room
-router.get('/room/:roomId', async (ctx, next) => {
+router.get('/rooms/:roomId', async (ctx, next) => {
   // Only admin can fetch specific room, as password is included
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
 
   const roomId = parseInt(ctx.params.roomId, 10)
-  const res = await Rooms.find(roomId)
+  const res = await Rooms.getQR(roomId)
 
   ctx.body = res
 })

@@ -13,8 +13,6 @@ export default class DisplayCtrl extends React.Component {
     isVisualizerEnabled: PropTypes.bool.isRequired,
     isRemoteControlQREnabled: PropTypes.bool.isRequired,
     isRemoteControlQRAlternateEnabled: PropTypes.bool.isRequired,
-    remoteControlQRSize: PropTypes.number.isRequired,
-    remoteControlQRTranslucency: PropTypes.number.isRequired,
     isWebGLSupported: PropTypes.bool.isRequired,
     mediaType: PropTypes.string,
     mp4Alpha: PropTypes.number.isRequired,

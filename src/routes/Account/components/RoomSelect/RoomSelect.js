@@ -41,6 +41,14 @@ const RoomSelect = props => {
         setSelectedRoomId(searchParams.get('roomId'));
       }
     }
+    // If roomPwd is set, set it
+    if (searchParams.get('roomToken')) {
+      setTimeout(() => { // not sure the best way to wait for passwordRef?
+        if (rooms.result.length >= 1 && passwordRef) {
+          passwordRef.value = searchParams.get('roomToken');
+        }
+      });
+    }
   }, [rooms])
 
   // focus room password when a room is manually selected
