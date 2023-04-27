@@ -34,6 +34,44 @@ class Rooms {
   }
 
   /**
+   * Find room
+   *
+   * @param  {Integer}  roomId  ID of room to fetch
+   * @return {Promise}
+   */
+  static async find(roomId) {
+    let result = []
+    let entities = {}
+    const whereClause = sql`roomId = ${roomId}`
+
+    const query = sql`
+      SELECT * FROM rooms
+      WHERE ${whereClause}
+    `
+    const row = await db.get(String(query), query.parameters)
+
+
+    if (!row) {
+      throw new Error('Room not found')
+    }
+
+    row.dateCreated = row.dateCreated.substring(0, 10)
+    row.hasPassword = !!row.password
+    //base64 encode row.password
+    if (row.hasPassword) {
+      row.password = Buffer.from(row.password).toString('base64')
+    } else {
+      delete row.password
+    }
+
+    result.push(row.roomId)
+    entities[row.roomId] = row
+
+
+    return { result, entities }
+  }
+
+  /**
    * Validate a room against optional criteria
    *
    * @param  {Number}    roomId
