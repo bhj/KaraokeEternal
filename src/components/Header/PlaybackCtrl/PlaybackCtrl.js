@@ -53,9 +53,6 @@ const PlaybackCtrl = props => {
     return (isAdmin && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
   }
 
-  console.log(room);
-  console.log((room.remoteControlQREnabled) ? true : false);
-
   return (
     <div className={styles.container}>
       <Button

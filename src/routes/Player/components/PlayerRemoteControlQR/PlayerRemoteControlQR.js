@@ -1,28 +1,22 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import styles from './PlayerRemoteControlQR.css'
 import QRCode from "react-qr-code";
+import { fetchRoom } from 'store/modules/room'
 
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('rooms')
 
 
-class PlayerRemoteControlQR extends React.Component {
-  static propTypes = {
-    // width: PropTypes.number.isRequired,
-    alternate: PropTypes.bool.isRequired,
-    size: PropTypes.number.isRequired,
-    opacity: PropTypes.number.isRequired,
-    roomId: PropTypes.number.isRequired,
-  }
-  state = {
-    position: "bottomLeft",
-    room: false,
-  };
+const PlayerRemoteControlQR = props => {
+  const [position, setPosition] = useState("bottomLeft");
+  const [intervalId, setIntervalId] = useState(null);
+  const user = useSelector(state => state.user)
+  const room = useSelector(state => state.room.entity)
 
-
-  frameId = null
-  positions = {
+  const positions = {
     bottomLeft: {
       bottom: 16,
       left: 16,
@@ -33,80 +27,66 @@ class PlayerRemoteControlQR extends React.Component {
     },
   };
 
+  useEffect(() => {
+    fetchRoom(user.roomId);
+    maybeSetupInterval();
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
-  fetchRoom() {
-    return api('GET', '/'+this.props.roomId)
-      .then(res => {
-        this.setState({ room: res.entity });
-      })
-      .catch(err => {
-        console.error(err)
-      })
-  }
 
-  componentDidMount() {
-    this.fetchRoom();
-    this.maybeSetupInterval();
-  }
-
-  maybeSetupInterval() {
+  const maybeSetupInterval = () => {
     // on mount, setup a interval to update the position of the QR code
-    if (this.props.alternate && !this.interval) {
-      this.interval = setInterval(() => {
-        this.setState({ position: this.state.position === "bottomLeft" ? "bottomRight" : "bottomLeft" });
-      }, 5 * 60 * 1000);
-    } else if (!this.props.alternate && this.interval) {
-      clearInterval(this.interval);
+    if (props.alternate && !intervalId) {
+      setIntervalId(setInterval(() => {
+        setPosition(prevPosition => prevPosition === "bottomLeft" ? "bottomRight" : "bottomLeft");
+      }, 5 * 60 * 1000));
+    } else if (!props.alternate && intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    this.maybeSetupInterval();
+
+  let qrValue = document.baseURI;
+  qrValue += "?roomId=" + props.roomId;
+
+  if (room) {
+    qrValue += "&roomToken=" + encodeURIComponent(room.token);
   }
 
-  componentWillUnmount() {
-    // on unmount, clear the interval
-    clearInterval(this.interval);
-  }
+  const baseStyles = {
+    padding: "3px",
+    backgroundColor: "#fff"
+  };
+  const positionStyles = positions[position];
 
-  render() {
-    // const { width } = this.props
-    let qrValue = document.baseURI;
-    qrValue += "?roomId="+this.props.roomId;
+  let myStyles = { ...baseStyles, ...positionStyles };
 
-    if (this.state.room) {
-      qrValue += "&roomToken="+encodeURIComponent(this.state.room.token);
-    }
+  myStyles.opacity = props.opacity;
+  myStyles.width = (props.size * 100) + "%";
+  myStyles.height = "auto";
 
-    const baseStyles = {
-      padding: "3px",
-      backgroundColor: "#fff"
-    };
-    const position = this.state.position;
-    const positionStyles = this.positions[position];
-
-    let myStyles = { ...baseStyles, ...positionStyles };
-
-    myStyles.opacity = this.props.opacity;
-    myStyles.width = (this.props.size * 100) + "%";
-    myStyles.height = "auto";
-
-    return (
-      <div className={styles.container} style={myStyles} >
-        <div className={styles.inner}>
-          <QRCode
-            size={256}
-            className={styles.qr}
-            style={{ width: "100%", height: "auto" }}
-            value={qrValue}
-            viewBox={`0 0 256 256`}
-          />
-        </div>
+  return (
+    <div className={styles.container} style={myStyles} >
+      <div className={styles.inner}>
+        <QRCode
+          size={256}
+          className={styles.qr}
+          style={{ width: "100%", height: "auto" }}
+          value={qrValue}
+          viewBox={`0 0 256 256`}
+        />
       </div>
-    )
-  }
-
-
+    </div>
+  )
 }
 
-export default PlayerRemoteControlQR
+PlayerRemoteControlQR.propTypes = {
+  alternate: PropTypes.bool.isRequired,
+  size: PropTypes.number.isRequired,
+  opacity: PropTypes.number.isRequired,
+  roomId: PropTypes.number.isRequired,
+};
+
+export default PlayerRemoteControlQR;
