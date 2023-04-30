@@ -7,6 +7,7 @@ import PlayerTextOverlay from '../PlayerTextOverlay'
 import PlayerRemoteControlQR from '../PlayerRemoteControlQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus } from '../../modules/player'
+import { fetchRoom } from 'store/modules/room'
 
 const PlayerController = props => {
   const queue = useSelector(getRoundRobinQueue)
@@ -15,6 +16,7 @@ const PlayerController = props => {
   const playerRemoteControlQR = useSelector(state => state.playerRemoteControlQR)
   const prefs = useSelector(state => state.prefs)
   const user = useSelector(state => state.user)
+  const room = useSelector(state => state.room.entity)
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
@@ -84,6 +86,11 @@ const PlayerController = props => {
     playerRemoteControlQR
   ])
 
+  // once per mount
+  useEffect(() => {
+    dispatch(fetchRoom(user.roomId))
+  }, [dispatch])
+
   // on unmount
   useEffect(() => () => dispatch(playerLeave()), [dispatch])
 
@@ -107,6 +114,7 @@ const PlayerController = props => {
       handleStatus({ isErrored: false })
     }
   }, [handleStatus, player.isErrored, player.isPlaying])
+
 
   return (
     <>
@@ -142,7 +150,7 @@ const PlayerController = props => {
         width={props.width}
         height={props.height}
       />
-      {playerRemoteControlQR.isEnabled &&
+      {playerRemoteControlQR.isEnabled && room.remoteControlQREnabled &&
         <PlayerRemoteControlQR
           alternate={playerRemoteControlQR.alternate}
           size={playerRemoteControlQR.size}

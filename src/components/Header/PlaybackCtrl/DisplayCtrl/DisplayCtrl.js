@@ -22,6 +22,7 @@ export default class DisplayCtrl extends React.Component {
     // actions
     onRequestOptions: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
+    isRemoteControlQREnabledAllowed: PropTypes.bool.isRequired,
   }
 
   checkbox = React.createRef()
@@ -57,7 +58,7 @@ export default class DisplayCtrl extends React.Component {
   handleRemoteControlSize = val => this.props.onRequestOptions({
     remoteControlQR: { size: val }
   })
-  
+
 
 
   handlePresetNext = () => this.props.onRequestOptions({
@@ -169,52 +170,56 @@ export default class DisplayCtrl extends React.Component {
             }
           </fieldset>
 
-          <fieldset className={styles.remoteControlQR}>
-            <legend>
-              <label>
-                <input type='checkbox'
-                  checked={this.props.isRemoteControlQREnabled}
-                  onChange={this.handleToggleRemoteControlQR}
-                  ref={this.checkbox}
-                /> Remote Control QR
-              </label>
-            </legend>
-            {this.props.isRemoteControlQREnabled &&
-              <>
-                <label>
-                  <input type='checkbox'
-                    checked={this.props.isRemoteControlQRAlternateEnabled}
-                    onChange={this.handleToggleRemoteControlQRAlternate}
-                    ref={this.checkbox}
-                  /> Alternate Position (Prevents Burn-in)
-                </label>
+          {this.props.isRemoteControlQREnabledAllowed &&
+            <>
+              <fieldset className={styles.remoteControlQR}>
+                <legend>
+                  <label>
+                    <input type='checkbox'
+                      checked={this.props.isRemoteControlQREnabled}
+                      onChange={this.handleToggleRemoteControlQR}
+                      ref={this.checkbox}
+                    /> Remote Control QR
+                  </label>
+                </legend>
+                {this.props.isRemoteControlQREnabled &&
+                  <>
+                    <label>
+                      <input type='checkbox'
+                        checked={this.props.isRemoteControlQRAlternateEnabled}
+                        onChange={this.handleToggleRemoteControlQRAlternate}
+                        ref={this.checkbox}
+                      /> Alternate Position (Prevents Burn-in)
+                    </label>
 
-                <label className={styles.field}>Translucency</label>
-                <OptimisticSlider
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={this.props.remoteControlTranslucency}
-                  onChange={this.handleRemoteControlTranslucency}
-                  handle={handle}
-                  className={styles.slider}
-                />
-                <label className={styles.field}>Size</label>
-                <OptimisticSlider
-                  min={0.05}
-                  max={0.25}
-                  step={0.01}
-                  value={this.props.remoteControlSize}
-                  onChange={this.handleRemoteControlSize}
-                  handle={handle}
-                  className={styles.slider}
-                />
-              </>
-            }
-            {!this.props.isRemoteControlQREnabled &&
-              <p className={styles.unsupported}>Enable to view options</p>
-            }
-          </fieldset>
+                    <label className={styles.field}>Translucency</label>
+                    <OptimisticSlider
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={this.props.remoteControlTranslucency}
+                      onChange={this.handleRemoteControlTranslucency}
+                      handle={handle}
+                      className={styles.slider}
+                    />
+                    <label className={styles.field}>Size</label>
+                    <OptimisticSlider
+                      min={0.05}
+                      max={0.25}
+                      step={0.01}
+                      value={this.props.remoteControlSize}
+                      onChange={this.handleRemoteControlSize}
+                      handle={handle}
+                      className={styles.slider}
+                    />
+                  </>
+                }
+                {!this.props.isRemoteControlQREnabled &&
+                  <p className={styles.unsupported}>Enable to view options</p>
+                }
+              </fieldset>
+            </>
+          }
         </div>
       </Modal>
     )

@@ -40,7 +40,7 @@ class Rooms {
    * @param  {Integer}  roomId  ID of room to fetch
    * @return {Promise}
    */
-  static async getQR (roomId) {
+  static async getRoom (roomId) {
     let entity = {}
     const whereClause = sql`roomId = ${roomId}`
 

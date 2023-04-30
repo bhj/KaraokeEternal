@@ -16,6 +16,7 @@ const EditRoom = props => {
 
     const data = new FormData(formRef.current)
     data.set('status', data.get('status') ? 'open' : 'closed')
+    data.set('remoteControlQREnabled', data.get('remoteControlQREnabled') ? 1 : 0)
 
     if (props.room) {
       if (!isPasswordDirty) data.delete('password')
@@ -67,10 +68,18 @@ const EditRoom = props => {
             defaultChecked={!props.room || props.room.status === 'open'}
             name='status'
           />
-           &nbsp;Open
+          &nbsp;Open
         </label>
-        <br/>
-        <br/>
+        <br />
+        <label>
+          <input type='checkbox'
+            defaultChecked={!props.room || props.room.remoteControlQREnabled}
+            name='remoteControlQREnabled'
+          />
+          &nbsp;Enable Remote Control QR
+        </label>
+        <br />
+        <br />
 
         <button type='submit' className={`${styles.btn} primary`}>
           {props.room ? 'Update Room' : 'Create Room'}
