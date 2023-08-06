@@ -56,14 +56,14 @@ See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're n
 
 See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
 
-### Docker (CLI and docker-compose)
+### Docker (CLI and Compose V2)
 
-The [Karaoke Eternal docker image](https://hub.docker.com/r/radrootllc/karaoke-eternal) supports `amd64`, `arm64` and `arm/v7`. The image is modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers):
+The [Karaoke Eternal docker image](https://hub.docker.com/r/radrootllc/karaoke-eternal) supports `amd64`, `arm64` and `arm/v7`. It's modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers) images:
 
   - `/config` should be mapped to a host volume (the database will be stored here)
   - media folder(s) should be mapped to host volume(s) (once inside the app, you'll add these as <a href="{{< ref "docs/karaoke-eternal-app#preferences-admin-only" >}}">Media Folders</a>)
   - port `8080` should be published to the desired host port
-  - `PUID`, `PGID` and `TZ` are optional
+  - `PUID`, `PGID` and `TZ` environment variables are optional
 
 Example CLI usage:
 
@@ -77,11 +77,9 @@ Example CLI usage:
     radrootllc/karaoke-eternal
 {{< /highlight >}}  
 
-Example `docker-compose` usage:
+Example `docker compose` usage:
 
 {{< highlight yaml >}}
----
-version: "2.1"
 services:
   karaoke-eternal:
     image: radrootllc/karaoke-eternal
