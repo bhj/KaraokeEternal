@@ -41,6 +41,12 @@
   text-align: center;
 }
 
+.modalOverlay,
+.modal,
+.modalContainer {
+  animation-fill-mode: forwards !important;
+}
+
 .modalCloseButton {
   position: absolute;
   top: 14px;
