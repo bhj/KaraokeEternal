@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import GitHubButton from 'react-github-btn'
+import Icon from 'components/Icon'
 import Logo from 'components/Logo'
 import Modal from 'components/Modal'
 import html from '<PROJECT_ROOT>/CHANGELOG.md'
@@ -21,9 +21,25 @@ const About = props => {
           v{__KE_VERSION__} {/* eslint-disable-line no-undef */}
         </p>
         <p><a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='_blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}
-        <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'><GitHubButton data-size='large' data-color-scheme='no-preference: dark; light: dark;'>GitHub</GitHubButton></a>&nbsp; {/* eslint-disable-line no-undef, max-len */}
-        <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'><GitHubButton data-icon='octicon-star' data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Star</GitHubButton></a>&nbsp; {/* eslint-disable-line no-undef, max-len */}
-        <a href={__KE_URL_SPONSOR__} target='_blank' rel='noreferrer'><GitHubButton data-icon='octicon-heart' data-size='large' data-color-scheme='no-preference: dark; light: dark;'>Sponsor</GitHubButton></a> {/* eslint-disable-line no-undef, max-len */}
+
+        <div className={styles.ghButtonContainer}>
+          <div className={styles.ghButton}>
+            <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>{/* eslint-disable-line no-undef */}
+              <Icon icon='GITHUB_REPO' size={16}/>GitHub
+            </a>
+          </div>
+          <div className={styles.ghButton}>
+            <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>{/* eslint-disable-line no-undef */}
+              <Icon icon='GITHUB_STAR' size={16}/>Star
+            </a>
+          </div>
+
+          <div className={`${styles.ghButton} ${styles.sponsor}`}>
+            <a href={__KE_URL_SPONSOR__} target='_blank' rel='noreferrer'>{/* eslint-disable-line no-undef */}
+              <Icon icon='GITHUB_SPONSOR' size={16}/>Sponsor
+            </a>
+          </div>
+        </div>
       </div>
 
       <Modal

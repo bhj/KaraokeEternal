@@ -44,3 +44,41 @@
   margin: .5rem 0;
   overflow: scroll;
 }
+
+.ghButtonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.ghButton {
+  display: inline-block;
+  white-space: nowrap;
+  border: 1px solid;
+  border-color: rgba(240,246,252,.1);
+  background-image: linear-gradient(180deg, #21262d, #1a1e23 90%);
+  border-radius: 0.25em;
+}
+
+.ghButton:hover {
+  border-color: #8b949e;  
+  background-image: linear-gradient(180deg, #30363d, #292e33 90%);
+}
+
+.ghButton a {
+  display: inline-block;
+  color: #c9d1d9;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.ghButton svg {
+  fill: currentColor;
+  margin-right: 5px;
+}
+
+.ghButton.sponsor svg {
+  fill: #db61a2;
+}
