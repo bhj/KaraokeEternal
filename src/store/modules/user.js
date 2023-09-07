@@ -2,7 +2,6 @@ import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { fetchPrefs } from './prefs'
 import HttpApi from 'lib/HttpApi'
-import history from 'lib/history'
 import {
   CREATE_ACCOUNT,
   LOGIN,
@@ -66,10 +65,10 @@ export function login (creds) {
         }
 
         // redirect in query string?
-        const redirect = new URLSearchParams(history.location.search).get('redirect')
+        const redirect = new URLSearchParams(window.location.search).get('redirect')
 
         if (redirect) {
-          history.push(basename.replace(/\/$/, '') + redirect)
+          window._router.navigate(basename.replace(/\/$/, '') + redirect)
         }
       })
       .catch(err => {

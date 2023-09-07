@@ -5,6 +5,9 @@ import App from './components/App'
 import { persistStore } from 'redux-persist'
 import io from 'socket.io-client'
 import { connectSocket } from './store/modules/user'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+
+const basename = new URL(document.baseURI).pathname
 
 // the "socket" side of the api requires authentication, so
 // we only want to attempt socket connection if we think we
@@ -40,6 +43,15 @@ window._persistor = persistStore(store, null, () => {
 const MOUNT_NODE = document.getElementById('root')
 const root = createRoot(MOUNT_NODE)
 
+// see https://github.com/remix-run/react-router/issues/9422#issuecomment-1302564759
+// also, we could make this a 'router' module that can be imported elsewhere to
+// call router.navigate(), but for now, storing on window for simplicity
+window._router = createBrowserRouter([
+  { path: '*', element: <App store={store} persistor={window._persistor} /> }
+], { basename })
+
 root.render(
-  <App store={store} persistor={window._persistor}/>
+  <React.StrictMode>
+    <RouterProvider router={window._router } />
+  </React.StrictMode>
 )
