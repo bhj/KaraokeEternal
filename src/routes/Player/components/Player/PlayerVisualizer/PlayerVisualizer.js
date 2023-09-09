@@ -72,6 +72,7 @@ class PlayerVisualizer extends React.Component {
 
   componentWillUnmount () {
     cancelAnimationFrame(this.frameId)
+    this.frameId = null
   }
 
   render () {
