@@ -69,6 +69,10 @@ class Player extends React.Component {
   }
 
   handleAudioElement = el => {
+    if (this.audioSourceNode && this.audioSourceNode.mediaElement === el) {
+      return
+    }
+
     this.audioSourceNode = this.audioCtx.createMediaElementSource(el)
     this.audioSourceNode.connect(this.audioGainNode)
     this.audioGainNode.connect(this.audioCtx.destination)
