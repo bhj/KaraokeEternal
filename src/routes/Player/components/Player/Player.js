@@ -35,16 +35,21 @@ class Player extends React.Component {
     onStatus: PropTypes.func.isRequired,
   }
 
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-  audioGainNode = this.audioCtx.createGain()
+  audioCtx = null
+  audioGainNode = null
   audioSourceNode = null
   isFetching = false // internal
 
   state = {
-    visualizerAudioSourceNode: this.audioCtx.createGain(),
+    visualizerAudioSourceNode: null,
   }
 
   componentDidMount () {
+    if (!this.audioCtx) {
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+      this.audioGainNode = this.audioCtx.createGain()
+    }
+
     this.updateVolume()
   }
 
@@ -115,7 +120,8 @@ class Player extends React.Component {
 
     const isVisualizerActive = this.props.mediaType === 'cdg' &&
       this.props.isWebGLSupported &&
-      this.props.visualizer.isEnabled
+      this.props.visualizer.isEnabled &&
+      this.state.visualizerAudioSourceNode
 
     return (
       <>
