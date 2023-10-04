@@ -5,7 +5,7 @@ import { formatDuration } from 'lib/dateTime'
 import { closeSongInfo, setPreferred } from 'store/modules/songInfo'
 import styles from './SongInfo.css'
 
-const SongInfo = (props) => {
+const SongInfo = () => {
   const { isLoading, isVisible, songId, media } = useSelector(state => state.songInfo)
 
   const dispatch = useDispatch()

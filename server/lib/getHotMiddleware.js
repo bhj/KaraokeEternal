@@ -1,5 +1,6 @@
 // based on https://github.com/tnnevol/webpack-hot-middleware-for-koa2
 
+// eslint-disable-next-line n/no-unpublished-require
 const webpackHotMiddleware = require('webpack-hot-middleware')
 
 module.exports = (compiler, opts) => {

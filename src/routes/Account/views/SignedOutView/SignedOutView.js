@@ -6,7 +6,7 @@ import FirstRun from './FirstRun'
 import SignIn from './SignIn'
 import styles from './SignedOutView.css'
 
-const SignedOutView = props => {
+const SignedOutView = () => {
   const [isCreating, setCreating] = useState(false)
   const toggleCreate = useCallback(() => setCreating(prevState => !prevState), [])
 

@@ -8,6 +8,8 @@
   The above copyright notice and this permission notice shall be
   included in all copies or substantial portions of this Source Code Form.
 */
+
+// eslint-disable-next-line n/no-unpublished-require
 const webpackDevMiddleware = require('webpack-dev-middleware')
 
 module.exports = (compiler, opts) => {

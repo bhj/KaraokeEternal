@@ -1,3 +1,4 @@
+// eslint-disable-next-line n/no-unpublished-require
 const { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } = require('electron')
 const path = require('path')
 const log = require('./Log')(`main:electron[${process.pid}]`)

@@ -6,7 +6,7 @@ import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEdit
 import getUsers from '../../selectors/getUsers'
 import styles from './Users.css'
 
-const Users = props => {
+const Users = () => {
   const [editorUser, setEditorUser] = useState(null)
 
   const curUserId = useSelector(state => state.user.userId)

@@ -1,7 +1,9 @@
 #!/usr/bin/env node
+const env = require('./lib/cli')
+if (env.KES_EXIT) return
+
 const childProcess = require('child_process')
 const path = require('path')
-const env = require('./lib/cli')
 const { Log } = require('./lib/Log')
 
 const log = new Log('server', {
@@ -90,7 +92,7 @@ Database.open({
   require('./serverWorker.js')({ env, startScanner, stopScanner })
 }).catch(err => {
   log.error(err.message)
-  process.exit(1)
+  throw err
 })
 
 function startScanner (onExit) {
@@ -125,11 +127,8 @@ function stopScanner () {
 function shutdown (signal) {
   log.info('Received %s', signal)
 
-  Database.close().then(() => {
-    log.info('Goodbye for now...')
-    process.exit(0)
-  }).catch(err => {
+  Database.close().catch(err => {
     log.error(err.message)
-    process.exit(1)
+    throw err
   })
 }

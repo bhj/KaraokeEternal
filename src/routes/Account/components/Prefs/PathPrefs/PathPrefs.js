@@ -10,7 +10,7 @@ import { receivePrefs, requestScan, setPathPriority } from 'store/modules/prefs'
 
 const api = new HttpApi('prefs/path')
 
-const PathPrefs = props => {
+const PathPrefs = () => {
   const paths = useSelector(state => state.prefs.paths)
   const [isExpanded, setExpanded] = useState(false)
   const [isChoosing, setChoosing] = useState(false)
@@ -84,7 +84,7 @@ const PathPrefs = props => {
 
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId='droppable'>
-            {(provided, snapshot) => (
+            {(provided) => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 {priority.map((pathId, i) =>
                   <PathItem index={i} key={pathId} path={paths.entities[pathId]} onRemove={handleRemovePath}/>

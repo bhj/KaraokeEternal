@@ -7,7 +7,7 @@ import { filterByRoom } from '../../modules/users'
 import getRoomList from '../../selectors/getRoomList'
 import styles from './Rooms.css'
 
-const Rooms = props => {
+const Rooms = () => {
   const [editorRoom, setEditorRoom] = useState(null)
 
   const { isEditorOpen, filterStatus } = useSelector(state => state.rooms)

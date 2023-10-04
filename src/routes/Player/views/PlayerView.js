@@ -8,7 +8,7 @@ import PlayerController from '../components/PlayerController'
 import screenfull from 'screenfull'
 import styles from './PlayerView.css'
 
-const PlayerView = (props) => {
+const PlayerView = () => {
   const { innerWidth, innerHeight, headerHeight, footerHeight } = useSelector(state => state.ui)
   const viewportHeight = innerHeight - headerHeight - footerHeight
 

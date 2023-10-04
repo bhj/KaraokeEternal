@@ -16,7 +16,7 @@ const handleFullscreen = () => {
   }
 }
 
-const PlaybackCtrl = props => {
+const PlaybackCtrl = () => {
   const isAdmin = useSelector(state => state.user.isAdmin)
   const isInRoom = useSelector(state => state.user.roomId !== null)
   const status = useSelector(state => state.status)

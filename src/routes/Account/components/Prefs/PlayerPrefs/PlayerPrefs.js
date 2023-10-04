@@ -4,7 +4,7 @@ import Icon from 'components/Icon'
 import { setPref } from 'store/modules/prefs'
 import styles from './PlayerPrefs.css'
 
-const PlayerPrefs = props => {
+const PlayerPrefs = () => {
   const [isExpanded, setExpanded] = useState(false)
   const isReplayGainEnabled = useSelector(state => state.prefs.isReplayGainEnabled)
   const toggleExpanded = useCallback(() => {

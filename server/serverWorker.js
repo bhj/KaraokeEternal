@@ -45,7 +45,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
 
     // http server error handler
     server.on('error', function (err) {
-      log.error(err)
+      log.error(err.message)
 
       process.emit('serverWorker', {
         type: SERVER_WORKER_ERROR,
@@ -53,7 +53,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
       })
 
       // not much we can do without a working server
-      process.exit(1)
+      throw err
     })
 
     // create socket.io server
@@ -83,6 +83,19 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
       // scanning on startup?
       if (env.KES_SCAN) startScanner(() => pushQueuesAndLibrary(io))
     })
+
+    function stopServer (signal) {
+      io.close(function () {
+        log.info(`Websocket server stopped (received ${signal})`)
+      })
+
+      server.close(function () {
+        log.info(`Web server stopped (received ${signal})`)
+      })
+    }
+
+    process.on('SIGINT', stopServer)
+    process.on('SIGTERM', stopServer)
   }
 
   // --------------------
@@ -210,8 +223,8 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
   // Development middleware
   // ----------------------
   log.info('Enabling webpack dev and HMR middleware')
-  const webpack = require('webpack')
-  const webpackConfig = require('../config/webpack.config')
+  const webpack = require('webpack') // eslint-disable-line n/no-unpublished-require
+  const webpackConfig = require('../config/webpack.config') // eslint-disable-line n/no-unpublished-require
   const compiler = webpack(webpackConfig)
 
   compiler.hooks.done.tap('indexPlugin', async (params) => {

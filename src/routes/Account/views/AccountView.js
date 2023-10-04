@@ -5,7 +5,7 @@ import SignedInView from './SignedInView'
 import SignedOutView from './SignedOutView'
 import styles from './AccountView.css'
 
-const AccountView = props => {
+const AccountView = () => {
   const isSignedIn = useSelector(state => state.user.userId !== null)
   const ui = useSelector(state => state.ui)
   const dispatch = useDispatch()

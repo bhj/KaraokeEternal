@@ -11,7 +11,7 @@ import getPlayerHistory from '../../selectors/getPlayerHistory'
 import getRoundRobinQueue from '../../selectors/getRoundRobinQueue'
 import getWaits from '../../selectors/getWaits'
 
-const QueueList = props => {
+const QueueList = () => {
   const artists = useSelector(state => state.artists)
   const { errorMessage, isAtQueueEnd, isErrored, position, queueId } = useSelector(state => state.status)
 

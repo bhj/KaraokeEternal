@@ -34,7 +34,10 @@ Database.open({
   startScan()
 }).catch(err => {
   log.error(err.message)
-  process.exit(1)
+
+  // scanner process won't exit automatically due to the
+  // IPC message listener; forcing exit here for now
+  process.exit(1) // eslint-disable-line n/no-process-exit
 })
 
 async function startScan () {
@@ -46,9 +49,11 @@ async function startScan () {
     const prefs = await Prefs.get()
     _Scanner = new FileScanner(prefs)
     await _Scanner.scan()
-  } // end while
+  }
 
-  process.exit(0)
+  // scanner process won't exit automatically due to the
+  // IPC message listener; forcing exit here for now
+  process.exit(0) // eslint-disable-line n/no-process-exit
 }
 
 function cancelScan () {

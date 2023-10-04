@@ -4,7 +4,7 @@ import { updateAccount, logout } from 'store/modules/user'
 import AccountForm from '../AccountForm'
 import styles from './Account.css'
 
-const Account = props => {
+const Account = () => {
   const curPassword = useRef(null)
 
   const user = useSelector(state => state.user)

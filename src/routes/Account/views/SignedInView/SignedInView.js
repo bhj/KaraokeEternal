@@ -9,7 +9,7 @@ import Prefs from '../../components/Prefs'
 import Rooms from '../../components/Rooms'
 import Users from '../../components/Users'
 
-const SignedInView = props => {
+const SignedInView = () => {
   const { isAdmin } = useSelector(state => state.user)
   const sliceExists = !!useSelector(state => state.users)
   const store = useStore()

@@ -25,6 +25,7 @@ const config = {
     filename: __DEV__ ? '[name].js' : '[name].[fullhash].js',
   },
   resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json'],
     modules: [
       path.join(baseDir, 'src'),
       'node_modules',
@@ -77,7 +78,7 @@ config.plugins.push(new HtmlWebpackPlugin({
 
 // JavaScript
 config.module.rules.push({
-  test: /\.(js|jsx)$/,
+  test: /\.(ts|js)x?$/,
   exclude: /node_modules/,
   use: [{
     loader: 'babel-loader',

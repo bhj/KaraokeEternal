@@ -73,9 +73,10 @@ const yargs = require('yargs')
   .usage('  0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug')
 
 let argv = yargs.argv
-
 let _app
+
 if (process.versions.electron) {
+  // eslint-disable-next-line n/no-unpublished-require
   _app = require('electron').app
 
   // see https://github.com/yargs/yargs/blob/master/docs/api.md#argv
@@ -86,10 +87,10 @@ if (process.versions.electron) {
 
 if (argv.version) {
   console.log(_app ? _app.getVersion() : process.env.npm_package_version)
-  process.exit(0)
+  env.KES_EXIT = true
 }
 
-// CLI options take precendence over env vars
+// CLI options take precedence over env vars
 if (argv.scan) {
   env.KES_SCAN = true
 }

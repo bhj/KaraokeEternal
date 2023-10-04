@@ -4,7 +4,7 @@ import AccountForm from '../../../components/AccountForm'
 import { createAccount } from 'store/modules/user'
 import styles from './FirstRun.css'
 
-const FirstRun = props => {
+const FirstRun = () => {
   const user = useSelector(state => state.user)
 
   const dispatch = useDispatch()

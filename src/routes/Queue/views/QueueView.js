@@ -10,7 +10,7 @@ import styles from './QueueView.css'
 
 const QUEUE_ITEM_HEIGHT = 92
 
-const QueueView = (props) => {
+const QueueView = () => {
   const { innerWidth, innerHeight, headerHeight, footerHeight } = useSelector(state => state.ui)
   const isInRoom = useSelector(state => !!state.user.roomId)
   const isLoading = useSelector(state => ensureState(state.queue).isLoading)

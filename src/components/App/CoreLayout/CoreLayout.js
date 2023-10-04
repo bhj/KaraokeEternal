@@ -11,18 +11,18 @@ import SongInfo from 'components/SongInfo'
 import Routes from '../Routes'
 import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
 
-const CoreLayout = (props) => {
+const CoreLayout = () => {
   const dispatch = useDispatch()
   const headerRef = React.useRef()
   const navRef = React.useRef()
 
   useResizeObserver({
-    onResize: ({ width, height }) => { dispatch(setHeaderHeight(height)) },
+    onResize: ({ height }) => { dispatch(setHeaderHeight(height)) },
     ref: headerRef,
   })
 
   useResizeObserver({
-    onResize: ({ width, height }) => { dispatch(setFooterHeight(height)) },
+    onResize: ({ height }) => { dispatch(setFooterHeight(height)) },
     ref: navRef,
   })
 

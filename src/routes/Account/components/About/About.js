@@ -5,7 +5,7 @@ import Modal from 'components/Modal'
 import html from '<PROJECT_ROOT>/CHANGELOG.md'
 import styles from './About.css'
 
-const About = props => {
+const About = () => {
   const [isChangelogVisible, setChangelogVisible] = useState(false)
   const toggleChangelog = useCallback(() => setChangelogVisible(prevState => !prevState), [])
 

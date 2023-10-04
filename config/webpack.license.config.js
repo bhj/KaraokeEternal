@@ -5,7 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 const applyLicenseConfig = config => {
   config.plugins.push(new LicenseWebpackPlugin({
     addBanner: true,
-    renderBanner: (filename, modules) => '/*! See licenses in ' + filename + ' */',
+    renderBanner: (filename) => '/*! See licenses in ' + filename + ' */',
     outputFilename: 'licenses.txt',
     perChunkOutput: false,
     renderLicenses: (modules) => {
