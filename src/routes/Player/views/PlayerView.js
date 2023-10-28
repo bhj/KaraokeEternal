@@ -1,6 +1,6 @@
 import React from 'react'
-import { useSelector, useStore } from 'react-redux'
-import { injectReducer } from 'store/reducers'
+import { useSelector } from 'react-redux'
+import { injectReducer } from 'store/store'
 import playerReducer from '../modules/player'
 import playerVisualizerReducer from '../modules/playerVisualizer'
 
@@ -13,10 +13,9 @@ const PlayerView = () => {
   const viewportHeight = innerHeight - headerHeight - footerHeight
 
   // @todo: find better place for this?
-  const store = useStore()
   if (!useSelector(state => state.player)) {
-    injectReducer(store, { key: 'player', reducer: playerReducer })
-    injectReducer(store, { key: 'playerVisualizer', reducer: playerVisualizerReducer })
+    injectReducer({ key: 'player', reducer: playerReducer })
+    injectReducer({ key: 'playerVisualizer', reducer: playerVisualizerReducer })
   }
 
   return (

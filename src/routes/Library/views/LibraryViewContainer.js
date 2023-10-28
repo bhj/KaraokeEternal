@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import { ensureState } from 'redux-optimistic-ui'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import { Searcher } from 'fast-fuzzy'
 import LibraryView from './LibraryView'
 import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'

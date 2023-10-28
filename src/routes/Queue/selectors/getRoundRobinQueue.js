@@ -1,5 +1,5 @@
 import { ensureState } from 'redux-optimistic-ui'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import getPlayerHistory from './getPlayerHistory'
 
 const getResult = (state) => ensureState(state.queue).result

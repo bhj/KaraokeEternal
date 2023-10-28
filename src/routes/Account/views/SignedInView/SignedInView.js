@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import { injectReducer } from 'store/reducers'
-import { useDispatch, useSelector, useStore } from 'react-redux'
+import { injectReducer } from 'store/store'
+import { useDispatch, useSelector } from 'react-redux'
 import { fetchAccount } from 'store/modules/user'
 import usersReducer from '../../modules/users'
 import About from '../../components/About'
@@ -12,11 +12,10 @@ import Users from '../../components/Users'
 const SignedInView = () => {
   const { isAdmin } = useSelector(state => state.user)
   const sliceExists = !!useSelector(state => state.users)
-  const store = useStore()
   const dispatch = useDispatch()
 
   if (isAdmin && !sliceExists) {
-    injectReducer(store, { key: 'users', reducer: usersReducer })
+    injectReducer({ key: 'users', reducer: usersReducer })
   }
 
   // once per mount

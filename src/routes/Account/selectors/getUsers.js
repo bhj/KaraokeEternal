@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 
 const getResult = (state) => state.users.result
 const getEntities = (state) => state.users.entities

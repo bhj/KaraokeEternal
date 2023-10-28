@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 
 import { requestScanStop } from 'store/modules/prefs'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'

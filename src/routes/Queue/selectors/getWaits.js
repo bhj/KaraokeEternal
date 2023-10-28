@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import getPlayerHistory from './getPlayerHistory'
 import getRoundRobinQueue from './getRoundRobinQueue'
 
