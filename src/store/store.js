@@ -2,6 +2,14 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import reducers from './reducers'
 import createSocketMiddleware from './socketMiddleware'
 import createThrottle from 'redux-throttle'
+import {
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist'
 import { windowResize } from './modules/ui'
 import io from 'socket.io-client'
 
@@ -33,7 +41,12 @@ const socketMiddleware = createSocketMiddleware(window._socket, 'server/')
 // ======================================================
 const store = configureStore({
   reducer: reducers,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(throttle, socketMiddleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    // https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
+    serializableCheck: {
+      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    },
+  }).concat(throttle, socketMiddleware),
 })
 
 store.asyncReducers = {}
