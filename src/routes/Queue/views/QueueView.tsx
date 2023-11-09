@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
+import { useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import { Link } from 'react-router-dom'
 import getRoundRobinQueue from '../selectors/getRoundRobinQueue'
@@ -11,11 +11,11 @@ import styles from './QueueView.css'
 const QUEUE_ITEM_HEIGHT = 92
 
 const QueueView = () => {
-  const { innerWidth, innerHeight, headerHeight, footerHeight } = useSelector(state => state.ui)
-  const isInRoom = useSelector(state => !!state.user.roomId)
-  const isLoading = useSelector(state => ensureState(state.queue).isLoading)
-  const queue = useSelector(getRoundRobinQueue)
-  const queueId = useSelector(state => state.status.queueId)
+  const { innerWidth, innerHeight, headerHeight, footerHeight } = useAppSelector(state => state.ui)
+  const isInRoom = useAppSelector(state => !!state.user.roomId)
+  const isLoading = useAppSelector(state => ensureState(state.queue).isLoading)
+  const queue = useAppSelector(getRoundRobinQueue)
+  const queueId = useAppSelector(state => state.status.queueId)
   const containerRef = useRef()
 
   // ensure current song is in view on first mount only

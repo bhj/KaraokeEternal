@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 
 import Player from '../Player'
 import PlayerTextOverlay from '../PlayerTextOverlay'
@@ -12,14 +12,14 @@ interface PlayerControllerProps {
 }
 
 const PlayerController = (props: PlayerControllerProps) => {
-  const queue = useSelector(getRoundRobinQueue)
-  const player = useSelector(state => state.player)
-  const playerVisualizer = useSelector(state => state.playerVisualizer)
-  const prefs = useSelector(state => state.prefs)
+  const queue = useAppSelector(getRoundRobinQueue)
+  const player = useAppSelector(state => state.player)
+  const playerVisualizer = useAppSelector(state => state.playerVisualizer)
+  const prefs = useAppSelector(state => state.prefs)
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleStatus = useCallback(status => dispatch(playerStatus(status)), [dispatch])
   const handleLoad = useCallback(() => dispatch(playerLoad()), [dispatch])
   const handlePlay = useCallback(() => dispatch(playerPlay()), [dispatch])

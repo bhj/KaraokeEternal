@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { injectReducer } from 'store/store'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchAccount } from 'store/modules/user'
 import usersReducer from '../../modules/users'
 import About from '../../components/About'
@@ -10,9 +10,9 @@ import Rooms from '../../components/Rooms'
 import Users from '../../components/Users'
 
 const SignedInView = () => {
-  const { isAdmin } = useSelector(state => state.user)
-  const sliceExists = !!useSelector(state => state.users)
-  const dispatch = useDispatch()
+  const { isAdmin } = useAppSelector(state => state.user)
+  const sliceExists = !!useAppSelector(state => state.users)
+  const dispatch = useAppDispatch()
 
   if (isAdmin && !sliceExists) {
     injectReducer({ key: 'users', reducer: usersReducer })

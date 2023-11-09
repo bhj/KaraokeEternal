@@ -13,6 +13,8 @@ import {
 import { windowResize } from './modules/ui'
 import io from 'socket.io-client'
 
+const asyncReducers = {}
+
 // the "socket" side of the api requires authentication, so
 // we only want to attempt socket connection if we think we
 // have a valid session (via JWT in cookie). the socket.io
@@ -23,7 +25,10 @@ window._socket = io({
 })
 
 // resize action
-window.addEventListener('resize', () => store.dispatch(windowResize(window)))
+window.addEventListener('resize', () => store.dispatch(windowResize({
+  innerWidth: window.innerWidth,
+  innerHeight: window.innerHeight,
+})))
 
 // ======================================================
 // Middleware Configuration
@@ -49,8 +54,6 @@ const store = configureStore({
   }).concat(throttle, socketMiddleware),
 })
 
-store.asyncReducers = {}
-
 if (module.hot) {
   module.hot.accept('./reducers', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -58,19 +61,23 @@ if (module.hot) {
 
     store.replaceReducer(combineReducers({
       ...reducers,
-      ...store.asyncReducers,
+      ...asyncReducers,
     }))
   })
 }
 
 export const injectReducer = ({ key, reducer }) => {
-  if (Object.hasOwnProperty.call(store.asyncReducers, key)) return
+  if (Object.hasOwnProperty.call(asyncReducers, key)) return
 
-  store.asyncReducers[key] = reducer
+  asyncReducers[key] = reducer
   store.replaceReducer(combineReducers({
     ...reducers,
-    ...store.asyncReducers,
+    ...asyncReducers,
   }))
 }
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
 
 export default store

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useAppSelector } from 'store/hooks'
 import Logo from 'components/Logo'
 import Create from './Create'
 import FirstRun from './FirstRun'
@@ -10,8 +10,8 @@ const SignedOutView = () => {
   const [isCreating, setCreating] = useState(false)
   const toggleCreate = useCallback(() => setCreating(prevState => !prevState), [])
 
-  const isFirstRun = useSelector(state => state.prefs.isFirstRun === true)
-  const ui = useSelector(state => state.ui)
+  const isFirstRun = useAppSelector(state => state.prefs.isFirstRun === true)
+  const ui = useAppSelector(state => state.ui)
 
   return (
     <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>

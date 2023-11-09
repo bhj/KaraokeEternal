@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from 'store/hooks'
 import { createUser, removeUser, updateUser } from '../../../modules/users'
 import Modal from 'components/Modal'
 import AccountForm from '../../AccountForm'
@@ -20,7 +20,7 @@ const EditUser = (props: EditUserProps) => {
     if (props.isVisible === false) setDirty(false)
   }, [props.isVisible])
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleSubmit = useCallback(data => {
     props.user ? dispatch(updateUser(props.user.userId, data)) : dispatch(createUser(data))
   }, [dispatch, props.user])

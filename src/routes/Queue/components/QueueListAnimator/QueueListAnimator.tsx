@@ -1,6 +1,6 @@
 import React from 'react'
 import { Flipper, Flipped } from 'react-flip-toolkit'
-import { useSelector } from 'react-redux'
+import { useAppSelector } from 'store/hooks'
 import styles from './QueueListAnimator.css'
 
 const handleEnter = (el) => {
@@ -23,7 +23,7 @@ interface QueueListAnimatorProps {
 const QueueListAnimator = ({
   children
 }: QueueListAnimatorProps) => {
-  const headerHeight = useSelector(state => state.ui.headerHeight)
+  const headerHeight = useAppSelector(state => state.ui.headerHeight)
 
   // Flipped applies data-* props to its child; using a div wrapper
   // here so QueueItems need not be concerned with rendering them

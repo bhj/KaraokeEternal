@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import EditUser from './EditUser'
 import { formatDateTime } from 'lib/dateTime'
 import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor } from '../../modules/users'
@@ -9,12 +9,12 @@ import styles from './Users.css'
 const Users = () => {
   const [editorUser, setEditorUser] = useState(null)
 
-  const curUserId = useSelector(state => state.user.userId)
-  const { isEditorOpen, filterOnline, filterRoomId } = useSelector(state => state.users)
-  const rooms = useSelector(state => state.rooms)
-  const users = useSelector(getUsers)
+  const curUserId = useAppSelector(state => state.user.userId)
+  const { isEditorOpen, filterOnline, filterRoomId } = useAppSelector(state => state.users)
+  const rooms = useAppSelector(state => state.rooms)
+  const users = useAppSelector(getUsers)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleClose = useCallback(() => dispatch(closeUserEditor()), [dispatch])
   const handleFilterChange = useCallback(e => {
     if (e.target.value === 'all') dispatch(filterByOnline(false))

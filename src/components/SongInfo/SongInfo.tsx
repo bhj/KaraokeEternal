@@ -1,17 +1,17 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Modal from 'components/Modal'
 import { formatDuration } from 'lib/dateTime'
-import { closeSongInfo, setPreferred } from 'store/modules/songInfo'
+import { closeSongInfo, setPreferredSong } from 'store/modules/songInfo'
 import styles from './SongInfo.css'
 
 const SongInfo = () => {
-  const { isLoading, isVisible, songId, media } = useSelector(state => state.songInfo)
+  const { isLoading, isVisible, songId, media } = useAppSelector(state => state.songInfo)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleCloseSongInfo = () => dispatch(closeSongInfo())
-  const handlePrefer = mediaId => dispatch(setPreferred(songId, mediaId, true))
-  const handleRemovePrefer = mediaId => dispatch(setPreferred(songId, mediaId, false))
+  const handlePrefer = mediaId => dispatch(setPreferredSong({ songId, mediaId, isPreferred: true }))
+  const handleRemovePrefer = mediaId => dispatch(setPreferredSong({ songId, mediaId, isPreferred: false }))
 
   const mediaDetails = media.result.map((mediaId) => {
     const item = media.entities[mediaId]

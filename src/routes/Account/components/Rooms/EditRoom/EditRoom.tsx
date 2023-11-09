@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from 'store/hooks'
 import { createRoom, updateRoom, removeRoom } from 'store/modules/rooms'
 import Modal from 'components/Modal'
 import styles from './EditRoom.css'
@@ -14,7 +14,7 @@ interface EditRoomProps {
 
 const EditRoom = (props: EditRoomProps) => {
   const formRef = useRef(null)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault()
@@ -24,7 +24,7 @@ const EditRoom = (props: EditRoomProps) => {
 
     if (props.room) {
       if (!isPasswordDirty) data.delete('password')
-      dispatch(updateRoom(props.room.roomId, data))
+      dispatch(updateRoom({ roomId: props.room.roomId, data }))
     } else {
       dispatch(createRoom(data))
     }

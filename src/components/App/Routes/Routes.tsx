@@ -1,6 +1,6 @@
 import React from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useAppSelector } from 'store/hooks'
 
 import AccountView from 'routes/Account/views'
 import LibraryView from 'routes/Library/views'
@@ -42,7 +42,7 @@ const RequireAuth = ({
   path,
   redirectTo
 }: RequireAuthProps) => {
-  const isAuthenticated = useSelector(state => state.user.userId !== null)
+  const isAuthenticated = useAppSelector(state => state.user.userId !== null)
   const location = useLocation()
 
   if (!isAuthenticated) {

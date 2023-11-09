@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 import HttpApi from 'lib/HttpApi'
 import Icon from 'components/Icon'
@@ -11,7 +11,7 @@ import { receivePrefs, requestScan, setPathPriority } from 'store/modules/prefs'
 const api = new HttpApi('prefs/path')
 
 const PathPrefs = () => {
-  const paths = useSelector(state => state.prefs.paths)
+  const paths = useAppSelector(state => state.prefs.paths)
   const [isExpanded, setExpanded] = useState(false)
   const [isChoosing, setChoosing] = useState(false)
   const [priority, setPriority] = useState(paths.result)
@@ -25,7 +25,7 @@ const PathPrefs = () => {
     setPriority(paths.result)
   }, [paths])
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleRefresh = useCallback(() => dispatch(requestScan()), [dispatch])
   const handleDragEnd = useCallback(dnd => {
     // dropped outside the list?

@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import AccountForm from '../../../components/AccountForm'
 import { createAccount } from 'store/modules/user'
 import styles from './FirstRun.css'
 
 const FirstRun = () => {
-  const user = useSelector(state => state.user)
+  const user = useAppSelector(state => state.user)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleCreate = useCallback(data => {
     dispatch(createAccount(data))
   }, [dispatch])
@@ -22,7 +22,6 @@ const FirstRun = () => {
       <AccountForm user={user} onSubmit={handleCreate}>
         <button className='primary'>Create Account</button>
       </AccountForm>
-
     </>
   )
 }

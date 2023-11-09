@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { useLocation } from 'react-router-dom'
 import screenfull from 'screenfull'
 import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolume } from 'store/modules/status'
@@ -17,15 +17,15 @@ const handleFullscreen = () => {
 }
 
 const PlaybackCtrl = () => {
-  const isAdmin = useSelector(state => state.user.isAdmin)
-  const isInRoom = useSelector(state => state.user.roomId !== null)
-  const status = useSelector(state => state.status)
-  const ui = useSelector(state => state.ui)
+  const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const isInRoom = useAppSelector(state => state.user.roomId !== null)
+  const status = useAppSelector(state => state.status)
+  const ui = useAppSelector(state => state.ui)
 
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleOptions = useCallback(opts => dispatch(requestOptions(opts)), [dispatch])
   const handlePause = useCallback(() => dispatch(requestPause()), [dispatch])
   const handlePlay = useCallback(() => dispatch(requestPlay()), [dispatch])

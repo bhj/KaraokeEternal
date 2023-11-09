@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { formatDateTime } from 'lib/dateTime'
 import EditRoom from './EditRoom'
 import { closeRoomEditor, fetchRooms, filterByStatus, openRoomEditor } from 'store/modules/rooms'
@@ -10,10 +10,10 @@ import styles from './Rooms.css'
 const Rooms = () => {
   const [editorRoom, setEditorRoom] = useState(null)
 
-  const { isEditorOpen, filterStatus } = useSelector(state => state.rooms)
-  const rooms = useSelector(getRoomList)
+  const { isEditorOpen, filterStatus } = useAppSelector(state => state.rooms)
+  const rooms = useAppSelector(getRoomList)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
   const handleFilterChange = useCallback(e => {
     if (e.target.value === 'all') dispatch(filterByStatus(false))

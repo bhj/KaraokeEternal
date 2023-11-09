@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { createSelector } from '@reduxjs/toolkit'
 
@@ -46,18 +46,18 @@ const getStatusProps = createSelector(
 
 // component
 const Header = React.forwardRef((props, ref) => {
-  const isAdmin = useSelector(state => state.user.isAdmin)
-  const isPlayerPresent = useSelector(state => state.status.isPlayerPresent)
-  const isScanning = useSelector(state => state.prefs.isScanning)
-  const scannerText = useSelector(state => state.prefs.scannerText)
-  const scannerPct = useSelector(state => state.prefs.scannerPct)
-  const { isUpNext, isUpNow } = useSelector(getStatusProps)
-  const wait = useSelector(getUserWait)
+  const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const isPlayerPresent = useAppSelector(state => state.status.isPlayerPresent)
+  const isScanning = useAppSelector(state => state.prefs.isScanning)
+  const scannerText = useAppSelector(state => state.prefs.scannerText)
+  const scannerPct = useAppSelector(state => state.prefs.scannerPct)
+  const { isUpNext, isUpNow } = useAppSelector(getStatusProps)
+  const wait = useAppSelector(getUserWait)
 
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const cancelScan = useCallback(() => dispatch(requestScanStop()), [dispatch])
 
   return (

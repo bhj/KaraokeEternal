@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import QueueItem from '../QueueItem'
 import QueueListAnimator from '../QueueListAnimator'
@@ -12,18 +12,18 @@ import getRoundRobinQueue from '../../selectors/getRoundRobinQueue'
 import getWaits from '../../selectors/getWaits'
 
 const QueueList = () => {
-  const artists = useSelector(state => state.artists)
-  const { errorMessage, isAtQueueEnd, isErrored, position, queueId } = useSelector(state => state.status)
+  const artists = useAppSelector(state => state.artists)
+  const { errorMessage, isAtQueueEnd, isErrored, position, queueId } = useAppSelector(state => state.status)
 
-  const playerHistory = useSelector(getPlayerHistory)
-  const queue = useSelector(getRoundRobinQueue)
-  const songs = useSelector(state => state.songs)
-  const starredSongs = useSelector(state => ensureState(state.userStars).starredSongs)
-  const user = useSelector(state => state.user)
-  const waits = useSelector(getWaits)
+  const playerHistory = useAppSelector(getPlayerHistory)
+  const queue = useAppSelector(getRoundRobinQueue)
+  const songs = useAppSelector(state => state.songs)
+  const starredSongs = useAppSelector(state => ensureState(state.userStars).starredSongs)
+  const user = useAppSelector(state => state.user)
+  const waits = useAppSelector(getWaits)
 
   // actions
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleMoveClick = useCallback(qId => {
     // reference user's last-played item as the new prevQueueId
     const userId = queue.entities[qId].userId
@@ -36,7 +36,7 @@ const QueueList = () => {
       }
     }
 
-    dispatch(moveItem(qId, lastPlayed))
+    dispatch(moveItem({ queueId: qId, prevQueueId: lastPlayed }))
   }, [dispatch, queueId, queue.entities, queue.result])
 
   // build children array

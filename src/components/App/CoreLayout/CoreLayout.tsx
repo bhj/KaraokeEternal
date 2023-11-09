@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import useResizeObserver from 'use-resize-observer'
 // global stylesheets should be imported before any
 // components that will import their own modular css
@@ -12,7 +12,7 @@ import Routes from '../Routes'
 import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
 
 const CoreLayout = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const headerRef = React.useRef()
   const navRef = React.useRef()
 
@@ -26,7 +26,7 @@ const CoreLayout = () => {
     ref: navRef,
   })
 
-  const ui = useSelector(state => state.ui)
+  const ui = useAppSelector(state => state.ui)
   const closeError = useCallback(() => dispatch(clearErrorMessage()), [dispatch])
 
   return (

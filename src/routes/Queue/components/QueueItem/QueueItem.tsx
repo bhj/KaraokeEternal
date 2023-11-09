@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from 'store/hooks'
 import { useSwipeable } from 'react-swipeable'
 
 import Button from 'components/Button'
@@ -63,7 +63,7 @@ const QueueItem = ({
 }: QueueItemProps) => {
   const [isExpanded, setExpanded] = useState(false)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(errorMessage)), [dispatch, errorMessage])
   const handleInfoClick = useCallback(() => dispatch(showSongInfo(songId)), [dispatch, songId])
   const handleMoveClick = useCallback(() => {

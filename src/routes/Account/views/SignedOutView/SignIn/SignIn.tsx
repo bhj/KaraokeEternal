@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from 'store/hooks'
 import RoomSelect from '../../../components/RoomSelect'
 import { login } from 'store/modules/user'
 import styles from './SignIn.css'
@@ -15,7 +15,7 @@ const SignIn = (props: SignInProps) => {
   const roomSelectRefCB = useCallback(r => { roomSelectRef = r }, [])
   const roomPasswordRefCB = useCallback(r => { roomPasswordRef = r }, [])
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleSubmit = useCallback(e => {
     e.preventDefault()
     dispatch(login({

@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "baseUrl": "src/"
+    "paths": {
+      "*": ["./src/*"],
+      "shared/*": ["./shared/*"],
+    },
     "esModuleInterop": true,
     "jsx": "react",
     "plugins": [
@@ -12,5 +15,5 @@
       },
     ],
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
 }

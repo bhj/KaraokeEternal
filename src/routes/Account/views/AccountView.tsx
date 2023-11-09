@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchPrefs } from 'store/modules/prefs'
 import SignedInView from './SignedInView'
 import SignedOutView from './SignedOutView'
 import styles from './AccountView.css'
 
 const AccountView = () => {
-  const isSignedIn = useSelector(state => state.user.userId !== null)
-  const ui = useSelector(state => state.ui)
-  const dispatch = useDispatch()
+  const isSignedIn = useAppSelector(state => state.user.userId !== null)
+  const ui = useAppSelector(state => state.ui)
+  const dispatch = useAppDispatch()
 
   // once per mount
   // (do this here instead of Prefs component to detect firstRun)

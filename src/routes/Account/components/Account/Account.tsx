@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { updateAccount, logout } from 'store/modules/user'
 import AccountForm from '../AccountForm'
 import styles from './Account.css'
@@ -7,10 +7,10 @@ import styles from './Account.css'
 const Account = () => {
   const curPassword = useRef(null)
 
-  const user = useSelector(state => state.user)
+  const user = useAppSelector(state => state.user)
   const [isDirty, setDirty] = useState(false)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleDirtyChange = useCallback(isDirty => setDirty(isDirty), [])
   const handleSignOut = useCallback(() => dispatch(logout()), [dispatch])
   const handleSubmit = useCallback(data => {

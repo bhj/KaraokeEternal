@@ -1,19 +1,19 @@
 import React, { useCallback, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Icon from 'components/Icon'
 import { setPref } from 'store/modules/prefs'
 import styles from './PlayerPrefs.css'
 
 const PlayerPrefs = () => {
   const [isExpanded, setExpanded] = useState(false)
-  const isReplayGainEnabled = useSelector(state => state.prefs.isReplayGainEnabled)
+  const isReplayGainEnabled = useAppSelector(state => state.prefs.isReplayGainEnabled)
   const toggleExpanded = useCallback(() => {
     setExpanded(!isExpanded)
   }, [isExpanded])
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const toggleCheckbox = useCallback((e) => {
-    dispatch(setPref(e.target.name, e.target.checked))
+    dispatch(setPref({ key: e.target.name, data: e.target.checked }))
   }, [dispatch])
 
   return (

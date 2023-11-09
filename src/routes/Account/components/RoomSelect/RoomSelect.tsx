@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchRooms } from 'store/modules/rooms'
 import styles from './RoomSelect.css'
 let passwordRef
@@ -12,9 +12,9 @@ interface RoomSelectProps {
 
 const RoomSelect = (props: RoomSelectProps) => {
   const { onSelectRef, onPasswordRef } = props
-  const rooms = useSelector(state => state.rooms)
+  const rooms = useAppSelector(state => state.rooms)
   const [selectedRoomId, setSelectedRoomId] = useState('')
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const handleSelectChange = useCallback(e => { setSelectedRoomId(e.target.value) }, [])
   const handleSelectRef = useCallback(r => { onSelectRef(r) }, [onSelectRef])

@@ -84,6 +84,7 @@
     "@babel/preset-typescript": "^7.22.15",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@reduxjs/toolkit": "^1.9.7",
+    "@types/webpack-env": "^1.18.3",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "babel-loader": "^9.1.2",

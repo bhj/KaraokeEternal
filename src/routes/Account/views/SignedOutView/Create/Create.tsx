@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import AccountForm from '../../../components/AccountForm'
 import RoomSelect from '../../../components/RoomSelect'
 import { createAccount } from 'store/modules/user'
@@ -11,11 +11,11 @@ interface CreateProps {
 }
 
 const Create = (props: CreateProps) => {
-  const user = useSelector(state => state.user)
+  const user = useAppSelector(state => state.user)
   const roomSelectRefCB = useCallback(r => { roomSelectRef = r }, [])
   const roomPasswordRefCB = useCallback(r => { roomPasswordRef = r }, [])
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleSubmit = useCallback(data => {
     if (!roomSelectRef.value) {
       alert('Please select a room')
