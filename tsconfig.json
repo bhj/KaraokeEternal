@@ -15,5 +15,5 @@
       },
     ],
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "config/declarations.d.ts"],
 }
