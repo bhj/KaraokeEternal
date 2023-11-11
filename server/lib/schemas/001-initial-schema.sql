@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS "rooms" (
   "name" text NOT NULL,
   "status" text NOT NULL,
   "password" text,
-  "dateCreated" text NOT NULL
+  "dateCreated" integer NOT NULL DEFAULT(0)
 );
 
 CREATE TABLE IF NOT EXISTS "songs" (

@@ -30,7 +30,7 @@ export interface Room {
   roomId: number
   name: string
   status: 'open' | 'closed'
-  dateCreated: string
+  dateCreated: number
   hasPassword: boolean
   numUsers: number
 }
