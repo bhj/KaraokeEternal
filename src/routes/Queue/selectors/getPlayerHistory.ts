@@ -1,6 +1,7 @@
+import { RootState } from 'store/store'
 import { createSelector } from '@reduxjs/toolkit'
 
-const getPlayerHistoryJSON = (state) => state.status.historyJSON
+const getPlayerHistoryJSON = (state: RootState) => state.status.historyJSON
 
 const getPlayerHistory = createSelector(
   [getPlayerHistoryJSON],

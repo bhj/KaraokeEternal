@@ -1,11 +1,12 @@
+import { RootState } from 'store/store'
 import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from '@reduxjs/toolkit'
 import getPlayerHistory from './getPlayerHistory'
 
-const getResult = (state) => ensureState(state.queue).result
-const getEntities = (state) => ensureState(state.queue).entities
-const getQueueId = (state) => state.status.queueId
-const getNextUserId = (state) => state.status.nextUserId
+const getResult = (state: RootState) => ensureState(state.queue).result
+const getEntities = (state: RootState) => ensureState(state.queue).entities
+const getQueueId = (state: RootState) => state.status.queueId
+const getNextUserId = (state: RootState) => state.status.nextUserId
 
 const getRoundRobinQueue = createSelector(
   [getResult, getEntities, getPlayerHistory, getQueueId, getNextUserId],

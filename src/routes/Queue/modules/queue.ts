@@ -1,5 +1,6 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
 import { logout } from 'store/modules/user'
+import { QueueItem } from 'shared/types'
 import {
   QUEUE_ADD,
   QUEUE_MOVE,
@@ -23,8 +24,8 @@ export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
 // ------------------------------------
 interface queueState {
   isLoading: boolean
-  result: number[] // queueIds
-  entities: object // keyed by queueId
+  result: PropertyKey[] // queueIds
+  entities: Record<PropertyKey, QueueItem>
 }
 
 const initialState: queueState = {
@@ -37,7 +38,7 @@ const queueReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(queueSong, (state, { payload }) => {
       // optimistic
-      const nextQueueId = state.result.length ? state.result[state.result.length - 1] + 1 : 1
+      const nextQueueId = state.result.length ? (state.result[state.result.length - 1] as number) + 1 : 1
 
       state.result.push(nextQueueId)
       state.entities[nextQueueId] = {

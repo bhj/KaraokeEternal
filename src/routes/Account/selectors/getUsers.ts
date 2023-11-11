@@ -1,9 +1,10 @@
+import { RootState } from 'store/store'
 import { createSelector } from '@reduxjs/toolkit'
 
-const getResult = (state) => state.users.result
-const getEntities = (state) => state.users.entities
-const getFilterOnline = (state) => state.users.filterOnline
-const getFilterRoomId = (state) => state.users.filterRoomId
+const getResult = (state: RootState) => state.users.result
+const getEntities = (state: RootState) => state.users.entities
+const getFilterOnline = (state: RootState) => state.users.filterOnline
+const getFilterRoomId = (state: RootState) => state.users.filterRoomId
 
 const getUsers = createSelector(
   [getResult, getEntities, getFilterOnline, getFilterRoomId],

@@ -1,8 +1,9 @@
+import { RootState } from 'store/store'
 import { createSelector } from '@reduxjs/toolkit'
 
-const getResult = (state) => state.rooms.result
-const getEntities = (state) => state.rooms.entities
-const getFilterStatus = (state) => state.rooms.filterStatus
+const getResult = (state: RootState) => state.rooms.result
+const getEntities = (state: RootState) => state.rooms.entities
+const getFilterStatus = (state: RootState) => state.rooms.filterStatus
 
 const getRoomList = createSelector(
   [getResult, getEntities, getFilterStatus],

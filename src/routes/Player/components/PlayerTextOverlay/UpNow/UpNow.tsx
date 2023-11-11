@@ -1,10 +1,11 @@
 import React from 'react'
 import { CSSTransition } from 'react-transition-group'
 import UserImage from 'components/UserImage'
+import { QueueItem } from 'shared/types'
 import styles from './UpNow.css'
 
 interface UpNowProps {
-  queueItem: object
+  queueItem: QueueItem
 }
 
 class UpNow extends React.Component<UpNowProps> {

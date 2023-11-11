@@ -17,7 +17,7 @@ interface MP4PlayerProps {
 }
 
 class MP4Player extends React.Component<MP4PlayerProps> {
-  video = React.createRef()
+  video = React.createRef<HTMLVideoElement>()
 
   componentDidMount () {
     this.props.onAudioElement(this.video.current)

@@ -1,5 +1,6 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { logout } from 'store/modules/user'
+import { Room } from 'shared/types'
 import {
   ROOMS_RECEIVE,
   ROOMS_REQUEST,
@@ -72,8 +73,8 @@ export const filterByStatus = createAction<boolean | string>(ROOM_FILTER_STATUS)
 // Reducer
 // ------------------------------------
 interface roomsState {
-  result: number[]
-  entities: object
+  result: PropertyKey[]
+  entities: Record<PropertyKey, Room>
   filterStatus: boolean | string
   isEditorOpen: boolean
 }

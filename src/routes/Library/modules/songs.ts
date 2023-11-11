@@ -1,4 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
+import { Song } from 'shared/types'
 import {
   LIBRARY_PUSH,
   LIBRARY_PUSH_SONG,
@@ -8,8 +9,8 @@ import {
 // Reducer
 // ------------------------------------
 interface songsState {
-  result: number[]
-  entities: object
+  result: PropertyKey[]
+  entities: Record<PropertyKey, Song>
 }
 
 const initialState: songsState = {

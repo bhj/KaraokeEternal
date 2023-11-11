@@ -1,4 +1,5 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
+import { Path } from 'shared/types'
 import {
   PREFS_RECEIVE,
   PREFS_REQUEST,
@@ -49,9 +50,13 @@ export const requestScanStop = createAsyncThunk(
 // Reducer
 // ------------------------------------
 interface prefsState {
+  isFirstRun?: boolean
   isScanning: boolean
   isReplayGainEnabled: boolean
-  paths: { result: number[]; entities: object }
+  paths: {
+    result: PropertyKey[]
+    entities: Record<PropertyKey, Path>
+  }
   scannerPct: number
   scannerText: string
 }
@@ -59,7 +64,10 @@ interface prefsState {
 const initialState: prefsState = {
   isScanning: false,
   isReplayGainEnabled: false,
-  paths: { result: [], entities: {} },
+  paths: {
+    result: [],
+    entities: {}
+  },
   scannerPct: 0,
   scannerText: '',
 }
