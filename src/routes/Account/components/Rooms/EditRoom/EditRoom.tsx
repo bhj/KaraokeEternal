@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createRoom, updateRoom, removeRoom } from 'store/modules/rooms'
 import Modal from 'components/Modal'
+import { Room } from 'shared/types'
 import styles from './EditRoom.css'
 
 let isPasswordDirty = false
 
 interface EditRoomProps {
-  room?: object
+  room?: Room
   isVisible: boolean
   onClose(...args: unknown[]): unknown
 }

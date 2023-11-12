@@ -2,26 +2,31 @@ import React from 'react'
 import PaddedList from 'components/PaddedList'
 import AlphaPicker from '../AlphaPicker'
 import ArtistItem from '../ArtistItem'
+import { RootState } from 'store/store'
+import { Artist, Song } from 'shared/types'
 const ROW_HEIGHT = 44
 
 interface ArtistListProps {
   alphaPickerMap: object
-  artists: object
-  artistsResult: unknown[] // entities;
-  expandedArtists: unknown[] // artistIds;
-  filterKeywords: unknown[]
-  queuedSongs: unknown[]
-  songs: object
-  starredSongs: unknown[] // entities;
-  starredArtistCounts: object
+  artists: Record<PropertyKey, Artist>
+  artistsResult: PropertyKey[]
+  expandedArtists: PropertyKey[] // artistIds
+  filterKeywords: string[]
+  queuedSongs: PropertyKey[] // songIds
+  songs: Record<PropertyKey, Song>
+  starredSongs: PropertyKey[]
+  starredArtistCounts: Record<PropertyKey, number>
   scrollTop: number
-  ui: object
+  ui: RootState['ui']
   // actions
   toggleArtistExpanded(...args: unknown[]): unknown
   scrollArtists(...args: unknown[]): unknown
 }
 
 class ArtistList extends React.Component<ArtistListProps> {
+  lastScrollTop = null
+  list = null
+
   render () {
     if (this.props.artistsResult.length === 0) return null
 
@@ -41,7 +46,6 @@ class ArtistList extends React.Component<ArtistListProps> {
         />
         <AlphaPicker
           onPick={this.handleAlphaPick}
-          onTouch={this.handleAlphaTouch}
           height={this.props.ui.innerHeight - this.props.ui.headerHeight - this.props.ui.footerHeight}
           top={this.props.ui.headerHeight}
         />
@@ -82,7 +86,7 @@ class ArtistList extends React.Component<ArtistListProps> {
     )
   }
 
-  rowHeight = index => {
+  rowHeight = (index: number) => {
     const artistId = this.props.artistsResult[index]
     let rows = 1
 
@@ -97,7 +101,7 @@ class ArtistList extends React.Component<ArtistListProps> {
     this.lastScrollTop = scrollOffset
   }
 
-  handleAlphaPick = (char) => {
+  handleAlphaPick = (char: string) => {
     const row = this.props.alphaPickerMap[char]
 
     if (typeof row !== 'undefined') {

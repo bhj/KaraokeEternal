@@ -16,7 +16,7 @@ const config = {
   mode: __PROD__ ? 'production' : 'development',
   entry: {
     main: [
-      './src/main.js',
+      './src/main',
       __DEV__ && 'webpack-hot-middleware/client', // https://github.com/pmmmwh/react-refresh-webpack-plugin/issues/213
     ].filter(Boolean),
   },

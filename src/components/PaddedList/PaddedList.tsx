@@ -16,6 +16,8 @@ interface PaddedListProps {
 }
 
 class PaddedList extends React.Component<PaddedListProps> {
+  list = null
+
   componentDidMount () {
     if (this.props.onRef) {
       this.props.onRef(this.list)

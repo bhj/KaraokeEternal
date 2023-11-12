@@ -33,7 +33,7 @@ const Rooms = () => {
   const rows = rooms.result.map(roomId => {
     const room = rooms.entities[roomId]
     return (
-      <tr key={roomId}>
+      <tr key={String(roomId)}>
         <td><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
         <td>
           {room.status}
@@ -50,7 +50,7 @@ const Rooms = () => {
     <div className={styles.container}>
       <div className={styles.titleContainer}>
         <h1 className={styles.title}>Rooms</h1>
-        <select onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus}>
+        <select onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus as string}>
           <option key='all' value={'all'}>All</option>
           <option key='open' value={'open'}>Open</option>
           <option key='closed' value={'closed'}>Closed</option>

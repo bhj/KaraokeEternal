@@ -27,7 +27,10 @@ interface CDGPlayerProps {
 class CDGPlayer extends React.Component<CDGPlayerProps> {
   audio = React.createRef<HTMLAudioElement>()
   canvas = React.createRef<HTMLCanvasElement>()
+  canvasCtx = null
+  cdg = null
   frameId = null
+  lastBitmap = null
   supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)') ||
     CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
 

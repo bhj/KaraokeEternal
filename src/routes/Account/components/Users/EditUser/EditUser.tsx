@@ -3,10 +3,11 @@ import { useAppDispatch } from 'store/hooks'
 import { createUser, removeUser, updateUser } from '../../../modules/users'
 import Modal from 'components/Modal'
 import AccountForm from '../../AccountForm'
+import { User } from 'shared/types'
 import styles from './EditUser.css'
 
 interface EditUserProps {
-  user?: object
+  user?: User
   isVisible: boolean
   onClose(...args: unknown[]): unknown
 }

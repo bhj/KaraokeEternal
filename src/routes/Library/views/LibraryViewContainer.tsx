@@ -5,21 +5,22 @@ import { Searcher } from 'fast-fuzzy'
 import LibraryView from './LibraryView'
 import { scrollArtists, toggleArtistExpanded, toggleArtistResultExpanded } from '../modules/library'
 import { showSongInfo, closeSongInfo } from 'store/modules/songInfo'
+import { RootState } from 'store/store'
 
-const getArtists = (state) => state.artists
-const getSongs = (state) => state.songs
-const getFilterStr = (state) => state.library.filterStr.trim().toLowerCase()
-const getFilterStarred = (state) => state.library.filterStarred
-const getStarredArtists = (state) => ensureState(state.userStars).starredArtists
-const getStarredSongs = (state) => ensureState(state.userStars).starredSongs
-const getQueue = (state) => ensureState(state.queue)
-const getCurrentQueueId = (state) => state.status.queueId
-const getPlayerHistoryJSON = (state) => state.status.historyJSON
+const getArtists = (state: RootState) => state.artists
+const getSongs = (state: RootState) => state.songs
+const getFilterStr = (state: RootState) => state.library.filterStr.trim().toLowerCase()
+const getFilterStarred = (state: RootState) => state.library.filterStarred
+const getStarredArtists = (state: RootState) => ensureState(state.userStars).starredArtists
+const getStarredSongs = (state: RootState) => ensureState(state.userStars).starredSongs
+const getQueue = (state: RootState) => ensureState(state.queue)
+const getCurrentQueueId = (state: RootState) => state.status.queueId
+const getPlayerHistoryJSON = (state: RootState) => state.status.historyJSON
 
 const getUpcomingSongs = createSelector(
   [getQueue, getCurrentQueueId, getPlayerHistoryJSON],
-  (queue, curId, history) => {
-    history = JSON.parse(history)
+  (queue, curId, historyJSON) => {
+    const history = JSON.parse(historyJSON)
 
     // not (re)ordering since it doesn't currently matter in library view
     return queue.result
@@ -111,7 +112,7 @@ const getSongsByView = createSelector(
     })
 )
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState) => {
   return {
     artists: state.artists.entities,
     songs: state.songs.entities,

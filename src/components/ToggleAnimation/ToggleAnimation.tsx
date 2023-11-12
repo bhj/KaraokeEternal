@@ -20,10 +20,12 @@ export default class ToggleAnimation extends Component<ToggleAnimationProps> {
   render () {
     if (this.state.animate) {
       return React.Children.map(this.props.children, c => {
-        return React.cloneElement(c, {
-          className: c.props.className + ' ' + this.props.className,
-          onAnimationEnd: this.handleAnimationEnd,
-        })
+        if (React.isValidElement<{ className: string; onAnimationEnd:() => void }>(c)) {
+          return React.cloneElement(c, {
+            className: c.props.className + ' ' + this.props.className,
+            onAnimationEnd: this.handleAnimationEnd,
+          })
+        }
       })
     }
 

@@ -31,7 +31,7 @@ const RoomSelect = (props: RoomSelectProps) => {
   // if there's only one open room, select it automatically
   useEffect(() => {
     if (rooms.result.length === 1) {
-      setSelectedRoomId(rooms.result[0])
+      setSelectedRoomId(String(rooms.result[0]))
     }
   }, [rooms])
 
@@ -52,7 +52,7 @@ const RoomSelect = (props: RoomSelectProps) => {
       >
         <option key='choose' value='' disabled>select room...</option>
         {rooms.result.map(roomId => (
-          <option key={roomId} value={roomId}>{rooms.entities[roomId].name}</option>
+          <option key={String(roomId)} value={String(roomId)}>{rooms.entities[roomId].name}</option>
         ))}
       </select>
 

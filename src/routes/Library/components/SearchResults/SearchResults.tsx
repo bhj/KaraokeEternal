@@ -2,6 +2,8 @@ import React from 'react'
 import PaddedList from 'components/PaddedList'
 import ArtistItem from '../ArtistItem'
 import SongList from '../SongList'
+import { RootState } from 'store/store'
+import { Artist, Song } from 'shared/types'
 import styles from './SearchResults.css'
 
 const ARTIST_HEADER_HEIGHT = 22
@@ -10,22 +12,24 @@ const SONG_HEADER_HEIGHT = 22
 const SONG_RESULT_HEIGHT = 60
 
 interface SearchResultsProps {
-  artists: object
-  artistsResult: unknown[]
-  expandedArtistResults: unknown[]
-  filterKeywords: unknown[]
+  artists: Record<PropertyKey, Artist>
+  artistsResult: PropertyKey[]
+  expandedArtistResults: PropertyKey[]
+  filterKeywords: string[]
   filterStarred: boolean
-  queuedSongs: unknown[]
-  songs: object
-  songsResult: unknown[]
-  starredSongs: unknown[]
-  starredArtistCounts: object
-  ui: object
+  queuedSongs: PropertyKey[]
+  songs: Record<PropertyKey, Song>
+  songsResult: PropertyKey[]
+  starredSongs: PropertyKey[]
+  starredArtistCounts: Record<PropertyKey, number>
+  ui: RootState['ui']
   // actions
   toggleArtistResultExpanded(...args: unknown[]): unknown
 }
 
 class SearchResults extends React.Component<SearchResultsProps> {
+  list = null
+
   componentDidUpdate () {
     if (this.list) {
       // @todo: clear size cache starting from the toggled artist

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import UserImage from './UserImage'
+import { User } from 'shared/types'
 import styles from './AccountForm.css'
 
 interface AccountFormProps {
@@ -8,10 +9,16 @@ interface AccountFormProps {
   onSubmit(...args: unknown[]): unknown
   requirePassword?: boolean
   showRole?: boolean
-  user?: object
+  user?: User
 }
 
 export default class AccountForm extends Component<AccountFormProps> {
+  username = null
+  newPassword = null
+  newPasswordConfirm = null
+  name = null
+  role = null
+
   state = {
     isDirty: false,
     isChangingPassword: !this.props.user || this.props.user.userId === null,

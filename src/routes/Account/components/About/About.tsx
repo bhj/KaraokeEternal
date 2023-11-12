@@ -13,29 +13,36 @@ const About = () => {
     <div className={styles.container}>
       <h1 className={styles.title}>About</h1>
       <div className={styles.content}>
-        <a href={__KE_URL_HOME__} target='_blank' rel='noreferrer'> {/* eslint-disable-line no-undef */}
+        {/* @ts-expect-error: global via Webpack */}
+        <a href={__KE_URL_HOME__} target='_blank' rel='noreferrer'>
           <Logo className={styles.logo}/>
         </a>
         <p className={styles.sm}>
-          &copy;{__KE_COPYRIGHT__} <a href='https://www.radroot.com' target='_blank' rel='noreferrer'>RadRoot LLC</a><br/> {/* eslint-disable-line no-undef */}
-          v{__KE_VERSION__} {/* eslint-disable-line no-undef */}
+          {/* @ts-expect-error: global via Webpack */}
+          &copy;{__KE_COPYRIGHT__} <a href='https://www.radroot.com' target='_blank' rel='noreferrer'>RadRoot LLC</a>
+          <br/>
+          {/* @ts-expect-error: global via Webpack */}
+          v{__KE_VERSION__}
         </p>
         <p><a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='_blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}
 
         <div className={styles.ghButtonContainer}>
           <div className={styles.ghButton}>
-            <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>{/* eslint-disable-line no-undef */}
+            {/* @ts-expect-error: global via Webpack */}
+            <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>
               <Icon icon='GITHUB_REPO' size={16}/>GitHub
             </a>
           </div>
           <div className={styles.ghButton}>
-            <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>{/* eslint-disable-line no-undef */}
+            {/* @ts-expect-error: global via Webpack */}
+            <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>
               <Icon icon='GITHUB_STAR' size={16}/>Star
             </a>
           </div>
 
           <div className={`${styles.ghButton} ${styles.sponsor}`}>
-            <a href={__KE_URL_SPONSOR__} target='_blank' rel='noreferrer'>{/* eslint-disable-line no-undef */}
+            {/* @ts-expect-error: global via Webpack */}
+            <a href={__KE_URL_SPONSOR__} target='_blank' rel='noreferrer'>
               <Icon icon='GITHUB_SPONSOR' size={16}/>Sponsor
             </a>
           </div>

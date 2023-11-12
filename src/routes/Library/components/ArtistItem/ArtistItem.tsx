@@ -7,13 +7,13 @@ import styles from './ArtistItem.css'
 
 interface ArtistItemProps {
   artistId: number
-  artistSongIds: unknown[]
-  filterKeywords: unknown[]
+  artistSongIds: PropertyKey[]
+  filterKeywords: string[]
   isExpanded: boolean
   name: string
   numStars: number
-  queuedSongs: unknown[]
-  starredSongs: unknown[]
+  queuedSongs: PropertyKey[]
+  starredSongs: PropertyKey[]
   style?: object
   // actions
   onArtistClick(...args: unknown[]): unknown

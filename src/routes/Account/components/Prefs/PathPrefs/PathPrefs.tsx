@@ -36,7 +36,7 @@ const PathPrefs = () => {
     res.splice(dnd.destination.index, 0, removed)
 
     setPriority(res)
-    dispatch(setPathPriority(res))
+    dispatch(setPathPriority(res as number[]))
   }, [dispatch, priority])
 
   const handleAddPath = useCallback(dir => {

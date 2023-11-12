@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import Button from 'components/Button'
 import Icon from 'components/Icon'
 import loadImage from 'blueimp-load-image'
+import { User } from 'shared/types'
 import styles from './UserImage.css'
 
 interface UserImageProps {
-  user?: object
+  user?: User
   onSelect(...args: unknown[]): unknown
 }
 

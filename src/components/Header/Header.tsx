@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
+import { RootState } from 'store/store'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { createSelector } from '@reduxjs/toolkit'
 
@@ -13,9 +14,9 @@ import UpNext from './UpNext'
 import styles from './Header.css'
 
 // selectors
-const getIsAtQueueEnd = (state) => state.status.isAtQueueEnd
-const getQueueId = (state) => state.status.queueId
-const getUserId = (state) => state.user.userId
+const getIsAtQueueEnd = (state: RootState) => state.status.isAtQueueEnd
+const getQueueId = (state: RootState) => state.status.queueId
+const getUserId = (state: RootState) => state.user.userId
 
 const getUserWait = createSelector(
   [getRoundRobinQueue, getQueueId, getUserId, getWaits],
@@ -45,7 +46,7 @@ const getStatusProps = createSelector(
 )
 
 // component
-const Header = React.forwardRef((props, ref) => {
+const Header = React.forwardRef<HTMLDivElement, undefined>((_, ref) => {
   const isAdmin = useAppSelector(state => state.user.isAdmin)
   const isPlayerPresent = useAppSelector(state => state.status.isPlayerPresent)
   const isScanning = useAppSelector(state => state.prefs.isScanning)

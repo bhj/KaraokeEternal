@@ -1,4 +1,5 @@
 import React from 'react'
+import { RootState } from 'store/store'
 import Modal, { ModalProps } from 'components/Modal'
 import OptimisticSlider from 'components/OptimisticSlider'
 import Icon from 'components/Icon'
@@ -14,14 +15,14 @@ interface DisplayCtrlProps {
   mp4Alpha: number
   sensitivity: number
   visualizerPresetName: string
-  ui: object
+  ui: RootState['ui']
   // actions
   onRequestOptions(...args: unknown[]): unknown
   onClose: ModalProps['onClose']
 }
 
 export default class DisplayCtrl extends React.Component<DisplayCtrlProps> {
-  checkbox = React.createRef()
+  checkbox = React.createRef<HTMLInputElement>()
 
   handleAlpha = val => {
     this.props.onRequestOptions({ [this.props.mediaType + 'Alpha']: val })

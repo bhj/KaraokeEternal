@@ -40,3 +40,12 @@ export interface Path {
   path: string
   priority: number
 }
+
+export interface User {
+  userId: number
+  username: string
+  name: string
+  isAdmin: boolean
+  dateCreated: number
+  dateUpdated: number
+}

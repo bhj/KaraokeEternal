@@ -2,12 +2,13 @@ import React from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import Button from 'components/Button'
 import Icon from 'components/Icon'
+import { Path } from 'shared/types'
 import styles from './PathItem.css'
 
 interface PathItemProps {
   index: number
   onRemove(...args: unknown[]): unknown
-  path: object
+  path: Path
 }
 
 const PathItem = (props: PathItemProps) => {

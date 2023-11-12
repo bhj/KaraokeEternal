@@ -12,7 +12,7 @@ interface LibraryHeaderProps {
 }
 
 class LibraryHeader extends React.Component<LibraryHeaderProps> {
-  searchInput = React.createRef()
+  searchInput = React.createRef<HTMLInputElement>()
   state = {
     value: this.props.filterStr,
   }
