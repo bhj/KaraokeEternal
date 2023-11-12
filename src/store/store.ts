@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import reducers from './reducers'
+import socket from 'lib/socket'
 import createSocketMiddleware from './socketMiddleware'
 import createThrottle from 'redux-throttle'
 import {
@@ -11,18 +12,8 @@ import {
   REGISTER,
 } from 'redux-persist'
 import { windowResize } from './modules/ui'
-import io from 'socket.io-client'
 
 const asyncReducers = {}
-
-// the "socket" side of the api requires authentication, so
-// we only want to attempt socket connection if we think we
-// have a valid session (via JWT in cookie). the socket.io
-// handshake (http) will then include the JWT/cookie
-window._socket = io({
-  autoConnect: false,
-  path: new URL(document.baseURI).pathname + 'socket.io',
-})
 
 // resize action
 window.addEventListener('resize', () => store.dispatch(windowResize({
@@ -39,7 +30,7 @@ const throttle = createThrottle(1000, {
   trailing: true,
 })
 
-const socketMiddleware = createSocketMiddleware(window._socket, 'server/')
+const socketMiddleware = createSocketMiddleware(socket, 'server/')
 
 // ======================================================
 // Store Instantiation and HMR Setup

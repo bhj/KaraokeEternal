@@ -1,8 +1,10 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import { fetchPrefs } from './prefs'
+import socket from 'lib/socket'
 import HttpApi from 'lib/HttpApi'
+import Persistor from 'store/Persistor'
+import { fetchPrefs } from './prefs'
 import {
   ACCOUNT_RECEIVE,
   ACCOUNT_REQUEST,
@@ -33,11 +35,11 @@ export const login = createAsyncThunk(
 
     // signing in can cause additional reducers to be injected and
     // trigger rehydration with stale data, so purge here first
-    window._persistor.purge()
+    Persistor.get().purge()
 
     thunkAPI.dispatch(receiveAccount(user))
     thunkAPI.dispatch(connectSocket())
-    window._socket.open()
+    socket.open()
 
     if (user.isAdmin) {
       thunkAPI.dispatch(fetchPrefs())
@@ -65,8 +67,8 @@ export const logout = createAsyncThunk(
       // ignore errors
     }
 
-    window._persistor.purge()
-    window._socket.close()
+    Persistor.get().purge()
+    socket.close()
   }
 )
 
@@ -141,7 +143,7 @@ export function connectSocket () {
     }
 
     dispatch(requestSocketConnect(versions))
-    window._socket.io.opts.query = versions
+    socket.io.opts.query = versions
   }
 }
 
