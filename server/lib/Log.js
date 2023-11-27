@@ -39,9 +39,6 @@ class IPCLog {
           level,
           msg: `${scope ? scope + ': ' : ''}${util.format(str, ...args)}`,
         },
-        meta: {
-          noAck: true,
-        }
       })
     }
 

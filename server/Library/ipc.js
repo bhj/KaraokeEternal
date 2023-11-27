@@ -13,6 +13,6 @@ module.exports = function (io) {
 
   return {
     [LIBRARY_MATCH_SONG]: async ({ payload }) => Library.matchSong(payload),
-    [SCANNER_WORKER_STATUS]: async action => emit(action),
+    [SCANNER_WORKER_STATUS]: action => emit(action),
   }
 }

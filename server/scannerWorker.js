@@ -19,12 +19,12 @@ Database.open({
   FileScanner = require('./Scanner/FileScanner')
 
   IPC.use({
-    [SCANNER_CMD_START]: async () => {
+    [SCANNER_CMD_START]: () => {
       log.info('Media scan requested (restarting)')
       _isScanQueued = true
       cancelScan()
     },
-    [SCANNER_CMD_STOP]: async () => {
+    [SCANNER_CMD_STOP]: () => {
       log.info('Stopping media scan (user requested)')
       _isScanQueued = false
       cancelScan()

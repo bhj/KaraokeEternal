@@ -22,9 +22,6 @@ class Scanner {
           pct,
           text,
         },
-        meta: {
-          noAck: true,
-        }
       })
     }
   }
