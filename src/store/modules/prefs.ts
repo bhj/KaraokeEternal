@@ -1,4 +1,5 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
+import { RootState } from 'store/store'
 import { Path } from 'shared/types'
 import {
   PREFS_RECEIVE,
@@ -22,7 +23,7 @@ export const setPref = createAction<{ key: string; data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<object>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_SET_PATH_PRIORITY)
 
-export const fetchPrefs = createAsyncThunk(
+export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
   PREFS_REQUEST,
   async (_, thunkAPI) => {
     const response = await api('GET', '')

@@ -14,7 +14,7 @@ let scrollLockTimer
 // Actions
 // ------------------------------------
 export const clearErrorMessage = createAction(CLEAR_ERROR_MESSAGE)
-export const showErrorMessage = createAction(SHOW_ERROR_MESSAGE)
+export const showErrorMessage = createAction<string>(SHOW_ERROR_MESSAGE)
 
 export const setHeaderHeight = (height) => {
   return (dispatch, getState) => {

@@ -17,7 +17,7 @@ const handleExit = (el, _i, removeEl) => {
 const handleShouldFlip = (prev, cur) => cur === prev
 
 interface QueueListAnimatorProps {
-  children?: React.ReactNode
+  children?: React.ReactElement
 }
 
 const QueueListAnimator = ({

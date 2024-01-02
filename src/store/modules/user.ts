@@ -2,6 +2,7 @@ import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import socket from 'lib/socket'
+import { RootState } from 'store/store'
 import HttpApi from 'lib/HttpApi'
 import Persistor from 'store/Persistor'
 import { fetchPrefs } from './prefs'
@@ -75,7 +76,7 @@ export const logout = createAsyncThunk(
 // ------------------------------------
 // Create account
 // ------------------------------------
-export const createAccount = createAsyncThunk(
+export const createAccount = createAsyncThunk<void, FormData, { state: RootState }>(
   ACCOUNT_CREATE,
   async (data: FormData, thunkAPI) => {
     const isFirstRun = thunkAPI.getState().prefs.isFirstRun
@@ -101,7 +102,7 @@ export const createAccount = createAsyncThunk(
 // ------------------------------------
 // Update account
 // ------------------------------------
-export const updateAccount = createAsyncThunk(
+export const updateAccount = createAsyncThunk<void, FormData, { state: RootState }>(
   ACCOUNT_UPDATE,
   async (data: FormData, thunkAPI) => {
     const { userId } = thunkAPI.getState().user

@@ -11,8 +11,8 @@ import {
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const moveItem = createAction(QUEUE_MOVE)
-export const removeItem = createAction(QUEUE_REMOVE)
+export const moveItem = createAction<{ queueId: number; prevQueueId: number }>(QUEUE_MOVE)
+export const removeItem = createAction<number>(QUEUE_REMOVE)
 
 export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
   payload: { songId },
