@@ -8,4 +8,4 @@ markup:
   goldmark:
     renderer:
       unsafe: true
-disableKinds: ["taxonomyTerm", "RSS"]
+disableKinds: ["taxonomy", "RSS"]

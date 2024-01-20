@@ -34,8 +34,8 @@ Once the server is running, browse to the web app at the **server URL**.
 If you're using the Windows or macOS package, you can open or copy the server URL using the tray or menu icon:
 
 <div class="row">
-  {{% img "server-macos.png" "Karaoke Eternal Server (macOS)" "1x" %}}
-  {{% img "server-windows.png" "Karaoke Eternal Server (Windows)" "1x" %}}
+  {{% img "server-macos.png" "Karaoke Eternal Server (macOS)" "1x" /%}}
+  {{% img "server-windows.png" "Karaoke Eternal Server (Windows)" "1x" /%}}
 </div>
 
 ## 3. Create Admin Account
@@ -54,7 +54,7 @@ Make sure you use a strong password and store it someplace safe, since admins ca
 Once signed in, you'll see an (unsurprisingly) empty library. Head to the Account view by following the "Add media folders" link or tapping the face icon in the bottom navigation area:
 
 <div class="row">
-  {{% img "app-account.png" "Account view" %}}
+  {{% img "app-account.png" "Account view" /%}}
 </div>
 
 Since you're an admin, the Account view will have a number of sections. In the **Preferences** section, select **Media Folders** and add the folder(s) containing your songs.
@@ -64,7 +64,7 @@ Since you're an admin, the Account view will have a number of sections. In the *
 Once the media scanner is finished, you should see your artists/songs back over in the Library view. If they aren't appearing, make sure your media files are named using the **"Artist - Title"** convention and are a <a href='{{< ref "docs/karaoke-eternal-server#media-files" >}}'>supported format</a>.
 
 <div class="row">
-  {{% img "app-library.png" "Library view" %}}
+  {{% img "app-library.png" "Library view" /%}}
 </div>
 
 In the Library view, queue a song by tapping an artist, then tapping a song. Go ahead and queue a few - the songs will glow to indicate they're queued. Pretty simple, right?
@@ -83,7 +83,7 @@ By now you've probably noticed a **"No player in room"** message at the top of t
 </aside>
 
 <div class="row">
-  {{% img "app-player.jpg" "Player view" %}}
+  {{% img "app-player.jpg" "Player view" /%}}
 </div>
 
 Now that there's a player in the room, playback and display controls will appear. Admins will always see these, as well as the user who is currently singing.

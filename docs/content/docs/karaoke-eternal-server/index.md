@@ -14,7 +14,7 @@ Note that because the <a href="{{< ref "docs/karaoke-eternal-app#player" >}}">pl
 
 - <a href='{{< ref "docs/karaoke-eternal-server#windows-and-macos" >}}'>Windows and macOS</a>
 - <a href='{{< ref "docs/karaoke-eternal-server#docker-synology-nas" >}}'>Docker (Synology NAS)</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#docker-cli-and-docker-compose" >}}'>Docker (CLI and docker-compose)</a>
+- <a href='{{< ref "docs/karaoke-eternal-server#docker-cli-and-compose-v2" >}}'>Docker (CLI and Compose v2)</a>
 - <a href='{{< ref "docs/karaoke-eternal-server#npm" >}}'>NPM</a>
 
 ### Windows and macOS
@@ -22,8 +22,8 @@ Note that because the <a href="{{< ref "docs/karaoke-eternal-app#player" >}}">pl
 The <a href="{{% baseurl %}}download">Releases page</a>{{% icon-external %}} has the latest packages available for Windows and macOS. Once started, Karaoke Eternal Server will appear in the tray or menu bar:
 
 <div class="row">
-  {{% img "server-windows.png" "Karaoke Eternal Server (Windows)" "1x" %}}
-  {{% img "server-macos.png" "Karaoke Eternal Server (macOS)" "1x" %}}
+  {{% img "server-windows.png" "Karaoke Eternal Server (Windows)" "1x" /%}}
+  {{% img "server-macos.png" "Karaoke Eternal Server (macOS)" "1x" /%}}
 </div>
 
 <aside class="info">
