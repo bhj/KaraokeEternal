@@ -23,11 +23,11 @@ const EditUser = (props: EditUserProps) => {
 
   const dispatch = useAppDispatch()
   const handleSubmit = useCallback(data => {
-    props.user ? dispatch(updateUser(props.user.userId, data)) : dispatch(createUser(data))
+    props.user ? dispatch(updateUser({ userId: props.user.userId, data })) : dispatch(createUser(data))
   }, [dispatch, props.user])
 
   const handleRemoveClick = useCallback(() => {
-    if (confirm(`Remove user "${props.user.username}"?\n\nTheir history of queued songs will also be removed.`)) {
+    if (confirm(`Remove user "${props.user.username}"?\n\nTheir queued songs will also be removed.`)) {
       dispatch(removeUser(props.user.userId))
     }
   }, [dispatch, props.user])

@@ -73,7 +73,6 @@ module.exports = {
   USERS_EDITOR_CLOSE: 'users/EDITOR_CLOSE',
   USERS_FILTER_ONLINE: 'users/FILTER_ONLINE',
   USERS_FILTER_ROOM_ID: 'users/FILTER_ROOM_ID',
-  USERS_RECEIVE: 'users/RECEIVE',
   USERS_REMOVE: 'users/REMOVE',
   USERS_REQUEST: 'users/REQUEST',
   USERS_UPDATE: 'users/UPDATE',
@@ -102,4 +101,5 @@ module.exports = {
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',
+  REDUX_SLICE_INJECT_NOOP: 'app/REDUX_SLICE_INJECT_NOOP',
 }

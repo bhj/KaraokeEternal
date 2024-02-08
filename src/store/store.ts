@@ -1,4 +1,4 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import { configureStore, ThunkAction, UnknownAction } from '@reduxjs/toolkit'
 import reducers from './reducers'
 import socket from 'lib/socket'
 import createSocketMiddleware from './socketMiddleware'
@@ -12,8 +12,6 @@ import {
   REGISTER,
 } from 'redux-persist'
 import { windowResize } from './modules/ui'
-
-const asyncReducers = {}
 
 // resize action
 window.addEventListener('resize', () => store.dispatch(windowResize({
@@ -45,30 +43,25 @@ const store = configureStore({
   }).concat(throttle, socketMiddleware),
 })
 
+// @todo: this doesn't handle dynamically injected (lazy-loaded) reducers
 if (module.hot) {
   module.hot.accept('./reducers', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const reducers = require('./reducers').default
-
-    store.replaceReducer(combineReducers({
-      ...reducers,
-      ...asyncReducers,
-    }))
+    const combinedReducer = require('./reducers').default
+    store.replaceReducer(combinedReducer)
   })
-}
-
-export const injectReducer = ({ key, reducer }) => {
-  if (Object.hasOwnProperty.call(asyncReducers, key)) return
-
-  asyncReducers[key] = reducer
-  store.replaceReducer(combineReducers({
-    ...reducers,
-    ...asyncReducers,
-  }))
 }
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
+
+// generic type for non-async thunks
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  UnknownAction
+>
 
 export default store

@@ -1,3 +1,4 @@
+import { combineSlices } from '@reduxjs/toolkit'
 import { optimistic } from 'redux-optimistic-ui'
 
 import artists from 'routes/Library/modules/artists'
@@ -13,7 +14,9 @@ import ui from './modules/ui'
 import user from './modules/user'
 import userStars from './modules/userStars'
 
-const reducers = {
+export interface LazyLoadedSlices {}
+
+const combinedReducer = combineSlices({
   artists,
   library,
   prefs,
@@ -26,6 +29,6 @@ const reducers = {
   ui,
   user,
   userStars: optimistic(userStars),
-}
+}).withLazyLoadedSlices<LazyLoadedSlices>()
 
-export default reducers
+export default combinedReducer

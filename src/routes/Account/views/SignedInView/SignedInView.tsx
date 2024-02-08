@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
-import { injectReducer } from 'store/store'
+import combinedReducer from 'store/reducers'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchAccount } from 'store/modules/user'
-import usersReducer from '../../modules/users'
+import usersReducer, { sliceInjectNoOp } from '../../modules/users'
 import About from '../../components/About'
 import Account from '../../components/Account'
 import Prefs from '../../components/Prefs'
@@ -15,7 +15,8 @@ const SignedInView = () => {
   const dispatch = useAppDispatch()
 
   if (isAdmin && !sliceExists) {
-    injectReducer({ key: 'users', reducer: usersReducer })
+    combinedReducer.inject({ reducerPath: 'users', reducer: usersReducer })
+    dispatch(sliceInjectNoOp()) // update store with new slice
   }
 
   // once per mount
