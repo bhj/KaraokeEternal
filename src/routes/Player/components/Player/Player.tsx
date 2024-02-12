@@ -1,6 +1,7 @@
 import React from 'react'
 import CDGPlayer from './CDGPlayer'
 import MP4Player from './MP4Player'
+import type { playerVisualizerState } from '../../modules/playerVisualizer'
 const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer'))
 
 const players = {
@@ -21,7 +22,7 @@ interface PlayerProps {
   mp4Alpha: number
   rgTrackGain?: number
   rgTrackPeak?: number
-  visualizer: object
+  visualizer: playerVisualizerState
   volume: number
   width: number
   height: number

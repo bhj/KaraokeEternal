@@ -4,6 +4,7 @@
       "*": ["./src/*"],
       "shared/*": ["./shared/*"],
     },
+    "downlevelIteration": true,
     "esModuleInterop": true,
     "jsx": "react",
     "plugins": [

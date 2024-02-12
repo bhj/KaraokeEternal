@@ -5,7 +5,7 @@ import imageData from 'butterchurn-presets/imageData'
 import styles from './PlayerVisualizer.css'
 
 interface PlayerVisualizerProps {
-  audioSourceNode: object
+  audioSourceNode: MediaElementAudioSourceNode
   isPlaying: boolean
   onError(...args: unknown[]): unknown
   presetKey: string
@@ -18,6 +18,7 @@ class PlayerVisualizer extends React.Component<PlayerVisualizerProps> {
   audioGainNode = null
   canvas = React.createRef<HTMLCanvasElement>()
   frameId = null
+  visualizer = null
 
   componentDidMount () {
     try {

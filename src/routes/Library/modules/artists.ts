@@ -8,8 +8,8 @@ import {
 // Reducer
 // ------------------------------------
 interface artistsState {
-  result: PropertyKey[]
-  entities: Record<PropertyKey, Artist>
+  result: number[]
+  entities: Record<number, Artist>
 }
 
 const initialState: artistsState = {

@@ -23,7 +23,7 @@ export const playerVisualizerError = createAction<string>(PLAYER_VISUALIZER_ERRO
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface playerVisualizerState {
+export interface playerVisualizerState {
   isEnabled: boolean
   isSupported: boolean
   presetKey: string

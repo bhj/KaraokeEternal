@@ -2,6 +2,7 @@ import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import socket from 'lib/socket'
+import AppRouter from 'lib/AppRouter'
 import { RootState } from 'store/store'
 import HttpApi from 'lib/HttpApi'
 import Persistor from 'store/Persistor'
@@ -50,7 +51,7 @@ export const login = createAsyncThunk(
     const redirect = new URLSearchParams(window.location.search).get('redirect')
 
     if (redirect) {
-      window._router.navigate(basename.replace(/\/$/, '') + redirect)
+      AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
     }
   }
 )
@@ -58,9 +59,11 @@ export const login = createAsyncThunk(
 // ------------------------------------
 // Logout
 // ------------------------------------
-export const logout = createAsyncThunk(
+const logout = createAction(LOGOUT)
+
+export const requestLogout = createAsyncThunk(
   LOGOUT,
-  async () => {
+  async (_, thunkAPI) => {
     try {
       // server response should clear our cookie
       await api('GET', 'logout')
@@ -68,6 +71,7 @@ export const logout = createAsyncThunk(
       // ignore errors
     }
 
+    thunkAPI.dispatch(logout())
     Persistor.get().purge()
     socket.close()
   }
@@ -177,7 +181,7 @@ const userReducer = createReducer(initialState, (builder) => {
       ...state,
       ...payload,
     }))
-    .addCase(logout.fulfilled, () => ({
+    .addCase(LOGOUT, () => ({
       ...initialState,
     }))
     .addCase(SOCKET_AUTH_ERROR, () => ({

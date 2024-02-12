@@ -1,7 +1,6 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
 import { REHYDRATE } from 'redux-persist'
 import { ensureState } from 'redux-optimistic-ui'
-import { logout } from 'store/modules/user'
 import {
   ACCOUNT_RECEIVE,
   STAR_SONG,
@@ -10,6 +9,7 @@ import {
   SONG_UNSTARRED,
   STARS_PUSH,
   SOCKET_AUTH_ERROR,
+  LOGOUT,
 } from 'shared/actionTypes'
 
 // ------------------------------------
@@ -74,12 +74,13 @@ const userStarsReducer = createReducer(initialState, (builder) => {
     .addCase(ACCOUNT_RECEIVE, (state, { payload }) => {
       state.userId = payload.userId
     })
+    // @ts-expect-error: payload exists; action type appears to be erroneous
     .addCase(REHYDRATE, (state, { payload }) => {
       if (typeof payload?.userId === 'number') {
         state.userId = payload.userId
       }
     })
-    .addCase(logout.fulfilled, () => ({
+    .addCase(LOGOUT, () => ({
       ...initialState,
     }))
     .addCase(SOCKET_AUTH_ERROR, () => ({

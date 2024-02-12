@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { updateAccount, logout } from 'store/modules/user'
+import { requestLogout, updateAccount } from 'store/modules/user'
 import AccountForm from '../AccountForm'
 import styles from './Account.css'
 
@@ -12,7 +12,7 @@ const Account = () => {
 
   const dispatch = useAppDispatch()
   const handleDirtyChange = useCallback(isDirty => setDirty(isDirty), [])
-  const handleSignOut = useCallback(() => dispatch(logout()), [dispatch])
+  const handleSignOut = useCallback(() => dispatch(requestLogout()), [dispatch])
   const handleSubmit = useCallback(data => {
     if (!curPassword.current.value.trim()) {
       alert('Please enter your current password to make changes.')

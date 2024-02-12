@@ -45,6 +45,7 @@ const CoreLayout = () => {
         title='Oops...'
         buttons=<button onClick={closeError}>OK</button>
       >
+        {/* @ts-expect-error: non-standard but still-used style prop */}
         <p style={{ '-webkit-user-select': 'text', userSelect: 'text' }}>
           {ui.errorMessage}
         </p>

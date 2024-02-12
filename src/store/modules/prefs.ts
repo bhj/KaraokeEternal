@@ -10,15 +10,16 @@ import {
   PREFS_REQ_SCANNER_START,
   PREFS_REQ_SCANNER_STOP,
   SCANNER_WORKER_STATUS,
+  LOGOUT,
 } from 'shared/actionTypes'
 
-import { logout } from './user'
 import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('prefs')
 
 // ------------------------------------
 // Actions
 // ------------------------------------
+const logout = createAction(LOGOUT)
 export const setPref = createAction<{ key: string; data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<object>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_SET_PATH_PRIORITY)

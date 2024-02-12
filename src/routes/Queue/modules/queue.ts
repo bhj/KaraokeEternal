@@ -1,12 +1,14 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import { logout } from 'store/modules/user'
 import { QueueItem } from 'shared/types'
 import {
   QUEUE_ADD,
   QUEUE_MOVE,
   QUEUE_PUSH,
   QUEUE_REMOVE,
+  LOGOUT,
 } from 'shared/actionTypes'
+
+interface OptimisticQueueItem extends Partial<QueueItem>{}
 
 // ------------------------------------
 // Actions
@@ -24,8 +26,8 @@ export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
 // ------------------------------------
 interface queueState {
   isLoading: boolean
-  result: PropertyKey[] // queueIds
-  entities: Record<PropertyKey, QueueItem>
+  result: number[] // queueIds
+  entities: Record<number, QueueItem | OptimisticQueueItem>
 }
 
 const initialState: queueState = {
@@ -53,7 +55,7 @@ const queueReducer = createReducer(initialState, (builder) => {
       result: payload.result,
       entities: payload.entities,
     }))
-    .addCase(logout.fulfilled, (state) => {
+    .addCase(LOGOUT, (state) => {
       state.result = []
       state.entities = {}
     })

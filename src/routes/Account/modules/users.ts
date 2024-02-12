@@ -15,6 +15,10 @@ import {
 
 const api = new HttpApi('')
 
+interface UserWithRooms extends User {
+  rooms: number[] // roomIds
+}
+
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -69,8 +73,8 @@ export const filterByRoom = createAction<number>(USERS_FILTER_ROOM_ID)
 // Reducer
 // ------------------------------------
 interface usersState {
-  result: PropertyKey[]
-  entities: Record<PropertyKey, User>
+  result: number[]
+  entities: Record<number, UserWithRooms>
   filterOnline: boolean
   filterRoomId: number | null
   isEditorOpen: boolean
