@@ -107,7 +107,7 @@
     "fast-fuzzy": "^1.12.0",
     "file-loader": "^6.2.0",
     "history": "^5.3.0",
-    "html-loader": "^4.2.0",
+    "html-loader": "^5.0.0",
     "html-webpack-plugin": "^5.5.0",
     "license-webpack-plugin": "^4.0.2",
     "markdown-loader": "^8.0.0",
@@ -121,7 +121,7 @@
     "react-dom": "^18.2.0",
     "react-flip-toolkit": "^7.0.17",
     "react-highlight-words": "^0.20.0",
-    "react-redux": "^8.0.5",
+    "react-redux": "^9.1.0",
     "react-refresh": "^0.14.0",
     "react-responsive-modal": "^6.4.1",
     "react-router-dom": "^6.9.0",
@@ -138,7 +138,7 @@
     "use-resize-observer": "^9.1.0",
     "webpack": "^5.76.2",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-middleware": "^6.0.2",
+    "webpack-dev-middleware": "^7.0.0",
     "webpack-hot-middleware": "^2.25.3",
     "webpack-node-externals": "^3.0.0"
   }
