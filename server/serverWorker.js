@@ -14,6 +14,7 @@ const koaLogger = require('koa-logger')
 const koaMount = require('koa-mount')
 const koaRange = require('koa-range')
 const koaStatic = require('koa-static')
+const webpackDevMiddleware = require('webpack-dev-middleware')
 
 const Prefs = require('./Prefs')
 const libraryRouter = require('./Library/router')
@@ -242,8 +243,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     }
   })
 
-  const devMiddleware = require('./lib/getDevMiddleware')(compiler, { publicPath: urlPath })
-  app.use(devMiddleware)
+  app.use(webpackDevMiddleware.koaWrapper(compiler, { publicPath: urlPath }))
 
   const hotMiddleware = require('./lib/getHotMiddleware')(compiler)
   app.use(hotMiddleware)
