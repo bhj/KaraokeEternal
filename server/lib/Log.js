@@ -31,23 +31,24 @@ class Log {
 class IPCLog {
   constructor (scope = '') {
     const IPC = require('./IPCBridge')
-    const { SCANNER_WORKER_LOG } = require('../../shared/actionTypes')
-    const send = (level, str, ...args) => {
+    const { WORKER_LOG } = require('../../shared/actionTypes')
+    const log = (level, str, ...args) => {
       IPC.send({
-        type: SCANNER_WORKER_LOG,
+        type: WORKER_LOG,
         payload: {
           level,
           msg: `${scope ? scope + ': ' : ''}${util.format(str, ...args)}`,
+          worker: process.env.KES_CHILD_PROCESS,
         },
       })
     }
 
     return {
-      error: send.bind(this, 'error'),
-      warn: send.bind(this, 'warn'),
-      info: send.bind(this, 'info'),
-      verbose: send.bind(this, 'verbose'),
-      debug: send.bind(this, 'debug'),
+      error: log.bind(this, 'error'),
+      warn: log.bind(this, 'warn'),
+      info: log.bind(this, 'info'),
+      verbose: log.bind(this, 'verbose'),
+      debug: log.bind(this, 'debug'),
     }
   }
 }

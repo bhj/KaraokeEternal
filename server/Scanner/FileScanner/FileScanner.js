@@ -26,81 +26,68 @@ class FileScanner extends Scanner {
     this.paths = prefs.paths
   }
 
-  async scan () {
-    const files = new Map() // pathId => [files]
-    const valid = [] // mediaIds
-    let i = 0 // file counter
-    let numTotal = 0
-    let numAdded = 0
+  async scan (pathId) {
+    const dir = this.paths.entities[pathId].path
+    const validMediaIds = []
+    let files // { file, stats }[]
 
-    // get list of files from all paths
-    for (const pathId of this.paths.result) {
-      const basePath = this.paths.entities[pathId].path
+    log.info('Searching: %s', dir)
+    this.emitStatus(`Searching: ${dir}`, 0)
 
-      this.emitStatus(`Listing folder ${this.paths.result.indexOf(pathId) + 1} of ${this.paths.result.length}`, 0)
-      log.info('Searching path: %s', basePath)
+    try {
+      files = await getFiles(dir, f => searchExtPerms.some(ext => f.endsWith('.' + ext)))
 
+      log.info('  => found %s files with valid extensions (%s)',
+        files.length.toLocaleString(),
+        JSON.stringify(searchExts)
+      )
+    } catch (err) {
+      log.error(`  => ${err.message} (path offline)`)
+      // @todo: emit status?
+      return
+    }
+
+    // log.info('Processing %s files', numTotal.toLocaleString())
+
+    for (let i = 0; i < files.length; i++) {
+      const curDir = path.dirname(files[i].file)
+      let prevDir
+
+      log.info('[%s/%s] %s', i + 1, files.length, files[i].file)
+      this.emitStatus(`Processing (${i + 1} of ${files.length})`, (i + 1 / files.length) * 100)
+
+      if (prevDir !== curDir) {
+        prevDir = curDir
+
+        // (re)init parser with this folder's config, if any
+        const cfg = getConfig(curDir, dir)
+        this.parser = new MetaParser(cfg)
+      }
+
+      // process file
       try {
-        const list = await getFiles(basePath, file => searchExtPerms.some(ext => file.endsWith('.' + ext)))
-        files.set(pathId, list)
-        numTotal += list.length
+        const res = await this.process(files[i], pathId)
 
-        log.info('  => found %s files with valid extensions %s',
-          list.length.toLocaleString(),
-          JSON.stringify(searchExts)
-        )
+        // success
+        validMediaIds.push(res.mediaId)
+        // if (res.isNew) numAdded++
       } catch (err) {
-        log.error(`  => ${err.message} (path offline)`)
+        log.warn(`  => ${err.message}`)
       }
 
       if (this.isCanceling) {
+        this.emitStatus('Stopped', 100, false)
         return
       }
     } // end for
 
-    log.info('Processing %s files', numTotal.toLocaleString())
+    log.info('Processed %s valid media files', validMediaIds.length.toLocaleString())
+    log.info('Searching for invalid media entries')
 
-    for (const [pathId, list] of files) {
-      let lastDir
+    const numRemoved = await this.removeInvalid(pathId, validMediaIds)
+    log.info(`Removed ${numRemoved} invalid media entries`)
 
-      for (const item of list) {
-        i++
-        log.info('[%s/%s] %s', i, numTotal, item.file)
-        this.emitStatus(`Scanning media (${i.toLocaleString()} of ${numTotal.toLocaleString()})`, (i / numTotal) * 100)
-
-        const dir = path.dirname(item.file)
-
-        if (lastDir !== dir) {
-          lastDir = dir
-
-          // (re)init parser with this folder's config, if any
-          const cfg = getConfig(dir, this.paths.entities[pathId].path)
-          this.parser = new MetaParser(cfg)
-        }
-
-        // process file
-        try {
-          const res = await this.process(item, pathId)
-
-          // success
-          valid.push(res.mediaId)
-          if (res.isNew) numAdded++
-        } catch (err) {
-          log.warn(`  => ${err.message}: ${item.file}`)
-        }
-
-        if (this.isCanceling) {
-          this.emitStatus(`Stopped (${numAdded} new media)`, 100, false)
-          return
-        }
-      } // end for
-    } // end for
-
-    log.info('Processed %s valid media files', valid.length.toLocaleString())
-
-    const numRemoved = await this.removeInvalid(valid, Array.from(files.keys()))
-
-    this.emitStatus(`Finished (${numAdded} new, ${numRemoved} removed, ${valid.length} total media)`, 100, false)
+    // this.emitStatus(`Finished (${numAdded} new, ${numRemoved} removed, ${valid.length} total media)`, 100, false)
 
     await IPC.req({ type: MEDIA_CLEANUP })
   }
@@ -197,28 +184,15 @@ class FileScanner extends Scanner {
     }
   }
 
-  async removeInvalid (validMedia = [], validPaths = []) {
-    log.info('Searching for invalid media entries')
+  async removeInvalid (pathId, validMediaIds = []) {
+    const res = await Media.search({ pathId })
+    const invalid = res.result.filter(mediaId => !validMediaIds.includes(mediaId))
 
-    const res = await Media.search()
-    const invalidMedia = []
-
-    res.result.forEach(mediaId => {
-      // just validated or in an offline path?
-      if (validMedia.includes(mediaId) || !validPaths.includes(res.entities[mediaId].pathId)) {
-        return
-      }
-
-      invalidMedia.push(mediaId)
-    })
-
-    log.info(`Found ${invalidMedia.length} invalid media entries`)
-
-    if (invalidMedia.length) {
-      await IPC.req({ type: MEDIA_REMOVE, payload: invalidMedia })
+    if (invalid.length) {
+      await IPC.req({ type: MEDIA_REMOVE, payload: invalid })
     }
 
-    return invalidMedia.length
+    return invalid.length
   }
 }
 

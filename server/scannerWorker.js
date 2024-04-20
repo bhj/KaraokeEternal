@@ -3,13 +3,14 @@ const log = require('./lib/Log')(`scanner[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
 const {
-  SCANNER_CMD_START,
   SCANNER_CMD_STOP,
+  SCANNER_WORKER_SCAN,
+  SCANNER_WORKER_PATH_SCANNED,
 } = require('../shared/actionTypes')
 
 let FileScanner, Prefs
 let _Scanner
-let _isScanQueued = true
+let pathQueue = []
 
 Database.open({
   file: path.join(process.env.KES_PATH_DATA, 'database.sqlite3'),
@@ -19,19 +20,18 @@ Database.open({
   FileScanner = require('./Scanner/FileScanner')
 
   IPC.use({
-    [SCANNER_CMD_START]: () => {
-      log.info('Media scan requested (restarting)')
-      _isScanQueued = true
-      cancelScan()
+    [SCANNER_WORKER_SCAN]: ({ payload }) => {
+      log.info('Media path queued for scan (pathId=%s)', payload.pathId)
+      pathQueue.push(payload.pathId)
+
+      if (!_Scanner) startScan()
     },
     [SCANNER_CMD_STOP]: () => {
       log.info('Stopping media scan (user requested)')
-      _isScanQueued = false
+      pathQueue = []
       cancelScan()
     }
   })
-
-  startScan()
 }).catch(err => {
   log.error(err.message)
 
@@ -43,12 +43,14 @@ Database.open({
 async function startScan () {
   log.info('Starting media scan')
 
-  while (_isScanQueued) {
-    _isScanQueued = false
-
+  while (pathQueue.length) {
     const prefs = await Prefs.get()
     _Scanner = new FileScanner(prefs)
-    await _Scanner.scan()
+
+    await _Scanner.scan(pathQueue.shift())
+
+    // push updated library/queue after each completed path
+    await IPC.req({ type: SCANNER_WORKER_PATH_SCANNED })
   }
 
   // scanner process won't exit automatically due to the

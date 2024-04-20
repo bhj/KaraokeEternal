@@ -11,10 +11,13 @@ const log = new Log('server', {
   file: Log.resolve(env.KES_LOG_LEVEL, env.NODE_ENV === 'development' ? 0 : 3),
 }).setDefaultInstance().logger.scope(`main[${process.pid}]`)
 
-const scannerLog = new Log('scanner', {
+const ipcLog = new Log('scanner', {
   console: Log.resolve(process.env.KES_SCAN_CONSOLE_LEVEL, process.env.NODE_ENV === 'development' ? 5 : 4),
   file: Log.resolve(process.env.KES_SCAN_LOG_LEVEL, process.env.NODE_ENV === 'development' ? 0 : 3),
-}).logger.scope('scanner')
+}).logger
+
+const scannerLog = ipcLog.scope('scanner')
+const watcherLog = ipcLog.scope('watcher')
 
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
@@ -22,17 +25,25 @@ const refs = {}
 const {
   SCANNER_CMD_START,
   SCANNER_CMD_STOP,
+  SCANNER_WORKER_SCAN,
   SERVER_WORKER_ERROR,
-  SCANNER_WORKER_LOG,
   SERVER_WORKER_STATUS,
+  WATCHER_WORKER_EVENT,
+  WATCHER_WORKER_WATCH,
+  WORKER_LOG,
 } = require('../shared/actionTypes')
 
-// handle scanner logs
-// @todo: this doesn't need to be async
 IPC.use({
-  [SCANNER_WORKER_LOG]: async (action) => {
-    scannerLog[action.payload.level](action.payload.msg)
-  }
+  [WORKER_LOG]: ({ payload }) => {
+    if (payload.worker === 'scanner') {
+      scannerLog[payload.level](payload.msg)
+    } else if (payload.worker === 'watcher') {
+      watcherLog[payload.level](payload.msg)
+    }
+  },
+  [WATCHER_WORKER_EVENT]: ({ payload }) => {
+    startScanner(payload)
+  },
 })
 
 // log non-default settings
@@ -72,10 +83,12 @@ if (process.versions.electron) {
   env.KES_PATH_DATA = refs.electron.app.getPath('userData')
 }
 
-Database.open({
-  file: path.join(env.KES_PATH_DATA, 'database.sqlite3'),
-  ro: false,
-}).then(db => {
+(async function () {
+  await Database.open({
+    file: path.join(env.KES_PATH_DATA, 'database.sqlite3'),
+    ro: false,
+  })
+
   if (refs.electron) {
     process.on('serverWorker', action => {
       const { type, payload } = action
@@ -88,14 +101,41 @@ Database.open({
     })
   }
 
-  // start web server
-  require('./serverWorker.js')({ env, startScanner, stopScanner })
-}).catch(err => {
-  log.error(err.message)
-  throw err
-})
+  const prefs = await require('./Prefs').get()
 
-function startScanner (onExit) {
+  if (true) { // todo: if watcher enabled
+    startWatcher(prefs.paths)
+  }
+
+  // start web server
+  require('./serverWorker.js')({ env, startScanner, stopScanner, startWatcher })
+})()
+
+function startWatcher (paths) {
+  if (refs.watcher === undefined) {
+    log.info('Starting folder watcher process')
+    refs.watcher = childProcess.fork(path.join(__dirname, 'watcherWorker.js'), [], {
+      env: { ...env, KES_CHILD_PROCESS: 'watcher' },
+      gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
+      uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
+    })
+
+    refs.watcher.on('exit', (code, signal) => {
+      log.info(`Folder watcher exited (${signal || code})`)
+      IPC.removeChild(refs.watcher)
+      delete refs.watcher
+    })
+
+    IPC.addChild(refs.watcher)
+  }
+
+  IPC.send({
+    type: WATCHER_WORKER_WATCH,
+    payload: { paths }
+  })
+}
+
+function startScanner (payload) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
     refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
@@ -108,14 +148,12 @@ function startScanner (onExit) {
       log.info(`Media scanner exited (${signal || code})`)
       IPC.removeChild(refs.scanner)
       delete refs.scanner
-
-      if (typeof onExit === 'function') onExit()
     })
 
     IPC.addChild(refs.scanner)
-  } else {
-    IPC.send({ type: SCANNER_CMD_START })
   }
+
+  IPC.send({ type: SCANNER_WORKER_SCAN, payload })
 }
 
 function stopScanner () {

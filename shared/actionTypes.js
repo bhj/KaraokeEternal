@@ -89,7 +89,8 @@ module.exports = {
   // IPC messages
   SCANNER_CMD_START: 'scannerWorker/CMD_START',
   SCANNER_CMD_STOP: 'scannerWorker/CMD_STOP',
-  SCANNER_WORKER_LOG: 'scannerWorker/LOG',
+  SCANNER_WORKER_PATH_SCANNED: 'scannerWorker/PATH_SCANNED',
+  SCANNER_WORKER_SCAN: 'scannerWorker/SCAN',
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
   SERVER_WORKER_ERROR: 'serverWorker/ERROR',
@@ -98,6 +99,9 @@ module.exports = {
   MEDIA_CLEANUP: 'scannerWorker/MEDIA_CLEANUP',
   MEDIA_REMOVE: 'scannerWorker/MEDIA_REMOVE',
   MEDIA_UPDATE: 'scannerWorker/MEDIA_UPDATE',
+  WATCHER_WORKER_EVENT: 'watcherWorker/EVENT',
+  WATCHER_WORKER_WATCH: 'watcherWorker/WATCH',
+  WORKER_LOG: 'worker/LOG',
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',

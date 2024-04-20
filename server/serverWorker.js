@@ -29,6 +29,7 @@ const IPC = require('./lib/IPCBridge')
 const IPCLibraryActions = require('./Library/ipc')
 const IPCMediaActions = require('./Media/ipc')
 const {
+  SCANNER_WORKER_PATH_SCANNED,
   SERVER_WORKER_STATUS,
   SERVER_WORKER_ERROR,
 } = require('../shared/actionTypes')
@@ -69,6 +70,11 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     // attach IPC action handlers
     IPC.use(IPCLibraryActions(io))
     IPC.use(IPCMediaActions(io))
+    IPC.use({
+      [SCANNER_WORKER_PATH_SCANNED]: async () => {
+        await pushQueuesAndLibrary(io)
+      }
+    })
 
     // success callback in 3rd arg
     server.listen(env.KES_PORT, () => {
@@ -82,7 +88,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
       })
 
       // scanning on startup?
-      if (env.KES_SCAN) startScanner(() => pushQueuesAndLibrary(io))
+      if (env.KES_SCAN) startScanner()
     })
 
     function stopServer (signal) {
@@ -166,7 +172,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
 
     // validated
     ctx.io = io
-    ctx.startScanner = () => startScanner(() => pushQueuesAndLibrary(io))
+    ctx.startScanner = (pathIds) => startScanner()
     ctx.stopScanner = stopScanner
 
     await next()
