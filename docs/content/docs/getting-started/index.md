@@ -99,7 +99,7 @@ Go ahead and press play to start the party!
 
 To get the most out of Karaoke Eternal, continue with the <a href="{{< ref "docs/karaoke-eternal-app" >}}">app documentation</a>. Seriously, there's quite a bit going on beneath the surface!
 
-You can also join the <a href="{{ baseurl }}discord" rel="noopener">Karaoke Eternal Discord Server</a>{{% icon-external %}} for general support and development chat, or just to say hi!
+You can also join the <a href="{{% baseurl %}}discord" rel="noopener">Karaoke Eternal Discord Server</a>{{% icon-external %}} for general support and development chat, or just to say hi!
 
 Lastly, if you are able, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor). This project relies on its community to sustain it, and your support has a direct impact.
 
