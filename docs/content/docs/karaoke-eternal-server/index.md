@@ -13,8 +13,8 @@ Note that because the <a href="{{< ref "docs/karaoke-eternal-app#player" >}}">pl
 # Installation
 
 - <a href='{{< ref "docs/karaoke-eternal-server#windows-and-macos" >}}'>Windows and macOS</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#docker-synology-nas" >}}'>Docker (Synology NAS)</a>
 - <a href='{{< ref "docs/karaoke-eternal-server#docker-cli-and-compose-v2" >}}'>Docker (CLI and Compose v2)</a>
+- <a href='{{< ref "docs/karaoke-eternal-server#docker-synology-nas" >}}'>Docker (Synology NAS)</a>
 - <a href='{{< ref "docs/karaoke-eternal-server#npm" >}}'>NPM</a>
 
 ### Windows and macOS
@@ -35,24 +35,6 @@ The <a href="{{% baseurl %}}download">Releases page</a>{{% icon-external %}} has
   {{% icon-info %}}
   <p>The server chooses a random port at startup unless <a href="#cli--env">otherwise specified</a>.</p>
 </aside>
-
-See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
-
-### Docker (Synology NAS)
-
-1. In the Registry section of DSM's Docker package, search for and download the `radrootllc/karaoke-eternal` image.
-2. In the Image section, double-click to launch the image.
-3. The container creation dialog has the following sections:
-  - **Network**
-    - No changes (click Next)
-  - **General**
-    - `Enable auto-restart` (if desired)
-  - **Port Settings**
-    - Set the Local Port to `8080` (or something else if desired)
-  - **Volume Settings**
-    - Click Add Folder, select `docker` and create a new `karaoke-eternal` subfolder. Select that subfolder and click Select, then enter the mount path `/config`. This path is used to store the database.
-    - Click Add Folder, and this time select your media folder(s). For their mount paths, enter something easy like `/mnt/karaoke`, etc. Once inside the app, you'll add these mount paths as <a href="{{< ref "docs/karaoke-eternal-app#preferences-admin-only" >}}">Media Folders</a>.
-4. Click Done. Karaoke Eternal Server should now be running and reachable at `http://<your_synology_ip>:8080`.
 
 See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
 
@@ -91,6 +73,35 @@ services:
       - <host_port>:8080
     restart: unless-stopped
 {{< /highlight >}}  
+
+See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
+
+### Docker (Synology NAS)
+
+This assumes your Synology DiskStation is running DSM 7.2 or later.
+
+1. In Package Center, open Container Manager.
+    - If Container Manager doesn't appear in the "Installed" section, install it from the "All Packages" section.
+2. In the Registry section, search for and download the `radrootllc/karaoke-eternal` image.
+3. In the Image section, select the `radrootllc/karaoke-eternal` image and click Run.
+4. At the **General Settings** page of the container creation dialog:
+    - Choose `Enable auto-restart` (if desired)
+    - Click Next.
+5. At the **Advanced Settings** page:
+
+<div class="row">
+  {{% img "server-synology.png" "Create Container > Advanced Settings " /%}}
+</div>
+
+  - **Port Settings**
+    - Set the Local Port to `8080` or another if desired (this will be the port used when browsing to the app URL)
+  - **Volume Settings**
+    - Click Add Folder, select `docker` and create a new `karaoke-eternal` subfolder. Select that subfolder and click Select, then map it to `/config`. This path will be used to store the database.
+    - Click Add Folder again, and this time select your media folder. Map it to `/mnt/karaoke` (once inside the app, you'll add this path in <a href="{{< ref "docs/karaoke-eternal-app#preferences-admin-only" >}}">Media Folders</a>.
+  - Click Next.
+
+6. Click Done.
+    - Karaoke Eternal Server will run and you should be able to browse to the app URL at `http://<your_synology_ip>:8080` (or whichever Local Port you chose in step 5)
 
 See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
 
