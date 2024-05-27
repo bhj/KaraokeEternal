@@ -1,6 +1,9 @@
 const path = require('path')
-const log = require('../../lib/Log')('FileScanner')
+const fsPromises = require('node:fs/promises')
 const musicMeta = require('music-metadata')
+const { unzip } = require('unzipit')
+const log = require('../../lib/Log')('FileScanner')
+const { getExt } = require('../../lib/util')
 const getFiles = require('./getFiles')
 const getConfig = require('./getConfig')
 const getCdgName = require('../../lib/getCdgName')
@@ -16,6 +19,7 @@ const {
   MEDIA_UPDATE,
 } = require('../../../shared/actionTypes')
 
+const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
 
 class FileScanner extends Scanner {
@@ -39,9 +43,9 @@ class FileScanner extends Scanner {
     this.emitStatus(`Searching: ${dir}`, 0)
 
     try {
-      files = await getFiles(dir, filename => searchExts.includes(path.extname(filename).toLowerCase()))
+      files = await getFiles(dir, file => searchExts.includes(getExt(file)))
 
-      log.info('  => found %s files with valid extensions (%s)',
+      log.info('  => found %s files with valid extensions %s',
         files.length.toLocaleString(),
         JSON.stringify(searchExts)
       )
@@ -55,8 +59,8 @@ class FileScanner extends Scanner {
       let prevDir
 
       log.info('[%s/%s] %s', i + 1, files.length, files[i].file)
-
       this.emitStatus(`Processing (${i + 1} of ${files.length})`, (i + 1) / files.length)
+
       if (prevDir !== curDir) {
         prevDir = curDir
 
@@ -86,8 +90,26 @@ class FileScanner extends Scanner {
     log.info(`Removed ${numRemoved} invalid media entries`)
   }
 
-  async process (item, pathId) {
-    const data = await musicMeta.parseFile(item.file, {
+  async process ({ file }, pathId) {
+    let buffer = await fsPromises.readFile(file)
+    let mimeType = fileTypes[getExt(file)].mimeType
+
+    if (getExt(file) === '.zip') {
+      const { entries } = await unzip(new Uint8Array(buffer))
+
+      const audioName = Object.keys(entries).find(f => !f.includes('/') && audioExts.includes(getExt(f)))
+      if (!audioName) throw new Error(`no valid audio file ${JSON.stringify(audioExts)} found in archive`)
+
+      const cdgName = Object.keys(entries).find(f => !f.includes('/') && getExt(f) === '.cdg')
+      if (!cdgName) throw new Error('no .cdg sidecar found in archive')
+
+      buffer = Buffer.from(await entries[audioName].arrayBuffer())
+      mimeType = fileTypes[getExt(audioName)].mimeType
+    } else {
+      if (fileTypes[getExt(file)].requiresCDG && !await getCdgName(file)) throw new Error('no .cdg sidecar found')
+    }
+
+    const data = await musicMeta.parseBuffer(buffer, mimeType, {
       duration: true,
       skipCovers: true,
     })
@@ -102,7 +124,7 @@ class FileScanner extends Scanner {
     )
 
     // run MetaParser
-    const pathInfo = path.parse(item.file)
+    const pathInfo = path.parse(file)
     const parsed = this.parser({
       dir: pathInfo.dir,
       dirSep: path.sep,
@@ -117,19 +139,10 @@ class FileScanner extends Scanner {
       songId: match.songId,
       pathId,
       // normalize relPath to forward slashes with no leading slash
-      relPath: item.file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
+      relPath: file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
       duration: Math.round(data.format.duration),
       rgTrackGain: data.common.replaygain_track_gain ? data.common.replaygain_track_gain.dB : null,
       rgTrackPeak: data.common.replaygain_track_peak ? data.common.replaygain_track_peak.ratio : null,
-    }
-
-    // need to look for .cdg if this is an audio-only file
-    if (!/\.mp4/i.test(path.extname(item.file))) {
-      if (!await getCdgName(item.file)) {
-        throw new Error('no .cdg sidecar found; skipping')
-      }
-
-      log.verbose('  => found .cdg sidecar')
     }
 
     // file already in database?

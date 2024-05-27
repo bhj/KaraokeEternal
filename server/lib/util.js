@@ -1,3 +1,13 @@
+const path = require('path')
+
+/**
+ * Gets the normalized file extension, in lowercase and including the period.
+ *
+ * @param {string} filename The filename to extract the extension from.
+ * @returns {string} The extension in lowercase with a period, or an empty string.
+ */
+const getExt = (filename) => path.extname(filename).toLowerCase()
+
 function parsePathIds (str) {
   const nums = []
 
@@ -22,5 +32,6 @@ function parsePathIds (str) {
 }
 
 module.exports = {
+  getExt,
   parsePathIds,
 }
