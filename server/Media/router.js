@@ -11,6 +11,7 @@ const Media = require('./Media')
 const Prefs = require('../Prefs')
 const Queue = require('../Queue')
 const Rooms = require('../Rooms')
+const fileTypes = require('./fileTypes')
 const {
   LIBRARY_PUSH_SONG,
   QUEUE_PUSH
@@ -56,10 +57,10 @@ router.get('/:mediaId', async (ctx, next) => {
   // get file info
   const stats = await stat(file)
   ctx.length = stats.size
-  ctx.type = Media.mimeTypes[path.extname(file).replace('.', '').toLowerCase()]
+  ctx.type = fileTypes[path.extname(file).toLowerCase()]?.mimeType
 
-  if (typeof ctx.type === 'undefined') {
-    ctx.throw(404, `Unknown mime type for extension: ${path.extname(file)}`)
+  if (!ctx.type) {
+    ctx.throw(404, `Unknown MIME type: ${file}`)
   }
 
   log.verbose('streaming %s (%sMB): %s', ctx.type, (ctx.length / 1000000).toFixed(2), file)

@@ -3,12 +3,12 @@ const log = require('../../lib/Log')('FileScanner')
 const musicMeta = require('music-metadata')
 const getFiles = require('./getFiles')
 const getConfig = require('./getConfig')
-const getPerms = require('../../lib/getPermutations')
 const getCdgName = require('../../lib/getCdgName')
 const Media = require('../../Media')
 const MetaParser = require('../MetaParser')
 const Scanner = require('../Scanner')
 const IPC = require('../../lib/IPCBridge')
+const fileTypes = require('../../Media/fileTypes')
 const {
   LIBRARY_MATCH_SONG,
   MEDIA_ADD,
@@ -16,8 +16,7 @@ const {
   MEDIA_UPDATE,
 } = require('../../../shared/actionTypes')
 
-const searchExts = ['mp4', 'm4a', 'mp3']
-const searchExtPerms = searchExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
+const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
 
 class FileScanner extends Scanner {
   constructor (prefs, qStats) {
@@ -40,7 +39,7 @@ class FileScanner extends Scanner {
     this.emitStatus(`Searching: ${dir}`, 0)
 
     try {
-      files = await getFiles(dir, f => searchExtPerms.some(ext => f.endsWith('.' + ext)))
+      files = await getFiles(dir, filename => searchExts.includes(path.extname(filename).toLowerCase()))
 
       log.info('  => found %s files with valid extensions (%s)',
         files.length.toLocaleString(),
