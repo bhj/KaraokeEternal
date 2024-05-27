@@ -13,7 +13,7 @@ router.get('/scan', async (ctx, next) => {
   }
 
   ctx.status = 200
-  ctx.startScanner()
+  ctx.startScanner(true) // todo: pathId
 })
 
 // stop media scan
@@ -60,7 +60,7 @@ router.post('/path', async (ctx, next) => {
   ctx.body = await Prefs.get()
 
   // update library
-  ctx.startScanner()
+  ctx.startScanner() // todo: pathId
 })
 
 // remove media file path
@@ -81,7 +81,7 @@ router.delete('/path/:pathId', async (ctx, next) => {
   ctx.body = await Prefs.get()
 
   // update library
-  ctx.startScanner()
+  ctx.startScanner() // todo
 })
 
 // get folder listing for path browser

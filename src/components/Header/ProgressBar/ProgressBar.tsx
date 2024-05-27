@@ -35,7 +35,7 @@ export default class ProgressBar extends React.Component<ProgressBarProps> {
 
   render () {
     const { state, props } = this
-    if (!state.isVisible) return null
+    if (!state.isVisible || props.pct === 100) return null
 
     return (
       <div className={styles.container} style={{ backgroundSize: props.pct + '% 100%' }}>

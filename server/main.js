@@ -21,11 +21,11 @@ const watcherLog = ipcLog.scope('watcher')
 
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
+const { parsePathIds } = require('./lib/util')
 const refs = {}
 const {
-  SCANNER_CMD_START,
-  SCANNER_CMD_STOP,
-  SCANNER_WORKER_SCAN,
+  REQUEST_SCAN,
+  REQUEST_SCAN_STOP,
   SERVER_WORKER_ERROR,
   SERVER_WORKER_STATUS,
   WATCHER_WORKER_EVENT,
@@ -42,7 +42,7 @@ IPC.use({
     }
   },
   [WATCHER_WORKER_EVENT]: ({ payload }) => {
-    startScanner(payload)
+    startScanner(payload.pathId)
   },
 })
 
@@ -101,14 +101,17 @@ if (process.versions.electron) {
     })
   }
 
+  // start web server
+  require('./serverWorker.js')({ env, startScanner, stopScanner, startWatcher })
+
   const prefs = await require('./Prefs').get()
 
   if (true) { // todo: if watcher enabled
     startWatcher(prefs.paths)
   }
 
-  // start web server
-  require('./serverWorker.js')({ env, startScanner, stopScanner, startWatcher })
+  const pathIds = parsePathIds(env.KES_SCAN)
+  if (pathIds) startScanner(pathIds)
 })()
 
 function startWatcher (paths) {
@@ -135,30 +138,31 @@ function startWatcher (paths) {
   })
 }
 
-function startScanner (payload) {
+function startScanner (pathIds) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
-    refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [], {
+
+    refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [pathIds.toString()], {
       env: { ...env, KES_CHILD_PROCESS: 'scanner' },
       gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
       uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
     })
 
     refs.scanner.on('exit', (code, signal) => {
-      log.info(`Media scanner exited (${signal || code})`)
+      log.info(`Media scanner process exited (${signal || code})`)
       IPC.removeChild(refs.scanner)
       delete refs.scanner
     })
 
     IPC.addChild(refs.scanner)
+  } else {
+    IPC.send({ type: REQUEST_SCAN, payload: { pathIds } })
   }
-
-  IPC.send({ type: SCANNER_WORKER_SCAN, payload })
 }
 
 function stopScanner () {
   if (refs.scanner) {
-    IPC.send({ type: SCANNER_CMD_STOP })
+    IPC.send({ type: REQUEST_SCAN_STOP })
   }
 }
 

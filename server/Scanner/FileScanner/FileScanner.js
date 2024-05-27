@@ -12,7 +12,6 @@ const IPC = require('../../lib/IPCBridge')
 const {
   LIBRARY_MATCH_SONG,
   MEDIA_ADD,
-  MEDIA_CLEANUP,
   MEDIA_REMOVE,
   MEDIA_UPDATE,
 } = require('../../../shared/actionTypes')
@@ -21,13 +20,19 @@ const searchExts = ['mp4', 'm4a', 'mp3']
 const searchExtPerms = searchExts.reduce((perms, ext) => perms.concat(getPerms(ext)), [])
 
 class FileScanner extends Scanner {
-  constructor (prefs) {
-    super()
+  constructor (prefs, qStats) {
+    super(qStats)
     this.paths = prefs.paths
   }
 
   async scan (pathId) {
-    const dir = this.paths.entities[pathId].path
+    const dir = this.paths.entities[pathId]?.path
+
+    if (!dir) {
+      log.error('invalid pathId: %s', pathId)
+      return
+    }
+
     const validMediaIds = []
     let files // { file, stats }[]
 
@@ -43,19 +48,16 @@ class FileScanner extends Scanner {
       )
     } catch (err) {
       log.error(`  => ${err.message} (path offline)`)
-      // @todo: emit status?
       return
     }
-
-    // log.info('Processing %s files', numTotal.toLocaleString())
 
     for (let i = 0; i < files.length; i++) {
       const curDir = path.dirname(files[i].file)
       let prevDir
 
       log.info('[%s/%s] %s', i + 1, files.length, files[i].file)
-      this.emitStatus(`Processing (${i + 1} of ${files.length})`, (i + 1 / files.length) * 100)
 
+      this.emitStatus(`Processing (${i + 1} of ${files.length})`, (i + 1) / files.length)
       if (prevDir !== curDir) {
         prevDir = curDir
 
@@ -67,10 +69,7 @@ class FileScanner extends Scanner {
       // process file
       try {
         const res = await this.process(files[i], pathId)
-
-        // success
         validMediaIds.push(res.mediaId)
-        // if (res.isNew) numAdded++
       } catch (err) {
         log.warn(`  => ${err.message}`)
       }
@@ -86,10 +85,6 @@ class FileScanner extends Scanner {
 
     const numRemoved = await this.removeInvalid(pathId, validMediaIds)
     log.info(`Removed ${numRemoved} invalid media entries`)
-
-    // this.emitStatus(`Finished (${numAdded} new, ${numRemoved} removed, ${valid.length} total media)`, 100, false)
-
-    await IPC.req({ type: MEDIA_CLEANUP })
   }
 
   async process (item, pathId) {
@@ -174,7 +169,6 @@ class FileScanner extends Scanner {
     } // end if
 
     // new media
-    // ---------
     media.dateAdded = Math.round(new Date().getTime() / 1000) // seconds
     log.info('  => new: %s', JSON.stringify(match))
 

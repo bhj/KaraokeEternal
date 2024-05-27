@@ -19,7 +19,7 @@ IPC.use({
     log.info('watching %s folder(s):', payload.paths.result.length)
 
     Object.values(payload.paths.entities).forEach(({ path, pathId }) => {
-      log.verbose('  -> %s', path)
+      log.verbose('  => %s', path)
 
       fs.watch(path, { recursive: true }, debounce((eventType, filename) => {
         log.info('event in path: %s (filename=%s) (type=%s)', path, filename, eventType)

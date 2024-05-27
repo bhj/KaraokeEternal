@@ -4,23 +4,23 @@ const {
 } = require('../../shared/actionTypes')
 
 class Scanner {
-  constructor () {
+  constructor (qStats) {
     this.isCanceling = false
-    this.emitStatus = this.getStatusEmitter()
+    this.emitStatus = this.getStatusEmitter(qStats)
   }
 
   cancel () {
     this.isCanceling = true
   }
 
-  getStatusEmitter () {
-    return (text, pct, isScanning = true) => {
+  getStatusEmitter ({ length }) {
+    return (text, progress, isScanning = true) => {
       IPC.send({
         type: SCANNER_WORKER_STATUS,
         payload: {
           isScanning,
-          pct,
-          text,
+          pct: (progress / length) * 100,
+          text: length === 1 ? text : `[1/${length}] ${text}`,
         },
       })
     }

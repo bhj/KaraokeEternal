@@ -11,7 +11,7 @@ const env = {
   KES_PATH_WEBROOT: path.join(baseDir, 'build'),
   KES_PORT: parseInt(process.env.KES_PORT, 10) || 0,
   KES_ROTATE_KEY: ['1', 'true'].includes(process.env.KES_ROTATE_KEY?.toLowerCase()),
-  KES_SCAN: ['1', 'true'].includes(process.env.KES_SCAN?.toLowerCase()),
+  KES_SCAN: process.env.KES_SCAN?.trim(),
   KES_SCAN_CONSOLE_LEVEL: parseInt(process.env.KES_SCAN_CONSOLE_LEVEL, 10),
   KES_SCAN_LOG_LEVEL: parseInt(process.env.KES_SCAN_LOG_LEVEL, 10),
   KES_URL_PATH: process.env.KES_URL_PATH || '/',
@@ -47,7 +47,8 @@ const yargs = require('yargs')
     describe: 'Rotate the session key at startup',
   })
   .option('scan', {
-    describe: 'Run the media scanner at startup',
+    describe: 'List of pathIds to scan at startup (comma separated; "true" to scan all)',
+    type: 'string',
   })
   .option('scanConsoleLevel', {
     describe: 'Media scanner console output level (default=4)',
@@ -90,18 +91,15 @@ if (argv.version) {
   env.KES_EXIT = true
 }
 
-// CLI options take precedence over env vars
-if (argv.scan) {
-  env.KES_SCAN = true
-}
-
 if (argv.rotateKey) {
   env.KES_ROTATE_KEY = true
 }
 
+// CLI options take precedence over env vars
 const opts = {
   data: 'KES_PATH_DATA',
   port: 'KES_PORT',
+  scan: 'KES_SCAN',
   scanConsoleLevel: 'KES_SCAN_CONSOLE_LEVEL',
   scanLogLevel: 'KES_SCAN_LOG_LEVEL',
   serverConsoleLevel: 'KES_CONSOLE_LEVEL',

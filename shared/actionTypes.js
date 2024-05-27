@@ -87,10 +87,9 @@ module.exports = {
   SONG_INFO_SET_PREFERRED: 'songInfo/SET_PREFERRED',
   SONG_INFO_CLOSE: 'songInfo/SONG_INFO_CLOSE',
   // IPC messages
-  SCANNER_CMD_START: 'scannerWorker/CMD_START',
-  SCANNER_CMD_STOP: 'scannerWorker/CMD_STOP',
   SCANNER_WORKER_PATH_SCANNED: 'scannerWorker/PATH_SCANNED',
-  SCANNER_WORKER_SCAN: 'scannerWorker/SCAN',
+  REQUEST_SCAN: 'scannerWorker/REQUEST_SCAN',
+  REQUEST_SCAN_STOP: 'scannerWorker/REQUEST_SCAN_STOP',
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
   SERVER_WORKER_ERROR: 'serverWorker/ERROR',

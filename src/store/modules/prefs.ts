@@ -45,7 +45,7 @@ export const requestScan = createAsyncThunk(
 
 export const requestScanStop = createAsyncThunk(
   PREFS_REQ_SCANNER_STOP,
-  async () => api('GET', '/scan')
+  async () => api('GET', '/scan/stop')
 )
 
 // ------------------------------------

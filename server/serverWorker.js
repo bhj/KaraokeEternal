@@ -86,9 +86,6 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
         type: SERVER_WORKER_STATUS,
         payload: { url },
       })
-
-      // scanning on startup?
-      if (env.KES_SCAN) startScanner()
     })
 
     function stopServer (signal) {
@@ -172,7 +169,7 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
 
     // validated
     ctx.io = io
-    ctx.startScanner = (pathIds) => startScanner()
+    ctx.startScanner = startScanner
     ctx.stopScanner = stopScanner
 
     await next()

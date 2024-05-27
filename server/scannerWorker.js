@@ -2,64 +2,61 @@ const path = require('path')
 const log = require('./lib/Log')(`scanner[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
+const { parsePathIds } = require('./lib/util')
 const {
-  SCANNER_CMD_STOP,
-  SCANNER_WORKER_SCAN,
+  MEDIA_CLEANUP,
+  REQUEST_SCAN,
+  REQUEST_SCAN_STOP,
   SCANNER_WORKER_PATH_SCANNED,
+  SCANNER_WORKER_STATUS,
 } = require('../shared/actionTypes')
 
-let FileScanner, Prefs
-let _Scanner
-let pathQueue = []
-
-Database.open({
-  file: path.join(process.env.KES_PATH_DATA, 'database.sqlite3'),
-  ro: true,
-}).then(db => {
-  Prefs = require('./Prefs')
-  FileScanner = require('./Scanner/FileScanner')
-
+;(async function () {
   IPC.use({
-    [SCANNER_WORKER_SCAN]: ({ payload }) => {
-      log.info('Media path queued for scan (pathId=%s)', payload.pathId)
-      pathQueue.push(payload.pathId)
-
-      if (!_Scanner) startScan()
+    [REQUEST_SCAN]: ({ payload }) => {
+      q.queue(payload.pathIds) // no need to await; fire and forget
     },
-    [SCANNER_CMD_STOP]: () => {
-      log.info('Stopping media scan (user requested)')
-      pathQueue = []
-      cancelScan()
+    [REQUEST_SCAN_STOP]: () => {
+      q.stop()
     }
   })
-}).catch(err => {
-  log.error(err.message)
 
-  // scanner process won't exit automatically due to the
-  // IPC message listener; forcing exit here for now
-  process.exit(1) // eslint-disable-line n/no-process-exit
-})
+  await Database.open({
+    file: path.join(process.env.KES_PATH_DATA, 'database.sqlite3'),
+    ro: true,
+  })
 
-async function startScan () {
-  log.info('Starting media scan')
+  const q = require('./Scanner/ScannerQueue')
 
-  while (pathQueue.length) {
-    const prefs = await Prefs.get()
-    _Scanner = new FileScanner(prefs)
+  const args = process.argv.slice(2)
+  log.verbose('received arguments: %s', args)
 
-    await _Scanner.scan(pathQueue.shift())
+  if (args.length) {
+    const pathIds = parsePathIds(args[0])
+    log.verbose('parsed pathIds: %s', pathIds)
 
-    // push updated library/queue after each completed path
-    await IPC.req({ type: SCANNER_WORKER_PATH_SCANNED })
+    await q.queue(pathIds)
+    await q.start(onPathScanned)
   }
 
-  // scanner process won't exit automatically due to the
-  // IPC message listener; forcing exit here for now
+  IPC.send({
+    type: SCANNER_WORKER_STATUS,
+    payload: {
+      isScanning: false,
+      pct: 100,
+      text: 'Finished',
+    },
+  })
+
+  // process won't exit automatically due to the IPC message listener
   process.exit(0) // eslint-disable-line n/no-process-exit
-}
+})()
 
-function cancelScan () {
-  if (_Scanner) {
-    _Scanner.cancel()
+async function onPathScanned ({ length }) {
+  // clean up before emitting library/queue if this is the last path
+  if (length === 0) {
+    await IPC.req({ type: MEDIA_CLEANUP })
   }
+
+  await IPC.req({ type: SCANNER_WORKER_PATH_SCANNED })
 }
