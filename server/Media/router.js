@@ -1,9 +1,11 @@
-const { promisify } = require('util')
 const fs = require('fs')
-const stat = promisify(fs.stat)
+const fsPromises = require('node:fs/promises')
+const { Readable } = require('stream')
 const path = require('path')
+const { unzip } = require('unzipit')
 const log = require('../lib/Log')('Media')
 const getCdgName = require('../lib/getCdgName')
+const { getExt } = require('../lib/util')
 const KoaRouter = require('@koa/router')
 const router = KoaRouter({ prefix: '/api/media' })
 const Library = require('../Library')
@@ -16,6 +18,8 @@ const {
   LIBRARY_PUSH_SONG,
   QUEUE_PUSH
 } = require('../../shared/actionTypes')
+
+const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 
 // stream a media file
 router.get('/:mediaId', async (ctx, next) => {
@@ -45,26 +49,38 @@ router.get('/:mediaId', async (ctx, next) => {
   const basePath = paths.entities[pathId].path
 
   let file = path.join(basePath, relPath)
+  let buffer
 
-  if (type === 'cdg') {
-    file = await getCdgName(file)
+  if (getExt(file) === '.zip') {
+    const { entries } = await unzip(new Uint8Array(await fsPromises.readFile(file)))
+    let entry
 
-    if (!file) {
-      ctx.throw(404, 'The .cdg file could not be found')
+    if (type === 'cdg') {
+      entry = Object.keys(entries).find(f => !f.includes('/') && getExt(f) === '.cdg')
+      if (!entry) ctx.throw(404, 'No .cdg file found in archive')
+    } else {
+      entry = Object.keys(entries).find(f => !f.includes('/') && audioExts.includes(getExt(f)))
+      if (!entry) ctx.throw(404, 'No valid audio file found in archive')
     }
+
+    ctx.length = entries[entry].size
+    ctx.type = fileTypes[getExt(entry)]?.mimeType
+    buffer = Buffer.from(await entries[entry].arrayBuffer())
+  } else {
+    if (type === 'cdg') {
+      file = await getCdgName(file)
+      if (!file) ctx.throw(404, 'The .cdg file could not be found')
+    }
+
+    const stats = await fsPromises.stat(file)
+    ctx.length = stats.size
+    ctx.type = fileTypes[getExt(file)]?.mimeType
   }
 
-  // get file info
-  const stats = await stat(file)
-  ctx.length = stats.size
-  ctx.type = fileTypes[path.extname(file).toLowerCase()]?.mimeType
-
-  if (!ctx.type) {
-    ctx.throw(404, `Unknown MIME type: ${file}`)
-  }
+  if (!ctx.type) ctx.throw(404, `Unknown MIME type: ${file}`)
 
   log.verbose('streaming %s (%sMB): %s', ctx.type, (ctx.length / 1000000).toFixed(2), file)
-  ctx.body = fs.createReadStream(file)
+  ctx.body = buffer ? Readable.from(buffer) : fs.createReadStream(file)
 })
 
 // set isPreferred flag
