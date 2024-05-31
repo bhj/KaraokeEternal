@@ -5,6 +5,8 @@ const router = KoaRouter({ prefix: '/api/prefs' })
 const getFolders = require('../lib/getFolders')
 const getWindowsDrives = require('../lib/getWindowsDrives')
 const Prefs = require('./Prefs')
+const Media = require('../Media')
+const pushQueuesAndLibrary = require('../lib/pushQueuesAndLibrary')
 
 // start media scan
 router.get('/scan', async (ctx, next) => {
@@ -80,8 +82,10 @@ router.delete('/path/:pathId', async (ctx, next) => {
   // respond with updated prefs
   ctx.body = await Prefs.get()
 
-  // update library
-  ctx.startScanner() // todo
+  await Media.cleanup()
+
+  // no need to await
+  pushQueuesAndLibrary(ctx.io)
 })
 
 // get folder listing for path browser
