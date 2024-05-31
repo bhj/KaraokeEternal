@@ -54,13 +54,13 @@ router.post('/path', async (ctx, next) => {
     ctx.throw(422, 'Invalid path')
   }
 
-  await Prefs.addPath(dir)
+  const pathId = await Prefs.addPath(dir)
 
   // respond with updated prefs
   ctx.body = await Prefs.get()
 
   // update library
-  ctx.startScanner() // todo: pathId
+  ctx.startScanner(pathId)
 })
 
 // remove media file path
