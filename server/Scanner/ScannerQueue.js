@@ -3,11 +3,16 @@ const Prefs = require('../Prefs')
 const log = require('../lib/Log')('queue')
 
 class ScannerQueue {
-  static #instance
-  static #isCanceling = false
-  static #q = []
+  #instance
+  #isCanceling = false
+  #q = []
 
-  static async queue (pathIds) {
+  constructor (onIteration, onDone) {
+    this.onIteration = onIteration
+    this.onDone = onDone
+  }
+
+  async queue (pathIds) {
     const prefs = await Prefs.get()
 
     if (pathIds === true) {
@@ -33,21 +38,27 @@ class ScannerQueue {
         this.#q.push(id)
       }
     })
+
+    if (this.#q.length && !this.#instance) {
+      this.start()
+    }
   }
 
-  static async start (cb) {
+  async start () {
     log.info('Starting media scan')
 
     while (this.#q.length && !this.#isCanceling) {
       const prefs = await Prefs.get()
       this.#instance = new FileScanner(prefs, { length: this.#q.length })
 
-      await this.#instance.scan(this.#q.shift())
-      await cb({ length: this.#q.length })
+      const stats = await this.#instance.scan(this.#q.shift())
+      this.onIteration(stats)
     }
+
+    this.onDone()
   }
 
-  static stop () {
+  stop () {
     log.info('Stopping media scan (user requested)')
     this.#isCanceling = true
 

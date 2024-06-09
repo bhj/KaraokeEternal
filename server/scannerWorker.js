@@ -4,10 +4,8 @@ const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
 const { parsePathIds } = require('./lib/util')
 const {
-  MEDIA_CLEANUP,
   REQUEST_SCAN,
   REQUEST_SCAN_STOP,
-  SCANNER_WORKER_PATH_SCANNED,
   SCANNER_WORKER_STATUS,
 } = require('../shared/actionTypes')
 
@@ -26,19 +24,26 @@ const {
     ro: true,
   })
 
-  const q = require('./Scanner/ScannerQueue')
-
+  const ScannerQueue = require('./Scanner/ScannerQueue')
+  const q = new ScannerQueue(onIteration, onDone)
   const args = process.argv.slice(2)
   log.verbose('received arguments: %s', args)
 
-  if (args.length) {
-    const pathIds = parsePathIds(args[0])
-    log.verbose('parsed pathIds: %s', pathIds)
-
-    await q.queue(pathIds)
-    await q.start(onPathScanned)
+  if (!args.length) {
+    process.exit(1) // eslint-disable-line n/no-process-exit
   }
 
+  const pathIds = parsePathIds(args[0])
+  log.verbose('parsed pathIds: %s', pathIds)
+
+  q.queue(pathIds)
+})()
+
+function onIteration (stats) {
+  // @todo
+}
+
+function onDone () {
   IPC.send({
     type: SCANNER_WORKER_STATUS,
     payload: {
@@ -48,15 +53,5 @@ const {
     },
   })
 
-  // process won't exit automatically due to the IPC message listener
   process.exit(0) // eslint-disable-line n/no-process-exit
-})()
-
-async function onPathScanned ({ length }) {
-  // clean up before emitting library/queue if this is the last path
-  if (length === 0) {
-    await IPC.req({ type: MEDIA_CLEANUP })
-  }
-
-  await IPC.req({ type: SCANNER_WORKER_PATH_SCANNED })
 }

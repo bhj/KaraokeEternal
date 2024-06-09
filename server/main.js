@@ -26,6 +26,7 @@ const refs = {}
 const {
   REQUEST_SCAN,
   REQUEST_SCAN_STOP,
+  SCANNER_WORKER_EXITED,
   SERVER_WORKER_ERROR,
   SERVER_WORKER_STATUS,
   WATCHER_WORKER_EVENT,
@@ -149,9 +150,11 @@ function startScanner (pathIds) {
     })
 
     refs.scanner.on('exit', (code, signal) => {
-      log.info(`Media scanner process exited (${signal || code})`)
       IPC.removeChild(refs.scanner)
       delete refs.scanner
+
+      process.emit(SCANNER_WORKER_EXITED, { signal, code })
+      log.info(`Media scanner process exited (${signal || code})`)
     })
 
     IPC.addChild(refs.scanner)

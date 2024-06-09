@@ -16,6 +16,7 @@ const koaRange = require('koa-range')
 const koaStatic = require('koa-static')
 const webpackDevMiddleware = require('webpack-dev-middleware')
 
+const Media = require('./Media')
 const Prefs = require('./Prefs')
 const libraryRouter = require('./Library/router')
 const mediaRouter = require('./Media/router')
@@ -29,7 +30,7 @@ const IPC = require('./lib/IPCBridge')
 const IPCLibraryActions = require('./Library/ipc')
 const IPCMediaActions = require('./Media/ipc')
 const {
-  SCANNER_WORKER_PATH_SCANNED,
+  SCANNER_WORKER_EXITED,
   SERVER_WORKER_STATUS,
   SERVER_WORKER_ERROR,
 } = require('../shared/actionTypes')
@@ -70,10 +71,13 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     // attach IPC action handlers
     IPC.use(IPCLibraryActions(io))
     IPC.use(IPCMediaActions(io))
-    IPC.use({
-      [SCANNER_WORKER_PATH_SCANNED]: async () => {
-        await pushQueuesAndLibrary(io)
-      }
+
+    // when scanner exits cleanly
+    process.on(SCANNER_WORKER_EXITED, async ({ code }) => {
+      if (code !== 0) return
+
+      await Media.cleanup()
+      await pushQueuesAndLibrary(io)
     })
 
     // success callback in 3rd arg
