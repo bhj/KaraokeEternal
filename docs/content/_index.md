@@ -41,7 +41,7 @@ There are several <a href='{{< ref "docs/karaoke-eternal-server#installation" >}
 
 ## Discord & Support
 
-Join the <a href="{{ baseurl }}discord" rel="noopener">Karaoke Eternal Discord Server</a>{{% icon-external %}} for general support and development chat, or just to say hi!
+Join the <a href="{{% baseurl %}}discord" rel="noopener">Karaoke Eternal Discord Server</a>{{% icon-external %}} for general support and development chat, or just to say hi!
 
 ## Contributing & Development
 
