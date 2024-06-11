@@ -68,10 +68,7 @@ process.on('SIGTERM', shutdown)
 process.on('SIGINT', shutdown)
 
 // make sure child processes don't hang around
-process.on('exit', function () {
-  if (refs.server) refs.server.kill()
-  if (refs.scanner) refs.scanner.kill()
-})
+process.on('exit', () => Object.values(refs).forEach(ref => ref.kill()))
 
 // debug: log stack trace for unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
