@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import HttpApi from 'lib/HttpApi'
 import Icon from 'components/Icon'
 import PathChooser from './PathChooser'

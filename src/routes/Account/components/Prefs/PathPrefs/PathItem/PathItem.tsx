@@ -1,5 +1,5 @@
 import React from 'react'
-import { Draggable } from 'react-beautiful-dnd'
+import { Draggable } from '@hello-pangea/dnd'
 import Button from 'components/Button'
 import Icon from 'components/Icon'
 import { Path } from 'shared/types'
