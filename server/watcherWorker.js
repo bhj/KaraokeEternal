@@ -24,7 +24,7 @@ IPC.use({
     Object.values(payload.paths.entities).forEach(({ path, pathId }) => {
       log.verbose('  => %s', path)
 
-      fs.watch(path, { recursive: true }, debounce((eventType, filename) => {
+      const ref = fs.watch(path, { recursive: true }, debounce((eventType, filename) => {
         if (!searchExts.includes(pathLib.extname(filename).toLowerCase())) {
           return
         }
@@ -36,6 +36,8 @@ IPC.use({
           payload: { pathId },
         })
       }, 3000))
+
+      refs.push(ref)
     })
   },
 })
