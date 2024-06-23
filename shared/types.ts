@@ -39,6 +39,9 @@ export interface Path {
   pathId: number
   path: string
   priority: number
+  prefs: {
+    isWatchingEnabled: boolean
+  }
 }
 
 export interface User {

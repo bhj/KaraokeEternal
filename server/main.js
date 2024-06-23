@@ -122,7 +122,7 @@ function startWatcher (paths) {
     })
 
     refs.watcher.on('exit', (code, signal) => {
-      log.info(`Folder watcher exited (${signal || code})`)
+      log.info(`Folder watcher process exited (${signal || code})`)
       IPC.removeChild(refs.watcher)
       delete refs.watcher
     })

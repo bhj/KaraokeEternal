@@ -3,7 +3,7 @@ const Library = require('../Library')
 const Prefs = require('./Prefs')
 const {
   LIBRARY_PUSH,
-  PREFS_SET_PATH_PRIORITY,
+  PREFS_PATH_SET_PRIORITY,
   PREFS_PUSH,
   PREFS_SET,
   _ERROR,
@@ -23,10 +23,10 @@ const ACTION_HANDLERS = {
 
     await pushPrefs(sock)
   },
-  [PREFS_SET_PATH_PRIORITY]: async (sock, { payload }, acknowledge) => {
+  [PREFS_PATH_SET_PRIORITY]: async (sock, { payload }, acknowledge) => {
     if (!sock.user.isAdmin) {
       acknowledge({
-        type: PREFS_SET_PATH_PRIORITY + _ERROR,
+        type: PREFS_PATH_SET_PRIORITY + _ERROR,
         error: 'Unauthorized',
       })
     }

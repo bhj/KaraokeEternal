@@ -8,27 +8,7 @@ const Prefs = require('./Prefs')
 const Media = require('../Media')
 const pushQueuesAndLibrary = require('../lib/pushQueuesAndLibrary')
 
-// start media scan
-router.get('/scan', async (ctx, next) => {
-  if (!ctx.user.isAdmin) {
-    ctx.throw(401)
-  }
-
-  ctx.status = 200
-  ctx.startScanner(true) // todo: pathId
-})
-
-// stop media scan
-router.get('/scan/stop', async (ctx, next) => {
-  if (!ctx.user.isAdmin) {
-    ctx.throw(401)
-  }
-
-  ctx.status = 200
-  ctx.stopScanner()
-})
-
-// get preferences and media paths
+// get all prefs (including media paths)
 router.get('/', async (ctx, next) => {
   const prefs = await Prefs.get()
 
@@ -38,12 +18,11 @@ router.get('/', async (ctx, next) => {
     return
   }
 
-  // there are no non-admin prefs but we don't want to
-  // trigger a fetch error on the frontend
+  // empty response for non-admins (to avoid a fetch() error)
   ctx.body = {}
 })
 
-// add media file path
+// add a media path
 router.post('/path', async (ctx, next) => {
   const dir = decodeURIComponent(ctx.query.dir)
 
@@ -65,7 +44,25 @@ router.post('/path', async (ctx, next) => {
   ctx.startScanner(pathId)
 })
 
-// remove media file path
+// set media path preferences
+router.put('/path/:pathId', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  const pathId = parseInt(ctx.params.pathId, 10)
+
+  if (isNaN(pathId)) {
+    ctx.throw(422, 'Invalid pathId')
+  }
+
+  await Prefs.setPathData(pathId, 'prefs.', ctx.request.body)
+
+  // respond with updated prefs
+  ctx.body = await Prefs.get()
+})
+
+// remove a media path
 router.delete('/path/:pathId', async (ctx, next) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
@@ -86,6 +83,42 @@ router.delete('/path/:pathId', async (ctx, next) => {
 
   // no need to await
   pushQueuesAndLibrary(ctx.io)
+})
+
+// scan a media path
+router.get('/path/:pathId/scan', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  const pathId = parseInt(ctx.params.pathId, 10)
+
+  if (isNaN(pathId)) {
+    ctx.throw(422, 'Invalid pathId')
+  }
+
+  ctx.status = 200
+  ctx.startScanner(pathId)
+})
+
+// scan all media paths
+router.get('/paths/scan', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  ctx.status = 200
+  ctx.startScanner(true)
+})
+
+// stop scanning
+router.get('/paths/scan/stop', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  ctx.status = 200
+  ctx.stopScanner()
 })
 
 // get folder listing for path browser

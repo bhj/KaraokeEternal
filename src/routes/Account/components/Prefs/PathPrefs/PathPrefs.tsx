@@ -4,9 +4,11 @@ import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import HttpApi from 'lib/HttpApi'
 import Icon from 'components/Icon'
 import PathChooser from './PathChooser'
+import PathInfo from './PathInfo/PathInfo'
 import PathItem from './PathItem'
 import styles from './PathPrefs.css'
-import { receivePrefs, requestScan, setPathPriority } from 'store/modules/prefs'
+import { receivePrefs, requestScan, requestScanAll, setPathPriority, setPathPrefs } from 'store/modules/prefs'
+import type { Path } from 'shared/types'
 
 const api = new HttpApi('prefs/path')
 
@@ -14,11 +16,13 @@ const PathPrefs = () => {
   const paths = useAppSelector(state => state.prefs.paths)
   const [isExpanded, setExpanded] = useState(false)
   const [isChoosing, setChoosing] = useState(false)
+  const [editingPath, setEditingPath] = useState<Path | null>(null)
   const [priority, setPriority] = useState(paths.result)
 
   const toggleExpanded = useCallback(() => setExpanded(prevState => !prevState), [])
   const handleCloseChooser = useCallback(() => setChoosing(false), [])
   const handleOpenChooser = useCallback(() => setChoosing(true), [])
+  const handleCloseInfo = useCallback(() => setEditingPath(null), [])
 
   useEffect(() => {
     // local state for immediate UI updates
@@ -26,7 +30,7 @@ const PathPrefs = () => {
   }, [paths])
 
   const dispatch = useAppDispatch()
-  const handleRefresh = useCallback(() => dispatch(requestScan()), [dispatch])
+
   const handleDragEnd = useCallback(dnd => {
     // dropped outside the list?
     if (!dnd.destination) return
@@ -39,7 +43,7 @@ const PathPrefs = () => {
     dispatch(setPathPriority(res as number[]))
   }, [dispatch, priority])
 
-  const handleAddPath = useCallback(dir => {
+  const handleAdd = useCallback(dir => {
     api('POST', `/?dir=${encodeURIComponent(dir)}`)
       .then(res => {
         dispatch(receivePrefs(res))
@@ -49,15 +53,26 @@ const PathPrefs = () => {
       })
   }, [dispatch])
 
-  const handleRemovePath = useCallback(e => {
-    const { path, pathId } = paths.entities[e.currentTarget.dataset.pathId]
+  const handleInfo = useCallback(e => {
+    const pathId = e.currentTarget.dataset.pathId
+    pathId && setEditingPath(paths.entities[e.currentTarget.dataset.pathId])
+  }, [paths])
 
-    if (!confirm(`Remove folder from library?\n\n${path}`)) {
+  const handleRefresh = useCallback(e => {
+    const pathId = e.currentTarget.dataset.pathId
+    pathId && dispatch(requestScan(pathId))
+  }, [dispatch])
+
+  const handleRefreshAll = useCallback(() => dispatch(requestScanAll()), [dispatch])
+
+  const handleRemove = useCallback((pathId: number) => {
+    if (!confirm(`Remove folder from library?\n\n${paths.entities[pathId].path}`)) {
       return
     }
 
     // optimistically update local state
     setPriority(priority.filter(id => id !== pathId))
+    setEditingPath(null)
 
     api('DELETE', `/${pathId}`)
       .then(res => {
@@ -66,6 +81,10 @@ const PathPrefs = () => {
         alert(err)
       })
   }, [dispatch, paths, priority])
+
+  const handleUpdate = useCallback((pathId, data) => {
+    dispatch(setPathPrefs({ pathId, data }))
+  }, [dispatch])
 
   return (
     <div className={styles.container}>
@@ -87,7 +106,13 @@ const PathPrefs = () => {
             {(provided) => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 {priority.map((pathId, i) =>
-                  <PathItem index={i} key={pathId} path={paths.entities[pathId]} onRemove={handleRemovePath}/>
+                  <PathItem
+                    index={i}
+                    key={pathId}
+                    path={paths.entities[pathId]}
+                    onInfo={handleInfo}
+                    onRefresh={handleRefresh}
+                  />
                 )}
 
                 {provided.placeholder}
@@ -101,7 +126,7 @@ const PathPrefs = () => {
             Add Folder
           </button>
           {paths.result.length > 0 &&
-            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={handleRefresh}>
+            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={handleRefreshAll}>
               Refresh
             </button>
           }
@@ -110,7 +135,15 @@ const PathPrefs = () => {
         <PathChooser
           isVisible={isChoosing}
           onCancel={handleCloseChooser}
-          onChoose={handleAddPath}
+          onChoose={handleAdd}
+        />
+
+        <PathInfo
+          isVisible={!!editingPath}
+          onClose={handleCloseInfo}
+          onRemove={handleRemove}
+          onUpdate={handleUpdate}
+          path={editingPath}
         />
       </div>
     </div>

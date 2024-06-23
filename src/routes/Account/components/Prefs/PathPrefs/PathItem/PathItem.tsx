@@ -7,7 +7,8 @@ import styles from './PathItem.css'
 
 interface PathItemProps {
   index: number
-  onRemove(...args: unknown[]): unknown
+  onInfo: () => void
+  onRefresh: (pathId: number) => void
   path: Path
 }
 
@@ -30,10 +31,17 @@ const PathItem = (props: PathItemProps) => {
             {path}
           </div>
           <Button
-            className={styles.btnClear}
+            className={styles.btnRefresh}
             data-path-id={pathId}
-            icon='CLEAR'
-            onClick={props.onRemove}
+            icon='REFRESH'
+            onClick={props.onRefresh}
+            size={32}
+          />
+          <Button
+            className={styles.btnInfo}
+            data-path-id={pathId}
+            icon='INFO_OUTLINE'
+            onClick={props.onInfo}
             size={32}
           />
         </div>

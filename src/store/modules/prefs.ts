@@ -5,7 +5,8 @@ import {
   PREFS_RECEIVE,
   PREFS_REQUEST,
   PREFS_SET,
-  PREFS_SET_PATH_PRIORITY,
+  PREFS_PATH_UPDATE,
+  PREFS_PATH_SET_PRIORITY,
   PREFS_PUSH,
   PREFS_REQ_SCANNER_START,
   PREFS_REQ_SCANNER_STOP,
@@ -22,7 +23,24 @@ const api = new HttpApi('prefs')
 const logout = createAction(LOGOUT)
 export const setPref = createAction<{ key: string; data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<object>(PREFS_RECEIVE)
-export const setPathPriority = createAction<number[]>(PREFS_SET_PATH_PRIORITY)
+export const setPathPriority = createAction<number[]>(PREFS_PATH_SET_PRIORITY)
+
+export const setPathPrefs = createAsyncThunk(
+  PREFS_PATH_UPDATE,
+  async ({
+    pathId,
+    data
+  }: {
+  pathId: number
+  data: FormData
+}, thunkAPI) => {
+    const response = await api('PUT', `/path/${pathId}`, {
+      body: data,
+    })
+
+    thunkAPI.dispatch(receivePrefs(response))
+  }
+)
 
 export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
   PREFS_REQUEST,
@@ -40,12 +58,17 @@ export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
 
 export const requestScan = createAsyncThunk(
   PREFS_REQ_SCANNER_START,
-  async () => api('GET', '/scan')
+  async (pathId: number) => await api('GET', `/path/${pathId}/scan`)
+)
+
+export const requestScanAll = createAsyncThunk(
+  PREFS_REQ_SCANNER_START,
+  async () => await api('GET', '/paths/scan')
 )
 
 export const requestScanStop = createAsyncThunk(
   PREFS_REQ_SCANNER_STOP,
-  async () => api('GET', '/scan/stop')
+  async () => await api('GET', '/paths/scan/stop')
 )
 
 // ------------------------------------

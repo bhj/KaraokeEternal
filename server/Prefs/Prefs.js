@@ -6,8 +6,8 @@ const log = require('../lib/Log')('Prefs')
 
 class Prefs {
   /**
-   * Gets prefs (includes media paths, does not inlcude JWT secret key)
-   * @return {Promise} Prefs object
+   * Get all global preferences (includes media paths; excludes JWT secret key)
+   * @return {Promise<object>}
    */
   static async get () {
     const prefs = {
@@ -36,6 +36,7 @@ class Prefs {
       const rows = await db.all(String(query), query.parameters)
 
       for (const row of rows) {
+        row.data = JSON.parse(row.data)
         prefs.paths.entities[row.pathId] = row
         prefs.paths.result.push(row.pathId)
       }
@@ -45,10 +46,10 @@ class Prefs {
   }
 
   /**
-   * Set a preference key
-   * @param  {string}  key  Prefs key name
-   * @param  {any}     data to be JSON encoded
-   * @return {Promise}      Success/fail boolean
+   * Set a global preference
+   * @param {string} key - the preference key
+   * @param {any} data - the value to be JSON encoded
+   * @return {Promise<boolean>} Success/fail boolean
    */
   static async set (key, data) {
     const query = sql`
@@ -61,8 +62,8 @@ class Prefs {
 
   /**
    * Add media path
-   * @param  {string}  dir Absolute path
-   * @return {Promise}     pathId (Number) of newly-added path
+   * @param {string} dir - an absolute path
+   * @return {Promise<number>} the newly-added path's pathId
    */
   static async addPath (dir) {
     const prefs = await Prefs.get()
@@ -92,9 +93,8 @@ class Prefs {
   }
 
   /**
-   * Remove media path
-   * @param  {Number}  pathId
-   * @return {Promise}
+   * Remove a media path
+   * @param {number} pathId
    */
   static async removePath (pathId) {
     const query = sql`
@@ -106,8 +106,7 @@ class Prefs {
 
   /**
    * Set media path priorities
-   * @param  {Array}  pathIds
-   * @return {Promise}
+   * @param {number[]} pathIds
    */
   static async setPathPriority (pathIds) {
     if (!Array.isArray(pathIds)) {
@@ -125,8 +124,27 @@ class Prefs {
   }
 
   /**
+   * Set a path's JSON data
+   * @param {number} pathId
+   * @param {string} keyPrefix - key prefix; e.g. `prefs.`
+   * @param {object} data - key:value pair to set
+   * @todo Currently only supports one key:value pair at a time
+   */
+  static async setPathData (pathId, keyPrefix = '', data) {
+    const keys = Object.keys(data).map(key => `$.${keyPrefix}${key}`)
+    const values = Object.values(data)
+
+    const query = sql`
+      UPDATE paths
+      SET data = json_set(data, ${keys[0]}, json(${JSON.stringify(values[0])}))
+      WHERE pathId = ${pathId}
+    `
+    await db.run(String(query), query.parameters)
+  }
+
+  /**
    * Get JWT secret key from db
-   * @return {Promise}  jwtKey (string)
+   * @return {Promise<string>} the current or newly-generated key
    */
   static async getJwtKey (forceRotate = false) {
     if (forceRotate) return this.rotateJwtKey()
@@ -147,7 +165,6 @@ class Prefs {
 
   /**
    * Create or rotate JWT secret key
-   * @return {Promise}  jwtKey (string)
    */
   static async rotateJwtKey () {
     const jwtKey = crypto.randomBytes(48).toString('base64') // 64 char
@@ -158,7 +175,12 @@ class Prefs {
       VALUES ("jwtKey", ${JSON.stringify(jwtKey)})
     `
     const res = await db.run(String(query), query.parameters)
-    if (res.changes) return jwtKey
+
+    if (!res.changes) {
+      throw new Error('Unable to update JWT secret key')
+    }
+
+    return jwtKey
   }
 }
 
