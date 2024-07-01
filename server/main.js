@@ -23,6 +23,7 @@ const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
 const { parsePathIds } = require('./lib/util')
 const refs = {}
+const shutdownHandlers = []
 const {
   PREFS_PATHS_CHANGED,
   REQUEST_SCAN,
@@ -66,9 +67,10 @@ if (Number.isInteger(env.KES_PUID)) {
   process.setuid(env.KES_PUID)
 }
 
-// close db before exiting (can't do async in the 'exit' handler)
-process.on('SIGTERM', shutdown)
-process.on('SIGINT', shutdown)
+// handle shutdown gracefully
+['SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'uncaughtException'].forEach((event) => {
+  process.on(event, shutdown)
+})
 
 // make sure child processes don't hang around
 process.on('exit', () => Object.values(refs).forEach(ref => ref.kill()))
@@ -90,6 +92,8 @@ if (process.versions.electron) {
     ro: false,
   })
 
+  shutdownHandlers.push(Database.close)
+
   if (refs.electron) {
     process.on('serverWorker', action => {
       const { type, payload } = action
@@ -103,7 +107,7 @@ if (process.versions.electron) {
   }
 
   // start web server
-  require('./serverWorker.js')({ env, startScanner, stopScanner, startWatcher })
+  require('./serverWorker.js')({ env, startScanner, stopScanner, shutdownHandlers })
 
   // scanning on startup?
   const pathIds = parsePathIds(env.KES_SCAN)
@@ -171,11 +175,9 @@ function stopScanner () {
   }
 }
 
-function shutdown (signal) {
+async function shutdown (signal) {
   log.info('Received %s', signal)
 
-  Database.close().catch(err => {
-    log.error(err.message)
-    throw err
-  })
+  await Promise.allSettled(shutdownHandlers.map(f => f()))
+  process.exit(0) // eslint-disable-line n/no-process-exit
 }

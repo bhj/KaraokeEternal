@@ -35,7 +35,7 @@ const {
   SERVER_WORKER_ERROR,
 } = require('../shared/actionTypes')
 
-async function serverWorker ({ env, startScanner, stopScanner }) {
+async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers }) {
   const indexFile = path.join(env.KES_PATH_WEBROOT, 'index.html')
   const urlPath = env.KES_URL_PATH.replace(/\/?$/, '/') // force trailing slash
   const jwtKey = await Prefs.getJwtKey(env.KES_ROTATE_KEY)
@@ -72,14 +72,6 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
     IPC.use(IPCLibraryActions(io))
     IPC.use(IPCMediaActions(io))
 
-    // when scanner exits cleanly
-    process.on(SCANNER_WORKER_EXITED, async ({ code }) => {
-      if (code !== 0) return
-
-      await Media.cleanup()
-      await pushQueuesAndLibrary(io)
-    })
-
     // success callback in 3rd arg
     server.listen(env.KES_PORT, () => {
       const port = server.address().port
@@ -92,18 +84,22 @@ async function serverWorker ({ env, startScanner, stopScanner }) {
       })
     })
 
-    function stopServer (signal) {
-      io.close(function () {
-        log.info(`Websocket server stopped (received ${signal})`)
-      })
+    // when scanner exits cleanly
+    process.on(SCANNER_WORKER_EXITED, async ({ code }) => {
+      if (code !== 0) return
 
-      server.close(function () {
-        log.info(`Web server stopped (received ${signal})`)
-      })
-    }
+      await Media.cleanup()
+      await pushQueuesAndLibrary(io)
+    })
 
-    process.on('SIGINT', stopServer)
-    process.on('SIGTERM', stopServer)
+    // handle shutdown gracefully
+    shutdownHandlers.push(() => new Promise((resolve) => {
+      // also calls http server's close method, which ultimately handles the callback
+      io.close(resolve)
+
+      // HMR keep-alive connections can prevent http server from fully closing
+      server.closeAllConnections()
+    }))
   }
 
   // --------------------
