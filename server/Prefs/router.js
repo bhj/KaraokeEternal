@@ -7,6 +7,9 @@ const getWindowsDrives = require('../lib/getWindowsDrives')
 const Prefs = require('./Prefs')
 const Media = require('../Media')
 const pushQueuesAndLibrary = require('../lib/pushQueuesAndLibrary')
+const {
+  PREFS_PATHS_CHANGED,
+} = require('../../shared/actionTypes')
 
 // get all prefs (including media paths)
 router.get('/', async (ctx, next) => {
@@ -40,9 +43,12 @@ router.post('/path', async (ctx, next) => {
   })
 
   // respond with updated prefs
-  ctx.body = await Prefs.get()
+  const prefs = await Prefs.get()
+  ctx.body = prefs
 
-  // update library
+  // (re)start watcher
+  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
+
   ctx.startScanner(pathId)
 })
 
@@ -61,7 +67,11 @@ router.put('/path/:pathId', async (ctx, next) => {
   await Prefs.setPathData(pathId, 'prefs.', ctx.request.body)
 
   // respond with updated prefs
-  ctx.body = await Prefs.get()
+  const prefs = await Prefs.get()
+  ctx.body = prefs
+
+  // (re)start watcher
+  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
 })
 
 // remove a media path
@@ -76,10 +86,16 @@ router.delete('/path/:pathId', async (ctx, next) => {
     ctx.throw(422, 'Invalid pathId')
   }
 
+  ctx.stopScanner()
+
   await Prefs.removePath(pathId)
 
   // respond with updated prefs
-  ctx.body = await Prefs.get()
+  const prefs = await Prefs.get()
+  ctx.body = prefs
+
+  // (re)start watcher
+  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
 
   await Media.cleanup()
 

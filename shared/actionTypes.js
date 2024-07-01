@@ -90,7 +90,6 @@ module.exports = {
   // IPC messages
   REQUEST_SCAN: 'scannerWorker/REQUEST_SCAN',
   REQUEST_SCAN_STOP: 'scannerWorker/REQUEST_SCAN_STOP',
-  SCANNER_WORKER_EXITED: 'scannerWorker/EXITED',
   SCANNER_WORKER_STATUS: 'scannerWorker/STATUS',
   SERVER_WORKER_STATUS: 'serverWorker/STATUS',
   SERVER_WORKER_ERROR: 'serverWorker/ERROR',
@@ -102,6 +101,9 @@ module.exports = {
   WATCHER_WORKER_EVENT: 'watcherWorker/EVENT',
   WATCHER_WORKER_WATCH: 'watcherWorker/WATCH',
   WORKER_LOG: 'worker/LOG',
+  // same-process messages via EventEmitter
+  SCANNER_WORKER_EXITED: 'scannerWorker/EXITED',
+  PREFS_PATHS_CHANGED: 'serverWorker/PREFS_PATHS_CHANGED',
   // misc
   _SUCCESS: '_SUCCESS',
   _ERROR: '_ERROR',

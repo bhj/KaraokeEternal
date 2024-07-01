@@ -24,6 +24,7 @@ const IPC = require('./lib/IPCBridge')
 const { parsePathIds } = require('./lib/util')
 const refs = {}
 const {
+  PREFS_PATHS_CHANGED,
   REQUEST_SCAN,
   REQUEST_SCAN_STOP,
   SCANNER_WORKER_EXITED,
@@ -46,6 +47,8 @@ IPC.use({
     startScanner(payload.pathId)
   },
 })
+
+process.on(PREFS_PATHS_CHANGED, startWatcher)
 
 // log non-default settings
 for (const key in env) {
@@ -102,14 +105,16 @@ if (process.versions.electron) {
   // start web server
   require('./serverWorker.js')({ env, startScanner, stopScanner, startWatcher })
 
-  const prefs = await require('./Prefs').get()
-
-  if (true) { // todo: if watcher enabled
-    startWatcher(prefs.paths)
-  }
-
+  // scanning on startup?
   const pathIds = parsePathIds(env.KES_SCAN)
   if (pathIds) startScanner(pathIds)
+
+  // any paths with watching enabled?
+  const { paths } = await require('./Prefs').get()
+
+  if (paths.result.find(pathId => paths.entities[pathId].prefs?.isWatchingEnabled)) {
+    startWatcher(paths)
+  }
 })()
 
 function startWatcher (paths) {
