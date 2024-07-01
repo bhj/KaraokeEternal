@@ -5,15 +5,13 @@ import type { Path } from 'shared/types'
 
 interface PathInfoProps {
   isVisible: boolean
-  onClose(...args: unknown[]): unknown
+  onClose: () => void
   onRemove: (pathId: number) => void
   onUpdate: (pathId: number, data: object) => void
   path: Path
 }
 
 const PathInfo = (props: PathInfoProps) => {
-  const formRef = useRef(null)
-
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     props.onUpdate(props.path.pathId, {
       [e.target.name]: e.target.checked
@@ -29,24 +27,29 @@ const PathInfo = (props: PathInfoProps) => {
       title={'Media Folder'}
       style={{ minWidth: '300px' }}
     >
-      <form ref={formRef} className={styles.form}>
-        <label>
-          <input type='checkbox'
-            defaultChecked={props.path?.prefs?.isWatchingEnabled}
-            name='isWatchingEnabled'
-            onChange={handleChange}
-          />
-           &nbsp;Watch folder for changes
-        </label>
-        <br/>
-        <br/>
-      </form>
+      <div>
+        <p className={styles.path}>{props.path?.path}</p>
+        <p><span className={styles.label}>pathId: </span>{props.path?.pathId}</p>
 
-      <button type='button' onClick={handleRemove} className={styles.btn}>
-        Remove Path
-      </button>
+        <form className={styles.form}>
+          <label>
+            <input type='checkbox'
+              defaultChecked={props.path?.prefs?.isWatchingEnabled}
+              name='isWatchingEnabled'
+              onChange={handleChange}
+            />
+             &nbsp;Watch folder
+          </label>
+          <br/>
+          <br/>
+          <br/>
+        </form>
 
-      <button type='button' onClick={props.onClose}>Done</button>
+        <div className={styles.footer}>
+          <button type='button' onClick={handleRemove}>Remove Folder</button>
+          <button type='button' onClick={props.onClose}>Done</button>
+        </div>
+      </div>
     </Modal>
   )
 }

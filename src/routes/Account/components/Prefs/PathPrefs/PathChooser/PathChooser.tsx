@@ -14,13 +14,17 @@ interface PathChooserProps {
 const PathChooser = (props: PathChooserProps) => {
   const { onCancel, onChoose, isVisible } = props
   const listRef = useRef<HTMLDivElement>()
+  const checkboxRef = useRef<HTMLInputElement>()
   const [pathInfo, setPathInfo] = useState({
     current: null,
     parent: null,
     children: [],
   })
 
-  const handleChoose = useCallback(() => { onChoose(pathInfo.current) }, [onChoose, pathInfo])
+  const handleChoose = useCallback(() => {
+    onChoose(pathInfo.current, { isWatchingEnabled: checkboxRef.current.checked })
+  }, [onChoose, pathInfo])
+
   const ls = useCallback(dir => {
     api('GET', `/ls?dir=${encodeURIComponent(dir)}`)
       .then(res => setPathInfo(res))
@@ -29,7 +33,7 @@ const PathChooser = (props: PathChooserProps) => {
 
   // get initial list when chooser first becomes visible
   useEffect(() => {
-    if (isVisible) ls(pathInfo.current || '.')
+    if (isVisible) ls(pathInfo.current ?? '.')
   }, [isVisible]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // scroll to top when changing dirs
@@ -44,7 +48,7 @@ const PathChooser = (props: PathChooserProps) => {
       title='Add Folder'
       style={{
         width: '90%',
-        height: '90%',
+        height: '95%',
       }}
     >
       <div className={styles.container}>
@@ -62,13 +66,21 @@ const PathChooser = (props: PathChooserProps) => {
           )}
         </div>
 
-        <div style={{ display: 'flex' }}>
-          <button className={`${styles.submit} primary`} onClick={handleChoose}>
+        <div className={styles.footer}>
+          <div className={styles.prefsContainer}>
+            <label>
+              <input type='checkbox' name='isWatchingEnabled' ref={checkboxRef} />
+               &nbsp;Watch folder
+            </label>
+          </div>
+          <div className={styles.btnContainer}>
+            <button className='primary' onClick={handleChoose}>
               Add Folder
-          </button>
-          <button className={styles.cancel} onClick={onCancel}>
-            Cancel
-          </button>
+            </button>
+            <button className='cancel' onClick={onCancel}>
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </Modal>

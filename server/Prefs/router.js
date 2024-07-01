@@ -35,7 +35,9 @@ router.post('/path', async (ctx, next) => {
     ctx.throw(422, 'Invalid path')
   }
 
-  const pathId = await Prefs.addPath(dir)
+  const pathId = await Prefs.addPath(dir, {
+    prefs: ctx.request.body,
+  })
 
   // respond with updated prefs
   ctx.body = await Prefs.get()

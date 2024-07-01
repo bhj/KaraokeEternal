@@ -6,7 +6,10 @@
 
 .folderCurrent {
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--text-color);
+  border-radius: var(--border-radius);
+  background: var(--panel-bg-color);
+  overflow-wrap: anywhere;
 }
 
 .folderList {
@@ -15,12 +18,31 @@
   overflow: scroll;
 }
 
-.submit {
-  flex: 1;
-  width: auto;
+.footer {
+  display: flex;
+  gap: 1em;
 }
 
-.cancel {
-  margin-left: 1em;
-  width: auto;
+.prefsContainer {
+  display: flex;
+  align-items: center;
+  background: var(--panel-bg-color);
+  padding: 1em;
+  border-radius: var(--border-radius);
+}
+
+.prefsContainer * {
+  cursor: pointer;
+}
+
+.prefsContainer label {
+  padding: 1em 0;
+  white-space: nowrap;
+}
+
+.btnContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  flex: 1;
 }

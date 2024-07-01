@@ -1,11 +1,18 @@
-.form label {
+.path {
+  overflow-wrap: anywhere;
+}
+
+.label {
+  font-weight: bold;
+  color: #777;
+}
+
+.form * {
   cursor: pointer;
 }
 
-.btn {
-  margin-bottom: var(--input-margin);
-}
-
-.field {
-  margin-bottom: var(--input-margin);
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--input-margin);
 }

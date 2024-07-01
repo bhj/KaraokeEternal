@@ -36,8 +36,9 @@ class Prefs {
       const rows = await db.all(String(query), query.parameters)
 
       for (const row of rows) {
-        row.data = JSON.parse(row.data)
-        prefs.paths.entities[row.pathId] = row
+        const data = JSON.parse(row.data)
+        delete row.data
+        prefs.paths.entities[row.pathId] = { ...row, ...data }
         prefs.paths.result.push(row.pathId)
       }
     }
@@ -48,7 +49,7 @@ class Prefs {
   /**
    * Set a global preference
    * @param {string} key - the preference key
-   * @param {any} data - the value to be JSON encoded
+   * @param {any} data - the value to be JSON-encoded
    * @return {Promise<boolean>} Success/fail boolean
    */
   static async set (key, data) {
@@ -63,9 +64,10 @@ class Prefs {
   /**
    * Add media path
    * @param {string} dir - an absolute path
+   * @param {object} data - the object to be JSON-encoded
    * @return {Promise<number>} the newly-added path's pathId
    */
-  static async addPath (dir) {
+  static async addPath (dir, data) {
     const prefs = await Prefs.get()
     const { result, entities } = prefs.paths
 
@@ -76,6 +78,7 @@ class Prefs {
 
     const fields = new Map()
     fields.set('path', dir)
+    fields.set('data', JSON.stringify(data))
     // priority defaults to one higher than current highest
     fields.set('priority', result.length ? entities[result[result.length - 1]].priority + 1 : 0)
 
