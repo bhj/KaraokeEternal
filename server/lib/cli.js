@@ -47,7 +47,7 @@ const yargs = require('yargs')
     describe: 'Rotate the session key at startup',
   })
   .option('scan', {
-    describe: 'List of pathIds to scan at startup (comma separated; "true" to scan all)',
+    describe: 'Run the media scanner at startup. Accepts a comma-separated list of pathIds, or "all"',
     type: 'string',
   })
   .option('scanConsoleLevel', {
