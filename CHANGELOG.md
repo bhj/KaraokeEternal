@@ -1,8 +1,8 @@
 ## TBD
 
-### Changed
-
-- **(server)**: Usernames are no longer case sensitive (thanks **gazugafan**)
+- Media folders can now be watched for changes and individually scanned
+- Added ZIP container support for MP3+G media
+- Usernames are no longer case sensitive (thanks **gazugafan**)
 
 ## v1.0.0 (2022-05-17)
 
