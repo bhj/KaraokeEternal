@@ -74,7 +74,7 @@ const QueueItem = ({
     dispatch(queueSong(songId))
     setExpanded(false)
   }, [dispatch, songId])
-  const handleRemoveClick = useCallback(() => dispatch(removeItem(queueId)), [dispatch, queueId])
+  const handleRemoveClick = useCallback(() => dispatch(removeItem({ queueId })), [dispatch, queueId])
   const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
   const handleStarClick = useCallback(() => dispatch(toggleSongStarred(songId)), [dispatch, songId])
 

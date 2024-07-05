@@ -14,7 +14,7 @@ interface OptimisticQueueItem extends Partial<QueueItem>{}
 // Actions
 // ------------------------------------
 export const moveItem = createAction<{ queueId: number; prevQueueId: number }>(QUEUE_MOVE)
-export const removeItem = createAction<number>(QUEUE_REMOVE)
+export const removeItem = createAction<{ queueId: number }>(QUEUE_REMOVE)
 
 export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
   payload: { songId },
