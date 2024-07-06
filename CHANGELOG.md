@@ -1,5 +1,7 @@
 ## TBD
 
+Sponsored by: [candre23](https://github.com/candre23), [nellisdev](https://github.com/nellisdev), [astrobyte](https://github.com/astrobyte), [jfeldhamer](https://github.com/jfeldhamer). Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
+
 - Media folders can now be watched for changes and individually scanned
 - Added ZIP container support for MP3+G media
 - Usernames are no longer case sensitive (thanks **gazugafan**)
