@@ -67,7 +67,7 @@ m.set('set title', (ctx, next) => {
   next()
 })
 
-// set arist
+// set artist
 m.set('set artist', (ctx, next) => {
   // skip if already set
   if (ctx.artist) return next()
@@ -153,7 +153,7 @@ function normalizeStr (str, articles) {
   return str
 }
 
-// move leading articles to end (but before any parantheses)
+// move leading articles to end (but before any parentheses)
 function moveArticles (str, articles) {
   if (!Array.isArray(articles)) return str
 
@@ -180,6 +180,8 @@ function moveArticles (str, articles) {
 }
 
 function removeArticles (str, articles) {
+  if (!Array.isArray(articles)) return str
+
   for (const article of articles) {
     const leading = new RegExp(`^${article} `, 'i')
     const trailing = new RegExp(`, ${article}$`, 'i')
