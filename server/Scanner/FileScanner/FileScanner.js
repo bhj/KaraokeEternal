@@ -128,7 +128,7 @@ class FileScanner extends Scanner {
       dir: pathInfo.dir,
       dirSep: path.sep,
       name: pathInfo.name,
-      data: data.common,
+      meta: data.common,
     })
 
     // get artistId and songId

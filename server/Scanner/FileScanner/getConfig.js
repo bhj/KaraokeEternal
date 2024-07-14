@@ -1,8 +1,8 @@
 const path = require('path')
 const log = require('../../lib/Log')('FileScanner')
 const fs = require('fs')
-const { NodeVM } = require('vm2')
-const CONFIG = '_kes.v1.js'
+const JSON5 = require('json5')
+const CONFIG = '_kes.v2.json'
 
 // search each folder from dir up to baseDir
 function getConfig (dir, baseDir) {
@@ -12,19 +12,19 @@ function getConfig (dir, baseDir) {
 
   try {
     const userScript = fs.readFileSync(cfgPath, 'utf-8')
-    log.info('  => using config: %s', cfgPath)
+    log.info('Using custom parser config: %s', cfgPath)
 
     try {
-      const vm = new NodeVM({ wrapper: 'none' })
-      return vm.run(userScript)
+      return JSON5.parse(userScript)
     } catch (err) {
       log.error(err)
     }
   } catch (err) {
-    log.verbose(`  => no config in ${dir}`)
+    log.verbose('No parser config found: %s', dir)
   }
 
   if (dir === baseDir) {
+    log.info('Using default parser config')
     return
   }
 

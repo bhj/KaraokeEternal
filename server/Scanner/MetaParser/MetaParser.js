@@ -1,6 +1,9 @@
+const log = require('../../lib/Log')('MetaParser')
 const { composeSync } = require('ctx-compose')
+const jsone = require('json-e')
 const defaultMiddleware = require('./defaultMiddleware')
 const defaultParser = compose(...defaultMiddleware.values())
+const parserCfgProps = ['articles', 'artistOnLeft', 'delimiter']
 
 function compose (...args) {
   const flattened = args.reduce(
@@ -8,6 +11,14 @@ function compose (...args) {
   )
 
   return composeSync(flattened)
+}
+
+const customFunctions = {
+  replace: (predicate, search, ...args) => {
+    return args.length === 1
+      ? predicate.replace(search, args[0])
+      : predicate.replace(new RegExp(search, args[0]), args[1])
+  },
 }
 
 // default parser creator
@@ -23,14 +34,44 @@ function getDefaultParser (cfg = {}) {
 }
 
 class MetaParser {
-  constructor (cfg = {}) {
-    const parser = typeof cfg === 'function'
-      ? cfg({ compose, getDefaultParser, defaultMiddleware })
-      : getDefaultParser(cfg)
+  constructor (userCfg = {}) {
+    const parserCfg = {}
+    const template = {}
 
-    return input => {
-      const ctx = { ...input, cfg }
+    // we accept parser config and JSON-e template items (both
+    // user-supplied) in a flat object format; separate them here
+    for (const [key, val] of Object.entries(userCfg)) {
+      parserCfgProps.includes(key) ? parserCfg[key] = val : template[key] = val
+    }
+
+    const parser = getDefaultParser(parserCfg)
+    const isUserTemplate = !!Object.keys(template).length
+
+    return (scannerCtx) => {
+      let ctx = {
+        cfg: parserCfg,
+        ...scannerCtx,
+      }
+
       parser(ctx)
+
+      if (isUserTemplate) {
+        const res = jsone(template, { ...ctx, ...customFunctions })
+
+        Object.keys(res).forEach(key => {
+          if (typeof res[key] === 'string') res[key] = res[key].trim()
+        })
+
+        if (res.artist) res.artistNorm = res.artistNorm ?? res.artist
+        if (res.title) res.titleNorm = res.titleNorm ?? res.title
+
+        log.debug('User template:')
+        log.debug(template)
+        log.debug('Result:')
+        log.debug(res)
+
+        ctx = { ...ctx, ...res }
+      }
 
       if (!ctx.artist || !ctx.title) {
         throw new Error('could not determine artist or title')
@@ -38,9 +79,9 @@ class MetaParser {
 
       return {
         artist: ctx.artist,
-        artistNorm: ctx.artistNorm || ctx.artist,
+        artistNorm: ctx.artistNorm ?? ctx.artist,
         title: ctx.title,
-        titleNorm: ctx.titleNorm || ctx.title,
+        titleNorm: ctx.titleNorm ?? ctx.title,
       }
     }
   }
