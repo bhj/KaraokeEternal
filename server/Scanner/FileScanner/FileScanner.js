@@ -30,14 +30,14 @@ class FileScanner extends Scanner {
 
   async scan (pathId) {
     const dir = this.paths.entities[pathId]?.path
+    const validMediaIds = []
+    let files // { file, stats }[]
+    let prevDir
 
     if (!dir) {
       log.error('invalid pathId: %s', pathId)
       return
     }
-
-    const validMediaIds = []
-    let files // { file, stats }[]
 
     log.info('Searching: %s', dir)
     this.emitStatus(`Searching: ${dir}`, 0)
@@ -56,10 +56,6 @@ class FileScanner extends Scanner {
 
     for (let i = 0; i < files.length; i++) {
       const curDir = path.dirname(files[i].file)
-      let prevDir
-
-      log.info('[%s/%s] %s', i + 1, files.length, files[i].file)
-      this.emitStatus(`Processing (${i + 1} of ${files.length})`, (i + 1) / files.length)
 
       if (prevDir !== curDir) {
         prevDir = curDir
@@ -68,6 +64,9 @@ class FileScanner extends Scanner {
         const cfg = getConfig(curDir, dir)
         this.parser = new MetaParser(cfg)
       }
+
+      log.info('[%s/%s] %s', i + 1, files.length, files[i].file)
+      this.emitStatus(`Processing (${i + 1} of ${files.length})`, (i + 1) / files.length)
 
       // process file
       try {
