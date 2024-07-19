@@ -21,8 +21,9 @@ const config = {
     ].filter(Boolean),
   },
   output: {
-    path: path.join(baseDir, 'build'),
     filename: __DEV__ ? '[name].js' : '[name].[fullhash].js',
+    path: path.join(baseDir, 'build'),
+    clean: true,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json'],
