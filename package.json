@@ -118,7 +118,7 @@
     "modern-normalize": "^2.0.0",
     "nodemon": "^3.1.4",
     "prop-types": "^15.8.1",
-    "rc-slider": "^10.6.2",
+    "rc-slider": "^11.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-flip-toolkit": "^7.2.4",
