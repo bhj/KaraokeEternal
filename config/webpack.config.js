@@ -117,7 +117,9 @@ config.module.rules.push({
       loader: 'css-loader',
       options: {
         modules: {
-          localIdentName: __DEV__ ? '[path][name]__[local]__' : '[hash:base64]',
+          namedExport: false,
+          exportLocalsConvention: 'as-is',
+          localIdentName: __DEV__ ? '[name]__[local]--[hash:base64:5]' : '[hash:base64]',
         }
       }
     }
