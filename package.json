@@ -40,7 +40,7 @@
     "project.config.js"
   ],
   "bin": {
-    "karaoke-eternal-server": "./server/main.js"
+    "karaoke-eternal-server": "server/main.js"
   },
   "repository": {
     "type": "git",
