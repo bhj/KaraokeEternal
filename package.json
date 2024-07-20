@@ -23,7 +23,7 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development nodemon --watch server --watch shared -- -p3000",
+    "dev": "NODE_ENV=development nodemon --watch server --watch shared -- -p 3000",
     "build": "webpack --config config/webpack.config.js",
     "serve": "node server/main.js",
     "serve:docs": "hugo serve --source docs -b http://$(hostname) --bind 0.0.0.0",

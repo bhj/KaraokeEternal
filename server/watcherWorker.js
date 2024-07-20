@@ -1,7 +1,12 @@
 const { initLogger } = require('./lib/Log')
 const log = initLogger('scanner', {
-  console: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
-  file: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+  console: {
+    level: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
+    useStyles: process.KES_CONSOLE_COLORS ?? undefined,
+  },
+  file: {
+    level: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+  }
 }).scope(`watcher[${process.pid}]`)
 
 const fs = require('fs')

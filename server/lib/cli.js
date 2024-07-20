@@ -4,8 +4,9 @@ const baseDir = path.resolve(path.dirname(require.main.filename), '..')
 
 const env = {
   NODE_ENV: process.env.NODE_ENV,
-  KES_SERVER_CONSOLE_LEVEL: parseInt(process.env.KES_SERVER_CONSOLE_LEVEL, 10) || undefined,
-  KES_SERVER_LOG_LEVEL: parseInt(process.env.KES_SERVER_LOG_LEVEL, 10) || undefined,
+  KES_CONSOLE_COLORS: process.env.KES_CONSOLE_COLORS
+    ? !['0', 'false'].includes(process.env.KES_CONSOLE_COLORS?.toLowerCase())
+    : undefined,
   KES_PATH_ASSETS: path.join(baseDir, 'assets'),
   KES_PATH_DATA: process.env.KES_PATH_DATA || getAppPath('Karaoke Eternal Server'),
   KES_PATH_WEBROOT: path.join(baseDir, 'build'),
@@ -14,6 +15,8 @@ const env = {
   KES_SCAN: process.env.KES_SCAN?.trim(),
   KES_SCANNER_CONSOLE_LEVEL: parseInt(process.env.KES_SCANNER_CONSOLE_LEVEL, 10) || undefined,
   KES_SCANNER_LOG_LEVEL: parseInt(process.env.KES_SCANNER_LOG_LEVEL, 10) || undefined,
+  KES_SERVER_CONSOLE_LEVEL: parseInt(process.env.KES_SERVER_CONSOLE_LEVEL, 10) || undefined,
+  KES_SERVER_LOG_LEVEL: parseInt(process.env.KES_SERVER_LOG_LEVEL, 10) || undefined,
   KES_URL_PATH: process.env.KES_URL_PATH || '/',
   // support PUID/PGID convention
   KES_PUID: parseInt(process.env.PUID, 10) || undefined,

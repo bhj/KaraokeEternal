@@ -4,8 +4,13 @@ if (env.KES_EXIT) return
 
 const { initLogger } = require('./lib/Log')
 const log = initLogger('server', {
-  console: env.KES_SERVER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
-  file: env.KES_SERVER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+  console: {
+    level: env.KES_SERVER_CONSOLE_LEVEL ?? (env.NODE_ENV === 'development' ? 5 : 4),
+    useStyles: env.KES_CONSOLE_COLORS ?? undefined,
+  },
+  file: {
+    level: env.KES_SERVER_LOG_LEVEL ?? (env.NODE_ENV === 'development' ? 0 : 3)
+  },
 }).scope(`main[${process.pid}]`)
 
 const childProcess = require('child_process')

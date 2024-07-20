@@ -1,7 +1,12 @@
 const { initLogger } = require('./lib/Log')
 const log = initLogger('scanner', {
-  console: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
-  file: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+  console: {
+    level: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
+    useStyles: process.KES_CONSOLE_COLORS ?? undefined,
+  },
+  file: {
+    level: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+  }
 }).scope(`scanner[${process.pid}]`)
 
 const path = require('path')
@@ -32,14 +37,14 @@ const {
   const ScannerQueue = require('./Scanner/ScannerQueue')
   const q = new ScannerQueue(onIteration, onDone)
   const args = process.argv.slice(2)
-  log.verbose('received arguments: %s', args)
+  log.debug('received arguments: %s', args)
 
   if (!args.length) {
     process.exit(1) // eslint-disable-line n/no-process-exit
   }
 
   const pathIds = parsePathIds(args[0])
-  log.verbose('parsed pathIds: %s', pathIds)
+  log.debug('parsed pathIds: %s', pathIds)
 
   q.queue(pathIds)
 })()

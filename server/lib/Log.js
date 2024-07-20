@@ -11,7 +11,10 @@ class Logger {
     log.transports.file.fileName = logId + '.log'
 
     for (const transport in cfg) {
-      log.transports[transport].level = LEVELS[cfg[transport]]
+      for (const key in cfg[transport]) {
+        if (key === 'level') log.transports[transport].level = LEVELS[cfg[transport].level]
+        else log.transports[transport][key] = cfg[transport][key]
+      }
     }
 
     Logger.#instance = log
