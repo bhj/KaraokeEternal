@@ -1,5 +1,10 @@
+const { initLogger } = require('./lib/Log')
+const log = initLogger('scanner', {
+  console: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
+  file: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+}).scope(`scanner[${process.pid}]`)
+
 const path = require('path')
-const log = require('./lib/Log')(`scanner[${process.pid}]`)
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
 const { parsePathIds } = require('./lib/util')

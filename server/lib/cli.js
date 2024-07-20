@@ -4,38 +4,28 @@ const baseDir = path.resolve(path.dirname(require.main.filename), '..')
 
 const env = {
   NODE_ENV: process.env.NODE_ENV,
-  KES_CONSOLE_LEVEL: parseInt(process.env.KES_CONSOLE_LEVEL, 10),
-  KES_LOG_LEVEL: parseInt(process.env.KES_LOG_LEVEL, 10),
+  KES_SERVER_CONSOLE_LEVEL: parseInt(process.env.KES_SERVER_CONSOLE_LEVEL, 10) || undefined,
+  KES_SERVER_LOG_LEVEL: parseInt(process.env.KES_SERVER_LOG_LEVEL, 10) || undefined,
   KES_PATH_ASSETS: path.join(baseDir, 'assets'),
   KES_PATH_DATA: process.env.KES_PATH_DATA || getAppPath('Karaoke Eternal Server'),
   KES_PATH_WEBROOT: path.join(baseDir, 'build'),
   KES_PORT: parseInt(process.env.KES_PORT, 10) || 0,
   KES_ROTATE_KEY: ['1', 'true'].includes(process.env.KES_ROTATE_KEY?.toLowerCase()),
   KES_SCAN: process.env.KES_SCAN?.trim(),
-  KES_SCAN_CONSOLE_LEVEL: parseInt(process.env.KES_SCAN_CONSOLE_LEVEL, 10),
-  KES_SCAN_LOG_LEVEL: parseInt(process.env.KES_SCAN_LOG_LEVEL, 10),
+  KES_SCANNER_CONSOLE_LEVEL: parseInt(process.env.KES_SCANNER_CONSOLE_LEVEL, 10) || undefined,
+  KES_SCANNER_LOG_LEVEL: parseInt(process.env.KES_SCANNER_LOG_LEVEL, 10) || undefined,
   KES_URL_PATH: process.env.KES_URL_PATH || '/',
   // support PUID/PGID convention
-  KES_PUID: parseInt(process.env.PUID, 10),
-  KES_PGID: parseInt(process.env.PGID, 10),
+  KES_PUID: parseInt(process.env.PUID, 10) || undefined,
+  KES_PGID: parseInt(process.env.PGID, 10) || undefined,
 }
 
 const yargs = require('yargs')
   .version(false) // disable default handler
-  .option('consoleLevel', {
-    describe: 'Web server console output level (default=4)',
-    number: true,
-    requiresArg: true,
-  })
   .option('data', {
     describe: 'Absolute path of folder for database files',
     requiresArg: true,
     type: 'string',
-  })
-  .option('logLevel', {
-    describe: 'Web server log file level (default=3)',
-    number: true,
-    requiresArg: true,
   })
   .option('p', {
     alias: 'port',
@@ -50,13 +40,23 @@ const yargs = require('yargs')
     describe: 'Run the media scanner at startup. Accepts a comma-separated list of pathIds, or "all"',
     type: 'string',
   })
-  .option('scanConsoleLevel', {
+  .option('scannerConsoleLevel', {
     describe: 'Media scanner console output level (default=4)',
     number: true,
     requiresArg: true,
   })
-  .option('scanLogLevel', {
+  .option('scannerLogLevel', {
     describe: 'Media scanner log file level (default=3)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('serverConsoleLevel', {
+    describe: 'Web server console output level (default=4)',
+    number: true,
+    requiresArg: true,
+  })
+  .option('serverLogLevel', {
+    describe: 'Web server log file level (default=3)',
     number: true,
     requiresArg: true,
   })
@@ -100,10 +100,10 @@ const opts = {
   data: 'KES_PATH_DATA',
   port: 'KES_PORT',
   scan: 'KES_SCAN',
-  scanConsoleLevel: 'KES_SCAN_CONSOLE_LEVEL',
-  scanLogLevel: 'KES_SCAN_LOG_LEVEL',
-  serverConsoleLevel: 'KES_CONSOLE_LEVEL',
-  serverLogLevel: 'KES_LOG_LEVEL',
+  scannerConsoleLevel: 'KES_SCANNER_CONSOLE_LEVEL',
+  scannerLogLevel: 'KES_SCANNER_LOG_LEVEL',
+  serverConsoleLevel: 'KES_SERVER_CONSOLE_LEVEL',
+  serverLogLevel: 'KES_SERVER_LOG_LEVEL',
   urlPath: 'KES_URL_PATH',
 }
 

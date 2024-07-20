@@ -100,7 +100,6 @@ module.exports = {
   MEDIA_UPDATE: 'scannerWorker/MEDIA_UPDATE',
   WATCHER_WORKER_EVENT: 'watcherWorker/EVENT',
   WATCHER_WORKER_WATCH: 'watcherWorker/WATCH',
-  WORKER_LOG: 'worker/LOG',
   // same-process messages via EventEmitter
   SCANNER_WORKER_EXITED: 'scannerWorker/EXITED',
   PREFS_PATHS_CHANGED: 'serverWorker/PREFS_PATHS_CHANGED',

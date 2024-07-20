@@ -1,6 +1,11 @@
+const { initLogger } = require('./lib/Log')
+const log = initLogger('scanner', {
+  console: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
+  file: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+}).scope(`watcher[${process.pid}]`)
+
 const fs = require('fs')
 const pathLib = require('path')
-const log = require('./lib/Log')(`watcher[${process.pid}]`)
 const debounce = require('./lib/debounce')
 const IPC = require('./lib/IPCBridge')
 const fileTypes = require('./Media/fileTypes')

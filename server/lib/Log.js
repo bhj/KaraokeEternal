@@ -1,69 +1,31 @@
-const util = require('util')
-const _levels = [false, 'error', 'warn', 'info', 'verbose', 'debug']
-let _defaultInstance
+const log = require('electron-log/node')
+const LEVELS = [false, 'error', 'warn', 'info', 'verbose', 'debug']
 
-class Log {
-  constructor (logId, cfg) {
-    this.logger = require('electron-log').create(logId)
+class Logger {
+  static #instance
 
+  static init (logId, cfg) {
     // defaults
-    this.logger.transports.console.level = 'debug'
-    this.logger.transports.file.level = false
-    this.logger.transports.file.fileName = logId + '.log'
+    log.transports.console.level = 'debug'
+    log.transports.file.level = false
+    log.transports.file.fileName = logId + '.log'
 
     for (const transport in cfg) {
-      this.logger.transports[transport].level = cfg[transport]
-    }
-  }
-
-  setDefaultInstance () {
-    _defaultInstance = this
-    return this
-  }
-
-  static resolve (userLevel, defaultLevel) {
-    return typeof _levels[userLevel] === 'undefined'
-      ? _levels[defaultLevel]
-      : _levels[userLevel]
-  }
-}
-
-class IPCLog {
-  constructor (scope = '') {
-    const IPC = require('./IPCBridge')
-    const { WORKER_LOG } = require('../../shared/actionTypes')
-    const log = (level, str, ...args) => {
-      IPC.send({
-        type: WORKER_LOG,
-        payload: {
-          level,
-          msg: `${scope ? scope + ': ' : ''}${util.format(str, ...args)}`,
-          worker: process.env.KES_CHILD_PROCESS,
-        },
-      })
+      log.transports[transport].level = LEVELS[cfg[transport]]
     }
 
-    return {
-      error: log.bind(this, 'error'),
-      warn: log.bind(this, 'warn'),
-      info: log.bind(this, 'info'),
-      verbose: log.bind(this, 'verbose'),
-      debug: log.bind(this, 'debug'),
-    }
+    Logger.#instance = log
+    return log
   }
-}
 
-function getLogger (scope = '') {
-  if (!_defaultInstance) throw new Error('no default logger instance')
-  return _defaultInstance.logger.scope(scope)
-}
-
-function getIPCLogger (scope = '') {
-  return new IPCLog(scope)
+  static getLogger (scope = '') {
+    if (!Logger.#instance) throw new Error('logger not initialized')
+    return Logger.#instance.scope(scope)
+  }
 }
 
 // default export
-module.exports = process.env.KES_CHILD_PROCESS ? getIPCLogger : getLogger
+module.exports = Logger.getLogger
 
-// used by main.js to instantiate the loggers
-module.exports.Log = Log
+// for each process/worker to initialize their logger
+module.exports.initLogger = Logger.init

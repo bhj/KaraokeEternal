@@ -2,23 +2,14 @@
 const env = require('./lib/cli')
 if (env.KES_EXIT) return
 
+const { initLogger } = require('./lib/Log')
+const log = initLogger('server', {
+  console: env.KES_SERVER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
+  file: env.KES_SERVER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+}).scope(`main[${process.pid}]`)
+
 const childProcess = require('child_process')
 const path = require('path')
-const { Log } = require('./lib/Log')
-
-const log = new Log('server', {
-  console: Log.resolve(env.KES_CONSOLE_LEVEL, env.NODE_ENV === 'development' ? 5 : 4),
-  file: Log.resolve(env.KES_LOG_LEVEL, env.NODE_ENV === 'development' ? 0 : 3),
-}).setDefaultInstance().logger.scope(`main[${process.pid}]`)
-
-const ipcLog = new Log('scanner', {
-  console: Log.resolve(process.env.KES_SCAN_CONSOLE_LEVEL, process.env.NODE_ENV === 'development' ? 5 : 4),
-  file: Log.resolve(process.env.KES_SCAN_LOG_LEVEL, process.env.NODE_ENV === 'development' ? 0 : 3),
-}).logger
-
-const scannerLog = ipcLog.scope('scanner')
-const watcherLog = ipcLog.scope('watcher')
-
 const Database = require('./lib/Database')
 const IPC = require('./lib/IPCBridge')
 const { parsePathIds } = require('./lib/util')
@@ -33,17 +24,9 @@ const {
   SERVER_WORKER_STATUS,
   WATCHER_WORKER_EVENT,
   WATCHER_WORKER_WATCH,
-  WORKER_LOG,
 } = require('../shared/actionTypes')
 
 IPC.use({
-  [WORKER_LOG]: ({ payload }) => {
-    if (payload.worker === 'scanner') {
-      scannerLog[payload.level](payload.msg)
-    } else if (payload.worker === 'watcher') {
-      watcherLog[payload.level](payload.msg)
-    }
-  },
   [WATCHER_WORKER_EVENT]: ({ payload }) => {
     startScanner(payload.pathId)
   },
