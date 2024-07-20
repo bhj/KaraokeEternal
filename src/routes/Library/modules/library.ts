@@ -75,8 +75,8 @@ const libraryReducer = createReducer(initialState, (builder) => {
     })
     .addCase(LIBRARY_PUSH, (state, { payload }) => ({
       ...state,
-      result: payload.artists.result,
-      entities: payload.artists.entities,
+      isLoading: false,
+      version: payload.version,
     }))
 })
 

@@ -28,7 +28,7 @@ const starCountsReducer = createReducer(initialState, (builder) => {
     .addCase(SONG_UNSTARRED, (state, { payload }) => {
       state.songs[payload.songId] = Math.max(state.songs[payload.songId] - 1, 0)
     })
-    .addCase(STAR_COUNTS_PUSH, (state, { payload }) => ({
+    .addCase(STAR_COUNTS_PUSH, (_, { payload }) => ({
       ...payload,
     }))
 })

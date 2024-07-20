@@ -19,7 +19,7 @@ const initialState: artistsState = {
 
 const artistsReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(LIBRARY_PUSH, (state, { payload }) => ({
+    .addCase(LIBRARY_PUSH, (_, { payload }) => ({
       result: payload.artists.result,
       entities: payload.artists.entities,
     }))
