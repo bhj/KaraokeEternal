@@ -1,7 +1,7 @@
 const { initLogger } = require('./lib/Log')
 const log = initLogger('scanner', {
   console: {
-    level: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
+    level: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 0),
     useStyles: process.KES_CONSOLE_COLORS ?? undefined,
   },
   file: {

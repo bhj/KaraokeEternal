@@ -2,7 +2,7 @@ const { initLogger } = require('./lib/Log')
 const log = initLogger('scanner', {
   console: {
     level: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
-    useStyles: process.KES_CONSOLE_COLORS ?? undefined,
+    useStyles: process.env.KES_CONSOLE_COLORS ?? undefined,
   },
   file: {
     level: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
@@ -11,7 +11,7 @@ const log = initLogger('scanner', {
 
 const fs = require('fs')
 const pathLib = require('path')
-const debounce = require('./lib/debounce')
+const accumulatedThrottle = require('./lib/accumulatedThrottle')
 const IPC = require('./lib/IPCBridge')
 const fileTypes = require('./Media/fileTypes')
 const {
@@ -40,21 +40,21 @@ IPC.use({
     log.info('watching %s path(s):', pathIds.length)
 
     pathIds.forEach(pathId => {
-      log.verbose('  => %s', entities[pathId].path)
+      log.info('  => %s', entities[pathId].path)
 
-      const ref = fs.watch(entities[pathId].path, { recursive: true }, debounce((eventType, filename) => {
-        if (!searchExts.includes(pathLib.extname(filename).toLowerCase())) {
-          return
-        }
+      const cb = accumulatedThrottle((events) => {
+        const event = events.find(([_, filename]) => searchExts.includes(pathLib.extname(filename).toLowerCase()))
+        if (!event) return
 
-        log.info('event in path: %s (filename=%s) (type=%s)', entities[pathId].path, filename, eventType)
+        log.info('event in path: %s (filename=%s) (type=%s)', entities[pathId].path, event[1], event[0])
 
         IPC.send({
           type: WATCHER_WORKER_EVENT,
           payload: { pathId },
         })
-      }, 3000))
+      }, 1000)
 
+      const ref = fs.watch(entities[pathId].path, { recursive: true }, cb)
       refs.push(ref)
     })
   },
