@@ -64,7 +64,7 @@ class Prefs {
   /**
    * Add media path
    * @param {string} dir - an absolute path
-   * @param {object} data - the object to be JSON-encoded
+   * @param {object?} data - the object to be JSON-encoded
    * @return {Promise<number>} the newly-added path's pathId
    */
   static async addPath (dir, data) {
@@ -78,9 +78,9 @@ class Prefs {
 
     const fields = new Map()
     fields.set('path', dir)
-    fields.set('data', JSON.stringify(data))
     // priority defaults to one higher than current highest
     fields.set('priority', result.length ? entities[result[result.length - 1]].priority + 1 : 0)
+    if (data) fields.set('data', JSON.stringify(data))
 
     const query = sql`
       INSERT INTO paths ${sql.tuple(Array.from(fields.keys()).map(sql.column))}

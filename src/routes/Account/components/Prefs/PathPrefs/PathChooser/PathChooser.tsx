@@ -14,7 +14,6 @@ interface PathChooserProps {
 const PathChooser = (props: PathChooserProps) => {
   const { onCancel, onChoose, isVisible } = props
   const listRef = useRef<HTMLDivElement>()
-  const checkboxRef = useRef<HTMLInputElement>()
   const [pathInfo, setPathInfo] = useState({
     current: null,
     parent: null,
@@ -22,7 +21,7 @@ const PathChooser = (props: PathChooserProps) => {
   })
 
   const handleChoose = useCallback(() => {
-    onChoose(pathInfo.current, { isWatchingEnabled: checkboxRef.current.checked })
+    onChoose(pathInfo.current, {})
   }, [onChoose, pathInfo])
 
   const ls = useCallback(dir => {
@@ -66,21 +65,13 @@ const PathChooser = (props: PathChooserProps) => {
           )}
         </div>
 
-        <div className={styles.footer}>
-          <div className={styles.prefsContainer}>
-            <label>
-              <input type='checkbox' name='isWatchingEnabled' ref={checkboxRef} />
-               &nbsp;Watch folder
-            </label>
-          </div>
-          <div className={styles.btnContainer}>
-            <button className='primary' onClick={handleChoose}>
-              Add Folder
-            </button>
-            <button className='cancel' onClick={onCancel}>
-              Cancel
-            </button>
-          </div>
+        <div className={styles.btnContainer}>
+          <button className='cancel' onClick={onCancel}>
+            Cancel
+          </button>
+          <button className='primary' onClick={handleChoose}>
+            Add Folder
+          </button>
         </div>
       </div>
     </Modal>

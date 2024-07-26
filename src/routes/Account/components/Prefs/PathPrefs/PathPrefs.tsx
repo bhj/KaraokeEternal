@@ -100,7 +100,6 @@ const PathPrefs = () => {
         {paths.result.length === 0 &&
           <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>
         }
-
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId='droppable'>
             {(provided) => (
@@ -114,7 +113,6 @@ const PathPrefs = () => {
                     onRefresh={handleRefresh}
                   />
                 )}
-
                 {provided.placeholder}
               </div>
             )}
@@ -122,14 +120,14 @@ const PathPrefs = () => {
         </DragDropContext>
 
         <div className={styles.btnContainer}>
-          <button className='primary' style={{ flex: 1, width: 'auto' }} onClick={handleOpenChooser}>
+          {paths.result.length > 0 &&
+          <button onClick={handleRefreshAll}>
+            Scan Folders
+          </button>
+        }
+          <button className='primary' onClick={handleOpenChooser}>
             Add Folder
           </button>
-          {paths.result.length > 0 &&
-            <button style={{ marginLeft: '.5em', width: 'auto' }} onClick={handleRefreshAll}>
-              Refresh
-            </button>
-          }
         </div>
 
         <PathChooser

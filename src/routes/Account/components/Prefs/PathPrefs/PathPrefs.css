@@ -25,5 +25,14 @@
 
 .btnContainer {
   display: flex;
+  gap: 0.5em;
   margin-top: var(--container-padding);
+}
+
+.btnContainer button {
+  width: auto;
+}
+
+.btnContainer :global(.primary) {
+  flex: 1;
 }
