@@ -1,6 +1,8 @@
-const path = require('path')
-const db = require('../lib/Database').db
-const sql = require('sqlate')
+import path from 'path'
+import Database from '../lib/Database.js'
+import sql from 'sqlate'
+
+const { db } = Database
 
 class Queue {
   /**
@@ -140,7 +142,7 @@ class Queue {
    * We could DELETE first and get the deleted item's prevQueueId using
    * RETURNING, but the DELETE and UPDATE need to be wrapped in a transaction
    * (so the prevQueueId foreign key check is deferred). Also, v0.9 betas didn't
-   * have prevQueueId DEFFERABLE, and so will still error at DELETE (do we care?)
+   * have prevQueueId DEFERRABLE, and so will still error at DELETE (do we care?)
    *
    * @param  {object}      queueId, userId
    * @return {Promise}     undefined
@@ -205,4 +207,4 @@ class Queue {
   }
 }
 
-module.exports = Queue
+export default Queue

@@ -1,8 +1,11 @@
-const db = require('../lib/Database').db
-const sql = require('sqlate')
-const log = require('../lib/Log')('Library')
-const { performance } = require('perf_hooks')
-const Media = require('../Media')
+import sql from 'sqlate'
+import Database from '../lib/Database.js'
+import getLogger from '../lib/Log.js'
+import { performance } from 'perf_hooks'
+import Media from '../Media/Media.js'
+
+const log = getLogger('Library')
+const { db } = Database
 
 class Library {
   static cache = { version: null }
@@ -337,4 +340,4 @@ class Library {
   }
 }
 
-module.exports = Library
+export default Library

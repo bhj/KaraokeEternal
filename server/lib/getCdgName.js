@@ -1,9 +1,9 @@
-const { promisify } = require('util')
-const fs = require('fs')
+import { promisify } from 'util'
+import fs from 'fs'
+import getPerms from './getPermutations.js'
 const stat = promisify(fs.stat)
-const getPerms = require('./getPermutations')
 
-module.exports = async function getCdgName (file) {
+export default async function getCdgName (file) {
   // upper and lowercase permutations since fs may be case-sensitive
   for (const ext of getPerms('cdg')) {
     const cdg = file.substring(0, file.lastIndexOf('.') + 1) + ext

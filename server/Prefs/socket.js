@@ -1,13 +1,8 @@
-const log = require('../lib/Log')(`server[${process.pid}]`)
-const Library = require('../Library')
-const Prefs = require('./Prefs')
-const {
-  LIBRARY_PUSH,
-  PREFS_PATH_SET_PRIORITY,
-  PREFS_PUSH,
-  PREFS_SET,
-  _ERROR,
-} = require('../../shared/actionTypes')
+import getLogger from '../lib/Log.js'
+import Library from '../Library/Library.js'
+import Prefs from './Prefs.js'
+import { LIBRARY_PUSH, PREFS_PATH_SET_PRIORITY, PREFS_PUSH, PREFS_SET, _ERROR } from '../../shared/actionTypes.js'
+const log = getLogger(`server[${process.pid}]`)
 
 const ACTION_HANDLERS = {
   [PREFS_SET]: async (sock, { payload }, acknowledge) => {
@@ -65,4 +60,4 @@ const pushPrefs = async (sock) => {
   }
 }
 
-module.exports = ACTION_HANDLERS
+export default ACTION_HANDLERS

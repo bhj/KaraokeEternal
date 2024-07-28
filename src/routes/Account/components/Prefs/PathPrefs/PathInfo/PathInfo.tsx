@@ -1,5 +1,5 @@
-import React, { useCallback, useRef } from 'react'
-import Modal from 'components/Modal'
+import React, { useCallback } from 'react'
+import Modal from 'components/Modal/Modal'
 import styles from './PathInfo.css'
 import type { Path } from 'shared/types'
 

@@ -1,6 +1,8 @@
 // https://gist.github.com/savokiss/96de34d4ca2d37cbb8e0799798c4c2d3
-module.exports = function () {
-  const interfaces = require('os').networkInterfaces()
+import os from 'os'
+
+export default function () {
+  const interfaces = os.networkInterfaces()
 
   for (const devName in interfaces) {
     const iface = interfaces[devName]

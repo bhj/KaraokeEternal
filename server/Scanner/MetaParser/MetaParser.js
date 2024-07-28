@@ -1,7 +1,8 @@
-const log = require('../../lib/Log')('MetaParser')
-const { composeSync } = require('ctx-compose')
-const jsone = require('json-e')
-const defaultMiddleware = require('./defaultMiddleware')
+import getLogger from '../../lib/Log.js'
+import { composeSync } from 'ctx-compose'
+import jsone from 'json-e'
+import defaultMiddleware from './defaultMiddleware.js'
+const log = getLogger('MetaParser')
 const defaultParser = compose(...defaultMiddleware.values())
 const parserCfgProps = ['articles', 'artistOnLeft', 'delimiter']
 
@@ -87,4 +88,4 @@ class MetaParser {
   }
 }
 
-module.exports = MetaParser
+export default MetaParser

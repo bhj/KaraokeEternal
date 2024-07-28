@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react'
 import { useAppSelector } from 'store/hooks'
-import Logo from 'components/Logo'
-import Create from './Create'
-import FirstRun from './FirstRun'
-import SignIn from './SignIn'
+import Logo from 'components/Logo/Logo'
+import Create from './Create/Create'
+import FirstRun from './FirstRun/FirstRun'
+import SignIn from './SignIn/SignIn'
 import styles from './SignedOutView.css'
 
 const SignedOutView = () => {

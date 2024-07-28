@@ -1,6 +1,6 @@
-const KoaRouter = require('@koa/router')
+import KoaRouter from '@koa/router'
+import Media from '../Media/Media.js'
 const router = KoaRouter({ prefix: '/api' })
-const Media = require('../Media')
 
 // lists underlying media for a given song
 router.get('/song/:songId', async (ctx, next) => {
@@ -24,4 +24,4 @@ router.get('/song/:songId', async (ctx, next) => {
   ctx.body = res
 })
 
-module.exports = router
+export default router

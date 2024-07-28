@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import AccountForm from '../../../components/AccountForm'
+import AccountForm from '../../../components/AccountForm/AccountForm'
 import { createAccount } from 'store/modules/user'
 import styles from './FirstRun.css'
 

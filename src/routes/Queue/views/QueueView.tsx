@@ -3,9 +3,9 @@ import { useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import { Link } from 'react-router-dom'
 import getRoundRobinQueue from '../selectors/getRoundRobinQueue'
-import QueueList from '../components/QueueList'
-import Spinner from 'components/Spinner'
-import TextOverlay from 'components/TextOverlay'
+import QueueList from '../components/QueueList/QueueList'
+import Spinner from 'components/Spinner/Spinner'
+import TextOverlay from 'components/TextOverlay/TextOverlay'
 import styles from './QueueView.css'
 
 const QUEUE_ITEM_HEIGHT = 92

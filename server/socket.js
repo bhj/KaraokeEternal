@@ -1,16 +1,16 @@
-const log = require('./lib/Log')('server')
-const jwtVerify = require('jsonwebtoken').verify
+import getLogger from './lib/Log.js'
+import jsonWebToken from 'jsonwebtoken'
+import parseCookie from './lib/parseCookie.js'
+import Library from './Library/Library.js'
+import LibrarySocket from './Library/socket.js'
+import PlayerSocket from './Player/socket.js'
+import Prefs from './Prefs/Prefs.js'
+import PrefsSocket from './Prefs/socket.js'
+import Rooms from './Rooms/Rooms.js'
+import Queue from './Queue/Queue.js'
+import QueueSocket from './Queue/socket.js'
 
-const parseCookie = require('./lib/parseCookie')
-const Library = require('./Library')
-const LibrarySocket = require('./Library/socket')
-const PlayerSocket = require('./Player/socket')
-const Prefs = require('./Prefs')
-const PrefsSocket = require('./Prefs/socket')
-const Rooms = require('./Rooms')
-const Queue = require('./Queue')
-const QueueSocket = require('./Queue/socket')
-const {
+import {
   LIBRARY_PUSH,
   QUEUE_PUSH,
   STARS_PUSH,
@@ -20,7 +20,8 @@ const {
   PREFS_PUSH,
   SOCKET_AUTH_ERROR,
   _ERROR,
-} = require('../shared/actionTypes')
+} from '../shared/actionTypes.js'
+const log = getLogger('server')
 
 const handlers = {
   ...LibrarySocket,
@@ -29,7 +30,9 @@ const handlers = {
   ...PrefsSocket,
 }
 
-module.exports = function (io, jwtKey) {
+const { verify: jwtVerify } = jsonWebToken
+
+export default function (io, jwtKey) {
   io.on('connection', async (sock) => {
     const { keToken } = parseCookie(sock.handshake.headers.cookie)
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)

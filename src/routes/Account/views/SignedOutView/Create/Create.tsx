@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import AccountForm from '../../../components/AccountForm'
-import RoomSelect from '../../../components/RoomSelect'
+import AccountForm from '../../../components/AccountForm/AccountForm'
+import RoomSelect from '../../../components/RoomSelect/RoomSelect'
 import { createAccount } from 'store/modules/user'
 import styles from './Create.css'
 let roomSelectRef, roomPasswordRef

@@ -1,20 +1,21 @@
-const { promisify } = require('util')
-const fs = require('fs')
+import { promisify } from 'util'
+import fs from 'fs'
+import Database from '../lib/Database.js'
+import sql from 'sqlate'
+import jsonWebToken from 'jsonwebtoken'
+import bcrypt from '../lib/bcrypt.js'
+import KoaRouter from '@koa/router'
+import Prefs from '../Prefs/Prefs.js'
+import Queue from '../Queue/Queue.js'
+import Rooms from '../Rooms/Rooms.js'
+import User from '../User/User.js'
+import { QUEUE_PUSH } from '../../shared/actionTypes.js'
 const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
-const db = require('../lib/Database').db
-const sql = require('sqlate')
-const jwtSign = require('jsonwebtoken').sign
-const bcrypt = require('../lib/bcrypt')
-const KoaRouter = require('@koa/router')
+
+const { db } = Database
 const router = KoaRouter({ prefix: '/api' })
-const Prefs = require('../Prefs')
-const Queue = require('../Queue')
-const Rooms = require('../Rooms')
-const User = require('../User')
-const {
-  QUEUE_PUSH,
-} = require('../../shared/actionTypes')
+const { sign: jwtSign } = jsonWebToken
 
 const BCRYPT_ROUNDS = 12
 const USERNAME_MIN_LENGTH = 3
@@ -133,7 +134,7 @@ router.put('/user/:userId', async (ctx, next) => {
       ctx.throw(422, 'Current password is required')
     }
 
-    if (!await bcrypt.compare(password, user.password)) {
+    if (!(await bcrypt.compare(password, user.password))) {
       ctx.throw(401, 'Incorrect current password')
     }
   }
@@ -328,7 +329,7 @@ router.get('/user/:userId/image', async (ctx, next) => {
   ctx.body = user.image
 })
 
-module.exports = router
+export default router
 
 async function _create (ctx, isAdmin = false) {
   let { name, username, newPassword, newPasswordConfirm } = ctx.request.body
@@ -400,7 +401,7 @@ async function _login (ctx, creds, validateRoomPassword = true) {
 
   const user = await User.getByUsername(username, true)
 
-  if (!user || !await bcrypt.compare(password, user.password)) {
+  if (!user || !(await bcrypt.compare(password, user.password))) {
     ctx.throw(401, 'Incorrect username/email or password')
   }
 

@@ -1,7 +1,8 @@
-const path = require('path')
-const log = require('../../lib/Log')('FileScanner')
-const fs = require('fs')
-const JSON5 = require('json5')
+import path from 'path'
+import getLogger from '../../lib/Log.js'
+import fs from 'fs'
+import JSON5 from 'json5'
+const log = getLogger('FileScanner')
 const CONFIG = '_kes.v2.json'
 
 // search each folder from dir up to baseDir
@@ -32,4 +33,4 @@ function getConfig (dir, baseDir) {
   return getConfig(path.resolve(dir, '..'), baseDir)
 }
 
-module.exports = getConfig
+export default getConfig

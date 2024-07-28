@@ -1,5 +1,5 @@
 import React from 'react'
-import Icon from 'components/Icon'
+import Icon from 'components/Icon/Icon'
 import styles from './PathItem.css'
 
 interface PathItemProps {

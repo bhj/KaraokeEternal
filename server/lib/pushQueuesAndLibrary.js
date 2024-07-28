@@ -1,10 +1,7 @@
-const Library = require('../Library')
-const Queue = require('../Queue')
-const Rooms = require('../Rooms')
-const {
-  LIBRARY_PUSH,
-  QUEUE_PUSH,
-} = require('../../shared/actionTypes')
+import Library from '../Library/Library.js'
+import Queue from '../Queue/Queue.js'
+import Rooms from '../Rooms/Rooms.js'
+import { LIBRARY_PUSH, QUEUE_PUSH } from '../../shared/actionTypes.js'
 
 async function pushQueuesAndLibrary (io) {
   // emit (potentially) updated queues to each room
@@ -26,4 +23,4 @@ async function pushQueuesAndLibrary (io) {
   })
 }
 
-module.exports = pushQueuesAndLibrary
+export default pushQueuesAndLibrary

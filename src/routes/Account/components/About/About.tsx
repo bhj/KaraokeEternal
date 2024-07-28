@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
-import Icon from 'components/Icon'
-import Logo from 'components/Logo'
-import Modal from 'components/Modal'
+import Icon from 'components/Icon/Icon'
+import Logo from 'components/Logo/Logo'
+import Modal from 'components/Modal/Modal'
 // @ts-expect-error: not worth configuring TS for this one weird import
 import html from '<PROJECT_ROOT>/CHANGELOG.md'
 import styles from './About.css'

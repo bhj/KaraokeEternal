@@ -1,7 +1,9 @@
-// eslint-disable-next-line n/no-unpublished-require
-const { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } = require('electron')
-const path = require('path')
-const log = require('./Log')(`main:electron[${process.pid}]`)
+// eslint-disable-next-line n/no-unpublished-import
+import { app, shell, clipboard, dialog, BrowserWindow, Tray, Menu } from 'electron'
+
+import path from 'path'
+import getLogger from './Log.js'
+const log = getLogger(`main:electron[${process.pid}]`)
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -11,7 +13,7 @@ const status = {
   url: '',
 }
 
-module.exports = ({ env }) => {
+export default ({ env }) => {
   // event handlers
   app.on('ready', createWindow)
   app.on('quit', (e, code) => { log.info(`exiting (${code})`) })

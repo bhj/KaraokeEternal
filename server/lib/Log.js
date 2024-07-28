@@ -1,4 +1,4 @@
-const log = require('electron-log/node')
+import log from 'electron-log/node.js'
 const LEVELS = [false, 'error', 'warn', 'info', 'verbose', 'debug']
 
 class Logger {
@@ -27,8 +27,8 @@ class Logger {
   }
 }
 
-// default export
-module.exports = Logger.getLogger
-
 // for each process/worker to initialize their logger
-module.exports.initLogger = Logger.init
+export const initLogger = Logger.init
+
+// default export
+export default Logger.getLogger

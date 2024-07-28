@@ -1,5 +1,6 @@
-const childProcess = require('child_process')
+import childProcess from 'child_process'
 const command = 'wmic logicaldisk get Caption, ProviderName'
+
 // sample output:
 //
 // Caption  ProviderName
@@ -8,7 +9,7 @@ const command = 'wmic logicaldisk get Caption, ProviderName'
 // E:       \\vboxsrv\Downloads
 // F:       \\vboxsrv\Karaoke
 
-module.exports = function () {
+export default function () {
   return new Promise((resolve, reject) => {
     childProcess.exec(command, (err, stdout) => {
       if (err) {

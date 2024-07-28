@@ -1,15 +1,10 @@
-const Media = require('./Media')
-const {
-  MEDIA_ADD,
-  MEDIA_CLEANUP,
-  MEDIA_REMOVE,
-  MEDIA_UPDATE,
-} = require('../../shared/actionTypes')
+import Media from './Media.js'
+import { MEDIA_ADD, MEDIA_CLEANUP, MEDIA_REMOVE, MEDIA_UPDATE } from '../../shared/actionTypes.js'
 
 /**
  * IPC action handlers
  */
-module.exports = function (io) {
+export default function (io) {
   return {
     [MEDIA_ADD]: async ({ payload }) => Media.add(payload),
     [MEDIA_CLEANUP]: Media.cleanup,

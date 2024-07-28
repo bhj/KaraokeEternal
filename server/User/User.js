@@ -1,6 +1,8 @@
-const db = require('../lib/Database').db
-const sql = require('sqlate')
-const Queue = require('../Queue')
+import Database from '../lib/Database.js'
+import sql from 'sqlate'
+import Queue from '../Queue/Queue.js'
+
+const { db } = Database
 
 class User {
   /**
@@ -136,4 +138,4 @@ class User {
   }
 }
 
-module.exports = User
+export default User

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createRoom, updateRoom, removeRoom } from 'store/modules/rooms'
-import Modal from 'components/Modal'
+import Modal from 'components/Modal/Modal'
 import { Room } from 'shared/types'
 import styles from './EditRoom.css'
 

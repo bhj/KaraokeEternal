@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react'
 import { useAppDispatch } from 'store/hooks'
-import RoomSelect from '../../../components/RoomSelect'
+import RoomSelect from '../../../components/RoomSelect/RoomSelect'
 import { login } from 'store/modules/user'
 import styles from './SignIn.css'
 let roomSelectRef, roomPasswordRef

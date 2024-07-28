@@ -1,18 +1,18 @@
-const path = require('path')
-const webpack = require('webpack')
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const applyLicenseConfig = require('./webpack.license.config')
+import path from 'path'
+import webpack from 'webpack'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
+import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import applyLicenseConfig from './webpack.license.config.js'
 
 const NODE_ENV = process.env.NODE_ENV || 'production'
 const __DEV__ = NODE_ENV === 'development'
 const __TEST__ = NODE_ENV === 'test'
 const __PROD__ = NODE_ENV === 'production'
-const baseDir = path.resolve(__dirname, '..')
+const baseDir = path.resolve(import.meta.dirname, '..')
 
-const config = {
+let config = {
   mode: __PROD__ ? 'production' : 'development',
   entry: {
     main: [
@@ -87,7 +87,7 @@ config.module.rules.push({
       cacheDirectory: __DEV__,
       configFile: path.join(baseDir, 'config', 'babel.config.json'),
       plugins: [
-        __DEV__ && require.resolve('react-refresh/babel'),
+        __DEV__ && import.meta.resolve('react-refresh/babel'),
       ].filter(Boolean),
     },
   }],
@@ -156,4 +156,6 @@ config.module.rules.push({
   ]
 })
 
-module.exports = __PROD__ ? applyLicenseConfig(config) : config
+if (__PROD__) config = applyLicenseConfig(config)
+
+export default config

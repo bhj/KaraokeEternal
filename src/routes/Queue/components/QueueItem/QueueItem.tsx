@@ -2,9 +2,9 @@ import React, { useCallback, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { useSwipeable } from 'react-swipeable'
 
-import Button from 'components/Button'
-import Buttons from 'components/Buttons'
-import UserImage from 'components/UserImage'
+import Button from 'components/Button/Button'
+import Buttons from 'components/Buttons/Buttons'
+import UserImage from 'components/UserImage/UserImage'
 import styles from './QueueItem.css'
 
 import { requestPlayNext } from 'store/modules/status'

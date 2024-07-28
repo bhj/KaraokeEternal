@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchPrefs } from 'store/modules/prefs'
-import SignedInView from './SignedInView'
-import SignedOutView from './SignedOutView'
+import SignedInView from './SignedInView/SignedInView'
+import SignedOutView from './SignedOutView/SignedOutView'
 import styles from './AccountView.css'
 
 const AccountView = () => {

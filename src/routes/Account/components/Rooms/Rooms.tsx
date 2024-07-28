@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { formatDateTime } from 'lib/dateTime'
-import EditRoom from './EditRoom'
+import EditRoom from './EditRoom/EditRoom'
 import { closeRoomEditor, fetchRooms, filterByStatus, openRoomEditor } from 'store/modules/rooms'
 import { filterByRoom } from '../../modules/users'
 import getRoomList from '../../selectors/getRoomList'

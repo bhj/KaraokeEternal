@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { requestLogout, updateAccount } from 'store/modules/user'
-import AccountForm from '../AccountForm'
+import AccountForm from '../AccountForm/AccountForm'
 import styles from './Account.css'
 
 const Account = () => {

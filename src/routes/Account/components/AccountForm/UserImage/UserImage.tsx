@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import Button from 'components/Button'
-import Icon from 'components/Icon'
+import Button from 'components/Button/Button'
+import Icon from 'components/Icon/Icon'
 import loadImage from 'blueimp-load-image'
 import { User } from 'shared/types'
 import styles from './UserImage.css'

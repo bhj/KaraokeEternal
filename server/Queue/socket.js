@@ -1,12 +1,6 @@
-const Queue = require('./Queue')
-const Rooms = require('../Rooms')
-
-const {
-  QUEUE_ADD,
-  QUEUE_MOVE,
-  QUEUE_REMOVE,
-  QUEUE_PUSH,
-} = require('../../shared/actionTypes')
+import Queue from './Queue.js'
+import Rooms from '../Rooms/Rooms.js'
+import { QUEUE_ADD, QUEUE_MOVE, QUEUE_REMOVE, QUEUE_PUSH } from '../../shared/actionTypes.js'
 
 // ------------------------------------
 // Action Handlers
@@ -51,7 +45,7 @@ const ACTION_HANDLERS = {
       })
     }
 
-    if (!sock.user.isAdmin && !await Queue.isOwner(sock.user.userId, queueId)) {
+    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, queueId))) {
       return acknowledge({
         type: QUEUE_MOVE + '_ERROR',
         error: 'Cannot move another user\'s song',
@@ -76,7 +70,7 @@ const ACTION_HANDLERS = {
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
     const { queueId } = payload
 
-    if (!sock.user.isAdmin && !await Queue.isOwner(sock.user.userId, queueId)) {
+    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, queueId))) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         error: 'Cannot remove another user\'s song',
@@ -96,4 +90,4 @@ const ACTION_HANDLERS = {
   },
 }
 
-module.exports = ACTION_HANDLERS
+export default ACTION_HANDLERS

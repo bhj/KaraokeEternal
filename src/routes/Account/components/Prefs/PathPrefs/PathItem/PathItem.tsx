@@ -1,7 +1,7 @@
 import React from 'react'
 import { Draggable } from '@hello-pangea/dnd'
-import Button from 'components/Button'
-import Icon from 'components/Icon'
+import Button from 'components/Button/Button'
+import Icon from 'components/Icon/Icon'
 import { Path } from 'shared/types'
 import styles from './PathItem.css'
 

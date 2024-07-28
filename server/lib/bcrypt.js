@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt')
+import bcrypt from 'bcrypt'
 
 function hash (myPlaintextPassword, saltRounds) {
   return new Promise(function (resolve, reject) {
@@ -18,7 +18,7 @@ function compare (data, hash) {
   })
 }
 
-module.exports = {
+export default {
   hash,
   compare,
 }

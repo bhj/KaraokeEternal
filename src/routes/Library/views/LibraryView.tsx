@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import ArtistList from '../components/ArtistList'
-import SearchResults from '../components/SearchResults'
-import TextOverlay from 'components/TextOverlay'
-import Spinner from 'components/Spinner'
+import ArtistList from '../components/ArtistList/ArtistList'
+import SearchResults from '../components/SearchResults/SearchResults'
+import TextOverlay from 'components/TextOverlay/TextOverlay'
+import Spinner from 'components/Spinner/Spinner'
 import styles from './LibraryView.css'
 
 interface LibraryViewProps {

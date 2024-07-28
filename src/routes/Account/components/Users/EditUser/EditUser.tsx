@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createUser, removeUser, updateUser } from '../../../modules/users'
-import Modal from 'components/Modal'
-import AccountForm from '../../AccountForm'
+import Modal from 'components/Modal/Modal'
+import AccountForm from '../../AccountForm/AccountForm'
 import { User } from 'shared/types'
 import styles from './EditUser.css'
 

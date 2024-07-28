@@ -1,10 +1,13 @@
-const bcrypt = require('../lib/bcrypt')
-const db = require('../lib/Database').db
-const sql = require('sqlate')
-const KoaRouter = require('@koa/router')
+import bcrypt from '../lib/bcrypt.js'
+import Database from '../lib/Database.js'
+import sql from 'sqlate'
+import KoaRouter from '@koa/router'
+import getLogger from '../lib/Log.js'
+import Rooms from '../Rooms/Rooms.js'
+
+const log = getLogger('Rooms')
+const { db } = Database
 const router = KoaRouter({ prefix: '/api' })
-const log = require('../lib/Log')('Rooms')
-const Rooms = require('../Rooms')
 
 const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1
@@ -143,4 +146,4 @@ router.delete('/rooms/:roomId', async (ctx, next) => {
   ctx.body = await Rooms.get(true)
 })
 
-module.exports = router
+export default router

@@ -1,9 +1,7 @@
-const log = require('./Log')('IPCBridge')
-const {
-  _ERROR,
-  _SUCCESS,
-} = require('../../shared/actionTypes')
+import getLogger from './Log.js'
+import { _ERROR, _SUCCESS } from '../../shared/actionTypes.js'
 
+const log = getLogger('IPCBridge')
 const PROCESS_NAME = process.env.KES_CHILD_PROCESS || 'main'
 const isParent = typeof process.env.KES_CHILD_PROCESS === 'undefined' // @todo
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
@@ -34,7 +32,7 @@ class IPCParent {
     // log.debug(`${PROCESS_NAME} rcv:`, type)
 
     if (!type || typeof IPCParent.handlers[type] !== 'function') {
-      console.log(`${PROCESS_NAME} no handler for action: ${type}`)
+      log.verbose(`${PROCESS_NAME}: no handler for action: ${type}`)
       return
     }
 
@@ -58,7 +56,7 @@ class IPCParent {
         error: err,
       }, meta?.pid)
 
-      log.error(`${PROCESS_NAME} error in ipc action ${type}: ${err.message}`)
+      log.error(`${PROCESS_NAME}: error in ipc action ${type}: ${err.message}`)
     })
   }
 
@@ -113,7 +111,7 @@ class IPCChild {
 
     // handle request
     if (!type || typeof IPCChild.handlers[type] !== 'function') {
-      console.log(`${PROCESS_NAME} no handler for action: ${type}`)
+      log.verbose(`${PROCESS_NAME}: no handler for action: ${type}`)
       return
     }
 
@@ -148,7 +146,7 @@ class IPCChild {
   }
 }
 
-module.exports = isParent ? IPCParent : IPCChild
+export default isParent ? IPCParent : IPCChild
 
 if (!isParent) {
   // child: handle messages from parent process

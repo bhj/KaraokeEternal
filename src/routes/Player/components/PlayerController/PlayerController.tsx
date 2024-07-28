@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 
-import Player from '../Player'
-import PlayerTextOverlay from '../PlayerTextOverlay'
+import Player from '../Player/Player'
+import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus } from '../../modules/player'
 

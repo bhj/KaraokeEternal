@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
-import QueueItem from '../QueueItem'
-import QueueListAnimator from '../QueueListAnimator'
+import QueueItem from '../QueueItem/QueueItem'
+import QueueListAnimator from '../QueueListAnimator/QueueListAnimator'
 import { formatSeconds } from 'lib/dateTime'
 
 import { moveItem } from '../../modules/queue'

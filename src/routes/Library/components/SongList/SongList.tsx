@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import { Artist, Song } from 'shared/types'
-import SongItem from '../SongItem'
+import SongItem from '../SongItem/SongItem'
 
 import { queueSong } from 'routes/Queue/modules/queue'
 import { showSongInfo } from 'store/modules/songInfo'

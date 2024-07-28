@@ -1,6 +1,6 @@
 import React from 'react'
-import PathPrefs from './PathPrefs'
-import PlayerPrefs from './PlayerPrefs'
+import PathPrefs from './PathPrefs/PathPrefs'
+import PlayerPrefs from './PlayerPrefs/PlayerPrefs'
 import styles from './Prefs.css'
 
 const Prefs = () => (

@@ -1,8 +1,8 @@
 import React from 'react'
-import SongList from '../SongList'
-import Icon from 'components/Icon'
+import SongList from '../SongList/SongList'
+import Icon from 'components/Icon/Icon'
 import Highlighter from 'react-highlight-words'
-import ToggleAnimation from 'components/ToggleAnimation'
+import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
 import styles from './ArtistItem.css'
 
 interface ArtistItemProps {

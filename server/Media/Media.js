@@ -1,7 +1,10 @@
-const db = require('../lib/Database').db
-const sql = require('sqlate')
-const log = require('../lib/Log')('Media')
-const Queue = require('../Queue')
+import sql from 'sqlate'
+import Database from '../lib/Database.js'
+import getLogger from '../lib/Log.js'
+import Queue from '../Queue/Queue.js'
+
+const log = getLogger('Media')
+const { db } = Database
 
 class Media {
   /**
@@ -197,4 +200,4 @@ class Media {
   }
 }
 
-module.exports = Media
+export default Media

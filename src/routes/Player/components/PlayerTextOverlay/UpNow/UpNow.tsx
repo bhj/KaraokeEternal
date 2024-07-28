@@ -1,6 +1,6 @@
 import React from 'react'
 import { CSSTransition } from 'react-transition-group'
-import UserImage from 'components/UserImage'
+import UserImage from 'components/UserImage/UserImage'
 import { QueueItem } from 'shared/types'
 import styles from './UpNow.css'
 

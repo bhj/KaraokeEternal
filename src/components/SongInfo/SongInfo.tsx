@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import Modal from 'components/Modal'
+import Modal from 'components/Modal/Modal'
 import { formatDuration } from 'lib/dateTime'
 import { closeSongInfo, setPreferredSong } from 'store/modules/songInfo'
 import styles from './SongInfo.css'

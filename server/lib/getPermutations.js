@@ -18,4 +18,4 @@ function getPermutations (str) {
   return results.filter((ext, pos, self) => self.indexOf(ext) === pos)
 }
 
-module.exports = getPermutations
+export default getPermutations

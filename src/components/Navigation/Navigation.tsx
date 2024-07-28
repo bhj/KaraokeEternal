@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import Button from 'components/Button'
+import Button from 'components/Button/Button'
 import styles from './Navigation.css'
 
 const Navigation = React.forwardRef<HTMLDivElement, undefined>((_, ref) => (

@@ -1,8 +1,8 @@
 import React from 'react'
 import { RootState } from 'store/store'
-import Modal, { ModalProps } from 'components/Modal'
-import OptimisticSlider from 'components/OptimisticSlider'
-import Icon from 'components/Icon'
+import Modal, { ModalProps } from 'components/Modal/Modal'
+import OptimisticSlider from 'components/OptimisticSlider/OptimisticSlider'
+import Icon from 'components/Icon/Icon'
 import styles from './DisplayCtrl.css'
 
 interface DisplayCtrlProps {

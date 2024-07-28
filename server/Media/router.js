@@ -1,23 +1,21 @@
-const fs = require('fs')
-const fsPromises = require('node:fs/promises')
-const { Readable } = require('stream')
-const path = require('path')
-const { unzip } = require('unzipit')
-const log = require('../lib/Log')('Media')
-const getCdgName = require('../lib/getCdgName')
-const { getExt } = require('../lib/util')
-const KoaRouter = require('@koa/router')
+import fs from 'fs'
+import fsPromises from 'node:fs/promises'
+import { Readable } from 'stream'
+import path from 'path'
+import { unzip } from 'unzipit'
+import getLogger from '../lib/Log.js'
+import getCdgName from '../lib/getCdgName.js'
+import { getExt } from '../lib/util.js'
+import KoaRouter from '@koa/router'
+import Library from '../Library/Library.js'
+import Media from './Media.js'
+import Prefs from '../Prefs/Prefs.js'
+import Queue from '../Queue/Queue.js'
+import Rooms from '../Rooms/Rooms.js'
+import fileTypes from './fileTypes.js'
+import { LIBRARY_PUSH_SONG, QUEUE_PUSH } from '../../shared/actionTypes.js'
+const log = getLogger('Media')
 const router = KoaRouter({ prefix: '/api/media' })
-const Library = require('../Library')
-const Media = require('./Media')
-const Prefs = require('../Prefs')
-const Queue = require('../Queue')
-const Rooms = require('../Rooms')
-const fileTypes = require('./fileTypes')
-const {
-  LIBRARY_PUSH_SONG,
-  QUEUE_PUSH
-} = require('../../shared/actionTypes')
 
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 
@@ -113,4 +111,4 @@ router.all('/:mediaId/prefer', async (ctx, next) => {
   })
 })
 
-module.exports = router
+export default router

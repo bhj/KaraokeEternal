@@ -1,15 +1,14 @@
-const path = require('path')
-const log = require('../lib/Log')('Prefs')
-const KoaRouter = require('@koa/router')
+import path from 'path'
+import getLogger from '../lib/Log.js'
+import KoaRouter from '@koa/router'
+import getFolders from '../lib/getFolders.js'
+import getWindowsDrives from '../lib/getWindowsDrives.js'
+import Prefs from './Prefs.js'
+import Media from '../Media/Media.js'
+import pushQueuesAndLibrary from '../lib/pushQueuesAndLibrary.js'
+import { PREFS_PATHS_CHANGED } from '../../shared/actionTypes.js'
+const log = getLogger('Prefs')
 const router = KoaRouter({ prefix: '/api/prefs' })
-const getFolders = require('../lib/getFolders')
-const getWindowsDrives = require('../lib/getWindowsDrives')
-const Prefs = require('./Prefs')
-const Media = require('../Media')
-const pushQueuesAndLibrary = require('../lib/pushQueuesAndLibrary')
-const {
-  PREFS_PATHS_CHANGED,
-} = require('../../shared/actionTypes')
 
 // get all prefs (including media paths)
 router.get('/', async (ctx, next) => {
@@ -176,4 +175,4 @@ router.get('/path/ls', async (ctx, next) => {
   }
 })
 
-module.exports = router
+export default router

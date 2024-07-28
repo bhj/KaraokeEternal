@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from 'store/hooks'
 import playerReducer, { sliceInjectNoOp } from '../modules/player'
 import playerVisualizerReducer from '../modules/playerVisualizer'
 
-import PlayerController from '../components/PlayerController'
+import PlayerController from '../components/PlayerController/PlayerController'
 import screenfull from 'screenfull'
 import styles from './PlayerView.css'
 

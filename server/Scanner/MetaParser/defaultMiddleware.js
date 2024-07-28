@@ -1,4 +1,6 @@
-const m = module.exports = new Map()
+const m = new Map()
+
+export default m
 
 // ----------------------
 // begin middleware stack

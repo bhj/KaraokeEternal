@@ -2,8 +2,8 @@ import React from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAppSelector } from 'store/hooks'
 
-import AccountView from 'routes/Account/views'
-import LibraryView from 'routes/Library/views'
+import AccountView from 'routes/Account/views/AccountView'
+import LibraryView from 'routes/Library/views/LibraryViewContainer' // @todo
 import QueueView from 'routes/Queue/views/QueueView'
 const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
 

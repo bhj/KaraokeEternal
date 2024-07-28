@@ -17,4 +17,4 @@ function accumulatedThrottle (callback, wait) {
   }
 }
 
-module.exports = accumulatedThrottle
+export default accumulatedThrottle

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import EditUser from './EditUser'
+import EditUser from './EditUser/EditUser'
 import { formatDateTime } from 'lib/dateTime'
 import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor } from '../../modules/users'
 import getUsers from '../../selectors/getUsers'

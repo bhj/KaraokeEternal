@@ -1,38 +1,36 @@
-const log = require('./lib/Log')('server')
-const path = require('path')
-const getIPAddress = require('./lib/getIPAddress')
-const http = require('http')
-const fs = require('fs')
-const { promisify } = require('util')
-const parseCookie = require('./lib/parseCookie')
-const jwtVerify = require('jsonwebtoken').verify
-const Koa = require('koa')
-const koaRouter = require('@koa/router')
-const { koaBody } = require('koa-body')
-const koaFavicon = require('koa-favicon')
-const koaLogger = require('koa-logger')
-const koaMount = require('koa-mount')
-const koaRange = require('koa-range')
-const koaStatic = require('koa-static')
+import getLogger from './lib/Log.js'
+import path from 'path'
+import getIPAddress from './lib/getIPAddress.js'
+import http from 'http'
+import fs from 'fs'
+import { promisify } from 'util'
+import parseCookie from './lib/parseCookie.js'
+import jsonWebToken from 'jsonwebtoken'
+import Koa from 'koa'
+import koaRouter from '@koa/router'
+import { koaBody } from 'koa-body'
+import koaFavicon from 'koa-favicon'
+import koaLogger from 'koa-logger'
+import koaMount from 'koa-mount'
+import koaRange from 'koa-range'
+import koaStatic from 'koa-static'
+import Media from './Media/Media.js'
+import Prefs from './Prefs/Prefs.js'
+import libraryRouter from './Library/router.js'
+import mediaRouter from './Media/router.js'
+import prefsRouter from './Prefs/router.js'
+import roomsRouter from './Rooms/router.js'
+import userRouter from './User/router.js'
+import pushQueuesAndLibrary from './lib/pushQueuesAndLibrary.js'
+import { Server as SocketIO } from 'socket.io'
+import socketActions from './socket.js'
+import IPC from './lib/IPCBridge.js'
+import IPCLibraryActions from './Library/ipc.js'
+import IPCMediaActions from './Media/ipc.js'
+import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from '../shared/actionTypes.js'
 
-const Media = require('./Media')
-const Prefs = require('./Prefs')
-const libraryRouter = require('./Library/router')
-const mediaRouter = require('./Media/router')
-const prefsRouter = require('./Prefs/router')
-const roomsRouter = require('./Rooms/router')
-const userRouter = require('./User/router')
-const pushQueuesAndLibrary = require('./lib/pushQueuesAndLibrary')
-const SocketIO = require('socket.io')
-const socketActions = require('./socket')
-const IPC = require('./lib/IPCBridge')
-const IPCLibraryActions = require('./Library/ipc')
-const IPCMediaActions = require('./Media/ipc')
-const {
-  SCANNER_WORKER_EXITED,
-  SERVER_WORKER_STATUS,
-  SERVER_WORKER_ERROR,
-} = require('../shared/actionTypes')
+const log = getLogger('server')
+const { verify: jwtVerify } = jsonWebToken
 
 async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers }) {
   const indexFile = path.join(env.KES_PATH_WEBROOT, 'index.html')
@@ -59,7 +57,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     })
 
     // create socket.io server
-    io = SocketIO(server, {
+    io = new SocketIO(server, {
       path: urlPath + 'socket.io',
       serveClient: false,
     })
@@ -212,8 +210,10 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   if (env.NODE_ENV !== 'development') {
     // make sure we handle index.html before koaStatic,
     // otherwise it'll be served without dynamic base tag
-    app.use(createIndexMiddleware(await promisify(fs.readFile)(indexFile, 'utf8')))
 
+    // console.log(indexFile)
+
+    app.use(createIndexMiddleware(await promisify(fs.readFile)(indexFile, 'utf8')))
     // serve build and asset folders
     app.use(koaMount(urlPath, koaStatic(env.KES_PATH_WEBROOT)))
     app.use(koaMount(`${urlPath}assets`, koaStatic(env.KES_PATH_ASSETS)))
@@ -226,8 +226,8 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   // Development middleware
   // ----------------------
   log.info('Enabling webpack dev and HMR middleware')
-  const webpack = require('webpack') // eslint-disable-line n/no-unpublished-require
-  const webpackConfig = require('../config/webpack.config') // eslint-disable-line n/no-unpublished-require
+  const { default: webpack } = await import('webpack') // eslint-disable-line n/no-unpublished-import
+  const { default: webpackConfig } = await import('../config/webpack.config.js') // eslint-disable-line n/no-unpublished-import
   const compiler = webpack(webpackConfig)
 
   compiler.hooks.done.tap('indexPlugin', async (params) => {
@@ -245,14 +245,14 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     }
   })
 
-  const webpackDevMiddleware = require('webpack-dev-middleware')
+  const { default: webpackDevMiddleware } = await import('webpack-dev-middleware') // eslint-disable-line n/no-unpublished-import
   app.use(webpackDevMiddleware.koaWrapper(compiler, { publicPath: urlPath }))
 
-  const hotMiddleware = require('./lib/getHotMiddleware')(compiler)
-  app.use(hotMiddleware)
+  const { default: hotMiddleware } = await import('./lib/getHotMiddleware.js')
+  app.use(hotMiddleware(compiler))
 
   // serve assets since webpack-dev-server is unaware of this folder
   app.use(koaMount(`${urlPath}assets`, koaStatic(env.KES_PATH_ASSETS)))
 }
 
-module.exports = serverWorker
+export default serverWorker

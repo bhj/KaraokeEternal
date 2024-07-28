@@ -1,4 +1,12 @@
-const { initLogger } = require('./lib/Log')
+import path from 'path'
+import { parsePathIds } from './lib/util.js'
+import { initLogger } from './lib/Log.js'
+import {
+  REQUEST_SCAN,
+  REQUEST_SCAN_STOP,
+  SCANNER_WORKER_STATUS
+} from '../shared/actionTypes.js'
+
 const log = initLogger('scanner', {
   console: {
     level: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 0),
@@ -9,17 +17,21 @@ const log = initLogger('scanner', {
   }
 }).scope(`scanner[${process.pid}]`)
 
-const path = require('path')
-const Database = require('./lib/Database')
-const IPC = require('./lib/IPCBridge')
-const { parsePathIds } = require('./lib/util')
-const {
-  REQUEST_SCAN,
-  REQUEST_SCAN_STOP,
-  SCANNER_WORKER_STATUS,
-} = require('../shared/actionTypes')
+let IPC
 
 ;(async function () {
+  // init database
+  const { open } = await import('./lib/Database.js')
+
+  await open({
+    file: path.join(process.env.KES_PATH_DATA, 'database.sqlite3'),
+    ro: true,
+  })
+
+  // init IPC listener
+  const IPCBridge = await import('./lib/IPCBridge.js')
+  IPC = IPCBridge.default
+
   IPC.use({
     [REQUEST_SCAN]: ({ payload }) => {
       q.queue(payload.pathIds) // no need to await; fire and forget
@@ -29,12 +41,7 @@ const {
     }
   })
 
-  await Database.open({
-    file: path.join(process.env.KES_PATH_DATA, 'database.sqlite3'),
-    ro: true,
-  })
-
-  const ScannerQueue = require('./Scanner/ScannerQueue')
+  const { default: ScannerQueue } = await import('./Scanner/ScannerQueue.js')
   const q = new ScannerQueue(onIteration, onDone)
   const args = process.argv.slice(2)
   log.debug('received arguments: %s', args)

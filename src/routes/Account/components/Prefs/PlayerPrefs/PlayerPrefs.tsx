@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import Icon from 'components/Icon'
+import Icon from 'components/Icon/Icon'
 import { setPref } from 'store/modules/prefs'
 import styles from './PlayerPrefs.css'
 

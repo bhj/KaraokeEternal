@@ -1,6 +1,6 @@
 import React from 'react'
-import ColorCycle from './ColorCycle'
-import UpNow from './UpNow'
+import ColorCycle from './ColorCycle/ColorCycle'
+import UpNow from './UpNow/UpNow'
 import styles from './PlayerTextOverlay.css'
 
 interface PlayerTextOverlayProps {

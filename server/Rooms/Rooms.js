@@ -1,6 +1,8 @@
-const bcrypt = require('../lib/bcrypt')
-const db = require('../lib/Database').db
-const sql = require('sqlate')
+import bcrypt from '../lib/bcrypt.js'
+import Database from '../lib/Database.js'
+import sql from 'sqlate'
+
+const { db } = Database
 
 class Rooms {
   /**
@@ -61,7 +63,7 @@ class Rooms {
         throw new Error('Room password is required')
       }
 
-      if (!await bcrypt.compare(password, room.password)) {
+      if (!(await bcrypt.compare(password, room.password))) {
         throw new Error('Incorrect room password')
       }
     }
@@ -111,4 +113,4 @@ class Rooms {
   }
 }
 
-module.exports = Rooms
+export default Rooms

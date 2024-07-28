@@ -1,11 +1,5 @@
-const Library = require('./Library')
-const {
-  STAR_SONG,
-  SONG_STARRED,
-  UNSTAR_SONG,
-  SONG_UNSTARRED,
-  _SUCCESS,
-} = require('../../shared/actionTypes')
+import Library from './Library.js'
+import { STAR_SONG, SONG_STARRED, UNSTAR_SONG, SONG_UNSTARRED, _SUCCESS } from '../../shared/actionTypes.js'
 
 const ACTION_HANDLERS = {
   [STAR_SONG]: async (sock, { payload }, acknowledge) => {
@@ -44,4 +38,4 @@ const ACTION_HANDLERS = {
   }
 }
 
-module.exports = ACTION_HANDLERS
+export default ACTION_HANDLERS

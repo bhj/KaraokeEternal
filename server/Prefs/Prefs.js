@@ -1,8 +1,10 @@
-const path = require('path')
-const db = require('../lib/Database').db
-const sql = require('sqlate')
-const crypto = require('crypto')
-const log = require('../lib/Log')('Prefs')
+import path from 'path'
+import sql from 'sqlate'
+import crypto from 'crypto'
+import Database from '../lib/Database.js'
+import getLogger from '../lib/Log.js'
+const log = getLogger('Prefs')
+const { db } = Database
 
 class Prefs {
   /**
@@ -187,4 +189,4 @@ class Prefs {
   }
 }
 
-module.exports = Prefs
+export default Prefs

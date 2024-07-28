@@ -1,6 +1,6 @@
 import React from 'react'
-import OptimisticSlider from 'components/OptimisticSlider'
-import Icon from 'components/Icon'
+import OptimisticSlider from 'components/OptimisticSlider/OptimisticSlider'
+import Icon from 'components/Icon/Icon'
 import styles from './VolumeSlider.css'
 
 interface VolumeSliderProps {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import PathItem from './PathItem'
-import Modal from 'components/Modal'
+import PathItem from './PathItem/PathItem'
+import Modal from 'components/Modal/Modal'
 import HttpApi from 'lib/HttpApi'
 import styles from './PathChooser.css'
 const api = new HttpApi('prefs/path')

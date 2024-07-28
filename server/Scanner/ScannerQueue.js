@@ -1,6 +1,8 @@
-const FileScanner = require('./FileScanner')
-const Prefs = require('../Prefs')
-const log = require('../lib/Log')('queue')
+import FileScanner from './FileScanner/FileScanner.js'
+import Prefs from '../Prefs/Prefs.js'
+import getLogger from '../lib/Log.js'
+
+const log = getLogger('queue')
 
 class ScannerQueue {
   #instance
@@ -68,4 +70,4 @@ class ScannerQueue {
   }
 }
 
-module.exports = ScannerQueue
+export default ScannerQueue

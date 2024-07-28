@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
-import Icon from '../Icon'
+import Icon from '../Icon/Icon'
 
 interface ButtonProps {
   animateClassName?: string

@@ -1,6 +1,8 @@
-const fs = require('fs')
-const { LicenseWebpackPlugin } = require('license-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin')
+import fs from 'fs'
+import licenseWebpackPlugin from 'license-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
+
+const { LicenseWebpackPlugin } = licenseWebpackPlugin
 
 const applyLicenseConfig = config => {
   config.plugins.push(new LicenseWebpackPlugin({
@@ -71,4 +73,4 @@ limitations under the License.
 `
 }
 
-module.exports = applyLicenseConfig
+export default applyLicenseConfig

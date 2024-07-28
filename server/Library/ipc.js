@@ -1,14 +1,11 @@
-const Library = require('./Library')
-const throttle = require('@jcoreio/async-throttle')
-const {
-  SCANNER_WORKER_STATUS,
-  LIBRARY_MATCH_SONG,
-} = require('../../shared/actionTypes')
+import Library from './Library.js'
+import throttle from '@jcoreio/async-throttle'
+import { SCANNER_WORKER_STATUS, LIBRARY_MATCH_SONG } from '../../shared/actionTypes.js'
 
 /**
  * IPC action handlers
  */
-module.exports = function (io) {
+export default function (io) {
   const emit = throttle(action => io.emit('action', action), 1000)
 
   return {

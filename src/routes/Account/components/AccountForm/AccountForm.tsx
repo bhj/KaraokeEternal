@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import UserImage from './UserImage'
+import UserImage from './UserImage/UserImage'
 import { User } from 'shared/types'
 import styles from './AccountForm.css'
 

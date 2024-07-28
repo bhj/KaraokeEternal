@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import { useSwipeable } from 'react-swipeable'
-
-import Buttons from 'components/Buttons'
-import Icon from 'components/Icon'
-import ToggleAnimation from 'components/ToggleAnimation'
+import Buttons from 'components/Buttons/Buttons'
+import Icon from 'components/Icon/Icon'
+import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
 import { formatDuration } from 'lib/dateTime'
 import styles from './SongItem.css'
 

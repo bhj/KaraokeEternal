@@ -1,6 +1,8 @@
-const os = require('os')
-const path = require('path')
-const baseDir = path.resolve(path.dirname(require.main.filename), '..')
+import os from 'os'
+import path from 'path'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+const baseDir = path.resolve(import.meta.dirname, '..', '..')
 
 const env = {
   NODE_ENV: process.env.NODE_ENV,
@@ -23,7 +25,7 @@ const env = {
   KES_PGID: parseInt(process.env.PGID, 10) || undefined,
 }
 
-const yargs = require('yargs')
+const argv = yargs(hideBin(process.argv))
   .version(false) // disable default handler
   .option('data', {
     describe: 'Absolute path of folder for database files',
@@ -75,23 +77,23 @@ const yargs = require('yargs')
   .usage('$0')
   .usage('  Logging options use the following numeric levels:')
   .usage('  0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug')
+  .parse()
 
-let argv = yargs.argv
 let _app
 
-if (process.versions.electron) {
-  // eslint-disable-next-line n/no-unpublished-require
-  _app = require('electron').app
-
-  // see https://github.com/yargs/yargs/blob/master/docs/api.md#argv
-  if (_app.isPackaged) {
-    argv = yargs.parse(process.argv.slice(1))
-  }
-}
+// if (process.versions.electron) {
+//   // eslint-disable-next-line n/no-unpublished-import
+//   _app = require('electron').app
+//
+//   // see https://github.com/yargs/yargs/blob/master/docs/api.md#argv
+//   if (_app.isPackaged) {
+//     argv = yargs.parse(process.argv.slice(1))
+//   }
+// }
 
 if (argv.version) {
   console.log(_app ? _app.getVersion() : process.env.npm_package_version)
-  env.KES_EXIT = true
+  process.exit(0) // eslint-disable-line n/no-process-exit
 }
 
 if (argv.rotateKey) {
@@ -117,7 +119,7 @@ for (const opt in opts) {
   }
 }
 
-module.exports = env
+export default env
 
 function getAppPath (appName) {
   const home = os.homedir ? os.homedir() : process.env.HOME

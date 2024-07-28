@@ -1,21 +1,21 @@
 import React from 'react'
-import { Modal, ModalProps } from 'react-responsive-modal'
+import { Modal as ResponsiveModal, ModalProps as ResponsiveModalProps } from 'react-responsive-modal'
 import styles from './Modal.css'
 
-interface CustomModalProps {
+export interface ModalProps {
   buttons?: React.ReactNode
   children?: React.ReactNode
   isVisible: boolean
-  onClose: ModalProps['onClose']
+  onClose: ResponsiveModalProps['onClose']
   style?: object
   title: string
 }
 
-const CustomModal = (props: CustomModalProps) => {
+const Modal = (props: ModalProps) => {
   // disabling blockScroll for now due to
   // https://github.com/pradel/react-responsive-modal/issues/468
   return (
-    <Modal
+    <ResponsiveModal
       blockScroll={false}
       animationDuration={167}
       open={props.isVisible}
@@ -50,8 +50,8 @@ const CustomModal = (props: CustomModalProps) => {
           </div>
         }
       </div>
-    </Modal>
+    </ResponsiveModal>
   )
 }
 
-export default React.memo(CustomModal)
+export default React.memo(Modal)

@@ -1,6 +1,6 @@
 // cookie helper based on
 // http://stackoverflow.com/questions/3393854/get-and-set-a-single-cookie-with-node-js-http-server
-module.exports = function parseCookie (cookie) {
+export default function parseCookie (cookie) {
   const list = {}
 
   cookie && cookie.split(';').forEach(c => {

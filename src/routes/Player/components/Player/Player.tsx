@@ -1,8 +1,8 @@
 import React from 'react'
-import CDGPlayer from './CDGPlayer'
-import MP4Player from './MP4Player'
+import CDGPlayer from './CDGPlayer/CDGPlayer'
+import MP4Player from './MP4Player/MP4Player'
 import type { playerVisualizerState } from '../../modules/playerVisualizer'
-const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer'))
+const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisualizer'))
 
 const players = {
   CDGPlayer,

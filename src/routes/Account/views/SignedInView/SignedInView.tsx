@@ -3,11 +3,11 @@ import combinedReducer from 'store/reducers'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchAccount } from 'store/modules/user'
 import usersReducer, { sliceInjectNoOp } from '../../modules/users'
-import About from '../../components/About'
-import Account from '../../components/Account'
-import Prefs from '../../components/Prefs'
-import Rooms from '../../components/Rooms'
-import Users from '../../components/Users'
+import About from '../../components/About/About'
+import Account from '../../components/Account/Account'
+import Prefs from '../../components/Prefs/Prefs'
+import Rooms from '../../components/Rooms/Rooms'
+import Users from '../../components/Users/Users'
 
 const SignedInView = () => {
   const { isAdmin } = useAppSelector(state => state.user)

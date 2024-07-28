@@ -1,9 +1,9 @@
 // based on https://github.com/tnnevol/webpack-hot-middleware-for-koa2
 
-// eslint-disable-next-line n/no-unpublished-require
-const webpackHotMiddleware = require('webpack-hot-middleware')
+// eslint-disable-next-line n/no-unpublished-import
+import webpackHotMiddleware from 'webpack-hot-middleware'
 
-module.exports = (compiler, opts) => {
+export default (compiler, opts) => {
   const middleware = webpackHotMiddleware(compiler, opts)
 
   return async (ctx, next) => {

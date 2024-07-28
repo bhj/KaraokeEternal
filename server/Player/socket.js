@@ -1,5 +1,6 @@
-const Rooms = require('../Rooms')
-const {
+import Rooms from '../Rooms/Rooms.js'
+
+import {
   PLAYER_CMD_OPTIONS,
   PLAYER_CMD_NEXT,
   PLAYER_CMD_PAUSE,
@@ -14,7 +15,7 @@ const {
   PLAYER_REQ_VOLUME,
   PLAYER_STATUS,
   PLAYER_LEAVE,
-} = require('../../shared/actionTypes')
+} from '../../shared/actionTypes.js'
 
 // ------------------------------------
 // Action Handlers
@@ -75,4 +76,4 @@ const ACTION_HANDLERS = {
   },
 }
 
-module.exports = ACTION_HANDLERS
+export default ACTION_HANDLERS

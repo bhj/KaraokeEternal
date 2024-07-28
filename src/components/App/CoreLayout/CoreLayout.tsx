@@ -4,11 +4,11 @@ import useResizeObserver from 'use-resize-observer'
 // global stylesheets should be imported before any
 // components that will import their own modular css
 import '../../../styles/global.css'
-import Header from 'components/Header'
-import Navigation from 'components/Navigation'
-import Modal from 'components/Modal'
-import SongInfo from 'components/SongInfo'
-import Routes from '../Routes'
+import Header from 'components/Header/Header'
+import Navigation from 'components/Navigation/Navigation'
+import Modal from 'components/Modal/Modal'
+import SongInfo from 'components/SongInfo/SongInfo'
+import Routes from '../Routes/Routes'
 import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
 
 const CoreLayout = () => {

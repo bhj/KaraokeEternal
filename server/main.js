@@ -1,8 +1,20 @@
 #!/usr/bin/env node
-const env = require('./lib/cli')
-if (env.KES_EXIT) return
+import childProcess from 'child_process'
+import env from './lib/cli.js'
+import path from 'path'
+import { initLogger } from './lib/Log.js'
+import { parsePathIds } from './lib/util.js'
+import {
+  PREFS_PATHS_CHANGED,
+  REQUEST_SCAN,
+  REQUEST_SCAN_STOP,
+  SCANNER_WORKER_EXITED,
+  // SERVER_WORKER_ERROR,
+  // SERVER_WORKER_STATUS,
+  WATCHER_WORKER_EVENT,
+  WATCHER_WORKER_WATCH,
+} from '../shared/actionTypes.js'
 
-const { initLogger } = require('./lib/Log')
 const log = initLogger('server', {
   console: {
     level: env.KES_SERVER_CONSOLE_LEVEL ?? (env.NODE_ENV === 'development' ? 5 : 4),
@@ -13,29 +25,9 @@ const log = initLogger('server', {
   },
 }).scope(`main[${process.pid}]`)
 
-const childProcess = require('child_process')
-const path = require('path')
-const Database = require('./lib/Database')
-const IPC = require('./lib/IPCBridge')
-const { parsePathIds } = require('./lib/util')
 const refs = {}
 const shutdownHandlers = []
-const {
-  PREFS_PATHS_CHANGED,
-  REQUEST_SCAN,
-  REQUEST_SCAN_STOP,
-  SCANNER_WORKER_EXITED,
-  SERVER_WORKER_ERROR,
-  SERVER_WORKER_STATUS,
-  WATCHER_WORKER_EVENT,
-  WATCHER_WORKER_WATCH,
-} = require('../shared/actionTypes')
-
-IPC.use({
-  [WATCHER_WORKER_EVENT]: ({ payload }) => {
-    startScanner(payload.pathId)
-  },
-})
+let IPC
 
 process.on(PREFS_PATHS_CHANGED, startWatcher)
 
@@ -64,45 +56,59 @@ if (Number.isInteger(env.KES_PUID)) {
 process.on('exit', () => Object.values(refs).forEach(ref => ref.kill()))
 
 // debug: log stack trace for unhandled promise rejections
-process.on('unhandledRejection', (reason, p) => {
-  log.error('Unhandled Rejection:', p, 'reason:', reason)
+process.on('unhandledRejection', (reason) => {
+  log.error('Unhandled Rejection:', reason)
 })
 
 // detect electron
-if (process.versions.electron) {
-  refs.electron = require('./lib/electron.js')({ env })
-  env.KES_PATH_DATA = refs.electron.app.getPath('userData')
-}
+// if (process.versions.electron) {
+//   refs.electron = require('./lib/electron.js')({ env })
+//   env.KES_PATH_DATA = refs.electron.app.getPath('userData')
+// }
 
-(async function () {
-  await Database.open({
+;(async function () {
+  // init database
+  const { open, close } = await import('./lib/Database.js')
+  shutdownHandlers.push(close)
+
+  await open({
     file: path.join(env.KES_PATH_DATA, 'database.sqlite3'),
     ro: false,
   })
 
-  shutdownHandlers.push(Database.close)
+  // init IPC listener
+  const IPCBridge = await import('./lib/IPCBridge.js')
+  IPC = IPCBridge.default
 
-  if (refs.electron) {
-    process.on('serverWorker', action => {
-      const { type, payload } = action
+  IPC.use({
+    [WATCHER_WORKER_EVENT]: ({ payload }) => {
+      startScanner(payload.pathId)
+    },
+  })
 
-      if (type === SERVER_WORKER_STATUS) {
-        return refs.electron.setStatus('url', payload.url)
-      } else if (type === SERVER_WORKER_ERROR) {
-        return refs.electron.setError(action.error)
-      }
-    })
-  }
+  //   if (refs.electron) {
+  //     process.on('serverWorker', action => {
+  //       const { type, payload } = action
+  //
+  //       if (type === SERVER_WORKER_STATUS) {
+  //         return refs.electron.setStatus('url', payload.url)
+  //       } else if (type === SERVER_WORKER_ERROR) {
+  //         return refs.electron.setError(action.error)
+  //       }
+  //     })
+  //   }
 
   // start web server
-  require('./serverWorker.js')({ env, startScanner, stopScanner, shutdownHandlers })
+  const serverWorker = await import('./serverWorker.js')
+  serverWorker.default({ env, startScanner, stopScanner, shutdownHandlers })
 
   // scanning on startup?
   const pathIds = parsePathIds(env.KES_SCAN)
   if (pathIds) startScanner(pathIds)
 
   // any paths with watching enabled?
-  const { paths } = await require('./Prefs').get()
+  const { default: Prefs } = await import('./Prefs/Prefs.js')
+  const { paths } = await Prefs.get()
 
   if (paths.result.find(pathId => paths.entities[pathId].prefs?.isWatchingEnabled)) {
     startWatcher(paths)
@@ -112,7 +118,7 @@ if (process.versions.electron) {
 function startWatcher (paths) {
   if (refs.watcher === undefined) {
     log.info('Starting folder watcher process')
-    refs.watcher = childProcess.fork(path.join(__dirname, 'watcherWorker.js'), [], {
+    refs.watcher = childProcess.fork(path.join(import.meta.dirname, 'watcherWorker.js'), [], {
       env: { ...env, KES_CHILD_PROCESS: 'watcher' },
       gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
       uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
@@ -137,7 +143,7 @@ function startScanner (pathIds) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
 
-    refs.scanner = childProcess.fork(path.join(__dirname, 'scannerWorker.js'), [pathIds.toString()], {
+    refs.scanner = childProcess.fork(path.join(import.meta.dirname, 'scannerWorker.js'), [pathIds.toString()], {
       env: { ...env, KES_CHILD_PROCESS: 'scanner' },
       gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
       uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,

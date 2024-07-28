@@ -1,6 +1,7 @@
-const fs = require('fs')
-const path = require('path')
-const log = require('../../lib/Log')('FileScanner:getFiles')
+import fs from 'fs'
+import path from 'path'
+import getLogger from '../../lib/Log.js'
+const log = getLogger('FileScanner:getFiles')
 
 /**
  * Silly promise wrapper for synchronous walker
@@ -60,4 +61,4 @@ function walkSync (dir, filterFn) {
   return results
 }
 
-module.exports = getFiles
+export default getFiles

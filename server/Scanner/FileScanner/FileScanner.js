@@ -1,23 +1,19 @@
-const path = require('path')
-const fsPromises = require('node:fs/promises')
-const musicMeta = require('music-metadata')
-const { unzip } = require('unzipit')
-const log = require('../../lib/Log')('FileScanner')
-const { getExt } = require('../../lib/util')
-const getFiles = require('./getFiles')
-const getConfig = require('./getConfig')
-const getCdgName = require('../../lib/getCdgName')
-const Media = require('../../Media')
-const MetaParser = require('../MetaParser')
-const Scanner = require('../Scanner')
-const IPC = require('../../lib/IPCBridge')
-const fileTypes = require('../../Media/fileTypes')
-const {
-  LIBRARY_MATCH_SONG,
-  MEDIA_ADD,
-  MEDIA_REMOVE,
-  MEDIA_UPDATE,
-} = require('../../../shared/actionTypes')
+import path from 'path'
+import fsPromises from 'node:fs/promises'
+import musicMeta from 'music-metadata'
+import { unzip } from 'unzipit'
+import getLogger from '../../lib/Log.js'
+import { getExt } from '../../lib/util.js'
+import getFiles from './getFiles.js'
+import getConfig from './getConfig.js'
+import getCdgName from '../../lib/getCdgName.js'
+import Media from '../../Media/Media.js'
+import MetaParser from '../MetaParser/MetaParser.js'
+import Scanner from '../Scanner.js'
+import IPC from '../../lib/IPCBridge.js'
+import fileTypes from '../../Media/fileTypes.js'
+import { LIBRARY_MATCH_SONG, MEDIA_ADD, MEDIA_REMOVE, MEDIA_UPDATE } from '../../../shared/actionTypes.js'
+const log = getLogger('FileScanner')
 
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
@@ -105,7 +101,7 @@ class FileScanner extends Scanner {
       buffer = Buffer.from(await entries[audioName].arrayBuffer())
       mimeType = fileTypes[getExt(audioName)].mimeType
     } else {
-      if (fileTypes[getExt(file)].requiresCDG && !await getCdgName(file)) throw new Error('no .cdg sidecar found')
+      if (fileTypes[getExt(file)].requiresCDG && !(await getCdgName(file))) throw new Error('no .cdg sidecar found')
     }
 
     const data = await musicMeta.parseBuffer(buffer, mimeType, {
@@ -201,4 +197,4 @@ class FileScanner extends Scanner {
   }
 }
 
-module.exports = FileScanner
+export default FileScanner

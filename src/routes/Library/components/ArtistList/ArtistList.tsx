@@ -1,7 +1,7 @@
 import React from 'react'
-import PaddedList from 'components/PaddedList'
-import AlphaPicker from '../AlphaPicker'
-import ArtistItem from '../ArtistItem'
+import PaddedList from 'components/PaddedList/PaddedList'
+import AlphaPicker from '../AlphaPicker/AlphaPicker'
+import ArtistItem from '../ArtistItem/ArtistItem'
 import { RootState } from 'store/store'
 import { Artist, Song } from 'shared/types'
 const ROW_HEIGHT = 44

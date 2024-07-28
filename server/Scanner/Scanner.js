@@ -1,7 +1,5 @@
-const IPC = require('../lib/IPCBridge')
-const {
-  SCANNER_WORKER_STATUS,
-} = require('../../shared/actionTypes')
+import IPC from '../lib/IPCBridge.js'
+import { SCANNER_WORKER_STATUS } from '../../shared/actionTypes.js'
 
 class Scanner {
   constructor (qStats) {
@@ -27,4 +25,4 @@ class Scanner {
   }
 }
 
-module.exports = Scanner
+export default Scanner
