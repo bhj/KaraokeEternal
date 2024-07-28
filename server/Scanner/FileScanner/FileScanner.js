@@ -1,6 +1,6 @@
 import path from 'path'
 import fsPromises from 'node:fs/promises'
-import musicMeta from 'music-metadata'
+import { parseBuffer } from 'music-metadata'
 import { unzip } from 'unzipit'
 import getLogger from '../../lib/Log.js'
 import { getExt } from '../../lib/util.js'
@@ -104,7 +104,7 @@ class FileScanner extends Scanner {
       if (fileTypes[getExt(file)].requiresCDG && !(await getCdgName(file))) throw new Error('no .cdg sidecar found')
     }
 
-    const data = await musicMeta.parseBuffer(buffer, mimeType, {
+    const data = await parseBuffer(buffer, mimeType, {
       duration: true,
       skipCovers: true,
     })
