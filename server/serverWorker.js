@@ -210,10 +210,8 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   if (env.NODE_ENV !== 'development') {
     // make sure we handle index.html before koaStatic,
     // otherwise it'll be served without dynamic base tag
-
-    // console.log(indexFile)
-
     app.use(createIndexMiddleware(await promisify(fs.readFile)(indexFile, 'utf8')))
+
     // serve build and asset folders
     app.use(koaMount(urlPath, koaStatic(env.KES_PATH_WEBROOT)))
     app.use(koaMount(`${urlPath}assets`, koaStatic(env.KES_PATH_ASSETS)))

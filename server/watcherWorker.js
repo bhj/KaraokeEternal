@@ -8,13 +8,14 @@ import {
   WATCHER_WORKER_WATCH
 } from '../shared/actionTypes.js'
 
+const env = JSON.parse(process.env.KES_ENV_JSON)
 const log = initLogger('scanner', {
   console: {
-    level: process.env.KES_SCANNER_CONSOLE_LEVEL ?? (process.env.NODE_ENV === 'development' ? 5 : 4),
-    useStyles: process.env.KES_CONSOLE_COLORS ?? undefined,
+    level: env.KES_SCANNER_CONSOLE_LEVEL ?? (env.NODE_ENV === 'development' ? 5 : 4),
+    useStyles: env.KES_CONSOLE_COLORS ?? undefined,
   },
   file: {
-    level: process.env.KES_SCANNER_LOG_LEVEL ?? (process.env.NODE_ENV === 'development' ? 0 : 3),
+    level: env.KES_SCANNER_LOG_LEVEL ?? (env.NODE_ENV === 'development' ? 0 : 3),
   }
 }).scope(`watcher[${process.pid}]`)
 

@@ -119,7 +119,7 @@ function startWatcher (paths) {
   if (refs.watcher === undefined) {
     log.info('Starting folder watcher process')
     refs.watcher = childProcess.fork(path.join(import.meta.dirname, 'watcherWorker.js'), [], {
-      env: { ...env, KES_CHILD_PROCESS: 'watcher' },
+      env: { KES_ENV_JSON: JSON.stringify(env), KES_CHILD_PROCESS: 'watcher' },
       gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
       uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
     })
@@ -144,7 +144,7 @@ function startScanner (pathIds) {
     log.info('Starting media scanner process')
 
     refs.scanner = childProcess.fork(path.join(import.meta.dirname, 'scannerWorker.js'), [pathIds.toString()], {
-      env: { ...env, KES_CHILD_PROCESS: 'scanner' },
+      env: { KES_ENV_JSON: JSON.stringify(env), KES_CHILD_PROCESS: 'scanner' },
       gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
       uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
     })
