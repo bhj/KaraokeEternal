@@ -13,7 +13,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.folder {
-  fill: var(--text-color);
-}

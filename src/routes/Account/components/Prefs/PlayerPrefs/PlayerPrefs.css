@@ -25,7 +25,3 @@
   padding: var(--container-padding);
   cursor: pointer;
 }
-
-.icon {
-  fill: var(--text-color);
-}

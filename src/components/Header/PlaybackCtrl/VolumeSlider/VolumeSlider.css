@@ -5,7 +5,7 @@
 
 .handle {
   cursor: pointer;
-  fill: var(--transport-btn-bg-color);
+  color: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
   position: absolute;
   top: -18px;

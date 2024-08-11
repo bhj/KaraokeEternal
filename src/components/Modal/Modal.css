@@ -59,7 +59,7 @@
   /* end defaults */
   border-radius: 0;
   box-shadow: none;
-  fill: var(--btn-active-bg-color);
+  color: var(--btn-active-bg-color);
   width: auto;
 }
 

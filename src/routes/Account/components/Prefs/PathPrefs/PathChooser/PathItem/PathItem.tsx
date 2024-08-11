@@ -11,7 +11,7 @@ const PathItem = (props: PathItemProps) => {
   return (
     <div className={styles.container} onClick={props.onSelect}>
       <div>
-        <Icon icon='FOLDER' size={28} className={styles.folder} />
+        <Icon icon='FOLDER' size={28} />
       </div>
       <div className={styles.path}>
         {props.path}

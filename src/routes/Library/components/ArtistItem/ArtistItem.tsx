@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import SongList from '../SongList/SongList'
 import Icon from 'components/Icon/Icon'
 import Highlighter from 'react-highlight-words'
@@ -27,11 +28,11 @@ class ArtistItem extends React.Component<ArtistItemProps> {
 
     return (
       <div style={props.style}>
-        <div onClick={this.handleArtistClick} className={props.isExpanded ? styles.containerExpanded : styles.container}>
-          <div className={isChildStarred ? styles.folderStarred : styles.folder}>
+        <div onClick={this.handleArtistClick} className={clsx(styles.container, isChildStarred && styles.hasStarred)}>
+          <div className={styles.folderContainer}>
             <Icon icon='FOLDER' size={44}/>
             {props.isExpanded &&
-              <div className={isChildStarred ? styles.iconExpandedStarred : styles.iconExpanded}>
+              <div className={styles.iconChevron}>
                 <Icon icon='CHEVRON_DOWN' size={24} />
               </div>
             }

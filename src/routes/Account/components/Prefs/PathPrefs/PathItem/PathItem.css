@@ -16,17 +16,17 @@
 
 .btnDrag {
   cursor: grab;
-  fill: var(--btn-bg-color);
+  color: var(--btn-bg-color);
 }
 
 .btnRefresh {
   cursor: pointer;
-  fill: var(--btn-active-bg-color);
+  color: var(--btn-active-bg-color);
 }
 
 .btnInfo {
   cursor: pointer;
-  fill: var(--btn-active-bg-color);
+  color: var(--btn-active-bg-color);
 }
 
 

@@ -3,5 +3,5 @@
 }
 
 .placeholder {
-  fill: var(--btn-bg-color);
+  color: var(--btn-bg-color);
 }

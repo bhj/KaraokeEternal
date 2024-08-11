@@ -15,10 +15,6 @@
   margin-left: 5px;
 }
 
-.icon {
-  fill: var(--text-color);
-}
-
 .content {
   padding: var(--container-padding);
 }

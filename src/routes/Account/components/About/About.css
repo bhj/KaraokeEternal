@@ -75,10 +75,9 @@
 }
 
 .ghButton svg {
-  fill: currentColor;
   margin-right: 5px;
 }
 
 .ghButton.sponsor svg {
-  fill: #db61a2;
+  color: #db61a2;
 }

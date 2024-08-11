@@ -5,10 +5,6 @@
   overflow: hidden;
 }
 
-.containerExpanded {
-  composes: container;
-}
-
 .name {
   color: var(--artist-name-color);
   flex: 1;
@@ -20,25 +16,9 @@
   cursor: pointer;
 }
 
-.isChildQueued {
-  color: var(--queued-item-color);
-  text-shadow: var(--queued-item-text-shadow);
-}
-
-.animateGlow {
-  animation: var(--animation-text-shadow-glow);
-}
-
-.folder {
+.folderContainer {
   height: var(--artist-item-height);
-  fill: var(--artist-folder-bg-color);
-}
-
-.folderStarred {
-  composes: folder;
-  color: var(--artist-folder-starred-color);
-  fill: var(--artist-folder-starred-bg-color);
-  filter: var(--artist-folder-starred-filter);
+  color: var(--artist-folder-bg-color);
 }
 
 .count {
@@ -46,16 +26,31 @@
   top: -30px;
   text-align: center;
   font-size: 16px;
+  color: var(--artist-name-color);
 }
 
-.iconExpanded {
+.iconChevron {
   position: relative;
   top: -34px;
   text-align: center;
-  fill: var(--text-color);
+  color: var(--text-color);
 }
 
-.iconExpandedStarred {
-  composes: iconExpanded;
-  fill: #000;
+.hasStarred .folderContainer {
+  color: var(--artist-folder-starred-bg-color);
+  filter: var(--artist-folder-starred-filter);
+}
+
+.hasStarred .iconChevron,
+.hasStarred .count {
+  color: #000;
+}
+
+.animateGlow {
+  animation: var(--animation-text-shadow-glow);
+}
+
+.isChildQueued {
+  color: var(--queued-item-color);
+  text-shadow: var(--queued-item-text-shadow);
 }

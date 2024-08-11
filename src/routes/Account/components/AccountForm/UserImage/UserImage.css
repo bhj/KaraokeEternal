@@ -26,10 +26,10 @@
   position: absolute;
   top: 0;
   left: 0;
-  fill: hsl(var(--hue-pink), 100%, 70%);
+  color: hsl(var(--hue-pink), 100%, 70%);
   z-index: 99;
 }
 
 .placeholder {
-  fill: var(--btn-bg-color);
+  color: var(--btn-bg-color);
 }

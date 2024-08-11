@@ -56,12 +56,12 @@
 }
 
 .star {
-  fill: var(--song-item-btn-bg-color);
+  color: var(--song-item-btn-bg-color);
   height: var(--song-item-btn-height);
 }
 
 .starStarred {
-  fill: var(--song-item-btn-active-bg-color);
+  color: var(--song-item-btn-active-bg-color);
   filter: var(--song-item-btn-active-filter);
 }
 
@@ -84,6 +84,6 @@
 }
 
 .info {
-  fill: var(--song-item-btn-active-bg-color);
+  color: var(--song-item-btn-active-bg-color);
   filter: var(--song-item-btn-active-filter);
 }

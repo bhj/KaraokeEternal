@@ -6,7 +6,7 @@
 
 .btn {
   cursor: pointer;
-  fill: var(--transport-btn-bg-color);
+  color: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
 }
 
@@ -29,12 +29,12 @@
 
 .displayCtrl {
   composes: btn;
-  fill: var(--btn-active-bg-color);
+  color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }
 
 .fullscreen {
   composes: btn;
-  fill: var(--btn-active-bg-color);
+  color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }

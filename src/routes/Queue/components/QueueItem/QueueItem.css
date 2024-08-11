@@ -95,18 +95,18 @@
 /* Buttons */
 .btn {
   cursor: pointer;
-  fill: var(--song-item-btn-bg-color);
+  color: var(--song-item-btn-bg-color);
   margin-right: var(--btn-margin);
   transition: opacity .3s;
 }
 
 .active {
-  fill: var(--song-item-btn-active-bg-color);
+  color: var(--song-item-btn-active-bg-color);
   filter: var(--song-item-btn-active-filter);
 }
 
 .danger {
-  fill: var(--btn-danger-bg-color);
+  color: var(--btn-danger-bg-color);
   filter: var(--btn-danger-filter);
 }
 

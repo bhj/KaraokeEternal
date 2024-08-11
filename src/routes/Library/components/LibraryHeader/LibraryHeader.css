@@ -20,12 +20,12 @@
 
 .btn {
   cursor: pointer;
-  fill: var(--btn-bg-color);
+  color: var(--btn-bg-color);
 }
 
 .btnActive {
   composes: btn;
-  fill: var(--btn-active-bg-color);
+  color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }
 

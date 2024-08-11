@@ -51,7 +51,7 @@
 }
 
 .btnIcon {
-  fill: var(--btn-base-blue);
+  color: var(--btn-base-blue);
 }
 
 .section legend label {
@@ -72,7 +72,7 @@
 
 .handle {
   cursor: pointer;
-  fill: var(--btn-active-bg-color);
+  color: var(--btn-active-bg-color);
   position: absolute;
   top: -15px;
   touch-action: 'pan-x';

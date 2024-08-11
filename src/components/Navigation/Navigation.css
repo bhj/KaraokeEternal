@@ -15,12 +15,12 @@
   padding-top: 4px;
   padding-bottom: 8px;
   text-align: center;
-  fill: var(--nav-link-color);
+  color: var(--nav-link-color);
 }
 
 .btnActive {
   composes: btn;
-  fill: var(--nav-active-color);
+  color: var(--nav-active-color);
   filter: var(--nav-active-filter);
 }
 
