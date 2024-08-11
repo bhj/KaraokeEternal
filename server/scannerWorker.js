@@ -10,7 +10,7 @@ import {
 const env = JSON.parse(process.env.KES_ENV_JSON)
 const log = initLogger('scanner', {
   console: {
-    level: env.KES_SCANNER_CONSOLE_LEVEL ?? (env.NODE_ENV === 'development' ? 5 : 0),
+    level: env.KES_SCANNER_CONSOLE_LEVEL ?? (env.NODE_ENV === 'development' ? 5 : 4),
     useStyles: env.KES_CONSOLE_COLORS ?? undefined,
   },
   file: {
