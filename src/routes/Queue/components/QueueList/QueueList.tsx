@@ -4,9 +4,7 @@ import { ensureState } from 'redux-optimistic-ui'
 import QueueItem from '../QueueItem/QueueItem'
 import QueueListAnimator from '../QueueListAnimator/QueueListAnimator'
 import { formatSeconds } from 'lib/dateTime'
-
 import { moveItem } from '../../modules/queue'
-
 import getPlayerHistory from '../../selectors/getPlayerHistory'
 import getRoundRobinQueue from '../../selectors/getRoundRobinQueue'
 import getWaits from '../../selectors/getWaits'
@@ -72,11 +70,7 @@ const QueueList = () => {
     )
   })
 
-  return (
-    <QueueListAnimator>
-      {items}
-    </QueueListAnimator>
-  )
+  return <QueueListAnimator queueItems={items} />
 }
 
 export default QueueList

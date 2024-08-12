@@ -46,7 +46,7 @@ const getStatusProps = createSelector(
 )
 
 // component
-const Header = React.forwardRef<HTMLDivElement, undefined>((_, ref) => {
+const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   const isAdmin = useAppSelector(state => state.user.isAdmin)
   const isPlayerPresent = useAppSelector(state => state.status.isPlayerPresent)
   const isScanning = useAppSelector(state => state.prefs.isScanning)

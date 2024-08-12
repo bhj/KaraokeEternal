@@ -1,5 +1,5 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import { QueueItem } from 'shared/types'
+import type { QueueItem, OptimisticQueueItem } from 'shared/types'
 import {
   QUEUE_ADD,
   QUEUE_MOVE,
@@ -7,8 +7,6 @@ import {
   QUEUE_REMOVE,
   LOGOUT,
 } from 'shared/actionTypes'
-
-interface OptimisticQueueItem extends Partial<QueueItem>{}
 
 // ------------------------------------
 // Actions

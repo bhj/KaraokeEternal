@@ -8,13 +8,13 @@ import styles from './ArtistItem.css'
 
 interface ArtistItemProps {
   artistId: number
-  artistSongIds: PropertyKey[]
+  artistSongIds: number[]
   filterKeywords: string[]
   isExpanded: boolean
   name: string
   numStars: number
-  queuedSongs: PropertyKey[]
-  starredSongs: PropertyKey[]
+  queuedSongs: number[]
+  starredSongs: number[]
   style?: object
   // actions
   onArtistClick(...args: unknown[]): unknown

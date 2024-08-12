@@ -24,12 +24,12 @@ const PathPrefs = () => {
   const handleOpenChooser = useCallback(() => setChoosing(true), [])
   const handleCloseInfo = useCallback(() => setEditingPath(null), [])
 
+  const dispatch = useAppDispatch()
+
   useEffect(() => {
     // local state for immediate UI updates
     setPriority(paths.result)
   }, [paths])
-
-  const dispatch = useAppDispatch()
 
   const handleDragEnd = useCallback(dnd => {
     // dropped outside the list?
@@ -53,18 +53,6 @@ const PathPrefs = () => {
       })
   }, [dispatch])
 
-  const handleInfo = useCallback(e => {
-    const pathId = e.currentTarget.dataset.pathId
-    pathId && setEditingPath(paths.entities[e.currentTarget.dataset.pathId])
-  }, [paths])
-
-  const handleRefresh = useCallback(e => {
-    const pathId = e.currentTarget.dataset.pathId
-    pathId && dispatch(requestScan(pathId))
-  }, [dispatch])
-
-  const handleRefreshAll = useCallback(() => dispatch(requestScanAll()), [dispatch])
-
   const handleRemove = useCallback((pathId: number) => {
     if (!confirm(`Remove folder from library?\n\n${paths.entities[pathId].path}`)) {
       return
@@ -86,13 +74,17 @@ const PathPrefs = () => {
     dispatch(setPathPrefs({ pathId, data }))
   }, [dispatch])
 
+  const handleInfo = useCallback((pathId: number) => setEditingPath(paths.entities[pathId]), [paths])
+  const handleRefresh = useCallback((pathId: number) => dispatch(requestScan(pathId)), [dispatch])
+  const handleRefreshAll = useCallback(() => dispatch(requestScanAll()), [dispatch])
+
   return (
     <div className={styles.container}>
       <div className={styles.heading} onClick={toggleExpanded}>
-        <Icon icon='FOLDER_MUSIC' size={28} className={styles.icon} />
+        <Icon icon='FOLDER_MUSIC' size={28}/>
         <div className={styles.title}>Media Folders</div>
         <div>
-          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} className={styles.icon} />
+          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24}/>
         </div>
       </div>
 

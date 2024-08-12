@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import Button from 'components/Button/Button'
 import styles from './Navigation.css'
 
-const Navigation = React.forwardRef<HTMLDivElement, undefined>((_, ref) => (
+const Navigation = React.forwardRef<HTMLDivElement>((_, ref) => (
   <div className={`${styles.container} bg-blur`} ref={ref}>
     <NavLink to='/library' className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
       <Button

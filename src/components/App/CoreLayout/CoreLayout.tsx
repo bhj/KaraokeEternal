@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import useResizeObserver from 'use-resize-observer'
 // global stylesheets should be imported before any
@@ -13,8 +13,8 @@ import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modul
 
 const CoreLayout = () => {
   const dispatch = useAppDispatch()
-  const headerRef = React.useRef()
-  const navRef = React.useRef()
+  const headerRef = useRef<HTMLDivElement>(null)
+  const navRef = useRef<HTMLDivElement>(null)
 
   useResizeObserver({
     onResize: ({ height }) => { dispatch(setHeaderHeight(height)) },

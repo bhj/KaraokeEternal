@@ -1,7 +1,7 @@
 import React from 'react'
 import { CSSTransition } from 'react-transition-group'
 import UserImage from 'components/UserImage/UserImage'
-import { QueueItem } from 'shared/types'
+import type { QueueItem } from 'shared/types'
 import styles from './UpNow.css'
 
 interface UpNowProps {
@@ -49,7 +49,7 @@ class UpNow extends React.Component<UpNowProps> {
             <div className={styles.innerContainer}>
               <UserImage
                 userId={this.props.queueItem.userId}
-                dateUpdated={this.props.queueItem.dateUpdated}
+                dateUpdated={this.props.queueItem.userDateUpdated}
                 className={styles.userImage}
               />
               <div className={styles.user}>

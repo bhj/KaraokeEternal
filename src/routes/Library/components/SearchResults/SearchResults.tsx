@@ -12,16 +12,16 @@ const SONG_HEADER_HEIGHT = 22
 const SONG_RESULT_HEIGHT = 60
 
 interface SearchResultsProps {
-  artists: Record<PropertyKey, Artist>
-  artistsResult: PropertyKey[]
-  expandedArtistResults: PropertyKey[]
+  artists: Record<number, Artist>
+  artistsResult: number[]
+  expandedArtistResults: number[]
   filterKeywords: string[]
   filterStarred: boolean
-  queuedSongs: PropertyKey[]
-  songs: Record<PropertyKey, Song>
-  songsResult: PropertyKey[]
-  starredSongs: PropertyKey[]
-  starredArtistCounts: Record<PropertyKey, number>
+  queuedSongs: number[]
+  songs: Record<number, Song>
+  songsResult: number[]
+  starredSongs: number[]
+  starredArtistCounts: Record<number, number>
   ui: RootState['ui']
   // actions
   toggleArtistResultExpanded(...args: unknown[]): unknown

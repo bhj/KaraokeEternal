@@ -20,10 +20,17 @@ export interface QueueItem {
   mediaId: number
   rgTrackGain: number
   rgTrackPeak: number
+  userDateUpdated: number
   userDisplayName: string
-  dateUpdated: number
   mediaType: 'cdg' | 'mp4'
-  isOptimistic?: boolean
+  isOptimistic?: false
+}
+
+export interface OptimisticQueueItem {
+  isOptimistic: true
+  prevQueueId: number
+  queueId: number
+  songId: number
 }
 
 export interface Room {

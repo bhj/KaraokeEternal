@@ -79,8 +79,8 @@ interface prefsState {
   isScanning: boolean
   isReplayGainEnabled: boolean
   paths: {
-    result: PropertyKey[]
-    entities: Record<PropertyKey, Path>
+    result: number[]
+    entities: Record<number, Path>
   }
   scannerPct: number
   scannerText: string

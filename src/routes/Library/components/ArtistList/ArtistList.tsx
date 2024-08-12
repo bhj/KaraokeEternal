@@ -8,14 +8,14 @@ const ROW_HEIGHT = 44
 
 interface ArtistListProps {
   alphaPickerMap: object
-  artists: Record<PropertyKey, Artist>
-  artistsResult: PropertyKey[]
-  expandedArtists: PropertyKey[] // artistIds
+  artists: Record<number, Artist>
+  artistsResult: number[]
+  expandedArtists: number[] // artistIds
   filterKeywords: string[]
-  queuedSongs: PropertyKey[] // songIds
-  songs: Record<PropertyKey, Song>
-  starredSongs: PropertyKey[]
-  starredArtistCounts: Record<PropertyKey, number>
+  queuedSongs: number[] // songIds
+  songs: Record<number, Song>
+  starredSongs: number[]
+  starredArtistCounts: Record<number, number>
   scrollTop: number
   ui: RootState['ui']
   // actions

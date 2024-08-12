@@ -1,21 +1,18 @@
 import React, { useCallback, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { useSwipeable } from 'react-swipeable'
-
 import Button from 'components/Button/Button'
 import Buttons from 'components/Buttons/Buttons'
 import UserImage from 'components/UserImage/UserImage'
-import styles from './QueueItem.css'
-
 import { requestPlayNext } from 'store/modules/status'
 import { showSongInfo } from 'store/modules/songInfo'
-import { queueSong, removeItem } from '../../modules/queue'
 import { toggleSongStarred } from 'store/modules/userStars'
 import { showErrorMessage } from 'store/modules/ui'
+import { queueSong, removeItem } from '../../modules/queue'
+import styles from './QueueItem.css'
 
 interface QueueItemProps {
   artist: string
-  dateUpdated: number
   errorMessage: string
   isCurrent: boolean
   isErrored: boolean
@@ -31,8 +28,9 @@ interface QueueItemProps {
   queueId: number
   songId: number
   title: string
-  userId: number
+  userDateUpdated: number
   userDisplayName: string
+  userId: number
   wait?: string
   // actions
   onMoveClick(...args: unknown[]): unknown
@@ -40,7 +38,6 @@ interface QueueItemProps {
 
 const QueueItem = ({
   artist,
-  dateUpdated,
   errorMessage,
   isCurrent,
   isErrored,
@@ -57,8 +54,9 @@ const QueueItem = ({
   queueId,
   songId,
   title,
-  userId,
+  userDateUpdated,
   userDisplayName,
+  userId,
   wait,
 }: QueueItemProps) => {
   const [isExpanded, setExpanded] = useState(false)
@@ -95,7 +93,7 @@ const QueueItem = ({
     >
       <div className={styles.content}>
         <div className={`${styles.imageContainer} ${isPlayed ? styles.greyed : ''}`}>
-          <UserImage userId={userId} dateUpdated={dateUpdated} height={72} className={styles.image}/>
+          <UserImage userId={userId} dateUpdated={userDateUpdated} height={72} className={styles.image}/>
           <div className={styles.waitContainer}>
             {isUpcoming &&
               <div className={`${styles.wait} ${isOwner ? styles.isOwner : ''}`}>

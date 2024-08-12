@@ -2,14 +2,14 @@ import React from 'react'
 import { Modal as ResponsiveModal, ModalProps as ResponsiveModalProps } from 'react-responsive-modal'
 import styles from './Modal.css'
 
-export interface ModalProps {
+export type ModalProps = {
   buttons?: React.ReactNode
   children?: React.ReactNode
   isVisible: boolean
   onClose: ResponsiveModalProps['onClose']
   style?: object
   title: string
-}
+} & Partial<ResponsiveModalProps>
 
 const Modal = (props: ModalProps) => {
   // disabling blockScroll for now due to

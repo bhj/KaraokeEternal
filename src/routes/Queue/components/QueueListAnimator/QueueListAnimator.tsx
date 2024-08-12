@@ -17,18 +17,18 @@ const handleExit = (el, _i, removeEl) => {
 const handleShouldFlip = (prev, cur) => cur === prev
 
 interface QueueListAnimatorProps {
-  children?: React.ReactElement
+  queueItems: React.ReactElement[]
 }
 
 const QueueListAnimator = ({
-  children
+  queueItems
 }: QueueListAnimatorProps) => {
   const headerHeight = useAppSelector(state => state.ui.headerHeight)
 
   // Flipped applies data-* props to its child; using a div wrapper
   // here so QueueItems need not be concerned with rendering them
   // https://github.com/aholachek/react-flip-toolkit#wrapping-a-react-component
-  const items = React.Children.map(children, child => {
+  const items = React.Children.map(queueItems, child => {
     return (
       <Flipped
         flipId={child.key}
@@ -49,7 +49,7 @@ const QueueListAnimator = ({
     <Flipper
       applyTransformOrigin={false}
       decisionData={headerHeight}
-      flipKey={children}
+      flipKey={queueItems}
     >
       {items}
     </Flipper>

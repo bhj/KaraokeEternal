@@ -1,11 +1,12 @@
 import React from 'react'
 import ColorCycle from './ColorCycle/ColorCycle'
 import UpNow from './UpNow/UpNow'
+import type { QueueItem } from 'shared/types'
 import styles from './PlayerTextOverlay.css'
 
 interface PlayerTextOverlayProps {
-  queueItem?: object
-  nextQueueItem?: object
+  queueItem?: QueueItem
+  nextQueueItem?: QueueItem
   isAtQueueEnd: boolean
   isQueueEmpty: boolean
   isErrored: boolean

@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
-import { Artist, Song } from 'shared/types'
 import SongItem from '../SongItem/SongItem'
 
 import { queueSong } from 'routes/Queue/modules/queue'
@@ -9,14 +8,10 @@ import { showSongInfo } from 'store/modules/songInfo'
 import { toggleSongStarred } from 'store/modules/userStars'
 
 interface SongListProps {
-  artists: Record<PropertyKey, Artist>
   filterKeywords: string[]
   queuedSongs: number[]
   showArtist: boolean
-  songs: Record<PropertyKey, Song>
   songIds: number[]
-  starredSongs: number[]
-  starredSongCounts: Record<PropertyKey, number>
 }
 
 const SongList = (props: SongListProps) => {

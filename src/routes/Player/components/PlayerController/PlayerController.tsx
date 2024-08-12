@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus } from '../../modules/player'
+import type { QueueItem } from 'shared/types'
 
 interface PlayerControllerProps {
   width: number
@@ -134,8 +134,8 @@ const PlayerController = (props: PlayerControllerProps) => {
         height={props.height}
       />
       <PlayerTextOverlay
-        queueItem={queueItem}
-        nextQueueItem={nextQueueItem}
+        queueItem={queueItem as QueueItem}
+        nextQueueItem={nextQueueItem as QueueItem}
         isAtQueueEnd={player.isAtQueueEnd}
         isQueueEmpty={!queue.result.length}
         isErrored={player.isErrored}

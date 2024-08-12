@@ -2,6 +2,7 @@ import React from 'react'
 import icons from './icons'
 
 interface IconProps {
+  className?: string
   icon: string
   size: number
 }

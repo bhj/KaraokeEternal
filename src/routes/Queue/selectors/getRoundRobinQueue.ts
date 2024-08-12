@@ -1,6 +1,7 @@
 import { RootState } from 'store/store'
 import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from '@reduxjs/toolkit'
+import type { QueueItem } from 'shared/types'
 import getPlayerHistory from './getPlayerHistory'
 
 const getResult = (state: RootState) => ensureState(state.queue).result
@@ -22,7 +23,7 @@ const getRoundRobinQueue = createSelector(
     // "lock in" next user's item (don't re-order it)
     if (nextUserId !== null) {
       for (const queueId of result) {
-        if (!history.includes(queueId) && entities[queueId].userId === nextUserId) {
+        if (!history.includes(queueId) && entities[queueId].isOptimistic !== true && entities[queueId].userId === nextUserId) {
           history.push(queueId)
           break
         }
@@ -31,11 +32,11 @@ const getRoundRobinQueue = createSelector(
 
     const map = new Map()
     const upcoming = []
-    const resultByUser = history.map(queueId => entities[queueId].userId)
+    const resultByUser = history.map(queueId => (entities[queueId] as QueueItem).userId) // should be no optimistic items
 
     result.forEach(queueId => {
       if (history.includes(queueId) || // only concerned with upcoming songs
-        entities[queueId].isOptimistic // ignore optimisic items
+        entities[queueId].isOptimistic === true // ignore optimistic items
       ) return
 
       const userId = entities[queueId].userId
@@ -70,8 +71,8 @@ const getRoundRobinQueue = createSelector(
     }
 
     return {
-      result: history.concat(upcoming),
-      entities,
+      result: history.concat(upcoming) as number[],
+      entities: entities as Record<number, QueueItem>,
     }
   }
 )

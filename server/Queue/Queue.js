@@ -52,7 +52,7 @@ class Queue {
     const query = sql`
       SELECT queueId, songId, userId, prevQueueId,
         media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
-        users.name AS userDisplayName, users.dateUpdated,
+        users.name AS userDisplayName, users.dateUpdated AS userDateUpdated,
         MAX(isPreferred) AS isPreferred
       FROM queue
         INNER JOIN users USING(userId)
