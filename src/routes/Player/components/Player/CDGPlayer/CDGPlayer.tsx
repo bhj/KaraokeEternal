@@ -7,6 +7,8 @@ const api = new HttpApi('media')
 const BACKDROP_PADDING = 10 // px at 1:1 scale
 const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue('--border-radius'))
 
+const defaultBounds = [10,10, 290, 206];
+
 interface CDGPlayerProps {
   cdgAlpha: number
   cdgSize: number
@@ -70,7 +72,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
   render () {
     const { cdgAlpha, cdgSize, width, height } = this.props
-    const [x1, y1, x2, y2] = this.state.contentBounds
+    const [x1, y1, x2, y2] = cdgAlpha === 1 && cdgSize === 1 ?  defaultBounds : this.state.contentBounds;
     const [r, g, b] = this.state.backgroundRGBA // eslint-disable-line no-unused-vars
     const filters = []
 
@@ -166,7 +168,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
   handleTimeUpdate = () => {
     this.props.onStatus({
-      position: this.audio.current.currentTime,
+      position: this.audio?.current?.currentTime,
     })
   }
 
@@ -175,7 +177,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   */
   paintCDG = bitmap => {
     const { clientWidth, clientHeight } = this.canvas.current
-
+    
     this.canvasCtx.imageSmoothingEnabled = false
     this.canvasCtx.shadowBlur = Math.min(16, clientHeight * this.props.cdgSize * 0.0333)
     this.canvasCtx.shadowColor = 'rgba(0,0,0,1)'

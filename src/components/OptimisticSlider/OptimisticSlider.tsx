@@ -45,7 +45,7 @@ export default class OptimisticSlider extends React.Component<OptimisticSliderPr
         handleRender={this.props.handle}
         max={this.props.max}
         min={this.props.min}
-        onAfterChange={this.handleAfterChange}
+        onChangeComplete={this.handleAfterChange}
         onBeforeChange={this.handleBeforeChange}
         onChange={this.handleChange}
         step={this.props.step}

@@ -109,8 +109,8 @@ interface playerState {
 }
 
 const initialState: playerState = {
-  cdgAlpha: 0.5,
-  cdgSize: 0.8,
+  cdgAlpha: 1,
+  cdgSize: 1,
   errorMessage: '',
   historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,
@@ -127,6 +127,7 @@ const initialState: playerState = {
   rgTrackGain: null,
   rgTrackPeak: null,
   volume: 1,
+  
 }
 
 const playerReducer = createReducer(initialState, (builder) => {
