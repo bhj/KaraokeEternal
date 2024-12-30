@@ -18,8 +18,9 @@ const PathItem = ({ index, onInfo, onRefresh, path }: PathItemProps) => {
 
   return (
     <Draggable draggableId={`path-${path.pathId}`} index={index}>
-      {(provided) => (
-        <div className={styles.pathItem}
+      {provided => (
+        <div
+          className={styles.pathItem}
           key={path.pathId}
           ref={provided.innerRef}
           style={provided.draggableProps.style}

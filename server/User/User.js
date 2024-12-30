@@ -51,7 +51,7 @@ class User {
     `
     const res = await db.all(String(query), query.parameters)
 
-    res.forEach(row => {
+    res.forEach((row) => {
       result.push(row.userId)
 
       row.isAdmin = row.isAdmin === 1

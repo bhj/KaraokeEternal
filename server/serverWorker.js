@@ -143,9 +143,9 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     ctx.jwtKey = jwtKey // used by login route
 
     // skip JWT/session validation if non-API request or logging in/out
-    if (!ctx.request.path.startsWith(`${urlPath}api/`) ||
-      ctx.request.path === `${urlPath}api/login` ||
-      ctx.request.path === `${urlPath}api/logout`) {
+    if (!ctx.request.path.startsWith(`${urlPath}api/`)
+      || ctx.request.path === `${urlPath}api/login`
+      || ctx.request.path === `${urlPath}api/logout`) {
       return next()
     }
 
@@ -174,7 +174,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
 
   // http api endpoints
   const baseRouter = koaRouter({
-    prefix: urlPath.replace(/\/$/, '') // avoid double slashes with /api prefix
+    prefix: urlPath.replace(/\/$/, ''), // avoid double slashes with /api prefix
   })
 
   baseRouter.use(libraryRouter.routes())
@@ -185,10 +185,10 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   app.use(baseRouter.routes())
 
   // serve index.html with dynamic base tag at the main SPA routes
-  const createIndexMiddleware = content => {
+  const createIndexMiddleware = (content) => {
     const indexRoutes = [
       urlPath,
-      ...['account', 'library', 'queue', 'player'].map(r => urlPath + r + '/')
+      ...['account', 'library', 'queue', 'player'].map(r => urlPath + r + '/'),
     ]
 
     content = content.replace('<base href="/">', `<base href="${urlPath}">`)

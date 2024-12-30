@@ -6,7 +6,7 @@ const basename = new URL(document.baseURI).pathname
 
 const AppRouter = createBrowserRouter([
   // https://github.com/remix-run/react-router/issues/9422#issuecomment-1302564759
-  { path: '*', element: <App /> }
+  { path: '*', element: <App /> },
 ], { basename })
 
 export default AppRouter

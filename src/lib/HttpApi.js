@@ -25,14 +25,14 @@ export default class HttpApi {
     }
 
     return fetch(`${document.baseURI}api/${this.prefix}${url}`, opts)
-      .then(res => {
+      .then((res) => {
         if (res.ok) {
           const type = res.headers.get('Content-Type')
           return (type && type.includes('application/json')) ? res.json() : res
         }
 
         // error
-        return res.text().then(txt => { throw new Error(txt) }) // eslint-disable-line promise/no-nesting
+        return res.text().then((txt) => { throw new Error(txt) }) // eslint-disable-line promise/no-nesting
       })
   }
 }

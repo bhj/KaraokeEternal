@@ -21,7 +21,7 @@ const log = initLogger('server', {
     useStyles: env.KES_CONSOLE_COLORS ?? undefined,
   },
   file: {
-    level: env.KES_SERVER_LOG_LEVEL ?? (env.NODE_ENV === 'development' ? 0 : 3)
+    level: env.KES_SERVER_LOG_LEVEL ?? (env.NODE_ENV === 'development' ? 0 : 3),
   },
 }).scope(`main[${process.pid}]`)
 
@@ -135,7 +135,7 @@ function startWatcher (paths) {
 
   IPC.send({
     type: WATCHER_WORKER_WATCH,
-    payload: { paths }
+    payload: { paths },
   })
 }
 

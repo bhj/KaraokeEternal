@@ -35,7 +35,7 @@ const getWaits = createSelector(
     })
 
     return waits
-  }
+  },
 )
 
 export default getWaits

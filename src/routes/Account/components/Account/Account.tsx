@@ -13,7 +13,7 @@ const Account = () => {
   const dispatch = useAppDispatch()
   const handleDirtyChange = useCallback(isDirty => setDirty(isDirty), [])
   const handleSignOut = useCallback(() => dispatch(requestLogout()), [dispatch])
-  const handleSubmit = useCallback(data => {
+  const handleSubmit = useCallback((data) => {
     if (!curPassword.current.value.trim()) {
       alert('Please enter your current password to make changes.')
       curPassword.current.focus()
@@ -28,13 +28,18 @@ const Account = () => {
     <div className={styles.container}>
       <h1 className={styles.title}>My Account</h1>
       <div className={styles.content}>
-        <p>Signed in as <strong>{user.username}</strong></p>
+        <p>
+          Signed in as
+          <strong>{user.username}</strong>
+        </p>
 
         <AccountForm user={user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit}>
-          {isDirty &&
+          {isDirty
+          && (
             <>
               <br />
-              <input type='password'
+              <input
+                type='password'
                 autoComplete='current-password'
                 placeholder='current password'
                 ref={curPassword}
@@ -43,7 +48,7 @@ const Account = () => {
                 Update Account
               </button>
             </>
-          }
+          )}
         </AccountForm>
 
         <button onClick={handleSignOut} className={styles.signOut}>

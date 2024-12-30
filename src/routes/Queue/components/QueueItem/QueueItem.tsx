@@ -93,13 +93,13 @@ const QueueItem = ({
     >
       <div className={styles.content}>
         <div className={`${styles.imageContainer} ${isPlayed ? styles.greyed : ''}`}>
-          <UserImage userId={userId} dateUpdated={userDateUpdated} height={72} className={styles.image}/>
+          <UserImage userId={userId} dateUpdated={userDateUpdated} height={72} className={styles.image} />
           <div className={styles.waitContainer}>
-            {isUpcoming &&
+            {isUpcoming && (
               <div className={`${styles.wait} ${isOwner ? styles.isOwner : ''}`}>
                 {wait}
               </div>
-            }
+            )}
           </div>
         </div>
 
@@ -114,22 +114,22 @@ const QueueItem = ({
         </div>
 
         <Buttons btnWidth={50} isExpanded={isExpanded}>
-          {isErrored &&
+          {isErrored && (
             <Button
               className={`${styles.btn} ${styles.danger}`}
               icon='INFO_OUTLINE'
               onClick={handleErrorInfoClick}
               size={44}
             />
-          }
+          )}
           <Button
             animateClassName={styles.animateStar}
             className={`${styles.btn} ${isStarred ? styles.active : ''}`}
-            icon={'STAR_FULL'}
+            icon='STAR_FULL'
             onClick={handleStarClick}
             size={44}
           />
-          {isPlayed &&
+          {isPlayed && (
             <Button
               className={`${styles.btn} ${styles.active}`}
               data-hide
@@ -137,8 +137,8 @@ const QueueItem = ({
               onClick={handleRequeueClick}
               size={48}
             />
-          }
-          {isMovable &&
+          )}
+          {isMovable && (
             <Button
               className={`${styles.btn} ${styles.active}`}
               data-hide
@@ -146,8 +146,8 @@ const QueueItem = ({
               onClick={handleMoveClick}
               size={44}
             />
-          }
-          {isInfoable &&
+          )}
+          {isInfoable && (
             <Button
               className={`${styles.btn} ${styles.active}`}
               data-hide
@@ -155,8 +155,8 @@ const QueueItem = ({
               onClick={handleInfoClick}
               size={44}
             />
-          }
-          {isRemovable &&
+          )}
+          {isRemovable && (
             <Button
               className={`${styles.btn} ${styles.danger}`}
               data-hide
@@ -164,8 +164,8 @@ const QueueItem = ({
               onClick={handleRemoveClick}
               size={44}
             />
-          }
-          {isSkippable &&
+          )}
+          {isSkippable && (
             <Button
               className={`${styles.btn} ${styles.danger}`}
               data-hide
@@ -173,7 +173,7 @@ const QueueItem = ({
               onClick={handleSkipClick}
               size={44}
             />
-          }
+          )}
         </Buttons>
       </div>
     </div>

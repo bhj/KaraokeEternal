@@ -13,7 +13,7 @@ class Prefs {
    */
   static async get () {
     const prefs = {
-      paths: { result: [], entities: {} }
+      paths: { result: [], entities: {} },
     }
 
     {
@@ -24,7 +24,7 @@ class Prefs {
       const rows = await db.all(String(query), query.parameters)
 
       // json-decode key/val pairs
-      rows.forEach(row => {
+      rows.forEach((row) => {
         prefs[row.key] = JSON.parse(row.data)
       })
     }

@@ -8,7 +8,7 @@ const FirstRun = () => {
   const user = useAppSelector(state => state.user)
 
   const dispatch = useAppDispatch()
-  const handleCreate = useCallback(data => {
+  const handleCreate = useCallback((data) => {
     dispatch(createAccount(data))
   }, [dispatch])
 
@@ -16,7 +16,12 @@ const FirstRun = () => {
     <>
       <div className={styles.heading}>
         <h2>Welcome</h2>
-        <p>Create your <b>admin</b> account to get started. All data is locally stored and never shared.</p>
+        <p>
+          Create your
+          <b>admin</b>
+          {' '}
+          account to get started. All data is locally stored and never shared.
+        </p>
       </div>
 
       <AccountForm user={user} onSubmit={handleCreate}>

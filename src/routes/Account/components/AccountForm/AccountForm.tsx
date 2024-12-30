@@ -45,65 +45,71 @@ export default class AccountForm extends Component<AccountFormProps> {
         noValidate
         onSubmit={this.handleSubmit}
       >
-        <input type='email'
+        <input
+          type='email'
           autoComplete='off'
           autoFocus={!isUser}
           onChange={this.updateDirty}
           placeholder={isUser ? 'change username (optional)' : 'username or email'}
-          ref={r => { this.username = r }}
+          ref={(r) => { this.username = r }}
           className={styles.field}
         />
 
-        <input type='password'
+        <input
+          type='password'
           autoComplete='new-password'
           onChange={this.updateDirty}
           placeholder={isUser ? 'change password (optional)' : 'password'}
-          ref={r => { this.newPassword = r }}
+          ref={(r) => { this.newPassword = r }}
           className={styles.field}
         />
 
-        {this.state.isChangingPassword &&
-          <input type='password'
+        {this.state.isChangingPassword
+        && (
+          <input
+            type='password'
             autoComplete='new-password'
             placeholder={isUser ? 'new password confirm' : 'confirm password'}
-            ref={r => { this.newPasswordConfirm = r }}
+            ref={(r) => { this.newPasswordConfirm = r }}
             className={styles.field}
           />
-        }
+        )}
 
         <div className={styles.userDisplayContainer}>
           <UserImage
             user={this.props.user}
             onSelect={this.handleUserImageChange}
           />
-          <input type='text'
+          <input
+            type='text'
             defaultValue={isUser ? this.props.user.name : ''}
             onChange={this.updateDirty}
             placeholder='display name'
-            ref={r => { this.name = r }}
+            ref={(r) => { this.name = r }}
             className={`${styles.field} ${styles.name}`}
           />
         </div>
 
-        {this.props.showRole &&
+        {this.props.showRole
+        && (
           <select
             defaultValue={isUser && this.props.user.isAdmin ? '1' : '0'}
             onChange={this.updateDirty}
-            ref={r => { this.role = r }}
+            ref={(r) => { this.role = r }}
             className={styles.field}
           >
-            <option key={'choose'} value='' disabled>select role...</option>
-            <option key={'std'} value='0'>Standard</option>
-            <option key={'admin'} value='1'>Administrator</option>
+            <option key='choose' value='' disabled>select role...</option>
+            <option key='std' value='0'>Standard</option>
+            <option key='admin' value='1'>Administrator</option>
           </select>
-        }
+        )}
 
         {this.props.children}
       </form>
     )
   }
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault()
     const data = new FormData()
 
@@ -131,7 +137,7 @@ export default class AccountForm extends Component<AccountFormProps> {
     this.props.onSubmit(data)
   }
 
-  handleUserImageChange = blob => {
+  handleUserImageChange = (blob) => {
     this.setState({
       userImage: blob,
       isDirty: true,
@@ -142,9 +148,9 @@ export default class AccountForm extends Component<AccountFormProps> {
     if (!this.props.user || this.props.user.userId === null) return
 
     this.setState({
-      isDirty: !!this.username.value || !!this.newPassword.value ||
-        this.name.value !== this.props.user.name ||
-        (this.role && this.role.value !== (this.props.user.isAdmin ? '1' : '0')),
+      isDirty: !!this.username.value || !!this.newPassword.value
+        || this.name.value !== this.props.user.name
+        || (this.role && this.role.value !== (this.props.user.isAdmin ? '1' : '0')),
       isChangingPassword: !!this.newPassword.value,
     })
   }

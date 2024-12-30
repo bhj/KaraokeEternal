@@ -18,13 +18,13 @@ export const toggleArtistResultExpanded = createAction(TOGGLE_ARTIST_RESULT_EXPA
 
 export const resetFilterStr = createAction(LIBRARY_FILTER_STRING_RESET)
 export const toggleFilterStarred = createAction(LIBRARY_FILTER_TOGGLE_STARRED)
-export const setFilterStr = createAction(LIBRARY_FILTER_STRING, (str) => ({
+export const setFilterStr = createAction(LIBRARY_FILTER_STRING, str => ({
   payload: { str },
   meta: {
     throttle: {
       wait: 350,
       leading: false,
-    }
+    },
   },
 }))
 

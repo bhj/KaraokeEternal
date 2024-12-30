@@ -15,12 +15,12 @@ const Rooms = () => {
 
   const dispatch = useAppDispatch()
   const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
-  const handleFilterChange = useCallback(e => {
+  const handleFilterChange = useCallback((e) => {
     if (e.target.value === 'all') dispatch(filterByStatus(false))
     else dispatch(filterByStatus(e.target.value))
   }, [dispatch])
   const handleFilterUsers = useCallback(e => dispatch(filterByRoom(parseInt(e.target.dataset.roomId, 10))), [dispatch])
-  const handleOpen = useCallback(e => {
+  const handleOpen = useCallback((e) => {
     setEditorRoom(rooms.entities[e.target.dataset.roomId])
     dispatch(openRoomEditor())
   }, [dispatch, rooms])
@@ -30,16 +30,24 @@ const Rooms = () => {
     dispatch(fetchRooms())
   }, [dispatch])
 
-  const rows = rooms.result.map(roomId => {
+  const rows = rooms.result.map((roomId) => {
     const room = rooms.entities[roomId]
     return (
       <tr key={String(roomId)}>
         <td><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
         <td>
           {room.status}
-          {room.numUsers > 0 &&
-            <>&nbsp;<a data-room-id={roomId} onClick={handleFilterUsers}>({room.numUsers})</a></>
-          }
+          {room.numUsers > 0
+          && (
+            <>
+&nbsp;
+              <a data-room-id={roomId} onClick={handleFilterUsers}>
+                (
+                {room.numUsers}
+                )
+              </a>
+            </>
+          )}
         </td>
         <td>{formatDateTime(new Date(room.dateCreated * 1000))}</td>
       </tr>
@@ -51,9 +59,9 @@ const Rooms = () => {
       <div className={styles.titleContainer}>
         <h1 className={styles.title}>Rooms</h1>
         <select onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus as string}>
-          <option key='all' value={'all'}>All</option>
-          <option key='open' value={'open'}>Open</option>
-          <option key='closed' value={'closed'}>Closed</option>
+          <option key='all' value='all'>All</option>
+          <option key='open' value='open'>Open</option>
+          <option key='closed' value='closed'>Closed</option>
         </select>
       </div>
       <div className={styles.content}>

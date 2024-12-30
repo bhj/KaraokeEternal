@@ -22,7 +22,7 @@ const EditUser = (props: EditUserProps) => {
   }, [props.isVisible])
 
   const dispatch = useAppDispatch()
-  const handleSubmit = useCallback(data => {
+  const handleSubmit = useCallback((data) => {
     props.user ? dispatch(updateUser({ userId: props.user.userId, data })) : dispatch(createUser(data))
   }, [dispatch, props.user])
 
@@ -40,25 +40,28 @@ const EditUser = (props: EditUserProps) => {
       style={{ minWidth: '300px' }}
     >
       <AccountForm user={props.user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit} showRole>
-        <br/>
-        {!props.user &&
+        <br />
+        {!props.user
+        && (
           <button className={`${styles.btn} primary`}>
             Create User
           </button>
-        }
+        )}
 
-        {props.user && isDirty &&
+        {props.user && isDirty
+        && (
           <button className={`${styles.btn} primary`}>
             Update User
           </button>
-        }
+        )}
       </AccountForm>
 
-      {props.user &&
+      {props.user
+      && (
         <button onClick={handleRemoveClick} className={styles.btn}>
           Remove User
         </button>
-      }
+      )}
 
       <button onClick={props.onClose}>Cancel</button>
     </Modal>

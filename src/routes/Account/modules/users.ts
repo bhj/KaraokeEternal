@@ -24,35 +24,35 @@ interface UserWithRooms extends User {
 // ------------------------------------
 export const fetchUsers = createAsyncThunk(
   USERS_REQUEST,
-  async () => await api('GET', 'users')
+  async () => await api('GET', 'users'),
 )
 
 export const createUser = createAsyncThunk(
   USERS_CREATE,
   async (data: FormData, thunkAPI) => {
     await api('POST', 'user', {
-      body: data
+      body: data,
     })
 
     thunkAPI.dispatch(fetchUsers())
-  }
+  },
 )
 
 export const updateUser = createAsyncThunk(
   USERS_UPDATE,
   async ({
     userId,
-    data
+    data,
   }: {
     userId: number
     data: FormData
   }, thunkAPI) => {
     await api('PUT', `user/${userId}`, {
-      body: data
+      body: data,
     })
 
     thunkAPI.dispatch(fetchUsers())
-  }
+  },
 )
 
 export const removeUser = createAsyncThunk(
@@ -61,7 +61,7 @@ export const removeUser = createAsyncThunk(
     await api('DELETE', `user/${userId}`)
 
     thunkAPI.dispatch(fetchUsers())
-  }
+  },
 )
 
 export const openUserEditor = createAction(USERS_EDITOR_OPEN)
@@ -80,7 +80,7 @@ interface usersState {
   isEditorOpen: boolean
 }
 
-const initialState:usersState = {
+const initialState: usersState = {
   result: [],
   entities: {},
   filterOnline: true,

@@ -28,7 +28,7 @@ const getUserWait = createSelector(
         return waits[queue.result[i]]
       }
     }
-  }
+  },
 )
 
 const getStatusProps = createSelector(
@@ -42,7 +42,7 @@ const getStatusProps = createSelector(
       isUpNext: result[curIdx + 1] ? entities[result[curIdx + 1]].userId === userId : false,
       isUpNow: curItem ? !isAtQueueEnd && curItem.userId === userId : false,
     }
-  }
+  },
 )
 
 // component
@@ -63,25 +63,24 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
 
   return (
     <div className={`${styles.container} bg-blur`} ref={ref}>
-      {!isPlayer && isPlayerPresent &&
-        <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />
-      }
+      {!isPlayer && isPlayerPresent
+      && <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />}
 
-      {(isUpNow || isAdmin) &&
-        <PlaybackCtrl />
-      }
+      {(isUpNow || isAdmin)
+      && <PlaybackCtrl />}
 
-      {isAdmin && !isPlayer &&
+      {isAdmin && !isPlayer
+      && (
         <ProgressBar
           isActive={isScanning}
           onCancel={cancelScan}
           pct={scannerPct}
           text={scannerText}
         />
-      }
+      )}
 
       <Routes>
-        <Route path='/library' element={<LibraryHeader/>}/>
+        <Route path='/library' element={<LibraryHeader />} />
       </Routes>
     </div>
   )

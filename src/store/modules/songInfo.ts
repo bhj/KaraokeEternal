@@ -13,7 +13,7 @@ const api = new HttpApi()
 // ------------------------------------
 export const showSongInfo = createAsyncThunk(
   SONG_INFO_REQUEST,
-  async (songId: number) => await api('GET', `song/${songId}`)
+  async (songId: number) => await api('GET', `song/${songId}`),
 )
 
 export const closeSongInfo = createAction(SONG_INFO_CLOSE)
@@ -23,7 +23,7 @@ export const setPreferredSong = createAsyncThunk(
   async ({
     songId,
     mediaId,
-    isPreferred
+    isPreferred,
   }: {
     songId: number
     mediaId: number
@@ -31,7 +31,7 @@ export const setPreferredSong = createAsyncThunk(
   }, thunkAPI) => {
     await api(isPreferred ? 'PUT' : 'DELETE', `media/${mediaId}/prefer`)
     thunkAPI.dispatch(showSongInfo(songId))
-  }
+  },
 )
 
 // ------------------------------------
@@ -41,7 +41,7 @@ interface songInfoState {
   isLoading: boolean
   isVisible: boolean
   songId: number | null
-  media: { result: number[]; entities: object }
+  media: { result: number[], entities: object }
 }
 
 const initialState: songInfoState = {

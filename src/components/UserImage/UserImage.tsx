@@ -20,12 +20,13 @@ class UserImage extends React.Component<UserImageProps> {
 
     return (
       <>
-        {(state.isLoading || state.isErrored) && props.height &&
-          <Icon icon='ACCOUNT' size={props.height} className={styles.placeholder}/>
-        }
+        {(state.isLoading || state.isErrored) && props.height
+        && <Icon icon='ACCOUNT' size={props.height} className={styles.placeholder} />}
 
-        {!state.isErrored &&
-          <img src={`${document.baseURI}api/user/${props.userId}/image?v=${props.dateUpdated}`}
+        {!state.isErrored
+        && (
+          <img
+            src={`${document.baseURI}api/user/${props.userId}/image?v=${props.dateUpdated}`}
             onLoad={this.handleImgLoad}
             onError={this.handleImgError}
             className={`${styles.image} ${props.className}`}
@@ -34,7 +35,7 @@ class UserImage extends React.Component<UserImageProps> {
               height: props.height ? props.height : null,
             }}
           />
-        }
+        )}
       </>
     )
   }

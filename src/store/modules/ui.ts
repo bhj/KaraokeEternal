@@ -38,13 +38,13 @@ export const setFooterHeight = (height) => {
   }
 }
 
-export const windowResize = createAction(UI_WINDOW_RESIZE, (window) => ({
+export const windowResize = createAction(UI_WINDOW_RESIZE, window => ({
   payload: window,
   meta: {
     throttle: {
       wait: 200,
       leading: false,
-    }
+    },
   },
 }))
 
@@ -110,7 +110,7 @@ const uiReducer = createReducer(initialState, (builder) => {
       (state, { error }) => {
         state.isErrored = true
         state.errorMessage = error.message ?? error
-      }
+      },
     )
 })
 

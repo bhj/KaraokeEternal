@@ -54,7 +54,7 @@ export default class OptimisticSlider extends React.Component<OptimisticSliderPr
     )
   }
 
-  handleChange = val => {
+  handleChange = (val) => {
     this.setState({ val }, () => {
       this.props.onChange(val)
     })
@@ -66,7 +66,7 @@ export default class OptimisticSlider extends React.Component<OptimisticSliderPr
     this.setState({ isDragging: true })
   }
 
-  handleAfterChange = val => {
+  handleAfterChange = (val) => {
     lockScrolling(false)
 
     this.setState({

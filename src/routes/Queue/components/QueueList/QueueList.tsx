@@ -22,7 +22,7 @@ const QueueList = () => {
 
   // actions
   const dispatch = useAppDispatch()
-  const handleMoveClick = useCallback(qId => {
+  const handleMoveClick = useCallback((qId) => {
     // reference user's last-played item as the new prevQueueId
     const userId = queue.entities[qId].userId
     let lastPlayed = queueId // default in case user has no played items
@@ -38,7 +38,7 @@ const QueueList = () => {
   }, [dispatch, queueId, queue.entities, queue.result])
 
   // build children array
-  const items = queue.result.map(qId => {
+  const items = queue.result.map((qId) => {
     const item = queue.entities[qId]
     const duration = songs.entities[item.songId].duration
     const isCurrent = (qId === queueId) && !isAtQueueEnd

@@ -18,26 +18,24 @@ const LibraryView = (props: LibraryViewProps) => {
 
   return (
     <>
-      {!isSearching &&
-        <ArtistList {...props} />
-      }
+      {!isSearching && <ArtistList {...props} />}
 
-      {isSearching &&
-        <SearchResults {...props} />
-      }
+      {isSearching && <SearchResults {...props} />}
 
-      {isLoading &&
-        <Spinner />
-      }
+      {isLoading && <Spinner />}
 
-      {!isLoading && isEmpty &&
+      {!isLoading && isEmpty && (
         <TextOverlay className={styles.empty}>
           <h1>Library Empty</h1>
-          {isAdmin &&
-            <p><Link to='/account'>Add media folders</Link> to get started.</p>
-          }
+          {isAdmin && (
+            <p>
+              <Link to='/account'>Add media folders</Link>
+              {' '}
+              to get started.
+            </p>
+          )}
         </TextOverlay>
-      }
+      )}
     </>
   )
 }

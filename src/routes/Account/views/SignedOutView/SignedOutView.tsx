@@ -15,19 +15,16 @@ const SignedOutView = () => {
 
   return (
     <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
-      <Logo className={styles.logo}/>
+      <Logo className={styles.logo} />
 
-      {isCreating &&
-        <Create onToggle={toggleCreate}/>
-      }
+      {isCreating
+      && <Create onToggle={toggleCreate} />}
 
-      {!isFirstRun && !isCreating &&
-        <SignIn onToggle={toggleCreate}/>
-      }
+      {!isFirstRun && !isCreating
+      && <SignIn onToggle={toggleCreate} />}
 
-      {isFirstRun &&
-        <FirstRun/>
-      }
+      {isFirstRun
+      && <FirstRun />}
     </div>
   )
 }

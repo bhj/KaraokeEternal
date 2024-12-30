@@ -22,37 +22,37 @@ export const receiveRooms = createAction<object>(ROOMS_RECEIVE)
 
 export const fetchRooms = createAsyncThunk(
   ROOMS_REQUEST,
-  async () => await api('GET', '')
+  async () => await api('GET', ''),
 )
 
 export const createRoom = createAsyncThunk(
   ROOM_CREATE,
   async (data: FormData, thunkAPI) => {
     const response = await api('POST', '', {
-      body: data
+      body: data,
     })
 
     thunkAPI.dispatch(receiveRooms(response))
     thunkAPI.dispatch(closeRoomEditor())
-  }
+  },
 )
 
 export const updateRoom = createAsyncThunk(
   ROOM_UPDATE,
   async ({
     roomId,
-    data
+    data,
   }: {
     roomId: number
     data: FormData
   }, thunkAPI) => {
     const response = await api('PUT', `/${roomId}`, {
-      body: data
+      body: data,
     })
 
     thunkAPI.dispatch(receiveRooms(response))
     thunkAPI.dispatch(closeRoomEditor())
-  }
+  },
 )
 
 export const removeRoom = createAsyncThunk(
@@ -62,7 +62,7 @@ export const removeRoom = createAsyncThunk(
 
     thunkAPI.dispatch(receiveRooms(response))
     thunkAPI.dispatch(closeRoomEditor())
-  }
+  },
 )
 
 export const openRoomEditor = createAction(ROOM_EDITOR_OPEN)
@@ -79,7 +79,7 @@ interface roomsState {
   isEditorOpen: boolean
 }
 
-const initialState:roomsState = {
+const initialState: roomsState = {
   result: [],
   entities: {},
   filterStatus: 'open',

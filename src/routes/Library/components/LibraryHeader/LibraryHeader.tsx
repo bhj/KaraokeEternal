@@ -42,21 +42,22 @@ class LibraryHeader extends React.Component<LibraryHeaderProps> {
           onClick={this.handleMagnifierClick}
           size={40}
         />
-        <input type='search'
+        <input
+          type='search'
           className={styles.searchInput}
           placeholder='search'
           value={this.state.value}
           onChange={this.handleChange}
           ref={this.searchInput}
         />
-        {filterStr &&
+        {filterStr && (
           <Button
             icon='CLEAR'
             onClick={this.clearSearch}
             className={styles.btnActive}
             size={40}
           />
-        }
+        )}
         <Button
           animateClassName={styles.btnAnimate}
           className={filterStarred ? styles.btnActive : styles.btn}

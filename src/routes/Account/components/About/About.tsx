@@ -16,42 +16,57 @@ const About = () => {
       <div className={styles.content}>
         {/* @ts-expect-error: global via Webpack */}
         <a href={__KE_URL_HOME__} target='_blank' rel='noreferrer'>
-          <Logo className={styles.logo}/>
+          <Logo className={styles.logo} />
         </a>
         <p className={styles.sm}>
           {/* @ts-expect-error: global via Webpack */}
-          &copy;{__KE_COPYRIGHT__} <a href='https://www.radroot.com' target='_blank' rel='noreferrer'>RadRoot LLC</a>
-          <br/>
+          &copy;
+          {__KE_COPYRIGHT__}
+          {' '}
+          <a href='https://www.radroot.com' target='_blank' rel='noreferrer'>RadRoot LLC</a>
+          <br />
           {/* @ts-expect-error: global via Webpack */}
-          v{__KE_VERSION__}
+          v
+          {__KE_VERSION__}
         </p>
-        <p><a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a> | <a href='/licenses.txt' target='_blank'>Licenses</a></p> {/* eslint-disable-line no-undef, max-len */}
+        <p>
+          <a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a>
+          {' '}
+          |
+          {' '}
+          <a href='/licenses.txt' target='_blank'>Licenses</a>
+        </p>
+        {' '}
+        { }
 
         <div className={styles.ghButtonContainer}>
           <div className={styles.ghButton}>
             {/* @ts-expect-error: global via Webpack */}
             <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>
-              <Icon icon='GITHUB_REPO' size={16}/>GitHub
+              <Icon icon='GITHUB_REPO' size={16} />
+              GitHub
             </a>
           </div>
           <div className={styles.ghButton}>
             {/* @ts-expect-error: global via Webpack */}
             <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>
-              <Icon icon='GITHUB_STAR' size={16}/>Star
+              <Icon icon='GITHUB_STAR' size={16} />
+              Star
             </a>
           </div>
 
           <div className={`${styles.ghButton} ${styles.sponsor}`}>
             {/* @ts-expect-error: global via Webpack */}
             <a href={__KE_URL_SPONSOR__} target='_blank' rel='noreferrer'>
-              <Icon icon='GITHUB_SPONSOR' size={16}/>Sponsor
+              <Icon icon='GITHUB_SPONSOR' size={16} />
+              Sponsor
             </a>
           </div>
         </div>
       </div>
 
       <Modal
-        title={'Changelog & Sponsors'}
+        title='Changelog & Sponsors'
         isVisible={isChangelogVisible}
         onClose={toggleChangelog}
         focusTrapped={false}
@@ -64,13 +79,13 @@ const About = () => {
           <div className={styles.changelogContent}>
             {/* @todo: without this anchor the changelog gets scrolled to
                 the first "real" link, even with focusTrapped=false */}
-            <a href=""></a>
+            <a href=''></a>
             <div dangerouslySetInnerHTML={{ __html: html }}>
             </div>
           </div>
           <div>
             <button className='primary' onClick={toggleChangelog}>
-                Done
+              Done
             </button>
           </div>
         </div>

@@ -59,8 +59,10 @@ class SearchResults extends React.Component<SearchResultsProps> {
     // # artist results heading
     if (index === 0) {
       return (
-        <div key={'artistsHeading'} style={style} className={styles.artistsHeading}>
-          {artistsResult.length} {filterStarred ? 'starred ' : ''}
+        <div key='artistsHeading' style={style} className={styles.artistsHeading}>
+          {artistsResult.length}
+          {' '}
+          {filterStarred ? 'starred ' : ''}
           {artistsResult.length === 1 ? 'artist' : 'artists'}
         </div>
       )
@@ -92,8 +94,10 @@ class SearchResults extends React.Component<SearchResultsProps> {
     // # song results heading
     if (index === artistsResult.length + 1) {
       return (
-        <div key={'songsHeading'} style={style} className={styles.songsHeading}>
-          {songsResult.length} {filterStarred ? 'starred ' : ''}
+        <div key='songsHeading' style={style} className={styles.songsHeading}>
+          {songsResult.length}
+          {' '}
+          {filterStarred ? 'starred ' : ''}
           {songsResult.length === 1 ? 'song' : 'songs'}
         </div>
       )
@@ -101,7 +105,7 @@ class SearchResults extends React.Component<SearchResultsProps> {
 
     // song results
     return (
-      <div style={style} key={'songs'}>
+      <div style={style} key='songs'>
         <SongList
           songIds={songsResult}
           showArtist
@@ -112,7 +116,7 @@ class SearchResults extends React.Component<SearchResultsProps> {
     )
   }
 
-  rowHeight = index => {
+  rowHeight = (index) => {
     // artists heading
     if (index === 0) return ARTIST_HEADER_HEIGHT
 

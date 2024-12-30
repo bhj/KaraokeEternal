@@ -35,7 +35,7 @@ const socketMiddleware = createSocketMiddleware(socket, 'server/')
 // ======================================================
 const store = configureStore({
   reducer: reducers,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+  middleware: getDefaultMiddleware => getDefaultMiddleware({
     // https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
     serializableCheck: {
       ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
@@ -46,7 +46,6 @@ const store = configureStore({
 // @todo: this doesn't handle dynamically injected (lazy-loaded) reducers
 if (module.hot) {
   module.hot.accept('./reducers', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const combinedReducer = require('./reducers').default
     store.replaceReducer(combinedReducer)
   })

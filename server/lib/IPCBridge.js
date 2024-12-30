@@ -43,13 +43,13 @@ class IPCParent {
     }
 
     // async handler: emit the result back to child
-    IPCParent.handlers[type](action).then(res => {
+    IPCParent.handlers[type](action).then((res) => {
       IPCParent.send({
         ...action,
         type: type + _SUCCESS,
         payload: res,
       }, meta?.pid)
-    }).catch(err => {
+    }).catch((err) => {
       IPCParent.send({
         ...action,
         type: type + _ERROR,
@@ -130,7 +130,7 @@ class IPCChild {
         ...action.meta,
         reqId: this.reqId,
         pid: process.pid,
-      }
+      },
     }
 
     this.send(action)

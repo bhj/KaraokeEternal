@@ -16,12 +16,12 @@ const Users = () => {
 
   const dispatch = useAppDispatch()
   const handleClose = useCallback(() => dispatch(closeUserEditor()), [dispatch])
-  const handleFilterChange = useCallback(e => {
+  const handleFilterChange = useCallback((e) => {
     if (e.target.value === 'all') dispatch(filterByOnline(false))
     else if (e.target.value === 'online') dispatch(filterByOnline(true))
     else dispatch(filterByRoom(parseInt(e.target.value, 10)))
   }, [dispatch])
-  const handleOpen = useCallback(e => {
+  const handleOpen = useCallback((e) => {
     setEditorUser(users.entities[e.target.dataset.userId])
     dispatch(openUserEditor())
   }, [dispatch, users])
@@ -31,16 +31,30 @@ const Users = () => {
     dispatch(fetchUsers())
   }, [dispatch])
 
-  const rows = users.result.map(userId => {
+  const rows = users.result.map((userId) => {
     const user = users.entities[userId]
     return (
       <tr key={userId}>
-        {userId === curUserId &&
-          <td><strong>{user.username}</strong> ({user.name})</td>
-        }
-        {userId !== curUserId &&
-          <td><a data-user-id={userId} onClick={handleOpen}>{user.username}</a> ({user.name})</td>
-        }
+        {userId === curUserId
+        && (
+          <td>
+            <strong>{user.username}</strong>
+            {' '}
+            (
+            {user.name}
+            )
+          </td>
+        )}
+        {userId !== curUserId
+        && (
+          <td>
+            <a data-user-id={userId} onClick={handleOpen}>{user.username}</a>
+            {' '}
+            (
+            {user.name}
+            )
+          </td>
+        )}
         <td>{user.isAdmin ? 'admin' : 'standard'}</td>
         <td>{formatDateTime(new Date(user.dateCreated * 1000))}</td>
       </tr>
@@ -56,8 +70,8 @@ const Users = () => {
       <div className={styles.titleContainer}>
         <h1 className={styles.title}>Users</h1>
         <select onChange={handleFilterChange} value={filterOnline ? 'online' : filterRoomId || 'all'}>
-          <option key='all' value={'all'}>All</option>
-          <option key='online' value={'online'}>Online</option>
+          <option key='all' value='all'>All</option>
+          <option key='online' value='online'>Online</option>
           <optgroup label='Online in...'>
             {roomOpts}
           </optgroup>

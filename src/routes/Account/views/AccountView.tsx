@@ -17,19 +17,20 @@ const AccountView = () => {
   }, [dispatch])
 
   return (
-    <div className={styles.container} style={{
-      paddingTop: ui.headerHeight,
-      paddingBottom: ui.footerHeight,
-      width: ui.contentWidth,
-      height: ui.innerHeight,
-    }}>
-      {isSignedIn &&
-        <SignedInView />
-      }
+    <div
+      className={styles.container}
+      style={{
+        paddingTop: ui.headerHeight,
+        paddingBottom: ui.footerHeight,
+        width: ui.contentWidth,
+        height: ui.innerHeight,
+      }}
+    >
+      {isSignedIn
+      && <SignedInView />}
 
-      {!isSignedIn &&
-        <SignedOutView />
-      }
+      {!isSignedIn
+      && <SignedOutView />}
     </div>
   )
 }

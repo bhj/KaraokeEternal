@@ -20,7 +20,7 @@ router.get('/rooms', async (ctx, next) => {
   // non-admins can only see open rooms
   const res = await Rooms.get(ctx.user.isAdmin)
 
-  res.result.forEach(roomId => {
+  res.result.forEach((roomId) => {
     const room = ctx.io.sockets.adapter.rooms.get(Rooms.prefix(roomId))
     res.entities[roomId].numUsers = room ? room.size : 0
   })

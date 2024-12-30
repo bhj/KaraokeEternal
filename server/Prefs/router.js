@@ -169,8 +169,8 @@ router.get('/path/ls', async (ctx, next) => {
       parent: parent === current ? (process.platform === 'win32' ? '' : false) : parent,
       children: list.map(p => ({
         path: p,
-        label: p.replace(current + path.sep, '')
-      })).filter(c => !(c.label.startsWith('.') || c.label.startsWith('/.')))
+        label: p.replace(current + path.sep, ''),
+      })).filter(c => !(c.label.startsWith('.') || c.label.startsWith('/.'))),
     }
   }
 })

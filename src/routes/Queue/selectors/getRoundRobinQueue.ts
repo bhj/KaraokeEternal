@@ -34,9 +34,9 @@ const getRoundRobinQueue = createSelector(
     const upcoming = []
     const resultByUser = history.map(queueId => (entities[queueId] as QueueItem).userId) // should be no optimistic items
 
-    result.forEach(queueId => {
-      if (history.includes(queueId) || // only concerned with upcoming songs
-        entities[queueId].isOptimistic === true // ignore optimistic items
+    result.forEach((queueId) => {
+      if (history.includes(queueId) // only concerned with upcoming songs
+        || entities[queueId].isOptimistic === true // ignore optimistic items
       ) return
 
       const userId = entities[queueId].userId
@@ -74,7 +74,7 @@ const getRoundRobinQueue = createSelector(
       result: history.concat(upcoming) as number[],
       entities: entities as Record<number, QueueItem>,
     }
-  }
+  },
 )
 
 export default getRoundRobinQueue

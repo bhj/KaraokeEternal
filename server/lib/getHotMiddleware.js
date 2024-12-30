@@ -9,7 +9,7 @@ export default (compiler, opts) => {
   return async (ctx, next) => {
     const { end: originalEnd } = ctx.res
 
-    const runNext = await new Promise(resolve => {
+    const runNext = await new Promise((resolve) => {
       ctx.res.end = function () {
         originalEnd.apply(this, arguments)
         resolve(false)

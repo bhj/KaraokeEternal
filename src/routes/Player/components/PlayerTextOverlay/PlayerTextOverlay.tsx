@@ -21,20 +21,22 @@ const PlayerTextOverlay = ({
   nextQueueItem,
   queueItem,
   width,
-  height
+  height,
 }: PlayerTextOverlayProps) => {
   let Component
 
   if (isQueueEmpty || (isAtQueueEnd && !nextQueueItem)) {
-    Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' className={styles.backdrop}/>
+    Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' className={styles.backdrop} />
   } else if (!queueItem || (isAtQueueEnd && nextQueueItem)) {
-    Component = <ColorCycle text='PRESS PLAY TO BEGIN' className={styles.backdrop}/>
+    Component = <ColorCycle text='PRESS PLAY TO BEGIN' className={styles.backdrop} />
   } else if (isErrored) {
     const offset = Math.random() * -300
-    Component = <>
-      <ColorCycle text='OOPS...' offset={offset} className={styles.backdrop}/>
-      <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} className={styles.backdrop}/>
-    </>
+    Component = (
+      <>
+        <ColorCycle text='OOPS...' offset={offset} className={styles.backdrop} />
+        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} className={styles.backdrop} />
+      </>
+    )
   } else {
     Component = <UpNow queueItem={queueItem} />
   }

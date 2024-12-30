@@ -71,14 +71,14 @@ const PlaybackCtrl = () => {
         size={48}
       />
 
-      {isPlayer && screenfull.isEnabled &&
+      {isPlayer && screenfull.isEnabled && (
         <Button
           className={styles.fullscreen}
           icon='FULLSCREEN'
           onClick={handleFullscreen}
           size={48}
         />
-      }
+      )}
 
       <DisplayCtrl
         cdgAlpha={status.cdgAlpha}

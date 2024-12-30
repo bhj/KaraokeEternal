@@ -33,9 +33,9 @@ let config = {
     ],
     alias: {
       '<PROJECT_ROOT>': baseDir,
-      assets: path.join(baseDir, 'assets'),
-      fonts: path.join(baseDir, 'docs', 'assets', 'fonts'),
-      shared: path.join(baseDir, 'shared'),
+      'assets': path.join(baseDir, 'assets'),
+      'fonts': path.join(baseDir, 'docs', 'assets', 'fonts'),
+      'shared': path.join(baseDir, 'shared'),
     },
     symlinks: false,
   },
@@ -103,7 +103,7 @@ config.module.rules.push({
     options: {
       modules: false,
       sourceMap: false,
-    }
+    },
   }],
 })
 
@@ -121,9 +121,9 @@ config.module.rules.push({
           namedExport: false,
           exportLocalsConvention: 'as-is',
           localIdentName: __DEV__ ? '[name]__[local]--[hash:base64:5]' : '[hash:base64]',
-        }
-      }
-    }
+        },
+      },
+    },
   ],
 })
 
@@ -140,7 +140,7 @@ config.module.rules.push(
   {
     test: /\.(png|jpg|gif)$/,
     type: 'asset',
-  }
+  },
 )
 
 // Markdown
@@ -152,8 +152,8 @@ config.module.rules.push({
     },
     {
       loader: 'markdown-loader',
-    }
-  ]
+    },
+  ],
 })
 
 if (__PROD__) config = applyLicenseConfig(config)

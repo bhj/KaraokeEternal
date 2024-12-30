@@ -19,20 +19,30 @@ const SongInfo = () => {
 
     return (
       <div key={item.mediaId} className={styles.media}>
-        {item.path + (item.path.indexOf('/') === 0 ? '/' : '\\') + item.relPath}<br />
-        <span className={styles.label}>Duration: </span>{formatDuration(item.duration)}<br />
-        <span className={styles.label}>Media ID: </span>{mediaId}<br />
+        {item.path + (item.path.indexOf('/') === 0 ? '/' : '\\') + item.relPath}
+        <br />
+        <span className={styles.label}>Duration: </span>
+        {formatDuration(item.duration)}
+        <br />
+        <span className={styles.label}>Media ID: </span>
+        {mediaId}
+        <br />
         <span className={styles.label}>Preferred: </span>
-        {isPreferred &&
-          <span><strong>Yes</strong>&nbsp;
+        {isPreferred
+        && (
+          <span>
+            <strong>Yes</strong>
+&nbsp;
             <a onClick={() => handleRemovePrefer(mediaId)}>(Unset)</a>
           </span>
-        }
-        {!isPreferred &&
-          <span>No&nbsp;
+        )}
+        {!isPreferred
+        && (
+          <span>
+            No&nbsp;
             <a onClick={() => handlePrefer(mediaId)}>(Set)</a>
           </span>
-        }
+        )}
       </div>
     )
   })
@@ -49,8 +59,11 @@ const SongInfo = () => {
     >
       <div className={styles.container}>
         <p>
-          <span className={styles.label}>Song ID: </span>{songId}<br />
-          <span className={styles.label}>Media Files: </span>{isLoading ? '?' : media.result.length}
+          <span className={styles.label}>Song ID: </span>
+          {songId}
+          <br />
+          <span className={styles.label}>Media Files: </span>
+          {isLoading ? '?' : media.result.length}
         </p>
 
         <div className={styles.mediaContainer}>
@@ -59,7 +72,7 @@ const SongInfo = () => {
 
         <div>
           <button className='primary' onClick={handleCloseSongInfo}>
-              Done
+            Done
           </button>
         </div>
       </div>

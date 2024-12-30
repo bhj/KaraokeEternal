@@ -50,7 +50,8 @@ const EditRoom = (props: EditRoomProps) => {
       style={{ minWidth: '300px' }}
     >
       <form onSubmit={handleSubmit} ref={formRef} className={styles.form}>
-        <input type='text'
+        <input
+          type='text'
           autoComplete='off'
           autoFocus={typeof props.room === 'undefined'}
           className={styles.field}
@@ -59,7 +60,8 @@ const EditRoom = (props: EditRoomProps) => {
           placeholder='room name'
         />
 
-        <input type='password'
+        <input
+          type='password'
           autoComplete='new-password'
           className={styles.field}
           defaultValue={props.room && props.room.hasPassword ? '*'.repeat(32) : ''}
@@ -69,24 +71,26 @@ const EditRoom = (props: EditRoomProps) => {
         />
 
         <label>
-          <input type='checkbox'
+          <input
+            type='checkbox'
             defaultChecked={!props.room || props.room.status === 'open'}
             name='status'
           />
            &nbsp;Open
         </label>
-        <br/>
-        <br/>
+        <br />
+        <br />
 
         <button type='submit' className={`${styles.btn} primary`}>
           {props.room ? 'Update Room' : 'Create Room'}
         </button>
 
-        {props.room &&
+        {props.room
+        && (
           <button type='button' onClick={handleRemoveClick} className={styles.btn}>
             Remove Room
           </button>
-        }
+        )}
 
         <button type='button' onClick={props.onClose}>Cancel</button>
       </form>

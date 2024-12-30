@@ -38,7 +38,8 @@ class MP4Player extends React.Component<MP4PlayerProps> {
     const { width, height } = this.props
 
     return (
-      <video className={styles.video}
+      <video
+        className={styles.video}
         preload='auto'
         width={width}
         height={height}

@@ -31,8 +31,8 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   cdg = null
   frameId = null
   lastBitmap = null
-  supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)') ||
-    CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
+  supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
+  || CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
 
   state = {
     backgroundRGBA: [0, 0, 0, 0],
@@ -57,9 +57,9 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
       this.updateIsPlaying()
     }
 
-    if (prevProps.width !== this.props.width ||
-        prevProps.height !== this.props.height ||
-        prevProps.cdgSize !== this.props.cdgSize) {
+    if (prevProps.width !== this.props.width
+      || prevProps.height !== this.props.height
+      || prevProps.cdgSize !== this.props.cdgSize) {
       if (this.lastBitmap) this.paintCDG(this.lastBitmap)
     }
   }
@@ -71,7 +71,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   render () {
     const { cdgAlpha, cdgSize, width, height } = this.props
     const [x1, y1, x2, y2] = this.state.contentBounds
-    const [r, g, b] = this.state.backgroundRGBA // eslint-disable-line no-unused-vars
+    const [r, g, b] = this.state.backgroundRGBA
     const filters = []
 
     // apply sizing as % of max height, leaving room for the backdrop
@@ -88,15 +88,19 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
     return (
       <div className={styles.container}>
-        <div className={styles.backdrop} style={{
-          backdropFilter: this.supportsFilters && cdgAlpha !== 1 ? filters.join(' ') : 'none',
-          backgroundColor: this.supportsFilters && cdgAlpha !== 1 ? 'transparent' : `rgba(${r},${g},${b},${cdgAlpha})`,
-          borderRadius: BORDER_RADIUS * scale,
-          left: (x1 - pad) * scale,
-          top: (y1 - pad) * scale,
-          width: ((x2 - x1) + pad * 2) * scale,
-          height: ((y2 - y1) + pad * 2) * scale,
-        }}></div>
+        <div
+          className={styles.backdrop}
+          style={{
+            backdropFilter: this.supportsFilters && cdgAlpha !== 1 ? filters.join(' ') : 'none',
+            backgroundColor: this.supportsFilters && cdgAlpha !== 1 ? 'transparent' : `rgba(${r},${g},${b},${cdgAlpha})`,
+            borderRadius: BORDER_RADIUS * scale,
+            left: (x1 - pad) * scale,
+            top: (y1 - pad) * scale,
+            width: ((x2 - x1) + pad * 2) * scale,
+            height: ((y2 - y1) + pad * 2) * scale,
+          }}
+        >
+        </div>
         <canvas
           ref={this.canvas}
           className={styles.canvas}
@@ -124,14 +128,14 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     // load .cdg file
     api('GET', `/${this.props.mediaId}?type=cdg`)
       .then(res => res.arrayBuffer())
-      .then(buffer => {
+      .then((buffer) => {
         // in case we've unmounted by this point
         if (!this.audio.current) return
 
         this.cdg.load(buffer)
         this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
         this.audio.current.load()
-      }).catch(err => {
+      }).catch((err) => {
         this.props.onError(err.message)
       })
   }
@@ -173,7 +177,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   /*
   * CDGraphics rendering
   */
-  paintCDG = bitmap => {
+  paintCDG = (bitmap) => {
     const { clientWidth, clientHeight } = this.canvas.current
 
     this.canvasCtx.imageSmoothingEnabled = false
@@ -199,7 +203,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     }
 
     createImageBitmap(frame.imageData)
-      .then(bitmap => {
+      .then((bitmap) => {
         this.lastBitmap = bitmap // cache for re-painting if canvas size changes
         this.paintCDG(bitmap)
       })

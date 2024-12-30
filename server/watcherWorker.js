@@ -5,7 +5,7 @@ import accumulatedThrottle from './lib/accumulatedThrottle.js'
 import fileTypes from './Media/fileTypes.js'
 import {
   WATCHER_WORKER_EVENT,
-  WATCHER_WORKER_WATCH
+  WATCHER_WORKER_WATCH,
 } from '../shared/actionTypes.js'
 
 const env = JSON.parse(process.env.KES_ENV_JSON)
@@ -16,7 +16,7 @@ const log = initLogger('scanner', {
   },
   file: {
     level: env.KES_SCANNER_LOG_LEVEL ?? (env.NODE_ENV === 'development' ? 0 : 3),
-  }
+  },
 }).scope(`watcher[${process.pid}]`)
 
 const refs = []
@@ -42,7 +42,7 @@ const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== 
 
       log.info('watching %s path(s):', pathIds.length)
 
-      pathIds.forEach(pathId => {
+      pathIds.forEach((pathId) => {
         log.info('  => %s', entities[pathId].path)
 
         const cb = accumulatedThrottle((events) => {

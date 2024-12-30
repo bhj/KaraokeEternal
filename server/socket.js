@@ -56,9 +56,9 @@ export default function (io, jwtKey) {
     }
 
     // attach disconnect handler
-    sock.on('disconnect', reason => {
+    sock.on('disconnect', (reason) => {
       log.verbose('%s (%s) disconnected (%s)',
-        sock.user.name, sock.id, reason
+        sock.user.name, sock.id, reason,
       )
 
       if (typeof sock.user.roomId !== 'number') return
@@ -66,7 +66,7 @@ export default function (io, jwtKey) {
       // beyond this point assumes there is a room
 
       log.verbose('%s (%s) left room %s (%s; %s in room)',
-        sock.user.name, sock.id, sock.user.roomId, reason, sock.adapter.rooms.size
+        sock.user.name, sock.id, sock.user.roomId, reason, sock.adapter.rooms.size,
       )
 
       // any players left in room?
@@ -164,7 +164,7 @@ export default function (io, jwtKey) {
     }
 
     log.verbose('%s (%s) joined room %s (%s in room)',
-      sock.user.name, sock.id, sock.user.roomId, sock.adapter.rooms.size
+      sock.user.name, sock.id, sock.user.roomId, sock.adapter.rooms.size,
     )
 
     // send room's queue

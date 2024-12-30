@@ -79,7 +79,7 @@ router.get('/users', async (ctx, next) => {
   // get all users
   const users = await User.get()
 
-  users.result.forEach(userId => {
+  users.result.forEach((userId) => {
     users.entities[userId].rooms = userRooms[userId] || []
   })
 

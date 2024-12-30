@@ -32,7 +32,7 @@ const Modal = (props: ModalProps) => {
       styles={{
         modal: {
           ...props.style,
-        }
+        },
       }}
     >
       <div className={styles.container}>
@@ -44,11 +44,12 @@ const Modal = (props: ModalProps) => {
           {props.children}
         </div>
 
-        {props.buttons &&
+        {props.buttons
+        && (
           <div className={styles.buttons}>
             {props.buttons}
           </div>
-        }
+        )}
       </div>
     </ResponsiveModal>
   )

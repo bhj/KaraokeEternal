@@ -32,7 +32,7 @@ export const login = createAsyncThunk(
     // calls api endpoint that should set an httpOnly cookie with
     // our JWT, then establish the sockiet.io connection
     const user = await api('POST', 'login', {
-      body: creds
+      body: creds,
     })
 
     // signing in can cause additional reducers to be injected and
@@ -53,7 +53,7 @@ export const login = createAsyncThunk(
     if (redirect) {
       AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
     }
-  }
+  },
 )
 
 // ------------------------------------
@@ -74,7 +74,7 @@ export const requestLogout = createAsyncThunk(
     thunkAPI.dispatch(logout())
     Persistor.get().purge()
     socket.close()
-  }
+  },
 )
 
 // ------------------------------------
@@ -86,7 +86,7 @@ export const createAccount = createAsyncThunk<void, FormData, { state: RootState
     const isFirstRun = thunkAPI.getState().prefs.isFirstRun
 
     const response = await api('POST', isFirstRun ? 'setup' : 'user', {
-      body: data
+      body: data,
     })
 
     // if firstRun, response should contain the newly-created room's id
@@ -100,7 +100,7 @@ export const createAccount = createAsyncThunk<void, FormData, { state: RootState
       roomId: isFirstRun ? response.roomId : data.get('roomId'),
       roomPassword: data.get('roomPassword'),
     }))
-  }
+  },
 )
 
 // ------------------------------------
@@ -112,12 +112,12 @@ export const updateAccount = createAsyncThunk<void, FormData, { state: RootState
     const { userId } = thunkAPI.getState().user
 
     const user = await api('PUT', `user/${userId}`, {
-      body: data
+      body: data,
     })
 
     thunkAPI.dispatch(receiveAccount(user))
     alert('Account updated successfully.')
-  }
+  },
 )
 
 // ------------------------------------
@@ -132,7 +132,7 @@ export const fetchAccount = createAsyncThunk(
     } catch (err) {
       // ignore errors
     }
-  }
+  },
 )
 
 // ------------------------------------

@@ -26,8 +26,10 @@ export default class Buttons extends React.Component<ButtonsProps> {
     })
 
     return (
-      <div className={`${styles.container} ${this.props.className}`}
-        style={{ width: this.props.btnWidth * visible }}>
+      <div
+        className={`${styles.container} ${this.props.className}`}
+        style={{ width: this.props.btnWidth * visible }}
+      >
         {children}
       </div>
     )

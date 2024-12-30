@@ -59,8 +59,8 @@ export function playerStatus (status = {}, deferEmit = false): AppThunk {
         throttle: {
           wait: 1000,
           leading: !deferEmit,
-        }
-      }
+        },
+      },
     })
   }
 }
@@ -71,7 +71,7 @@ export function playerStatusCancel () {
     type: CANCEL,
     payload: {
       type: PLAYER_EMIT_STATUS,
-    }
+    },
   }
 }
 
@@ -156,7 +156,7 @@ const playerReducer = createReducer(initialState, (builder) => {
       isFetching: false,
       isPlaying: false,
     }))
-    .addCase(playerLoad, (state) => ({
+    .addCase(playerLoad, state => ({
       ...state,
       errorMessage: '',
       isErrored: false,

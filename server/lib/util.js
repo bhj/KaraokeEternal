@@ -6,7 +6,7 @@ import path from 'path'
  * @param {string} filename The filename to extract the extension from.
  * @returns {string} The extension in lowercase with a period, or an empty string.
  */
-export const getExt = (filename) => path.extname(filename).toLowerCase()
+export const getExt = filename => path.extname(filename).toLowerCase()
 
 export const parsePathIds = (str) => {
   const nums = []

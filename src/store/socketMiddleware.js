@@ -4,11 +4,11 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimistic-ui'
 let transactionID = 0
 
 export default function createSocketMiddleware (socket, prefix) {
-  return store => {
+  return (store) => {
     // attach handler for incoming actions (from server)
     socket.on('action', action => store.dispatch(action))
 
-    return next => action => {
+    return next => (action) => {
       const { type, meta } = action
       const isOptimistic = meta && !!meta.isOptimistic
 
@@ -27,13 +27,13 @@ export default function createSocketMiddleware (socket, prefix) {
           ...action,
           meta: {
             ...meta,
-            optimistic: { type: BEGIN, id: transactionID }
-          }
+            optimistic: { type: BEGIN, id: transactionID },
+          },
         })
       } else next(action)
 
       // server can respond with an action in the ack callback (3rd arg)
-      socket.emit('action', action, cbAction => {
+      socket.emit('action', action, (cbAction) => {
         // make sure callback response is an action
         if (typeof cbAction !== 'object' || typeof cbAction.type !== 'string') {
           return
@@ -42,7 +42,7 @@ export default function createSocketMiddleware (socket, prefix) {
         if (isOptimistic) {
           cbAction.meta = {
             ...cbAction.meta,
-            optimistic: cbAction.error ? { type: REVERT, id: transactionID } : { type: COMMIT, id: transactionID }
+            optimistic: cbAction.error ? { type: REVERT, id: transactionID } : { type: COMMIT, id: transactionID },
           }
         }
 

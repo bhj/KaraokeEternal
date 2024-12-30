@@ -8,7 +8,7 @@ const parserCfgProps = ['articles', 'artistOnLeft', 'delimiter']
 
 function compose (...args) {
   const flattened = args.reduce(
-    (accumulator, currentValue) => accumulator.concat(currentValue), []
+    (accumulator, currentValue) => accumulator.concat(currentValue), [],
   )
 
   return composeSync(flattened)
@@ -59,7 +59,7 @@ class MetaParser {
       if (isUserTemplate) {
         const res = jsone(template, { ...ctx, ...customFunctions })
 
-        Object.keys(res).forEach(key => {
+        Object.keys(res).forEach((key) => {
           if (typeof res[key] === 'string') res[key] = res[key].trim()
         })
 

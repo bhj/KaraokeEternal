@@ -28,7 +28,7 @@ class AlphaPicker extends React.Component<AlphaPickerProps> {
         onMouseDown={this.handleTouch}
         onMouseUp={this.handleTouchEnd}
       >
-        {this.alphabet.map((char) => (
+        {this.alphabet.map(char => (
           <div
             key={char}
             style={{ flex: '1 1 auto', minHeight: 0 }}

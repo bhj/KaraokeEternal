@@ -24,7 +24,7 @@ const QueueView = () => {
       const i = queue.result.indexOf(queueId)
       containerRef.current.scrollTop = QUEUE_ITEM_HEIGHT * i
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [queue.result, queueId])
 
   return (
     <div
@@ -37,25 +37,32 @@ const QueueView = () => {
         height: innerHeight,
       }}
     >
-      {!isInRoom &&
+      {!isInRoom && (
         <TextOverlay>
           <h1>Get a Room!</h1>
-          <p><Link to='/account'>Sign in to a room</Link> to start queueing songs.</p>
+          <p>
+            <Link to='/account'>Sign in to a room</Link>
+            {' '}
+            to start queueing songs.
+          </p>
         </TextOverlay>
-      }
+      )}
 
-      {isLoading &&
-        <Spinner />
-      }
+      {isLoading && <Spinner />}
 
-      {!isLoading && queue.result.length === 0 &&
+      {!isLoading && queue.result.length === 0 && (
         <TextOverlay>
           <h1>Queue Empty</h1>
-          <p>Tap a song in the <Link to='/library'>library</Link> to queue it.</p>
+          <p>
+            Tap a song in the
+            <Link to='/library'>library</Link>
+            {' '}
+            to queue it.
+          </p>
         </TextOverlay>
-      }
+      )}
 
-      <QueueList/>
+      <QueueList />
     </div>
   )
 }

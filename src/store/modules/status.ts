@@ -23,17 +23,17 @@ export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
     throttle: {
       wait: 200,
       leading: false,
-    }
+    },
   },
 }))
 
-export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts) => ({
+export const requestOptions = createAction(PLAYER_REQ_OPTIONS, opts => ({
   payload: opts,
   meta: {
     throttle: {
       wait: 200,
       leading: true,
-    }
+    },
   },
 }))
 

@@ -30,7 +30,7 @@ const ACTION_HANDLERS = {
     // to all in room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(sock.user.roomId)
+      payload: await Queue.get(sock.user.roomId),
     })
   },
   [QUEUE_MOVE]: async (sock, { payload }, acknowledge) => {
@@ -64,7 +64,7 @@ const ACTION_HANDLERS = {
     // tell room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(sock.user.roomId)
+      payload: await Queue.get(sock.user.roomId),
     })
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
@@ -85,7 +85,7 @@ const ACTION_HANDLERS = {
     // tell room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(sock.user.roomId)
+      payload: await Queue.get(sock.user.roomId),
     })
   },
 }

@@ -6,6 +6,7 @@
     },
     "downlevelIteration": true,
     "esModuleInterop": true,
+    "moduleResolution": "Bundler",
     "jsx": "react",
     "plugins": [
       {

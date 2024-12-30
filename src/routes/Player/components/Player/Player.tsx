@@ -65,15 +65,15 @@ class Player extends React.Component<PlayerProps> {
     }
 
     // don't change volume if we know we're changing songs
-    if (!this.isFetching && (prevProps.volume !== this.props.volume ||
-      prevProps.rgTrackGain !== this.props.rgTrackGain ||
-      prevProps.rgTrackPeak !== this.props.rgTrackPeak ||
-      prevProps.isReplayGainEnabled !== this.props.isReplayGainEnabled)) {
+    if (!this.isFetching && (prevProps.volume !== this.props.volume
+      || prevProps.rgTrackGain !== this.props.rgTrackGain
+      || prevProps.rgTrackPeak !== this.props.rgTrackPeak
+      || prevProps.isReplayGainEnabled !== this.props.isReplayGainEnabled)) {
       this.updateVolume()
     }
   }
 
-  handleAudioElement = el => {
+  handleAudioElement = (el) => {
     if (this.audioSourceNode && this.audioSourceNode.mediaElement === el) {
       return
     }
@@ -118,10 +118,10 @@ class Player extends React.Component<PlayerProps> {
       return null
     }
 
-    const isVisualizerActive = this.props.mediaType === 'cdg' &&
-      this.props.isWebGLSupported &&
-      this.props.visualizer.isEnabled &&
-      this.state.visualizerAudioSourceNode
+    const isVisualizerActive = this.props.mediaType === 'cdg'
+      && this.props.isWebGLSupported
+      && this.props.visualizer.isEnabled
+      && this.state.visualizerAudioSourceNode
 
     return (
       <>
@@ -130,7 +130,7 @@ class Player extends React.Component<PlayerProps> {
           onAudioElement={this.handleAudioElement}
           onPlay={this.handlePlay}
         />
-        {isVisualizerActive &&
+        {isVisualizerActive && (
           <PlayerVisualizer
             audioSourceNode={this.state.visualizerAudioSourceNode}
             isPlaying={this.props.isPlaying}
@@ -140,7 +140,7 @@ class Player extends React.Component<PlayerProps> {
             width={this.props.width}
             height={this.props.height}
           />
-        }
+        )}
       </>
     )
   }

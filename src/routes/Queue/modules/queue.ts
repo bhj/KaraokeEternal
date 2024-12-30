@@ -11,7 +11,7 @@ import {
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const moveItem = createAction<{ queueId: number; prevQueueId: number }>(QUEUE_MOVE)
+export const moveItem = createAction<{ queueId: number, prevQueueId: number }>(QUEUE_MOVE)
 export const removeItem = createAction<{ queueId: number }>(QUEUE_REMOVE)
 
 export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
@@ -45,7 +45,7 @@ const queueReducer = createReducer(initialState, (builder) => {
         ...payload,
         queueId: nextQueueId,
         prevQueueId: nextQueueId - 1 || null,
-        isOptimistic: true
+        isOptimistic: true,
       }
     })
     .addCase(QUEUE_PUSH, (state, { payload }) => ({

@@ -17,7 +17,7 @@ const Icon = (props: IconProps) => {
       viewBox={icons[icon].viewBox}
       {...restProps}
     >
-      <path fill='currentColor' d={icons[icon].d}/>
+      <path fill='currentColor' d={icons[icon].d} />
     </svg>
   )
 }

@@ -34,7 +34,7 @@ function walkSync (dir, filterFn) {
   let results = []
   const list = fs.readdirSync(dir)
 
-  list.forEach(file => {
+  list.forEach((file) => {
     let stats
     file = path.join(dir, file)
 

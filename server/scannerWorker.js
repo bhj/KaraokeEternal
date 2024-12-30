@@ -4,7 +4,7 @@ import { initLogger } from './lib/Log.js'
 import {
   REQUEST_SCAN,
   REQUEST_SCAN_STOP,
-  SCANNER_WORKER_STATUS
+  SCANNER_WORKER_STATUS,
 } from '../shared/actionTypes.js'
 
 const env = JSON.parse(process.env.KES_ENV_JSON)
@@ -15,7 +15,7 @@ const log = initLogger('scanner', {
   },
   file: {
     level: env.KES_SCANNER_LOG_LEVEL ?? (env.NODE_ENV === 'development' ? 0 : 3),
-  }
+  },
 }).scope(`scanner[${process.pid}]`)
 
 let IPC
@@ -39,7 +39,7 @@ let IPC
     },
     [REQUEST_SCAN_STOP]: () => {
       q.stop()
-    }
+    },
   })
 
   const { default: ScannerQueue } = await import('./Scanner/ScannerQueue.js')

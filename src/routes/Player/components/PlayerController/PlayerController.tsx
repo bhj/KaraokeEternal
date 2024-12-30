@@ -20,7 +20,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
   const dispatch = useAppDispatch()
-  const handleStatus = useCallback<(status?:object) => void>(status => dispatch(playerStatus(status)), [dispatch])
+  const handleStatus = useCallback<(status?: object) => void>(status => dispatch(playerStatus(status)), [dispatch])
   const handleLoad = useCallback(() => dispatch(playerLoad()), [dispatch])
   const handlePlay = useCallback(() => dispatch(playerPlay()), [dispatch])
   const handleError = useCallback((msg) => {

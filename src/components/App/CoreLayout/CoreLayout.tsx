@@ -31,22 +31,22 @@ const CoreLayout = () => {
 
   return (
     <>
-      <Header ref={headerRef}/>
+      <Header ref={headerRef} />
 
-      <Routes/>
+      <Routes />
 
-      <Navigation ref={navRef}/>
+      <Navigation ref={navRef} />
 
-      <SongInfo/>
+      <SongInfo />
 
       <Modal
         isVisible={ui.isErrored}
         onClose={closeError}
         title='Oops...'
-        buttons=<button onClick={closeError}>OK</button>
+        buttons={<button onClick={closeError}>OK</button>}
       >
         {/* @ts-expect-error: non-standard but still-used style prop */}
-        <p style={{ '-webkit-user-select': 'text', userSelect: 'text' }}>
+        <p style={{ '-webkit-user-select': 'text', 'userSelect': 'text' }}>
           {ui.errorMessage}
         </p>
       </Modal>

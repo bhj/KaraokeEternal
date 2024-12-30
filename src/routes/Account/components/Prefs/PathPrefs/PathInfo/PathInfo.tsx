@@ -14,7 +14,7 @@ interface PathInfoProps {
 const PathInfo = (props: PathInfoProps) => {
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     props.onUpdate(props.path.pathId, {
-      [e.target.name]: e.target.checked
+      [e.target.name]: e.target.checked,
     })
   }, [props])
 
@@ -24,25 +24,29 @@ const PathInfo = (props: PathInfoProps) => {
     <Modal
       isVisible={props.isVisible}
       onClose={props.onClose}
-      title={'Media Folder'}
+      title='Media Folder'
       style={{ minWidth: '300px' }}
     >
       <div>
         <p className={styles.path}>{props.path?.path}</p>
-        <p><span className={styles.label}>pathId: </span>{props.path?.pathId}</p>
+        <p>
+          <span className={styles.label}>pathId: </span>
+          {props.path?.pathId}
+        </p>
 
         <form className={styles.form}>
           <label>
-            <input type='checkbox'
+            <input
+              type='checkbox'
               defaultChecked={props.path?.prefs?.isWatchingEnabled}
               name='isWatchingEnabled'
               onChange={handleChange}
             />
              &nbsp;Watch folder
           </label>
-          <br/>
-          <br/>
-          <br/>
+          <br />
+          <br />
+          <br />
         </form>
 
         <div className={styles.footer}>

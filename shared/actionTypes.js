@@ -132,7 +132,7 @@ const exported = {
   _SUCCESS: '_SUCCESS',
 
   _ERROR: '_ERROR',
-  REDUX_SLICE_INJECT_NOOP: 'app/REDUX_SLICE_INJECT_NOOP'
+  REDUX_SLICE_INJECT_NOOP: 'app/REDUX_SLICE_INJECT_NOOP',
 }
 
 export default exported
@@ -231,5 +231,5 @@ export const {
   PREFS_PATHS_CHANGED,
   _SUCCESS,
   _ERROR,
-  REDUX_SLICE_INJECT_NOOP
+  REDUX_SLICE_INJECT_NOOP,
 } = exported

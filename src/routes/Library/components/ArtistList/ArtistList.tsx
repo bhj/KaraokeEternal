@@ -109,7 +109,7 @@ class ArtistList extends React.Component<ArtistListProps> {
     }
   }
 
-  handleRef = r => {
+  handleRef = (r) => {
     this.list = r
     this.list.scrollTo(this.props.scrollTop)
   }

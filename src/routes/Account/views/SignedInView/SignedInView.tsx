@@ -26,17 +26,14 @@ const SignedInView = () => {
 
   return (
     <>
-      {isAdmin &&
-        <Rooms/>
-      }
+      {isAdmin
+      && <Rooms />}
 
-      {isAdmin &&
-        <Users/>
-      }
+      {isAdmin
+      && <Users />}
 
-      {isAdmin &&
-        <Prefs />
-      }
+      {isAdmin
+      && <Prefs />}
 
       <Account />
 

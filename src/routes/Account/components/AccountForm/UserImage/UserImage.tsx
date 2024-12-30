@@ -27,25 +27,29 @@ export default class UserImage extends Component<UserImageProps> {
   render () {
     return (
       <div className={styles.container}>
-        {!this.state.imageURL &&
-          <Icon icon='ACCOUNT_BOX' size={72} className={styles.placeholder}/>
-        }
+        {!this.state.imageURL
+        && <Icon icon='ACCOUNT_BOX' size={72} className={styles.placeholder} />}
 
-        {this.state.imageURL &&
-          <img src={this.state.imageURL} width={96} height={72}
+        {this.state.imageURL
+        && (
+          <img
+            src={this.state.imageURL}
+            width={96}
+            height={72}
             onLoad={this.handleImgLoad}
             onError={this.handleImgError}
           />
-        }
+        )}
 
-        {this.state.imageURL && !this.state.isLoading &&
+        {this.state.imageURL && !this.state.isLoading
+        && (
           <Button
             className={styles.btnClear}
             icon='CLEAR'
             onClick={this.handleImgClear}
             size={32}
           />
-        }
+        )}
 
         <input
           type='file'
@@ -71,11 +75,11 @@ export default class UserImage extends Component<UserImageProps> {
     this.props.onSelect(null)
   }
 
-  handleChoose = e => {
+  handleChoose = (e) => {
     const file = e.target.files[0]
 
     if (file) {
-      loadImage(file, canvas => {
+      loadImage(file, (canvas) => {
         if (canvas.type === 'error') {
           return alert('The image could not be loaded.')
         }
@@ -87,9 +91,9 @@ export default class UserImage extends Component<UserImageProps> {
           downsamplingRatio: 0.5,
         })
 
-        scaled.toBlob(blob => {
+        scaled.toBlob((blob) => {
           this.setState({
-            imageURL: URL.createObjectURL(blob)
+            imageURL: URL.createObjectURL(blob),
           })
 
           this.props.onSelect(blob)

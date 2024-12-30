@@ -38,7 +38,7 @@ const SongItem = ({
   isAdmin,
   numStars,
   numMedia,
-  filterKeywords
+  filterKeywords,
 }: SongItemProps) => {
   const [isExpanded, setExpanded] = useState(false)
 
@@ -74,7 +74,14 @@ const SongItem = ({
         <div onClick={handleClick} className={styles.primary}>
           <div className={styles.title}>
             <Highlighter autoEscape textToHighlight={title} searchWords={filterKeywords} />
-            {isAdmin && numMedia > 1 && <i> ({numMedia})</i>}
+            {isAdmin && numMedia > 1 && (
+              <i>
+                {' '}
+                (
+                {numMedia}
+                )
+              </i>
+            )}
             {artist && <div className={styles.artist}>{artist}</div>}
           </div>
         </div>
@@ -83,14 +90,14 @@ const SongItem = ({
       <Buttons btnWidth={50} isExpanded={isExpanded}>
         <div onClick={handleStarClick} className={`${styles.btn} ${styles.star}`}>
           <ToggleAnimation toggle={isStarred} className={styles.animateStar}>
-            <Icon size={44} icon={'STAR_FULL'} className={isStarred ? styles.starStarred : styles.star}/>
+            <Icon size={44} icon='STAR_FULL' className={isStarred ? styles.starStarred : styles.star} />
           </ToggleAnimation>
           <div className={isStarred ? styles.starCountStarred : styles.starCount}>
             {numStars || ''}
           </div>
         </div>
         <div onClick={handleInfoClick} className={styles.btn} data-hide>
-          <Icon size={44} icon='INFO_OUTLINE' className={`${styles.btn} ${styles.info}`}/>
+          <Icon size={44} icon='INFO_OUTLINE' className={`${styles.btn} ${styles.info}`} />
         </div>
       </Buttons>
     </div>

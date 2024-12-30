@@ -30,15 +30,15 @@ class ArtistItem extends React.Component<ArtistItemProps> {
       <div style={props.style}>
         <div onClick={this.handleArtistClick} className={clsx(styles.container, isChildStarred && styles.hasStarred)}>
           <div className={styles.folderContainer}>
-            <Icon icon='FOLDER' size={44}/>
-            {props.isExpanded &&
+            <Icon icon='FOLDER' size={44} />
+            {props.isExpanded
+            && (
               <div className={styles.iconChevron}>
                 <Icon icon='CHEVRON_DOWN' size={24} />
               </div>
-            }
-            {!props.isExpanded &&
-              <div className={styles.count}>{props.artistSongIds.length}</div>
-            }
+            )}
+            {!props.isExpanded
+            && <div className={styles.count}>{props.artistSongIds.length}</div>}
           </div>
           <ToggleAnimation toggle={isChildQueued} className={styles.animateGlow}>
             <div className={`${styles.name} ${isChildQueued ? styles.isChildQueued : ''}`}>
@@ -47,14 +47,15 @@ class ArtistItem extends React.Component<ArtistItemProps> {
           </ToggleAnimation>
         </div>
 
-        {props.isExpanded &&
+        {props.isExpanded
+        && (
           <SongList
             songIds={props.artistSongIds}
             showArtist={false}
             filterKeywords={props.filterKeywords}
             queuedSongs={props.queuedSongs}
           />
-        }
+        )}
       </div>
     )
   }

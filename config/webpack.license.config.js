@@ -4,10 +4,10 @@ import TerserPlugin from 'terser-webpack-plugin'
 
 const { LicenseWebpackPlugin } = licenseWebpackPlugin
 
-const applyLicenseConfig = config => {
+const applyLicenseConfig = (config) => {
   config.plugins.push(new LicenseWebpackPlugin({
     addBanner: true,
-    renderBanner: (filename) => '/*! See licenses in ' + filename + ' */',
+    renderBanner: filename => '/*! See licenses in ' + filename + ' */',
     outputFilename: 'licenses.txt',
     perChunkOutput: false,
     renderLicenses: (modules) => {
@@ -35,10 +35,10 @@ const applyLicenseConfig = config => {
           // Tell terser to remove all comments except for the banner added via LicenseWebpackPlugin.
           // This can be customized further to allow other types of comments to show up in the final js file as well.
           // See the terser documentation for format.comments options for more details.
-          comments: (astNode, comment) => (comment.value.startsWith('! See licenses in '))
-        }
-      }
-    })
+          comments: (astNode, comment) => (comment.value.startsWith('! See licenses in ')),
+        },
+      },
+    }),
   ]
 
   return config
@@ -70,7 +70,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-`
+`,
 }
 
 export default applyLicenseConfig

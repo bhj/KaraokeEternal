@@ -12,11 +12,11 @@ interface CreateProps {
 
 const Create = (props: CreateProps) => {
   const user = useAppSelector(state => state.user)
-  const roomSelectRefCB = useCallback(r => { roomSelectRef = r }, [])
-  const roomPasswordRefCB = useCallback(r => { roomPasswordRef = r }, [])
+  const roomSelectRefCB = useCallback((r) => { roomSelectRef = r }, [])
+  const roomPasswordRefCB = useCallback((r) => { roomPasswordRef = r }, [])
 
   const dispatch = useAppDispatch()
-  const handleSubmit = useCallback(data => {
+  const handleSubmit = useCallback((data) => {
     if (!roomSelectRef.value) {
       alert('Please select a room')
       roomSelectRef.focus()

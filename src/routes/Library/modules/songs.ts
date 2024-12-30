@@ -29,7 +29,7 @@ const songsReducer = createReducer(initialState, (builder) => {
       entities: {
         ...state.entities,
         ...payload,
-      }
+      },
     }))
 })
 

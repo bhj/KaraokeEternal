@@ -45,7 +45,7 @@ const Button = ({
       ref={ref}
       {...props}
     >
-      <Icon icon={icon} size={size}/>
+      <Icon icon={icon} size={size} />
       {props.children}
     </div>
   )

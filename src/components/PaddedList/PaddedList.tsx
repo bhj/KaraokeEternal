@@ -58,11 +58,11 @@ class PaddedList extends React.Component<PaddedListProps> {
 
     return this.props.rowRenderer({
       index: --index,
-      style: { ...style, paddingRight: this.props.paddingRight }
+      style: { ...style, paddingRight: this.props.paddingRight },
     })
   }
 
-  getItemSize = index => {
+  getItemSize = (index) => {
     // top & bottom spacer
     if (index === 0) {
       return this.props.paddingTop

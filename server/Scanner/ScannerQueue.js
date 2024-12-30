@@ -28,7 +28,7 @@ class ScannerQueue {
       return
     }
 
-    pathIds.forEach(id => {
+    pathIds.forEach((id) => {
       const dir = prefs.paths.entities[id]?.path
 
       if (!dir) {

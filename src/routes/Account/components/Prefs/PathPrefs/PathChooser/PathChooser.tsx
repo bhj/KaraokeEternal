@@ -24,7 +24,7 @@ const PathChooser = (props: PathChooserProps) => {
     onChoose(pathInfo.current, {})
   }, [onChoose, pathInfo])
 
-  const ls = useCallback(dir => {
+  const ls = useCallback((dir) => {
     api('GET', `/ls?dir=${encodeURIComponent(dir)}`)
       .then(res => setPathInfo(res))
       .catch(err => alert(err))
@@ -33,7 +33,7 @@ const PathChooser = (props: PathChooserProps) => {
   // get initial list when chooser first becomes visible
   useEffect(() => {
     if (isVisible) ls(pathInfo.current ?? '.')
-  }, [isVisible]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isVisible, ls, pathInfo])
 
   // scroll to top when changing dirs
   useEffect(() => {
@@ -56,12 +56,11 @@ const PathChooser = (props: PathChooserProps) => {
         </div>
 
         <div className={styles.folderList} ref={listRef}>
-          {pathInfo.parent !== false &&
-            <strong><PathItem path={'..'} onSelect={() => ls(pathInfo.parent)} /></strong>
-          }
+          {pathInfo.parent !== false
+          && <strong><PathItem path='..' onSelect={() => ls(pathInfo.parent)} /></strong>}
 
           {pathInfo.children.map((item, i) =>
-            <PathItem key={i} path={item.label} onSelect={() => ls(item.path)} />
+            <PathItem key={i} path={item.label} onSelect={() => ls(item.path)} />,
           )}
         </div>
 

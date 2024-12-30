@@ -28,11 +28,14 @@ const PlayerPrefs = () => {
 
       <div className={styles.content} style={{ display: isExpanded ? 'block' : 'none' }}>
         <label>
-          <input type='checkbox'
+          <input
+            type='checkbox'
             checked={isReplayGainEnabled}
             onChange={toggleCheckbox}
             name='isReplayGainEnabled'
-          /> ReplayGain (clip-safe)
+          />
+          {' '}
+          ReplayGain (clip-safe)
         </label>
       </div>
     </div>

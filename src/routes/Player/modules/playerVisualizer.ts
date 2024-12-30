@@ -8,7 +8,7 @@ import {
 
 const _presetKeys = Object.keys(presets)
 
-const getPreset = (i) => ({
+const getPreset = i => ({
   presetKey: _presetKeys[i],
   presetName: `[${i + 1}/${_presetKeys.length}] ` + _presetKeys[i],
 })
@@ -40,7 +40,7 @@ const initialState: playerVisualizerState = {
 
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(PLAYER_LOAD, (state) => ({
+    .addCase(PLAYER_LOAD, state => ({
       ...state,
       ...getRandomPreset(),
     }))

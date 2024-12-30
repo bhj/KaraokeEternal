@@ -16,7 +16,7 @@ class Media {
   static async search (filter) {
     const media = {
       result: [],
-      entities: {}
+      entities: {},
     }
 
     const whereClause = typeof filter !== 'object'
@@ -53,10 +53,10 @@ class Media {
    * @return {Number}        New media's mediaId
    */
   static async add (media) {
-    if (!Number.isInteger(media.songId) ||
-        !Number.isInteger(media.duration) ||
-        !Number.isInteger(media.pathId) ||
-        !media.relPath
+    if (!Number.isInteger(media.songId)
+      || !Number.isInteger(media.duration)
+      || !Number.isInteger(media.pathId)
+      || !media.relPath
     ) throw new Error('invalid media data: ' + JSON.stringify(media))
 
     // currently uses an Object instead of Map

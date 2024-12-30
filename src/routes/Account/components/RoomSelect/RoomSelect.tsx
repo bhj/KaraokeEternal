@@ -16,9 +16,9 @@ const RoomSelect = (props: RoomSelectProps) => {
   const [selectedRoomId, setSelectedRoomId] = useState('')
   const dispatch = useAppDispatch()
 
-  const handleSelectChange = useCallback(e => { setSelectedRoomId(e.target.value) }, [])
-  const handleSelectRef = useCallback(r => { onSelectRef(r) }, [onSelectRef])
-  const handlePasswordRef = useCallback(r => {
+  const handleSelectChange = useCallback((e) => { setSelectedRoomId(e.target.value) }, [])
+  const handleSelectRef = useCallback((r) => { onSelectRef(r) }, [onSelectRef])
+  const handlePasswordRef = useCallback((r) => {
     passwordRef = r
     onPasswordRef(r)
   }, [onPasswordRef])
@@ -56,14 +56,16 @@ const RoomSelect = (props: RoomSelectProps) => {
         ))}
       </select>
 
-      {selectedRoomId && rooms.entities[selectedRoomId].hasPassword &&
-        <input type='password'
+      {selectedRoomId && rooms.entities[selectedRoomId].hasPassword
+      && (
+        <input
+          type='password'
           autoComplete='off'
           className={`${styles.field} ${props.className}`}
           placeholder='room password (required)'
           ref={handlePasswordRef}
         />
-      }
+      )}
     </>
   )
 }

@@ -8,8 +8,8 @@ import Spinner from '../Spinner/Spinner'
 
 const App = () => (
   <Provider store={store}>
-    <PersistGate loading={<Spinner/>} persistor={Persistor.get()}>
-      <React.Suspense fallback={<Spinner/>}>
+    <PersistGate loading={<Spinner />} persistor={Persistor.get()}>
+      <React.Suspense fallback={<Spinner />}>
         <CoreLayout />
       </React.Suspense>
     </PersistGate>

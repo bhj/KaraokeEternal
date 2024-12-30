@@ -26,12 +26,12 @@ const getUpcomingSongs = createSelector(
     return queue.result
       .filter(queueId => !history.includes(queueId))
       .map(queueId => queue.entities[queueId].songId)
-  }
+  },
 )
 
 const getFilterKeywords = createSelector(
   [getFilterStr],
-  (str) => str.length ? str.split(' ') : []
+  str => str.length ? str.split(' ') : [],
 )
 
 const getAlphaPickerMap = createSelector(
@@ -60,18 +60,18 @@ const getAlphaPickerMap = createSelector(
 
 const getArtistSearcher = createSelector(
   [getArtists],
-  (artists) => new Searcher(artists.result, {
+  artists => new Searcher(artists.result, {
     keySelector: artistId => artists.entities[artistId].name,
     threshold: 0.8,
-  })
+  }),
 )
 
 const getSongSearcher = createSelector(
   [getSongs],
-  (songs) => new Searcher(songs.result, {
+  songs => new Searcher(songs.result, {
     keySelector: songId => songs.entities[songId].title,
     threshold: 0.8,
-  })
+  }),
 )
 
 // #1: keyword filters
@@ -99,17 +99,17 @@ const getSongsByKeyword = createSelector(
 const getArtistsByView = createSelector(
   [getArtistsByKeyword, getFilterStarred, getStarredArtists],
   (artistsWithKeyword, filterStarred, starredArtists) =>
-    artistsWithKeyword.filter(artistId => {
+    artistsWithKeyword.filter((artistId) => {
       return filterStarred ? starredArtists.includes(artistId) : true
-    })
+    }),
 )
 
 const getSongsByView = createSelector(
   [getSongsByKeyword, getFilterStarred, getStarredSongs],
   (songsWithKeyword, filterStarred, starredSongs) =>
-    songsWithKeyword.filter(songId => {
+    songsWithKeyword.filter((songId) => {
       return filterStarred ? starredSongs.includes(songId) : true
-    })
+    }),
 )
 
 const mapStateToProps = (state: RootState) => {

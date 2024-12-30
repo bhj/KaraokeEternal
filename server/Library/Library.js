@@ -26,11 +26,11 @@ class Library {
     const SongIdsByArtist = {}
     const artists = {
       result: [],
-      entities: {}
+      entities: {},
     }
     const songs = {
       result: [],
-      entities: {}
+      entities: {},
     }
 
     // query #1: songs
@@ -115,7 +115,7 @@ class Library {
         songId: media.songId,
         title: media.title,
         numMedia: result.length,
-      }
+      },
     }
   }
 
@@ -313,7 +313,7 @@ class Library {
       `
       const rows = await db.all(String(query), query.parameters)
 
-      rows.forEach(row => { artists[row.artistId] = row.count })
+      rows.forEach((row) => { artists[row.artistId] = row.count })
     }
 
     // get song star counts
@@ -325,7 +325,7 @@ class Library {
       `
       const rows = await db.all(String(query), query.parameters)
 
-      rows.forEach(row => { songs[row.songId] = row.count })
+      rows.forEach((row) => { songs[row.songId] = row.count })
     }
 
     log.info('built star count cache in %sms', (performance.now() - startTime).toFixed(3))

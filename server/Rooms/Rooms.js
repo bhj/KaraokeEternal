@@ -23,7 +23,7 @@ class Rooms {
     `
     const res = await db.all(String(query), query.parameters)
 
-    res.forEach(row => {
+    res.forEach((row) => {
       row.dateCreated = parseInt(row.dateCreated, 10) // v1.0 schema used 'text' column
       row.hasPassword = !!row.password
       delete row.password

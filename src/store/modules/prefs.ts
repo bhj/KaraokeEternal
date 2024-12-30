@@ -21,7 +21,7 @@ const api = new HttpApi('prefs')
 // Actions
 // ------------------------------------
 const logout = createAction(LOGOUT)
-export const setPref = createAction<{ key: string; data: unknown }>(PREFS_SET)
+export const setPref = createAction<{ key: string, data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<object>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_PATH_SET_PRIORITY)
 
@@ -29,17 +29,17 @@ export const setPathPrefs = createAsyncThunk(
   PREFS_PATH_UPDATE,
   async ({
     pathId,
-    data
+    data,
   }: {
-  pathId: number
-  data: FormData
-}, thunkAPI) => {
+    pathId: number
+    data: FormData
+  }, thunkAPI) => {
     const response = await api('PUT', `/path/${pathId}`, {
       body: data,
     })
 
     thunkAPI.dispatch(receivePrefs(response))
-  }
+  },
 )
 
 export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
@@ -53,22 +53,22 @@ export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
     }
 
     return response
-  }
+  },
 )
 
 export const requestScan = createAsyncThunk(
   PREFS_REQ_SCANNER_START,
-  async (pathId: number) => await api('GET', `/path/${pathId}/scan`)
+  async (pathId: number) => await api('GET', `/path/${pathId}/scan`),
 )
 
 export const requestScanAll = createAsyncThunk(
   PREFS_REQ_SCANNER_START,
-  async () => await api('GET', '/paths/scan')
+  async () => await api('GET', '/paths/scan'),
 )
 
 export const requestScanStop = createAsyncThunk(
   PREFS_REQ_SCANNER_STOP,
-  async () => await api('GET', '/paths/scan/stop')
+  async () => await api('GET', '/paths/scan/stop'),
 )
 
 // ------------------------------------
@@ -91,7 +91,7 @@ const initialState: prefsState = {
   isReplayGainEnabled: false,
   paths: {
     result: [],
-    entities: {}
+    entities: {},
   },
   scannerPct: 0,
   scannerText: '',

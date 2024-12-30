@@ -31,7 +31,7 @@ const PathPrefs = () => {
     setPriority(paths.result)
   }, [paths])
 
-  const handleDragEnd = useCallback(dnd => {
+  const handleDragEnd = useCallback((dnd) => {
     // dropped outside the list?
     if (!dnd.destination) return
 
@@ -45,10 +45,10 @@ const PathPrefs = () => {
 
   const handleAdd = useCallback((dir: string, prefs: object) => {
     api('POST', `/?dir=${encodeURIComponent(dir)}`, { body: prefs })
-      .then(res => {
+      .then((res) => {
         dispatch(receivePrefs(res))
         setChoosing(false)
-      }).catch(err => {
+      }).catch((err) => {
         alert(err)
       })
   }, [dispatch])
@@ -63,9 +63,9 @@ const PathPrefs = () => {
     setEditingPath(null)
 
     api('DELETE', `/${pathId}`)
-      .then(res => {
+      .then((res) => {
         dispatch(receivePrefs(res))
-      }).catch(err => {
+      }).catch((err) => {
         alert(err)
       })
   }, [dispatch, paths, priority])
@@ -81,22 +81,21 @@ const PathPrefs = () => {
   return (
     <div className={styles.container}>
       <div className={styles.heading} onClick={toggleExpanded}>
-        <Icon icon='FOLDER_MUSIC' size={28}/>
+        <Icon icon='FOLDER_MUSIC' size={28} />
         <div className={styles.title}>Media Folders</div>
         <div>
-          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24}/>
+          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} />
         </div>
       </div>
 
       <div className={styles.content} style={{ display: isExpanded ? 'block' : 'none' }}>
-        {paths.result.length === 0 &&
-          <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>
-        }
+        {paths.result.length === 0
+        && <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>}
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId='droppable'>
-            {(provided) => (
+            {provided => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
-                {priority.map((pathId, i) =>
+                {priority.map((pathId, i) => (
                   <PathItem
                     index={i}
                     key={pathId}
@@ -104,6 +103,7 @@ const PathPrefs = () => {
                     onInfo={handleInfo}
                     onRefresh={handleRefresh}
                   />
+                ),
                 )}
                 {provided.placeholder}
               </div>
@@ -112,11 +112,12 @@ const PathPrefs = () => {
         </DragDropContext>
 
         <div className={styles.btnContainer}>
-          {paths.result.length > 0 &&
-          <button onClick={handleRefreshAll}>
-            Scan Folders
-          </button>
-        }
+          {paths.result.length > 0
+          && (
+            <button onClick={handleRefreshAll}>
+              Scan Folders
+            </button>
+          )}
           <button className='primary' onClick={handleOpenChooser}>
             Add Folder
           </button>

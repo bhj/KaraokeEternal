@@ -43,7 +43,7 @@ class FileScanner extends Scanner {
 
       log.info('  => found %s files with valid extensions %s',
         files.length.toLocaleString(),
-        JSON.stringify(searchExts)
+        JSON.stringify(searchExts),
       )
     } catch (err) {
       log.error(`  => ${err.message} (path offline)`)
@@ -115,7 +115,7 @@ class FileScanner extends Scanner {
 
     log.verbose('  => duration: %s:%s',
       Math.floor(data.format.duration / 60),
-      Math.round(data.format.duration % 60, 10).toString().padStart(2, '0')
+      Math.round(data.format.duration % 60, 10).toString().padStart(2, '0'),
     )
 
     // run MetaParser
@@ -153,7 +153,7 @@ class FileScanner extends Scanner {
       const diff = {}
 
       // did anything change?
-      Object.keys(media).forEach(key => {
+      Object.keys(media).forEach((key) => {
         if (media[key] !== row[key]) diff[key] = media[key]
       })
 
@@ -164,7 +164,7 @@ class FileScanner extends Scanner {
             mediaId: row.mediaId,
             dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
             ...diff,
-          }
+          },
         })
 
         log.info('  => updated: %s', Object.keys(diff).join(', '))
@@ -181,7 +181,7 @@ class FileScanner extends Scanner {
 
     return {
       mediaId: await IPC.req({ type: MEDIA_ADD, payload: media }),
-      isNew: true
+      isNew: true,
     }
   }
 

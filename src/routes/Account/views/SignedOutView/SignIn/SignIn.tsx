@@ -12,11 +12,11 @@ interface SignInProps {
 const SignIn = (props: SignInProps) => {
   const usernameRef = useRef(null)
   const passwordRef = useRef(null)
-  const roomSelectRefCB = useCallback(r => { roomSelectRef = r }, [])
-  const roomPasswordRefCB = useCallback(r => { roomPasswordRef = r }, [])
+  const roomSelectRefCB = useCallback((r) => { roomSelectRef = r }, [])
+  const roomPasswordRefCB = useCallback((r) => { roomPasswordRef = r }, [])
 
   const dispatch = useAppDispatch()
-  const handleSubmit = useCallback(e => {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault()
     dispatch(login({
       username: usernameRef.current.value.trim(),
@@ -34,14 +34,16 @@ const SignIn = (props: SignInProps) => {
       </div>
 
       <form noValidate>
-        <input type='email'
+        <input
+          type='email'
           autoComplete='username'
           autoFocus
           placeholder='username or email'
           ref={usernameRef}
           className={styles.field}
         />
-        <input type='password'
+        <input
+          type='password'
           autoComplete='current-password'
           placeholder='password'
           ref={passwordRef}

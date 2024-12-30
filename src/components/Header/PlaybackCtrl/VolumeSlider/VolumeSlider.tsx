@@ -27,9 +27,7 @@ export default class VolumeSlider extends React.Component<VolumeSliderProps> {
 }
 
 // volume slider handle/grabber
-const handle = (node, props) => {
-  const { value } = props // eslint-disable-line react/prop-types
-
+const handle = (node, { value }) => {
   let icon = 'VOLUME_UP'
   if (value === 0) icon = 'VOLUME_OFF'
   else if (value < 0.4) icon = 'VOLUME_MUTE'

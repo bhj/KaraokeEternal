@@ -9,23 +9,32 @@ const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
 
 const AppRoutes = () => (
   <Routes>
-    <Route path='/account' element={<AccountView/>}/>
-    <Route path='/library' element={
-      <RequireAuth path='/library' redirectTo='/account'>
-        <LibraryView/>
-      </RequireAuth>
-    }/>
-    <Route path='/queue' element={
-      <RequireAuth path='/queue' redirectTo='/account'>
-        <QueueView/>
-      </RequireAuth>
-    }/>
-    <Route path='/player' element={
-      <RequireAuth path='/player' redirectTo='/account'>
-        <PlayerView/>
-      </RequireAuth>
-    }/>
-    <Route path='/' element={<Navigate to='/library'/>}/>
+    <Route path='/account' element={<AccountView />} />
+    <Route
+      path='/library'
+      element={(
+        <RequireAuth path='/library' redirectTo='/account'>
+          <LibraryView />
+        </RequireAuth>
+      )}
+    />
+    <Route
+      path='/queue'
+      element={(
+        <RequireAuth path='/queue' redirectTo='/account'>
+          <QueueView />
+        </RequireAuth>
+      )}
+    />
+    <Route
+      path='/player'
+      element={(
+        <RequireAuth path='/player' redirectTo='/account'>
+          <PlayerView />
+        </RequireAuth>
+      )}
+    />
+    <Route path='/' element={<Navigate to='/library' />} />
   </Routes>
 )
 
@@ -40,7 +49,7 @@ interface RequireAuthProps {
 const RequireAuth = ({
   children,
   path,
-  redirectTo
+  redirectTo,
 }: RequireAuthProps) => {
   const isAuthenticated = useAppSelector(state => state.user.userId !== null)
   const location = useLocation()
@@ -50,7 +59,7 @@ const RequireAuth = ({
     const params = new URLSearchParams(location.search)
     params.set('redirect', path)
 
-    return <Navigate to={redirectTo + '?' + params.toString() }/>
+    return <Navigate to={redirectTo + '?' + params.toString()} />
   }
 
   return children

@@ -1,4 +1,3 @@
-/* eslint-disable max-len, no-template-curly-in-string */
 const manifest = require('../package.json')
 const config = {
   appId: 'com.RadRoot.KaraokeEternalServer',

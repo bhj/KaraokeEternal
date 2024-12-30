@@ -13,7 +13,9 @@ const UpNext = (props: UpNextProps) => {
     return (
       <div className={styles.upNow}>
         <p className={styles.msg}>
-          You&rsquo;re up <strong>now</strong>
+          You&rsquo;re up
+          {' '}
+          <strong>now</strong>
         </p>
       </div>
     )
@@ -23,7 +25,10 @@ const UpNext = (props: UpNextProps) => {
     return (
       <div className={styles.upNext}>
         <p className={styles.msg}>
-          You&rsquo;re up <strong>next</strong>{props.wait ? ` in ${formatSeconds(props.wait, true)}` : ''}
+          You&rsquo;re up
+          {' '}
+          <strong>next</strong>
+          {props.wait ? ` in ${formatSeconds(props.wait, true)}` : ''}
         </p>
       </div>
     )
@@ -33,7 +38,9 @@ const UpNext = (props: UpNextProps) => {
     return (
       <div className={styles.inQueue}>
         <p className={styles.msg}>
-          You&rsquo;re up in {formatSeconds(props.wait, true)}
+          You&rsquo;re up in
+          {' '}
+          {formatSeconds(props.wait, true)}
         </p>
       </div>
     )
