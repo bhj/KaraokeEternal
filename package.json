@@ -88,6 +88,7 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "@reduxjs/toolkit": "^2.5.0",
     "@stylistic/eslint-plugin": "^2.12.1",
+    "@types/react": "^19.0.2",
     "@types/redux-optimistic-ui": "^0.4.14",
     "@types/webpack-env": "^1.18.5",
     "@typescript-eslint/eslint-plugin": "^8.18.2",

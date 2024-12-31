@@ -4,9 +4,11 @@
       "*": ["./src/*"],
       "shared/*": ["./shared/*"],
     },
+    "skipLibCheck": true,
     "downlevelIteration": true,
     "esModuleInterop": true,
     "moduleResolution": "Bundler",
+    "module": "esnext",
     "jsx": "react",
     "plugins": [
       {
