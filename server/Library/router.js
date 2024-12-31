@@ -1,6 +1,6 @@
 import KoaRouter from '@koa/router'
 import Media from '../Media/Media.js'
-const router = KoaRouter({ prefix: '/api' })
+const router = new KoaRouter({ prefix: '/api' })
 
 // lists underlying media for a given song
 router.get('/song/:songId', async (ctx, next) => {

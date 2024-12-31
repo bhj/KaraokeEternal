@@ -7,7 +7,7 @@ import Rooms from '../Rooms/Rooms.js'
 
 const log = getLogger('Rooms')
 const { db } = Database
-const router = KoaRouter({ prefix: '/api' })
+const router = new KoaRouter({ prefix: '/api' })
 
 const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1

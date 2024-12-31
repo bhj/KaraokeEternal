@@ -173,7 +173,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   })
 
   // http api endpoints
-  const baseRouter = koaRouter({
+  const baseRouter = new koaRouter({
     prefix: urlPath.replace(/\/$/, ''), // avoid double slashes with /api prefix
   })
 

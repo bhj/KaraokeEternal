@@ -8,7 +8,7 @@ import Media from '../Media/Media.js'
 import pushQueuesAndLibrary from '../lib/pushQueuesAndLibrary.js'
 import { PREFS_PATHS_CHANGED } from '../../shared/actionTypes.js'
 const log = getLogger('Prefs')
-const router = KoaRouter({ prefix: '/api/prefs' })
+const router = new KoaRouter({ prefix: '/api/prefs' })
 
 // get all prefs (including media paths)
 router.get('/', async (ctx, next) => {

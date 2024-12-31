@@ -15,7 +15,7 @@ import Rooms from '../Rooms/Rooms.js'
 import fileTypes from './fileTypes.js'
 import { LIBRARY_PUSH_SONG, QUEUE_PUSH } from '../../shared/actionTypes.js'
 const log = getLogger('Media')
-const router = KoaRouter({ prefix: '/api/media' })
+const router = new KoaRouter({ prefix: '/api/media' })
 
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 

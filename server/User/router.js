@@ -14,7 +14,7 @@ const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
 
 const { db } = Database
-const router = KoaRouter({ prefix: '/api' })
+const router = new KoaRouter({ prefix: '/api' })
 const { sign: jwtSign } = jsonWebToken
 
 const BCRYPT_ROUNDS = 12
