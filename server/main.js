@@ -60,12 +60,6 @@ process.on('unhandledRejection', (reason) => {
   log.error('Unhandled Rejection:', reason)
 })
 
-// detect electron
-// if (process.versions.electron) {
-//   refs.electron = require('./lib/electron.js')({ env })
-//   env.KES_PATH_DATA = refs.electron.app.getPath('userData')
-// }
-
 ;(async function () {
   // init database
   const { open, close } = await import('./lib/Database.js')
@@ -85,18 +79,6 @@ process.on('unhandledRejection', (reason) => {
       startScanner(payload.pathId)
     },
   })
-
-  //   if (refs.electron) {
-  //     process.on('serverWorker', action => {
-  //       const { type, payload } = action
-  //
-  //       if (type === SERVER_WORKER_STATUS) {
-  //         return refs.electron.setStatus('url', payload.url)
-  //       } else if (type === SERVER_WORKER_ERROR) {
-  //         return refs.electron.setError(action.error)
-  //       }
-  //     })
-  //   }
 
   // start web server
   const serverWorker = await import('./serverWorker.js')

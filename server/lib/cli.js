@@ -79,20 +79,8 @@ const argv = yargs(hideBin(process.argv))
   .usage('  0=off, 1=error, 2=warn, 3=info, 4=verbose, 5=debug')
   .parse()
 
-let _app
-
-// if (process.versions.electron) {
-//   // eslint-disable-next-line n/no-unpublished-import
-//   _app = require('electron').app
-//
-//   // see https://github.com/yargs/yargs/blob/master/docs/api.md#argv
-//   if (_app.isPackaged) {
-//     argv = yargs.parse(process.argv.slice(1))
-//   }
-// }
-
 if (argv.version) {
-  console.log(_app ? _app.getVersion() : process.env.npm_package_version)
+  console.log(process.env.npm_package_version)
   process.exit(0) // eslint-disable-line n/no-process-exit
 }
 

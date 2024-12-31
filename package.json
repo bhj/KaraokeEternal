@@ -17,8 +17,8 @@
   "type": "module",
   "main": "./server/main.js",
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "lint": "eslint .",
@@ -28,10 +28,7 @@
     "build": "webpack --config config/webpack.config.js",
     "serve": "node server/main.js",
     "serve:docs": "hugo serve --source docs -b http://$(hostname) --bind 0.0.0.0",
-    "server": "npm run serve",
-    "start": "electron . -p 3000",
-    "dist": "DEBUG=electron-builder:* electron-builder -c config/electron-builder.config.js",
-    "install-app-deps": "electron-builder install-app-deps"
+    "server": "npm run serve"
   },
   "files": [
     "assets/**",
@@ -101,8 +98,6 @@
     "cdgraphics": "^6.0.1",
     "clsx": "^2.1.1",
     "css-loader": "^7.1.2",
-    "electron": "^25.9.8",
-    "electron-builder": "^24.13.3",
     "eslint": "^9.17.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-n": "^17.15.1",
