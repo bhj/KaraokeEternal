@@ -135,6 +135,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
         this.cdg.load(buffer)
         this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
         this.audio.current.load()
+        return
       }).catch((err) => {
         this.props.onError(err.message)
       })
@@ -206,6 +207,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
       .then((bitmap) => {
         this.lastBitmap = bitmap // cache for re-painting if canvas size changes
         this.paintCDG(bitmap)
+        return
       })
       .catch(err => this.props.onError(err.message))
   }

@@ -20,7 +20,7 @@ const router = new KoaRouter({ prefix: '/api/media' })
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 
 // stream a media file
-router.get('/:mediaId', async (ctx, next) => {
+router.get('/:mediaId', async (ctx) => {
   const { type } = ctx.query
 
   if (!ctx.user.isAdmin) {
@@ -82,7 +82,7 @@ router.get('/:mediaId', async (ctx, next) => {
 })
 
 // set isPreferred flag
-router.all('/:mediaId/prefer', async (ctx, next) => {
+router.all('/:mediaId/prefer', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }

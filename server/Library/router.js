@@ -3,7 +3,7 @@ import Media from '../Media/Media.js'
 const router = new KoaRouter({ prefix: '/api' })
 
 // lists underlying media for a given song
-router.get('/song/:songId', async (ctx, next) => {
+router.get('/song/:songId', async (ctx) => {
   // must be admin
   if (!ctx.user.isAdmin) {
     ctx.throw(401)

@@ -26,12 +26,12 @@ const NAME_MAX_LENGTH = 50
 const IMG_MAX_LENGTH = 50000 // bytes
 
 // login
-router.post('/login', async (ctx, next) => {
+router.post('/login', async (ctx) => {
   await _login(ctx, ctx.request.body)
 })
 
 // logout
-router.get('/logout', async (ctx, next) => {
+router.get('/logout', async (ctx) => {
   // @todo force socket room leave
   ctx.cookies.set('keToken', '')
   ctx.status = 200
@@ -39,7 +39,7 @@ router.get('/logout', async (ctx, next) => {
 })
 
 // get own account (helps sync account changes across devices)
-router.get('/user', async (ctx, next) => {
+router.get('/user', async (ctx) => {
   if (typeof ctx.user.userId !== 'number') {
     ctx.throw(401)
   }
@@ -59,7 +59,7 @@ router.get('/user', async (ctx, next) => {
 })
 
 // list all users (admin only)
-router.get('/users', async (ctx, next) => {
+router.get('/users', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -87,7 +87,7 @@ router.get('/users', async (ctx, next) => {
 })
 
 // delete a user (admin only)
-router.delete('/user/:userId', async (ctx, next) => {
+router.delete('/user/:userId', async (ctx) => {
   const targetId = parseInt(ctx.params.userId, 10)
 
   if (!ctx.user.isAdmin || targetId === ctx.user.userId) {
@@ -117,7 +117,7 @@ router.delete('/user/:userId', async (ctx, next) => {
 })
 
 // update a user account
-router.put('/user/:userId', async (ctx, next) => {
+router.put('/user/:userId', async (ctx) => {
   const targetId = parseInt(ctx.params.userId, 10)
   const user = await User.getById(ctx.user.userId, true)
 
@@ -238,7 +238,7 @@ router.put('/user/:userId', async (ctx, next) => {
 })
 
 // create account
-router.post('/user', async (ctx, next) => {
+router.post('/user', async (ctx) => {
   if (!ctx.user.isAdmin) {
     // already signed in as non-admin?
     if (ctx.user.userId !== null) {
@@ -267,7 +267,7 @@ router.post('/user', async (ctx, next) => {
 })
 
 // first-time setup
-router.post('/setup', async (ctx, next) => {
+router.post('/setup', async (ctx) => {
   // must be first run
   const prefs = await Prefs.get()
 
@@ -312,7 +312,7 @@ router.post('/setup', async (ctx, next) => {
 })
 
 // get a user's image
-router.get('/user/:userId/image', async (ctx, next) => {
+router.get('/user/:userId/image', async (ctx) => {
   const userId = parseInt(ctx.params.userId, 10)
   const user = await User.getById(userId)
 

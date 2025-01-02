@@ -31,7 +31,7 @@ export default tseslint.config(
   },
   // client-only config
   {
-    files: ['src/**/*.{js,jsx,ts,tsx}', 'shared/**/*.{js,ts}', 'config/**/*.{js,ts}'],
+    files: ['src/**/*.{js,jsx,ts,tsx}', 'shared/**/*.{js,ts}'],
     plugins: {
       'react': pluginReact,
       'react-hooks': pluginReactHooks,
@@ -56,7 +56,7 @@ export default tseslint.config(
   },
   // server-only config
   {
-    files: ['server/**/*.js'],
+    files: ['server/**/*.js', 'config/webpack.config.js'],
     ...pluginNode.configs['flat/recommended-script'],
     languageOptions: {
       globals: globals.node,

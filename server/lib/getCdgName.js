@@ -11,7 +11,7 @@ export default async function getCdgName (file) {
     try {
       await stat(cdg)
       return cdg
-    } catch (err) {
+    } catch {
       // try another permutation
     }
   } // end for

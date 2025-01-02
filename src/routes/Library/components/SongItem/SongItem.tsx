@@ -43,7 +43,8 @@ const SongItem = ({
   const [isExpanded, setExpanded] = useState(false)
 
   const handleClick = useCallback(() => {
-    ignoreMouseup ? ignoreMouseup = false : onSongQueue(songId)
+    if (ignoreMouseup) ignoreMouseup = false
+    else onSongQueue(songId)
   }, [onSongQueue, songId])
   const handleInfoClick = useCallback(() => onSongInfo(songId), [onSongInfo, songId])
   const handleStarClick = useCallback(() => onSongStarClick(songId), [onSongStarClick, songId])

@@ -313,7 +313,9 @@ class Library {
       `
       const rows = await db.all(String(query), query.parameters)
 
-      rows.forEach((row) => { artists[row.artistId] = row.count })
+      rows.forEach((row) => {
+        artists[row.artistId] = row.count
+      })
     }
 
     // get song star counts
@@ -325,7 +327,9 @@ class Library {
       `
       const rows = await db.all(String(query), query.parameters)
 
-      rows.forEach((row) => { songs[row.songId] = row.count })
+      rows.forEach((row) => {
+        songs[row.songId] = row.count
+      })
     }
 
     log.info('built star count cache in %sms', (performance.now() - startTime).toFixed(3))

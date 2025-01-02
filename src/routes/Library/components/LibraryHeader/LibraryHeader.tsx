@@ -23,7 +23,8 @@ class LibraryHeader extends React.Component<LibraryHeaderProps> {
   }
 
   handleMagnifierClick = () => {
-    this.state.value.trim() ? this.clearSearch() : this.searchInput.current.focus()
+    if (this.state.value.trim()) this.clearSearch()
+    else this.searchInput.current.focus()
   }
 
   clearSearch = () => {

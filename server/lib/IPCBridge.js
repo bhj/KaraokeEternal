@@ -49,6 +49,8 @@ class IPCParent {
         type: type + _SUCCESS,
         payload: res,
       }, meta?.pid)
+
+      return
     }).catch((err) => {
       IPCParent.send({
         ...action,

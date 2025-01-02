@@ -18,7 +18,7 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const [isAnimating, setAnimating] = useState(false)
-  const ref = useRef<HTMLDivElement>()
+  const ref = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
     if (isAnimating) ref.current.classList.add(animateClassName)

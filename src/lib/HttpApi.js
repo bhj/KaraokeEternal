@@ -32,7 +32,9 @@ export default class HttpApi {
         }
 
         // error
-        return res.text().then((txt) => { throw new Error(txt) }) // eslint-disable-line promise/no-nesting
+        return res.text().then((txt) => { // eslint-disable-line promise/no-nesting
+          throw new Error(txt)
+        })
       })
   }
 }

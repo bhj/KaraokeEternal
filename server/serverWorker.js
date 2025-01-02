@@ -153,7 +153,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     try {
       const { keToken } = parseCookie(ctx.request.header.cookie)
       ctx.user = jwtVerify(keToken, jwtKey)
-    } catch (err) {
+    } catch {
       ctx.user = {
         dateUpdated: null,
         isAdmin: false,
@@ -228,7 +228,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   const { default: webpackConfig } = await import('../config/webpack.config.js') // eslint-disable-line n/no-unpublished-import
   const compiler = webpack(webpackConfig)
 
-  compiler.hooks.done.tap('indexPlugin', async (params) => {
+  compiler.hooks.done.tap('indexPlugin', async () => {
     const indexContent = await new Promise((resolve, reject) => {
       compiler.outputFileSystem.readFile(indexFile, 'utf8', (err, result) => {
         if (err) return reject(err)

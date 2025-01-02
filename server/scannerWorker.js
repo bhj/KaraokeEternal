@@ -57,8 +57,9 @@ let IPC
   q.queue(pathIds)
 })()
 
+// @todo
 function onIteration (stats) {
-  // @todo
+  return stats
 }
 
 function onDone () {

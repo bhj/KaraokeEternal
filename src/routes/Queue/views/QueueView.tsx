@@ -16,7 +16,7 @@ const QueueView = () => {
   const isLoading = useAppSelector(state => ensureState(state.queue).isLoading)
   const queue = useAppSelector(getRoundRobinQueue)
   const queueId = useAppSelector(state => state.status.queueId)
-  const containerRef = useRef<HTMLDivElement>()
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // ensure current song is in view on first mount only
   useEffect(() => {

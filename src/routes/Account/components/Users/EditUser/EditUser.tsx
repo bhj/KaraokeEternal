@@ -23,7 +23,8 @@ const EditUser = (props: EditUserProps) => {
 
   const dispatch = useAppDispatch()
   const handleSubmit = useCallback((data) => {
-    props.user ? dispatch(updateUser({ userId: props.user.userId, data })) : dispatch(createUser(data))
+    if (props.user) dispatch(updateUser({ userId: props.user.userId, data }))
+    else dispatch(createUser(data))
   }, [dispatch, props.user])
 
   const handleRemoveClick = useCallback(() => {

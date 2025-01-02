@@ -6,6 +6,8 @@ import Modal from 'components/Modal/Modal'
 import html from '<PROJECT_ROOT>/CHANGELOG.md'
 import styles from './About.css'
 
+const curYear = new Date().getFullYear()
+
 const About = () => {
   const [isChangelogVisible, setChangelogVisible] = useState(false)
   const toggleChangelog = useCallback(() => setChangelogVisible(prevState => !prevState), [])
@@ -19,14 +21,13 @@ const About = () => {
           <Logo className={styles.logo} />
         </a>
         <p className={styles.sm}>
-          {/* @ts-expect-error: global via Webpack */}
           &copy;
-          {__KE_COPYRIGHT__}
+          {`2019-${curYear}`}
           {' '}
           <a href='https://www.radroot.com' target='_blank' rel='noreferrer'>RadRoot LLC</a>
           <br />
-          {/* @ts-expect-error: global via Webpack */}
           v
+          {/* @ts-expect-error: global via Webpack */}
           {__KE_VERSION__}
         </p>
         <p>
@@ -36,8 +37,6 @@ const About = () => {
           {' '}
           <a href='/licenses.txt' target='_blank'>Licenses</a>
         </p>
-        {' '}
-        { }
 
         <div className={styles.ghButtonContainer}>
           <div className={styles.ghButton}>

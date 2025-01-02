@@ -80,7 +80,6 @@ class ArtistList extends React.Component<ArtistListProps> {
         onArtistClick={this.props.toggleArtistExpanded}
         queuedSongs={this.props.queuedSongs}
         starredSongs={this.props.starredSongs}
-        songs={this.props.songs}
         style={style}
       />
     )

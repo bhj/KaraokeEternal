@@ -76,7 +76,6 @@ class SearchResults extends React.Component<SearchResultsProps> {
       return (
         <ArtistItem
           artistId={artistId}
-          songs={this.props.songs}
           name={artist.name}
           numStars={this.props.starredArtistCounts[artistId] || 0}
           artistSongIds={artist.songIds} // "children"

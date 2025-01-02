@@ -14,7 +14,7 @@ import ui from './modules/ui'
 import user from './modules/user'
 import userStars from './modules/userStars'
 
-export interface LazyLoadedSlices {}
+export interface LazyLoadedSlices {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 const combinedReducer = combineSlices({
   artists,

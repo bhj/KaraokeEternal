@@ -48,6 +48,7 @@ const PathPrefs = () => {
       .then((res) => {
         dispatch(receivePrefs(res))
         setChoosing(false)
+        return
       }).catch((err) => {
         alert(err)
       })
@@ -65,6 +66,7 @@ const PathPrefs = () => {
     api('DELETE', `/${pathId}`)
       .then((res) => {
         dispatch(receivePrefs(res))
+        return
       }).catch((err) => {
         alert(err)
       })

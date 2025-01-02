@@ -28,19 +28,19 @@ const ACTION_HANDLERS = {
       payload,
     })
   },
-  [PLAYER_REQ_NEXT]: async (sock, { payload }) => {
+  [PLAYER_REQ_NEXT]: async (sock) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_NEXT,
     })
   },
-  [PLAYER_REQ_PAUSE]: async (sock, { payload }) => {
+  [PLAYER_REQ_PAUSE]: async (sock) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_PAUSE,
     })
   },
-  [PLAYER_REQ_PLAY]: async (sock, { payload }) => {
+  [PLAYER_REQ_PLAY]: async (sock) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_PLAY,
@@ -63,7 +63,7 @@ const ACTION_HANDLERS = {
       payload,
     })
   },
-  [PLAYER_EMIT_LEAVE]: async (sock, { payload }) => {
+  [PLAYER_EMIT_LEAVE]: async (sock) => {
     sock._lastPlayerStatus = null
 
     // any players left in room?

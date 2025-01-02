@@ -45,8 +45,8 @@ const store = configureStore({
 
 // @todo: this doesn't handle dynamically injected (lazy-loaded) reducers
 if (module.hot) {
-  module.hot.accept('./reducers', () => {
-    const combinedReducer = require('./reducers').default
+  module.hot.accept('./reducers', async () => {
+    const { default: combinedReducer } = await import('./reducers')
     store.replaceReducer(combinedReducer)
   })
 }

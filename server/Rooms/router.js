@@ -16,7 +16,7 @@ const PASSWORD_MIN_LENGTH = 5
 const STATUSES = ['open', 'closed']
 
 // list rooms
-router.get('/rooms', async (ctx, next) => {
+router.get('/rooms', async (ctx) => {
   // non-admins can only see open rooms
   const res = await Rooms.get(ctx.user.isAdmin)
 
@@ -29,7 +29,7 @@ router.get('/rooms', async (ctx, next) => {
 })
 
 // create room
-router.post('/rooms', async (ctx, next) => {
+router.post('/rooms', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -69,7 +69,7 @@ router.post('/rooms', async (ctx, next) => {
 })
 
 // update room
-router.put('/rooms/:roomId', async (ctx, next) => {
+router.put('/rooms/:roomId', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -115,7 +115,7 @@ router.put('/rooms/:roomId', async (ctx, next) => {
 })
 
 // remove room
-router.delete('/rooms/:roomId', async (ctx, next) => {
+router.delete('/rooms/:roomId', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }

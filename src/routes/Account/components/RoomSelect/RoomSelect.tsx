@@ -6,8 +6,8 @@ let passwordRef
 
 interface RoomSelectProps {
   className?: string
-  onSelectRef(...args: unknown[]): unknown
-  onPasswordRef(...args: unknown[]): unknown
+  onSelectRef(node: HTMLSelectElement): void
+  onPasswordRef(node: HTMLInputElement): void
 }
 
 const RoomSelect = (props: RoomSelectProps) => {
@@ -16,9 +16,9 @@ const RoomSelect = (props: RoomSelectProps) => {
   const [selectedRoomId, setSelectedRoomId] = useState('')
   const dispatch = useAppDispatch()
 
-  const handleSelectChange = useCallback((e) => { setSelectedRoomId(e.target.value) }, [])
-  const handleSelectRef = useCallback((r) => { onSelectRef(r) }, [onSelectRef])
-  const handlePasswordRef = useCallback((r) => {
+  const handleSelectChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => setSelectedRoomId(e.target.value), [])
+  const handleSelectRef = useCallback((r: HTMLSelectElement) => onSelectRef(r), [onSelectRef])
+  const handlePasswordRef = useCallback((r: HTMLInputElement) => {
     passwordRef = r
     onPasswordRef(r)
   }, [onPasswordRef])
@@ -30,9 +30,7 @@ const RoomSelect = (props: RoomSelectProps) => {
 
   // if there's only one open room, select it automatically
   useEffect(() => {
-    if (rooms.result.length === 1) {
-      setSelectedRoomId(String(rooms.result[0]))
-    }
+    if (rooms.result.length === 1) setSelectedRoomId(String(rooms.result[0]))
   }, [rooms])
 
   // focus room password when a room is manually selected

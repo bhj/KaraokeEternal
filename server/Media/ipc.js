@@ -4,7 +4,7 @@ import { MEDIA_ADD, MEDIA_CLEANUP, MEDIA_REMOVE, MEDIA_UPDATE } from '../../shar
 /**
  * IPC action handlers
  */
-export default function (io) {
+export default function () {
   return {
     [MEDIA_ADD]: async ({ payload }) => Media.add(payload),
     [MEDIA_CLEANUP]: Media.cleanup,

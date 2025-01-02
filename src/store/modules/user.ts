@@ -67,7 +67,7 @@ export const requestLogout = createAsyncThunk(
     try {
       // server response should clear our cookie
       await api('GET', 'logout')
-    } catch (err) {
+    } catch {
       // ignore errors
     }
 
@@ -129,7 +129,7 @@ export const fetchAccount = createAsyncThunk(
     try {
       const user = await api('GET', 'user')
       thunkAPI.dispatch(receiveAccount(user))
-    } catch (err) {
+    } catch {
       // ignore errors
     }
   },

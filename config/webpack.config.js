@@ -50,7 +50,6 @@ let config = {
       __KE_URL_LICENSE__: JSON.stringify('/licenses.txt'),
       __KE_URL_REPO__: JSON.stringify('https://www.karaoke-eternal.com/repo'),
       __KE_URL_SPONSOR__: JSON.stringify('https://www.karaoke-eternal.com/sponsor'),
-      __KE_COPYRIGHT__: JSON.stringify(`2019-${new Date().getFullYear()}`),
     })),
     new CaseSensitivePathsPlugin(),
     new MiniCssExtractPlugin({

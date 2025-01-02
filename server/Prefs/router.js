@@ -11,7 +11,7 @@ const log = getLogger('Prefs')
 const router = new KoaRouter({ prefix: '/api/prefs' })
 
 // get all prefs (including media paths)
-router.get('/', async (ctx, next) => {
+router.get('/', async (ctx) => {
   const prefs = await Prefs.get()
 
   // must be admin or firstrun
@@ -25,7 +25,7 @@ router.get('/', async (ctx, next) => {
 })
 
 // add a media path
-router.post('/path', async (ctx, next) => {
+router.post('/path', async (ctx) => {
   const dir = decodeURIComponent(ctx.query.dir)
 
   if (!ctx.user.isAdmin) {
@@ -52,7 +52,7 @@ router.post('/path', async (ctx, next) => {
 })
 
 // set media path preferences
-router.put('/path/:pathId', async (ctx, next) => {
+router.put('/path/:pathId', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -74,7 +74,7 @@ router.put('/path/:pathId', async (ctx, next) => {
 })
 
 // remove a media path
-router.delete('/path/:pathId', async (ctx, next) => {
+router.delete('/path/:pathId', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -103,7 +103,7 @@ router.delete('/path/:pathId', async (ctx, next) => {
 })
 
 // scan a media path
-router.get('/path/:pathId/scan', async (ctx, next) => {
+router.get('/path/:pathId/scan', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -119,7 +119,7 @@ router.get('/path/:pathId/scan', async (ctx, next) => {
 })
 
 // scan all media paths
-router.get('/paths/scan', async (ctx, next) => {
+router.get('/paths/scan', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -129,7 +129,7 @@ router.get('/paths/scan', async (ctx, next) => {
 })
 
 // stop scanning
-router.get('/paths/scan/stop', async (ctx, next) => {
+router.get('/paths/scan/stop', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -139,7 +139,7 @@ router.get('/paths/scan/stop', async (ctx, next) => {
 })
 
 // get folder listing for path browser
-router.get('/path/ls', async (ctx, next) => {
+router.get('/path/ls', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }

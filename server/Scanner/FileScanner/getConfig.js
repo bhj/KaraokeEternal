@@ -20,7 +20,7 @@ function getConfig (dir, baseDir) {
     } catch (err) {
       log.error(err)
     }
-  } catch (err) {
+  } catch {
     log.verbose('No parser config found: %s', dir)
   }
 

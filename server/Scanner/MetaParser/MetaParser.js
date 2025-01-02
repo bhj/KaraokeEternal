@@ -42,7 +42,8 @@ class MetaParser {
     // we accept parser config and JSON-e template items (both
     // user-supplied) in a flat object format; separate them here
     for (const [key, val] of Object.entries(userCfg)) {
-      parserCfgProps.includes(key) ? parserCfg[key] = val : template[key] = val
+      if (parserCfgProps.includes(key)) parserCfg[key] = val
+      else template[key] = val
     }
 
     const parser = getDefaultParser(parserCfg)

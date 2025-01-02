@@ -13,7 +13,7 @@ interface PathChooserProps {
 
 const PathChooser = (props: PathChooserProps) => {
   const { onCancel, onChoose, isVisible } = props
-  const listRef = useRef<HTMLDivElement>()
+  const listRef = useRef<HTMLDivElement>(null)
   const [pathInfo, setPathInfo] = useState({
     current: null,
     parent: null,

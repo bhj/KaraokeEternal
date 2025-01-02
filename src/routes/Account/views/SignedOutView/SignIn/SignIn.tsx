@@ -12,8 +12,8 @@ interface SignInProps {
 const SignIn = (props: SignInProps) => {
   const usernameRef = useRef(null)
   const passwordRef = useRef(null)
-  const roomSelectRefCB = useCallback((r) => { roomSelectRef = r }, [])
-  const roomPasswordRefCB = useCallback((r) => { roomPasswordRef = r }, [])
+  const roomSelectRefCB = useCallback(r => roomSelectRef = r, [])
+  const roomPasswordRefCB = useCallback(r => roomPasswordRef = r, [])
 
   const dispatch = useAppDispatch()
   const handleSubmit = useCallback((e) => {

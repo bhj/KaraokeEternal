@@ -67,11 +67,15 @@ const libraryReducer = createReducer(initialState, (builder) => {
     })
     .addCase(toggleArtistExpanded, (state, { payload }) => {
       const idx = state.expandedArtists.indexOf(payload)
-      idx === -1 ? state.expandedArtists.push(payload) : state.expandedArtists.splice(idx, 1)
+
+      if (idx === -1) state.expandedArtists.push(payload)
+      else state.expandedArtists.splice(idx, 1)
     })
     .addCase(toggleArtistResultExpanded, (state, { payload }) => {
       const idx = state.expandedArtistResults.indexOf(payload)
-      idx === -1 ? state.expandedArtistResults.push(payload) : state.expandedArtistResults.splice(idx, 1)
+
+      if (idx === -1) state.expandedArtistResults.push(payload)
+      else state.expandedArtistResults.splice(idx, 1)
     })
     .addCase(LIBRARY_PUSH, (state, { payload }) => ({
       ...state,

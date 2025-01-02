@@ -12,8 +12,8 @@ interface CreateProps {
 
 const Create = (props: CreateProps) => {
   const user = useAppSelector(state => state.user)
-  const roomSelectRefCB = useCallback((r) => { roomSelectRef = r }, [])
-  const roomPasswordRefCB = useCallback((r) => { roomPasswordRef = r }, [])
+  const roomSelectRefCB = useCallback(r => roomSelectRef = r, [])
+  const roomPasswordRefCB = useCallback(r => roomPasswordRef = r, [])
 
   const dispatch = useAppDispatch()
   const handleSubmit = useCallback((data) => {
