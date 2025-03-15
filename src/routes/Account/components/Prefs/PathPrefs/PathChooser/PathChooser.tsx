@@ -42,13 +42,13 @@ const PathChooser = (props: PathChooserProps) => {
 
   return (
     <Modal
-      isVisible={isVisible}
+      visible={isVisible}
       onClose={onCancel}
       title='Add Folder'
-      style={{
-        width: '90%',
-        height: '95%',
-      }}
+      // style={{
+      //   width: '90%',
+      //   height: '95%',
+      // }}
     >
       <div className={styles.container}>
         <div className={styles.folderCurrent}>

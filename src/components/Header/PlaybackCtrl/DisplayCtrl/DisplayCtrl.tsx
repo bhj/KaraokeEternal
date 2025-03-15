@@ -55,13 +55,13 @@ export default class DisplayCtrl extends React.Component<DisplayCtrlProps> {
   render () {
     return (
       <Modal
-        isVisible={this.props.isVisible}
+        visible={this.props.isVisible}
         onClose={this.props.onClose}
         title='Display'
         buttons={<button onClick={this.props.onClose}>Done</button>}
-        style={{
-          width: Math.max(320, this.props.ui.contentWidth * 0.66),
-        }}
+        // style={{
+        //   width: Math.max(320, this.props.ui.contentWidth * 0.66),
+        // }}
       >
         <div>
           <fieldset className={styles.visualizer}>

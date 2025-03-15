@@ -1,112 +1,20 @@
-.modalRoot {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-
-.modalOverlay {
-  background: rgba(0, 0, 0, 0.5);
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: -1;
-}
-
-.modal {
-  max-width: 800px;
-  display: inline-block;
-  text-align: left;
-  vertical-align: middle;
-  background: var(--bg-color);
-  box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.25);
-  margin: 1.2rem;
-  padding: 1.2rem;
-  position: relative;
-  overflow-y: auto;
-  /* end defaults */
-  background-clip: padding-box;
-  outline: none;
-}
-
-.modalContainer {
-  height: 100%;
-  outline: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  text-align: center;
-}
-
-.modalOverlay,
-.modal,
-.modalContainer {
-  animation-fill-mode: forwards !important;
-}
-
-.modalCloseButton {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  background-color: transparent;
-  display: flex;
-  /* end defaults */
-  border-radius: 0;
-  box-shadow: none;
-  color: var(--btn-active-bg-color);
-  width: auto;
-}
-
-@keyframes :global(react-responsive-modal-overlay-in) {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes :global(react-responsive-modal-overlay-out) {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes :global(react-responsive-modal-modal-in) {
-  0% {
-    transform: scale(0.96);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(100%);
-    opacity: 1;
-  }
-}
-
-@keyframes :global(react-responsive-modal-modal-out) {
-  0% {
-    transform: scale(100%);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.96);
-    opacity: 0;
-  }
-}
-
 .container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  opacity: 0;
+  color: var(--text-color);
+  background: var(--bg-color);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border: none;
+  max-width: 800px;
+  overflow-y: auto;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0);
+  
+  &[open] {
+    animation: fadeIn 0.15s forwards;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5);
+  }
 }
 
 .title {
@@ -124,4 +32,25 @@
 
 .buttons {
   margin-top: var(--container-padding);
+}
+
+/* .btnClose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background-color: transparent;
+  display: flex;
+
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--btn-active-bg-color);
+  width: auto;
+} */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

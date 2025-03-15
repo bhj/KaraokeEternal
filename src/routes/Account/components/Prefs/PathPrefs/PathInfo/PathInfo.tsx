@@ -22,10 +22,10 @@ const PathInfo = (props: PathInfoProps) => {
 
   return (
     <Modal
-      isVisible={props.isVisible}
+      visible={props.isVisible}
       onClose={props.onClose}
       title='Media Folder'
-      style={{ minWidth: '300px' }}
+      // style={{ minWidth: '300px' }}
     >
       <div>
         <p className={styles.path}>{props.path?.path}</p>

@@ -1,58 +1,58 @@
-import React from 'react'
-import { Modal as ResponsiveModal, ModalProps as ResponsiveModalProps } from 'react-responsive-modal'
+import React, { useEffect, useRef } from 'react'
+import clsx from 'clsx'
 import styles from './Modal.css'
 
 export type ModalProps = {
   buttons?: React.ReactNode
+  className?: string
   children?: React.ReactNode
-  isVisible: boolean
-  onClose: ResponsiveModalProps['onClose']
-  style?: object
+  visible?: boolean
+  onClose: () => void
   title: string
-} & Partial<ResponsiveModalProps>
+}
 
-const Modal = (props: ModalProps) => {
-  // disabling blockScroll for now due to
-  // https://github.com/pradel/react-responsive-modal/issues/468
+const Modal = ({ buttons, className, children, visible = true, onClose, title }: ModalProps) => {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    if (visible && dialogRef.current) {
+      dialogRef.current.showModal()
+    }
+  }, [visible])
+
+  const handleOutsideClick = (event: React.MouseEvent<HTMLDialogElement>) => {
+    if (event.target === dialogRef.current) {
+      onClose()
+    }
+  }
+
+  if (!visible) return null
+
   return (
-    <ResponsiveModal
-      blockScroll={false}
-      animationDuration={167}
-      open={props.isVisible}
-      onClose={props.onClose}
-      closeOnEsc
-      closeOnOverlayClick
-      classNames={{
-        root: styles.modalRoot,
-        overlay: styles.modalOverlay,
-        modal: styles.modal,
-        modalContainer: styles.modalContainer,
-        closeButton: styles.modalCloseButton,
-      }}
-      styles={{
-        modal: {
-          ...props.style,
-        },
+    <dialog
+      ref={dialogRef}
+      className={clsx(styles.container, className)}
+      onClick={handleOutsideClick}
+      onCancel={(e) => {
+        e.preventDefault()
+        onClose()
       }}
     >
-      <div className={styles.container}>
+      <div>
         <h1 className={styles.title}>
-          {props.title}
+          {title}
         </h1>
-
         <div className={styles.content}>
-          {props.children}
+          {children}
         </div>
-
-        {props.buttons
-        && (
+        {buttons && (
           <div className={styles.buttons}>
-            {props.buttons}
+            {buttons}
           </div>
         )}
       </div>
-    </ResponsiveModal>
+    </dialog>
   )
 }
 
-export default React.memo(Modal)
+export default Modal

@@ -49,13 +49,13 @@ const SongInfo = () => {
 
   return (
     <Modal
-      isVisible={isVisible}
+      visible={isVisible}
       onClose={handleCloseSongInfo}
       title='Song Info'
-      style={{
-        width: '90%',
-        height: '90%',
-      }}
+      // style={{
+      //   width: '90%',
+      //   height: '90%',
+      // }}
     >
       <div className={styles.container}>
         <p>

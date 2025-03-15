@@ -35,10 +35,10 @@ const EditUser = (props: EditUserProps) => {
 
   return (
     <Modal
-      isVisible={props.isVisible}
+      visible={props.isVisible}
       onClose={props.onClose}
       title={props.user ? props.user.username : 'Create User'}
-      style={{ minWidth: '300px' }}
+      // style={{ minWidth: '300px' }}
     >
       <AccountForm user={props.user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit} showRole>
         <br />

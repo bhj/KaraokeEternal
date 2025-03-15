@@ -66,13 +66,13 @@ const About = () => {
 
       <Modal
         title='Changelog & Sponsors'
-        isVisible={isChangelogVisible}
+        visible={isChangelogVisible}
         onClose={toggleChangelog}
-        focusTrapped={false}
-        style={{
-          width: '90%',
-          height: '90%',
-        }}
+        // focusTrapped={false}
+        // style={{
+        //   width: '90%',
+        //   height: '90%',
+        // }}
       >
         <div className={styles.changelogContainer}>
           <div className={styles.changelogContent}>
