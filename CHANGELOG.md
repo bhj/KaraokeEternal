@@ -5,6 +5,7 @@ Sponsored by: [candre23](https://github.com/candre23), [nellisdev](https://githu
 - Media folders can now be watched for changes and individually scanned
 - Added ZIP container support for MP3+G media
 - Usernames are no longer case sensitive (thanks **gazugafan**)
+- Fixed listing of drives on Windows due to removal of wmic
 
 ## v1.0.0 (2022-05-17)
 

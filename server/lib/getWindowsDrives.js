@@ -1,31 +1,18 @@
-import childProcess from 'child_process'
-const command = 'wmic logicaldisk get Caption, ProviderName'
-
-// sample output:
-//
-// Caption  ProviderName
-// C:
-// D:
-// E:       \\vboxsrv\Downloads
-// F:       \\vboxsrv\Karaoke
+import fs from 'fs'
 
 export default function () {
-  return new Promise((resolve, reject) => {
-    childProcess.exec(command, (err, stdout) => {
-      if (err) {
-        return reject(err)
-      }
-
-      // split to lines
-      const rows = stdout.split(/\r?\n/)
-
-      // first line is heading(s)
-      rows.shift()
-
-      resolve(rows.filter(r => !!r.trim()).map(r => ({
-        path: r.trim().substring(0, 2) + '\\',
-        label: r,
-      })))
-    })
+  const possibleDrives = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => `${letter}:\\`)
+  const existingDrives = possibleDrives.filter((drive) => {
+    try {
+      fs.accessSync(drive, fs.constants.R_OK)
+      return true
+    } catch {
+      return false
+    }
   })
+
+  return existingDrives.map(drive => ({
+    path: drive,
+    label: drive.substring(0, 2),
+  }))
 }

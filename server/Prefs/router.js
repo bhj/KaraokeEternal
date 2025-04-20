@@ -149,7 +149,7 @@ router.get('/path/ls', async (ctx) => {
   // windows is a special snowflake and gets an
   // extra top level of available drive letters
   if (dir === '' && process.platform === 'win32') {
-    const drives = await getWindowsDrives()
+    const drives = getWindowsDrives()
 
     ctx.body = {
       current: '',
