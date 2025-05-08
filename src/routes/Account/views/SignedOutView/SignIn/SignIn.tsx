@@ -1,36 +1,35 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import RoomSelect from '../../../components/RoomSelect/RoomSelect'
 import { login } from 'store/modules/user'
 import styles from './SignIn.css'
-let roomSelectRef, roomPasswordRef
 
 interface SignInProps {
-  onToggle(...args: unknown[]): unknown
+  onToggle: () => void
 }
 
-const SignIn = (props: SignInProps) => {
+const SignIn = ({ onToggle }: SignInProps) => {
   const usernameRef = useRef(null)
   const passwordRef = useRef(null)
-  const roomSelectRefCB = useCallback(r => roomSelectRef = r, [])
-  const roomPasswordRefCB = useCallback(r => roomPasswordRef = r, [])
-
+  const [roomCreds, setRoomCreds] = useState({ roomId: '', roomPassword: '' })
   const dispatch = useAppDispatch()
+
   const handleSubmit = useCallback((e) => {
     e.preventDefault()
+
     dispatch(login({
       username: usernameRef.current.value.trim(),
       password: passwordRef.current.value,
-      roomId: roomSelectRef.value,
-      roomPassword: roomPasswordRef ? roomPasswordRef.value : undefined,
+      roomId: roomCreds.roomId,
+      roomPassword: roomCreds.roomPassword,
     }))
-  }, [dispatch])
+  }, [dispatch, roomCreds])
 
   return (
     <>
       <div className={styles.heading}>
         <h2>Sign In</h2>
-        <span><a onClick={props.onToggle}>Don&rsquo;t have an account?</a></span>
+        <span><a onClick={onToggle}>Don&rsquo;t have an account?</a></span>
       </div>
 
       <form noValidate>
@@ -50,7 +49,7 @@ const SignIn = (props: SignInProps) => {
           className={styles.field}
         />
 
-        <RoomSelect onSelectRef={roomSelectRefCB} onPasswordRef={roomPasswordRefCB} />
+        <RoomSelect onChange={setRoomCreds} />
 
         <button onClick={handleSubmit} className='primary'>
           Sign In

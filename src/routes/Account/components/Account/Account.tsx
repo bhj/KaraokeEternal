@@ -34,8 +34,7 @@ const Account = () => {
         </p>
 
         <AccountForm user={user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit}>
-          {isDirty
-          && (
+          {isDirty && (
             <>
               <br />
               <input

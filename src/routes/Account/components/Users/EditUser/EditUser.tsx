@@ -8,19 +8,10 @@ import styles from './EditUser.css'
 
 interface EditUserProps {
   user?: User
-  isVisible: boolean
-  onClose(...args: unknown[]): unknown
+  onClose: () => void
 }
 
 const EditUser = (props: EditUserProps) => {
-  const [isDirty, setDirty] = useState(false)
-  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty), [])
-
-  // reset dirty flag when the editor "closes"
-  useEffect(() => {
-    if (props.isVisible === false) setDirty(false)
-  }, [props.isVisible])
-
   const dispatch = useAppDispatch()
   const handleSubmit = useCallback((data) => {
     if (props.user) dispatch(updateUser({ userId: props.user.userId, data }))
@@ -35,30 +26,26 @@ const EditUser = (props: EditUserProps) => {
 
   return (
     <Modal
-      visible={props.isVisible}
       onClose={props.onClose}
       title={props.user ? props.user.username : 'Create User'}
       // style={{ minWidth: '300px' }}
     >
-      <AccountForm user={props.user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit} showRole>
+      <AccountForm user={props.user} onSubmit={handleSubmit} showRole>
         <br />
-        {!props.user
-        && (
+        {!props.user && (
           <button className={`${styles.btn} primary`}>
             Create User
           </button>
         )}
 
-        {props.user && isDirty
-        && (
+        {props.user && (
           <button className={`${styles.btn} primary`}>
             Update User
           </button>
         )}
       </AccountForm>
 
-      {props.user
-      && (
+      {props.user && (
         <button onClick={handleRemoveClick} className={styles.btn}>
           Remove User
         </button>

@@ -7,6 +7,7 @@ import PlayerSocket from './Player/socket.js'
 import Prefs from './Prefs/Prefs.js'
 import PrefsSocket from './Prefs/socket.js'
 import Rooms from './Rooms/Rooms.js'
+import RoomsSocket from './Rooms/socket.js'
 import Queue from './Queue/Queue.js'
 import QueueSocket from './Queue/socket.js'
 
@@ -28,6 +29,7 @@ const handlers = {
   ...QueueSocket,
   ...PlayerSocket,
   ...PrefsSocket,
+  ...RoomsSocket,
 }
 
 const { verify: jwtVerify } = jsonWebToken

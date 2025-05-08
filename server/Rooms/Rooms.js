@@ -1,24 +1,47 @@
 import bcrypt from '../lib/bcrypt.js'
-import Database from '../lib/Database.js'
 import sql from 'sqlate'
+import Database from '../lib/Database.js'
+import { ValidationError } from '../lib/Errors.js'
 
 const { db } = Database
+const BCRYPT_ROUNDS = 12
+const NAME_MIN_LENGTH = 1
+const NAME_MAX_LENGTH = 50
+const PASSWORD_MIN_LENGTH = 5
+
+export const STATUSES = ['open', 'closed']
 
 class Rooms {
   /**
    * Get all rooms
    *
-   * @param  {Boolean}  closed  Whether to include rooms with status "closed"
+   * @param  {Object}
    * @return {Promise}
    */
-  static async get (closed = false) {
+  static async get (roomId, { status = ['open'], prefs = false }) {
     const result = []
     const entities = {}
-    const whereClause = closed ? sql`true` : sql`status = "open"`
+    const whereConditions = []
+    let whereClause = sql``
+
+    if (typeof roomId === 'number') {
+      whereConditions.push(sql`roomId = ${roomId}`)
+    }
+
+    if (status && status.length > 0) {
+      whereConditions.push(sql`status IN ${sql.tuple(status)}`)
+    }
+
+    if (whereConditions.length > 0) {
+      whereClause = sql`WHERE ${whereConditions.reduce((acc, curr, index) => {
+        if (index > 0) return sql`${acc} AND ${curr}`
+        return curr
+      })}`
+    }
 
     const query = sql`
       SELECT * FROM rooms
-      WHERE ${whereClause}
+      ${whereClause}
       ORDER BY dateCreated DESC
     `
     const res = await db.all(String(query), query.parameters)
@@ -26,13 +49,67 @@ class Rooms {
     res.forEach((row) => {
       row.dateCreated = parseInt(row.dateCreated, 10) // v1.0 schema used 'text' column
       row.hasPassword = !!row.password
+
+      if (prefs) {
+        const data = JSON.parse(row.data)
+        row.prefs = data.prefs ?? {}
+      }
+
       delete row.password
+      delete row.data
 
       result.push(row.roomId)
       entities[row.roomId] = row
     })
 
     return { result, entities }
+  }
+
+  static async set (roomId, room) {
+    const { name, password, status, prefs } = room
+    let query
+
+    if (!name || !name.trim() || name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+      throw new ValidationError(`Room name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
+    }
+
+    if (password && password.length < PASSWORD_MIN_LENGTH) {
+      throw new ValidationError(`Room password must have at least ${PASSWORD_MIN_LENGTH} characters`)
+    }
+
+    if (!status || !STATUSES.includes(status)) {
+      throw new ValidationError('Invalid room status')
+    }
+
+    if (typeof roomId === 'number') {
+      const passwordSql = typeof password === 'undefined'
+        // leave unchanged
+        ? sql``
+        // empty string unsets password
+        : sql`password = ${password === '' ? null : await bcrypt.hash(password, BCRYPT_ROUNDS)},`
+
+      query = sql`
+        UPDATE rooms
+        SET name = ${name},
+            ${passwordSql}
+            status = ${status},
+            data = json_set(data, '$.prefs', json(${JSON.stringify(prefs)}))
+        WHERE roomId = ${roomId}
+      `
+    } else {
+      query = sql`
+        INSERT INTO rooms (name, password, status, dateCreated, data)
+        VALUES (
+          ${name},
+          ${typeof password === 'undefined' ? null : await bcrypt.hash(password, BCRYPT_ROUNDS)},
+          ${status},
+          ${Math.floor(Date.now() / 1000)},
+          json_set('{}', '$.prefs', json(${JSON.stringify(prefs)}))
+        )
+      `
+    }
+
+    return await db.run(String(query), query.parameters)
   }
 
   /**

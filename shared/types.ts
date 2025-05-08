@@ -33,6 +33,15 @@ export interface OptimisticQueueItem {
   songId: number
 }
 
+export interface IRoomPrefs {
+  qr: {
+    isEnabled: boolean
+    opacity: number
+    password: string
+    size: number
+  }
+}
+
 export interface Room {
   roomId: number
   name: string
@@ -40,6 +49,7 @@ export interface Room {
   dateCreated: number
   hasPassword: boolean
   numUsers: number
+  prefs?: IRoomPrefs
 }
 
 export interface Path {

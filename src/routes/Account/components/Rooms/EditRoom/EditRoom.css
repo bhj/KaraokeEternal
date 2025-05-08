@@ -9,3 +9,7 @@
 .field {
   margin-bottom: var(--input-margin);
 }
+
+.modal {
+  min-width: 360px;
+}

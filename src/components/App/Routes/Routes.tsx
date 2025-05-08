@@ -34,7 +34,18 @@ const AppRoutes = () => (
         </RequireAuth>
       )}
     />
-    <Route path='/' element={<Navigate to='/library' />} />
+    <Route
+      path='/'
+      element={(
+        <Navigate
+          to={{
+            pathname: '/library',
+            search: window.location.search, // pass through search params (e.g. roomId)
+          }}
+          replace
+        />
+      )}
+    />
   </Routes>
 )
 

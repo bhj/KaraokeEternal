@@ -1,0 +1,20 @@
+.container {
+  position: absolute;
+  bottom: 3vh;
+  left: 3vh;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+
+  &.alternate {
+    left: unset;
+    right: 3vh;
+  }
+}
+
+.enterActive {
+  opacity: 1;
+}
+
+.exitActive {
+  opacity: 0;
+}

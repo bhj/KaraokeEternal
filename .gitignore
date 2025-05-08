@@ -12,3 +12,4 @@ node_modules/
 *.sqlite3-wal
 .hugo_build.lock
 .nova
+.vscode

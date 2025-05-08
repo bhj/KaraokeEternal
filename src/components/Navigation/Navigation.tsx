@@ -5,7 +5,7 @@ import styles from './Navigation.css'
 
 const Navigation = React.forwardRef<HTMLDivElement>((_, ref) => (
   <div className={`${styles.container} bg-blur`} ref={ref}>
-    <NavLink to='/library' className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
+    <NavLink to='/library' replace className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
       <Button
         animateClassName={styles.btnAnimate}
         className={styles.shadow}
@@ -13,7 +13,7 @@ const Navigation = React.forwardRef<HTMLDivElement>((_, ref) => (
         size={42}
       />
     </NavLink>
-    <NavLink to='/queue' className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
+    <NavLink to='/queue' replace className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
       <Button
         animateClassName={styles.btnAnimate}
         className={styles.shadow}
@@ -21,7 +21,7 @@ const Navigation = React.forwardRef<HTMLDivElement>((_, ref) => (
         size={42}
       />
     </NavLink>
-    <NavLink to='/account' className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
+    <NavLink to='/account' replace className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
       <Button
         animateClassName={styles.btnAnimate}
         className={styles.shadow}

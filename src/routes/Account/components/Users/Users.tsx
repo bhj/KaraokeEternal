@@ -16,11 +16,12 @@ const Users = () => {
 
   const dispatch = useAppDispatch()
   const handleClose = useCallback(() => dispatch(closeUserEditor()), [dispatch])
-  const handleFilterChange = useCallback((e) => {
+  const handleFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === 'all') dispatch(filterByOnline(false))
     else if (e.target.value === 'online') dispatch(filterByOnline(true))
     else dispatch(filterByRoom(parseInt(e.target.value, 10)))
   }, [dispatch])
+
   const handleOpen = useCallback((e) => {
     setEditorUser(users.entities[e.target.dataset.userId])
     dispatch(openUserEditor())
@@ -35,8 +36,7 @@ const Users = () => {
     const user = users.entities[userId]
     return (
       <tr key={userId}>
-        {userId === curUserId
-        && (
+        {userId === curUserId && (
           <td>
             <strong>{user.username}</strong>
             {' '}
@@ -45,8 +45,7 @@ const Users = () => {
             )
           </td>
         )}
-        {userId !== curUserId
-        && (
+        {userId !== curUserId && (
           <td>
             <a data-user-id={userId} onClick={handleOpen}>{user.username}</a>
             {' '}
@@ -96,7 +95,9 @@ const Users = () => {
           Create User
         </button>
 
-        <EditUser isVisible={isEditorOpen} onClose={handleClose} user={editorUser} />
+        {isEditorOpen && (
+          <EditUser onClose={handleClose} user={editorUser} />
+        )}
       </div>
     </div>
   )

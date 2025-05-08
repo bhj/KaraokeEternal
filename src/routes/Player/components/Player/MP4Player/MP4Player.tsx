@@ -79,6 +79,8 @@ class MP4Player extends React.Component<MP4PlayerProps> {
   handlePlay = () => this.props.onPlay()
 
   handleTimeUpdate = () => {
+    if (!this.video.current) return
+
     this.props.onStatus({
       position: this.video.current.currentTime,
     })

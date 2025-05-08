@@ -37,8 +37,7 @@ const Rooms = () => {
         <td><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
         <td>
           {room.status}
-          {room.numUsers > 0
-          && (
+          {room.numUsers > 0 && (
             <>
 &nbsp;
               <a data-room-id={roomId} onClick={handleFilterUsers}>
@@ -83,7 +82,7 @@ const Rooms = () => {
           Create Room
         </button>
 
-        <EditRoom isVisible={isEditorOpen} onClose={handleClose} room={editorRoom} />
+        {isEditorOpen && <EditRoom onClose={handleClose} room={editorRoom} />}
       </div>
     </div>
   )

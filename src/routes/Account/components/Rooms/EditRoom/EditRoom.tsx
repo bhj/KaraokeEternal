@@ -1,61 +1,84 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useRef, useState, useEffect } from 'react'
 import { useAppDispatch } from 'store/hooks'
-import { createRoom, updateRoom, removeRoom } from 'store/modules/rooms'
+import { createRoom, removeRoom, updateRoom, requestPrefsPush } from 'store/modules/rooms'
 import Modal from 'components/Modal/Modal'
-import { Room } from 'shared/types'
+import RoomPrefs from '../RoomPrefs/RoomPrefs'
+import type { Room, IRoomPrefs } from 'shared/types'
+import { getFormData } from 'lib/util'
 import styles from './EditRoom.css'
-
-let isPasswordDirty = false
 
 interface EditRoomProps {
   room?: Room
-  isVisible: boolean
-  onClose(...args: unknown[]): unknown
+  onClose: () => void
 }
 
-const EditRoom = (props: EditRoomProps) => {
+const EditRoom = ({ onClose, room }: EditRoomProps) => {
   const formRef = useRef(null)
+  const [prefs, setPrefs] = useState<IRoomPrefs>(room?.prefs || {} as IRoomPrefs)
+  const [isPasswordDirty, setIsPasswordDirty] = useState(false)
   const dispatch = useAppDispatch()
+
+  // Initialize prefs from room when component mounts or room changes
+  useEffect(() => {
+    if (room?.prefs) {
+      setPrefs(room.prefs)
+    }
+  }, [room])
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault()
 
-    const data = new FormData(formRef.current)
-    data.set('status', data.get('status') ? 'open' : 'closed')
+    const data = getFormData(new FormData(formRef.current)) as Record<string, string | IRoomPrefs>
+    data.status = data.status ? 'open' : 'closed'
+    data.prefs = prefs
 
-    if (props.room) {
-      if (!isPasswordDirty) data.delete('password')
-      dispatch(updateRoom({ roomId: props.room.roomId, data }))
+    if (room) {
+      if (!isPasswordDirty) delete data.password
+      dispatch(updateRoom({ roomId: room.roomId, data }))
     } else {
+      if (!data.password) delete data.password
       dispatch(createRoom(data))
     }
-  }, [dispatch, props.room])
+  }, [dispatch, prefs, room, isPasswordDirty])
 
   const handleRemoveClick = useCallback(() => {
-    if (confirm(`Remove room "${props.room.name}" and its queue?`)) {
-      dispatch(removeRoom(props.room.roomId))
+    if (room && confirm(`Remove room "${room.name}" and its queue?`)) {
+      dispatch(removeRoom(room.roomId))
     }
-  }, [dispatch, props.room])
+  }, [dispatch, room])
 
-  // reset dirty flag when the editor "closes"
-  useEffect(() => {
-    if (props.isVisible === false) isPasswordDirty = false
-  }, [props.isVisible])
+  const handlePrefsChange = useCallback((newPrefs: IRoomPrefs) => {
+    setPrefs(newPrefs)
+    if (room) {
+      dispatch(requestPrefsPush(room.roomId, newPrefs))
+    }
+  }, [dispatch, room])
+
+  const handleClose = useCallback(() => {
+    // emit initial prefs
+    if (room) {
+      dispatch(requestPrefsPush(room.roomId, room.prefs))
+    }
+    onClose()
+  }, [dispatch, onClose, room])
+
+  const handlePasswordChange = useCallback(() => {
+    setIsPasswordDirty(true)
+  }, [])
 
   return (
     <Modal
-      isVisible={props.isVisible}
-      onClose={props.onClose}
-      title={props.room ? 'Edit Room' : 'Create Room'}
-      style={{ minWidth: '300px' }}
+      onClose={handleClose}
+      title={room ? 'Edit Room' : 'Create Room'}
+      className={styles.modal}
     >
       <form onSubmit={handleSubmit} ref={formRef} className={styles.form}>
         <input
           type='text'
           autoComplete='off'
-          autoFocus={typeof props.room === 'undefined'}
+          autoFocus={typeof room === 'undefined'}
           className={styles.field}
-          defaultValue={props.room ? props.room.name : ''}
+          defaultValue={room ? room.name : ''}
           name='name'
           placeholder='room name'
         />
@@ -64,16 +87,17 @@ const EditRoom = (props: EditRoomProps) => {
           type='password'
           autoComplete='new-password'
           className={styles.field}
-          defaultValue={props.room && props.room.hasPassword ? '*'.repeat(32) : ''}
+          defaultValue={room && room.hasPassword ? '*'.repeat(32) : ''}
           name='password'
-          onChange={() => { isPasswordDirty = true }}
+          onChange={handlePasswordChange}
+          onFocus={e => e.target.select()}
           placeholder='room password (optional)'
         />
 
         <label>
           <input
             type='checkbox'
-            defaultChecked={!props.room || props.room.status === 'open'}
+            defaultChecked={!room || room.status === 'open'}
             name='status'
           />
            &nbsp;Open
@@ -81,18 +105,19 @@ const EditRoom = (props: EditRoomProps) => {
         <br />
         <br />
 
+        <RoomPrefs prefs={prefs} onChange={handlePrefsChange} />
+
         <button type='submit' className={`${styles.btn} primary`}>
-          {props.room ? 'Update Room' : 'Create Room'}
+          {room ? 'Update Room' : 'Create Room'}
         </button>
 
-        {props.room
-        && (
+        {room && (
           <button type='button' onClick={handleRemoveClick} className={styles.btn}>
             Remove Room
           </button>
         )}
 
-        <button type='button' onClick={props.onClose}>Cancel</button>
+        <button type='button' onClick={handleClose}>Cancel</button>
       </form>
     </Modal>
   )

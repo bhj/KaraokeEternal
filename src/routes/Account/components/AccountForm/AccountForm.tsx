@@ -64,8 +64,7 @@ export default class AccountForm extends Component<AccountFormProps> {
           className={styles.field}
         />
 
-        {this.state.isChangingPassword
-        && (
+        {this.state.isChangingPassword && (
           <input
             type='password'
             autoComplete='new-password'
@@ -91,18 +90,18 @@ export default class AccountForm extends Component<AccountFormProps> {
         </div>
 
         {this.props.showRole
-        && (
-          <select
-            defaultValue={isUser && this.props.user.isAdmin ? '1' : '0'}
-            onChange={this.updateDirty}
-            ref={(r) => { this.role = r }}
-            className={styles.field}
-          >
-            <option key='choose' value='' disabled>select role...</option>
-            <option key='std' value='0'>Standard</option>
-            <option key='admin' value='1'>Administrator</option>
-          </select>
-        )}
+          && (
+            <select
+              defaultValue={isUser && this.props.user.isAdmin ? '1' : '0'}
+              onChange={this.updateDirty}
+              ref={(r) => { this.role = r }}
+              className={styles.field}
+            >
+              <option key='choose' value='' disabled>select role...</option>
+              <option key='std' value='0'>Standard</option>
+              <option key='admin' value='1'>Administrator</option>
+            </select>
+          )}
 
         {this.props.children}
       </form>
@@ -137,7 +136,7 @@ export default class AccountForm extends Component<AccountFormProps> {
     this.props.onSubmit(data)
   }
 
-  handleUserImageChange = (blob) => {
+  handleUserImageChange = (blob: Blob) => {
     this.setState({
       userImage: blob,
       isDirty: true,

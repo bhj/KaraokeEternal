@@ -121,6 +121,7 @@
     "react-dom": "^18.3.1",
     "react-flip-toolkit": "^7.2.4",
     "react-highlight-words": "^0.21.0",
+    "react-qrcode-logo": "^3.0.0",
     "react-redux": "^9.2.0",
     "react-refresh": "^0.16.0",
     "react-router-dom": "^6.30.0",

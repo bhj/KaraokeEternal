@@ -2,8 +2,10 @@ import React, { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
+import PlayerQR from '../PlayerQR/PlayerQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus } from '../../modules/player'
+import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
 
 interface PlayerControllerProps {
@@ -16,6 +18,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   const player = useAppSelector(state => state.player)
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
   const prefs = useAppSelector(state => state.prefs)
+  const roomPrefs = useAppSelector(getRoomPrefs)
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
@@ -142,6 +145,13 @@ const PlayerController = (props: PlayerControllerProps) => {
         width={props.width}
         height={props.height}
       />
+      {roomPrefs?.qr?.isEnabled && (
+        <PlayerQR
+          height={props.height}
+          prefs={roomPrefs.qr}
+          queueItem={queueItem}
+        />
+      )}
     </>
   )
 }
