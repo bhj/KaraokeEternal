@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from 'react'
+import clsx from 'clsx'
 import Highlighter from 'react-highlight-words'
 import { useSwipeable } from 'react-swipeable'
+import Button from 'components/Button/Button'
 import Buttons from 'components/Buttons/Buttons'
 import Icon from 'components/Icon/Icon'
 import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
@@ -66,7 +68,7 @@ const SongItem = ({
     <div
       {...swipeHandlers}
       style={{ height: artist ? 60 : 44 }}
-      className={isQueued ? styles.containerQueued : styles.container}
+      className={clsx(styles.container, isQueued && styles.queued, isStarred && styles.starred, isExpanded && styles.expanded)}
     >
       <ToggleAnimation toggle={isQueued} className={styles.animateGlow}>
         <div className={styles.duration}>
@@ -89,17 +91,17 @@ const SongItem = ({
       </ToggleAnimation>
 
       <Buttons btnWidth={50} isExpanded={isExpanded}>
-        <div onClick={handleStarClick} className={`${styles.btn} ${styles.star}`}>
+        <Button onClick={handleStarClick} className={clsx(styles.btn, styles.star)}>
           <ToggleAnimation toggle={isStarred} className={styles.animateStar}>
-            <Icon size={44} icon='STAR_FULL' className={isStarred ? styles.starStarred : styles.star} />
+            <Icon size={44} icon='STAR_FULL' />
           </ToggleAnimation>
-          <div className={isStarred ? styles.starCountStarred : styles.starCount}>
+          <div className={styles.starCount}>
             {numStars || ''}
           </div>
-        </div>
-        <div onClick={handleInfoClick} className={styles.btn} data-hide>
-          <Icon size={44} icon='INFO_OUTLINE' className={`${styles.btn} ${styles.info}`} />
-        </div>
+        </Button>
+        <Button onClick={handleInfoClick} className={clsx(styles.btn, styles.info)} data-hide>
+          <Icon size={44} icon='INFO_OUTLINE' />
+        </Button>
       </Buttons>
     </div>
   )

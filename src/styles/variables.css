@@ -2,22 +2,43 @@
   --hue-blue: 209;
   --hue-pink: 270;
 
-  /* Defaults */
   --font-family: system-ui, sans-serif;
-  --font-family-custom: Raleway, system-ui, sans-serif;
+  --font-family-custom: system-ui, sans-serif;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-bold: 600;
+
+  --font-size-xs: 0.75rem;
+  --font-size-s: 1rem;
+  --font-size-m: 1.25rem;
+  --font-size-l: 1.5rem;
+  --font-size-xl: 2rem;
+
+  --icon-size-s: 1rem;
+  --icon-size-m: 1.5rem;
+  --icon-size-l: 2rem;
+  --icon-size-xl: 3rem;
+
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 32px;
+  --container-padding: 12px;
+
   --bg-color: #000;
-  --text-color: hsl(var(--hue-blue), 10%, 87%);
+  --text-color: hsl(var(--hue-blue), 10%, 85%);
   --link-color: hsl(var(--hue-blue), 92%, 69%);
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   --drop-shadow-filter: drop-shadow(0 2px 5px #222);
-  --container-padding: 10px;
   --btn-margin: 6px;
-  --border-radius: 5px;
+  --border-radius: 8px;
+  --focus-outline: 4px solid var(--btn-danger-bg-color);
 
   --input-color: #444;
   --input-placeholder-color: var(--btn-bg-color);
-  --input-bg-color: hsl(var(--hue-blue), 10%, 90%);
+  --input-bg-color: hsl(var(--hue-blue), 10%, 80%);
   --input-outline-color: hsl(var(--hue-blue), 90%, 50%);
   --input-margin: 7px;
 
@@ -81,11 +102,6 @@
 
   /* Account panels */
   --panel-bg-color: hsl(var(--hue-blue), 20%, 10%);
-  --panel-title-color: hsl(var(--hue-blue), 10%, 92%);
-  --panel-title-bg-color: hsl(var(--hue-blue), 5%, 30%);
-  --panel-title-size: 20px;
-  --panel-title-padding: 6px;
-  --panel-title-font: 300 20px var(--font-family-custom);
 
   /* PlaybackCtrl */
   --transport-btn-bg-color: var(--btn-danger-bg-color);
@@ -104,9 +120,6 @@
   --up-now-filter: none;
 
   /* <button> colors */
-  --btn-default-color: #333;
-  --btn-default-bg-color: hsl(var(--hue-blue), 10%, 75%);
-
   --btn-primary-color: #333;
   --btn-primary-bg-color: var(--btn-active-bg-color);
 

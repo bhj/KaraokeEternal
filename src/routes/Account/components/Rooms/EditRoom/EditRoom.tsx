@@ -1,10 +1,12 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createRoom, removeRoom, updateRoom, requestPrefsPush } from 'store/modules/rooms'
-import Modal from 'components/Modal/Modal'
-import RoomPrefs from '../RoomPrefs/RoomPrefs'
-import type { Room, IRoomPrefs } from 'shared/types'
 import { getFormData } from 'lib/util'
+import Button from 'components/Button/Button'
+import Modal from 'components/Modal/Modal'
+import UserPrefs from './UserPrefs/UserPrefs'
+import QRPrefs from './QRPrefs/QRPrefs'
+import type { Room, IRoomPrefs } from 'shared/types'
 import styles from './EditRoom.css'
 
 interface EditRoomProps {
@@ -14,22 +16,15 @@ interface EditRoomProps {
 
 const EditRoom = ({ onClose, room }: EditRoomProps) => {
   const formRef = useRef(null)
+  const [roomPassword, setRoomPassword] = useState(room && room.hasPassword ? '*'.repeat(32) : '')
   const [prefs, setPrefs] = useState<IRoomPrefs>(room?.prefs || {} as IRoomPrefs)
   const [isPasswordDirty, setIsPasswordDirty] = useState(false)
   const dispatch = useAppDispatch()
-
-  // Initialize prefs from room when component mounts or room changes
-  useEffect(() => {
-    if (room?.prefs) {
-      setPrefs(room.prefs)
-    }
-  }, [room])
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault()
 
     const data = getFormData(new FormData(formRef.current)) as Record<string, string | IRoomPrefs>
-    data.status = data.status ? 'open' : 'closed'
     data.prefs = prefs
 
     if (room) {
@@ -62,62 +57,70 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
     onClose()
   }, [dispatch, onClose, room])
 
-  const handlePasswordChange = useCallback(() => {
+  const handlePasswordChange = useCallback((e) => {
     setIsPasswordDirty(true)
+    setRoomPassword(e.target.value)
   }, [])
+
+  useEffect(() => {
+    if (room?.prefs) setPrefs(room.prefs)
+  }, [room])
 
   return (
     <Modal
+      className={styles.modal}
       onClose={handleClose}
       title={room ? 'Edit Room' : 'Create Room'}
-      className={styles.modal}
     >
       <form onSubmit={handleSubmit} ref={formRef} className={styles.form}>
-        <input
-          type='text'
-          autoComplete='off'
-          autoFocus={typeof room === 'undefined'}
-          className={styles.field}
-          defaultValue={room ? room.name : ''}
-          name='name'
-          placeholder='room name'
-        />
-
-        <input
-          type='password'
-          autoComplete='new-password'
-          className={styles.field}
-          defaultValue={room && room.hasPassword ? '*'.repeat(32) : ''}
-          name='password'
-          onChange={handlePasswordChange}
-          onFocus={e => e.target.select()}
-          placeholder='room password (optional)'
-        />
-
-        <label>
+        <div className={styles.fieldContainer}>
           <input
-            type='checkbox'
-            defaultChecked={!room || room.status === 'open'}
-            name='status'
+            type='text'
+            autoComplete='off'
+            defaultValue={room ? room.name : ''}
+            name='name'
+            placeholder='room name'
+            // https://github.com/facebook/react/issues/23301
+            ref={r => typeof room === 'undefined' ? r?.setAttribute('autofocus', 'true') : undefined}
           />
-           &nbsp;Open
-        </label>
-        <br />
-        <br />
 
-        <RoomPrefs prefs={prefs} onChange={handlePrefsChange} />
+          <input
+            type='password'
+            autoComplete='new-password'
+            value={roomPassword}
+            name='password'
+            onChange={handlePasswordChange}
+            onFocus={e => e.target.select()}
+            placeholder='room password (optional)'
+          />
 
-        <button type='submit' className={`${styles.btn} primary`}>
-          {room ? 'Update Room' : 'Create Room'}
-        </button>
+          <select
+            name='status'
+            defaultValue={room?.status ?? 'open'}
+          >
+            <option value='open'>Open</option>
+            <option value='closed'>Closed</option>
+          </select>
+        </div>
 
-        {room && (
-          <button type='button' onClick={handleRemoveClick} className={styles.btn}>
-            Remove Room
-          </button>
-        )}
+        <div className={styles.prefsContainer}>
+          <UserPrefs prefs={prefs} onChange={handlePrefsChange} />
+          <QRPrefs prefs={prefs} onChange={handlePrefsChange} roomPassword={roomPassword} roomPasswordDirty={isPasswordDirty} />
+        </div>
 
-        <button type='button' onClick={handleClose}>Cancel</button>
+        <div className={styles.btnContainer}>
+          <Button type='submit' variant='primary' className={styles.btn}>
+            {room ? 'Update Room' : 'Create Room'}
+          </Button>
+          {room && (
+            <Button onClick={handleRemoveClick} className={styles.btn} variant='danger'>
+              Remove Room
+            </Button>
+          )}
+          <Button onClick={handleClose} variant='default'>
+            Cancel
+          </Button>
+        </div>
       </form>
     </Modal>
   )

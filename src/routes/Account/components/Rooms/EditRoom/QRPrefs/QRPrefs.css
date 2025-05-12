@@ -1,0 +1,28 @@
+.heading  {
+  button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-s);
+    font-size: var(--font-size-s);  
+  }
+
+  svg {
+    height: var(--icon-size-m);
+  }
+}
+
+.slider {
+  margin: 0 1.25rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  padding: var(--space-m) var(--container-padding);
+}
+
+.hidden {
+  display: none;
+}

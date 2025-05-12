@@ -47,6 +47,7 @@ export function playerStatus (status = {}, deferEmit = false): AppThunk {
         isErrored: player.isErrored,
         isPlaying: player.isPlaying,
         isWebGLSupported: player.isWebGLSupported,
+        isVideoKeyingEnabled: player.isVideoKeyingEnabled,
         mediaType: player.mediaType,
         mp4Alpha: player.mp4Alpha,
         nextUserId: player.nextUserId,
@@ -97,6 +98,7 @@ interface playerState {
   isFetching: boolean
   isPlaying: boolean
   isPlayingNext: boolean
+  isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
   mediaType: string | null
   mp4Alpha: number
@@ -118,6 +120,7 @@ const initialState: playerState = {
   isFetching: false,
   isPlaying: false,
   isPlayingNext: false,
+  isVideoKeyingEnabled: false,
   isWebGLSupported: getWebGLSupport(),
   mediaType: null,
   mp4Alpha: 1,

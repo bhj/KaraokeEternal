@@ -26,8 +26,8 @@ const PathItem = ({ index, onInfo, onRefresh, path }: PathItemProps) => {
           style={provided.draggableProps.style}
           {...provided.draggableProps}
         >
-          <div {...provided.dragHandleProps}>
-            <Icon icon='DRAG_INDICATOR' size={24} className={styles.btnDrag} />
+          <div {...provided.dragHandleProps} tabIndex={-1}>
+            <Icon icon='DRAG_INDICATOR' className={styles.btnDrag} />
           </div>
           <div className={styles.pathName}>
             {path.path}
@@ -37,14 +37,12 @@ const PathItem = ({ index, onInfo, onRefresh, path }: PathItemProps) => {
             data-path-id={path.pathId}
             icon='REFRESH'
             onClick={handleRefresh}
-            size={32}
           />
           <Button
             className={styles.btnInfo}
             data-path-id={path.pathId}
             icon='INFO_OUTLINE'
             onClick={handleInfo}
-            size={32}
           />
         </div>
       )}

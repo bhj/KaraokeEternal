@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { useLocation } from 'react-router-dom'
+import clsx from 'clsx'
 import screenfull from 'screenfull'
 import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolume } from 'store/modules/status'
 import Button from 'components/Button/Button'
@@ -17,13 +18,13 @@ const handleFullscreen = () => {
 }
 
 const PlaybackCtrl = () => {
+  const [isDisplayCtrlVisible, setDisplayCtrlVisible] = useState(false)
+  const location = useLocation()
+  const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
+
   const isAdmin = useAppSelector(state => state.user.isAdmin)
   const isInRoom = useAppSelector(state => state.user.roomId !== null)
   const status = useAppSelector(state => state.status)
-  const ui = useAppSelector(state => state.ui)
-
-  const location = useLocation()
-  const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const dispatch = useAppDispatch()
   const handleOptions = useCallback(opts => dispatch(requestOptions(opts)), [dispatch])
@@ -32,7 +33,6 @@ const PlaybackCtrl = () => {
   const handlePlayNext = useCallback(() => dispatch(requestPlayNext()), [dispatch])
   const handleVolume = useCallback(val => dispatch(requestVolume(val)), [dispatch])
 
-  const [isDisplayCtrlVisible, setDisplayCtrlVisible] = useState(false)
   const toggleDisplayCtrl = useCallback(() => {
     setDisplayCtrlVisible(!isDisplayCtrlVisible)
   }, [isDisplayCtrlVisible])
@@ -45,18 +45,18 @@ const PlaybackCtrl = () => {
     <div className={styles.container}>
       <Button
         animateClassName={styles.btnAnimate}
-        className={status.isPlaying ? styles.pause : styles.play}
+        className={clsx(styles.btn, status.isPlaying ? styles.pause : styles.play)}
         icon={status.isPlaying ? 'PAUSE' : 'PLAY'}
         onClick={status.isPlaying ? handlePause : handlePlay}
-        size={44}
+        aria-label={status.isPlaying ? 'Pause' : 'Play'}
       />
 
       <Button
         animateClassName={styles.btnAnimate}
-        className={styles.next}
+        className={clsx(styles.btn, styles.next)}
         icon='PLAY_NEXT'
         onClick={handlePlayNext}
-        size={48}
+        aria-label='Play Next'
       />
 
       <VolumeSlider
@@ -65,35 +65,37 @@ const PlaybackCtrl = () => {
       />
 
       <Button
-        className={styles.displayCtrl}
+        className={clsx(styles.btn, styles.displayCtrl)}
         icon='TUNE'
         onClick={toggleDisplayCtrl}
         size={48}
+        aria-label='Display Options'
       />
 
       {isPlayer && screenfull.isEnabled && (
         <Button
-          className={styles.fullscreen}
+          className={clsx(styles.btn, styles.fullscreen)}
           icon='FULLSCREEN'
           onClick={handleFullscreen}
-          size={48}
+          aria-label='Enter Fullscreen'
         />
       )}
 
-      <DisplayCtrl
-        cdgAlpha={status.cdgAlpha}
-        cdgSize={status.cdgSize}
-        isVisible={isDisplayCtrlVisible}
-        isVisualizerEnabled={status.visualizer.isEnabled}
-        isWebGLSupported={status.isWebGLSupported}
-        mediaType={status.mediaType}
-        mp4Alpha={status.mp4Alpha}
-        onClose={toggleDisplayCtrl}
-        onRequestOptions={handleOptions}
-        sensitivity={status.visualizer.sensitivity}
-        ui={ui}
-        visualizerPresetName={status.visualizer.presetName}
-      />
+      {isDisplayCtrlVisible && (
+        <DisplayCtrl
+          cdgAlpha={status.cdgAlpha}
+          cdgSize={status.cdgSize}
+          isVideoKeyingEnabled={status.isVideoKeyingEnabled}
+          isVisualizerEnabled={status.visualizer.isEnabled}
+          isWebGLSupported={status.isWebGLSupported}
+          mediaType={status.mediaType}
+          mp4Alpha={status.mp4Alpha}
+          onClose={toggleDisplayCtrl}
+          onRequestOptions={handleOptions}
+          sensitivity={status.visualizer.sensitivity}
+          visualizerPresetName={status.visualizer.presetName}
+        />
+      )}
     </div>
   )
 }

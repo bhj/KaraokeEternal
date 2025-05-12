@@ -1,20 +1,31 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import Button from 'components/Button/Button'
 import PathItem from './PathItem/PathItem'
 import Modal from 'components/Modal/Modal'
 import HttpApi from 'lib/HttpApi'
 import styles from './PathChooser.css'
+
 const api = new HttpApi('prefs/path')
 
-interface PathChooserProps {
-  isVisible: boolean
-  onChoose(...args: unknown[]): unknown
-  onCancel(...args: unknown[]): unknown
+interface PathItemType {
+  label: string
+  path: string
 }
 
-const PathChooser = (props: PathChooserProps) => {
-  const { onCancel, onChoose, isVisible } = props
+interface PathInfoType {
+  current: string | null
+  parent: string | null | false
+  children: PathItemType[]
+}
+
+interface PathChooserProps {
+  onChoose(path: string | null, options: Record<string, unknown>): void
+  onCancel(): void
+}
+
+const PathChooser = ({ onCancel, onChoose }: PathChooserProps) => {
   const listRef = useRef<HTMLDivElement>(null)
-  const [pathInfo, setPathInfo] = useState({
+  const [pathInfo, setPathInfo] = useState<PathInfoType>({
     current: null,
     parent: null,
     children: [],
@@ -24,16 +35,17 @@ const PathChooser = (props: PathChooserProps) => {
     onChoose(pathInfo.current, {})
   }, [onChoose, pathInfo])
 
-  const ls = useCallback((dir) => {
+  const ls = useCallback((dir: string) => {
     api('GET', `/ls?dir=${encodeURIComponent(dir)}`)
       .then(res => setPathInfo(res))
       .catch(err => alert(err))
   }, [])
 
-  // get initial list when chooser first becomes visible
+  // get initial list on first mount
   useEffect(() => {
-    if (isVisible) ls(pathInfo.current ?? '.')
-  }, [isVisible, ls, pathInfo])
+    ls(pathInfo.current ?? '.')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // scroll to top when changing dirs
   useEffect(() => {
@@ -42,13 +54,20 @@ const PathChooser = (props: PathChooserProps) => {
 
   return (
     <Modal
-      visible={isVisible}
-      onClose={onCancel}
       title='Add Folder'
-      // style={{
-      //   width: '90%',
-      //   height: '95%',
-      // }}
+      className={styles.modal}
+      onClose={onCancel}
+      scrollable
+      buttons={(
+        <div className={styles.btnContainer}>
+          <Button onClick={onCancel} variant='default'>
+            Cancel
+          </Button>
+          <Button onClick={handleChoose} variant='primary'>
+            Add Folder
+          </Button>
+        </div>
+      )}
     >
       <div className={styles.container}>
         <div className={styles.folderCurrent}>
@@ -57,20 +76,11 @@ const PathChooser = (props: PathChooserProps) => {
 
         <div className={styles.folderList} ref={listRef}>
           {pathInfo.parent !== false
-          && <strong><PathItem path='..' onSelect={() => ls(pathInfo.parent)} /></strong>}
+            && <strong><PathItem path='..' onSelect={() => ls(pathInfo.parent as string)} /></strong>}
 
           {pathInfo.children.map((item, i) =>
             <PathItem key={i} path={item.label} onSelect={() => ls(item.path)} />,
           )}
-        </div>
-
-        <div className={styles.btnContainer}>
-          <button className='cancel' onClick={onCancel}>
-            Cancel
-          </button>
-          <button className='primary' onClick={handleChoose}>
-            Add Folder
-          </button>
         </div>
       </div>
     </Modal>

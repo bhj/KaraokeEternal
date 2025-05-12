@@ -1,18 +1,5 @@
-.container {
-  top: var(--container-padding);
-  background-color: var(--panel-bg-color);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-}
-
-.title {
-  margin: 0;
-  font: var(--panel-title-font);
-  padding: var(--panel-title-padding);
-  background-color: var(--panel-title-bg-color);
-  color: var(--panel-title-color);
-}
-
 .content {
-  padding: var(--container-padding);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }

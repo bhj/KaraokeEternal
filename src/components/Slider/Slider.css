@@ -1,0 +1,53 @@
+.container {
+  --track-height: 0.5rem;
+  --handle-height: 3rem;
+
+  height: var(--handle-height);
+  
+  &:global(.rc-slider) {
+    position: relative;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+  
+  &:global(.rc-slider) * {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+  
+  & :global(.rc-slider-rail) {
+    position: absolute;
+    height: var(--track-height);
+    top: calc(50% - (var(--track-height) / 2));
+    width: 100%;
+    background-color: var(--transport-volume-track-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+  }
+  
+  & :global(.rc-slider-track) {
+    position: absolute;
+    height: var(--track-height);
+    top: calc(50% - (var(--track-height) / 2));
+    left: 0;
+    border-radius: var(--border-radius);
+    background-color: var(--transport-volume-track-active-color);
+    filter: var(--transport-volume-track-active-filter);
+    cursor: pointer;
+  }
+}
+
+.handle {
+  cursor: pointer;
+  color: var(--btn-active-bg-color);
+  position: absolute;
+  touch-action: pan-x;
+  outline: none;
+
+  &:focus-visible {
+    outline: var(--focus-outline);
+  }
+
+  svg {
+    display: block;
+    height: var(--handle-height);
+  }
+}

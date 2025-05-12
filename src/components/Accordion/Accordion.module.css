@@ -1,0 +1,45 @@
+.container {
+  background: hsl(var(--hue-blue), 20%, 15%);
+  border-radius: var(--border-radius);
+  
+  &[data-expanded] {
+    .icon { 
+      transform: rotate(90deg);
+    }
+
+    .headingContainer {
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.headingContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: hsl(var(--hue-blue), 20%, 25%);
+  background-image: linear-gradient(135deg, hsl(var(--hue-blue), 20%, 25%) 0%, hsl(var(--hue-blue), 20%, 15%) 100%);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+
+  button {
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    
+    &:focus-visible {
+      outline: var(--focus-outline);
+    }
+  }
+
+  svg {
+    display: block;
+    height: var(--icon-size-l);
+  }
+}

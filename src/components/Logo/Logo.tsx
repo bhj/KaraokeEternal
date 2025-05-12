@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import styles from './Logo.css'
 
 interface LogoProps {
@@ -7,7 +8,7 @@ interface LogoProps {
 
 const Logo = (props: LogoProps) => {
   return (
-    <div className={`${styles.container} ${props.className}`}>
+    <div className={clsx(styles.container, props.className)}>
       <h1 className={styles.title}>
         Karaoke
         <span className={styles.eternal}>

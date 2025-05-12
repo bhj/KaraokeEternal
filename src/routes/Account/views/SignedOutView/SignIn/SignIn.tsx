@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
+import Button from 'components/Button/Button'
 import RoomSelect from '../../../components/RoomSelect/RoomSelect'
 import { login } from 'store/modules/user'
 import styles from './SignIn.css'
@@ -33,6 +34,8 @@ const SignIn = ({ onToggle }: SignInProps) => {
       </div>
 
       <form noValidate>
+        <RoomSelect onChange={setRoomCreds} />
+
         <input
           type='email'
           autoComplete='username'
@@ -48,12 +51,9 @@ const SignIn = ({ onToggle }: SignInProps) => {
           ref={passwordRef}
           className={styles.field}
         />
-
-        <RoomSelect onChange={setRoomCreds} />
-
-        <button onClick={handleSubmit} className='primary'>
+        <Button type='submit' onClick={handleSubmit} variant='primary'>
           Sign In
-        </button>
+        </Button>
       </form>
     </>
   )

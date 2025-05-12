@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import EditUser from './EditUser/EditUser'
-import { formatDateTime } from 'lib/dateTime'
 import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor } from '../../modules/users'
+import { formatDateTime } from 'lib/dateTime'
+import Panel from 'components/Panel/Panel'
+import Button from 'components/Button/Button'
+import EditUser from './EditUser/EditUser'
 import getUsers from '../../selectors/getUsers'
 import styles from './Users.css'
 
@@ -64,19 +66,22 @@ const Users = () => {
     .filter(roomId => !!rooms.entities[roomId].numUsers)
     .map(roomId => <option key={roomId} value={roomId}>{rooms.entities[roomId].name}</option>)
 
+  const userFilter = (
+    <select className={styles.usersFilter} onChange={handleFilterChange} value={filterOnline ? 'online' : filterRoomId || 'all'}>
+      <option key='all' value='all'>All</option>
+      <option key='online' value='online'>Online</option>
+      <optgroup label='Online in...'>
+        {roomOpts}
+      </optgroup>
+    </select>
+  )
+
   return (
-    <div className={styles.container}>
-      <div className={styles.titleContainer}>
-        <h1 className={styles.title}>Users</h1>
-        <select onChange={handleFilterChange} value={filterOnline ? 'online' : filterRoomId || 'all'}>
-          <option key='all' value='all'>All</option>
-          <option key='online' value='online'>Online</option>
-          <optgroup label='Online in...'>
-            {roomOpts}
-          </optgroup>
-        </select>
-      </div>
-      <div className={styles.content}>
+    <Panel
+      title='Users'
+      titleComponent={userFilter}
+    >
+      <>
         <table className={styles.table}>
           <thead>
             <tr>
@@ -91,15 +96,15 @@ const Users = () => {
         </table>
 
         <br />
-        <button onClick={handleOpen} className='primary'>
+        <Button onClick={handleOpen} variant='primary'>
           Create User
-        </button>
+        </Button>
 
         {isEditorOpen && (
           <EditUser onClose={handleClose} user={editorUser} />
         )}
-      </div>
-    </div>
+      </>
+    </Panel>
   )
 }
 

@@ -1,58 +1,55 @@
 import React, { useCallback } from 'react'
 import Modal from 'components/Modal/Modal'
+import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
+import Button from 'components/Button/Button'
 import styles from './PathInfo.css'
 import type { Path } from 'shared/types'
 
 interface PathInfoProps {
-  isVisible: boolean
   onClose: () => void
   onRemove: (pathId: number) => void
   onUpdate: (pathId: number, data: object) => void
   path: Path
 }
 
-const PathInfo = (props: PathInfoProps) => {
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    props.onUpdate(props.path.pathId, {
-      [e.target.name]: e.target.checked,
-    })
-  }, [props])
+const PathInfo = ({ onClose, onRemove, onUpdate, path }: PathInfoProps) => {
+  const handleChange = useCallback((data: Record<string, boolean>) => {
+    onUpdate(path.pathId, data)
+  }, [onUpdate, path.pathId])
 
-  const handleRemove = useCallback(() => props.onRemove(props.path.pathId), [props])
+  const handleRemove = useCallback(() => onRemove(path.pathId), [onRemove, path.pathId])
 
   return (
     <Modal
-      visible={props.isVisible}
-      onClose={props.onClose}
+      onClose={onClose}
       title='Media Folder'
-      // style={{ minWidth: '300px' }}
+      buttons={(
+        <>
+          <Button onClick={handleRemove} variant='danger'>Remove Folder</Button>
+          <Button onClick={onClose} variant='primary'>Done</Button>
+        </>
+      )}
     >
       <div>
-        <p className={styles.path}>{props.path?.path}</p>
-        <p>
+        <p className={styles.path}>
+          {path?.path}
+          <br />
           <span className={styles.label}>pathId: </span>
-          {props.path?.pathId}
+          {path?.pathId}
         </p>
 
         <form className={styles.form}>
-          <label>
-            <input
-              type='checkbox'
-              defaultChecked={props.path?.prefs?.isWatchingEnabled}
-              name='isWatchingEnabled'
-              onChange={handleChange}
-            />
-             &nbsp;Watch folder
-          </label>
-          <br />
-          <br />
-          <br />
+          <InputCheckbox
+            label='Watch folder'
+            defaultChecked={path?.prefs?.isWatchingEnabled}
+            onChange={checked => handleChange({ isWatchingEnabled: checked })}
+          />
+          <InputCheckbox
+            label='Allow video background keying'
+            defaultChecked={path?.prefs?.isVideoKeyingEnabled}
+            onChange={checked => handleChange({ isVideoKeyingEnabled: checked })}
+          />
         </form>
-
-        <div className={styles.footer}>
-          <button type='button' onClick={handleRemove}>Remove Folder</button>
-          <button type='button' onClick={props.onClose}>Done</button>
-        </div>
       </div>
     </Modal>
   )

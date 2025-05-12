@@ -4,7 +4,7 @@ import icons from './icons'
 interface IconProps {
   className?: string
   icon: string
-  size: number
+  size?: number
 }
 
 const Icon = (props: IconProps) => {
@@ -12,9 +12,9 @@ const Icon = (props: IconProps) => {
 
   return (
     <svg
-      width={`${size}px`}
-      height={`${size}px`}
+      height={size ? `${size}px` : undefined}
       viewBox={icons[icon].viewBox}
+      aria-hidden
       {...restProps}
     >
       <path fill='currentColor' d={icons[icon].d} />

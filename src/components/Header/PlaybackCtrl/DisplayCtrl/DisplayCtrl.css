@@ -1,80 +1,81 @@
+.modal {
+  width: 90vw;
+  max-width: 480px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
 .section {
-  border: 1px solid var(--btn-bg-color);
-  border-radius: var(--border-radius);
-  margin-top: var(--container-padding);
+  /* Safari REALLY doesn't like fieldsets to be flex *items*, hence the .section wrapper */
+  fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    margin: 0;
+    padding: var(--container-padding);
+    border: 1px solid var(--btn-bg-color);
+    border-radius: var(--border-radius);
+  }
+
+  legend {
+    font-size: var(--font-size-m);
+    width: fit-content;
+   }
 }
 
-.visualizer {
-  composes: section;
+.visualizer legend {
+  label {
+    display: flex;
+    gap: var(--space-s);
+    align-items: center;
+    cursor: pointer;
+  }
 }
 
-.lyrics {
-  composes: section;
-}
-
-.visualizer legend,
-.lyrics legend {
-  margin-left: -.5em;
-}
-
-.visualizer legend label {
+.presetContainer {
   display: flex;
-  align-items: center;
-  cursor: pointer;
+  flex-direction: column;
+  gap: var(--space-s);
 }
 
-.visualizer legend input[type="checkbox"] {
-  margin-right: .25em;
-}
-
-.field {
-  display: block;
-  margin: 0.8em 0;
-  color: hsl(var(--hue-blue), 10%, 67%);
-}
-
-.lyrics label:first-of-type {
-  margin-top: .25rem;
-}
-
-.presetBtnContainer {
+.presetButtons {
   display: flex;
-  margin: .25rem 0 .5rem 0;
-  justify-content: space-between;
+  gap: var(--space-s);
+
+  button {
+    display: block;
+    background-color: var(--btn-active-bg-color);
+    border-radius: var(--border-radius);
+    width: 100%;
+
+    svg {
+      height: var(--icon-size-xl);
+      color: #000;
+    }
+  }
 }
 
-.btnPreset {
-  width: 30%;
-  display: block;
-  padding: 0;
-  background-color: var(--btn-active-bg-color);
-}
-
-.btnIcon {
-  color: var(--btn-base-blue);
-}
-
-.section legend label {
-  font-size: 18px;
-  padding: 0 .25em;
+.presetName {
+  margin: 0;
+  height: 2lh;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .unsupported {
   text-align: center;
-  margin: 1rem 0;
+  margin: var(--space-m) 0;
   color: grey;
 }
 
 .slider {
-  padding-bottom: 1em;
-  margin: 0 15px;
-}
-
-.handle {
-  cursor: pointer;
-  color: var(--btn-active-bg-color);
-  position: absolute;
-  top: -15px;
-  touch-action: 'pan-x';
-  outline: none;
+  margin: 0 1.25rem;
 }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import clsx from 'clsx'
 
 interface ToggleAnimationProps {
   toggle: boolean
@@ -22,7 +23,7 @@ export default class ToggleAnimation extends Component<ToggleAnimationProps> {
       return React.Children.map(this.props.children, (c) => {
         if (React.isValidElement<{ className: string, onAnimationEnd: () => void }>(c)) {
           return React.cloneElement(c, {
-            className: c.props.className + ' ' + this.props.className,
+            className: clsx(c.props.className, this.props.className),
             onAnimationEnd: this.handleAnimationEnd,
           })
         }

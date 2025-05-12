@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import clsx from 'clsx'
+import Button from 'components/Button/Button'
 import styles from './Modal.css'
 
 export type ModalProps = {
   buttons?: React.ReactNode
   className?: string
   children?: React.ReactNode
-  visible?: boolean
   onClose: () => void
+  scrollable?: boolean
   title: string
+  visible?: boolean
 }
 
-const Modal = ({ buttons, className, children, visible = true, onClose, title }: ModalProps) => {
+const Modal = ({ buttons, className, children, visible = true, onClose, scrollable, title }: ModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const isOutsideClick = useRef(false)
 
@@ -47,11 +49,12 @@ const Modal = ({ buttons, className, children, visible = true, onClose, title }:
       onMouseUp={handleMouseUp}
       onCancel={handleCancel}
     >
-      <div>
-        <h1 className={styles.title}>{title}</h1>
-        <div className={styles.content}>{children}</div>
-        {buttons && <div className={styles.buttons}>{buttons}</div>}
+      <div className={styles.titleContainer}>
+        <h1>{title}</h1>
+        <Button icon='CLEAR' className={styles.btnClose} onClick={onClose} aria-label='Close' />
       </div>
+      <div className={clsx(styles.content, scrollable && styles.scrollable)}>{children}</div>
+      {buttons && <div className={styles.buttons}>{buttons}</div>}
     </dialog>
   )
 }

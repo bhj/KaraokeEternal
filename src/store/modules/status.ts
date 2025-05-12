@@ -49,6 +49,7 @@ interface statusState {
   isErrored: boolean
   isPlayerPresent: boolean
   isPlaying: boolean
+  isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
   mediaType: string | null
   mp4Alpha: number
@@ -68,6 +69,7 @@ const initialState: statusState = {
   isErrored: false,
   isPlayerPresent: false,
   isPlaying: false,
+  isVideoKeyingEnabled: false,
   isWebGLSupported: false,
   mediaType: null,
   mp4Alpha: 1,

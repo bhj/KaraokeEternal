@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import UserImage from './UserImage/UserImage'
 import { User } from 'shared/types'
 import styles from './AccountForm.css'
@@ -12,145 +12,154 @@ interface AccountFormProps {
   user?: User
 }
 
-export default class AccountForm extends Component<AccountFormProps> {
-  username = null
-  newPassword = null
-  newPasswordConfirm = null
-  name = null
-  role = null
+const AccountForm = ({ children, onDirtyChange, onSubmit, showRole, user }: AccountFormProps) => {
+  const username = useRef<HTMLInputElement>(null)
+  const newPassword = useRef<HTMLInputElement>(null)
+  const newPasswordConfirm = useRef<HTMLInputElement>(null)
+  const name = useRef<HTMLInputElement>(null)
+  const role = useRef<HTMLSelectElement>(null)
 
-  state = {
+  const [state, setState] = useState({
     isDirty: false,
-    isChangingPassword: !this.props.user || this.props.user.userId === null,
-    userImage: undefined,
-  }
+    isChangingPassword: !user || user.userId === null,
+    userImage: undefined as Blob | undefined,
+  })
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.props.user && prevProps.user.dateUpdated !== this.props.user.dateUpdated) {
-      this.setState({ isDirty: false })
+  const isUser = user && user.userId !== null
+
+  useEffect(() => {
+    if (user && prevUser.current?.dateUpdated !== user.dateUpdated) {
+      setState(prev => ({ ...prev, isDirty: false }))
+    }
+  }, [user])
+
+  const prevUser = useRef<User | undefined>(undefined)
+  const prevIsDirty = useRef(state.isDirty)
+
+  useEffect(() => {
+    prevUser.current = user
+
+    if (onDirtyChange && prevIsDirty.current !== state.isDirty) {
+      onDirtyChange(state.isDirty)
     }
 
-    if (this.props.onDirtyChange && prevState.isDirty !== this.state.isDirty) {
-      this.props.onDirtyChange(this.state.isDirty)
-    }
+    prevIsDirty.current = state.isDirty
+  }, [user, state.isDirty, onDirtyChange])
+
+  const updateDirty = () => {
+    if (!user || user.userId === null) return
+
+    setState(prev => ({
+      ...prev,
+      isDirty: !!username.current?.value || !!newPassword.current?.value
+        || (name.current?.value !== user.name)
+        || (role.current && role.current.value !== (user.isAdmin ? '1' : '0')),
+      isChangingPassword: !!newPassword.current?.value,
+    }))
   }
 
-  render () {
-    const isUser = this.props.user && this.props.user.userId !== null
-
-    return (
-      <form
-        className={styles.container}
-        key={this.props.user?.dateUpdated}
-        noValidate
-        onSubmit={this.handleSubmit}
-      >
-        <input
-          type='email'
-          autoComplete='off'
-          autoFocus={!isUser}
-          onChange={this.updateDirty}
-          placeholder={isUser ? 'change username (optional)' : 'username or email'}
-          ref={(r) => { this.username = r }}
-          className={styles.field}
-        />
-
-        <input
-          type='password'
-          autoComplete='new-password'
-          onChange={this.updateDirty}
-          placeholder={isUser ? 'change password (optional)' : 'password'}
-          ref={(r) => { this.newPassword = r }}
-          className={styles.field}
-        />
-
-        {this.state.isChangingPassword && (
-          <input
-            type='password'
-            autoComplete='new-password'
-            placeholder={isUser ? 'new password confirm' : 'confirm password'}
-            ref={(r) => { this.newPasswordConfirm = r }}
-            className={styles.field}
-          />
-        )}
-
-        <div className={styles.userDisplayContainer}>
-          <UserImage
-            user={this.props.user}
-            onSelect={this.handleUserImageChange}
-          />
-          <input
-            type='text'
-            defaultValue={isUser ? this.props.user.name : ''}
-            onChange={this.updateDirty}
-            placeholder='display name'
-            ref={(r) => { this.name = r }}
-            className={`${styles.field} ${styles.name}`}
-          />
-        </div>
-
-        {this.props.showRole
-          && (
-            <select
-              defaultValue={isUser && this.props.user.isAdmin ? '1' : '0'}
-              onChange={this.updateDirty}
-              ref={(r) => { this.role = r }}
-              className={styles.field}
-            >
-              <option key='choose' value='' disabled>select role...</option>
-              <option key='std' value='0'>Standard</option>
-              <option key='admin' value='1'>Administrator</option>
-            </select>
-          )}
-
-        {this.props.children}
-      </form>
-    )
+  const handleUserImageChange = (blob: Blob) => {
+    setState(prev => ({
+      ...prev,
+      userImage: blob,
+      isDirty: true,
+    }))
   }
 
-  handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const data = new FormData()
 
-    if (this.name.value.trim()) {
-      data.append('name', this.name.value.trim())
+    if (name.current?.value.trim()) {
+      data.append('name', name.current.value.trim())
     }
 
-    if (this.username.value.trim()) {
-      data.append('username', this.username.value.trim())
+    if (username.current?.value.trim()) {
+      data.append('username', username.current.value.trim())
     }
 
-    if (this.state.isChangingPassword) {
-      data.append('newPassword', this.newPassword.value)
-      data.append('newPasswordConfirm', this.newPasswordConfirm.value)
+    if (state.isChangingPassword) {
+      data.append('newPassword', newPassword.current?.value || '')
+      data.append('newPasswordConfirm', newPasswordConfirm.current?.value || '')
     }
 
-    if (typeof this.state.userImage !== 'undefined') {
-      data.append('image', this.state.userImage)
+    if (typeof state.userImage !== 'undefined') {
+      data.append('image', state.userImage)
     }
 
-    if (this.role) {
-      data.append('role', this.role.value)
+    if (role.current) {
+      data.append('role', role.current.value)
     }
 
-    this.props.onSubmit(data)
+    onSubmit(data)
   }
 
-  handleUserImageChange = (blob: Blob) => {
-    this.setState({
-      userImage: blob,
-      isDirty: true,
-    })
-  }
+  return (
+    <form
+      className={styles.container}
+      key={user?.dateUpdated}
+      noValidate
+      onSubmit={handleSubmit}
+    >
+      <input
+        type='email'
+        autoComplete='off'
+        onChange={updateDirty}
+        placeholder={isUser ? 'change username (optional)' : 'username or email'}
+        // https://github.com/facebook/react/issues/23301
+        ref={(r) => {
+          if (r) username.current = r
+          if (!isUser) r?.setAttribute('autofocus', 'true')
+        }}
+      />
 
-  updateDirty = () => {
-    if (!this.props.user || this.props.user.userId === null) return
+      <input
+        type='password'
+        autoComplete='new-password'
+        onChange={updateDirty}
+        placeholder={isUser ? 'change password (optional)' : 'password'}
+        ref={newPassword}
+      />
 
-    this.setState({
-      isDirty: !!this.username.value || !!this.newPassword.value
-        || this.name.value !== this.props.user.name
-        || (this.role && this.role.value !== (this.props.user.isAdmin ? '1' : '0')),
-      isChangingPassword: !!this.newPassword.value,
-    })
-  }
+      {state.isChangingPassword && (
+        <input
+          type='password'
+          autoComplete='new-password'
+          placeholder={isUser ? 'new password confirm' : 'confirm password'}
+          ref={newPasswordConfirm}
+        />
+      )}
+
+      <div className={styles.userDisplayContainer}>
+        <UserImage
+          user={user}
+          onSelect={handleUserImageChange}
+        />
+        <input
+          type='text'
+          defaultValue={isUser ? user.name : ''}
+          onChange={updateDirty}
+          placeholder='display name'
+          ref={name}
+          className={styles.name}
+        />
+      </div>
+
+      {showRole && (
+        <select
+          defaultValue={isUser && user.isAdmin ? '1' : '0'}
+          onChange={updateDirty}
+          ref={role}
+        >
+          <option key='choose' value='' disabled>select role...</option>
+          <option key='std' value='0'>Standard</option>
+          <option key='admin' value='1'>Administrator</option>
+        </select>
+      )}
+
+      {children}
+    </form>
+  )
 }
+
+export default AccountForm

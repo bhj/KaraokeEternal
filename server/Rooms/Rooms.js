@@ -47,7 +47,10 @@ class Rooms {
     const res = await db.all(String(query), query.parameters)
 
     res.forEach((row) => {
-      row.dateCreated = parseInt(row.dateCreated, 10) // v1.0 schema used 'text' column
+      const data = JSON.parse(row.data)
+      row.prefs = data.prefs ?? {}
+      delete row.data
+
       row.hasPassword = !!row.password
 
       if (prefs) {
@@ -57,6 +60,8 @@ class Rooms {
 
       delete row.password
       delete row.data
+
+      row.dateCreated = parseInt(row.dateCreated, 10) // v1.0 schema used 'text' column
 
       result.push(row.roomId)
       entities[row.roomId] = row

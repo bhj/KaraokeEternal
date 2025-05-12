@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { formatDateTime } from 'lib/dateTime'
+import Panel from 'components/Panel/Panel'
+import Button from 'components/Button/Button'
 import EditRoom from './EditRoom/EditRoom'
 import { closeRoomEditor, fetchRooms, filterByStatus, openRoomEditor } from 'store/modules/rooms'
 import { filterByRoom } from '../../modules/users'
@@ -53,17 +55,17 @@ const Rooms = () => {
     )
   })
 
+  const roomsFilter = (
+    <select className={styles.roomsFilter} onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus as string}>
+      <option key='all' value='all'>All</option>
+      <option key='open' value='open'>Open</option>
+      <option key='closed' value='closed'>Closed</option>
+    </select>
+  )
+
   return (
-    <div className={styles.container}>
-      <div className={styles.titleContainer}>
-        <h1 className={styles.title}>Rooms</h1>
-        <select onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus as string}>
-          <option key='all' value='all'>All</option>
-          <option key='open' value='open'>Open</option>
-          <option key='closed' value='closed'>Closed</option>
-        </select>
-      </div>
-      <div className={styles.content}>
+    <Panel title='Rooms' titleComponent={roomsFilter}>
+      <>
         <table className={styles.table}>
           <thead>
             <tr>
@@ -78,13 +80,13 @@ const Rooms = () => {
         </table>
 
         <br />
-        <button onClick={handleOpen} className='primary'>
+        <Button onClick={handleOpen} variant='primary'>
           Create Room
-        </button>
+        </Button>
 
         {isEditorOpen && <EditRoom onClose={handleClose} room={editorRoom} />}
-      </div>
-    </div>
+      </>
+    </Panel>
   )
 }
 

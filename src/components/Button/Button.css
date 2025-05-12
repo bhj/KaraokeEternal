@@ -1,0 +1,46 @@
+.container {
+  background: transparent;
+  border: none;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: var(--focus-outline);
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.default,
+.primary,
+.danger {
+  padding: var(--space-m);
+  width: 100%;
+  color: var(--btn-default-color);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--box-shadow);
+  border-radius: var(--border-radius);
+}
+
+.default {
+  color: var(--text-color);
+  text-shadow: var(--text-shadow);
+  background-color: hsl(var(--hue-blue), 10%, 25%);
+  background-image: linear-gradient(180deg, hsl(var(--hue-blue),10%,30%) 0%, hsl(var(--hue-blue),10%,20%) 100%);
+}
+
+.primary {
+  color: hsl(var(--hue-blue), 10%, 15%);
+  background-color: var(--btn-primary-bg-color);
+  background-image: linear-gradient(180deg, hsl(var(--hue-blue),92%,60%) 0%, hsl(var(--hue-blue),92%,50%) 100%);
+}
+
+.danger {
+  color: var(--text-color);
+  text-shadow: var(--text-shadow);
+  background-color: var(--btn-danger-bg-color);
+  background-image: linear-gradient(180deg, hsl(var(--hue-pink), 62%, 50%) 0%, hsl(var(--hue-pink),62%,40%) 100%);
+}

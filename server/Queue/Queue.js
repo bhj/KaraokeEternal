@@ -47,12 +47,14 @@ class Queue {
     const result = []
     const entities = {}
     const map = new Map()
+    const pathData = new Map()
     let curQueueId = null
 
     const query = sql`
       SELECT queueId, songId, userId, prevQueueId,
         media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
         users.name AS userDisplayName, users.dateUpdated AS userDateUpdated,
+        paths.pathId, paths.data AS pathData,
         MAX(isPreferred) AS isPreferred
       FROM queue
         INNER JOIN users USING(userId)
@@ -65,12 +67,20 @@ class Queue {
     const rows = await db.all(String(query), query.parameters)
 
     for (const row of rows) {
+      if (!pathData.has(row.pathId)) {
+        pathData.set(row.pathId, JSON.parse(row.pathData))
+      }
+
+      const pathPrefs = pathData.get(row.pathId)?.prefs
+
       entities[row.queueId] = row
       entities[row.queueId].mediaType = this.getType(row.relPath)
+      entities[row.queueId].isVideoKeyingEnabled = !!pathPrefs?.isVideoKeyingEnabled
 
       // don't send over the wire
       delete entities[row.queueId].relPath
       delete entities[row.queueId].isPreferred
+      delete entities[row.queueId].pathData
 
       if (row.prevQueueId === null) {
         // found the first item

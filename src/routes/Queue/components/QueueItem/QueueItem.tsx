@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import clsx from 'clsx'
 import { useAppDispatch } from 'store/hooks'
 import { useSwipeable } from 'react-swipeable'
 import Button from 'components/Button/Button'
@@ -92,23 +93,23 @@ const QueueItem = ({
       style={{ backgroundSize: (isCurrent && pctPlayed < 2 ? 2 : pctPlayed) + '% 100%' }}
     >
       <div className={styles.content}>
-        <div className={`${styles.imageContainer} ${isPlayed ? styles.greyed : ''}`}>
+        <div className={clsx(styles.imageContainer, isPlayed && styles.greyed)}>
           <UserImage userId={userId} dateUpdated={userDateUpdated} height={72} className={styles.image} />
           <div className={styles.waitContainer}>
             {isUpcoming && (
-              <div className={`${styles.wait} ${isOwner ? styles.isOwner : ''}`}>
+              <div className={clsx(styles.wait, isOwner && styles.isOwner)}>
                 {wait}
               </div>
             )}
           </div>
         </div>
 
-        <div className={`${styles.primary} ${isPlayed ? styles.greyed : ''}`}>
+        <div className={clsx(styles.primary, isPlayed && styles.greyed)}>
           <div className={styles.innerPrimary}>
             <div className={styles.title}>{title}</div>
             <div className={styles.artist}>{artist}</div>
           </div>
-          <div className={`${styles.user} ${isOwner ? styles.isOwner : ''}`}>
+          <div className={clsx(styles.user, isOwner && styles.isOwner)}>
             {userDisplayName}
           </div>
         </div>
@@ -116,7 +117,7 @@ const QueueItem = ({
         <Buttons btnWidth={50} isExpanded={isExpanded}>
           {isErrored && (
             <Button
-              className={`${styles.btn} ${styles.danger}`}
+              className={clsx(styles.btn, styles.danger)}
               icon='INFO_OUTLINE'
               onClick={handleErrorInfoClick}
               size={44}
@@ -124,14 +125,14 @@ const QueueItem = ({
           )}
           <Button
             animateClassName={styles.animateStar}
-            className={`${styles.btn} ${isStarred ? styles.active : ''}`}
+            className={clsx(styles.btn, isStarred && styles.active)}
             icon='STAR_FULL'
             onClick={handleStarClick}
             size={44}
           />
           {isPlayed && (
             <Button
-              className={`${styles.btn} ${styles.active}`}
+              className={clsx(styles.btn, styles.active)}
               data-hide
               icon='REFRESH'
               onClick={handleRequeueClick}
@@ -140,7 +141,7 @@ const QueueItem = ({
           )}
           {isMovable && (
             <Button
-              className={`${styles.btn} ${styles.active}`}
+              className={clsx(styles.btn, styles.active)}
               data-hide
               icon='MOVE_TOP'
               onClick={handleMoveClick}
@@ -149,7 +150,7 @@ const QueueItem = ({
           )}
           {isInfoable && (
             <Button
-              className={`${styles.btn} ${styles.active}`}
+              className={clsx(styles.btn, styles.active)}
               data-hide
               icon='INFO_OUTLINE'
               onClick={handleInfoClick}
@@ -158,7 +159,7 @@ const QueueItem = ({
           )}
           {isRemovable && (
             <Button
-              className={`${styles.btn} ${styles.danger}`}
+              className={clsx(styles.btn, styles.danger)}
               data-hide
               icon='CLEAR'
               onClick={handleRemoveClick}
@@ -167,7 +168,7 @@ const QueueItem = ({
           )}
           {isSkippable && (
             <Button
-              className={`${styles.btn} ${styles.danger}`}
+              className={clsx(styles.btn, styles.danger)}
               data-hide
               icon='PLAY_NEXT'
               onClick={handleSkipClick}

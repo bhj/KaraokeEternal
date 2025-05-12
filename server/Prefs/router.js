@@ -69,8 +69,10 @@ router.put('/path/:pathId', async (ctx) => {
   const prefs = await Prefs.get()
   ctx.body = prefs
 
-  // (re)start watcher
-  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
+  // (re)start watcher?
+  if ('isWatchingEnabled' in ctx.request.body) {
+    process.emit(PREFS_PATHS_CHANGED, prefs.paths)
+  }
 })
 
 // remove a media path

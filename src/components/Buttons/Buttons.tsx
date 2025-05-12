@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import styles from './Buttons.css'
 
 interface ButtonsProps {
@@ -16,7 +17,7 @@ export default class Buttons extends React.Component<ButtonsProps> {
       if (React.isValidElement<{ className: string }>(c)) {
         if (c.props['data-hide'] && !this.props.isExpanded) {
           return React.cloneElement(c, {
-            className: c.props.className + ' ' + styles.btnHide,
+            className: clsx(c.props.className, styles.btnHide),
           })
         }
 
@@ -27,7 +28,7 @@ export default class Buttons extends React.Component<ButtonsProps> {
 
     return (
       <div
-        className={`${styles.container} ${this.props.className}`}
+        className={clsx(styles.container, this.props.className)}
         style={{ width: this.props.btnWidth * visible }}
       >
         {children}

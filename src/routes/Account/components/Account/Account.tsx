@@ -1,6 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react'
+import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { requestLogout, updateAccount } from 'store/modules/user'
+import Panel from 'components/Panel/Panel'
+import Button from 'components/Button/Button'
 import AccountForm from '../AccountForm/AccountForm'
 import styles from './Account.css'
 
@@ -11,7 +14,6 @@ const Account = () => {
   const [isDirty, setDirty] = useState(false)
 
   const dispatch = useAppDispatch()
-  const handleDirtyChange = useCallback(isDirty => setDirty(isDirty), [])
   const handleSignOut = useCallback(() => dispatch(requestLogout()), [dispatch])
   const handleSubmit = useCallback((data) => {
     if (!curPassword.current.value.trim()) {
@@ -25,15 +27,14 @@ const Account = () => {
   }, [dispatch])
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>My Account</h1>
-      <div className={styles.content}>
+    <Panel title='My Account' contentClassName={styles.content}>
+      <>
         <p>
-          Signed in as
+          Signed in as&nbsp;
           <strong>{user.username}</strong>
         </p>
 
-        <AccountForm user={user} onDirtyChange={handleDirtyChange} onSubmit={handleSubmit}>
+        <AccountForm user={user} onDirtyChange={setDirty} onSubmit={handleSubmit}>
           {isDirty && (
             <>
               <br />
@@ -43,18 +44,18 @@ const Account = () => {
                 placeholder='current password'
                 ref={curPassword}
               />
-              <button className={`primary ${styles.updateAccount}`}>
+              <Button type='submit' className={clsx('primary', styles.updateAccount)} variant='primary'>
                 Update Account
-              </button>
+              </Button>
             </>
           )}
         </AccountForm>
 
-        <button onClick={handleSignOut} className={styles.signOut}>
+        <Button onClick={handleSignOut} className={styles.signOut} variant='default'>
           Sign Out
-        </button>
-      </div>
-    </div>
+        </Button>
+      </>
+    </Panel>
   )
 }
 

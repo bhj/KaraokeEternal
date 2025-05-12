@@ -1,15 +1,25 @@
 .container {
   display: flex;
   align-items: center;
-}
 
-.containerQueued {
-  composes: container;
-  text-shadow: var(--queued-item-text-shadow);
-}
+  &.queued {
+    text-shadow: var(--queued-item-text-shadow);
 
-.containerQueued .title {
-  color: var(--queued-item-color);
+    .title {
+      color: var(--queued-item-color);
+    }
+  }
+
+  &.starred {
+    .star {
+      color: var(--song-item-btn-active-bg-color);
+      filter: var(--song-item-btn-active-filter);
+    }
+ 
+    .starCount {
+      color: var(--song-item-btn-active-color);
+    }
+  }
 }
 
 .animateGlow {
@@ -60,11 +70,6 @@
   height: var(--song-item-btn-height);
 }
 
-.starStarred {
-  color: var(--song-item-btn-active-bg-color);
-  filter: var(--song-item-btn-active-filter);
-}
-
 .starCount {
   position: relative;
   font-size: 13px;
@@ -72,11 +77,6 @@
   text-align: center;
   text-shadow: none;
   color: var(--text-color);
-}
-
-.starCountStarred {
-  composes: starCount;
-  color: var(--song-item-btn-active-color);
 }
 
 .animateStar {

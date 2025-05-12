@@ -4,6 +4,7 @@ import useResizeObserver from 'use-resize-observer'
 // global stylesheets should be imported before any
 // components that will import their own modular css
 import '../../../styles/global.css'
+import Button from 'components/Button/Button'
 import Header from 'components/Header/Header'
 import Navigation from 'components/Navigation/Navigation'
 import Modal from 'components/Modal/Modal'
@@ -43,10 +44,9 @@ const CoreLayout = () => {
         <Modal
           title='Oops...'
           onClose={closeError}
-          buttons={<button onClick={closeError}>OK</button>}
+          buttons={<Button variant='primary' onClick={closeError}>OK</Button>}
         >
-          {/* @ts-expect-error: non-standard but still-used style prop */}
-          <p style={{ '-webkit-user-select': 'text', 'userSelect': 'text' }}>
+          <p style={{ WebkitUserSelect: 'text', userSelect: 'text' }}>
             {ui.errorMessage}
           </p>
         </Modal>

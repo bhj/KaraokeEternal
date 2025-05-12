@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import styles from './ColorCycle.css'
 
 const framerate = 33 // ms
@@ -34,7 +35,7 @@ class ColorCycle extends React.Component<ColorCycleProps> {
     })
 
     return (
-      <div className={`${styles.container} ${this.props.className}`}>
+      <div className={clsx(styles.container, this.props.className)}>
         {text}
       </div>
     )

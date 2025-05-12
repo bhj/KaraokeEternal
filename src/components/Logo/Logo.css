@@ -9,6 +9,7 @@
   color: hsl(var(--hue-blue), 10%, 80%);
   display: inline-block;
   font-size: 200%;
+  font-weight: normal;
   text-transform: uppercase;
   margin: 0;
   text-shadow:

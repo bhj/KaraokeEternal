@@ -1,0 +1,41 @@
+.container {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+    background: var(--btn-bg-color);
+    color: var(--btn-bg-color);
+    width: 1.25em;
+    height: 1.25em;
+    border-radius: 0.15em;
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: var(--focus-outline);
+    }
+    
+    &::before {
+      content: "";
+      width: 0.65em;
+      height: 0.65em;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+      transform: scale(0);
+      background: #000;
+    }
+
+    &:checked {
+      background: var(--btn-active-bg-color);
+    }
+
+    &:checked::before {
+      transform: scale(1);
+    }
+  }
+}

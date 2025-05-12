@@ -1,13 +1,9 @@
 import React from 'react'
 import CDGPlayer from './CDGPlayer/CDGPlayer'
 import MP4Player from './MP4Player/MP4Player'
+import MP4AlphaPlayer from './MP4Player/MP4AlphaPlayer'
 import type { playerVisualizerState } from '../../modules/playerVisualizer'
 const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisualizer'))
-
-const players = {
-  CDGPlayer,
-  MP4Player,
-}
 
 interface PlayerProps {
   cdgAlpha: number
@@ -15,6 +11,7 @@ interface PlayerProps {
   isPlaying: boolean
   isVisible: boolean
   isReplayGainEnabled: boolean
+  isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
   mediaId?: number
   mediaKey?: number
@@ -111,14 +108,17 @@ class Player extends React.Component<PlayerProps> {
   render () {
     if (!this.props.isVisible || typeof this.props.mediaId !== 'number') return null
 
-    const PlayerComponent = players[this.props.mediaType.toUpperCase() + 'Player']
+    let PlayerComponent
+
+    if (this.props.mediaType === 'cdg') PlayerComponent = CDGPlayer
+    else if (this.props.mediaType === 'mp4') PlayerComponent = this.props.isVideoKeyingEnabled ? MP4AlphaPlayer : MP4Player
 
     if (typeof PlayerComponent === 'undefined') {
       this.props.onError(`No player for mediaType: ${this.props.mediaType}`)
       return null
     }
 
-    const isVisualizerActive = this.props.mediaType === 'cdg'
+    const isVisualizerActive = (this.props.mediaType === 'cdg' || this.props.isVideoKeyingEnabled)
       && this.props.isWebGLSupported
       && this.props.visualizer.isEnabled
       && this.state.visualizerAudioSourceNode

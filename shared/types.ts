@@ -24,6 +24,7 @@ export interface QueueItem {
   userDisplayName: string
   mediaType: 'cdg' | 'mp4'
   isOptimistic?: false
+  isVideoKeyingEnabled: boolean
 }
 
 export interface OptimisticQueueItem {
@@ -57,6 +58,7 @@ export interface Path {
   path: string
   priority: number
   prefs: {
+    isVideoKeyingEnabled: boolean
     isWatchingEnabled: boolean
   }
 }

@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createUser, removeUser, updateUser } from '../../../modules/users'
+import Button from 'components/Button/Button'
 import Modal from 'components/Modal/Modal'
 import AccountForm from '../../AccountForm/AccountForm'
 import { User } from 'shared/types'
@@ -26,32 +27,35 @@ const EditUser = (props: EditUserProps) => {
 
   return (
     <Modal
+      className={styles.modal}
       onClose={props.onClose}
       title={props.user ? props.user.username : 'Create User'}
-      // style={{ minWidth: '300px' }}
     >
       <AccountForm user={props.user} onSubmit={handleSubmit} showRole>
-        <br />
-        {!props.user && (
-          <button className={`${styles.btn} primary`}>
-            Create User
-          </button>
-        )}
+        <div className={styles.btnContainer}>
+          {!props.user && (
+            <Button type='submit' className={styles.btn} variant='primary'>
+              Create User
+            </Button>
+          )}
 
-        {props.user && (
-          <button className={`${styles.btn} primary`}>
-            Update User
-          </button>
-        )}
+          {props.user && (
+            <Button type='submit' className={styles.btn} variant='primary'>
+              Update User
+            </Button>
+          )}
+
+          {props.user && (
+            <Button onClick={handleRemoveClick} className={styles.btn} variant='danger'>
+              Remove User
+            </Button>
+          )}
+
+          <Button onClick={props.onClose} variant='default'>
+            Cancel
+          </Button>
+        </div>
       </AccountForm>
-
-      {props.user && (
-        <button onClick={handleRemoveClick} className={styles.btn}>
-          Remove User
-        </button>
-      )}
-
-      <button onClick={props.onClose}>Cancel</button>
     </Modal>
   )
 }

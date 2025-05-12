@@ -1,22 +1,3 @@
-.container {
-  background-color: var(--panel-bg-color);
-  border-radius: var(--border-radius);
-  margin: 10px 0;
-  overflow: hidden;
-}
-
-.title {
-  margin: 0;
-  font: var(--panel-title-font);
-  padding: var(--panel-title-padding);
-  background-color: var(--panel-title-bg-color);
-  color: var(--panel-title-color);
-}
-
-.content {
-  padding: var(--container-padding);
-}
-
 .content p {
   margin-top: 10px;
 }

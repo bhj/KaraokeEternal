@@ -7,12 +7,9 @@
   color: #777;
 }
 
-.form * {
-  cursor: pointer;
-}
-
-.footer {
+.form {
   display: flex;
   flex-direction: column;
-  gap: var(--input-margin);
+  gap: var(--space-m);
+  margin-bottom: var(--space-m);
 }

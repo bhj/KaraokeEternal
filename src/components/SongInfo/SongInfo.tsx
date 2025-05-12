@@ -1,5 +1,6 @@
 import React from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
+import Button from 'components/Button/Button'
 import Modal from 'components/Modal/Modal'
 import { formatDuration } from 'lib/dateTime'
 import { closeSongInfo, setPreferredSong } from 'store/modules/songInfo'
@@ -29,20 +30,20 @@ const SongInfo = () => {
         <br />
         <span className={styles.label}>Preferred: </span>
         {isPreferred
-        && (
-          <span>
-            <strong>Yes</strong>
+          && (
+            <span>
+              <strong>Yes</strong>
 &nbsp;
-            <a onClick={() => handleRemovePrefer(mediaId)}>(Unset)</a>
-          </span>
-        )}
+              <a onClick={() => handleRemovePrefer(mediaId)}>(Unset)</a>
+            </span>
+          )}
         {!isPreferred
-        && (
-          <span>
-            No&nbsp;
-            <a onClick={() => handlePrefer(mediaId)}>(Set)</a>
-          </span>
-        )}
+          && (
+            <span>
+              No&nbsp;
+              <a onClick={() => handlePrefer(mediaId)}>(Set)</a>
+            </span>
+          )}
       </div>
     )
   })
@@ -71,9 +72,9 @@ const SongInfo = () => {
         </div>
 
         <div>
-          <button className='primary' onClick={handleCloseSongInfo}>
+          <Button variant='primary' onClick={handleCloseSongInfo}>
             Done
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

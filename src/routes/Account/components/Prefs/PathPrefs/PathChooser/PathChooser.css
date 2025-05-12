@@ -1,7 +1,12 @@
+.modal {
+  width: 90%;
+  height: 95%;
+}
+
 .container {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .folderCurrent {
@@ -14,11 +19,11 @@
 
 .folderList {
   flex: 1;
-  margin: .5rem 0;
-  overflow: scroll;
+  margin: var(--space-s) 0;
+  overflow: auto;
 }
 
 .btnContainer {
   display: flex;
-  gap: .5em;
+  gap: var(--space-m);
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import styles from './TextOverlay.css'
 
 interface TextOverlayProps {
@@ -8,7 +9,7 @@ interface TextOverlayProps {
 
 export const TextOverlay = (props: TextOverlayProps) => (
   <div className={styles.container}>
-    <div className={`${styles.text} ${props.className}`}>
+    <div className={clsx(styles.text, props.className)}>
       {props.children}
     </div>
   </div>

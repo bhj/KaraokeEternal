@@ -11,7 +11,7 @@
 .backdrop {
   background-color: var(--chrome-bg-color);
   border-radius: var(--border-radius);
-  padding: 1rem 2rem;
+  padding: var(--space-m) var(--space-xl);
 }
 
 @supports (backdrop-filter: saturate(50%) blur(20px)) or (-webkit-backdrop-filter: saturate(50%) blur(20px)) {

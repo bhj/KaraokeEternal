@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
+import Button from 'components/Button/Button'
 import AccountForm from '../../../components/AccountForm/AccountForm'
 import RoomSelect from '../../../components/RoomSelect/RoomSelect'
 import { createAccount } from 'store/modules/user'
@@ -35,7 +36,7 @@ const Create = ({ onToggle }: CreateProps) => {
 
       <AccountForm user={user} onSubmit={handleSubmit}>
         <RoomSelect onChange={setRoomCreds} />
-        <button className='primary'>Create Account</button>
+        <Button type='submit' variant='primary'>Create Account</Button>
       </AccountForm>
     </>
   )

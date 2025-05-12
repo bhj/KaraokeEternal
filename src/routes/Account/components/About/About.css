@@ -1,20 +1,4 @@
-.container {
-  top: var(--container-padding);
-  background-color: var(--panel-bg-color);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-}
-
-.title {
-  background-color: var(--panel-title-bg-color);
-  font: var(--panel-title-font);
-  margin: 0;
-  padding: var(--panel-title-padding);
-  color: var(--panel-title-color);
-}
-
 .content {
-  padding: var(--container-padding);
   text-align: center;
 }
 
@@ -33,16 +17,10 @@
   text-decoration: underline;
 }
 
-.changelogContainer {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.changelogContent {
-  flex: 1;
-  margin: .5rem 0;
-  overflow: scroll;
+.changelog {
+  text-align: left;
+  width: 90%;
+  height: 90%;
 }
 
 .ghButtonContainer {

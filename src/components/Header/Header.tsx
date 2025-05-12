@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { RootState } from 'store/store'
 import { Routes, Route, useLocation } from 'react-router-dom'
@@ -62,7 +63,7 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   const cancelScan = useCallback(() => dispatch(requestScanStop()), [dispatch])
 
   return (
-    <div className={`${styles.container} bg-blur`} ref={ref}>
+    <div className={clsx(styles.container, 'bg-blur')} ref={ref}>
       {!isPlayer && isPlayerPresent
       && <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />}
 

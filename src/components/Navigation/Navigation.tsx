@@ -1,32 +1,30 @@
 import React from 'react'
+import clsx from 'clsx'
 import { NavLink } from 'react-router-dom'
 import Button from 'components/Button/Button'
 import styles from './Navigation.css'
 
 const Navigation = React.forwardRef<HTMLDivElement>((_, ref) => (
-  <div className={`${styles.container} bg-blur`} ref={ref}>
-    <NavLink to='/library' replace className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
+  <div className={clsx(styles.container, 'bg-blur')} ref={ref}>
+    <NavLink to='/library' replace className={({ isActive }) => clsx(isActive && styles.active)}>
       <Button
-        animateClassName={styles.btnAnimate}
-        className={styles.shadow}
         icon='NAV_LIBRARY'
-        size={42}
+        as='span'
+        animateClassName={styles.btnAnimate}
       />
     </NavLink>
-    <NavLink to='/queue' replace className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
+    <NavLink to='/queue' replace className={({ isActive }) => clsx(isActive && styles.active)}>
       <Button
-        animateClassName={styles.btnAnimate}
-        className={styles.shadow}
         icon='NAV_SUBSCRIPTIONS'
-        size={42}
+        as='span'
+        animateClassName={styles.btnAnimate}
       />
     </NavLink>
-    <NavLink to='/account' replace className={({ isActive }) => isActive ? styles.btnActive : styles.btn}>
+    <NavLink to='/account' replace className={({ isActive }) => clsx(isActive && styles.active)}>
       <Button
-        animateClassName={styles.btnAnimate}
-        className={styles.shadow}
         icon='NAV_ACCOUNT'
-        size={42}
+        as='span'
+        animateClassName={styles.btnAnimate}
       />
     </NavLink>
   </div>

@@ -57,6 +57,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       isAtQueueEnd: false,
       isPlaying: true,
       isPlayingNext: false,
+      isVideoKeyingEnabled: nextQueueItem.isVideoKeyingEnabled,
       mediaType: nextQueueItem.mediaType,
       position: 0,
       queueId: nextQueueItem.queueId,
@@ -119,6 +120,7 @@ const PlayerController = (props: PlayerControllerProps) => {
         isPlaying={player.isPlaying}
         isVisible={!!queueItem && !player.isErrored && !player.isAtQueueEnd}
         isReplayGainEnabled={prefs.isReplayGainEnabled}
+        isVideoKeyingEnabled={!!queueItem?.isVideoKeyingEnabled}
         isWebGLSupported={player.isWebGLSupported}
         mediaId={queueItem ? queueItem.mediaId : null}
         mediaKey={queueItem ? queueItem.queueId : null}

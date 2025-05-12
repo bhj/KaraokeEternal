@@ -1,5 +1,12 @@
-.btn {
-  margin-bottom: var(--input-margin);
+.modal {
+  min-width: 360px;
+}
+
+.btnContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  margin-top: var(--space-m);
 }
 
 .field {

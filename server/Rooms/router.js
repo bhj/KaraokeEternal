@@ -15,11 +15,16 @@ import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
 router.get('/:roomId?', async (ctx) => {
   const roomId = ctx.params.roomId ? parseInt(ctx.params.roomId, 10) : undefined
   const status = ctx.user.isAdmin ? STATUSES : undefined
-  const res = await Rooms.get(roomId, { status, prefs: ctx.user.isAdmin })
+  const res = await Rooms.get(roomId, { status })
 
   res.result.forEach((roomId) => {
-    const room = ctx.io.sockets.adapter.rooms.get(Rooms.prefix(roomId))
-    res.entities[roomId].numUsers = room ? room.size : 0
+    if (ctx.user.isAdmin) {
+      const room = ctx.io.sockets.adapter.rooms.get(Rooms.prefix(roomId))
+      res.entities[roomId].numUsers = room ? room.size : 0
+    } else {
+      // only pass the 'user' prefs key
+      res.entities[roomId].prefs = res.entities[roomId].prefs?.user ? { user: res.entities[roomId].prefs.user } : {}
+    }
   })
 
   ctx.body = res
@@ -40,7 +45,7 @@ router.post('/', async (ctx) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(null, { status: STATUSES, prefs: true })
+  ctx.body = await Rooms.get(null, { status: STATUSES })
 })
 
 // update room
@@ -64,13 +69,13 @@ router.put('/:roomId', async (ctx) => {
     if (sock?.user?.isAdmin && sock?.user.roomId === roomId) {
       ctx.io.to(sock.id).emit('action', {
         type: ROOM_PREFS_PUSH,
-        payload: await Rooms.get(roomId, { prefs: true }),
+        payload: await Rooms.get(roomId),
       })
     }
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(null, { status: STATUSES, prefs: true })
+  ctx.body = await Rooms.get(null, { status: STATUSES })
 })
 
 // remove room
@@ -102,7 +107,7 @@ router.delete('/:roomId', async (ctx) => {
   log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
 
   // send updated room list
-  ctx.body = await Rooms.get(null, { status: STATUSES, prefs: true })
+  ctx.body = await Rooms.get(null, { status: STATUSES })
 })
 
 export default router

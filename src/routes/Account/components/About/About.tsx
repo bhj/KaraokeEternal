@@ -1,7 +1,10 @@
 import React, { useCallback, useState } from 'react'
+import clsx from 'clsx'
+import Panel from 'components/Panel/Panel'
 import Icon from 'components/Icon/Icon'
 import Logo from 'components/Logo/Logo'
 import Modal from 'components/Modal/Modal'
+import Button from 'components/Button/Button'
 // @ts-expect-error: not worth configuring TS for this one weird import
 import html from '<PROJECT_ROOT>/CHANGELOG.md'
 import styles from './About.css'
@@ -9,13 +12,12 @@ import styles from './About.css'
 const curYear = new Date().getFullYear()
 
 const About = () => {
-  const [isChangelogVisible, setChangelogVisible] = useState(false)
-  const toggleChangelog = useCallback(() => setChangelogVisible(prevState => !prevState), [])
+  const [isChangelogOpen, setChangelogOpen] = useState(false)
+  const toggleChangelog = useCallback(() => setChangelogOpen(prevState => !prevState), [])
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>About</h1>
-      <div className={styles.content}>
+    <Panel title='About' contentClassName={styles.content}>
+      <>
         {/* @ts-expect-error: global via Webpack */}
         <a href={__KE_URL_HOME__} target='_blank' rel='noreferrer'>
           <Logo className={styles.logo} />
@@ -54,7 +56,7 @@ const About = () => {
             </a>
           </div>
 
-          <div className={`${styles.ghButton} ${styles.sponsor}`}>
+          <div className={clsx(styles.ghButton, styles.sponsor)}>
             {/* @ts-expect-error: global via Webpack */}
             <a href={__KE_URL_SPONSOR__} target='_blank' rel='noreferrer'>
               <Icon icon='GITHUB_SPONSOR' size={16} />
@@ -62,34 +64,27 @@ const About = () => {
             </a>
           </div>
         </div>
-      </div>
 
-      <Modal
-        title='Changelog & Sponsors'
-        visible={isChangelogVisible}
-        onClose={toggleChangelog}
-        // focusTrapped={false}
-        // style={{
-        //   width: '90%',
-        //   height: '90%',
-        // }}
-      >
-        <div className={styles.changelogContainer}>
-          <div className={styles.changelogContent}>
+        {isChangelogOpen && (
+          <Modal
+            title='Changelog & Sponsors'
+            className={styles.changelog}
+            onClose={toggleChangelog}
+            scrollable
+            buttons={(
+              <Button variant='primary' onClick={toggleChangelog}>
+                Done
+              </Button>
+            )}
+          >
             {/* @todo: without this anchor the changelog gets scrolled to
-                the first "real" link, even with focusTrapped=false */}
-            <a href=''></a>
-            <div dangerouslySetInnerHTML={{ __html: html }}>
-            </div>
-          </div>
-          <div>
-            <button className='primary' onClick={toggleChangelog}>
-              Done
-            </button>
-          </div>
-        </div>
-      </Modal>
-    </div>
+              the first "real" link, even with focusTrapped=false */}
+            <a href='' aria-hidden></a>
+            <div dangerouslySetInnerHTML={{ __html: html }} />
+          </Modal>
+        )}
+      </>
+    </Panel>
   )
 }
 

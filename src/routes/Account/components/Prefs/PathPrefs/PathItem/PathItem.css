@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   background-color: var(--panel-bg-color);
-  padding: 3px;
-  margin: 0 0 5px 0;
+  padding: var(--space-xs);
+  margin-bottom: var(--space-s);
   border-radius: var(--border-radius);
 }
 
@@ -12,21 +12,22 @@
   user-select: text;
   text-overflow: ellipsis;
   overflow: hidden;
+  direction: rtl;
+  text-align: left;
 }
 
 .btnDrag {
   cursor: grab;
   color: var(--btn-bg-color);
+  height: var(--icon-size-l);
 }
 
-.btnRefresh {
-  cursor: pointer;
-  color: var(--btn-active-bg-color);
-}
-
+.btnRefresh,
 .btnInfo {
-  cursor: pointer;
   color: var(--btn-active-bg-color);
+  padding: var(--space-xs);
+
+  svg {
+    height: var(--icon-size-l);
+  }
 }
-
-

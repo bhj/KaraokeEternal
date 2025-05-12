@@ -2,10 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import HttpApi from 'lib/HttpApi'
+import Accordion from 'components/Accordion/Accordion'
 import Icon from 'components/Icon/Icon'
 import PathChooser from './PathChooser/PathChooser'
 import PathInfo from './PathInfo/PathInfo'
 import PathItem from './PathItem/PathItem'
+import Button from 'components/Button/Button'
 import styles from './PathPrefs.css'
 import { receivePrefs, requestScan, requestScanAll, setPathPriority, setPathPrefs } from 'store/modules/prefs'
 import type { Path } from 'shared/types'
@@ -14,12 +16,10 @@ const api = new HttpApi('prefs/path')
 
 const PathPrefs = () => {
   const paths = useAppSelector(state => state.prefs.paths)
-  const [isExpanded, setExpanded] = useState(false)
   const [isChoosing, setChoosing] = useState(false)
   const [editingPath, setEditingPath] = useState<Path | null>(null)
   const [priority, setPriority] = useState(paths.result)
 
-  const toggleExpanded = useCallback(() => setExpanded(prevState => !prevState), [])
   const handleCloseChooser = useCallback(() => setChoosing(false), [])
   const handleOpenChooser = useCallback(() => setChoosing(true), [])
   const handleCloseInfo = useCallback(() => setEditingPath(null), [])
@@ -81,18 +81,16 @@ const PathPrefs = () => {
   const handleRefreshAll = useCallback(() => dispatch(requestScanAll()), [dispatch])
 
   return (
-    <div className={styles.container}>
-      <div className={styles.heading} onClick={toggleExpanded}>
-        <Icon icon='FOLDER_MUSIC' size={28} />
+    <Accordion headingComponent={(
+      <div className={styles.heading}>
+        <Icon icon='FOLDER_MUSIC' />
         <div className={styles.title}>Media Folders</div>
-        <div>
-          <Icon icon={isExpanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT'} size={24} />
-        </div>
       </div>
-
-      <div className={styles.content} style={{ display: isExpanded ? 'block' : 'none' }}>
+    )}
+    >
+      <div className={styles.content}>
         {paths.result.length === 0
-        && <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>}
+          && <p style={{ marginTop: 0 }}>Add a media folder to get started.</p>}
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId='droppable'>
             {provided => (
@@ -114,32 +112,33 @@ const PathPrefs = () => {
         </DragDropContext>
 
         <div className={styles.btnContainer}>
-          {paths.result.length > 0
-          && (
-            <button onClick={handleRefreshAll}>
+          {paths.result.length > 0 && (
+            <Button onClick={handleRefreshAll} variant='default'>
               Scan Folders
-            </button>
+            </Button>
           )}
-          <button className='primary' onClick={handleOpenChooser}>
+          <Button onClick={handleOpenChooser} variant='primary'>
             Add Folder
-          </button>
+          </Button>
         </div>
 
-        <PathChooser
-          isVisible={isChoosing}
-          onCancel={handleCloseChooser}
-          onChoose={handleAdd}
-        />
+        {isChoosing && (
+          <PathChooser
+            onCancel={handleCloseChooser}
+            onChoose={handleAdd}
+          />
+        )}
 
-        <PathInfo
-          isVisible={!!editingPath}
-          onClose={handleCloseInfo}
-          onRemove={handleRemove}
-          onUpdate={handleUpdate}
-          path={editingPath}
-        />
+        {!!editingPath && (
+          <PathInfo
+            onClose={handleCloseInfo}
+            onRemove={handleRemove}
+            onUpdate={handleUpdate}
+            path={editingPath}
+          />
+        )}
       </div>
-    </div>
+    </Accordion>
   )
 }
 

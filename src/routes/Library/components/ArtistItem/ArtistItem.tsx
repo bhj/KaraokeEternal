@@ -31,24 +31,21 @@ class ArtistItem extends React.Component<ArtistItemProps> {
         <div onClick={this.handleArtistClick} className={clsx(styles.container, isChildStarred && styles.hasStarred)}>
           <div className={styles.folderContainer}>
             <Icon icon='FOLDER' size={44} />
-            {props.isExpanded
-            && (
+            {props.isExpanded && (
               <div className={styles.iconChevron}>
                 <Icon icon='CHEVRON_DOWN' size={24} />
               </div>
             )}
-            {!props.isExpanded
-            && <div className={styles.count}>{props.artistSongIds.length}</div>}
+            {!props.isExpanded && <div className={styles.count}>{props.artistSongIds.length}</div>}
           </div>
           <ToggleAnimation toggle={isChildQueued} className={styles.animateGlow}>
-            <div className={`${styles.name} ${isChildQueued ? styles.isChildQueued : ''}`}>
+            <div className={clsx(styles.name, isChildQueued && styles.isChildQueued)}>
               <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
             </div>
           </ToggleAnimation>
         </div>
 
-        {props.isExpanded
-        && (
+        {props.isExpanded && (
           <SongList
             songIds={props.artistSongIds}
             showArtist={false}

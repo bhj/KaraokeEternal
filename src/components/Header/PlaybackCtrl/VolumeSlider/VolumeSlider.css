@@ -1,6 +1,6 @@
 .slider {
   width: 100%;
-  margin: -5px 34px 0 30px;
+  margin: 0 34px 0 30px;
 }
 
 .handle {
@@ -8,7 +8,14 @@
   color: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
   position: absolute;
-  top: -18px;
-  touch-action: 'pan-x';
+  touch-action: pan-x;
   outline: none;
+
+  &:focus-visible {
+    outline: var(--focus-outline);
+  }
+
+  svg {
+    height: var(--icon-size-xl);
+  }
 }

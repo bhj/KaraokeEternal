@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import Icon from 'components/Icon/Icon'
 import styles from './UserImage.css'
 
@@ -21,15 +22,14 @@ class UserImage extends React.Component<UserImageProps> {
     return (
       <>
         {(state.isLoading || state.isErrored) && props.height
-        && <Icon icon='ACCOUNT' size={props.height} className={styles.placeholder} />}
+          && <Icon icon='ACCOUNT' size={props.height} className={styles.placeholder} />}
 
-        {!state.isErrored
-        && (
+        {!state.isErrored && (
           <img
             src={`${document.baseURI}api/user/${props.userId}/image?v=${props.dateUpdated}`}
             onLoad={this.handleImgLoad}
             onError={this.handleImgError}
-            className={`${styles.image} ${props.className}`}
+            className={clsx(styles.image, props.className)}
             style={{
               display: state.isLoading ? 'none' : 'initial',
               height: props.height ? props.height : null,

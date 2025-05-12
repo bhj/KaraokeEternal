@@ -1,163 +1,189 @@
 import React from 'react'
-import { RootState } from 'store/store'
+import clsx from 'clsx'
 import Modal, { ModalProps } from 'components/Modal/Modal'
-import OptimisticSlider from 'components/OptimisticSlider/OptimisticSlider'
+import Button from 'components/Button/Button'
+import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
+import Slider from 'components/Slider/Slider'
 import Icon from 'components/Icon/Icon'
 import styles from './DisplayCtrl.css'
 
 interface DisplayCtrlProps {
   cdgAlpha: number
   cdgSize: number
-  isVisible: boolean
+  isVideoKeyingEnabled: boolean
   isVisualizerEnabled: boolean
   isWebGLSupported: boolean
   mediaType?: string
   mp4Alpha: number
   sensitivity: number
   visualizerPresetName: string
-  ui: RootState['ui']
   // actions
   onRequestOptions(...args: unknown[]): unknown
   onClose: ModalProps['onClose']
 }
 
-export default class DisplayCtrl extends React.Component<DisplayCtrlProps> {
-  checkbox = React.createRef<HTMLInputElement>()
-
-  handleAlpha = (val) => {
-    this.props.onRequestOptions({ [this.props.mediaType + 'Alpha']: val })
+const DisplayCtrl = ({
+  cdgAlpha,
+  cdgSize,
+  isVideoKeyingEnabled,
+  isVisualizerEnabled,
+  isWebGLSupported,
+  mediaType = '',
+  mp4Alpha,
+  sensitivity,
+  visualizerPresetName,
+  onRequestOptions,
+  onClose,
+}: DisplayCtrlProps) => {
+  const handleAlpha = (val: number) => {
+    onRequestOptions({ [mediaType + 'Alpha']: val })
   }
 
-  handleSensitivity = val => this.props.onRequestOptions({
+  const handleSensitivity = (val: number) => onRequestOptions({
     visualizer: { sensitivity: val },
   })
 
-  handleSize = (val) => {
-    this.props.onRequestOptions({ cdgSize: val })
+  const handleSize = (val: number) => {
+    onRequestOptions({ cdgSize: val })
   }
 
-  handleToggleVisualizer = () => this.props.onRequestOptions({
-    visualizer: { isEnabled: !this.props.isVisualizerEnabled },
+  const handleToggleVisualizer = () => onRequestOptions({
+    visualizer: { isEnabled: !isVisualizerEnabled },
   })
 
-  handlePresetNext = () => this.props.onRequestOptions({
+  const handlePresetNext = () => onRequestOptions({
     visualizer: { nextPreset: true },
   })
 
-  handlePresetPrev = () => this.props.onRequestOptions({
+  const handlePresetPrev = () => onRequestOptions({
     visualizer: { prevPreset: true },
   })
 
-  handlePresetRandom = () => this.props.onRequestOptions({
+  const handlePresetRandom = () => onRequestOptions({
     visualizer: { randomPreset: true },
   })
 
-  render () {
-    return (
-      <Modal
-        visible={this.props.isVisible}
-        onClose={this.props.onClose}
-        title='Display'
-        buttons={<button onClick={this.props.onClose}>Done</button>}
-        // style={{
-        //   width: Math.max(320, this.props.ui.contentWidth * 0.66),
-        // }}
-      >
-        <div>
-          <fieldset className={styles.visualizer}>
+  return (
+    <Modal
+      className={styles.modal}
+      onClose={onClose}
+      title='Display'
+      buttons={<Button variant='primary' onClick={onClose}>Done</Button>}
+    >
+      <div className={styles.container}>
+        <div className={clsx(styles.section, styles.visualizer)}>
+          <fieldset>
             <legend>
-              <label>
-                <input
-                  type='checkbox'
-                  checked={this.props.isVisualizerEnabled}
-                  disabled={!this.props.isWebGLSupported}
-                  onChange={this.handleToggleVisualizer}
-                  ref={this.checkbox}
-                />
-                {' '}
-                Visualizer
-              </label>
+              <InputCheckbox
+                label='Visualizer'
+                checked={isVisualizerEnabled}
+                disabled={!isWebGLSupported}
+                onChange={handleToggleVisualizer}
+              />
             </legend>
 
-            {this.props.isWebGLSupported && this.props.mediaType === 'cdg' && (
+            {isWebGLSupported && (mediaType === 'cdg' || isVideoKeyingEnabled) && (
               <>
-                <div className={styles.presetBtnContainer}>
-                  <button className={styles.btnPreset} onClick={this.handlePresetPrev}>
-                    <Icon icon='CHEVRON_LEFT' size={42} className={styles.btnIcon} />
-                  </button>
-                  <button className={styles.btnPreset} onClick={this.handlePresetRandom}>
-                    <Icon icon='DICE' size={48} className={styles.btnIcon} />
-                  </button>
-                  <button className={styles.btnPreset} onClick={this.handlePresetNext}>
-                    <Icon icon='CHEVRON_RIGHT' size={42} className={styles.btnIcon} />
-                  </button>
+                <div className={styles.presetContainer}>
+                  <div className={styles.presetButtons}>
+                    <Button
+                      onClick={handlePresetPrev}
+                      aria-label='Previous preset'
+                      aria-controls='visualizer-preset-name'
+                    >
+                      <Icon icon='CHEVRON_LEFT' />
+                    </Button>
+                    <Button
+                      onClick={handlePresetRandom}
+                      aria-label='Random preset'
+                      aria-controls='visualizer-preset-name'
+                    >
+                      <Icon icon='DICE' />
+                    </Button>
+                    <Button
+                      onClick={handlePresetNext}
+                      aria-label='Next preset'
+                      aria-controls='visualizer-preset-name'
+                    >
+                      <Icon icon='CHEVRON_RIGHT' />
+                    </Button>
+                  </div>
+                  <p
+                    id='visualizer-preset-name'
+                    className={styles.presetName}
+                    aria-live='polite'
+                  >
+                    {visualizerPresetName}
+                  </p>
                 </div>
-                <label>{this.props.visualizerPresetName}</label>
 
-                <label className={styles.field}>Sensitivity</label>
-                <OptimisticSlider
-                  min={0}
-                  max={2}
-                  step={0.01}
-                  value={this.props.sensitivity}
-                  onChange={this.handleSensitivity}
-                  handle={handle}
-                  className={styles.slider}
-                />
+                <div className={styles.field}>
+                  <label id='label-visualizer-sensitivity'>Sensitivity</label>
+                  <Slider
+                    min={0}
+                    max={2}
+                    step={0.01}
+                    value={sensitivity}
+                    onChange={handleSensitivity}
+                    className={styles.slider}
+                    aria-labelledby='label-visualizer-sensitivity'
+                  />
+                </div>
               </>
             )}
 
-            {this.props.isWebGLSupported && this.props.mediaType !== 'cdg'
-            && <p className={styles.unsupported}>Not available for this media type</p>}
+            {isWebGLSupported && mediaType !== 'cdg' && !isVideoKeyingEnabled
+              && <p className={styles.unsupported}>Not available for this media type</p>}
 
-            {!this.props.isWebGLSupported
-            && <p className={styles.unsupported}>WebGL not supported</p>}
+            {!isWebGLSupported
+              && <p className={styles.unsupported}>WebGL not supported</p>}
           </fieldset>
+        </div>
 
-          <fieldset className={styles.lyrics}>
+        <div className={clsx(styles.section, styles.lyrics)}>
+          <fieldset>
             <legend>
               <label>Lyrics</label>
             </legend>
 
-            {this.props.mediaType === 'cdg'
-            && (
-              <>
-                <label className={styles.field}>Size</label>
-                <OptimisticSlider
+            {mediaType === 'cdg' && (
+              <div className={styles.field}>
+                <label id='label-lyrics-size'>Size</label>
+                <Slider
                   min={0.6}
                   max={1}
                   step={0.01}
-                  value={this.props.cdgSize}
-                  onChange={this.handleSize}
-                  handle={handle}
+                  value={cdgSize}
+                  onChange={handleSize}
                   className={styles.slider}
+                  aria-labelledby='label-lyrics-size'
                 />
+              </div>
+            )}
 
-                <label className={styles.field}>Background</label>
-                <OptimisticSlider
+            {(mediaType === 'cdg' || isVideoKeyingEnabled) && (
+              <div className={styles.field}>
+                <label id='label-lyrics-background'>Background</label>
+                <Slider
                   min={0}
                   max={1}
                   step={0.01}
-                  value={this.props[this.props.mediaType + 'Alpha']}
-                  onChange={this.handleAlpha}
-                  handle={handle}
+                  value={mediaType === 'cdg' ? cdgAlpha : mp4Alpha}
+                  onChange={handleAlpha}
                   className={styles.slider}
+                  aria-labelledby='label-lyrics-background'
                 />
-              </>
+              </div>
             )}
 
-            {this.props.mediaType !== 'cdg' && <p className={styles.unsupported}>No options available</p>}
+            {mediaType !== 'cdg' && !isVideoKeyingEnabled && (
+              <p className={styles.unsupported}>No options available</p>
+            )}
           </fieldset>
         </div>
-      </Modal>
-    )
-  }
+      </div>
+    </Modal>
+  )
 }
 
-// slider handle/grabber
-const handle = (node) => {
-  // rc-slider passes a node (div) to which we add style and children
-  return React.cloneElement(node, { className: styles.handle }, (
-    <Icon icon='CIRCLE' size={36} />
-  ))
-}
+export default DisplayCtrl

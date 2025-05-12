@@ -5,36 +5,35 @@
 }
 
 .btn {
-  cursor: pointer;
   color: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
+
+  svg {
+    height: var(--icon-size-xl);
+  }
 }
 
 .btnAnimate {
   animation: var(--animation-btn-danger-activate);
 }
 
-.play {
-  composes: btn;
-}
-
+.play,
 .pause {
-  composes: btn;
+  svg {
+    height: 2.66rem;
+  }
 }
 
 .next {
-  composes: btn;
-  margin-left: 7px;
+  margin: 0 var(--space-s);
 }
 
 .displayCtrl {
-  composes: btn;
   color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }
 
 .fullscreen {
-  composes: btn;
   color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }

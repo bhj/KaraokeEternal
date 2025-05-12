@@ -1,24 +1,19 @@
-.container {
-  background-color: var(--panel-title-bg-color);
-  border-radius: var(--border-radius);
-  margin-top: var(--container-padding);
-}
+.heading  {
+  button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-s);
+    font-size: var(--font-size-m);
+  }
 
-.heading {
-  display: flex;
-  align-items: center;
-  padding: 3px 5px;
-  cursor: pointer;
-}
-
-.title {
-  flex: 1;
-  margin-left: 5px;
+  svg {
+    height: var(--icon-size-l);
+  }
 }
 
 .content {
   padding: var(--container-padding);
-  margin-left: 20px;
 }
 
 .content label {
