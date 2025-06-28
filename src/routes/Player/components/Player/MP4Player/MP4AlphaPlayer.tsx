@@ -18,13 +18,15 @@ interface MP4AlphaPlayerProps {
 }
 
 class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
-  canvas = React.createRef()
+  canvas = React.createRef<HTMLCanvasElement>()
   frameId = null
   video = document.createElement('video')
   state = {
     videoWidth: 0,
     videoHeight: 0,
   }
+
+  chroma: GLChroma
 
   componentDidMount () {
     this.props.onAudioElement(this.video)
@@ -37,8 +39,10 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
     this.video.ontimeupdate = this.handleTimeUpdate
     this.video.preload = 'auto'
 
-    this.chroma = new GLChroma(this.video, this.canvas.current)
-    this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
+    if (this.canvas.current) {
+      this.chroma = new GLChroma(this.video, this.canvas.current)
+      this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
+    }
 
     this.updateSources()
   }
@@ -116,14 +120,23 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   /*
   * <video> event handlers
   */
-  handleEnded = (el) => {
+  handleEnded = () => {
     this.props.onEnd()
     this.stopChroma()
   }
 
-  handleError = (el) => {
-    const { message, code } = el.target.error
-    this.props.onError(`${message} (code ${code})`)
+  handleError: OnErrorEventHandlerNonNull = (event, soruce, line, col, error) => {
+    if (typeof event === 'string') {
+      this.props.onError(event)
+      return
+    }
+
+    if (!error) {
+      this.props.onError('Unknown error occurred')
+      return
+    }
+
+    this.props.onError(error.message)
   }
 
   handlePlay = () => {

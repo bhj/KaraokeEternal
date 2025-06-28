@@ -9,6 +9,7 @@ import {
   PLAYER_STATUS,
   PLAYER_LEAVE,
 } from 'shared/actionTypes'
+import { MediaType, PlaybackOptions } from 'shared/types'
 
 // ------------------------------------
 // Actions
@@ -27,7 +28,7 @@ export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
   },
 }))
 
-export const requestOptions = createAction(PLAYER_REQ_OPTIONS, opts => ({
+export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOptions) => ({
   payload: opts,
   meta: {
     throttle: {
@@ -51,7 +52,7 @@ interface statusState {
   isPlaying: boolean
   isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
-  mediaType: string | null
+  mediaType: MediaType | null
   mp4Alpha: number
   nextUserId: number | null
   position: number

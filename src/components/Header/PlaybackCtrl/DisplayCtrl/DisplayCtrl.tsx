@@ -6,6 +6,7 @@ import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Slider from 'components/Slider/Slider'
 import Icon from 'components/Icon/Icon'
 import styles from './DisplayCtrl.css'
+import { MediaType, PlaybackOptions } from 'shared/types'
 
 interface DisplayCtrlProps {
   cdgAlpha: number
@@ -13,12 +14,12 @@ interface DisplayCtrlProps {
   isVideoKeyingEnabled: boolean
   isVisualizerEnabled: boolean
   isWebGLSupported: boolean
-  mediaType?: string
+  mediaType?: MediaType
   mp4Alpha: number
   sensitivity: number
   visualizerPresetName: string
   // actions
-  onRequestOptions(...args: unknown[]): unknown
+  onRequestOptions(opts: PlaybackOptions): unknown
   onClose: ModalProps['onClose']
 }
 
@@ -36,6 +37,7 @@ const DisplayCtrl = ({
   onClose,
 }: DisplayCtrlProps) => {
   const handleAlpha = (val: number) => {
+    if (mediaType === '') return
     onRequestOptions({ [mediaType + 'Alpha']: val })
   }
 

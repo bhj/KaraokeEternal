@@ -41,6 +41,10 @@ export interface IRoomPrefs {
     password: string
     size: number
   }
+  user?: {
+    isNewAllowed?: boolean
+    isGuestAllowed?: boolean
+  }
 }
 
 export interface Room {
@@ -71,3 +75,18 @@ export interface User {
   dateCreated: number
   dateUpdated: number
 }
+
+export interface PlaybackOptions {
+  cdgAlpha?: number
+  cdgSize?: number
+  mp4Alpha?: number
+  visualizer?: {
+    sensitivity?: number
+    isEnabled?: boolean
+    nextPreset?: boolean
+    prevPreset?: boolean
+    randomPreset?: boolean
+  }
+}
+
+export type MediaType = 'cdg' | 'mp4' | ''
