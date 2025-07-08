@@ -14,6 +14,7 @@ class Prefs {
   static async get () {
     const prefs = {
       paths: { result: [], entities: {} },
+      roles: { result: [], entities: {} },
     }
 
     {
@@ -27,6 +28,20 @@ class Prefs {
       rows.forEach((row) => {
         prefs[row.key] = JSON.parse(row.data)
       })
+    }
+
+    // include roles
+    {
+      const query = sql`
+        SELECT roleId, name
+        FROM roles
+      `
+      const rows = await db.all(String(query), query.parameters)
+
+      for (const row of rows) {
+        prefs.roles.entities[row.roleId] = row
+        prefs.roles.result.push(row.roleId)
+      }
     }
 
     // include media paths

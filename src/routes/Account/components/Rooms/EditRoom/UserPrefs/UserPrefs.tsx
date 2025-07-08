@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import { useAppSelector } from 'store/hooks'
 import Accordion from 'components/Accordion/Accordion'
 import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Icon from 'components/Icon/Icon'
@@ -11,9 +12,31 @@ interface UserPrefsProps {
 }
 
 const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
-  const handleSetPref = useCallback((update: Partial<IRoomPrefs>) => {
-    onChange({ ...prefs, ...update })
-  }, [onChange, prefs])
+  const roles = useAppSelector(state => state.prefs.roles)
+
+  const getRoleId = useCallback((roleName: string) => {
+    return roles.result.find(roleId => roles.entities[roleId].name === roleName)
+  }, [roles.entities, roles.result])
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target
+    const roleId = getRoleId(name)
+    if (!roleId) return
+
+    onChange({
+      ...prefs,
+      roles: {
+        ...prefs.roles,
+        [roleId]: {
+          ...prefs.roles?.[roleId],
+          allowNew: checked,
+        },
+      },
+    })
+  }, [getRoleId, onChange, prefs])
+
+  const allowNewGuest = prefs.roles?.[getRoleId('guest')]?.allowNew ?? false
+  const allowNewStandard = prefs.roles?.[getRoleId('standard')]?.allowNew ?? false
 
   return (
     <Accordion
@@ -27,16 +50,18 @@ const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
       <div className={styles.content}>
         <div className={styles.field}>
           <InputCheckbox
-            label='Allow new standard accounts'
-            checked={prefs?.user?.isNewAllowed ?? false}
-            onChange={checked => handleSetPref({ user: { ...prefs.user, isNewAllowed: checked } })}
+            label='Allow new standard users'
+            name='standard'
+            checked={allowNewStandard}
+            onChange={handleChange}
           />
         </div>
         <div className={styles.field}>
           <InputCheckbox
-            label='Allow new guest accounts'
-            checked={prefs?.user?.isGuestAllowed ?? false}
-            onChange={checked => handleSetPref({ user: { ...prefs.user, isGuestAllowed: checked } })}
+            label='Allow new guests'
+            name='guest'
+            checked={allowNewGuest}
+            onChange={handleChange}
           />
         </div>
       </div>

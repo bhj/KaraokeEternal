@@ -14,40 +14,56 @@ const Account = () => {
   const [isDirty, setDirty] = useState(false)
 
   const dispatch = useAppDispatch()
-  const handleSignOut = useCallback(() => dispatch(requestLogout()), [dispatch])
-  const handleSubmit = useCallback((data) => {
-    if (!curPassword.current.value.trim()) {
-      alert('Please enter your current password to make changes.')
-      curPassword.current.focus()
+  const handleSignOut = useCallback(() => {
+    if (user.isGuest && !confirm(`As a guest, you won't be able to sign back in to the same account.\nAre you sure you want to sign out?`)) {
       return
     }
 
-    data.append('password', curPassword.current.value)
+    dispatch(requestLogout())
+  }, [dispatch, user.isGuest])
+
+  const handleSubmit = useCallback((data) => {
+    if (!user.isGuest) {
+      if (!curPassword.current.value.trim()) {
+        alert('Please enter your current password to make changes.')
+        curPassword.current.focus()
+        return
+      }
+
+      data.append('password', curPassword.current.value)
+    }
+
     dispatch(updateAccount(data))
-  }, [dispatch])
+  }, [dispatch, user.isGuest])
 
   return (
     <Panel title='My Account' contentClassName={styles.content}>
       <>
         <p>
           Signed in as&nbsp;
-          <strong>{user.username}</strong>
+          <strong>{user.isGuest ? 'guest' : user.username}</strong>
         </p>
 
-        <AccountForm user={user} onDirtyChange={setDirty} onSubmit={handleSubmit}>
+        <AccountForm
+          user={user}
+          onDirtyChange={setDirty}
+          onSubmit={handleSubmit}
+          showUsername={!user.isGuest}
+          showPassword={!user.isGuest}
+        >
+          {isDirty && !user.isGuest && (
+            <input
+              type='password'
+              autoComplete='current-password'
+              placeholder='current password'
+              ref={curPassword}
+            />
+
+          )}
           {isDirty && (
-            <>
-              <br />
-              <input
-                type='password'
-                autoComplete='current-password'
-                placeholder='current password'
-                ref={curPassword}
-              />
-              <Button type='submit' className={clsx('primary', styles.updateAccount)} variant='primary'>
-                Update Account
-              </Button>
-            </>
+            <Button type='submit' className={clsx('primary', styles.updateAccount)} variant='primary'>
+              Update Account
+            </Button>
           )}
         </AccountForm>
 

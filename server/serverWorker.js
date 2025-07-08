@@ -157,6 +157,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       ctx.user = {
         dateUpdated: null,
         isAdmin: false,
+        isGuest: false,
         name: null,
         roomId: null,
         userId: null,

@@ -20,8 +20,8 @@ router.get('/', async (ctx) => {
     return
   }
 
-  // empty response for non-admins (to avoid a fetch() error)
-  ctx.body = {}
+  // non-admins only get roles
+  ctx.body = { roles: prefs.roles }
 })
 
 // add a media path

@@ -6,7 +6,12 @@
     border-radius: var(--border-radius);
     text-align: center;
     cursor: pointer;
-}
+    background-color: var(--btn-bg-color);
+
+    svg {
+      color: #000;
+    }
+  }
 
 .fileInput {
     cursor: inherit;

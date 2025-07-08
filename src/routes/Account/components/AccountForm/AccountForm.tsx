@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import UserImage from './UserImage/UserImage'
+import InputImage from 'components/InputImage/InputImage'
 import { User } from 'shared/types'
 import styles from './AccountForm.css'
 
@@ -7,12 +7,25 @@ interface AccountFormProps {
   children?: React.ReactNode
   onDirtyChange?(...args: unknown[]): unknown
   onSubmit(...args: unknown[]): unknown
-  requirePassword?: boolean
   showRole?: boolean
-  user?: User
+  showUsername?: boolean
+  showPassword?: boolean
+  user?: UserWithRole
 }
 
-const AccountForm = ({ children, onDirtyChange, onSubmit, showRole, user }: AccountFormProps) => {
+interface UserWithRole extends User {
+  role?: string
+}
+
+const AccountForm = ({
+  children,
+  onDirtyChange,
+  onSubmit,
+  showRole,
+  showUsername = true,
+  showPassword = true,
+  user,
+}: AccountFormProps) => {
   const username = useRef<HTMLInputElement>(null)
   const newPassword = useRef<HTMLInputElement>(null)
   const newPasswordConfirm = useRef<HTMLInputElement>(null)
@@ -101,25 +114,29 @@ const AccountForm = ({ children, onDirtyChange, onSubmit, showRole, user }: Acco
       noValidate
       onSubmit={handleSubmit}
     >
-      <input
-        type='email'
-        autoComplete='off'
-        onChange={updateDirty}
-        placeholder={isUser ? 'change username (optional)' : 'username or email'}
-        // https://github.com/facebook/react/issues/23301
-        ref={(r) => {
-          if (r) username.current = r
-          if (!isUser) r?.setAttribute('autofocus', 'true')
-        }}
-      />
+      {showUsername && (
+        <input
+          type='email'
+          autoComplete='off'
+          onChange={updateDirty}
+          placeholder={isUser ? 'change username (optional)' : 'username or email'}
+          // https://github.com/facebook/react/issues/23301
+          ref={(r) => {
+            if (r) username.current = r
+            if (!isUser) r?.setAttribute('autofocus', 'true')
+          }}
+        />
+      )}
 
-      <input
-        type='password'
-        autoComplete='new-password'
-        onChange={updateDirty}
-        placeholder={isUser ? 'change password (optional)' : 'password'}
-        ref={newPassword}
-      />
+      {showPassword && (
+        <input
+          type='password'
+          autoComplete='new-password'
+          onChange={updateDirty}
+          placeholder={isUser ? 'change password (optional)' : 'password'}
+          ref={newPassword}
+        />
+      )}
 
       {state.isChangingPassword && (
         <input
@@ -131,7 +148,7 @@ const AccountForm = ({ children, onDirtyChange, onSubmit, showRole, user }: Acco
       )}
 
       <div className={styles.userDisplayContainer}>
-        <UserImage
+        <InputImage
           user={user}
           onSelect={handleUserImageChange}
         />
@@ -141,19 +158,18 @@ const AccountForm = ({ children, onDirtyChange, onSubmit, showRole, user }: Acco
           onChange={updateDirty}
           placeholder='display name'
           ref={name}
-          className={styles.name}
         />
       </div>
 
       {showRole && (
         <select
-          defaultValue={isUser && user.isAdmin ? '1' : '0'}
+          defaultValue={isUser && user.role}
           onChange={updateDirty}
           ref={role}
         >
           <option key='choose' value='' disabled>select role...</option>
-          <option key='std' value='0'>Standard</option>
-          <option key='admin' value='1'>Administrator</option>
+          <option key='std' value='standard'>Standard</option>
+          <option key='admin' value='admin'>Administrator</option>
         </select>
       )}
 

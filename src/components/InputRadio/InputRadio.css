@@ -1,0 +1,28 @@
+.container {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  cursor: pointer;
+
+  input[type="radio"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 1.5em;
+    min-height: 1.5em;
+    border-radius: 50%;
+    border: 2px solid var(--btn-bg-color);
+    outline: none;
+
+    &:checked,
+    &:focus:checked,
+    &:hover:checked {
+      background: radial-gradient(
+        circle,
+        var(--btn-active-bg-color) 0%,
+        var(--btn-active-bg-color) 60%,
+        #000 60%,
+        #000 100%
+      );
+    }
+  }
+}

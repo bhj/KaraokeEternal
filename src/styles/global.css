@@ -49,7 +49,7 @@ input[type="search"]{
   background-color: var(--input-bg-color);
 }
 
-::placeholder {
+input[type="text"]::placeholder {
   color: var(--input-placeholder-color);
 }
 
