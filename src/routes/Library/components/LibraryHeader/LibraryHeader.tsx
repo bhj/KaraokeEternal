@@ -6,9 +6,9 @@ interface LibraryHeaderProps {
   filterStr: string
   filterStarred: boolean
   // actions
-  setFilterStr(...args: unknown[]): unknown
-  resetFilterStr(...args: unknown[]): unknown
-  toggleFilterStarred(...args: unknown[]): unknown
+  setFilterStr(search: string): void
+  resetFilterStr(): void
+  toggleFilterStarred(): void
 }
 
 class LibraryHeader extends React.Component<LibraryHeaderProps> {
@@ -17,7 +17,7 @@ class LibraryHeader extends React.Component<LibraryHeaderProps> {
     value: this.props.filterStr,
   }
 
-  handleChange = (event) => {
+  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ value: event.target.value })
     this.props.setFilterStr(event.target.value)
   }

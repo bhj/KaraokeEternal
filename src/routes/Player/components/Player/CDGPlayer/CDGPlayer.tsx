@@ -15,13 +15,13 @@ interface CDGPlayerProps {
   mediaKey: number
   width: number
   height: number
-  onAudioElement(...args: unknown[]): unknown
+  onAudioElement(video: HTMLAudioElement): void
   // media events
-  onEnd(...args: unknown[]): unknown
-  onError(...args: unknown[]): unknown
-  onLoad(...args: unknown[]): unknown
-  onPlay(...args: unknown[]): unknown
-  onStatus(...args: unknown[]): unknown
+  onEnd(): void
+  onError(error: string): void
+  onLoad(): void
+  onPlay(): void
+  onStatus(status: { position: number }): void
 }
 
 class CDGPlayer extends React.Component<CDGPlayerProps> {
@@ -31,8 +31,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   cdg = null
   frameId = null
   lastBitmap = null
-  supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
-  || CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
+  supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)') || CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
 
   state = {
     backgroundRGBA: [0, 0, 0, 0],

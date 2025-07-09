@@ -19,8 +19,8 @@ interface ArtistListProps {
   scrollTop: number
   ui: RootState['ui']
   // actions
-  toggleArtistExpanded(...args: unknown[]): unknown
-  scrollArtists(...args: unknown[]): unknown
+  toggleArtistExpanded(artistId: number): void
+  scrollArtists(scrollTop: number): void
 }
 
 class ArtistList extends React.Component<ArtistListProps> {

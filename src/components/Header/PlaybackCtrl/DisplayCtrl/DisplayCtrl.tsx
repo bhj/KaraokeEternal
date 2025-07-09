@@ -19,7 +19,7 @@ interface DisplayCtrlProps {
   sensitivity: number
   visualizerPresetName: string
   // actions
-  onRequestOptions(opts: PlaybackOptions): unknown
+  onRequestOptions(opts: PlaybackOptions): void
   onClose: ModalProps['onClose']
 }
 

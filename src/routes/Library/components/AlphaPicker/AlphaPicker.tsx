@@ -3,7 +3,7 @@ import { lockScrolling } from 'store/modules/ui'
 import styles from './AlphaPicker.css'
 
 interface AlphaPickerProps {
-  onPick(...args: unknown[]): unknown
+  onPick(char: string): void
   height: number
   top: number
 }

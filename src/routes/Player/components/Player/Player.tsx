@@ -2,7 +2,8 @@ import React from 'react'
 import CDGPlayer from './CDGPlayer/CDGPlayer'
 import MP4Player from './MP4Player/MP4Player'
 import MP4AlphaPlayer from './MP4Player/MP4AlphaPlayer'
-import type { playerVisualizerState } from '../../modules/playerVisualizer'
+import { type State as PlayerVisualizerState } from '../../modules/playerVisualizer'
+import { type State as PlayerState } from '../../modules/player'
 const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisualizer'))
 
 interface PlayerProps {
@@ -19,22 +20,22 @@ interface PlayerProps {
   mp4Alpha: number
   rgTrackGain?: number
   rgTrackPeak?: number
-  visualizer: playerVisualizerState
+  visualizer: PlayerVisualizerState
   volume: number
   width: number
   height: number
   // media events
-  onEnd(...args: unknown[]): unknown
-  onError(...args: unknown[]): unknown
-  onLoad(...args: unknown[]): unknown
-  onPlay(...args: unknown[]): unknown
-  onStatus(...args: unknown[]): unknown
+  onEnd(): void
+  onError(error: string): void
+  onLoad(): void
+  onPlay(): void
+  onStatus(status: Partial<PlayerState>): void
 }
 
 class Player extends React.Component<PlayerProps> {
-  audioCtx = null
-  audioGainNode = null
-  audioSourceNode = null
+  audioCtx: AudioContext | null = null
+  audioGainNode: GainNode | null = null
+  audioSourceNode: MediaElementAudioSourceNode | null = null
   isFetching = false // internal
 
   state = {
@@ -70,7 +71,7 @@ class Player extends React.Component<PlayerProps> {
     }
   }
 
-  handleAudioElement = (el) => {
+  handleAudioElement = (el: HTMLVideoElement | HTMLAudioElement) => {
     if (this.audioSourceNode && this.audioSourceNode.mediaElement === el) {
       return
     }

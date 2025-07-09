@@ -12,14 +12,14 @@ import {
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const scrollArtists = createAction(SCROLL_ARTISTS)
-export const toggleArtistExpanded = createAction(TOGGLE_ARTIST_EXPANDED)
-export const toggleArtistResultExpanded = createAction(TOGGLE_ARTIST_RESULT_EXPANDED)
+export const scrollArtists = createAction<number>(SCROLL_ARTISTS)
+export const toggleArtistExpanded = createAction<number>(TOGGLE_ARTIST_EXPANDED)
+export const toggleArtistResultExpanded = createAction<number>(TOGGLE_ARTIST_RESULT_EXPANDED)
 
 export const resetFilterStr = createAction(LIBRARY_FILTER_STRING_RESET)
 export const toggleFilterStarred = createAction(LIBRARY_FILTER_TOGGLE_STARRED)
-export const setFilterStr = createAction(LIBRARY_FILTER_STRING, str => ({
-  payload: { str },
+export const setFilterStr = createAction(LIBRARY_FILTER_STRING, (payload: string) => ({
+  payload,
   meta: {
     throttle: {
       wait: 350,
@@ -54,7 +54,7 @@ const initialState: libraryState = {
 const libraryReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(setFilterStr, (state, { payload }) => {
-      state.filterStr = payload.str
+      state.filterStr = payload
     })
     .addCase(resetFilterStr, (state) => {
       state.filterStr = ''

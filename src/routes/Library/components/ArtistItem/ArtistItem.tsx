@@ -17,7 +17,7 @@ interface ArtistItemProps {
   starredSongs: number[]
   style?: object
   // actions
-  onArtistClick(...args: unknown[]): unknown
+  onArtistClick(artistId: number): void
 }
 
 class ArtistItem extends React.Component<ArtistItemProps> {

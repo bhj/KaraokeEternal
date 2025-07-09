@@ -24,7 +24,7 @@ interface SearchResultsProps {
   starredArtistCounts: Record<number, number>
   ui: RootState['ui']
   // actions
-  toggleArtistResultExpanded(...args: unknown[]): unknown
+  toggleArtistResultExpanded(artistId: number): void
 }
 
 class SearchResults extends React.Component<SearchResultsProps> {

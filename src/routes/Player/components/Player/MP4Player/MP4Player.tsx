@@ -7,13 +7,13 @@ interface MP4PlayerProps {
   mediaKey: number
   width: number
   height: number
-  onAudioElement(...args: unknown[]): unknown
+  onAudioElement(video: HTMLVideoElement): void
   // media events
-  onEnd(...args: unknown[]): unknown
-  onError(...args: unknown[]): unknown
-  onLoad(...args: unknown[]): unknown
-  onPlay(...args: unknown[]): unknown
-  onStatus(...args: unknown[]): unknown
+  onEnd(): void
+  onError(error: string): void
+  onLoad(): void
+  onPlay(): void
+  onStatus(status: { position: number }): void
 }
 
 class MP4Player extends React.Component<MP4PlayerProps> {

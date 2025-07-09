@@ -8,13 +8,13 @@ interface MP4AlphaPlayerProps {
   mp4Alpha: number
   width: number
   height: number
-  onAudioElement(...args: unknown[]): unknown
+  onAudioElement(video: HTMLVideoElement): void
   // media events
-  onEnd(...args: unknown[]): unknown
-  onError(...args: unknown[]): unknown
-  onLoad(...args: unknown[]): unknown
-  onPlay(...args: unknown[]): unknown
-  onStatus(...args: unknown[]): unknown
+  onEnd(): void
+  onError(error: string): void
+  onLoad(): void
+  onPlay(): void
+  onStatus(status: { position: number }): void
 }
 
 class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {

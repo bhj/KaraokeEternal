@@ -88,7 +88,7 @@ export function playerLeave (): AppThunk {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface playerState {
+export interface State {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
@@ -110,7 +110,7 @@ interface playerState {
   volume: number
 }
 
-const initialState: playerState = {
+const initialState: State = {
   cdgAlpha: 0.5,
   cdgSize: 0.8,
   errorMessage: '',

@@ -1,5 +1,5 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import type { playerVisualizerState } from 'routes/Player/modules/playerVisualizer'
+import { type State as PlayerVisualizerState } from 'routes/Player/modules/playerVisualizer'
 import {
   PLAYER_REQ_OPTIONS,
   PLAYER_REQ_PLAY,
@@ -57,7 +57,7 @@ interface statusState {
   nextUserId: number | null
   position: number
   queueId: number
-  visualizer: playerVisualizerState | Record<string, never>
+  visualizer: PlayerVisualizerState | Record<string, never>
   volume: number
 }
 

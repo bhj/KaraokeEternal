@@ -29,9 +29,9 @@ interface LibraryViewProps {
   filterStarred: boolean
   expandedArtistResults: number[]
   // Actions
-  toggleArtistExpanded: () => void
-  toggleArtistResultExpanded: () => void
-  scrollArtists: () => void
+  toggleArtistExpanded: (artistId: number) => void
+  toggleArtistResultExpanded: (artistId: number) => void
+  scrollArtists: (scrollTop: number) => void
   showSongInfo: (songId: number) => void
   closeSongInfo: () => void
 }

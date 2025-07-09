@@ -7,7 +7,7 @@ import styles from './PlayerVisualizer.css'
 interface PlayerVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode
   isPlaying: boolean
-  onError(...args: unknown[]): unknown
+  onError(error: string): void
   presetKey: string
   sensitivity: number
   width: number
