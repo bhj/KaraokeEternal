@@ -101,7 +101,7 @@ const getArtistsByView = createSelector(
   (artistsWithKeyword, filterStarred, starredArtists) =>
     artistsWithKeyword.filter((artist) => {
       return filterStarred ? starredArtists.includes(artist.id) : true
-    }),
+    }).map(artist => artist.id),
 )
 
 const getSongsByView = createSelector(
@@ -109,7 +109,7 @@ const getSongsByView = createSelector(
   (songsWithKeyword, filterStarred, starredSongs) =>
     songsWithKeyword.filter((song) => {
       return filterStarred ? starredSongs.includes(song.id) : true
-    }),
+    }).map(song => song.id),
 )
 
 const mapStateToProps = (state: RootState) => {

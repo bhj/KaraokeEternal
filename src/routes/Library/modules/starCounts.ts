@@ -9,8 +9,8 @@ import {
 // Reducer
 // ------------------------------------
 interface startCountsState {
-  artists: object
-  songs: object
+  artists: Record<number, number>
+  songs: Record<number, number>
   version: number
 }
 

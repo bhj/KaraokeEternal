@@ -45,7 +45,7 @@ export interface IRoomPrefs {
     isNewAllowed?: boolean
     isGuestAllowed?: boolean
   }
-  roles: Record<number, {
+  roles?: Record<number, {
     allowNew: boolean
   }>
 }

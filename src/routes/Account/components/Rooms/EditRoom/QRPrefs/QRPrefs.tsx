@@ -41,7 +41,7 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
           <InputCheckbox
             label='Show QR code'
             checked={prefs?.qr?.isEnabled ?? false}
-            onChange={checked => handleSetPref({ qr: { ...prefs.qr, isEnabled: checked } })}
+            onChange={event => handleSetPref({ qr: { ...prefs.qr, isEnabled: event.currentTarget.checked } })}
           />
         </div>
         {prefs?.qr?.isEnabled && roomPassword && (
@@ -49,7 +49,8 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
             <InputCheckbox
               label='Include room password'
               checked={isQRPasswordEnabled}
-              onChange={(checked) => {
+              onChange={(event) => {
+                const checked = event.currentTarget.checked
                 setIsQRPasswordEnabled(checked)
                 if (!checked) handleSetPref({ qr: { ...prefs.qr, password: '' } })
               }}

@@ -65,7 +65,7 @@ export const lockScrolling = (lock) => {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface uiState {
+export interface State {
   isErrored: boolean
   errorMessage: string | null
   footerHeight: number
@@ -75,7 +75,7 @@ interface uiState {
   contentWidth: number
 }
 
-const initialState: uiState = {
+const initialState: State = {
   isErrored: false,
   errorMessage: null,
   footerHeight: 0,

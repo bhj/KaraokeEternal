@@ -5,12 +5,35 @@ import SearchResults from '../components/SearchResults/SearchResults'
 import TextOverlay from 'components/TextOverlay/TextOverlay'
 import Spinner from 'components/Spinner/Spinner'
 import styles from './LibraryView.css'
+import { Artist, Song } from 'shared/types'
+import { State as UIState } from 'store/modules/ui'
 
 interface LibraryViewProps {
   isAdmin: boolean
   isLoading: boolean
   isSearching: boolean
   isEmpty: boolean
+  artists: Record<number, Artist>
+  songs: Record<number, Song>
+  starredArtistCounts: Record<number, number>
+  queuedSongs: number[]
+  starredSongs: number[]
+  expandedArtists: number[]
+  alphaPickerMap: Record<string, number>
+  scrollTop: number
+  ui: UIState
+  // SearchResults view
+  songsResult: number[]
+  artistsResult: number[]
+  filterKeywords: string[]
+  filterStarred: boolean
+  expandedArtistResults: number[]
+  // Actions
+  toggleArtistExpanded: () => void
+  toggleArtistResultExpanded: () => void
+  scrollArtists: () => void
+  showSongInfo: (songId: number) => void
+  closeSongInfo: () => void
 }
 
 const LibraryView = (props: LibraryViewProps) => {
