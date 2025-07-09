@@ -6,8 +6,5 @@
 
 .userDisplayContainer {
   display: flex;
-}
-
-.name {
-  margin-left: var(--space-s);
+  gap: var(--space-s);
 }

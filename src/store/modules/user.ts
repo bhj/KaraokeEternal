@@ -21,11 +21,11 @@ import {
 const api = new HttpApi('')
 const basename = new URL(document.baseURI).pathname
 
+const receiveAccount = createAction<object>(ACCOUNT_RECEIVE)
+
 // ------------------------------------
 // Login
 // ------------------------------------
-const receiveAccount = createAction<object>(ACCOUNT_RECEIVE)
-
 export const login = createAsyncThunk(
   LOGIN,
   async (creds: object, thunkAPI) => {
@@ -40,12 +40,9 @@ export const login = createAsyncThunk(
     Persistor.get().purge()
 
     thunkAPI.dispatch(receiveAccount(user))
+    thunkAPI.dispatch(fetchPrefs())
     thunkAPI.dispatch(connectSocket())
     socket.open()
-
-    if (user.isAdmin) {
-      thunkAPI.dispatch(fetchPrefs())
-    }
 
     // redirect in query string?
     const redirect = new URLSearchParams(window.location.search).get('redirect')
@@ -85,21 +82,25 @@ export const createAccount = createAsyncThunk<void, FormData, { state: RootState
   async (data: FormData, thunkAPI) => {
     const isFirstRun = thunkAPI.getState().prefs.isFirstRun
 
-    const response = await api('POST', isFirstRun ? 'setup' : 'user', {
+    const user = await api('POST', isFirstRun ? 'setup' : 'user', {
       body: data,
     })
 
-    // if firstRun, response should contain the newly-created room's id
-    if (isFirstRun && typeof response.roomId !== 'number') {
-      throw new Error('firstRun: No roomId in response')
-    }
+    // signing in can cause additional reducers to be injected and
+    // trigger rehydration with stale data, so purge here first
+    Persistor.get().purge()
 
-    thunkAPI.dispatch(login({
-      username: data.get('username'),
-      password: data.get('newPassword'),
-      roomId: isFirstRun ? response.roomId : data.get('roomId'),
-      roomPassword: data.get('roomPassword'),
-    }))
+    thunkAPI.dispatch(receiveAccount(user))
+    thunkAPI.dispatch(fetchPrefs())
+    thunkAPI.dispatch(connectSocket())
+    socket.open()
+
+    // redirect in query string?
+    const redirect = new URLSearchParams(window.location.search).get('redirect')
+
+    if (redirect) {
+      AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
+    }
   },
 )
 
@@ -161,6 +162,7 @@ interface userState {
   name: string | null
   roomId: number | null
   isAdmin: boolean
+  isGuest: boolean
   dateCreated: number
   dateUpdated: number
 }
@@ -171,6 +173,7 @@ const initialState: userState = {
   name: null,
   roomId: null,
   isAdmin: false,
+  isGuest: false,
   dateCreated: 0,
   dateUpdated: 0,
 }

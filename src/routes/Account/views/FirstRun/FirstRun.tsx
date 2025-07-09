@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { createAccount } from 'store/modules/user'
 import Button from 'components/Button/Button'
-import AccountForm from '../../../components/AccountForm/AccountForm'
+import AccountForm from '../../components/AccountForm/AccountForm'
 import styles from './FirstRun.css'
 
 const FirstRun = () => {

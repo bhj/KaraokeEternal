@@ -3,14 +3,14 @@ import Button from 'components/Button/Button'
 import Icon from 'components/Icon/Icon'
 import loadImage from 'blueimp-load-image'
 import { User } from 'shared/types'
-import styles from './UserImage.css'
+import styles from './InputImage.css'
 
 interface UserImageProps {
   user?: User
   onSelect: (blob: Blob) => void
 }
 
-const UserImage = ({ user, onSelect }: UserImageProps) => {
+const InputImage = ({ user, onSelect }: UserImageProps) => {
   const [isLoading, setIsLoading] = useState(true)
   const [imageURL, setImageURL] = useState<string | null>(
     user && user.userId !== null
@@ -77,7 +77,7 @@ const UserImage = ({ user, onSelect }: UserImageProps) => {
   return (
     <div className={styles.container}>
       {!imageURL && (
-        <Icon icon='ACCOUNT_BOX' size={72} className={styles.placeholder} />
+        <Icon icon='PERSON_ADD' size={72} className={styles.placeholder} />
       )}
 
       {imageURL && (
@@ -118,4 +118,4 @@ const UserImage = ({ user, onSelect }: UserImageProps) => {
   )
 }
 
-export default UserImage
+export default InputImage

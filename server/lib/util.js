@@ -1,4 +1,5 @@
 import path from 'path'
+import crypto from 'crypto'
 
 /**
  * Gets the normalized file extension, in lowercase and including the period.
@@ -29,4 +30,16 @@ export const parsePathIds = (str) => {
   if (nums.length) return nums
 
   return !!str
+}
+
+export const randomChars = (length) => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const bytes = crypto.randomBytes(length)
+  let result = ''
+
+  for (let i = 0; i < length; i++) {
+    result += chars[bytes[i] % chars.length]
+  }
+
+  return result
 }

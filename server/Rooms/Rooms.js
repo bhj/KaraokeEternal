@@ -18,7 +18,7 @@ class Rooms {
    * @param  {Object}
    * @return {Promise}
    */
-  static async get (roomId, { status = ['open'], prefs = false }) {
+  static async get (roomId, { status = ['open'], includePassword = false } = {}) {
     const result = []
     const entities = {}
     const whereConditions = []
@@ -40,7 +40,8 @@ class Rooms {
     }
 
     const query = sql`
-      SELECT * FROM rooms
+      SELECT *
+      FROM rooms
       ${whereClause}
       ORDER BY dateCreated DESC
     `
@@ -52,14 +53,7 @@ class Rooms {
       delete row.data
 
       row.hasPassword = !!row.password
-
-      if (prefs) {
-        const data = JSON.parse(row.data)
-        row.prefs = data.prefs ?? {}
-      }
-
-      delete row.password
-      delete row.data
+      if (!includePassword) delete row.password
 
       row.dateCreated = parseInt(row.dateCreated, 10) // v1.0 schema used 'text' column
 
@@ -125,12 +119,15 @@ class Rooms {
    * @param  {[Object]}  opts          (bool) isOpen, (bool) validatePassword
    * @return {Promise}                 True if validated, otherwise throws an error
    */
-  static async validate (roomId, password, { isOpen = true, validatePassword = true } = {}) {
-    const query = sql`
-      SELECT * FROM rooms
-      WHERE roomId = ${roomId}
-    `
-    const room = await db.get(String(query), query.parameters)
+  static async validate (roomId, password,
+    {
+      isOpen = true,
+      validatePassword = true,
+      role,
+    } = {},
+  ) {
+    const res = await Rooms.get(roomId, { includePassword: true })
+    const room = res.entities[roomId]
 
     if (!room) {
       throw new Error('Room not found')
@@ -147,6 +144,20 @@ class Rooms {
 
       if (!(await bcrypt.compare(password, room.password))) {
         throw new Error('Incorrect room password')
+      }
+    }
+
+    if (role) {
+      const query = sql`SELECT roleId FROM roles WHERE name = ${role}`
+      const row = await db.get(String(query), query.parameters)
+      const roleId = row?.roleId
+
+      if (!roleId) {
+        throw new Error('Role not found')
+      }
+
+      if (!room.prefs?.roles?.[roleId]?.allowNew) {
+        throw new Error(`New "${role}" accounts are not allowed in this room`)
       }
     }
 

@@ -45,6 +45,9 @@ export interface IRoomPrefs {
     isNewAllowed?: boolean
     isGuestAllowed?: boolean
   }
+  roles: Record<number, {
+    allowNew: boolean
+  }>
 }
 
 export interface Room {
@@ -55,6 +58,11 @@ export interface Room {
   hasPassword: boolean
   numUsers: number
   prefs?: IRoomPrefs
+}
+
+export interface Role {
+  roleId: number
+  name: string
 }
 
 export interface Path {
@@ -71,7 +79,8 @@ export interface User {
   userId: number
   username: string
   name: string
-  isAdmin: boolean
+  isAdmin: boolean // todo: client and server ctx only
+  isGuest: boolean // todo: client and server ctx only
   dateCreated: number
   dateUpdated: number
 }

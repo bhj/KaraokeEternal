@@ -22,8 +22,8 @@ router.get('/:roomId?', async (ctx) => {
       const room = ctx.io.sockets.adapter.rooms.get(Rooms.prefix(roomId))
       res.entities[roomId].numUsers = room ? room.size : 0
     } else {
-      // only pass the 'user' prefs key
-      res.entities[roomId].prefs = res.entities[roomId].prefs?.user ? { user: res.entities[roomId].prefs.user } : {}
+      // only pass the 'roles' prefs key
+      res.entities[roomId].prefs = res.entities[roomId].prefs?.roles ? { roles: res.entities[roomId].prefs.roles } : {}
     }
   })
 
@@ -63,11 +63,13 @@ router.put('/:roomId', async (ctx) => {
     throw err
   }
 
-  log.verbose('%s updated a room (roomId: %s)', ctx.user.name, ctx.params.roomId)
+  log.verbose('%s updated a room (roomId: %s)', ctx.user.name, roomId)
 
-  for (const sock of ctx.io.of('/').sockets.values()) {
-    if (sock?.user?.isAdmin && sock?.user.roomId === roomId) {
-      ctx.io.to(sock.id).emit('action', {
+  const sockets = await ctx.io.in(Rooms.prefix(roomId)).fetchSockets()
+
+  for (const s of sockets) {
+    if (s?.user.isAdmin) {
+      ctx.io.to(s.id).emit('action', {
         type: ROOM_PREFS_PUSH,
         payload: await Rooms.get(roomId),
       })

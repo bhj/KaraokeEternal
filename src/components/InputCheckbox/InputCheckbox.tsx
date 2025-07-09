@@ -1,35 +1,29 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import clsx from 'clsx'
 import styles from './InputCheckbox.css'
 
-interface InputCheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-  onChange?: (checked: boolean) => void
+interface InputCheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   className?: string
 }
 
-const InputCheckbox = ({
-  onChange,
+const InputCheckbox = forwardRef<HTMLInputElement, InputCheckboxProps>(({
   label,
   className,
   ...rest
-}: InputCheckboxProps) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onChange) {
-      onChange(e.target.checked)
-    }
-  }
-
+}, ref) => {
   return (
     <label className={clsx(styles.container, className)}>
       <input
         type='checkbox'
-        onChange={handleChange}
+        ref={ref}
         {...rest}
       />
       {label}
     </label>
   )
-}
+})
+
+InputCheckbox.displayName = 'InputCheckbox'
 
 export default InputCheckbox

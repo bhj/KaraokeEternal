@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchPrefs } from 'store/modules/prefs'
+import FirstRun from './FirstRun/FirstRun'
 import SignedInView from './SignedInView/SignedInView'
 import SignedOutView from './SignedOutView/SignedOutView'
 import styles from './AccountView.css'
 
 const AccountView = () => {
   const isSignedIn = useAppSelector(state => state.user.userId !== null)
+  const isFirstRun = useAppSelector(state => state.prefs.isFirstRun === true)
   const ui = useAppSelector(state => state.ui)
   const dispatch = useAppDispatch()
 
@@ -27,10 +29,13 @@ const AccountView = () => {
       }}
     >
       {isSignedIn
-      && <SignedInView />}
+        && <SignedInView />}
 
-      {!isSignedIn
-      && <SignedOutView />}
+      {!isFirstRun && !isSignedIn
+        && <SignedOutView />}
+
+      {isFirstRun
+        && <FirstRun />}
     </div>
   )
 }

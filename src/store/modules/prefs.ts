@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { RootState } from 'store/store'
-import { Path } from 'shared/types'
+import type { Path, Role } from 'shared/types'
 import {
   PREFS_RECEIVE,
   PREFS_REQUEST,
@@ -82,6 +82,10 @@ interface prefsState {
     result: number[]
     entities: Record<number, Path>
   }
+  roles: {
+    result: number[]
+    entities: Record<number, Role>
+  }
   scannerPct: number
   scannerText: string
 }
@@ -90,6 +94,10 @@ const initialState: prefsState = {
   isScanning: false,
   isReplayGainEnabled: false,
   paths: {
+    result: [],
+    entities: {},
+  },
+  roles: {
     result: [],
     entities: {},
   },

@@ -36,6 +36,7 @@ const Users = () => {
 
   const rows = users.result.map((userId) => {
     const user = users.entities[userId]
+
     return (
       <tr key={userId}>
         {userId === curUserId && (
@@ -56,7 +57,7 @@ const Users = () => {
             )
           </td>
         )}
-        <td>{user.isAdmin ? 'admin' : 'standard'}</td>
+        <td>{user.role}</td>
         <td>{formatDateTime(new Date(user.dateCreated * 1000))}</td>
       </tr>
     )

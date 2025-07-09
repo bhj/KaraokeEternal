@@ -1,21 +1,9 @@
-.heading {
-  align-items: baseline;
-  color: hsl(var(--hue-blue), 10%, 60%);
+.container {
   display: flex;
-  flex-wrap: wrap;
-  margin-bottom: var(--container-padding);
-}
+  flex-direction: column;
+  gap: var(--space-s);
 
-.heading h2 {
-  color: hsl(var(--hue-blue), 10%, 80%);
-  flex: 1;
-  margin: 0 1em 0 0;
-  font-size: 32px;
-  font-family: var(--font-family-custom);
-  font-weight: 200;
-  white-space: nowrap;
-}
-
-.field {
-  margin-bottom: var(--input-margin);
+  button {
+    margin-top: var(--space-s);
+  }
 }

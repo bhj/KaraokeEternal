@@ -55,6 +55,7 @@ const QueueView = () => {
           <h1>Queue Empty</h1>
           <p>
             Tap a song in the
+            {' '}
             <Link to='/library'>library</Link>
             {' '}
             to queue it.
