@@ -36,7 +36,7 @@ const PathChooser = ({ onCancel, onChoose }: PathChooserProps) => {
   }, [onChoose, pathInfo])
 
   const ls = useCallback((dir: string) => {
-    api('GET', `/ls?dir=${encodeURIComponent(dir)}`)
+    api.get(`/ls?dir=${encodeURIComponent(dir)}`)
       .then(res => setPathInfo(res))
       .catch(err => alert(err))
   }, [])

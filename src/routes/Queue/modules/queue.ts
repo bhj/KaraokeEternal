@@ -11,8 +11,10 @@ import {
 // ------------------------------------
 // Actions
 // ------------------------------------
+const logout = createAction(LOGOUT)
 export const moveItem = createAction<{ queueId: number, prevQueueId: number }>(QUEUE_MOVE)
 export const removeItem = createAction<{ queueId: number }>(QUEUE_REMOVE)
+export const queuePush = createAction<State>(QUEUE_PUSH)
 
 export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
   payload: { songId },
@@ -22,13 +24,13 @@ export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface queueState {
+interface State {
   isLoading: boolean
   result: number[] // queueIds
   entities: Record<number, QueueItem | OptimisticQueueItem>
 }
 
-const initialState: queueState = {
+const initialState: State = {
   isLoading: true,
   result: [],
   entities: {},
@@ -48,12 +50,12 @@ const queueReducer = createReducer(initialState, (builder) => {
         isOptimistic: true,
       }
     })
-    .addCase(QUEUE_PUSH, (state, { payload }) => ({
+    .addCase(queuePush, (state, { payload }) => ({
       isLoading: false,
       result: payload.result,
       entities: payload.entities,
     }))
-    .addCase(LOGOUT, (state) => {
+    .addCase(logout, (state) => {
       state.result = []
       state.entities = {}
     })

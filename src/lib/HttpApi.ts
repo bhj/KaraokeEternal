@@ -1,14 +1,20 @@
 export default class HttpApi {
+  prefix: string
+  options: RequestInit
+
   constructor (prefix = '') {
     this.prefix = prefix
     this.options = {
       credentials: 'same-origin',
     }
-
-    return this.callApi
   }
 
-  callApi = (method, url, options = {}) => {
+  put = (url, options = {}) => this.request('PUT', url, options)
+  post = (url, options = {}) => this.request('POST', url, options)
+  get = (url, options = {}) => this.request('GET', url, options)
+  delete = (url, options = {}) => this.request('DELETE', url, options)
+
+  request = (method, url, options = {}) => {
     const opts = {
       ...this.options,
       ...options,

@@ -32,16 +32,21 @@ const unstarSong = createAction(UNSTAR_SONG, (songId: number) => ({
   meta: { isOptimistic: true },
 }))
 
+const songStarred = createAction<{ userId: number, songId: number }>(SONG_STARRED)
+const songUnstarred = createAction<{ userId: number, songId: number }>(SONG_UNSTARRED)
+const starsPush = createAction<State>(STARS_PUSH) // @todo Seems to be unused
+const accountReceive = createAction<{ userId: number }>(ACCOUNT_RECEIVE)
+
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface userStarsState {
+interface State {
   userId: number | null
   starredArtists: number[]
   starredSongs: number[]
 }
 
-const initialState: userStarsState = {
+const initialState: State = {
   userId: null,
   starredArtists: [],
   starredSongs: [],
@@ -57,21 +62,21 @@ const userStarsReducer = createReducer(initialState, (builder) => {
       // optimistic
       state.starredSongs.splice(state.starredSongs.indexOf(payload.songId), 1)
     })
-    .addCase(SONG_STARRED, (state, { payload }) => {
+    .addCase(songStarred, (state, { payload }) => {
       if (payload.userId === state.userId && !state.starredSongs.includes(payload.songId)) {
         state.starredSongs.push(payload.songId)
       }
     })
-    .addCase(SONG_UNSTARRED, (state, { payload }) => {
+    .addCase(songUnstarred, (state, { payload }) => {
       if (payload.userId === state.userId && state.starredSongs.includes(payload.songId)) {
         state.starredSongs.splice(state.starredSongs.indexOf(payload.songId), 1)
       }
     })
-    .addCase(STARS_PUSH, (state, { payload }) => ({
+    .addCase(starsPush, (state, { payload }) => ({
       ...state,
       ...payload,
     }))
-    .addCase(ACCOUNT_RECEIVE, (state, { payload }) => {
+    .addCase(accountReceive, (state, { payload }) => {
       state.userId = payload.userId
     })
     // @ts-expect-error: payload exists; action type appears to be erroneous

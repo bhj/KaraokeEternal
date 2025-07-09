@@ -61,6 +61,8 @@ export const lockScrolling = (lock) => {
     }, 200)
   }
 }
+const footerHeightChange = createAction<number>(FOOTER_HEIGHT_CHANGE)
+const headerHeightChange = createAction<number>(HEADER_HEIGHT_CHANGE)
 
 // ------------------------------------
 // Reducer
@@ -87,10 +89,10 @@ const initialState: State = {
 
 const uiReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(HEADER_HEIGHT_CHANGE, (state, { payload }) => {
+    .addCase(headerHeightChange, (state, { payload }) => {
       state.headerHeight = payload
     })
-    .addCase(FOOTER_HEIGHT_CHANGE, (state, { payload }) => {
+    .addCase(footerHeightChange, (state, { payload }) => {
       state.footerHeight = payload
     })
     .addCase(showErrorMessage, (state, { payload }) => {

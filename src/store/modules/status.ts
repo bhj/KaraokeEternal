@@ -17,6 +17,8 @@ import { MediaType, PlaybackOptions } from 'shared/types'
 export const requestPlay = createAction(PLAYER_REQ_PLAY)
 export const requestPause = createAction(PLAYER_REQ_PAUSE)
 export const requestPlayNext = createAction(PLAYER_REQ_NEXT)
+const playerStatus = createAction<object>(PLAYER_STATUS)
+const playerLeave = createAction(PLAYER_LEAVE)
 
 export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
   payload: vol,
@@ -41,7 +43,7 @@ export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOp
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface statusState {
+interface State {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
@@ -61,7 +63,7 @@ interface statusState {
   volume: number
 }
 
-const initialState: statusState = {
+const initialState: State = {
   cdgAlpha: 0,
   cdgSize: 0.8,
   errorMessage: '',
@@ -83,10 +85,10 @@ const initialState: statusState = {
 
 const statusReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(PLAYER_LEAVE, (state) => {
+    .addCase(playerLeave, (state) => {
       state.isPlayerPresent = false
     })
-    .addCase(PLAYER_STATUS, (state, { payload }) => ({
+    .addCase(playerStatus, (state, { payload }) => ({
       ...state,
       ...payload,
       isPlayerPresent: true,

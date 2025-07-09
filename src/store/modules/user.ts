@@ -31,7 +31,7 @@ export const login = createAsyncThunk(
   async (creds: object, thunkAPI) => {
     // calls api endpoint that should set an httpOnly cookie with
     // our JWT, then establish the sockiet.io connection
-    const user = await api('POST', 'login', {
+    const user = await api.post('login', {
       body: creds,
     })
 
@@ -63,7 +63,7 @@ export const requestLogout = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       // server response should clear our cookie
-      await api('GET', 'logout')
+      await api.get('logout')
     } catch {
       // ignore errors
     }
@@ -82,7 +82,7 @@ export const createAccount = createAsyncThunk<void, FormData, { state: RootState
   async (data: FormData, thunkAPI) => {
     const isFirstRun = thunkAPI.getState().prefs.isFirstRun
 
-    const user = await api('POST', isFirstRun ? 'setup' : 'user', {
+    const user = await api.post(isFirstRun ? 'setup' : 'user', {
       body: data,
     })
 
@@ -112,7 +112,7 @@ export const updateAccount = createAsyncThunk<void, FormData, { state: RootState
   async (data: FormData, thunkAPI) => {
     const { userId } = thunkAPI.getState().user
 
-    const user = await api('PUT', `user/${userId}`, {
+    const user = await api.put(`user/${userId}`, {
       body: data,
     })
 
@@ -128,7 +128,7 @@ export const fetchAccount = createAsyncThunk(
   ACCOUNT_REQUEST,
   async (_, thunkAPI) => {
     try {
-      const user = await api('GET', 'user')
+      const user = await api.get('user')
       thunkAPI.dispatch(receiveAccount(user))
     } catch {
       // ignore errors

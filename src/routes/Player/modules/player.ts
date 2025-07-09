@@ -26,6 +26,15 @@ export const playerUpdate = createAction<object>(PLAYER_UPDATE)
 export const playerError = createAction<string>(PLAYER_ERROR)
 export const playerLoad = createAction(PLAYER_LOAD)
 export const playerPlay = createAction(PLAYER_PLAY)
+export const playerCmdNext = createAction(PLAYER_CMD_NEXT)
+const playerCmdPause = createAction(PLAYER_CMD_PAUSE)
+const playerCmdPlay = createAction(PLAYER_CMD_PLAY)
+const playerCmdVolume = createAction<number>(PLAYER_CMD_VOLUME)
+const playerCmdOptions = createAction<{
+  cdgAlpha: number
+  cdgSize: number
+  mp4Alpha: number
+}>(PLAYER_CMD_OPTIONS)
 
 // ------------------------------------
 // Actions for emitting to room
@@ -134,22 +143,22 @@ const initialState: State = {
 
 const playerReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(PLAYER_CMD_NEXT, (state) => {
+    .addCase(playerCmdNext, (state) => {
       state.isPlayingNext = true
     })
-    .addCase(PLAYER_CMD_OPTIONS, (state, { payload }) => ({
+    .addCase(playerCmdOptions, (state, { payload }) => ({
       ...state,
       cdgAlpha: typeof payload.cdgAlpha === 'number' ? payload.cdgAlpha : state.cdgAlpha,
       cdgSize: typeof payload.cdgSize === 'number' ? payload.cdgSize : state.cdgSize,
       mp4Alpha: typeof payload.mp4Alpha === 'number' ? payload.mp4Alpha : state.mp4Alpha,
     }))
-    .addCase(PLAYER_CMD_PAUSE, (state) => {
+    .addCase(playerCmdPause, (state) => {
       state.isPlaying = false
     })
-    .addCase(PLAYER_CMD_PLAY, (state) => {
+    .addCase(playerCmdPlay, (state) => {
       state.isPlaying = true
     })
-    .addCase(PLAYER_CMD_VOLUME, (state, { payload }) => {
+    .addCase(playerCmdVolume, (state, { payload }) => {
       state.volume = payload
     })
     .addCase(playerError, (state, { payload }) => ({

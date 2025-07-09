@@ -125,7 +125,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     this.stopCDG()
 
     // load .cdg file
-    api('GET', `/${this.props.mediaId}?type=cdg`)
+    api.get(`/${this.props.mediaId}?type=cdg`)
       .then(res => res.arrayBuffer())
       .then((buffer) => {
         // in case we've unmounted by this point

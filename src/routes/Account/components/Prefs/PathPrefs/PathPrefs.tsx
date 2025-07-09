@@ -44,7 +44,7 @@ const PathPrefs = () => {
   }, [dispatch, priority])
 
   const handleAdd = useCallback((dir: string, prefs: object) => {
-    api('POST', `/?dir=${encodeURIComponent(dir)}`, { body: prefs })
+    api.post(`/?dir=${encodeURIComponent(dir)}`, { body: prefs })
       .then((res) => {
         dispatch(receivePrefs(res))
         setChoosing(false)
@@ -63,7 +63,7 @@ const PathPrefs = () => {
     setPriority(priority.filter(id => id !== pathId))
     setEditingPath(null)
 
-    api('DELETE', `/${pathId}`)
+    api.delete(`/${pathId}`)
       .then((res) => {
         dispatch(receivePrefs(res))
         return

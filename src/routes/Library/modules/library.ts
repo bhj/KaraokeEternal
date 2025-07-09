@@ -15,6 +15,7 @@ import {
 export const scrollArtists = createAction<number>(SCROLL_ARTISTS)
 export const toggleArtistExpanded = createAction<number>(TOGGLE_ARTIST_EXPANDED)
 export const toggleArtistResultExpanded = createAction<number>(TOGGLE_ARTIST_RESULT_EXPANDED)
+const libraryPush = createAction<State>(LIBRARY_PUSH)
 
 export const resetFilterStr = createAction(LIBRARY_FILTER_STRING_RESET)
 export const toggleFilterStarred = createAction(LIBRARY_FILTER_TOGGLE_STARRED)
@@ -31,7 +32,7 @@ export const setFilterStr = createAction(LIBRARY_FILTER_STRING, (payload: string
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface libraryState {
+interface State {
   isLoading: boolean
   version: number
   filterStr: string
@@ -41,7 +42,7 @@ interface libraryState {
   expandedArtistResults: number[]
 }
 
-const initialState: libraryState = {
+const initialState: State = {
   isLoading: true,
   version: 0,
   filterStr: '',
@@ -77,7 +78,7 @@ const libraryReducer = createReducer(initialState, (builder) => {
       if (idx === -1) state.expandedArtistResults.push(payload)
       else state.expandedArtistResults.splice(idx, 1)
     })
-    .addCase(LIBRARY_PUSH, (state, { payload }) => ({
+    .addCase(libraryPush, (state, { payload }) => ({
       ...state,
       isLoading: false,
       version: payload.version,
