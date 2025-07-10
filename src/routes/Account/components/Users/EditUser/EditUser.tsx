@@ -14,7 +14,7 @@ interface EditUserProps {
 
 const EditUser = (props: EditUserProps) => {
   const dispatch = useAppDispatch()
-  const handleSubmit = useCallback((data) => {
+  const handleSubmit = useCallback((data: FormData) => {
     if (props.user) dispatch(updateUser({ userId: props.user.userId, data }))
     else dispatch(createUser(data))
   }, [dispatch, props.user])

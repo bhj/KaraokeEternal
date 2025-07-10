@@ -24,8 +24,8 @@ const Users = () => {
     else dispatch(filterByRoom(parseInt(e.target.value, 10)))
   }, [dispatch])
 
-  const handleOpen = useCallback((e) => {
-    setEditorUser(users.entities[e.target.dataset.userId])
+  const handleOpen = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    setEditorUser(users.entities[parseInt(e.currentTarget.dataset.userId || '0')])
     dispatch(openUserEditor())
   }, [dispatch, users])
 

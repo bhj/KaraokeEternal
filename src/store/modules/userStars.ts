@@ -1,4 +1,4 @@
-import { createAction, createReducer } from '@reduxjs/toolkit'
+import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { REHYDRATE } from 'redux-persist'
 import { ensureState } from 'redux-optimistic-ui'
 import {
@@ -11,16 +11,22 @@ import {
   SOCKET_AUTH_ERROR,
   LOGOUT,
 } from 'shared/actionTypes'
+import { RootState } from 'store/store'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const toggleSongStarred = (songId: number) => {
-  return (dispatch, getState) => {
+export const toggleSongStarred = createAsyncThunk<void, number, { state: RootState }>(
+  'userStars/toggleSongStarred',
+  async (songId, { dispatch, getState }) => {
     const starredSongs = ensureState(getState().userStars).starredSongs
-    dispatch(starredSongs.includes(songId) ? unstarSong(songId) : starSong(songId))
-  }
-}
+    if (starredSongs.includes(songId)) {
+      dispatch(unstarSong(songId))
+    } else {
+      dispatch(starSong(songId))
+    }
+  },
+)
 
 const starSong = createAction(STAR_SONG, (songId: number) => ({
   payload: { songId },

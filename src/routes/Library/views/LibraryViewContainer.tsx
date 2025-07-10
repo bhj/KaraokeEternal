@@ -37,7 +37,7 @@ const getFilterKeywords = createSelector(
 const getAlphaPickerMap = createSelector(
   [getArtists],
   (artists) => {
-    const map = { '#': 0 } // letters to row numbers
+    const map: Record<string, number> = { '#': 0 } // letters to row numbers
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
     let c = 0
 

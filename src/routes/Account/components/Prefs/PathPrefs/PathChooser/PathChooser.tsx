@@ -35,10 +35,13 @@ const PathChooser = ({ onCancel, onChoose }: PathChooserProps) => {
     onChoose(pathInfo.current, {})
   }, [onChoose, pathInfo])
 
-  const ls = useCallback((dir: string) => {
-    api.get(`/ls?dir=${encodeURIComponent(dir)}`)
-      .then(res => setPathInfo(res))
-      .catch(err => alert(err))
+  const ls = useCallback(async (dir: string) => {
+    try {
+      const result = await api.get<PathInfoType>(`/ls?dir=${encodeURIComponent(dir)}`)
+      setPathInfo(result)
+    } catch (err) {
+      alert(err)
+    }
   }, [])
 
   // get initial list on first mount

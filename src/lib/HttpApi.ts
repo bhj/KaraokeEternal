@@ -9,12 +9,16 @@ export default class HttpApi {
     }
   }
 
-  put = (url, options = {}) => this.request('PUT', url, options)
-  post = (url, options = {}) => this.request('POST', url, options)
-  get = (url, options = {}) => this.request('GET', url, options)
-  delete = (url, options = {}) => this.request('DELETE', url, options)
+  put = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('PUT', url, options)
+  post = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('POST', url, options)
+  get = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('GET', url, options)
+  delete = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('DELETE', url, options)
 
-  request = (method, url, options = {}) => {
+  request = async <T = Record<string, unknown> | Response>(
+    method: string,
+    url: string,
+    options = {},
+  ): Promise<T> => {
     const opts = {
       ...this.options,
       ...options,
@@ -30,17 +34,16 @@ export default class HttpApi {
       opts.body = JSON.stringify(opts.body)
     }
 
-    return fetch(`${document.baseURI}api/${this.prefix}${url}`, opts)
-      .then((res) => {
-        if (res.ok) {
-          const type = res.headers.get('Content-Type')
-          return (type && type.includes('application/json')) ? res.json() : res
-        }
+    const res = await fetch(`${document.baseURI}api/${this.prefix}${url}`, opts)
 
-        // error
-        return res.text().then((txt) => { // eslint-disable-line promise/no-nesting
-          throw new Error(txt)
-        })
-      })
+    if (res.ok) {
+      const type = res.headers.get('Content-Type')
+      return (type && type.includes('application/json'))
+        ? res.json()
+        : res as unknown as T
+    }
+
+    const txt = await res.text()
+    throw new Error(txt)
   }
 }

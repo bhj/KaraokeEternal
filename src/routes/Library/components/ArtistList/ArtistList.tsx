@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import PaddedList from 'components/PaddedList/PaddedList'
 import AlphaPicker from '../AlphaPicker/AlphaPicker'
 import ArtistItem from '../ArtistItem/ArtistItem'
 import { RootState } from 'store/store'
 import { Artist, Song } from 'shared/types'
+import { ListOnScrollProps, VariableSizeList } from 'react-window'
 const ROW_HEIGHT = 44
 
 interface ArtistListProps {
-  alphaPickerMap: object
+  alphaPickerMap: Record<string, number>
   artists: Record<number, Artist>
   artistsResult: number[]
   expandedArtists: number[] // artistIds
@@ -24,8 +25,8 @@ interface ArtistListProps {
 }
 
 class ArtistList extends React.Component<ArtistListProps> {
-  lastScrollTop = null
-  list = null
+  lastScrollTop: number | null = null
+  list: VariableSizeList | null = null
 
   render () {
     if (this.props.artistsResult.length === 0) return null
@@ -64,7 +65,7 @@ class ArtistList extends React.Component<ArtistListProps> {
     this.list.resetAfterIndex(0)
   }
 
-  rowRenderer = ({ index, style }) => {
+  rowRenderer = ({ index, style }: { index: number, style: CSSProperties }) => {
     const { artists, artistsResult, expandedArtists } = this.props
     const artist = artists[artistsResult[index]]
 
@@ -96,7 +97,7 @@ class ArtistList extends React.Component<ArtistListProps> {
     return rows * ROW_HEIGHT
   }
 
-  handleScroll = ({ scrollOffset }) => {
+  handleScroll = ({ scrollOffset }: ListOnScrollProps) => {
     this.lastScrollTop = scrollOffset
   }
 
@@ -108,7 +109,7 @@ class ArtistList extends React.Component<ArtistListProps> {
     }
   }
 
-  handleRef = (r) => {
+  handleRef = (r: VariableSizeList) => {
     this.list = r
     this.list.scrollTo(this.props.scrollTop)
   }

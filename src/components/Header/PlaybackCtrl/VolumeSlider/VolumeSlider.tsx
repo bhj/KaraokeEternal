@@ -15,10 +15,12 @@ interface HandleProps {
 
 // volume slider handle/grabber
 const handle = (node: React.ReactElement<HandleProps>, { value }: { value: number }) => {
-  let icon = 'VOLUME_UP'
-  if (value === 0) icon = 'VOLUME_OFF'
-  else if (value < 0.4) icon = 'VOLUME_MUTE'
-  else if (value < 0.7) icon = 'VOLUME_DOWN'
+  const icon = (() => {
+    if (value === 0) return 'VOLUME_OFF'
+    if (value < 0.4) return 'VOLUME_MUTE'
+    if (value < 0.7) return 'VOLUME_DOWN'
+    return 'VOLUME_UP'
+  })()
 
   // rc-slider passes a node (div) to which we add style and children
   return React.cloneElement(node, {

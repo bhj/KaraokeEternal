@@ -9,7 +9,7 @@ import { PlaybackOptions } from 'shared/types'
 
 const _presetKeys = Object.keys(presets)
 
-const getPreset = i => ({
+const getPreset = (i: number) => ({
   presetKey: _presetKeys[i],
   presetName: `[${i + 1}/${_presetKeys.length}] ` + _presetKeys[i],
 })

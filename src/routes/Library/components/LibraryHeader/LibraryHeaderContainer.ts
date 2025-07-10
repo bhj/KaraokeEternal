@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import LibraryHeader from './LibraryHeader'
 import { setFilterStr, resetFilterStr, toggleFilterStarred } from '../../modules/library'
+import { RootState } from 'store/store'
 
 const mapActionCreators = {
   setFilterStr,
@@ -8,7 +9,7 @@ const mapActionCreators = {
   toggleFilterStarred,
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState) => {
   return {
     filterStr: state.library.filterStr,
     filterStarred: state.library.filterStarred,

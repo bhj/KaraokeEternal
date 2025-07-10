@@ -26,7 +26,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   const handleStatus = useCallback<(status?: Partial<PlayerState>) => void>(status => dispatch(playerStatus(status)), [dispatch])
   const handleLoad = useCallback(() => dispatch(playerLoad()), [dispatch])
   const handlePlay = useCallback(() => dispatch(playerPlay()), [dispatch])
-  const handleError = useCallback((msg) => {
+  const handleError = useCallback((msg: string) => {
     dispatch(playerError(msg))
     handleStatus()
   }, [dispatch, handleStatus])

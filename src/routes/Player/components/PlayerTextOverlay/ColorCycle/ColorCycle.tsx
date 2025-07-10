@@ -11,7 +11,7 @@ interface ColorCycleProps {
 }
 
 class ColorCycle extends React.Component<ColorCycleProps> {
-  shouldComponentUpdate (prevProps) {
+  shouldComponentUpdate (prevProps: ColorCycleProps) {
     return prevProps.text !== this.props.text
   }
 

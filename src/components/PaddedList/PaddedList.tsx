@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import { VariableSizeList as List, ListOnScrollProps } from 'react-window'
 import styles from './PaddedList.css'
 
@@ -9,7 +9,7 @@ interface PaddedListProps {
   paddingTop: number
   paddingRight?: number
   paddingBottom: number
-  rowRenderer(props: { index: number, style: object }): React.ReactNode
+  rowRenderer(props: { index: number, style: CSSProperties }): React.ReactNode
   rowHeight(index: number): number
   width: number
   height: number
@@ -41,14 +41,14 @@ class PaddedList extends React.Component<PaddedListProps> {
     )
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: PaddedListProps) {
     const { paddingTop, paddingBottom } = this.props
     if (paddingTop !== prevProps.paddingTop || paddingBottom !== prevProps.paddingBottom) {
       this.list.resetAfterIndex(0)
     }
   }
 
-  rowRenderer = ({ index, style }) => {
+  rowRenderer = ({ index, style }: { index: number, style: CSSProperties }) => {
     // top & bottom spacer
     if (index === 0 || index === this.props.numRows + 1) {
       return (

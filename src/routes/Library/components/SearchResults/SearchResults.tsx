@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import PaddedList from 'components/PaddedList/PaddedList'
 import ArtistItem from '../ArtistItem/ArtistItem'
 import SongList from '../SongList/SongList'
 import { RootState } from 'store/store'
 import { Artist, Song } from 'shared/types'
 import styles from './SearchResults.css'
+import { VariableSizeList } from 'react-window'
 
 const ARTIST_HEADER_HEIGHT = 22
 const ARTIST_RESULT_HEIGHT = 44
@@ -28,7 +29,7 @@ interface SearchResultsProps {
 }
 
 class SearchResults extends React.Component<SearchResultsProps> {
-  list = null
+  list: VariableSizeList | null = null
 
   componentDidUpdate () {
     if (this.list) {
@@ -53,7 +54,7 @@ class SearchResults extends React.Component<SearchResultsProps> {
     )
   }
 
-  rowRenderer = ({ index, style }) => {
+  rowRenderer = ({ index, style }: { index: number, style: CSSProperties }) => {
     const { artistsResult, songsResult, filterStarred } = this.props
 
     // # artist results heading
@@ -115,7 +116,7 @@ class SearchResults extends React.Component<SearchResultsProps> {
     )
   }
 
-  rowHeight = (index) => {
+  rowHeight = (index: number) => {
     // artists heading
     if (index === 0) return ARTIST_HEADER_HEIGHT
 
@@ -138,7 +139,7 @@ class SearchResults extends React.Component<SearchResultsProps> {
     return this.props.songsResult.length * SONG_RESULT_HEIGHT
   }
 
-  setRef = (ref) => {
+  setRef = (ref: VariableSizeList) => {
     this.list = ref
   }
 }

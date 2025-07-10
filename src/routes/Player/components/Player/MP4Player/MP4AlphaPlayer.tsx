@@ -19,7 +19,7 @@ interface MP4AlphaPlayerProps {
 
 class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   canvas = React.createRef<HTMLCanvasElement>()
-  frameId = null
+  frameId: number | null = null
   video = document.createElement('video')
   state = {
     videoWidth: 0,
@@ -47,7 +47,7 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
     this.updateSources()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: MP4AlphaPlayerProps) {
     if (prevProps.mediaKey !== this.props.mediaKey) {
       this.updateSources()
     }

@@ -12,7 +12,7 @@ const getWaits = createSelector(
   [getQueue, getQueueId, getPlayerHistory, getPosition, getSongs],
   (queue, queueId, history, position, songs) => {
     const curIdx = queue.result.indexOf(queueId)
-    const waits = {}
+    const waits: Record<number, number> = {}
     let curWait = 0
     let nextWait = 0
 

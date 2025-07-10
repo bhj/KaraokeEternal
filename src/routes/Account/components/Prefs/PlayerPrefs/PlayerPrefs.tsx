@@ -9,8 +9,8 @@ const PlayerPrefs = () => {
   const isReplayGainEnabled = useAppSelector(state => state.prefs.isReplayGainEnabled)
   const dispatch = useAppDispatch()
 
-  const toggleCheckbox = useCallback((e) => {
-    dispatch(setPref({ key: e.target.name, data: e.target.checked }))
+  const toggleCheckbox = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setPref({ key: e.currentTarget.name, data: e.currentTarget.checked }))
   }, [dispatch])
 
   return (

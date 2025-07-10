@@ -141,8 +141,9 @@ export const fetchAccount = createAsyncThunk(
 // ------------------------------------
 const requestSocketConnect = createAction<object>(SOCKET_REQUEST_CONNECT)
 
-export function connectSocket () {
-  return (dispatch, getState) => {
+export const connectSocket = createAsyncThunk<void, void, { state: RootState }>(
+  'user/SOCKET_CONNECT',
+  async (_, { dispatch, getState }) => {
     const versions = {
       library: getState().library.version,
       stars: getState().starCounts.version,
@@ -150,8 +151,8 @@ export function connectSocket () {
 
     dispatch(requestSocketConnect(versions))
     socket.io.opts.query = versions
-  }
-}
+  },
+)
 
 // ------------------------------------
 // Reducer

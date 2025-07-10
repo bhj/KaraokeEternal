@@ -14,8 +14,8 @@ interface PlayerProps {
   isReplayGainEnabled: boolean
   isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
-  mediaId?: number
-  mediaKey?: number
+  mediaId: number
+  mediaKey: number
   mediaType?: string
   mp4Alpha: number
   rgTrackGain?: number
@@ -32,13 +32,17 @@ interface PlayerProps {
   onStatus(status: Partial<PlayerState>): void
 }
 
+interface State {
+  visualizerAudioSourceNode: MediaElementAudioSourceNode | null
+}
+
 class Player extends React.Component<PlayerProps> {
   audioCtx: AudioContext | null = null
   audioGainNode: GainNode | null = null
   audioSourceNode: MediaElementAudioSourceNode | null = null
   isFetching = false // internal
 
-  state = {
+  state: State = {
     visualizerAudioSourceNode: null,
   }
 
@@ -51,7 +55,7 @@ class Player extends React.Component<PlayerProps> {
     this.updateVolume()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: PlayerProps) {
     // may have been suspended by browser if no user interaction yet
     if (this.props.isPlaying && !prevProps.isPlaying) {
       this.audioCtx.resume()

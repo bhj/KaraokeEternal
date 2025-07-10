@@ -24,7 +24,7 @@ class MP4Player extends React.Component<MP4PlayerProps> {
     this.updateSources()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: MP4PlayerProps) {
     if (prevProps.mediaKey !== this.props.mediaKey) {
       this.updateSources()
     }
@@ -71,8 +71,8 @@ class MP4Player extends React.Component<MP4PlayerProps> {
   /*
   * <video> event handlers
   */
-  handleError = (el) => {
-    const { message, code } = el.target.error
+  handleError = (el: React.SyntheticEvent<HTMLVideoElement>) => {
+    const { message, code } = el.currentTarget.error
     this.props.onError(`${message} (code ${code})`)
   }
 

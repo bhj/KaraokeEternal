@@ -3,7 +3,7 @@ import icons from './icons'
 
 interface IconProps {
   className?: string
-  icon: string
+  icon: keyof typeof icons
   size?: number
 }
 

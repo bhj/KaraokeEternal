@@ -24,7 +24,7 @@ export default class ProgressBar extends React.Component<ProgressBarProps> {
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: ProgressBarProps) {
     if (this.props.isActive && !prevProps.isActive) {
       this.setState({ isVisible: true, isCanceling: false })
     } else if (this.state.isCanceling && this.props.text !== prevProps.text) {
