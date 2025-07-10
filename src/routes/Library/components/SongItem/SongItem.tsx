@@ -16,15 +16,15 @@ interface SongItemProps {
   artist?: string
   title: string
   duration: number
-  onSongQueue(...args: unknown[]): unknown
-  onSongStarClick(...args: unknown[]): unknown
-  onSongInfo(...args: unknown[]): unknown
+  onSongQueue(songId: number): void
+  onSongStarClick(songId: number): void
+  onSongInfo(songId: number): void
   isQueued: boolean
   isStarred: boolean
   isAdmin: boolean
   numStars: number
   numMedia: number
-  filterKeywords: unknown[]
+  filterKeywords: string[]
 }
 
 const SongItem = ({

@@ -34,7 +34,7 @@ interface QueueItemProps {
   userId: number
   wait?: string
   // actions
-  onMoveClick(...args: unknown[]): unknown
+  onMoveClick(queueId: number): void
 }
 
 const QueueItem = ({

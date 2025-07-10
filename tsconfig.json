@@ -5,11 +5,16 @@
       "shared/*": ["./shared/*"],
     },
     "skipLibCheck": true,
+    "noImplicitAny": true,
     "downlevelIteration": true,
     "esModuleInterop": true,
     "moduleResolution": "Bundler",
     "module": "esnext",
     "jsx": "react",
+    "typeRoots": [
+      "types",
+      "node_modules/@types"
+    ],
     "plugins": [
       {
         "name": "typescript-plugin-css-modules",

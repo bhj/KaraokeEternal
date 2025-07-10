@@ -37,7 +37,7 @@ const getFilterKeywords = createSelector(
 const getAlphaPickerMap = createSelector(
   [getArtists],
   (artists) => {
-    const map = { '#': 0 } // letters to row numbers
+    const map: Record<string, number> = { '#': 0 } // letters to row numbers
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
     let c = 0
 
@@ -60,16 +60,16 @@ const getAlphaPickerMap = createSelector(
 
 const getArtistSearcher = createSelector(
   [getArtists],
-  artists => new Searcher(artists.result, {
-    keySelector: artistId => artists.entities[artistId].name,
+  artists => new Searcher(artists.result.map(id => ({ id })), {
+    keySelector: artist => artists.entities[artist.id].name,
     threshold: 0.8,
   }),
 )
 
 const getSongSearcher = createSelector(
   [getSongs],
-  songs => new Searcher(songs.result, {
-    keySelector: songId => songs.entities[songId].title,
+  songs => new Searcher(songs.result.map(id => ({ id })), {
+    keySelector: song => songs.entities[song.id].title,
     threshold: 0.8,
   }),
 )
@@ -78,7 +78,7 @@ const getSongSearcher = createSelector(
 const getArtistsByKeyword = createSelector(
   [getArtists, getFilterStr, getArtistSearcher],
   (artists, str, searcher) => {
-    if (!str) return artists.result
+    if (!str) return artists.result.map(id => ({ id }))
 
     return searcher.search(str, {
       returnMatchData: true,
@@ -88,7 +88,7 @@ const getArtistsByKeyword = createSelector(
 const getSongsByKeyword = createSelector(
   [getSongs, getFilterStr, getSongSearcher],
   (songs, str, searcher) => {
-    if (!str) return songs.result
+    if (!str) return songs.result.map(id => ({ id }))
 
     return searcher.search(str, {
       returnMatchData: true,
@@ -99,17 +99,17 @@ const getSongsByKeyword = createSelector(
 const getArtistsByView = createSelector(
   [getArtistsByKeyword, getFilterStarred, getStarredArtists],
   (artistsWithKeyword, filterStarred, starredArtists) =>
-    artistsWithKeyword.filter((artistId) => {
-      return filterStarred ? starredArtists.includes(artistId) : true
-    }),
+    artistsWithKeyword.filter((artist) => {
+      return filterStarred ? starredArtists.includes(artist.id) : true
+    }).map(artist => artist.id),
 )
 
 const getSongsByView = createSelector(
   [getSongsByKeyword, getFilterStarred, getStarredSongs],
   (songsWithKeyword, filterStarred, starredSongs) =>
-    songsWithKeyword.filter((songId) => {
-      return filterStarred ? starredSongs.includes(songId) : true
-    }),
+    songsWithKeyword.filter((song) => {
+      return filterStarred ? starredSongs.includes(song.id) : true
+    }).map(song => song.id),
 )
 
 const mapStateToProps = (state: RootState) => {

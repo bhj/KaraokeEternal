@@ -1,30 +1,35 @@
-import { createReducer } from '@reduxjs/toolkit'
+import { createAction, createReducer } from '@reduxjs/toolkit'
 import { Song } from 'shared/types'
 import {
   LIBRARY_PUSH,
   LIBRARY_PUSH_SONG,
 } from 'shared/actionTypes'
 
+const libraryPushSong = createAction<State['entities'][number]>(LIBRARY_PUSH_SONG)
+const libraryPush = createAction<{
+  songs: State
+}>(LIBRARY_PUSH)
+
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface songsState {
+interface State {
   result: number[]
   entities: Record<number, Song>
 }
 
-const initialState: songsState = {
+const initialState: State = {
   result: [],
   entities: {},
 }
 
 const songsReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(LIBRARY_PUSH, (_, { payload }) => ({
+    .addCase(libraryPush, (_, { payload }) => ({
       result: payload.songs.result,
       entities: payload.songs.entities,
     }))
-    .addCase(LIBRARY_PUSH_SONG, (state, { payload }) => ({
+    .addCase(libraryPushSong, (state, { payload }) => ({
       ...state,
       entities: {
         ...state.entities,

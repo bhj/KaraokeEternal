@@ -34,7 +34,7 @@ const Modal = ({ buttons, className, children, visible = true, onClose, scrollab
     isOutsideClick.current = false
   }, [onClose])
 
-  const handleCancel = useCallback((e) => {
+  const handleCancel = useCallback((e: React.SyntheticEvent) => {
     e.preventDefault()
     onClose()
   }, [onClose])

@@ -9,7 +9,7 @@ const FirstRun = () => {
   const user = useAppSelector(state => state.user)
 
   const dispatch = useAppDispatch()
-  const handleCreate = useCallback((data) => {
+  const handleCreate = useCallback((data: FormData) => {
     dispatch(createAccount(data))
   }, [dispatch])
 

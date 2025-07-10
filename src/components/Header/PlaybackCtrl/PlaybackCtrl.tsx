@@ -9,6 +9,7 @@ import VolumeSlider from './VolumeSlider/VolumeSlider'
 import NoPlayer from './NoPlayer/NoPlayer'
 import DisplayCtrl from './DisplayCtrl/DisplayCtrl'
 import styles from './PlaybackCtrl.css'
+import { PlaybackOptions } from 'shared/types'
 
 const handleFullscreen = () => {
   if (screenfull.isEnabled) {
@@ -27,11 +28,11 @@ const PlaybackCtrl = () => {
   const status = useAppSelector(state => state.status)
 
   const dispatch = useAppDispatch()
-  const handleOptions = useCallback(opts => dispatch(requestOptions(opts)), [dispatch])
+  const handleOptions = useCallback((opts: PlaybackOptions) => dispatch(requestOptions(opts)), [dispatch])
   const handlePause = useCallback(() => dispatch(requestPause()), [dispatch])
   const handlePlay = useCallback(() => dispatch(requestPlay()), [dispatch])
   const handlePlayNext = useCallback(() => dispatch(requestPlayNext()), [dispatch])
-  const handleVolume = useCallback(val => dispatch(requestVolume(val)), [dispatch])
+  const handleVolume = useCallback((val: number) => dispatch(requestVolume(val)), [dispatch])
 
   const toggleDisplayCtrl = useCallback(() => {
     setDisplayCtrlVisible(!isDisplayCtrlVisible)

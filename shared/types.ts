@@ -41,7 +41,11 @@ export interface IRoomPrefs {
     password: string
     size: number
   }
-  roles: Record<number, {
+  user?: {
+    isNewAllowed?: boolean
+    isGuestAllowed?: boolean
+  }
+  roles?: Record<number, {
     allowNew: boolean
   }>
 }
@@ -79,4 +83,28 @@ export interface User {
   isGuest: boolean // todo: client and server ctx only
   dateCreated: number
   dateUpdated: number
+}
+
+export interface PlaybackOptions {
+  cdgAlpha?: number
+  cdgSize?: number
+  mp4Alpha?: number
+  visualizer?: {
+    sensitivity?: number
+    isEnabled?: boolean
+    nextPreset?: boolean
+    prevPreset?: boolean
+    randomPreset?: boolean
+  }
+}
+
+export type MediaType = 'cdg' | 'mp4' | ''
+
+export interface Media {
+  songId: number
+  mediaId: number
+  isPreferred: boolean
+  path: string
+  relPath: string
+  duration: number
 }

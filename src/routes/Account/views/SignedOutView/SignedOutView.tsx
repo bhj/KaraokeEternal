@@ -35,11 +35,11 @@ const SignedOutView = () => {
   // room selection visibility/defaults
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
-    const id = searchParams.get('roomId')
+    const id = parseInt(searchParams.get('roomId') ?? '0')
     const password = searchParams.get('password')
 
     if (id && rooms.entities[id]) {
-      setRoomId(parseInt(id))
+      setRoomId(id)
       setShowAllRooms(false)
       userSectionRef.current.classList.remove(styles.hidden)
 
@@ -88,7 +88,7 @@ const SignedOutView = () => {
     }))
   }, [dispatch, password, roomId, roomPassword, username])
 
-  const handleCreate = useCallback(({ name, image, passwordConfirm }) => {
+  const handleCreate = useCallback(({ name, image, passwordConfirm }: { name: string, image: Blob | undefined, passwordConfirm: string }) => {
     const data = new FormData()
 
     data.append('username', username.trim())

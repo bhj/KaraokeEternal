@@ -9,7 +9,7 @@ type ButtonBaseProps = {
   animateClassName?: string
   children?: React.ReactNode
   className?: string
-  icon?: string
+  icon?: React.ComponentProps<typeof Icon>['icon']
   size?: number
   variant?: 'primary' | 'danger' | 'default'
   as?: ButtonElementType

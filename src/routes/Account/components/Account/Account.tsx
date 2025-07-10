@@ -22,7 +22,7 @@ const Account = () => {
     dispatch(requestLogout())
   }, [dispatch, user.isGuest])
 
-  const handleSubmit = useCallback((data) => {
+  const handleSubmit = useCallback((data: FormData) => {
     if (!user.isGuest) {
       if (!curPassword.current.value.trim()) {
         alert('Please enter your current password to make changes.')
