@@ -26,7 +26,7 @@ const FirstRun = () => {
       </div>
 
       <AccountForm user={user} onSubmit={handleCreate}>
-        <Button variant='primary'>
+        <Button variant='primary' type='submit'>
           Create Account
         </Button>
       </AccountForm>
