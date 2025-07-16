@@ -5,7 +5,7 @@ import {
   REQUEST_SCAN,
   REQUEST_SCAN_STOP,
   SCANNER_WORKER_STATUS,
-} from '../shared/actionTypes.js'
+} from '../shared/actionTypes.ts'
 
 const env = JSON.parse(process.env.KES_ENV_JSON)
 const log = initLogger('scanner', {

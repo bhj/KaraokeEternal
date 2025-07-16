@@ -1,7 +1,7 @@
 import Library from '../Library/Library.js'
 import Queue from '../Queue/Queue.js'
 import Rooms from '../Rooms/Rooms.js'
-import { LIBRARY_PUSH, QUEUE_PUSH } from '../../shared/actionTypes.js'
+import { LIBRARY_PUSH, QUEUE_PUSH } from '../../shared/actionTypes.ts'
 
 async function pushQueuesAndLibrary (io) {
   // emit (potentially) updated queues to each room

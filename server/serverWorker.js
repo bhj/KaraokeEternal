@@ -27,7 +27,7 @@ import socketActions from './socket.js'
 import IPC from './lib/IPCBridge.js'
 import IPCLibraryActions from './Library/ipc.js'
 import IPCMediaActions from './Media/ipc.js'
-import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from '../shared/actionTypes.js'
+import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from '../shared/actionTypes.ts'
 
 const log = getLogger('server')
 const { verify: jwtVerify } = jsonWebToken

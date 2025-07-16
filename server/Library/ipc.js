@@ -1,6 +1,6 @@
 import Library from './Library.js'
 import throttle from '@jcoreio/async-throttle'
-import { SCANNER_WORKER_STATUS, LIBRARY_MATCH_SONG } from '../../shared/actionTypes.js'
+import { SCANNER_WORKER_STATUS, LIBRARY_MATCH_SONG } from '../../shared/actionTypes.ts'
 
 /**
  * IPC action handlers
