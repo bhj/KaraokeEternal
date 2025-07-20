@@ -1,5 +1,5 @@
 import Library from './Library.js'
-import { STAR_SONG, SONG_STARRED, UNSTAR_SONG, SONG_UNSTARRED, _SUCCESS } from '../../shared/actionTypes.js'
+import { STAR_SONG, SONG_STARRED, UNSTAR_SONG, SONG_UNSTARRED, _SUCCESS } from '../../shared/actionTypes.ts'
 
 const ACTION_HANDLERS = {
   [STAR_SONG]: async (sock, { payload }, acknowledge) => {

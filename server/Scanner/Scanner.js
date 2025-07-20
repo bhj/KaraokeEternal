@@ -1,5 +1,5 @@
 import IPC from '../lib/IPCBridge.js'
-import { SCANNER_WORKER_STATUS } from '../../shared/actionTypes.js'
+import { SCANNER_WORKER_STATUS } from '../../shared/actionTypes.ts'
 
 class Scanner {
   constructor (qStats) {

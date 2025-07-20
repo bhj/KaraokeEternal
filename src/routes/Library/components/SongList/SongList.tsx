@@ -22,9 +22,9 @@ const SongList = (props: SongListProps) => {
   const isAdmin = useAppSelector(state => state.user.isAdmin)
 
   const dispatch = useAppDispatch()
-  const handleSongQueue = useCallback(songId => dispatch(queueSong(songId)), [dispatch])
-  const handleSongInfo = useCallback(songId => dispatch(showSongInfo(songId)), [dispatch])
-  const handleSongStar = useCallback(songId => dispatch(toggleSongStarred(songId)), [dispatch])
+  const handleSongQueue = useCallback((songId: number) => dispatch(queueSong(songId)), [dispatch])
+  const handleSongInfo = useCallback((songId: number) => dispatch(showSongInfo(songId)), [dispatch])
+  const handleSongStar = useCallback((songId: number) => dispatch(toggleSongStarred(songId)), [dispatch])
 
   return props.songIds.map(songId => (
     <SongItem

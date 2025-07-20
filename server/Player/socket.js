@@ -15,7 +15,7 @@ import {
   PLAYER_REQ_VOLUME,
   PLAYER_STATUS,
   PLAYER_LEAVE,
-} from '../../shared/actionTypes.js'
+} from '../../shared/actionTypes.ts'
 
 // ------------------------------------
 // Action Handlers

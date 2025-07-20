@@ -3,18 +3,18 @@ import { Flipper, Flipped } from 'react-flip-toolkit'
 import { useAppSelector } from 'store/hooks'
 import styles from './QueueListAnimator.css'
 
-const handleEnter = (el) => {
-  el.addEventListener('animationend', e => e.target.classList.remove(styles.itemEnter))
+const handleEnter = (el: HTMLDivElement) => {
+  el.addEventListener('animationend', e => (e.currentTarget as HTMLDivElement).classList.remove(styles.itemEnter))
   el.classList.add(styles.itemEnter)
   el.style.removeProperty('opacity')
 }
 
-const handleExit = (el, _i, removeEl) => {
+const handleExit = (el: HTMLDivElement, _i: number, removeEl: () => void) => {
   el.addEventListener('animationend', removeEl)
   el.classList.add(styles.itemExit)
 }
 
-const handleShouldFlip = (prev, cur) => cur === prev
+const handleShouldFlip = (prev: number, cur: number) => cur === prev
 
 interface QueueListAnimatorProps {
   queueItems: React.ReactElement[]

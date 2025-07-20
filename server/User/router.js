@@ -9,7 +9,7 @@ import Prefs from '../Prefs/Prefs.js'
 import Queue from '../Queue/Queue.js'
 import Rooms from '../Rooms/Rooms.js'
 import User from '../User/User.js'
-import { QUEUE_PUSH } from '../../shared/actionTypes.js'
+import { QUEUE_PUSH } from '../../shared/actionTypes.ts'
 import { BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, PASSWORD_MIN_LENGTH, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from './User.js'
 
 const router = new KoaRouter({ prefix: '/api' })

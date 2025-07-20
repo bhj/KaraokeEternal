@@ -14,7 +14,7 @@ export default tseslint.config(
   // global config
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
-  stylistic.configs['recommended-flat'],
+  stylistic.configs.recommended,
   pluginPromise.configs['flat/recommended'],
   {
     plugins: {

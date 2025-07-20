@@ -46,13 +46,14 @@ const InputImage = ({ user, onSelect }: UserImageProps) => {
 
     loadImage(
       file,
-      (canvas: HTMLCanvasElement | Event) => {
-        if (canvas instanceof Event && canvas.type === 'error') {
+      (canvas) => {
+        if (canvas instanceof Event) {
           alert('The image could not be loaded.')
           return
         }
 
         const scaled = loadImage.scale(canvas, {
+          canvas: true,
           maxWidth: 400,
           maxHeight: 300,
           crop: true,

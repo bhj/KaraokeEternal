@@ -3,7 +3,7 @@ import {
   ROOM_PREFS_PUSH_REQUEST,
   ROOM_PREFS_PUSH,
   _ERROR,
-} from '../../shared/actionTypes.js'
+} from '../../shared/actionTypes.ts'
 
 const ACTION_HANDLERS = {
   [ROOM_PREFS_PUSH_REQUEST]: async (sock, { payload }, acknowledge) => {

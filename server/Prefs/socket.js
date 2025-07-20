@@ -1,7 +1,7 @@
 import getLogger from '../lib/Log.js'
 import Library from '../Library/Library.js'
 import Prefs from './Prefs.js'
-import { LIBRARY_PUSH, PREFS_PATH_SET_PRIORITY, PREFS_PUSH, PREFS_SET, _ERROR } from '../../shared/actionTypes.js'
+import { LIBRARY_PUSH, PREFS_PATH_SET_PRIORITY, PREFS_PUSH, PREFS_SET, _ERROR } from '../../shared/actionTypes.ts'
 const log = getLogger(`server[${process.pid}]`)
 
 const ACTION_HANDLERS = {

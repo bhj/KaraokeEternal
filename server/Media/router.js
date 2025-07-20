@@ -13,7 +13,7 @@ import Prefs from '../Prefs/Prefs.js'
 import Queue from '../Queue/Queue.js'
 import Rooms from '../Rooms/Rooms.js'
 import fileTypes from './fileTypes.js'
-import { LIBRARY_PUSH_SONG, QUEUE_PUSH } from '../../shared/actionTypes.js'
+import { LIBRARY_PUSH_SONG, QUEUE_PUSH } from '../../shared/actionTypes.ts'
 const log = getLogger('Media')
 const router = new KoaRouter({ prefix: '/api/media' })
 

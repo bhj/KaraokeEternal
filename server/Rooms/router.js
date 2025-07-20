@@ -9,7 +9,7 @@ const log = getLogger('Rooms')
 const { db } = Database
 const router = new KoaRouter({ prefix: '/api/rooms' })
 
-import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
+import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.ts'
 
 // list rooms
 router.get('/:roomId?', async (ctx) => {

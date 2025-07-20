@@ -1,5 +1,5 @@
 import getLogger from './Log.js'
-import { _ERROR, _SUCCESS } from '../../shared/actionTypes.js'
+import { _ERROR, _SUCCESS } from '../../shared/actionTypes.ts'
 
 const log = getLogger('IPCBridge')
 const PROCESS_NAME = process.env.KES_CHILD_PROCESS || 'main'

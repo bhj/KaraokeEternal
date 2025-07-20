@@ -13,8 +13,8 @@ interface PathItemProps {
 }
 
 const PathItem = ({ index, onInfo, onRefresh, path }: PathItemProps) => {
-  const handleInfo = useCallback(e => onInfo(e.currentTarget.dataset.pathId), [onInfo])
-  const handleRefresh = useCallback(e => onRefresh(e.currentTarget.dataset.pathId), [onRefresh])
+  const handleInfo = useCallback((e: React.SyntheticEvent<HTMLElement>) => onInfo(parseInt(e.currentTarget.dataset.pathId)), [onInfo])
+  const handleRefresh = useCallback((e: React.SyntheticEvent<HTMLElement>) => onRefresh(parseInt(e.currentTarget.dataset.pathId)), [onRefresh])
 
   return (
     <Draggable draggableId={`path-${path.pathId}`} index={index}>

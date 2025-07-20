@@ -42,12 +42,12 @@ const PathInfo = ({ onClose, onRemove, onUpdate, path }: PathInfoProps) => {
           <InputCheckbox
             label='Watch folder'
             defaultChecked={path?.prefs?.isWatchingEnabled}
-            onChange={checked => handleChange({ isWatchingEnabled: checked })}
+            onChange={event => handleChange({ isWatchingEnabled: event.currentTarget.checked })}
           />
           <InputCheckbox
             label='Allow video background keying'
             defaultChecked={path?.prefs?.isVideoKeyingEnabled}
-            onChange={checked => handleChange({ isVideoKeyingEnabled: checked })}
+            onChange={event => handleChange({ isVideoKeyingEnabled: event.currentTarget.checked })}
           />
         </form>
       </div>

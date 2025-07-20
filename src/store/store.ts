@@ -1,5 +1,5 @@
-import { configureStore, ThunkAction, UnknownAction } from '@reduxjs/toolkit'
-import reducers from './reducers'
+import { Action, configureStore, ThunkAction, UnknownAction } from '@reduxjs/toolkit'
+import rootReducer from './reducers'
 import socket from 'lib/socket'
 import createSocketMiddleware from './socketMiddleware'
 import createThrottle from 'redux-throttle'
@@ -19,6 +19,12 @@ window.addEventListener('resize', () => store.dispatch(windowResize({
   innerHeight: window.innerHeight,
 })))
 
+export interface OptimisticAction extends Action {
+  meta: {
+    isOptimistic?: boolean
+  }
+}
+
 // ======================================================
 // Middleware Configuration
 // ======================================================
@@ -34,7 +40,7 @@ const socketMiddleware = createSocketMiddleware(socket, 'server/')
 // Store Instantiation and HMR Setup
 // ======================================================
 const store = configureStore({
-  reducer: reducers,
+  reducer: rootReducer,
   middleware: getDefaultMiddleware => getDefaultMiddleware({
     // https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
     serializableCheck: {
@@ -52,7 +58,7 @@ if (module.hot) {
 }
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>
+export type RootState = ReturnType<typeof rootReducer>
 export type AppDispatch = typeof store.dispatch
 
 // generic type for non-async thunks

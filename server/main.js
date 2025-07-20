@@ -13,7 +13,7 @@ import {
   // SERVER_WORKER_STATUS,
   WATCHER_WORKER_EVENT,
   WATCHER_WORKER_WATCH,
-} from '../shared/actionTypes.js'
+} from '../shared/actionTypes.ts'
 
 const log = initLogger('server', {
   console: {

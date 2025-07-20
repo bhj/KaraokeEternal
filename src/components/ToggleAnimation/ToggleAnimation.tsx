@@ -12,7 +12,7 @@ export default class ToggleAnimation extends Component<ToggleAnimationProps> {
     animate: false,
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: ToggleAnimationProps) {
     if (this.props.toggle !== prevProps.toggle) {
       this.setState({ animate: true })
     }

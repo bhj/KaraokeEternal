@@ -11,8 +11,8 @@ const SongInfo = () => {
 
   const dispatch = useAppDispatch()
   const handleCloseSongInfo = () => dispatch(closeSongInfo())
-  const handlePrefer = mediaId => dispatch(setPreferredSong({ songId, mediaId, isPreferred: true }))
-  const handleRemovePrefer = mediaId => dispatch(setPreferredSong({ songId, mediaId, isPreferred: false }))
+  const handlePrefer = (mediaId: number) => dispatch(setPreferredSong({ songId, mediaId, isPreferred: true }))
+  const handleRemovePrefer = (mediaId: number) => dispatch(setPreferredSong({ songId, mediaId, isPreferred: false }))
 
   const mediaDetails = media.result.map((mediaId) => {
     const item = media.entities[mediaId]

@@ -21,7 +21,7 @@ import {
   PREFS_PUSH,
   SOCKET_AUTH_ERROR,
   _ERROR,
-} from '../shared/actionTypes.js'
+} from '../shared/actionTypes.ts'
 const log = getLogger('server')
 
 const handlers = {
