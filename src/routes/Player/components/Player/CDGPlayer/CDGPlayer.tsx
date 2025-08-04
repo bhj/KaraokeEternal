@@ -40,8 +40,6 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
   componentDidMount () {
     this.canvasCtx = this.canvas.current.getContext('2d')
-    this.cdg = new CDGraphics()
-
     this.props.onAudioElement(this.audio.current)
     this.updateSources()
   }
@@ -132,7 +130,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
       // in case we've unmounted by this point
       if (!this.audio.current) return
 
-      this.cdg.load(buffer)
+      this.cdg = new CDGraphics(buffer)
       this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
       this.audio.current.load()
       return
