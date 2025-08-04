@@ -35,7 +35,8 @@ const SignedOutView = () => {
   // room selection visibility/defaults
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
-    const id = parseInt(searchParams.get('roomId') ?? '0')
+    const roomIdParam = searchParams.get('roomId')
+    const id = roomIdParam ? parseInt(roomIdParam, 10) : null
     const password = searchParams.get('password')
 
     if (id && rooms.entities[id]) {
