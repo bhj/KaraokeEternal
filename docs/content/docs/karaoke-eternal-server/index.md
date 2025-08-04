@@ -121,7 +121,7 @@ Karaoke Eternal is available as an `npm` package for systems running [Node.js](h
   $ karaoke-eternal-server
 {{< /highlight >}}
 
-3. Watch the output for "Web server running at..." and browse to the **server URL**.
+3. Look for "Web server running at..." and browse to the **server URL**.
 
 See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
 
@@ -129,99 +129,107 @@ See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're n
 
 The following types are supported:
 
-- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (.cdg and .mp3 files must be named the same; also supports an .m4a instead of .mp3)
+- [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (including zipped; also supports .m4a instead of .mp3)
 - MP4 video (codec support can vary depending on the browser running the <a href="{{< ref "docs/karaoke-eternal-app#player" >}}">player</a>).
 
 Your media files should be named in **"Artist - Title"** format by default (you can [configure this](#configuring-the-metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
 
-### Configuring the Metadata Parser
+## Metadata Parser
 
-The media metadata parser can be customized using a `_kes.v1.js` file. When this file is encountered in a media folder it applies to all files and subfolders (if any subfolders have their own `_kes.v1.js`, it will take precedence).
+You can customize Karaoke Eternal's metadata parser by creating a file named `_kes.v2.json` in a media folder. It will apply to all media files in the folder, including subfolders. If any subfolders contain their own `_kes.v2.json` file, that will take precedence instead. These files can be in JSON or JSON5 format - JSON5 is used in the examples below since it's friendlier for humans.
 
-You can configure the default metadata parser by returning an object with the options you want to override. For example, if a folder has filenames in the format "Title - Artist", you could add this `_kes.v1.js` file:
+### Basic Configuration
+
+At the most basic, your `_kes.v2.json` file can alter some or all of the parser's default configuration, which is:
 
 {{< highlight js >}}
-return {
+{
+  articles: ['A', 'An', 'The'], // used to normalize artist/title; set false to disable
+  artistOnLeft: true, // assumes filenames are in "Artist - Title" format
+  delimiter: '-', // assumes a hyphen separates the artist and title 
+}
+{{< /highlight >}}
+
+For example, if you had a folder with filenames in the format "Title - Artist" instead, you could create this `_kes.v2.json` file in it:
+
+{{< highlight js >}}
+{
   artistOnLeft: false, // override default
 }
 {{< /highlight >}}
 
-<aside class="info">
-  {{% icon-info %}}
-  <p>It's important to `return` the configuration object. JSON format is not currently supported.</p>
-</aside>
+### Advanced Templating
 
-The default configuration is:
-
-{{< highlight js >}}
-return {
-  articles: ['A', 'An', 'The'], // false disables article normalization
-  artistOnLeft: true,
-  delimiter: '-', // can also be a RegExp
-}
-{{< /highlight >}}
-
-### Creating a Metadata Parser (Experimental)
-
-Your `_kes.v1.js` file can also return a *parser creator* instead of a configuration object. A parser creator returns a function that can be called for each media file. The [default parser](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js){{% icon-external %}} is still available so you don't have to reinvent the wheel.
-
-The following example creates a parser that removes the word 'junk' from each filename before handing off to the default parser:
-
-{{< highlight js >}}
-return ({ compose, getDefaultParser, defaultMiddleware }) => {
-  function customMiddleware (ctx, next) {
-    ctx.name = ctx.name.replace('junk', '')
-    next()
-  }
-
-  return compose(
-    customMiddleware,   // our custom pre-processing
-    getDefaultParser(), // everything else (optionally accepts a configuration object)
-  )
-}
-{{< /highlight >}}
-
-Your parser creator is passed an object with the following properties:
-
-- `compose` (function) accepts functions (or arrays of functions) as arguments and returns a single composed function that can be used as a parser
-- `getDefaultParser` (function) gets an instance of the default parser, which itself can be used as middleware. Note that the method must be called because you can optionally pass a [configuration object](#configuring-the-metadata-parser)
-- `defaultMiddleware` [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map){{% icon-external %}} containing the [default middleware](/repo/blob/master/server/Scanner/MetaParser/defaultMiddleware.js){{% icon-external %}} in order. This can be used to recompose the middleware in your custom parser
-
-When a media file is scanned, the parser is called with a context object `ctx` having the following properties:
-
-- `dir` (string) full path of the containing folder
-- `dirSep` (string) path segment separator used by the current OS (`/` or `\`)
-- `name` (string) media filename (without extension)
-- `data` (object) media file's [metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md){{% icon-external %}}
-
-Middleware may mutate `ctx` as required. Once finished, the following properties on it will be used:
+If changing the parser's default configuration doesn't yield the desired results, you can also define your own "template" to override the result for one or more of these fields:
 
 - `artist` (string) artist's name as it will be shown in the library
 - `artistNorm` (string) normalized version of the artist's name; used for matching and sorting (`artist` if not set)
 - `title` (string) song's title as it will be shown in the library
 - `titleNorm` (string) normalized version of the song's title; used for matching and sorting (`title` if not set)
 
-It's important that each middleware call `next` unless you're done or don't want the chain to continue.
+For each media file encountered, Karaoke Eternal makes a "context" available to your field template(s). This context includes the fields above (that is, the results from the built-in parser) in addition to:
+
+- `name` (string) media filename (without extension)
+- `meta` (object) media file's [metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md){{% icon-external %}}
+- `dir` (string) full path of the containing folder
+- `dirSep` (string) path separator used by the current OS (`/` or `\`)
+
+Field templates are defined using [JSON-e syntax](https://json-e.js.org){{% icon-external %}}. In addition to JSON-e's [built-in methods](https://json-e.js.org/built-ins.html){{% icon-external %}}, a `replace` method is also provided for simple text replacement. Here are a few examples of how one might use field templates in their `_kes.v2.json` file:
+
+{{< highlight js >}}
+// explicitly set the artist field
+{
+  artist: "My Artist's Name",
+}
+{{< /highlight >}}
+
+{{< highlight js >}}
+// remove the text "junk" from anywhere in the parsed artist field
+{
+  artist: {
+    $eval: 'replace(artist, "junk", "")'
+  },
+}
+{{< /highlight >}}
+
+{{< highlight js >}}
+// remove the word "junk" case-insensitively from the start of the parsed artist field (regex syntax)
+// the double-backslash resolves to a single backslash in the string
+{
+  artist: {
+    $eval: 'replace(artist, "^junk\\s", "i", "")'
+  },
+}
+{{< /highlight >}}
+
+{{< highlight js >}}
+// set artist and title using the media file's metadata tags
+{
+  artist: '${meta.artist}',
+  title: '${meta.title}',
+}
+{{< /highlight >}}
 
 <aside class="info">
   {{% icon-info %}}
-  <p>Media duration is handled automatically and cannot be set from a parser.</p>
+  <p><strong>Tip: </strong>Setting the media scanner log or console level to "debug" (see below) can be helpful in troubleshooting your field templates.
+</p>
 </aside>
 
 ## CLI & ENV
 
-Karaoke Eternal Server supports the following CLI options and environment variables. The numeric levels used for logs/console are: **0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug
+Karaoke Eternal Server supports the following CLI options and environment variables. The numeric values used for log/console levels are: **0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug
 
 | Option | ENV | Description | Default |
 | --- | --- | --- | --- |
-| <span style="white-space: nowrap;">`--consoleLevel <number>`</span>| <span style="white-space: nowrap;">`KES_CONSOLE_LEVEL`</span> | Web server console output level | 4 |
 | <span style="white-space: nowrap;">`--data <string>`</span>| <span style="white-space: nowrap;">`KES_PATH_DATA`</span> | Absolute path of folder for database files | |
-| <span style="white-space: nowrap;">`--logLevel <number>`</span>| <span style="white-space: nowrap;">`KES_LOG_LEVEL`</span> | Web server log file level | 3 |
 | <span style="white-space: nowrap;">`-p, --port <number>`</span>| <span style="white-space: nowrap;">`KES_PORT`</span> | Web server port | auto |
 | <span style="white-space: nowrap;">`--rotateKey`</span>| <span style="white-space: nowrap;">`KES_ROTATE_KEY`</span> | Rotate the session key at startup | |
 | <span style="white-space: nowrap;">`--scan`</span>| <span style="white-space: nowrap;">`KES_SCAN`</span> | Run the media scanner at startup. Accepts a comma-separated list of pathIds, or "all" | |
-| <span style="white-space: nowrap;">`--scanConsoleLevel <number>`</span>| `KES_SCAN_CONSOLE_LEVEL` | Media scanner console output level (default=4) | 4 |
-| <span style="white-space: nowrap;">`--scanLogLevel <number>`</span>| <span style="white-space: nowrap;">`KES_SCAN_LOG_LEVEL`</span> | Media scanner log file level | 3 |
+| <span style="white-space: nowrap;">`--scannerConsoleLevel <number>`</span>| `KES_SCANNER_CONSOLE_LEVEL` | Media scanner console output level (default=4) | 4 |
+| <span style="white-space: nowrap;">`--scannerLogLevel <number>`</span>| <span style="white-space: nowrap;">`KES_SCANNER_LOG_LEVEL`</span> | Media scanner log file level | 3 |
+| <span style="white-space: nowrap;">`--serverConsoleLevel <number>`</span>| <span style="white-space: nowrap;">`KES_SERVER_CONSOLE_LEVEL`</span> | Web server console output level | 4 |
+| <span style="white-space: nowrap;">`--serverLogLevel <number>`</span>| <span style="white-space: nowrap;">`KES_SERVER_LOG_LEVEL`</span> | Web server log file level | 3 |
 | <span style="white-space: nowrap;">`--urlPath <string>`</span>| <span style="white-space: nowrap;">`KES_URL_PATH`</span> | Web server base URL path (must begin with a forward slash) | / |
 | <span style="white-space: nowrap;">`-v, --version`</span>| | Show version and exit | |
 
