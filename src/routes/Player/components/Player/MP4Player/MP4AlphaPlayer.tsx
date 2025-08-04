@@ -125,18 +125,9 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
     this.stopChroma()
   }
 
-  handleError: OnErrorEventHandlerNonNull = (event, soruce, line, col, error) => {
-    if (typeof event === 'string') {
-      this.props.onError(event)
-      return
-    }
-
-    if (!error) {
-      this.props.onError('Unknown error occurred')
-      return
-    }
-
-    this.props.onError(error.message)
+  handleError = () => {
+    const { message, code } = this.video.error
+    this.props.onError(`${message} (code ${code})`)
   }
 
   handlePlay = () => {

@@ -71,8 +71,8 @@ class MP4Player extends React.Component<MP4PlayerProps> {
   /*
   * <video> event handlers
   */
-  handleError = (el: React.SyntheticEvent<HTMLVideoElement>) => {
-    const { message, code } = el.currentTarget.error
+  handleError = () => {
+    const { message, code } = this.video.current.error
     this.props.onError(`${message} (code ${code})`)
   }
 
