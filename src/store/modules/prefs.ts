@@ -47,8 +47,8 @@ export const setPathPrefs = createAsyncThunk(
 export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
   PREFS_REQUEST,
   async (_, thunkAPI) => {
-    const response = await api.get<{ isFirstRun: boolean }>('')
-    if (response instanceof Response) return response
+    const response = await api.get('')
+
     // sign out if we see isFirstRun flag
     if (response.isFirstRun && thunkAPI.getState().user.userId !== null) {
       thunkAPI.dispatch(logout())
