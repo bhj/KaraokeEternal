@@ -15,24 +15,23 @@ interface CDGPlayerProps {
   mediaKey: number
   width: number
   height: number
-  onAudioElement(...args: unknown[]): unknown
+  onAudioElement(video: HTMLAudioElement): void
   // media events
-  onEnd(...args: unknown[]): unknown
-  onError(...args: unknown[]): unknown
-  onLoad(...args: unknown[]): unknown
-  onPlay(...args: unknown[]): unknown
-  onStatus(...args: unknown[]): unknown
+  onEnd(): void
+  onError(error: string): void
+  onLoad(): void
+  onPlay(): void
+  onStatus(status: { position: number }): void
 }
 
 class CDGPlayer extends React.Component<CDGPlayerProps> {
   audio = React.createRef<HTMLAudioElement>()
   canvas = React.createRef<HTMLCanvasElement>()
-  canvasCtx = null
-  cdg = null
-  frameId = null
-  lastBitmap = null
-  supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
-  || CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
+  canvasCtx: CanvasRenderingContext2D | null = null
+  cdg: CDGraphics = null
+  frameId: number | null = null
+  lastBitmap: ImageBitmap | null = null
+  supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)') || CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
 
   state = {
     backgroundRGBA: [0, 0, 0, 0],
@@ -47,7 +46,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     this.updateSources()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: CDGPlayerProps) {
     if (prevProps.mediaKey !== this.props.mediaKey) {
       this.updateSources()
       return
@@ -122,23 +121,24 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     )
   }
 
-  updateSources = () => {
+  updateSources = async () => {
     this.stopCDG()
 
     // load .cdg file
-    api('GET', `/${this.props.mediaId}?type=cdg`)
-      .then(res => res.arrayBuffer())
-      .then((buffer) => {
-        // in case we've unmounted by this point
-        if (!this.audio.current) return
+    try {
+      const response = await api.get(`/${this.props.mediaId}?type=cdg`)
+      if (!(response instanceof Response)) return
+      const buffer = await response.arrayBuffer()
+      // in case we've unmounted by this point
+      if (!this.audio.current) return
 
-        this.cdg.load(buffer)
-        this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
-        this.audio.current.load()
-        return
-      }).catch((err) => {
-        this.props.onError(err.message)
-      })
+      this.cdg.load(buffer)
+      this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
+      this.audio.current.load()
+      return
+    } catch (err) {
+      this.props.onError(err.message)
+    }
   }
 
   updateIsPlaying = () => {
@@ -159,8 +159,8 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     this.stopCDG()
   }
 
-  handleError = (el) => {
-    const { message, code } = el.target.error
+  handleError = (el: React.SyntheticEvent<HTMLAudioElement>) => {
+    const { message, code } = el.currentTarget.error
     this.props.onError(`${message} (code ${code})`)
   }
 
@@ -178,7 +178,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   /*
   * CDGraphics rendering
   */
-  paintCDG = (bitmap) => {
+  paintCDG = (bitmap: ImageBitmap) => {
     const { clientWidth, clientHeight } = this.canvas.current
 
     this.canvasCtx.imageSmoothingEnabled = false

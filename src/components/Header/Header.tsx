@@ -65,20 +65,20 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div className={clsx(styles.container, 'bg-blur')} ref={ref}>
       {!isPlayer && isPlayerPresent
-      && <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />}
+        && <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />}
 
       {(isUpNow || isAdmin)
-      && <PlaybackCtrl />}
+        && <PlaybackCtrl />}
 
       {isAdmin && !isPlayer
-      && (
-        <ProgressBar
-          isActive={isScanning}
-          onCancel={cancelScan}
-          pct={scannerPct}
-          text={scannerText}
-        />
-      )}
+        && (
+          <ProgressBar
+            isActive={isScanning}
+            onCancel={cancelScan}
+            pct={scannerPct}
+            text={scannerText}
+          />
+        )}
 
       <Routes>
         <Route path='/library' element={<LibraryHeader />} />

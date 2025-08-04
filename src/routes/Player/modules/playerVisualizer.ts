@@ -5,10 +5,11 @@ import {
   PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
 } from 'shared/actionTypes'
+import { PlaybackOptions } from 'shared/types'
 
 const _presetKeys = Object.keys(presets)
 
-const getPreset = i => ({
+const getPreset = (i: number) => ({
   presetKey: _presetKeys[i],
   presetName: `[${i + 1}/${_presetKeys.length}] ` + _presetKeys[i],
 })
@@ -18,12 +19,14 @@ const getRandomPreset = () => getPreset(Math.floor(Math.random() * (_presetKeys.
 // ------------------------------------
 // Actions
 // ------------------------------------
+const playerCmdOptions = createAction<{ visualizer: PlaybackOptions['visualizer'] }>(PLAYER_CMD_OPTIONS)
+export const playerLoad = createAction(PLAYER_LOAD)
 export const playerVisualizerError = createAction<string>(PLAYER_VISUALIZER_ERROR)
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-export interface playerVisualizerState {
+export interface PlayerVisualizerState {
   isEnabled: boolean
   isSupported: boolean
   presetKey: string
@@ -31,7 +34,7 @@ export interface playerVisualizerState {
   sensitivity: number
 }
 
-const initialState: playerVisualizerState = {
+const initialState: PlayerVisualizerState = {
   isEnabled: true,
   isSupported: true,
   ...getRandomPreset(),
@@ -40,11 +43,11 @@ const initialState: playerVisualizerState = {
 
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(PLAYER_LOAD, state => ({
+    .addCase(playerLoad, state => ({
       ...state,
       ...getRandomPreset(),
     }))
-    .addCase(PLAYER_CMD_OPTIONS, (state, { payload }) => {
+    .addCase(playerCmdOptions, (state, { payload }) => {
       const { visualizer } = payload
       if (typeof visualizer !== 'object') return state
 

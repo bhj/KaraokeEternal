@@ -1,4 +1,4 @@
-import { AnyAction, createAction, createReducer } from '@reduxjs/toolkit'
+import { AnyAction, createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import {
   CLEAR_ERROR_MESSAGE,
   FOOTER_HEIGHT_CHANGE,
@@ -6,9 +6,10 @@ import {
   SHOW_ERROR_MESSAGE,
   UI_WINDOW_RESIZE,
 } from 'shared/actionTypes'
+import { RootState } from 'store/store'
 
 const MAX_CONTENT_WIDTH = 768
-let scrollLockTimer
+let scrollLockTimer: ReturnType<typeof setTimeout> | null
 
 // ------------------------------------
 // Actions
@@ -16,27 +17,21 @@ let scrollLockTimer
 export const clearErrorMessage = createAction(CLEAR_ERROR_MESSAGE)
 export const showErrorMessage = createAction<string>(SHOW_ERROR_MESSAGE)
 
-export const setHeaderHeight = (height) => {
-  return (dispatch, getState) => {
-    if (getState().ui.headerHeight === height) return
+export const setHeaderHeight = createAsyncThunk<void, number, { state: RootState }>('ui/SET_HEADER_HEIGHT', async (height: number, { dispatch, getState }) => {
+  if (getState().ui.headerHeight === height) return
+  dispatch({
+    type: HEADER_HEIGHT_CHANGE,
+    payload: height ?? 0, // height might be undefined if Header renders nothing
+  })
+})
 
-    dispatch({
-      type: HEADER_HEIGHT_CHANGE,
-      payload: height ?? 0, // height might be undefined if Header renders nothing
-    })
-  }
-}
-
-export const setFooterHeight = (height) => {
-  return (dispatch, getState) => {
-    if (getState().ui.footerHeight === height) return
-
-    dispatch({
-      type: FOOTER_HEIGHT_CHANGE,
-      payload: height ?? 0, // height might be undefined if Footer renders nothing
-    })
-  }
-}
+export const setFooterHeight = createAsyncThunk<void, number, { state: RootState }>('ui/SET_HEADER_HEIGHT', async (height: number, { dispatch, getState }) => {
+  if (getState().ui.footerHeight === height) return
+  dispatch({
+    type: FOOTER_HEIGHT_CHANGE,
+    payload: height ?? 0, // height might be undefined if Header renders nothing
+  })
+})
 
 export const windowResize = createAction(UI_WINDOW_RESIZE, window => ({
   payload: window,
@@ -49,7 +44,7 @@ export const windowResize = createAction(UI_WINDOW_RESIZE, window => ({
 }))
 
 // does not dispatch anything (only affects the DOM)
-export const lockScrolling = (lock) => {
+export const lockScrolling = (lock: boolean) => {
   if (lock) {
     clearTimeout(scrollLockTimer)
     scrollLockTimer = null
@@ -61,11 +56,13 @@ export const lockScrolling = (lock) => {
     }, 200)
   }
 }
+const footerHeightChange = createAction<number>(FOOTER_HEIGHT_CHANGE)
+const headerHeightChange = createAction<number>(HEADER_HEIGHT_CHANGE)
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface uiState {
+export interface UIState {
   isErrored: boolean
   errorMessage: string | null
   footerHeight: number
@@ -75,7 +72,7 @@ interface uiState {
   contentWidth: number
 }
 
-const initialState: uiState = {
+const initialState: UIState = {
   isErrored: false,
   errorMessage: null,
   footerHeight: 0,
@@ -87,10 +84,10 @@ const initialState: uiState = {
 
 const uiReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(HEADER_HEIGHT_CHANGE, (state, { payload }) => {
+    .addCase(headerHeightChange, (state, { payload }) => {
       state.headerHeight = payload
     })
-    .addCase(FOOTER_HEIGHT_CHANGE, (state, { payload }) => {
+    .addCase(footerHeightChange, (state, { payload }) => {
       state.footerHeight = payload
     })
     .addCase(showErrorMessage, (state, { payload }) => {

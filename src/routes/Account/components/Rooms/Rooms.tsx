@@ -17,13 +17,13 @@ const Rooms = () => {
 
   const dispatch = useAppDispatch()
   const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
-  const handleFilterChange = useCallback((e) => {
-    if (e.target.value === 'all') dispatch(filterByStatus(false))
-    else dispatch(filterByStatus(e.target.value))
+  const handleFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.currentTarget.value === 'all') dispatch(filterByStatus(false))
+    else dispatch(filterByStatus(e.currentTarget.value))
   }, [dispatch])
-  const handleFilterUsers = useCallback(e => dispatch(filterByRoom(parseInt(e.target.dataset.roomId, 10))), [dispatch])
-  const handleOpen = useCallback((e) => {
-    setEditorRoom(rooms.entities[e.target.dataset.roomId])
+  const handleFilterUsers = useCallback((e: React.MouseEvent<HTMLElement>) => dispatch(filterByRoom(parseInt(e.currentTarget.dataset.roomId))), [dispatch])
+  const handleOpen = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    setEditorRoom(rooms.entities[parseInt(e.currentTarget.dataset.roomId || '0')])
     dispatch(openRoomEditor())
   }, [dispatch, rooms])
 

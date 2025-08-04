@@ -5,8 +5,8 @@ import styles from './AccountForm.css'
 
 interface AccountFormProps {
   children?: React.ReactNode
-  onDirtyChange?(...args: unknown[]): unknown
-  onSubmit(...args: unknown[]): unknown
+  onDirtyChange?(isDirty: boolean): void
+  onSubmit(formData: FormData): void
   showRole?: boolean
   showUsername?: boolean
   showPassword?: boolean

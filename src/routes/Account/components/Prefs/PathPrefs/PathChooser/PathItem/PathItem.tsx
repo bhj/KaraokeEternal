@@ -4,7 +4,7 @@ import styles from './PathItem.css'
 
 interface PathItemProps {
   path: string
-  onSelect?(...args: unknown[]): unknown
+  onSelect?(event: React.MouseEvent<HTMLDivElement>): void
 }
 
 const PathItem = (props: PathItemProps) => {

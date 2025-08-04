@@ -1,5 +1,5 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import type { playerVisualizerState } from 'routes/Player/modules/playerVisualizer'
+import { type PlayerVisualizerState } from 'routes/Player/modules/playerVisualizer'
 import {
   PLAYER_REQ_OPTIONS,
   PLAYER_REQ_PLAY,
@@ -9,6 +9,7 @@ import {
   PLAYER_STATUS,
   PLAYER_LEAVE,
 } from 'shared/actionTypes'
+import { MediaType, PlaybackOptions } from 'shared/types'
 
 // ------------------------------------
 // Actions
@@ -16,6 +17,8 @@ import {
 export const requestPlay = createAction(PLAYER_REQ_PLAY)
 export const requestPause = createAction(PLAYER_REQ_PAUSE)
 export const requestPlayNext = createAction(PLAYER_REQ_NEXT)
+const playerStatus = createAction<object>(PLAYER_STATUS)
+const playerLeave = createAction(PLAYER_LEAVE)
 
 export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
   payload: vol,
@@ -27,7 +30,7 @@ export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
   },
 }))
 
-export const requestOptions = createAction(PLAYER_REQ_OPTIONS, opts => ({
+export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOptions) => ({
   payload: opts,
   meta: {
     throttle: {
@@ -40,7 +43,7 @@ export const requestOptions = createAction(PLAYER_REQ_OPTIONS, opts => ({
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface statusState {
+interface StatusState {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
@@ -51,16 +54,16 @@ interface statusState {
   isPlaying: boolean
   isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
-  mediaType: string | null
+  mediaType: MediaType | null
   mp4Alpha: number
   nextUserId: number | null
   position: number
   queueId: number
-  visualizer: playerVisualizerState | Record<string, never>
+  visualizer: PlayerVisualizerState | Record<string, never>
   volume: number
 }
 
-const initialState: statusState = {
+const initialState: StatusState = {
   cdgAlpha: 0,
   cdgSize: 0.8,
   errorMessage: '',
@@ -82,10 +85,10 @@ const initialState: statusState = {
 
 const statusReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(PLAYER_LEAVE, (state) => {
+    .addCase(playerLeave, (state) => {
       state.isPlayerPresent = false
     })
-    .addCase(PLAYER_STATUS, (state, { payload }) => ({
+    .addCase(playerStatus, (state, { payload }) => ({
       ...state,
       ...payload,
       isPlayerPresent: true,

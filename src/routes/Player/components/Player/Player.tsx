@@ -2,7 +2,9 @@ import React from 'react'
 import CDGPlayer from './CDGPlayer/CDGPlayer'
 import MP4Player from './MP4Player/MP4Player'
 import MP4AlphaPlayer from './MP4Player/MP4AlphaPlayer'
-import type { playerVisualizerState } from '../../modules/playerVisualizer'
+import { type PlayerState } from '../../modules/player'
+import { type PlayerVisualizerState } from '../../modules/playerVisualizer'
+
 const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisualizer'))
 
 interface PlayerProps {
@@ -13,31 +15,35 @@ interface PlayerProps {
   isReplayGainEnabled: boolean
   isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
-  mediaId?: number
-  mediaKey?: number
+  mediaId: number
+  mediaKey: number
   mediaType?: string
   mp4Alpha: number
   rgTrackGain?: number
   rgTrackPeak?: number
-  visualizer: playerVisualizerState
+  visualizer: PlayerVisualizerState
   volume: number
   width: number
   height: number
   // media events
-  onEnd(...args: unknown[]): unknown
-  onError(...args: unknown[]): unknown
-  onLoad(...args: unknown[]): unknown
-  onPlay(...args: unknown[]): unknown
-  onStatus(...args: unknown[]): unknown
+  onEnd(): void
+  onError(error: string): void
+  onLoad(): void
+  onPlay(): void
+  onStatus(status: Partial<PlayerState>): void
+}
+
+interface State {
+  visualizerAudioSourceNode: MediaElementAudioSourceNode | null
 }
 
 class Player extends React.Component<PlayerProps> {
-  audioCtx = null
-  audioGainNode = null
-  audioSourceNode = null
+  audioCtx: AudioContext | null = null
+  audioGainNode: GainNode | null = null
+  audioSourceNode: MediaElementAudioSourceNode | null = null
   isFetching = false // internal
 
-  state = {
+  state: State = {
     visualizerAudioSourceNode: null,
   }
 
@@ -50,7 +56,7 @@ class Player extends React.Component<PlayerProps> {
     this.updateVolume()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: PlayerProps) {
     // may have been suspended by browser if no user interaction yet
     if (this.props.isPlaying && !prevProps.isPlaying) {
       this.audioCtx.resume()
@@ -70,7 +76,7 @@ class Player extends React.Component<PlayerProps> {
     }
   }
 
-  handleAudioElement = (el) => {
+  handleAudioElement = (el: HTMLVideoElement | HTMLAudioElement) => {
     if (this.audioSourceNode && this.audioSourceNode.mediaElement === el) {
       return
     }

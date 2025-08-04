@@ -6,7 +6,7 @@ import fileTypes from './Media/fileTypes.js'
 import {
   WATCHER_WORKER_EVENT,
   WATCHER_WORKER_WATCH,
-} from '../shared/actionTypes.js'
+} from '../shared/actionTypes.ts'
 
 const env = JSON.parse(process.env.KES_ENV_JSON)
 const log = initLogger('scanner', {

@@ -1,22 +1,22 @@
-import React from 'react'
-import { VariableSizeList as List } from 'react-window'
+import React, { CSSProperties } from 'react'
+import { VariableSizeList as List, ListOnScrollProps } from 'react-window'
 import styles from './PaddedList.css'
 
 interface PaddedListProps {
   numRows: number
-  onScroll?(...args: unknown[]): unknown
-  onRef?(...args: unknown[]): unknown
+  onScroll?(props: ListOnScrollProps): void
+  onRef?(ref: List): void
   paddingTop: number
   paddingRight?: number
   paddingBottom: number
-  rowRenderer(...args: unknown[]): unknown
-  rowHeight(...args: unknown[]): unknown
+  rowRenderer(props: { index: number, style: CSSProperties }): React.ReactNode
+  rowHeight(index: number): number
   width: number
   height: number
 }
 
 class PaddedList extends React.Component<PaddedListProps> {
-  list = null
+  list: List | null = null
 
   componentDidMount () {
     if (this.props.onRef) {
@@ -41,14 +41,14 @@ class PaddedList extends React.Component<PaddedListProps> {
     )
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: PaddedListProps) {
     const { paddingTop, paddingBottom } = this.props
     if (paddingTop !== prevProps.paddingTop || paddingBottom !== prevProps.paddingBottom) {
       this.list.resetAfterIndex(0)
     }
   }
 
-  rowRenderer = ({ index, style }) => {
+  rowRenderer = ({ index, style }: { index: number, style: CSSProperties }) => {
     // top & bottom spacer
     if (index === 0 || index === this.props.numRows + 1) {
       return (
@@ -62,7 +62,7 @@ class PaddedList extends React.Component<PaddedListProps> {
     })
   }
 
-  getItemSize = (index) => {
+  getItemSize = (index: number) => {
     // top & bottom spacer
     if (index === 0) {
       return this.props.paddingTop
@@ -75,7 +75,7 @@ class PaddedList extends React.Component<PaddedListProps> {
     return this.props.rowHeight(index)
   }
 
-  setRef = (ref) => {
+  setRef = (ref: List) => {
     this.list = ref
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import butterchurn from 'butterchurn'
+import butterchurn, { type Visualizer } from 'butterchurn'
 import presets from 'butterchurn-presets/all'
 import imageData from 'butterchurn-presets/imageData'
 import styles from './PlayerVisualizer.css'
@@ -7,7 +7,7 @@ import styles from './PlayerVisualizer.css'
 interface PlayerVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode
   isPlaying: boolean
-  onError(...args: unknown[]): unknown
+  onError(error: string): void
   presetKey: string
   sensitivity: number
   width: number
@@ -15,10 +15,10 @@ interface PlayerVisualizerProps {
 }
 
 class PlayerVisualizer extends React.Component<PlayerVisualizerProps> {
-  audioGainNode = null
+  audioGainNode: GainNode | null = null
   canvas = React.createRef<HTMLCanvasElement>()
-  frameId = null
-  visualizer = null
+  frameId: number | null = null
+  visualizer: Visualizer | null = null
 
   componentDidMount () {
     try {
@@ -46,7 +46,7 @@ class PlayerVisualizer extends React.Component<PlayerVisualizerProps> {
     this.updatePlaying()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: PlayerVisualizerProps) {
     const { props } = this
 
     if (props.audioSourceNode !== prevProps.audioSourceNode) {

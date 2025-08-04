@@ -15,7 +15,7 @@ import {
 
 const api = new HttpApi('')
 
-interface UserWithRoomsAndRole extends User {
+export interface UserWithRoomsAndRole extends User {
   rooms: number[] // roomIds
   role: string
 }
@@ -25,13 +25,13 @@ interface UserWithRoomsAndRole extends User {
 // ------------------------------------
 export const fetchUsers = createAsyncThunk(
   USERS_REQUEST,
-  async () => await api('GET', 'users'),
+  async () => await api.get('users'),
 )
 
 export const createUser = createAsyncThunk(
   USERS_CREATE,
   async (data: FormData, thunkAPI) => {
-    await api('POST', 'user', {
+    await api.post('user', {
       body: data,
     })
 
@@ -48,7 +48,7 @@ export const updateUser = createAsyncThunk(
     userId: number
     data: FormData
   }, thunkAPI) => {
-    await api('PUT', `user/${userId}`, {
+    await api.put(`user/${userId}`, {
       body: data,
     })
 
@@ -59,7 +59,7 @@ export const updateUser = createAsyncThunk(
 export const removeUser = createAsyncThunk(
   USERS_REMOVE,
   async (userId: number, thunkAPI) => {
-    await api('DELETE', `user/${userId}`)
+    await api.delete(`user/${userId}`)
 
     thunkAPI.dispatch(fetchUsers())
   },
@@ -73,7 +73,7 @@ export const filterByRoom = createAction<number>(USERS_FILTER_ROOM_ID)
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface usersState {
+interface UsersState {
   result: number[]
   entities: Record<number, UserWithRoomsAndRole>
   filterOnline: boolean
@@ -81,7 +81,7 @@ interface usersState {
   isEditorOpen: boolean
 }
 
-const initialState: usersState = {
+const initialState: UsersState = {
   result: [],
   entities: {},
   filterOnline: true,

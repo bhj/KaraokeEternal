@@ -3,14 +3,22 @@ import { lockScrolling } from 'store/modules/ui'
 import styles from './AlphaPicker.css'
 
 interface AlphaPickerProps {
-  onPick(...args: unknown[]): unknown
+  onPick(char: string): void
   height: number
   top: number
 }
 
+interface State {
+  isTouchCapable: boolean
+  isTouching: boolean
+  char: string | null
+  y: number | null
+}
+
 class AlphaPicker extends React.Component<AlphaPickerProps> {
   alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-  state = {
+
+  state: State = {
     isTouchCapable: false,
     isTouching: false,
     char: null,
@@ -49,7 +57,7 @@ class AlphaPicker extends React.Component<AlphaPickerProps> {
     })
   }
 
-  handleTouch = (e) => {
+  handleTouch = (e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
 
     if (e.type === 'mousedown' && this.state.isTouchCapable) {
@@ -58,7 +66,7 @@ class AlphaPicker extends React.Component<AlphaPickerProps> {
       return
     }
 
-    const y = (e.targetTouches ? e.targetTouches[0].clientY : e.clientY)
+    const y = ('targetTouches' in e) ? e.targetTouches[0].clientY : e.clientY
     const char = this.alphabet[Math.floor(((y - this.props.top) / this.props.height) * this.alphabet.length)]
 
     this.setState({

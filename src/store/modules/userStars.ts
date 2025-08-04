@@ -1,4 +1,4 @@
-import { createAction, createReducer } from '@reduxjs/toolkit'
+import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { REHYDRATE } from 'redux-persist'
 import { ensureState } from 'redux-optimistic-ui'
 import {
@@ -11,16 +11,22 @@ import {
   SOCKET_AUTH_ERROR,
   LOGOUT,
 } from 'shared/actionTypes'
+import { RootState } from 'store/store'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const toggleSongStarred = (songId: number) => {
-  return (dispatch, getState) => {
+export const toggleSongStarred = createAsyncThunk<void, number, { state: RootState }>(
+  'userStars/toggleSongStarred',
+  async (songId, { dispatch, getState }) => {
     const starredSongs = ensureState(getState().userStars).starredSongs
-    dispatch(starredSongs.includes(songId) ? unstarSong(songId) : starSong(songId))
-  }
-}
+    if (starredSongs.includes(songId)) {
+      dispatch(unstarSong(songId))
+    } else {
+      dispatch(starSong(songId))
+    }
+  },
+)
 
 const starSong = createAction(STAR_SONG, (songId: number) => ({
   payload: { songId },
@@ -32,16 +38,21 @@ const unstarSong = createAction(UNSTAR_SONG, (songId: number) => ({
   meta: { isOptimistic: true },
 }))
 
+const songStarred = createAction<{ userId: number, songId: number }>(SONG_STARRED)
+const songUnstarred = createAction<{ userId: number, songId: number }>(SONG_UNSTARRED)
+const starsPush = createAction<UserStarsState>(STARS_PUSH) // @todo Seems to be unused
+const accountReceive = createAction<{ userId: number }>(ACCOUNT_RECEIVE)
+
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface userStarsState {
+interface UserStarsState {
   userId: number | null
   starredArtists: number[]
   starredSongs: number[]
 }
 
-const initialState: userStarsState = {
+const initialState: UserStarsState = {
   userId: null,
   starredArtists: [],
   starredSongs: [],
@@ -57,21 +68,21 @@ const userStarsReducer = createReducer(initialState, (builder) => {
       // optimistic
       state.starredSongs.splice(state.starredSongs.indexOf(payload.songId), 1)
     })
-    .addCase(SONG_STARRED, (state, { payload }) => {
+    .addCase(songStarred, (state, { payload }) => {
       if (payload.userId === state.userId && !state.starredSongs.includes(payload.songId)) {
         state.starredSongs.push(payload.songId)
       }
     })
-    .addCase(SONG_UNSTARRED, (state, { payload }) => {
+    .addCase(songUnstarred, (state, { payload }) => {
       if (payload.userId === state.userId && state.starredSongs.includes(payload.songId)) {
         state.starredSongs.splice(state.starredSongs.indexOf(payload.songId), 1)
       }
     })
-    .addCase(STARS_PUSH, (state, { payload }) => ({
+    .addCase(starsPush, (state, { payload }) => ({
       ...state,
       ...payload,
     }))
-    .addCase(ACCOUNT_RECEIVE, (state, { payload }) => {
+    .addCase(accountReceive, (state, { payload }) => {
       state.userId = payload.userId
     })
     // @ts-expect-error: payload exists; action type appears to be erroneous

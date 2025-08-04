@@ -24,6 +24,8 @@ const logout = createAction(LOGOUT)
 export const setPref = createAction<{ key: string, data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<object>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_PATH_SET_PRIORITY)
+const prefsPush = createAction<PrefsState>(PREFS_PUSH)
+const scannerWorkerStatus = createAction<{ isScanning: boolean, pct: number, text: string }>(SCANNER_WORKER_STATUS)
 
 export const setPathPrefs = createAsyncThunk(
   PREFS_PATH_UPDATE,
@@ -34,7 +36,7 @@ export const setPathPrefs = createAsyncThunk(
     pathId: number
     data: FormData
   }, thunkAPI) => {
-    const response = await api('PUT', `/path/${pathId}`, {
+    const response = await api.put(`/path/${pathId}`, {
       body: data,
     })
 
@@ -45,7 +47,7 @@ export const setPathPrefs = createAsyncThunk(
 export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
   PREFS_REQUEST,
   async (_, thunkAPI) => {
-    const response = await api('GET', '')
+    const response = await api.get('')
 
     // sign out if we see isFirstRun flag
     if (response.isFirstRun && thunkAPI.getState().user.userId !== null) {
@@ -58,23 +60,23 @@ export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
 
 export const requestScan = createAsyncThunk(
   PREFS_REQ_SCANNER_START,
-  async (pathId: number) => await api('GET', `/path/${pathId}/scan`),
+  async (pathId: number) => await api.get(`/path/${pathId}/scan`),
 )
 
 export const requestScanAll = createAsyncThunk(
   PREFS_REQ_SCANNER_START,
-  async () => await api('GET', '/paths/scan'),
+  async () => await api.get('/paths/scan'),
 )
 
 export const requestScanStop = createAsyncThunk(
   PREFS_REQ_SCANNER_STOP,
-  async () => await api('GET', '/paths/scan/stop'),
+  async () => await api.get('/paths/scan/stop'),
 )
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface prefsState {
+interface PrefsState {
   isFirstRun?: boolean
   isScanning: boolean
   isReplayGainEnabled: boolean
@@ -90,7 +92,7 @@ interface prefsState {
   scannerText: string
 }
 
-const initialState: prefsState = {
+const initialState: PrefsState = {
   isScanning: false,
   isReplayGainEnabled: false,
   paths: {
@@ -115,11 +117,11 @@ const prefsReducer = createReducer(initialState, (builder) => {
       ...state,
       ...payload,
     }))
-    .addCase(PREFS_PUSH, (state, { payload }) => ({
+    .addCase(prefsPush, (state, { payload }) => ({
       ...state,
       ...payload,
     }))
-    .addCase(SCANNER_WORKER_STATUS, (state, { payload }) => ({
+    .addCase(scannerWorkerStatus, (state, { payload }) => ({
       ...state,
       isScanning: payload.isScanning,
       scannerPct: payload.pct,

@@ -4,7 +4,7 @@ import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
-import { playerLeave, playerError, playerLoad, playerPlay, playerStatus } from '../../modules/player'
+import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
 
@@ -23,10 +23,10 @@ const PlayerController = (props: PlayerControllerProps) => {
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
   const dispatch = useAppDispatch()
-  const handleStatus = useCallback<(status?: object) => void>(status => dispatch(playerStatus(status)), [dispatch])
+  const handleStatus = useCallback<(status?: Partial<PlayerState>) => void>(status => dispatch(playerStatus(status)), [dispatch])
   const handleLoad = useCallback(() => dispatch(playerLoad()), [dispatch])
   const handlePlay = useCallback(() => dispatch(playerPlay()), [dispatch])
-  const handleError = useCallback((msg) => {
+  const handleError = useCallback((msg: string) => {
     dispatch(playerError(msg))
     handleStatus()
   }, [dispatch, handleStatus])

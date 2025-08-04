@@ -21,7 +21,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
   const [isPasswordDirty, setIsPasswordDirty] = useState(false)
   const dispatch = useAppDispatch()
 
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
 
     const data = getFormData(new FormData(formRef.current)) as Record<string, string | IRoomPrefs>
@@ -57,7 +57,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
     onClose()
   }, [dispatch, onClose, room])
 
-  const handlePasswordChange = useCallback((e) => {
+  const handlePasswordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPasswordDirty(true)
     setRoomPassword(e.target.value)
   }, [])

@@ -8,23 +8,25 @@ interface MP4AlphaPlayerProps {
   mp4Alpha: number
   width: number
   height: number
-  onAudioElement(...args: unknown[]): unknown
+  onAudioElement(video: HTMLVideoElement): void
   // media events
-  onEnd(...args: unknown[]): unknown
-  onError(...args: unknown[]): unknown
-  onLoad(...args: unknown[]): unknown
-  onPlay(...args: unknown[]): unknown
-  onStatus(...args: unknown[]): unknown
+  onEnd(): void
+  onError(error: string): void
+  onLoad(): void
+  onPlay(): void
+  onStatus(status: { position: number }): void
 }
 
 class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
-  canvas = React.createRef()
-  frameId = null
+  canvas = React.createRef<HTMLCanvasElement>()
+  frameId: number | null = null
   video = document.createElement('video')
   state = {
     videoWidth: 0,
     videoHeight: 0,
   }
+
+  chroma: GLChroma
 
   componentDidMount () {
     this.props.onAudioElement(this.video)
@@ -37,13 +39,15 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
     this.video.ontimeupdate = this.handleTimeUpdate
     this.video.preload = 'auto'
 
-    this.chroma = new GLChroma(this.video, this.canvas.current)
-    this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
+    if (this.canvas.current) {
+      this.chroma = new GLChroma(this.video, this.canvas.current)
+      this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
+    }
 
     this.updateSources()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps: MP4AlphaPlayerProps) {
     if (prevProps.mediaKey !== this.props.mediaKey) {
       this.updateSources()
     }
@@ -116,13 +120,13 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   /*
   * <video> event handlers
   */
-  handleEnded = (el) => {
+  handleEnded = () => {
     this.props.onEnd()
     this.stopChroma()
   }
 
-  handleError = (el) => {
-    const { message, code } = el.target.error
+  handleError = () => {
+    const { message, code } = this.video.error
     this.props.onError(`${message} (code ${code})`)
   }
 

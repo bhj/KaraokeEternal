@@ -5,6 +5,7 @@ import {
   SONG_INFO_SET_PREFERRED,
   SONG_INFO_CLOSE,
 } from 'shared/actionTypes'
+import { Media } from 'shared/types'
 
 const api = new HttpApi()
 
@@ -13,7 +14,7 @@ const api = new HttpApi()
 // ------------------------------------
 export const showSongInfo = createAsyncThunk(
   SONG_INFO_REQUEST,
-  async (songId: number) => await api('GET', `song/${songId}`),
+  async (songId: number) => await api.get<{ result: number[], entities: Media[] }>(`song/${songId}`),
 )
 
 export const closeSongInfo = createAction(SONG_INFO_CLOSE)
@@ -24,12 +25,8 @@ export const setPreferredSong = createAsyncThunk(
     songId,
     mediaId,
     isPreferred,
-  }: {
-    songId: number
-    mediaId: number
-    isPreferred: boolean
-  }, thunkAPI) => {
-    await api(isPreferred ? 'PUT' : 'DELETE', `media/${mediaId}/prefer`)
+  }: Pick<Media, 'songId' | 'mediaId' | 'isPreferred'>, thunkAPI) => {
+    await api.request(isPreferred ? 'PUT' : 'DELETE', `media/${mediaId}/prefer`)
     thunkAPI.dispatch(showSongInfo(songId))
   },
 )
@@ -37,14 +34,14 @@ export const setPreferredSong = createAsyncThunk(
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface songInfoState {
+interface SongInfoState {
   isLoading: boolean
   isVisible: boolean
   songId: number | null
-  media: { result: number[], entities: object }
+  media: { result: number[], entities: Record<number, Media> }
 }
 
-const initialState: songInfoState = {
+const initialState: SongInfoState = {
   isLoading: false,
   isVisible: false,
   songId: null,

@@ -1,20 +1,24 @@
-import { createReducer } from '@reduxjs/toolkit'
+import { createAction, createReducer } from '@reduxjs/toolkit'
 import {
   SONG_STARRED,
   SONG_UNSTARRED,
   STAR_COUNTS_PUSH,
 } from 'shared/actionTypes'
 
+const songStarred = createAction<{ songId: number }>(SONG_STARRED)
+const songUnstarred = createAction<{ songId: number }>(SONG_UNSTARRED)
+const starCountsPush = createAction<StarCountsState>(STAR_COUNTS_PUSH)
+
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface startCountsState {
-  artists: object
-  songs: object
+interface StarCountsState {
+  artists: Record<number, number>
+  songs: Record<number, number>
   version: number
 }
 
-const initialState: startCountsState = {
+const initialState: StarCountsState = {
   artists: {},
   songs: {},
   version: 0,
@@ -22,13 +26,13 @@ const initialState: startCountsState = {
 
 const starCountsReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(SONG_STARRED, (state, { payload }) => {
+    .addCase(songStarred, (state, { payload }) => {
       state.songs[payload.songId] = state.songs[payload.songId] + 1 || 1
     })
-    .addCase(SONG_UNSTARRED, (state, { payload }) => {
+    .addCase(songUnstarred, (state, { payload }) => {
       state.songs[payload.songId] = Math.max(state.songs[payload.songId] - 1, 0)
     })
-    .addCase(STAR_COUNTS_PUSH, (_, { payload }) => ({
+    .addCase(starCountsPush, (_, { payload }) => ({
       ...payload,
     }))
 })

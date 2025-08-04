@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor } from '../../modules/users'
+import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor, type UserWithRoomsAndRole } from '../../modules/users'
 import { formatDateTime } from 'lib/dateTime'
 import Panel from 'components/Panel/Panel'
 import Button from 'components/Button/Button'
@@ -9,7 +9,7 @@ import getUsers from '../../selectors/getUsers'
 import styles from './Users.css'
 
 const Users = () => {
-  const [editorUser, setEditorUser] = useState(null)
+  const [editorUser, setEditorUser] = useState<UserWithRoomsAndRole | null>(null)
 
   const curUserId = useAppSelector(state => state.user.userId)
   const { isEditorOpen, filterOnline, filterRoomId } = useAppSelector(state => state.users)
@@ -24,8 +24,8 @@ const Users = () => {
     else dispatch(filterByRoom(parseInt(e.target.value, 10)))
   }, [dispatch])
 
-  const handleOpen = useCallback((e) => {
-    setEditorUser(users.entities[e.target.dataset.userId])
+  const handleOpen = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    setEditorUser(users.entities[parseInt(e.currentTarget.dataset.userId)])
     dispatch(openUserEditor())
   }, [dispatch, users])
 

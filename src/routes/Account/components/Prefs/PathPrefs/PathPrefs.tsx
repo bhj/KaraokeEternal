@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd'
 import HttpApi from 'lib/HttpApi'
 import Accordion from 'components/Accordion/Accordion'
 import Icon from 'components/Icon/Icon'
@@ -31,7 +31,7 @@ const PathPrefs = () => {
     setPriority(paths.result)
   }, [paths])
 
-  const handleDragEnd = useCallback((dnd) => {
+  const handleDragEnd = useCallback((dnd: DropResult) => {
     // dropped outside the list?
     if (!dnd.destination) return
 
@@ -44,7 +44,7 @@ const PathPrefs = () => {
   }, [dispatch, priority])
 
   const handleAdd = useCallback((dir: string, prefs: object) => {
-    api('POST', `/?dir=${encodeURIComponent(dir)}`, { body: prefs })
+    api.post(`/?dir=${encodeURIComponent(dir)}`, { body: prefs })
       .then((res) => {
         dispatch(receivePrefs(res))
         setChoosing(false)
@@ -63,7 +63,7 @@ const PathPrefs = () => {
     setPriority(priority.filter(id => id !== pathId))
     setEditingPath(null)
 
-    api('DELETE', `/${pathId}`)
+    api.delete(`/${pathId}`)
       .then((res) => {
         dispatch(receivePrefs(res))
         return
@@ -72,7 +72,7 @@ const PathPrefs = () => {
       })
   }, [dispatch, paths, priority])
 
-  const handleUpdate = useCallback((pathId, data) => {
+  const handleUpdate = useCallback((pathId: number, data: FormData) => {
     dispatch(setPathPrefs({ pathId, data }))
   }, [dispatch])
 
