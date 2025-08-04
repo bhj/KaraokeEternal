@@ -7,18 +7,18 @@ import {
 
 const songStarred = createAction<{ songId: number }>(SONG_STARRED)
 const songUnstarred = createAction<{ songId: number }>(SONG_UNSTARRED)
-const starCountsPush = createAction<State>(STAR_COUNTS_PUSH)
+const starCountsPush = createAction<StarCountsState>(STAR_COUNTS_PUSH)
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface StarCountsState {
   artists: Record<number, number>
   songs: Record<number, number>
   version: number
 }
 
-const initialState: State = {
+const initialState: StarCountsState = {
   artists: {},
   songs: {},
   version: 0,

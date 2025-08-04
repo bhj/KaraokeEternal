@@ -15,7 +15,7 @@ import {
 
 const api = new HttpApi('')
 
-interface UserWithRoomsAndRole extends User {
+export interface UserWithRoomsAndRole extends User {
   rooms: number[] // roomIds
   role: string
 }
@@ -73,7 +73,7 @@ export const filterByRoom = createAction<number>(USERS_FILTER_ROOM_ID)
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface usersState {
+interface UsersState {
   result: number[]
   entities: Record<number, UserWithRoomsAndRole>
   filterOnline: boolean
@@ -81,7 +81,7 @@ interface usersState {
   isEditorOpen: boolean
 }
 
-const initialState: usersState = {
+const initialState: UsersState = {
   result: [],
   entities: {},
   filterOnline: true,

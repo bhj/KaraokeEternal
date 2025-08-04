@@ -107,14 +107,14 @@ export function requestPrefsPush (roomId: number, prefs: IRoomPrefs): AppThunk {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface RoomsState {
   result: number[]
   entities: Record<number, Room>
   filterStatus: boolean | string
   isEditorOpen: boolean
 }
 
-const initialState: State = {
+const initialState: RoomsState = {
   result: [],
   entities: {},
   filterStatus: 'open',

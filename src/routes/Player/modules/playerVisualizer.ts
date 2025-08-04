@@ -26,7 +26,7 @@ export const playerVisualizerError = createAction<string>(PLAYER_VISUALIZER_ERRO
 // ------------------------------------
 // Reducer
 // ------------------------------------
-export interface State {
+export interface PlayerVisualizerState {
   isEnabled: boolean
   isSupported: boolean
   presetKey: string
@@ -34,7 +34,7 @@ export interface State {
   sensitivity: number
 }
 
-const initialState: State = {
+const initialState: PlayerVisualizerState = {
   isEnabled: true,
   isSupported: true,
   ...getRandomPreset(),

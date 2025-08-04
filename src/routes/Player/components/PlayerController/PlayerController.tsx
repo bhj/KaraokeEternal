@@ -4,7 +4,7 @@ import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
-import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type State as PlayerState } from '../../modules/player'
+import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
 

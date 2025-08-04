@@ -1,5 +1,5 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import { type State as PlayerVisualizerState } from 'routes/Player/modules/playerVisualizer'
+import { type PlayerVisualizerState } from 'routes/Player/modules/playerVisualizer'
 import {
   PLAYER_REQ_OPTIONS,
   PLAYER_REQ_PLAY,
@@ -43,7 +43,7 @@ export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOp
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface StatusState {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
@@ -63,7 +63,7 @@ interface State {
   volume: number
 }
 
-const initialState: State = {
+const initialState: StatusState = {
   cdgAlpha: 0,
   cdgSize: 0.8,
   errorMessage: '',

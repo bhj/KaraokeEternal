@@ -2,8 +2,9 @@ import React from 'react'
 import CDGPlayer from './CDGPlayer/CDGPlayer'
 import MP4Player from './MP4Player/MP4Player'
 import MP4AlphaPlayer from './MP4Player/MP4AlphaPlayer'
-import { type State as PlayerVisualizerState } from '../../modules/playerVisualizer'
-import { type State as PlayerState } from '../../modules/player'
+import { type PlayerState } from '../../modules/player'
+import { type PlayerVisualizerState } from '../../modules/playerVisualizer'
+
 const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisualizer'))
 
 interface PlayerProps {

@@ -24,7 +24,7 @@ const logout = createAction(LOGOUT)
 export const setPref = createAction<{ key: string, data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<object>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_PATH_SET_PRIORITY)
-const prefsPush = createAction<State>(PREFS_PUSH)
+const prefsPush = createAction<PrefsState>(PREFS_PUSH)
 const scannerWorkerStatus = createAction<{ isScanning: boolean, pct: number, text: string }>(SCANNER_WORKER_STATUS)
 
 export const setPathPrefs = createAsyncThunk(
@@ -76,7 +76,7 @@ export const requestScanStop = createAsyncThunk(
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface PrefsState {
   isFirstRun?: boolean
   isScanning: boolean
   isReplayGainEnabled: boolean
@@ -92,7 +92,7 @@ interface State {
   scannerText: string
 }
 
-const initialState: State = {
+const initialState: PrefsState = {
   isScanning: false,
   isReplayGainEnabled: false,
   paths: {

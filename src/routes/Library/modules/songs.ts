@@ -5,20 +5,20 @@ import {
   LIBRARY_PUSH_SONG,
 } from 'shared/actionTypes'
 
-const libraryPushSong = createAction<State['entities'][number]>(LIBRARY_PUSH_SONG)
+const libraryPushSong = createAction<SongsState['entities'][number]>(LIBRARY_PUSH_SONG)
 const libraryPush = createAction<{
-  songs: State
+  songs: SongsState
 }>(LIBRARY_PUSH)
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface SongsState {
   result: number[]
   entities: Record<number, Song>
 }
 
-const initialState: State = {
+const initialState: SongsState = {
   result: [],
   entities: {},
 }

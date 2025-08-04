@@ -62,7 +62,7 @@ const headerHeightChange = createAction<number>(HEADER_HEIGHT_CHANGE)
 // ------------------------------------
 // Reducer
 // ------------------------------------
-export interface State {
+export interface UIState {
   isErrored: boolean
   errorMessage: string | null
   footerHeight: number
@@ -72,7 +72,7 @@ export interface State {
   contentWidth: number
 }
 
-const initialState: State = {
+const initialState: UIState = {
   isErrored: false,
   errorMessage: null,
   footerHeight: 0,

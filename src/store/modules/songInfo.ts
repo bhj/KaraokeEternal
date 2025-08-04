@@ -34,14 +34,14 @@ export const setPreferredSong = createAsyncThunk(
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface songInfoState {
+interface SongInfoState {
   isLoading: boolean
   isVisible: boolean
   songId: number | null
   media: { result: number[], entities: Record<number, Media> }
 }
 
-const initialState: songInfoState = {
+const initialState: SongInfoState = {
   isLoading: false,
   isVisible: false,
   songId: null,

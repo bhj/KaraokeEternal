@@ -40,19 +40,19 @@ const unstarSong = createAction(UNSTAR_SONG, (songId: number) => ({
 
 const songStarred = createAction<{ userId: number, songId: number }>(SONG_STARRED)
 const songUnstarred = createAction<{ userId: number, songId: number }>(SONG_UNSTARRED)
-const starsPush = createAction<State>(STARS_PUSH) // @todo Seems to be unused
+const starsPush = createAction<UserStarsState>(STARS_PUSH) // @todo Seems to be unused
 const accountReceive = createAction<{ userId: number }>(ACCOUNT_RECEIVE)
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface UserStarsState {
   userId: number | null
   starredArtists: number[]
   starredSongs: number[]
 }
 
-const initialState: State = {
+const initialState: UserStarsState = {
   userId: null,
   starredArtists: [],
   starredSongs: [],

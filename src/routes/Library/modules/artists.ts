@@ -5,18 +5,18 @@ import {
 } from 'shared/actionTypes'
 
 const libraryPush = createAction<{
-  artists: State
+  artists: ArtistsState
 }>(LIBRARY_PUSH)
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface ArtistsState {
   result: number[]
   entities: Record<number, Artist>
 }
 
-const initialState: State = {
+const initialState: ArtistsState = {
   result: [],
   entities: {},
 }

@@ -14,7 +14,7 @@ import {
 const logout = createAction(LOGOUT)
 export const moveItem = createAction<{ queueId: number, prevQueueId: number }>(QUEUE_MOVE)
 export const removeItem = createAction<{ queueId: number }>(QUEUE_REMOVE)
-export const queuePush = createAction<State>(QUEUE_PUSH)
+export const queuePush = createAction<QueueState>(QUEUE_PUSH)
 
 export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
   payload: { songId },
@@ -24,13 +24,13 @@ export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface State {
+interface QueueState {
   isLoading: boolean
   result: number[] // queueIds
   entities: Record<number, QueueItem | OptimisticQueueItem>
 }
 
-const initialState: State = {
+const initialState: QueueState = {
   isLoading: true,
   result: [],
   entities: {},

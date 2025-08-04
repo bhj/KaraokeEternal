@@ -6,7 +6,7 @@ import TextOverlay from 'components/TextOverlay/TextOverlay'
 import Spinner from 'components/Spinner/Spinner'
 import styles from './LibraryView.css'
 import { Artist, Song } from 'shared/types'
-import { State as UIState } from 'store/modules/ui'
+import { type UIState } from 'store/modules/ui'
 
 interface LibraryViewProps {
   isAdmin: boolean
