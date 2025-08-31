@@ -132,7 +132,7 @@ const initialState: PlayerState = {
   isVideoKeyingEnabled: false,
   isWebGLSupported: getWebGLSupport(),
   mediaType: null,
-  mp4Alpha: 1,
+  mp4Alpha: 0.5,
   nextUserId: null,
   position: 0,
   queueId: -1,

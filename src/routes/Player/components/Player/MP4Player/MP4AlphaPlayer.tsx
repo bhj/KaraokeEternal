@@ -1,5 +1,9 @@
 import React from 'react'
 import GLChroma from 'gl-chromakey'
+import styles from './MP4Player.css'
+
+const BACKDROP_PADDING = 10 // px at 1:1 scale
+const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue('--border-radius'))
 
 interface MP4AlphaPlayerProps {
   isPlaying: boolean
@@ -21,12 +25,13 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   canvas = React.createRef<HTMLCanvasElement>()
   frameId: number | null = null
   video = document.createElement('video')
+  chroma: GLChroma
+  supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)') || CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
   state = {
+    contentBounds: [0, 0, 0, 0], // x1, y1, x2, y2
     videoWidth: 0,
     videoHeight: 0,
   }
-
-  chroma: GLChroma
 
   componentDidMount () {
     this.props.onAudioElement(this.video)
@@ -41,7 +46,7 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
 
     if (this.canvas.current) {
       this.chroma = new GLChroma(this.video, this.canvas.current)
-      this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
+      this.chroma.key({ color: 'auto' })
     }
 
     this.updateSources()
@@ -56,8 +61,16 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
       this.updateIsPlaying()
     }
 
-    if (prevProps.mp4Alpha !== this.props.mp4Alpha) {
-      this.chroma.key({ color: 'auto', amount: 1.0 - this.props.mp4Alpha })
+    if (!this.props.isPlaying && (
+      prevProps.width !== this.props.width
+      || prevProps.height !== this.props.height
+      || prevProps.mp4Alpha !== this.props.mp4Alpha)
+    ) {
+      const contentBounds = this.chroma.render({ passthrough: this.props.mp4Alpha === 1 }).getContentBounds()
+
+      if (!contentBounds.every((val, i) => val === this.state.contentBounds[i])) {
+        this.setState({ contentBounds })
+      }
     }
   }
 
@@ -72,18 +85,44 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   }
 
   render () {
-    const screenAspect = this.props.width / this.props.height
+    const { mp4Alpha, width, height } = this.props
+    const screenAspect = width / height
     const videoAspect = this.state.videoWidth / this.state.videoHeight
     const scale = screenAspect > videoAspect
-      ? this.props.height / this.state.videoHeight
-      : this.props.width / this.state.videoWidth
+      ? height / this.state.videoHeight
+      : width / this.state.videoWidth
+    const filters = []
+    const [x1, y1, x2, y2] = this.state.contentBounds
+    const pad = (x2 - x1) && (y2 - y1) ? scale * BACKDROP_PADDING : 0
+
+    if (this.supportsFilters) {
+      filters.push(`blur(${30 * mp4Alpha * scale}px)`)
+      filters.push(`brightness(${100 - (100 * (mp4Alpha ** 3))}%)`)
+      filters.push(`saturate(${100 - (100 * (mp4Alpha ** 3))}%)`)
+    }
 
     return (
-      <canvas
-        width={(this.state.videoWidth * scale) || 0}
-        height={(this.state.videoHeight * scale) || 0}
-        ref={this.canvas}
-      />
+      <div className={styles.container}>
+        <div
+          className={styles.backdrop}
+          style={{
+            backdropFilter: this.supportsFilters && mp4Alpha !== 1 ? filters.join(' ') : 'none',
+            borderRadius: BORDER_RADIUS * scale,
+            left: x1 - pad,
+            top: y1 - pad,
+            width: (x2 - x1) + pad * 2,
+            height: (y2 - y1) + pad * 2,
+          }}
+        >
+        </div>
+        <canvas
+          className={styles.canvas}
+          width={(this.state.videoWidth * scale) || 0}
+          height={(this.state.videoHeight * scale) || 0}
+          ref={this.canvas}
+        />
+      </div>
+
     )
   }
 
@@ -112,7 +151,12 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
 
   startChroma = () => {
     this.frameId = requestAnimationFrame(this.startChroma)
-    this.chroma.render()
+    const contentBounds = this.chroma.render({ passthrough: this.props.mp4Alpha === 1 }).getContentBounds()
+
+    // content bounds changed?
+    if (!contentBounds.every((val, i) => val === this.state.contentBounds[i])) {
+      this.setState({ contentBounds })
+    }
   }
 
   stopChroma = () => cancelAnimationFrame(this.frameId)
