@@ -78,7 +78,7 @@ const InputImage = ({ user, onSelect }: UserImageProps) => {
   return (
     <div className={styles.container}>
       {!imageURL && (
-        <Icon icon='PERSON_ADD' size={72} className={styles.placeholder} />
+        <Icon icon='PHOTO_ADD' size={48} className={styles.placeholder} />
       )}
 
       {imageURL && (

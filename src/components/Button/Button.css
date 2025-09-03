@@ -29,18 +29,19 @@
   color: var(--text-color);
   text-shadow: var(--text-shadow);
   background-color: hsl(var(--hue-blue), 10%, 25%);
-  background-image: linear-gradient(180deg, hsl(var(--hue-blue),10%,30%) 0%, hsl(var(--hue-blue),10%,20%) 100%);
+  background-image: linear-gradient(180deg, hsl(var(--hue-blue), 10%, 30%) 0%, hsl(var(--hue-blue), 10%, 25%) 100%);
 }
 
 .primary {
-  color: hsl(var(--hue-blue), 10%, 15%);
+  color: var(--text-color);
+  text-shadow: var(--text-shadow);
   background-color: var(--btn-primary-bg-color);
-  background-image: linear-gradient(180deg, hsl(var(--hue-blue),92%,60%) 0%, hsl(var(--hue-blue),92%,50%) 100%);
+  background-image: linear-gradient(180deg, hsl(var(--hue-blue), 92%, 50%) 0%, hsl(var(--hue-blue), 92%, 45%) 100%);
 }
 
 .danger {
   color: var(--text-color);
   text-shadow: var(--text-shadow);
   background-color: var(--btn-danger-bg-color);
-  background-image: linear-gradient(180deg, hsl(var(--hue-pink), 62%, 50%) 0%, hsl(var(--hue-pink),62%,40%) 100%);
+  background-image: linear-gradient(180deg, hsl(var(--hue-pink), 62%, 50%) 0%, hsl(var(--hue-pink), 62%, 45%) 100%);
 }

@@ -27,7 +27,7 @@
   --container-padding: 12px;
 
   --bg-color: #000;
-  --text-color: hsl(var(--hue-blue), 10%, 85%);
+  --text-color: hsl(var(--hue-blue), 10%, 80%);
   --link-color: hsl(var(--hue-blue), 92%, 69%);
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
@@ -37,7 +37,7 @@
   --focus-outline: 4px solid var(--btn-danger-bg-color);
 
   --input-color: #444;
-  --input-placeholder-color: var(--btn-bg-color);
+  --input-placeholder-color: hsl(var(--hue-blue), 40%, 20%);
   --input-bg-color: hsl(var(--hue-blue), 10%, 80%);
   --input-outline-color: hsl(var(--hue-blue), 90%, 50%);
   --input-margin: 7px;
