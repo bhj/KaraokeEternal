@@ -5,7 +5,7 @@ import { useSwipeable } from 'react-swipeable'
 import Button from 'components/Button/Button'
 import Buttons from 'components/Buttons/Buttons'
 import UserImage from 'components/UserImage/UserImage'
-import { requestPlayNext } from 'store/modules/status'
+import { requestPlayNext, requestReplay } from 'store/modules/status'
 import { showSongInfo } from 'store/modules/songInfo'
 import { toggleSongStarred } from 'store/modules/userStars'
 import { showErrorMessage } from 'store/modules/ui'
@@ -22,6 +22,7 @@ interface QueueItemProps {
   isOwner: boolean
   isPlayed: boolean
   isRemovable: boolean
+  isReplayable: boolean
   isSkippable: boolean
   isStarred: boolean
   isUpcoming: boolean
@@ -47,6 +48,7 @@ const QueueItem = ({
   isOwner,
   isPlayed,
   isRemovable,
+  isReplayable,
   isSkippable,
   isStarred,
   isUpcoming,
@@ -69,6 +71,10 @@ const QueueItem = ({
     onMoveClick(queueId)
     setExpanded(false)
   }, [onMoveClick, queueId])
+  const handleReplayClick = useCallback(() => {
+    dispatch(requestReplay(queueId))
+    setExpanded(false)
+  }, [dispatch, queueId])
   const handleRequeueClick = useCallback(() => {
     dispatch(queueSong(songId))
     setExpanded(false)
@@ -130,11 +136,20 @@ const QueueItem = ({
             onClick={handleStarClick}
             size={44}
           />
+          {isReplayable && (
+            <Button
+              className={clsx(styles.btn, styles.active)}
+              data-hide
+              icon='REPLAY'
+              onClick={handleReplayClick}
+              size={44}
+            />
+          )}
           {isPlayed && (
             <Button
               className={clsx(styles.btn, styles.active)}
               data-hide
-              icon='REFRESH'
+              icon='PLUS'
               onClick={handleRequeueClick}
               size={48}
             />
@@ -161,7 +176,7 @@ const QueueItem = ({
             <Button
               className={clsx(styles.btn, styles.danger)}
               data-hide
-              icon='CLEAR'
+              icon='DELETE'
               onClick={handleRemoveClick}
               size={44}
             />

@@ -12,7 +12,7 @@ interface CDGPlayerProps {
   cdgSize: number
   isPlaying: boolean
   mediaId: number
-  mediaKey: number
+  mediaKey: string
   width: number
   height: number
   onAudioElement(video: HTMLAudioElement): void
@@ -46,8 +46,13 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
   componentDidUpdate (prevProps: CDGPlayerProps) {
     if (prevProps.mediaKey !== this.props.mediaKey) {
-      this.updateSources()
-      return
+      if (prevProps.mediaId !== this.props.mediaId) {
+        this.updateSources()
+      } else {
+        this.audio.current.currentTime = 0
+      }
+
+      // return
     }
 
     if (prevProps.isPlaying !== this.props.isPlaying) {

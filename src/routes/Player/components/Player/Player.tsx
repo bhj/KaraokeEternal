@@ -16,7 +16,7 @@ interface PlayerProps {
   isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
   mediaId: number
-  mediaKey: number
+  mediaKey: string
   mediaType?: string
   mp4Alpha: number
   rgTrackGain?: number
@@ -77,7 +77,7 @@ class Player extends React.Component<PlayerProps> {
   }
 
   handleAudioElement = (el: HTMLVideoElement | HTMLAudioElement) => {
-    if (this.audioSourceNode && this.audioSourceNode.mediaElement === el) {
+    if (!this.audioCtx || (this.audioSourceNode && this.audioSourceNode.mediaElement === el)) {
       return
     }
 

@@ -7,6 +7,7 @@ import {
   PLAYER_CMD_OPTIONS,
   PLAYER_CMD_PAUSE,
   PLAYER_CMD_PLAY,
+  PLAYER_CMD_REPLAY,
   PLAYER_CMD_VOLUME,
   PLAYER_EMIT_LEAVE,
   PLAYER_EMIT_STATUS,
@@ -20,15 +21,16 @@ import {
 // internal use
 export const playerUpdate = createAction<object>(PLAYER_UPDATE)
 
-// ------------------------------------
-// Actions triggered by media events
-// ------------------------------------
+// triggered by media events
 export const playerError = createAction<string>(PLAYER_ERROR)
 export const playerLoad = createAction(PLAYER_LOAD)
 export const playerPlay = createAction(PLAYER_PLAY)
 export const playerCmdNext = createAction(PLAYER_CMD_NEXT)
+
+// triggered by clients
 const playerCmdPause = createAction(PLAYER_CMD_PAUSE)
 const playerCmdPlay = createAction(PLAYER_CMD_PLAY)
+const playerCmdReplay = createAction<{ queueId: number }>(PLAYER_CMD_REPLAY)
 const playerCmdVolume = createAction<number>(PLAYER_CMD_VOLUME)
 const playerCmdOptions = createAction<{
   cdgAlpha: number
@@ -104,9 +106,7 @@ export interface PlayerState {
   historyJSON: string
   isAtQueueEnd: boolean
   isErrored: boolean
-  isFetching: boolean
   isPlaying: boolean
-  isPlayingNext: boolean
   isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
   mediaType: string | null
@@ -117,6 +117,9 @@ export interface PlayerState {
   rgTrackGain: number | null
   rgTrackPeak: number | null
   volume: number
+  _isFetching: boolean
+  _isPlayingNext: boolean
+  _isReplayingQueueId: number | null
 }
 
 const initialState: PlayerState = {
@@ -126,9 +129,7 @@ const initialState: PlayerState = {
   historyJSON: '[]', // queueIds (JSON string is hack to pass selector equality check on clients)
   isAtQueueEnd: false,
   isErrored: false,
-  isFetching: false,
   isPlaying: false,
-  isPlayingNext: false,
   isVideoKeyingEnabled: false,
   isWebGLSupported: getWebGLSupport(),
   mediaType: null,
@@ -139,12 +140,16 @@ const initialState: PlayerState = {
   rgTrackGain: null,
   rgTrackPeak: null,
   volume: 1,
+  // "private" internal state that shouldn't be emitted
+  _isFetching: false,
+  _isPlayingNext: false,
+  _isReplayingQueueId: null,
 }
 
 const playerReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(playerCmdNext, (state) => {
-      state.isPlayingNext = true
+      state._isPlayingNext = true
     })
     .addCase(playerCmdOptions, (state, { payload }) => ({
       ...state,
@@ -158,6 +163,9 @@ const playerReducer = createReducer(initialState, (builder) => {
     .addCase(playerCmdPlay, (state) => {
       state.isPlaying = true
     })
+    .addCase(playerCmdReplay, (state, { payload }) => {
+      state._isReplayingQueueId = payload.queueId
+    })
     .addCase(playerCmdVolume, (state, { payload }) => {
       state.volume = payload
     })
@@ -165,17 +173,17 @@ const playerReducer = createReducer(initialState, (builder) => {
       ...state,
       errorMessage: payload,
       isErrored: true,
-      isFetching: false,
       isPlaying: false,
+      _isFetching: false,
     }))
     .addCase(playerLoad, state => ({
       ...state,
       errorMessage: '',
       isErrored: false,
-      isFetching: true,
+      _isFetching: true,
     }))
     .addCase(playerPlay, (state) => {
-      state.isFetching = false
+      state._isFetching = false
     })
     .addCase(playerUpdate, (state, { payload }) => ({
       ...state,

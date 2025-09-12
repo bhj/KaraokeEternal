@@ -8,7 +8,7 @@ const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue(
 interface MP4AlphaPlayerProps {
   isPlaying: boolean
   mediaId: number
-  mediaKey: number
+  mediaKey: string
   mp4Alpha: number
   width: number
   height: number
@@ -54,7 +54,11 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
 
   componentDidUpdate (prevProps: MP4AlphaPlayerProps) {
     if (prevProps.mediaKey !== this.props.mediaKey) {
-      this.updateSources()
+      if (prevProps.mediaId !== this.props.mediaId) {
+        this.updateSources()
+      } else {
+        this.video.currentTime = 0
+      }
     }
 
     if (prevProps.isPlaying !== this.props.isPlaying) {
