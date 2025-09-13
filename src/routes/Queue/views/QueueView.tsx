@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import getRoundRobinQueue from '../selectors/getRoundRobinQueue'
 import QueueList from '../components/QueueList/QueueList'
 import Spinner from 'components/Spinner/Spinner'

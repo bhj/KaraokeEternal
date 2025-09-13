@@ -1,6 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
+import { RouterProvider } from 'react-router'
 import store from './store/store'
 import socket from 'lib/socket'
 import AppRouter from 'lib/AppRouter'

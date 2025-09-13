@@ -1,6 +1,6 @@
 import React from 'react'
 import clsx from 'clsx'
-import { NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router'
 import Button from 'components/Button/Button'
 import styles from './Navigation.css'
 

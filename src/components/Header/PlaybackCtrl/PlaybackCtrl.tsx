@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import clsx from 'clsx'
 import screenfull from 'screenfull'
 import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolume } from 'store/modules/status'

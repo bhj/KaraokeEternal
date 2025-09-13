@@ -1,5 +1,5 @@
 import React from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router'
 import App from 'components/App/App'
 
 const basename = new URL(document.baseURI).pathname
