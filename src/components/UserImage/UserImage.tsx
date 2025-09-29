@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import clsx from 'clsx'
 import Icon from 'components/Icon/Icon'
 import styles from './UserImage.css'
@@ -6,47 +6,43 @@ import styles from './UserImage.css'
 interface UserImageProps {
   className?: string
   dateUpdated: number
-  height?: number
   userId: number
 }
 
-class UserImage extends React.Component<UserImageProps> {
-  state = {
-    isLoading: true,
-    isErrored: false,
-  }
+const UserImage = ({ className, dateUpdated, userId }: UserImageProps) => {
+  const [isLoading, setIsLoading] = useState(true)
+  const [isErrored, setIsErrored] = useState(false)
 
-  render () {
-    const { props, state } = this
+  const handleLoaded = useCallback(() => setIsLoading(false), [])
 
-    return (
-      <>
-        {(state.isLoading || state.isErrored) && props.height
-          && <Icon icon='ACCOUNT' size={props.height} className={styles.placeholder} />}
+  const handleError = useCallback(() => {
+    setIsLoading(false)
+    setIsErrored(true)
+  }, [])
 
-        {!state.isErrored && (
-          <img
-            src={`${document.baseURI}api/user/${props.userId}/image?v=${props.dateUpdated}`}
-            onLoad={this.handleImgLoad}
-            onError={this.handleImgError}
-            className={clsx(styles.image, props.className)}
-            style={{
-              display: state.isLoading ? 'none' : 'initial',
-              height: props.height ? props.height : null,
-            }}
-          />
-        )}
-      </>
-    )
-  }
+  useEffect(() => {
+    setIsLoading(true)
+    setIsErrored(false)
+  }, [userId, dateUpdated])
 
-  handleImgLoad = () => {
-    this.setState({ isLoading: false })
-  }
+  return (
+    <div className={clsx(styles.container, className)}>
+      {(isLoading || isErrored) && (
+        <Icon icon='ACCOUNT' />
+      )}
 
-  handleImgError = () => {
-    this.setState({ isErrored: true, isLoading: false })
-  }
+      {!isErrored && (
+        <img
+          src={`${document.baseURI}api/user/${userId}/image?v=${dateUpdated}`}
+          onLoad={handleLoaded}
+          onError={handleError}
+          style={{
+            display: isLoading ? 'none' : 'initial',
+          }}
+        />
+      )}
+    </div>
+  )
 }
 
 export default UserImage

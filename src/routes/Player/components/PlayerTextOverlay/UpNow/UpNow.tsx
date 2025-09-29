@@ -11,6 +11,7 @@ interface UpNowProps {
 const UpNow = ({ queueItem }: UpNowProps) => {
   const [show, setShow] = useState(false)
   const timeoutID = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const nodeRef = useRef<HTMLDivElement | null>(null)
 
   const animate = () => {
     if (timeoutID.current) {
@@ -48,7 +49,7 @@ const UpNow = ({ queueItem }: UpNowProps) => {
 
   return (
     <CSSTransition
-      // unmountOnExit
+      nodeRef={nodeRef}
       in={show}
       timeout={500}
       classNames={{
@@ -57,7 +58,7 @@ const UpNow = ({ queueItem }: UpNowProps) => {
         exitActive: styles.exitActive,
       }}
     >
-      <div className={styles.container}>
+      <div ref={nodeRef} className={styles.container}>
         <div className={styles.innerContainer}>
           <UserImage
             userId={queueItem.userId}

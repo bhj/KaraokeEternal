@@ -15,7 +15,7 @@
       color: var(--song-item-btn-active-bg-color);
       filter: var(--song-item-btn-active-filter);
     }
- 
+
     .starCount {
       color: var(--song-item-btn-active-color);
     }
@@ -58,11 +58,8 @@
 
 /* Buttons */
 .btn {
-  cursor: pointer;
   width: var(--song-item-btn-width);
   height: var(--song-item-btn-height);
-  margin-right: var(--btn-margin);
-  transition: opacity .3s;
 }
 
 .star {

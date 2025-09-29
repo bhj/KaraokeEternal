@@ -1,18 +1,22 @@
 .container {
-  background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-to-bg-color));
-  background-repeat: no-repeat;
-  height: var(--queue-item-height);
+  position: relative;
+  /* 104px */
+  height: 6.5rem;
+  display: flex;
+  align-items: center;
   overflow: hidden;
-  padding-right: 4px;
+  background-color: hsl(var(--hue-blue), 40%, 6%);
+
+  --image-width: 104px;
+  margin: var(--space-xs) 0;
+  /* border-top: 4px solid #000;
+  border-bottom: 4px solid #000; */
 }
 
 .content {
   display: flex;
   flex: 1;
-  margin-top: var(--container-padding);
-  margin-right: 0;
-  margin-bottom: var(--container-padding);
-  margin-left: var(--container-padding);
+  margin: 0.75rem 0 0.75rem var(--space-s);
   overflow: hidden;
 }
 
@@ -23,15 +27,15 @@
 .imageContainer {
   position: relative;
   display: flex;
-  align-items: center;
   justify-content: center;
-  width: 96px;
-  height: 72px;
-}
+  width: var(--image-width);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
 
-.image {
-  max-width: 96px;
-  max-height: 72px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .waitContainer {
@@ -43,9 +47,9 @@
 }
 
 .wait {
-  color: #ccc;
-  font-size: 15px;
-  padding: 3px 3px;
+  color: var(--color-gray-7);
+  font-size: var(--font-size-s);
+  padding: var(--space-xs);
 }
 
 .primary {
@@ -54,37 +58,29 @@
   flex-direction: column;
   margin-left: var(--container-padding);
   overflow: hidden;
-  padding: 3px 0;
 }
 
 .innerPrimary {
   flex: 1;
 }
 
-.ellipsis {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 .title {
-  composes: ellipsis;
-  font-size: 19px;
+  color: var(--color-gray-9);
+  font-size: 1.25rem;
 }
 
 .artist {
-  composes: ellipsis;
-  color: #aaa;
-  font-size: 17px;
+  color: var(--color-gray-7);
+  font-size: 1.125rem;
 }
 
 .user {
-  font-size: 15px;
-  /*  for some reason composes: ellipsis; isn't working here */
+  font-size: var(--font-size-s);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  color: #777;
+  color: var(--color-gray-5);
+  margin-bottom: 0.25rem;
 }
 
 .isOwner {
@@ -92,12 +88,22 @@
   text-shadow: var(--text-shadow-glow);
 }
 
+.title,
+.artist,
+.user {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* Buttons */
+.btnContainer {
+  position: relative;
+  z-index: 1;
+}
+
 .btn {
-  cursor: pointer;
   color: var(--song-item-btn-bg-color);
-  margin-right: var(--btn-margin);
-  transition: opacity .3s;
 }
 
 .active {
@@ -112,4 +118,56 @@
 
 .animateStar {
   animation: var(--animation-bounce);
+}
+
+/* Currently playing  */
+.container.current {
+  /* Added 1% tail fade (99% -> 100%) */
+  background-image: linear-gradient(to right,
+      hsl(var(--hue-blue), 100%, 20%) 99%,
+      transparent 100%);
+  background-repeat: no-repeat;
+  background-size: var(--progress, 0%) 100%;
+}
+
+.container.current::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: auto;
+  width: var(--progress, 0%);
+  --queue-item-crawl-span: 300%;
+  --queue-item-shine-width: 55vw;
+  /* Tile must exceed shine width; gap factor creates transparent buffer so repeat is seamless */
+  --queue-item-gap-factor: 1.5;
+  --queue-item-tile-size: calc(var(--queue-item-shine-width) * var(--queue-item-gap-factor));
+  /* Soften trailing edge of shine (fade last 1%) */
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 99%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to right, #000 0%, #000 99%, rgba(0, 0, 0, 0) 100%);
+  /* Slightly reduced alpha of shine for overall softness */
+  background: linear-gradient(90deg,
+      transparent 0%,
+      transparent calc(50% - (var(--queue-item-shine-width) / 2)),
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent calc(50% + (var(--queue-item-shine-width) / 2)),
+      transparent 100%);
+  /* Use the computed tile size so the shine fully fits inside one repeat */
+  background-size: var(--queue-item-tile-size) 100%;
+  background-repeat: repeat-x;
+  animation: queueItemCrawl 3s linear infinite;
+  will-change: background-position;
+  mix-blend-mode: overlay;
+  opacity: 0.85;
+}
+
+@keyframes queueItemCrawl {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: var(--queue-item-tile-size) 0;
+  }
 }

@@ -95,12 +95,12 @@ const QueueItem = ({
   return (
     <div
       {...swipeHandlers}
-      className={styles.container}
-      style={{ backgroundSize: (isCurrent && pctPlayed < 2 ? 2 : pctPlayed) + '% 100%' }}
+      className={clsx(styles.container, isCurrent && styles.current)}
+      style={{ '--progress': (isCurrent && pctPlayed < 2 ? 2 : pctPlayed) + '%' } as React.CSSProperties}
     >
       <div className={styles.content}>
         <div className={clsx(styles.imageContainer, isPlayed && styles.greyed)}>
-          <UserImage userId={userId} dateUpdated={userDateUpdated} height={72} className={styles.image} />
+          <UserImage userId={userId} dateUpdated={userDateUpdated} />
           <div className={styles.waitContainer}>
             {isUpcoming && (
               <div className={clsx(styles.wait, isOwner && styles.isOwner)}>
@@ -120,7 +120,7 @@ const QueueItem = ({
           </div>
         </div>
 
-        <Buttons btnWidth={50} isExpanded={isExpanded}>
+        <Buttons btnWidth={52} isExpanded={isExpanded} className={styles.btnContainer}>
           {isErrored && (
             <Button
               className={clsx(styles.btn, styles.danger)}

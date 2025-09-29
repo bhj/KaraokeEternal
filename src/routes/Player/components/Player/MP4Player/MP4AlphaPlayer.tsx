@@ -92,9 +92,11 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
     const { mp4Alpha, width, height } = this.props
     const screenAspect = width / height
     const videoAspect = this.state.videoWidth / this.state.videoHeight
-    const scale = screenAspect > videoAspect
-      ? height / this.state.videoHeight
-      : width / this.state.videoWidth
+    const scale = !isNaN(videoAspect)
+      ? (screenAspect > videoAspect
+          ? height / this.state.videoHeight
+          : width / this.state.videoWidth)
+      : 0
     const filters = []
     const [x1, y1, x2, y2] = this.state.contentBounds
     const pad = (x2 - x1) && (y2 - y1) ? scale * BACKDROP_PADDING : 0
@@ -121,8 +123,8 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
         </div>
         <canvas
           className={styles.canvas}
-          width={(this.state.videoWidth * scale) || 0}
-          height={(this.state.videoHeight * scale) || 0}
+          width={this.state.videoWidth * scale}
+          height={this.state.videoHeight * scale}
           ref={this.canvas}
         />
       </div>

@@ -90,7 +90,7 @@ const SongItem = ({
         </div>
       </ToggleAnimation>
 
-      <Buttons btnWidth={50} isExpanded={isExpanded}>
+      <Buttons btnWidth={52} isExpanded={isExpanded}>
         <Button onClick={handleStarClick} className={clsx(styles.btn, styles.star)}>
           <ToggleAnimation toggle={isStarred} className={styles.animateStar}>
             <Icon size={44} icon='STAR_FULL' />

@@ -1,7 +1,18 @@
-.image {
-  border-radius: var(--border-radius);
-}
+.container {
+  aspect-ratio: 4/3;
+  margin: 0 auto;
 
-.placeholder {
-  color: var(--btn-bg-color);
+  img {
+    border-radius: var(--border-radius);
+  }
+
+  svg {
+    color: var(--btn-bg-color);
+  }
+
+  img,
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }

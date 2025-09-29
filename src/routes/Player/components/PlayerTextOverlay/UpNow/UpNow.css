@@ -41,6 +41,9 @@
   font-size: 6vh;
   text-rendering: optimizeLegibility;
   text-shadow: 1px 1px 5px #000;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 33vw;
 }
 
 .userImage {
@@ -48,11 +51,21 @@
 }
 
 @keyframes slide-in {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 @keyframes slide-out {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(0%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
 }

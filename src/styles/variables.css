@@ -1,6 +1,15 @@
 :root {
   --hue-blue: 209;
   --hue-pink: 270;
+  --color-gray-1: hsl(var(--hue-blue), 10%, 10%);
+  --color-gray-2: hsl(var(--hue-blue), 10%, 20%);
+  --color-gray-3: hsl(var(--hue-blue), 10%, 30%);
+  --color-gray-4: hsl(var(--hue-blue), 10%, 40%);
+  --color-gray-5: hsl(var(--hue-blue), 10%, 50%);
+  --color-gray-6: hsl(var(--hue-blue), 10%, 60%);
+  --color-gray-7: hsl(var(--hue-blue), 10%, 70%);
+  --color-gray-8: hsl(var(--hue-blue), 10%, 80%);
+  --color-gray-9: hsl(var(--hue-blue), 10%, 90%);
 
   --font-family: system-ui, sans-serif;
   --font-family-custom: system-ui, sans-serif;
@@ -32,7 +41,6 @@
   --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   --drop-shadow-filter: drop-shadow(0 2px 5px #222);
-  --btn-margin: 6px;
   --border-radius: 8px;
   --focus-outline: 4px solid var(--btn-danger-bg-color);
 
@@ -46,16 +54,12 @@
   --btn-active-bg-color: var(--link-color);
   --btn-active-filter: drop-shadow(0 0 10px hsla(var(--hue-blue), 100%, 100%, .5));
   --btn-activate-filter:
-    drop-shadow(-5px 0 10px hsl(var(--hue-blue), 80%, 50%))
-    drop-shadow(5px 0 10px hsl(var(--hue-blue), 80%, 50%))
-    drop-shadow(0 0 10px hsl(var(--hue-blue), 80%, 50%));
+    drop-shadow(-5px 0 10px hsl(var(--hue-blue), 80%, 50%)) drop-shadow(5px 0 10px hsl(var(--hue-blue), 80%, 50%)) drop-shadow(0 0 10px hsl(var(--hue-blue), 80%, 50%));
 
   --btn-danger-bg-color: hsl(var(--hue-pink), 60%, 57%);
   --btn-danger-filter: drop-shadow(0 0 10px hsla(var(--hue-pink), 100%, 100%, .5));
   --btn-danger-activate-filter:
-    drop-shadow(-5px 0 10px hsl(var(--hue-pink), 80%, 70%))
-    drop-shadow(5px 0 10px hsl(var(--hue-pink), 80%, 70%))
-    drop-shadow(0 0 10px hsl(var(--hue-pink), 80%, 70%));
+    drop-shadow(-5px 0 10px hsl(var(--hue-pink), 80%, 70%)) drop-shadow(5px 0 10px hsl(var(--hue-pink), 80%, 70%)) drop-shadow(0 0 10px hsl(var(--hue-pink), 80%, 70%));
 
   /* UI chrome (header/footer) */
   --chrome-bg-color: hsla(var(--hue-blue), 100%, 5%, .8);
@@ -95,11 +99,6 @@
   --search-results-heading-bg-color: var(--artist-folder-bg-color);
   --mark-bg-color: hsl(var(--hue-blue), 50%, 30%);
 
-  /* Queue */
-  --active-item-from-bg-color: hsl(var(--hue-blue), 70%, 15%);
-  --active-item-to-bg-color: hsl(var(--hue-blue), 70%, 30%);
-  --queue-item-height: 92px;
-
   /* Account panels */
   --panel-bg-color: hsl(var(--hue-blue), 20%, 10%);
 
@@ -135,24 +134,53 @@
 }
 
 @keyframes bounce {
-  from { transform: scale3d(1, 1, 1); }
-  3% { transform: scale3d(1.75, 1.75, 1.75); }
-  95% { transform: scale3d(.9, .9, .9); }
-  to { transform: scale3d(1, 1, 1); }
+  from {
+    transform: scale3d(1, 1, 1);
+  }
+
+  3% {
+    transform: scale3d(1.75, 1.75, 1.75);
+  }
+
+  95% {
+    transform: scale3d(.9, .9, .9);
+  }
+
+  to {
+    transform: scale3d(1, 1, 1);
+  }
 }
 
 @keyframes glow {
-  from { text-shadow: none; }
-  25% { text-shadow: 0 0 4px hsl(var(--hue-pink), 100%, 100%), 0 0 8px hsl(var(--hue-pink), 100%, 100%), 0 0 12px hsl(var(--hue-pink), 100%, 100%); }
-  to { text-shadow: var(--text-shadow-glow); }
+  from {
+    text-shadow: none;
+  }
+
+  25% {
+    text-shadow: 0 0 4px hsl(var(--hue-pink), 100%, 100%), 0 0 8px hsl(var(--hue-pink), 100%, 100%), 0 0 12px hsl(var(--hue-pink), 100%, 100%);
+  }
+
+  to {
+    text-shadow: var(--text-shadow-glow);
+  }
 }
 
 @keyframes btn-activate {
-  from { filter: var(--btn-activate-filter); }
-  to { filter: none; }
+  from {
+    filter: var(--btn-activate-filter);
+  }
+
+  to {
+    filter: none;
+  }
 }
 
 @keyframes btn-danger-activate {
-  from { filter: var(--btn-danger-activate-filter); }
-  to { filter: none; }
+  from {
+    filter: var(--btn-danger-activate-filter);
+  }
+
+  to {
+    filter: none;
+  }
 }
