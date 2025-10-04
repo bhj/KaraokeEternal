@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import ArtistList from '../components/ArtistList/ArtistList'
 import SearchResults from '../components/SearchResults/SearchResults'
@@ -20,7 +20,7 @@ interface LibraryViewProps {
   starredSongs: number[]
   expandedArtists: number[]
   alphaPickerMap: Record<string, number>
-  scrollTop: number
+  scrollRow: number
   ui: UIState
   // SearchResults view
   songsResult: number[]
@@ -31,13 +31,26 @@ interface LibraryViewProps {
   // Actions
   toggleArtistExpanded: (artistId: number) => void
   toggleArtistResultExpanded: (artistId: number) => void
-  scrollArtists: (scrollTop: number) => void
+  scrollArtists: (scrollRow: number) => void
   showSongInfo: (songId: number) => void
   closeSongInfo: () => void
 }
 
 const LibraryView = (props: LibraryViewProps) => {
-  const { isAdmin, isEmpty, isLoading, isSearching } = props
+  const { isAdmin, isEmpty, isLoading, isSearching, ui } = props
+  const initialHeaderHeight = useRef(ui.headerHeight)
+  const [finalHeaderHeight, setFinalHeaderHeight] = useState(null)
+
+  // don't render ArtistList until headerHeight is stable; otherwise
+  // scroll position restoration does not work well (appears OBO)
+  // @todo - this is hacky
+  useEffect(() => {
+    if (ui.headerHeight > initialHeaderHeight.current) {
+      setFinalHeaderHeight(ui.headerHeight)
+    }
+  }, [ui.headerHeight, finalHeaderHeight])
+
+  if (!finalHeaderHeight) return null
 
   return (
     <>

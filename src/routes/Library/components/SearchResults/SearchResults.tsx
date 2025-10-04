@@ -1,11 +1,11 @@
 import React, { CSSProperties } from 'react'
+import { type ListImperativeAPI } from 'react-window'
 import PaddedList from 'components/PaddedList/PaddedList'
 import ArtistItem from '../ArtistItem/ArtistItem'
 import SongList from '../SongList/SongList'
 import { RootState } from 'store/store'
 import { Artist, Song } from 'shared/types'
 import styles from './SearchResults.css'
-import { VariableSizeList } from 'react-window'
 
 const ARTIST_HEADER_HEIGHT = 22
 const ARTIST_RESULT_HEIGHT = 44
@@ -29,14 +29,7 @@ interface SearchResultsProps {
 }
 
 class SearchResults extends React.Component<SearchResultsProps> {
-  list: VariableSizeList | null = null
-
-  componentDidUpdate () {
-    if (this.list) {
-      // @todo: clear size cache starting from the toggled artist
-      this.list.resetAfterIndex(0)
-    }
-  }
+  list: ListImperativeAPI | null = null
 
   render () {
     return (
@@ -47,9 +40,8 @@ class SearchResults extends React.Component<SearchResultsProps> {
         paddingTop={this.props.ui.headerHeight}
         paddingRight={4}
         paddingBottom={this.props.ui.footerHeight}
-        width={this.props.ui.innerWidth}
         height={this.props.ui.innerHeight}
-        onRef={this.setRef}
+        onRef={this.handleRef}
       />
     )
   }
@@ -139,8 +131,11 @@ class SearchResults extends React.Component<SearchResultsProps> {
     return this.props.songsResult.length * SONG_RESULT_HEIGHT
   }
 
-  setRef = (ref: VariableSizeList) => {
-    this.list = ref
+  handleRef = (ref: ListImperativeAPI) => {
+    if (ref) {
+      this.list = ref
+      // this.list.scrollToRow({ index: this.props.scrollRow, align: 'start' })
+    }
   }
 }
 

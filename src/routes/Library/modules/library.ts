@@ -37,7 +37,7 @@ interface LibraryState {
   version: number
   filterStr: string
   filterStarred: boolean
-  scrollTop: number
+  scrollRow: number
   expandedArtists: number[]
   expandedArtistResults: number[]
 }
@@ -47,7 +47,7 @@ const initialState: LibraryState = {
   version: 0,
   filterStr: '',
   filterStarred: false,
-  scrollTop: 0,
+  scrollRow: 0,
   expandedArtists: [],
   expandedArtistResults: [],
 }
@@ -64,7 +64,7 @@ const libraryReducer = createReducer(initialState, (builder) => {
       state.filterStarred = !state.filterStarred
     })
     .addCase(scrollArtists, (state, { payload }) => {
-      state.scrollTop = payload
+      state.scrollRow = payload
     })
     .addCase(toggleArtistExpanded, (state, { payload }) => {
       const idx = state.expandedArtists.indexOf(payload)

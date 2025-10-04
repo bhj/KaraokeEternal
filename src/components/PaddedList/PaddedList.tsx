@@ -1,83 +1,80 @@
-import React, { CSSProperties } from 'react'
-import { VariableSizeList as List, ListOnScrollProps } from 'react-window'
+import React, { CSSProperties, useCallback } from 'react'
+import { List, type RowComponentProps, type ListImperativeAPI } from 'react-window'
 import styles from './PaddedList.css'
+
+const fakeRowProps = {}
 
 interface PaddedListProps {
   numRows: number
-  onScroll?(props: ListOnScrollProps): void
-  onRef?(ref: List): void
+  onRowsRendered?: (visibleRows: {
+    startIndex: number
+    stopIndex: number
+  }, allRows: {
+      startIndex: number
+      stopIndex: number
+    }) => void
+  onRef?(ref: ListImperativeAPI | null): void
   paddingTop: number
   paddingRight?: number
   paddingBottom: number
   rowRenderer(props: { index: number, style: CSSProperties }): React.ReactNode
+  // rowComponent: RowComponentProps
   rowHeight(index: number): number
-  width: number
+  width?: number
   height: number
 }
 
-class PaddedList extends React.Component<PaddedListProps> {
-  list: List | null = null
+const PaddedList = ({
+  numRows,
+  onRowsRendered,
+  onRef,
+  paddingTop,
+  paddingRight,
+  paddingBottom,
+  rowRenderer,
+  rowHeight,
+  width,
+  height,
+}: PaddedListProps) => {
+  const handleListRef = useCallback((ref: ListImperativeAPI | null) => {
+    if (onRef) onRef(ref)
+  }, [onRef])
 
-  componentDidMount () {
-    if (this.props.onRef) {
-      this.props.onRef(this.list)
-    }
-  }
-
-  render () {
-    return (
-      <List
-        itemCount={this.props.numRows + 2} // top & bottom spacer
-        itemSize={this.getItemSize}
-        onScroll={this.props.onScroll}
-        overscanCount={10}
-        ref={this.setRef}
-        className={styles.container}
-        width={this.props.width}
-        height={this.props.height}
-      >
-        {this.rowRenderer}
-      </List>
-    )
-  }
-
-  componentDidUpdate (prevProps: PaddedListProps) {
-    const { paddingTop, paddingBottom } = this.props
-    if (paddingTop !== prevProps.paddingTop || paddingBottom !== prevProps.paddingBottom) {
-      this.list.resetAfterIndex(0)
-    }
-  }
-
-  rowRenderer = ({ index, style }: { index: number, style: CSSProperties }) => {
+  const RowComponent = useCallback(({ index, style }: RowComponentProps) => {
     // top & bottom spacer
-    if (index === 0 || index === this.props.numRows + 1) {
+    if (index === 0 || index === numRows + 1) {
       return (
         <div key={index === 0 ? 'top' : 'bottom'} style={style} />
       )
     }
 
-    return this.props.rowRenderer({
+    return rowRenderer({
       index: --index,
-      style: { ...style, paddingRight: this.props.paddingRight },
+      style: { ...style, paddingRight },
     })
-  }
+  }, [numRows, rowRenderer, paddingRight])
 
-  getItemSize = (index: number) => {
+  const getRowHeight = (index: number) => {
     // top & bottom spacer
-    if (index === 0) {
-      return this.props.paddingTop
-    } else if (index === this.props.numRows + 1) {
-      return this.props.paddingBottom
-    } else {
-      index--
-    }
+    if (index === 0) return paddingTop
+    if (index === numRows + 1) return paddingBottom
 
-    return this.props.rowHeight(index)
+    return rowHeight(index - 1)
   }
 
-  setRef = (ref: List) => {
-    this.list = ref
-  }
+  return (
+    <List
+      rowProps={fakeRowProps} // todo
+      rowComponent={RowComponent}
+      rowCount={numRows + 2} // top & bottom spacer
+      rowHeight={getRowHeight}
+      onRowsRendered={onRowsRendered}
+      overscanCount={10}
+      listRef={handleListRef}
+      className={styles.container}
+      style={{ width, height }}
+    />
+  )
 }
 
 export default PaddedList

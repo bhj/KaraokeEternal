@@ -121,7 +121,7 @@ const mapStateToProps = (state: RootState) => {
     starredSongs: getStarredSongs(state),
     expandedArtists: state.library.expandedArtists,
     alphaPickerMap: getAlphaPickerMap(state),
-    scrollTop: state.library.scrollTop,
+    scrollRow: state.library.scrollRow,
     isAdmin: state.user.isAdmin,
     isSearching: !!getFilterKeywords(state).length || getFilterStarred(state),
     isLoading: state.library.isLoading,
