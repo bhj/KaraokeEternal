@@ -1,85 +1,86 @@
-import React, { CSSProperties, useCallback, useEffect, useRef } from 'react'
-import { type ListImperativeAPI } from 'react-window'
+import React, { useCallback, useEffect, useRef } from 'react'
+import { ensureState } from 'redux-optimistic-ui'
+import { RootState } from 'store/store'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
+import { scrollArtists, toggleArtistExpanded } from '../../modules/library'
+import getAlphaPickerMap from '../../selectors/getAlphaPickerMap'
+import getQueuedSongs from '../../selectors/getQueuedSongs'
 import PaddedList from 'components/PaddedList/PaddedList'
 import AlphaPicker from '../AlphaPicker/AlphaPicker'
 import ArtistItem from '../ArtistItem/ArtistItem'
-import { RootState } from 'store/store'
-import { Artist, Song } from 'shared/types'
+import type { ListImperativeAPI, RowComponentProps } from 'react-window'
 
 const ROW_HEIGHT = 44
 
 interface ArtistListProps {
-  alphaPickerMap: Record<string, number>
-  artists: Record<number, Artist>
-  artistsResult: number[]
-  expandedArtists: number[] // artistIds
-  filterKeywords: string[]
-  queuedSongs: number[] // songIds
-  songs: Record<number, Song>
-  starredSongs: number[]
-  starredArtistCounts: Record<number, number>
-  scrollRow: number
   ui: RootState['ui']
-  // actions
-  toggleArtistExpanded(artistId: number): void
-  scrollArtists(scrollRow: number): void
+}
+
+interface CustomRowProps {
+  dispatch: ReturnType<typeof useAppDispatch>
+  artists: RootState['artists']
+  expandedArtists: number[]
+}
+
+// this is outside the ArtistList component to keep the reference as stable as possible,
+// as react-window will re-render the list (breaking animations) when RowComponent changes
+const RowComponent = ({
+  index,
+  style,
+  // below are also used in ArtistList and passed via rowProps to avoid duplicate effort
+  dispatch,
+  artists,
+  expandedArtists,
+}: RowComponentProps<CustomRowProps>) => {
+  const starredArtistCounts = useAppSelector(state => state.starCounts.artists)
+  const { starredSongs } = useAppSelector(state => ensureState(state.userStars))
+  const queuedSongs = useAppSelector(getQueuedSongs)
+
+  const artist = artists.entities[artists.result[index]]
+
+  return (
+    <ArtistItem
+      artistSongIds={artist.songIds} // "children"
+      isExpanded={expandedArtists.includes(artist.artistId)}
+      key={artist.artistId}
+      name={artist.name}
+      numStars={starredArtistCounts[artist.artistId] || 0}
+      onArtistClick={() => dispatch(toggleArtistExpanded(artist.artistId))}
+      queuedSongs={queuedSongs}
+      starredSongs={starredSongs}
+      style={style}
+    />
+  )
 }
 
 const ArtistList = ({
-  alphaPickerMap,
-  artists,
-  artistsResult,
-  expandedArtists,
-  filterKeywords,
-  queuedSongs,
-  scrollArtists,
-  scrollRow,
-  starredArtistCounts,
-  starredSongs,
-  toggleArtistExpanded,
   ui,
 }: ArtistListProps) => {
+  const dispatch = useAppDispatch()
+  const { expandedArtists } = useAppSelector(state => state.library)
+  const scrollRow = useAppSelector(state => state.library.scrollRow)
+  const alphaPickerMap = useAppSelector(getAlphaPickerMap)
+  const artists = useAppSelector(state => state.artists)
+
   const lastScrollRow = useRef(scrollRow)
   const list = useRef<ListImperativeAPI | null>(null)
 
-  // console.log('ArtistList render; headerHeight=', ui.headerHeight)
-
   useEffect(() => {
     return () => {
-      scrollArtists(lastScrollRow.current)
+      dispatch(scrollArtists(lastScrollRow.current))
     }
-  }, [scrollArtists])
-
-  const rowRenderer = useCallback(({ index, style }: { index: number, style: CSSProperties }) => {
-    const artist = artists[artistsResult[index]]
-
-    return (
-      <ArtistItem
-        artistId={artist.artistId}
-        artistSongIds={artist.songIds} // "children"
-        filterKeywords={filterKeywords}
-        isExpanded={expandedArtists.includes(artist.artistId)}
-        key={artist.artistId}
-        name={artist.name}
-        numStars={starredArtistCounts[artist.artistId] || 0}
-        onArtistClick={toggleArtistExpanded}
-        queuedSongs={queuedSongs}
-        starredSongs={starredSongs}
-        style={style}
-      />
-    )
-  }, [artists, artistsResult, expandedArtists, filterKeywords, queuedSongs, starredArtistCounts, starredSongs, toggleArtistExpanded])
+  }, [dispatch])
 
   const rowHeight = useCallback((index: number) => {
-    const artistId = artistsResult[index]
+    const artistId = artists.result[index]
     let rows = 1
 
     if (expandedArtists.includes(artistId)) {
-      rows += artists[artistId].songIds.length
+      rows += artists.entities[artistId].songIds.length
     }
 
     return rows * ROW_HEIGHT
-  }, [artists, artistsResult, expandedArtists])
+  }, [artists, expandedArtists])
 
   const handleRowsRendered = useCallback(({ startIndex }: { startIndex: number }) => {
     // console.log('rendered rows: ', { startIndex })
@@ -105,14 +106,15 @@ const ArtistList = ({
     }
   }, [])
 
-  if (artistsResult.length === 0) return null
+  if (artists.result.length === 0) return null
 
   return (
     <div>
       <PaddedList
-        numRows={artistsResult.length}
+        rowComponent={RowComponent}
+        rowProps={{ dispatch, artists, expandedArtists }}
         rowHeight={rowHeight}
-        rowRenderer={rowRenderer}
+        numRows={artists.result.length}
         onRowsRendered={handleRowsRendered}
         onRef={handleRef}
         paddingTop={ui.headerHeight}

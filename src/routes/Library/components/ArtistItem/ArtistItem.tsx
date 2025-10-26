@@ -1,65 +1,64 @@
 import React from 'react'
 import clsx from 'clsx'
+import Highlighter from 'react-highlight-words'
 import SongList from '../SongList/SongList'
 import Icon from 'components/Icon/Icon'
-import Highlighter from 'react-highlight-words'
 import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
 import styles from './ArtistItem.css'
 
 interface ArtistItemProps {
-  artistId: number
   artistSongIds: number[]
-  filterKeywords: string[]
+  filterKeywords?: string[]
   isExpanded: boolean
   name: string
   numStars: number
+  onArtistClick: () => void
   queuedSongs: number[]
   starredSongs: number[]
   style?: object
-  // actions
-  onArtistClick(artistId: number): void
 }
 
-class ArtistItem extends React.Component<ArtistItemProps> {
-  render () {
-    const { props } = this
-    const isChildQueued = props.artistSongIds.some(songId => props.queuedSongs.includes(songId))
-    const isChildStarred = props.artistSongIds.some(songId => props.starredSongs.includes(songId))
+const ArtistItem = ({
+  artistSongIds,
+  filterKeywords,
+  isExpanded,
+  name,
+  onArtistClick,
+  queuedSongs,
+  starredSongs,
+  style,
+}: ArtistItemProps): React.ReactElement => {
+  const isChildQueued = artistSongIds.some(songId => queuedSongs.includes(songId))
+  const isChildStarred = artistSongIds.some(songId => starredSongs.includes(songId))
 
-    return (
-      <div style={props.style}>
-        <div onClick={this.handleArtistClick} className={clsx(styles.container, isChildStarred && styles.hasStarred)}>
-          <div className={styles.folderContainer}>
-            <Icon icon='FOLDER' size={44} />
-            {props.isExpanded && (
-              <div className={styles.iconChevron}>
-                <Icon icon='CHEVRON_DOWN' size={24} />
-              </div>
-            )}
-            {!props.isExpanded && <div className={styles.count}>{props.artistSongIds.length}</div>}
-          </div>
-          <ToggleAnimation toggle={isChildQueued} className={styles.animateGlow}>
-            <div className={clsx(styles.name, isChildQueued && styles.isChildQueued)}>
-              <Highlighter autoEscape textToHighlight={props.name} searchWords={props.filterKeywords} />
+  return (
+    <div style={style}>
+      <div onClick={onArtistClick} className={clsx(styles.container, isChildStarred && styles.hasStarred)}>
+        <div className={styles.folderContainer}>
+          <Icon icon='FOLDER' size={44} />
+          {isExpanded && (
+            <div className={styles.iconChevron}>
+              <Icon icon='CHEVRON_DOWN' size={24} />
             </div>
-          </ToggleAnimation>
+          )}
+          {!isExpanded && <div className={styles.count}>{artistSongIds.length}</div>}
         </div>
-
-        {props.isExpanded && (
-          <SongList
-            songIds={props.artistSongIds}
-            showArtist={false}
-            filterKeywords={props.filterKeywords}
-            queuedSongs={props.queuedSongs}
-          />
-        )}
+        <ToggleAnimation toggle={isChildQueued} className={styles.animateGlow}>
+          <div className={clsx(styles.name, isChildQueued && styles.isChildQueued)}>
+            {filterKeywords?.length ? <Highlighter autoEscape textToHighlight={name} searchWords={filterKeywords} /> : name}
+          </div>
+        </ToggleAnimation>
       </div>
-    )
-  }
 
-  handleArtistClick = () => {
-    this.props.onArtistClick(this.props.artistId)
-  }
+      {isExpanded && (
+        <SongList
+          songIds={artistSongIds}
+          showArtist={false}
+          filterKeywords={filterKeywords}
+        />
+      )}
+    </div>
+  )
 }
 
 export default ArtistItem

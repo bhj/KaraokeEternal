@@ -18,7 +18,7 @@ export const toggleArtistResultExpanded = createAction<number>(TOGGLE_ARTIST_RES
 const libraryPush = createAction<LibraryState>(LIBRARY_PUSH)
 
 export const resetFilterStr = createAction(LIBRARY_FILTER_STRING_RESET)
-export const toggleFilterStarred = createAction(LIBRARY_FILTER_TOGGLE_STARRED)
+export const toggleFilterStarred = createAction<void>(LIBRARY_FILTER_TOGGLE_STARRED)
 export const setFilterStr = createAction(LIBRARY_FILTER_STRING, (payload: string) => ({
   payload,
   meta: {

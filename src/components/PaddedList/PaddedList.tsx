@@ -1,8 +1,6 @@
-import React, { CSSProperties, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { List, type RowComponentProps, type ListImperativeAPI } from 'react-window'
 import styles from './PaddedList.css'
-
-const fakeRowProps = {}
 
 interface PaddedListProps {
   numRows: number
@@ -17,9 +15,9 @@ interface PaddedListProps {
   paddingTop: number
   paddingRight?: number
   paddingBottom: number
-  rowRenderer(props: { index: number, style: CSSProperties }): React.ReactNode
-  // rowComponent: RowComponentProps
+  rowComponent: React.ComponentType<RowComponentProps>
   rowHeight(index: number): number
+  rowProps?: Partial<RowComponentProps> & Record<string, unknown>
   width?: number
   height: number
 }
@@ -31,8 +29,9 @@ const PaddedList = ({
   paddingTop,
   paddingRight,
   paddingBottom,
-  rowRenderer,
+  rowComponent: RowComponent,
   rowHeight,
+  rowProps = {},
   width,
   height,
 }: PaddedListProps) => {
@@ -40,7 +39,7 @@ const PaddedList = ({
     if (onRef) onRef(ref)
   }, [onRef])
 
-  const RowComponent = useCallback(({ index, style }: RowComponentProps) => {
+  const PaddedRowComponent = useCallback(({ index, style, ariaAttributes, ...rest }: RowComponentProps) => {
     // top & bottom spacer
     if (index === 0 || index === numRows + 1) {
       return (
@@ -48,11 +47,8 @@ const PaddedList = ({
       )
     }
 
-    return rowRenderer({
-      index: --index,
-      style: { ...style, paddingRight },
-    })
-  }, [numRows, rowRenderer, paddingRight])
+    return <RowComponent index={--index} style={{ ...style, paddingRight }} ariaAttributes={ariaAttributes} {...rest} />
+  }, [numRows, RowComponent, paddingRight])
 
   const getRowHeight = (index: number) => {
     // top & bottom spacer
@@ -64,8 +60,8 @@ const PaddedList = ({
 
   return (
     <List
-      rowProps={fakeRowProps} // todo
-      rowComponent={RowComponent}
+      rowProps={rowProps}
+      rowComponent={PaddedRowComponent}
       rowCount={numRows + 2} // top & bottom spacer
       rowHeight={getRowHeight}
       onRowsRendered={onRowsRendered}

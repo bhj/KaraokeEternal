@@ -1,43 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useAppSelector } from 'store/hooks'
 import { Link } from 'react-router'
 import ArtistList from '../components/ArtistList/ArtistList'
 import SearchResults from '../components/SearchResults/SearchResults'
 import TextOverlay from 'components/TextOverlay/TextOverlay'
 import Spinner from 'components/Spinner/Spinner'
 import styles from './LibraryView.css'
-import { Artist, Song } from 'shared/types'
-import { type UIState } from 'store/modules/ui'
 
-interface LibraryViewProps {
-  isAdmin: boolean
-  isLoading: boolean
-  isSearching: boolean
-  isEmpty: boolean
-  artists: Record<number, Artist>
-  songs: Record<number, Song>
-  starredArtistCounts: Record<number, number>
-  queuedSongs: number[]
-  starredSongs: number[]
-  expandedArtists: number[]
-  alphaPickerMap: Record<string, number>
-  scrollRow: number
-  ui: UIState
-  // SearchResults view
-  songsResult: number[]
-  artistsResult: number[]
-  filterKeywords: string[]
-  filterStarred: boolean
-  expandedArtistResults: number[]
-  // Actions
-  toggleArtistExpanded: (artistId: number) => void
-  toggleArtistResultExpanded: (artistId: number) => void
-  scrollArtists: (scrollRow: number) => void
-  showSongInfo: (songId: number) => void
-  closeSongInfo: () => void
-}
+const LibraryView = () => {
+  const { isAdmin } = useAppSelector(state => state.user)
+  const { isLoading, filterStr, filterStarred } = useAppSelector(state => state.library)
+  const songsResult = useAppSelector(state => state.songs.result)
+  const ui = useAppSelector(state => state.ui)
 
-const LibraryView = (props: LibraryViewProps) => {
-  const { isAdmin, isEmpty, isLoading, isSearching, ui } = props
+  const isSearching = !!filterStr.trim().length || filterStarred
   const initialHeaderHeight = useRef(ui.headerHeight)
   const [finalHeaderHeight, setFinalHeaderHeight] = useState(null)
 
@@ -54,13 +30,13 @@ const LibraryView = (props: LibraryViewProps) => {
 
   return (
     <>
-      {!isSearching && <ArtistList {...props} />}
+      {!isSearching && <ArtistList ui={ui} />}
 
-      {isSearching && <SearchResults {...props} />}
+      {isSearching && <SearchResults ui={ui} />}
 
       {isLoading && <Spinner />}
 
-      {!isLoading && isEmpty && (
+      {!isLoading && songsResult.length === 0 && (
         <TextOverlay className={styles.empty}>
           <h1>Library Empty</h1>
           {isAdmin && (

@@ -1,74 +1,63 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
+import { setFilterStr, resetFilterStr, toggleFilterStarred } from '../../modules/library'
 import Button from 'components/Button/Button'
 import styles from './LibraryHeader.css'
 
-interface LibraryHeaderProps {
-  filterStr: string
-  filterStarred: boolean
-  // actions
-  setFilterStr(search: string): void
-  resetFilterStr(): void
-  toggleFilterStarred(): void
-}
+const LibraryHeader = () => {
+  const dispatch = useAppDispatch()
+  const { filterStr, filterStarred } = useAppSelector(state => state.library)
 
-class LibraryHeader extends React.Component<LibraryHeaderProps> {
-  searchInput = React.createRef<HTMLInputElement>()
-  state = {
-    value: this.props.filterStr,
+  const searchInput = useRef<HTMLInputElement>(null)
+  const [value, setValue] = useState(filterStr)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value)
+    dispatch(setFilterStr(event.target.value))
   }
 
-  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ value: event.target.value })
-    this.props.setFilterStr(event.target.value)
+  const clearSearch = () => {
+    setValue('')
+    dispatch(resetFilterStr())
   }
 
-  handleMagnifierClick = () => {
-    if (this.state.value.trim()) this.clearSearch()
-    else this.searchInput.current.focus()
+  const handleMagnifierClick = () => {
+    if (value.trim()) clearSearch()
+    else searchInput.current?.focus()
   }
 
-  clearSearch = () => {
-    this.setState({ value: '' })
-    this.props.resetFilterStr()
-  }
-
-  render () {
-    const { filterStr, filterStarred } = this.props
-
-    return (
-      <div className={styles.container}>
+  return (
+    <div className={styles.container}>
+      <Button
+        className={filterStr ? styles.btnActive : styles.btn}
+        icon='MAGNIFIER'
+        onClick={handleMagnifierClick}
+        size={40}
+      />
+      <input
+        type='search'
+        className={styles.searchInput}
+        placeholder='search'
+        value={value}
+        onChange={handleChange}
+        ref={searchInput}
+      />
+      {filterStr && (
         <Button
-          className={filterStr ? styles.btnActive : styles.btn}
-          icon='MAGNIFIER'
-          onClick={this.handleMagnifierClick}
+          icon='CLEAR'
+          onClick={clearSearch}
+          className={styles.btnActive}
           size={40}
         />
-        <input
-          type='search'
-          className={styles.searchInput}
-          placeholder='search'
-          value={this.state.value}
-          onChange={this.handleChange}
-          ref={this.searchInput}
-        />
-        {filterStr && (
-          <Button
-            icon='CLEAR'
-            onClick={this.clearSearch}
-            className={styles.btnActive}
-            size={40}
-          />
-        )}
-        <Button
-          animateClassName={styles.btnAnimate}
-          className={filterStarred ? styles.btnActive : styles.btn}
-          icon='STAR_FULL'
-          onClick={this.props.toggleFilterStarred}
-          size={44}
-        />
-      </div>
-    )
-  }
+      )}
+      <Button
+        className={filterStarred ? styles.btnActive : styles.btn}
+        icon='STAR_FULL'
+        onClick={() => dispatch(toggleFilterStarred())}
+        size={44}
+      />
+    </div>
+  )
 }
 
 export default LibraryHeader

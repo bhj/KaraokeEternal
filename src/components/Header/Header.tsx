@@ -8,7 +8,7 @@ import { createSelector } from '@reduxjs/toolkit'
 import { requestScanStop } from 'store/modules/prefs'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import getWaits from 'routes/Queue/selectors/getWaits'
-import LibraryHeader from 'routes/Library/components/LibraryHeader/LibraryHeaderContainer' // @todo
+import LibraryHeader from 'routes/Library/components/LibraryHeader/LibraryHeader'
 import PlaybackCtrl from './PlaybackCtrl/PlaybackCtrl'
 import ProgressBar from './ProgressBar/ProgressBar'
 import UpNext from './UpNext/UpNext'

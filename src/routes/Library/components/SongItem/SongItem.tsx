@@ -76,7 +76,7 @@ const SongItem = ({
         </div>
         <div onClick={handleClick} className={styles.primary}>
           <div className={styles.title}>
-            <Highlighter autoEscape textToHighlight={title} searchWords={filterKeywords} />
+            {filterKeywords?.length ? <Highlighter autoEscape textToHighlight={title} searchWords={filterKeywords} /> : title}
             {isAdmin && numMedia > 1 && (
               <i>
                 {' '}
