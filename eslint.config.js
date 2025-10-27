@@ -1,6 +1,7 @@
 // @ts-check
 
 import eslint from '@eslint/js'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 import stylistic from '@stylistic/eslint-plugin'
 import pluginReact from 'eslint-plugin-react'
@@ -10,11 +11,13 @@ import pluginPromise from 'eslint-plugin-promise'
 import pluginNode from 'eslint-plugin-n'
 import globals from 'globals'
 
-export default tseslint.config(
+export default defineConfig(
   // global config
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   stylistic.configs.recommended,
+  // https://github.com/eslint-community/eslint-plugin-promise/issues/488
+  // @ts-expect-error - eslint-plugin-promise types are incomplete
   pluginPromise.configs['flat/recommended'],
   {
     plugins: {

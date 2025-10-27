@@ -57,7 +57,7 @@ let config = {
       chunkFilename: __DEV__ ? '[id].css' : '[id].[fullhash].css',
     }),
     __DEV__ && new webpack.HotModuleReplacementPlugin(),
-    __DEV__ && new ReactRefreshWebpackPlugin(),
+    __DEV__ && new ReactRefreshWebpackPlugin({ overlay: { sockIntegration: 'whm' } }),
   ].filter(Boolean),
   optimization: {
     splitChunks: {
