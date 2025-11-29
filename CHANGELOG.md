@@ -1,11 +1,39 @@
-## TBD
+## v2.0.0-beta.0
 
-Sponsored by: [candre23](https://github.com/candre23), [nellisdev](https://github.com/nellisdev), [astrobyte](https://github.com/astrobyte), [jfeldhamer](https://github.com/jfeldhamer). Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
+**Sponsored by**: [candre23](https://github.com/candre23), [nellisdev](https://github.com/nellisdev), [astrobyte](https://github.com/astrobyte), [jfeldhamer](https://github.com/jfeldhamer), (cubandaddy)[https://github.com/cubandaddy], [Backroads4Me](https://github.com/Backroads4Me) and other private sponsors. Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
 
-- Media folders can now be watched for changes and individually scanned
-- Added ZIP container support for MP3+G media
-- Usernames are no longer case sensitive (thanks **gazugafan**)
-- Fixed listing of drives on Windows due to removal of wmic
+### Guest accounts and QR codes
+
+Joining the party is now faster and easier. The player supports QR codes that link directly to a room, where singers can now (finally!) join as guests. Admins can also choose whether a room allows guests and/or new standard users, or only existing users.
+
+### Videos + visualizer
+
+Visualizations are now supported with video files. By automatically detecting a video's background color and making it transparent, visualizer effects can be displayed behind the lyrics. This works best on videos with solid color backgrounds, and can be enabled by selecting "Allow video background keying" in the media folder's preferences.
+
+### Improved queue management
+
+Enhancements to the queue include:
+
+- The queue can be restarted from any previously played song, or the beginning of the current song
+- All upcoming songs for a user can be removed at once by long-pressing the *Remove* button
+- When a standard user or guest signs out, their upcoming songs are now automatically removed from the queue
+
+### Metadata parser changes
+
+Previously, the metadata parser (which uses filenames or tags to determine artist names and song titles) could be customized via `_kes.v1.js` files which were essentially arbitrary JavaScript. They were run in a sandbox to limit their functionality, but that sandbox was deprecated, and the overall approach was complex.
+
+In v2, the parser instead uses `_kes.v2.json` files. These JSON files allow the same basic configuration, in addition to simple string replacement and "templating" of artist names and song titles. See the docs for more information. As always, the best approach is to properly name/tag media, but customizing the parser can help in specific cases.
+
+### Other features and fixes
+
+- Zipped MP3+G media is now supported
+- Media folders can now be watched for changes, as well as manually scanned individually
+- In the Library view, songs that have already been played in the current session appear greyed
+- In the Library view, tapping a song that is already upcoming no longer queues it again
+- Fixed an error when listing drives on Windows due to removal of `wmic` (thanks Microsoft! /s)
+- Usernames/emails are no longer case sensitive (thanks **gazugafan**)
+
+This release includes contributions from [gazugafan](https://github.com/gazugafan), (gausie)[https://github.com/gausie] and [EffakT](https://github.com/EffakT). Thanks!
 
 ## v1.0.0 (2022-05-17)
 
