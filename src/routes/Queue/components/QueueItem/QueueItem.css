@@ -1,4 +1,7 @@
 .container {
+  --image-width: 104px;
+  --queue-item-btn-size: 48px;
+
   position: relative;
   /* 104px */
   height: 6.5rem;
@@ -6,17 +9,13 @@
   align-items: center;
   overflow: hidden;
   background-color: hsl(var(--hue-blue), 40%, 6%);
-
-  --image-width: 104px;
-  margin: var(--space-xs) 0;
-  /* border-top: 4px solid #000;
-  border-bottom: 4px solid #000; */
+  margin: var(--space-s) 0;
 }
 
 .content {
   display: flex;
   flex: 1;
-  margin: 0.75rem 0 0.75rem var(--space-s);
+  margin: 0.5rem 0 0.5rem var(--space-s);
   overflow: hidden;
 }
 
@@ -98,26 +97,45 @@
 
 /* Buttons */
 .btnContainer {
-  position: relative;
-  z-index: 1;
+  button {
+    position: relative;
+    /* overflow: hidden; */
+    width: var(--queue-item-btn-size);
+    height: var(--queue-item-btn-size);
+    color: var(--song-item-btn-bg-color);
+  }
+
+  button.active {
+    color: var(--song-item-btn-active-bg-color);
+    filter: var(--song-item-btn-active-filter);
+  }
+
+  button.danger {
+    color: var(--btn-danger-bg-color);
+    filter: var(--btn-danger-filter);
+  }
+
+  svg {
+    width: var(--queue-item-btn-size);
+    height: var(--queue-item-btn-size);
+  }
 }
 
-.btn {
-  color: var(--song-item-btn-bg-color);
-}
-
-.active {
-  color: var(--song-item-btn-active-bg-color);
-  filter: var(--song-item-btn-active-filter);
-}
-
-.danger {
-  color: var(--btn-danger-bg-color);
-  filter: var(--btn-danger-filter);
+.btnAdd svg,
+.btnMove svg,
+.btnPlayNext svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .animateStar {
-  animation: var(--animation-bounce);
+  animation: var(--animation-btn-star);
+  will-change: transform;
 }
 
 /* Currently playing  */
@@ -160,6 +178,10 @@
   will-change: background-position;
   mix-blend-mode: overlay;
   opacity: 0.85;
+}
+
+.container.current.paused::after {
+  animation-play-state: paused;
 }
 
 @keyframes queueItemCrawl {

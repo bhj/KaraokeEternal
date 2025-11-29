@@ -69,15 +69,18 @@ const ACTION_HANDLERS = {
   },
   [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
     const { queueId } = payload
+    const ids = Array.isArray(queueId) ? queueId : [queueId]
 
-    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, queueId))) {
+    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, ids))) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         error: 'Cannot remove another user\'s song',
       })
     }
 
-    await Queue.remove(queueId)
+    for (const id of ids) {
+      await Queue.remove(id)
+    }
 
     // success
     acknowledge({ type: QUEUE_REMOVE + '_SUCCESS' })

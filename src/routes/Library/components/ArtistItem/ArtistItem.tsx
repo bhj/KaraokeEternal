@@ -13,9 +13,9 @@ interface ArtistItemProps {
   name: string
   numStars: number
   onArtistClick: () => void
-  queuedSongs: number[]
   starredSongs: number[]
   style?: object
+  upcomingSongs: number[]
 }
 
 const ArtistItem = ({
@@ -24,27 +24,27 @@ const ArtistItem = ({
   isExpanded,
   name,
   onArtistClick,
-  queuedSongs,
   starredSongs,
   style,
+  upcomingSongs,
 }: ArtistItemProps): React.ReactElement => {
-  const isChildQueued = artistSongIds.some(songId => queuedSongs.includes(songId))
+  const isChildUpcoming = artistSongIds.some(songId => upcomingSongs.includes(songId))
   const isChildStarred = artistSongIds.some(songId => starredSongs.includes(songId))
 
   return (
     <div style={style}>
       <div onClick={onArtistClick} className={clsx(styles.container, isChildStarred && styles.hasStarred)}>
         <div className={styles.folderContainer}>
-          <Icon icon='FOLDER' size={44} />
+          <Icon icon='FOLDER' />
           {isExpanded && (
-            <div className={styles.iconChevron}>
-              <Icon icon='CHEVRON_DOWN' size={24} />
+            <div className={styles.iconChevronContainer}>
+              <Icon icon='CHEVRON_DOWN' />
             </div>
           )}
           {!isExpanded && <div className={styles.count}>{artistSongIds.length}</div>}
         </div>
-        <ToggleAnimation toggle={isChildQueued} className={styles.animateGlow}>
-          <div className={clsx(styles.name, isChildQueued && styles.isChildQueued)}>
+        <ToggleAnimation toggle={isChildUpcoming} className={styles.animateGlow}>
+          <div className={clsx(styles.name, isChildUpcoming && styles.isChildUpcoming)}>
             {filterKeywords?.length ? <Highlighter autoEscape textToHighlight={name} searchWords={filterKeywords} /> : name}
           </div>
         </ToggleAnimation>

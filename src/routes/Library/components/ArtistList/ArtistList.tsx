@@ -4,13 +4,14 @@ import { RootState } from 'store/store'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { scrollArtists, toggleArtistExpanded } from '../../modules/library'
 import getAlphaPickerMap from '../../selectors/getAlphaPickerMap'
-import getQueuedSongs from '../../selectors/getQueuedSongs'
+import getSongsStatus from '../../selectors/getSongsStatus'
 import PaddedList from 'components/PaddedList/PaddedList'
 import AlphaPicker from '../AlphaPicker/AlphaPicker'
 import ArtistItem from '../ArtistItem/ArtistItem'
 import type { ListImperativeAPI, RowComponentProps } from 'react-window'
 
-const ROW_HEIGHT = 44
+const ROW_HEIGHT_ARTIST = 48
+const ROW_HEIGHT_SONG = 56
 
 interface ArtistListProps {
   ui: RootState['ui']
@@ -34,7 +35,7 @@ const RowComponent = ({
 }: RowComponentProps<CustomRowProps>) => {
   const starredArtistCounts = useAppSelector(state => state.starCounts.artists)
   const { starredSongs } = useAppSelector(state => ensureState(state.userStars))
-  const queuedSongs = useAppSelector(getQueuedSongs)
+  const { upcomingSongs } = useAppSelector(getSongsStatus)
 
   const artist = artists.entities[artists.result[index]]
 
@@ -46,7 +47,7 @@ const RowComponent = ({
       name={artist.name}
       numStars={starredArtistCounts[artist.artistId] || 0}
       onArtistClick={() => dispatch(toggleArtistExpanded(artist.artistId))}
-      queuedSongs={queuedSongs}
+      upcomingSongs={upcomingSongs}
       starredSongs={starredSongs}
       style={style}
     />
@@ -73,13 +74,13 @@ const ArtistList = ({
 
   const rowHeight = useCallback((index: number) => {
     const artistId = artists.result[index]
-    let rows = 1
+    let height = ROW_HEIGHT_ARTIST
 
     if (expandedArtists.includes(artistId)) {
-      rows += artists.entities[artistId].songIds.length
+      height += artists.entities[artistId].songIds.length * ROW_HEIGHT_SONG
     }
 
-    return rows * ROW_HEIGHT
+    return height
   }, [artists, expandedArtists])
 
   const handleRowsRendered = useCallback(({ startIndex }: { startIndex: number }) => {

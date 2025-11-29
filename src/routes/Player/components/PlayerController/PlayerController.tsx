@@ -105,7 +105,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   }, [handleStatus, nextQueueItem, player.nextUserId, queue, queueItem])
 
   // always emit status when any of these change
-  useEffect(() => handleStatus(), [
+  useEffect(() => handleStatus({ isVideoKeyingEnabled: queueItem?.isVideoKeyingEnabled }), [
     handleStatus,
     player.cdgAlpha,
     player.cdgSize,
@@ -113,6 +113,7 @@ const PlayerController = (props: PlayerControllerProps) => {
     player.mp4Alpha,
     player.volume,
     playerVisualizer,
+    queueItem.isVideoKeyingEnabled,
   ])
 
   // on unmount

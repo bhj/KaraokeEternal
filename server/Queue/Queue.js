@@ -192,19 +192,22 @@ class Queue {
   }
 
   /**
-   * Check if a user owns a queue item
+   * Check if user owns queue item(s)
    * @param  {number} userId
-   * @param  {number} queueId
+   * @param  {number|number[]} queueId
    * @return {boolean}
    */
-  static async isOwner (userId, queueId) {
+  static async isOwner(userId, queueId) {
+    const ids = Array.isArray(queueId) ? queueId : [queueId]
+    if (ids.length === 0) return false
+
     const query = sql`
       SELECT COUNT(*) AS count
       FROM queue
-      WHERE userId = ${userId} AND queueId = ${queueId}
+      WHERE userId = ${userId} AND queueId IN ${sql.tuple(ids)}
     `
     const res = await db.get(String(query), query.parameters)
-    return res.count === 1
+    return res.count === ids.length
   }
 
   /**

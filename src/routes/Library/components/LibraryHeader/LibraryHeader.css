@@ -1,7 +1,17 @@
 .container {
   display: flex;
   align-items: center;
-  padding-right: var(--container-padding);
+  padding: var(--space-xs);
+
+  button {
+    cursor: pointer;
+    color: var(--btn-bg-color);
+  }
+
+  button.active {
+    color: var(--btn-active-bg-color);
+    filter: var(--btn-active-filter);
+  }
 }
 
 .searchInput {
@@ -9,26 +19,28 @@
   margin: 0;
   margin-left: -4px;
   border: none !important;
+  font-size: var(--font-size-m) !important;
   color: var(--text-color) !important;
   background-color: transparent !important;
   box-shadow: none !important;
 }
 
 .searchInput::placeholder {
-  color: var(--input-placeholder-color) !important;
+  color: var(--btn-bg-color) !important;
 }
 
-.btn {
-  cursor: pointer;
-  color: var(--btn-bg-color);
+.btnMagnifier svg {
+  height: 2.5rem;
 }
 
-.btnActive {
-  composes: btn;
-  color: var(--btn-active-bg-color);
-  filter: var(--btn-active-filter);
+.btnClear {
+  height: 2.75rem;
+
+  svg {
+    height: 3rem;
+  }
 }
 
-.btnAnimate {
-  animation: var(--animation-bounce);
+.btnStar svg {
+  height: 2.75rem;
 }

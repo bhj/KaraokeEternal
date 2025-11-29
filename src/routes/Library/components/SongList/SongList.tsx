@@ -5,7 +5,7 @@ import SongItem from '../SongItem/SongItem'
 import { queueSong } from 'routes/Queue/modules/queue'
 import { showSongInfo } from 'store/modules/songInfo'
 import { toggleSongStarred } from 'store/modules/userStars'
-import getQueuedSongs from '../../selectors/getQueuedSongs'
+import getSongsStatus from '../../selectors/getSongsStatus'
 
 interface SongListProps {
   filterKeywords?: string[]
@@ -20,7 +20,7 @@ const SongList = (props: SongListProps) => {
   const starredSongs = useAppSelector(state => ensureState(state.userStars).starredSongs)
   const starredSongCounts = useAppSelector(state => state.starCounts.songs)
   const isAdmin = useAppSelector(state => state.user.isAdmin)
-  const queuedSongs = useAppSelector(getQueuedSongs)
+  const { playedSongs, upcomingSongs } = useAppSelector(getSongsStatus)
 
   const handleSongQueue = useCallback((songId: number) => dispatch(queueSong(songId)), [dispatch])
   const handleSongInfo = useCallback((songId: number) => dispatch(showSongInfo(songId)), [dispatch])
@@ -31,7 +31,8 @@ const SongList = (props: SongListProps) => {
       {...songs[songId]}
       artist={props.showArtist ? artists[songs[songId].artistId].name : ''}
       filterKeywords={props.filterKeywords}
-      isQueued={queuedSongs.includes(songId)}
+      isPlayed={playedSongs.includes(songId)}
+      isUpcoming={upcomingSongs.includes(songId)}
       isStarred={starredSongs.includes(songId)}
       isAdmin={isAdmin}
       key={songId}

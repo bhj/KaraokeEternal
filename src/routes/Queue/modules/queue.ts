@@ -1,5 +1,6 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import type { QueueItem, OptimisticQueueItem } from 'shared/types'
+import { RootState, AppDispatch, AppThunk } from 'store/store'
+import getUpcoming from '../selectors/getUpcoming'
 import {
   QUEUE_ADD,
   QUEUE_MOVE,
@@ -7,19 +8,25 @@ import {
   QUEUE_REMOVE,
   LOGOUT,
 } from 'shared/actionTypes'
+import type { QueueItem, OptimisticQueueItem } from 'shared/types'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 const logout = createAction(LOGOUT)
 export const moveItem = createAction<{ queueId: number, prevQueueId: number }>(QUEUE_MOVE)
-export const removeItem = createAction<{ queueId: number }>(QUEUE_REMOVE)
+export const removeItem = createAction<{ queueId: number | number[] }>(QUEUE_REMOVE)
 export const queuePush = createAction<QueueState>(QUEUE_PUSH)
 
 export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
   payload: { songId },
   meta: { isOptimistic: true },
 }))
+
+export const removeUpcomingItems = (userId: number): AppThunk => (dispatch: AppDispatch, getState: () => RootState) => {
+  const upcomingQueueIds = getUpcoming(getState(), userId)
+  dispatch(removeItem({ queueId: upcomingQueueIds }))
+}
 
 // ------------------------------------
 // Reducer

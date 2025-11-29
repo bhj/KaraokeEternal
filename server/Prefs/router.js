@@ -6,7 +6,10 @@ import getWindowsDrives from '../lib/getWindowsDrives.js'
 import Prefs from './Prefs.js'
 import Media from '../Media/Media.js'
 import pushQueuesAndLibrary from '../lib/pushQueuesAndLibrary.js'
-import { PREFS_PATHS_CHANGED } from '../../shared/actionTypes.ts'
+import Rooms from '../Rooms/Rooms.js'
+import Queue from '../Queue/Queue.js'
+import { PREFS_PATHS_CHANGED, QUEUE_PUSH } from '../../shared/actionTypes.ts'
+
 const log = getLogger('Prefs')
 const router = new KoaRouter({ prefix: '/api/prefs' })
 
@@ -72,6 +75,16 @@ router.put('/path/:pathId', async (ctx) => {
   // (re)start watcher?
   if ('isWatchingEnabled' in ctx.request.body) {
     process.emit(PREFS_PATHS_CHANGED, prefs.paths)
+  }
+
+  // need to push updated queue items?
+  if ('isVideoKeyingEnabled' in ctx.request.body) {
+    for (const { room, roomId } of Rooms.getActive(ctx.io)) {
+      ctx.io.to(room).emit('action', {
+        type: QUEUE_PUSH,
+        payload: await Queue.get(roomId),
+      })
+    }
   }
 })
 

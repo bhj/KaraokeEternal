@@ -37,7 +37,7 @@ a {
 input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="search"]{
+input[type="search"] {
   display: block;
   width: 100%;
   padding: 8px;
@@ -49,7 +49,9 @@ input[type="search"]{
   background-color: var(--input-bg-color);
 }
 
-input[type="text"]::placeholder {
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
   color: var(--input-placeholder-color);
 }
 

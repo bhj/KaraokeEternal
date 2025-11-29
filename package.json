@@ -142,6 +142,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
     "typescript-plugin-css-modules": "^5.2.0",
+    "use-long-press": "^3.3.0",
     "use-resize-observer": "^9.1.0",
     "webpack": "^5.102.1",
     "webpack-cli": "^6.0.1",

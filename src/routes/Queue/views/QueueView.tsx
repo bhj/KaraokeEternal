@@ -24,7 +24,7 @@ const QueueView = () => {
       const i = queue.result.indexOf(queueId)
       containerRef.current.scrollTop = QUEUE_ITEM_HEIGHT * i
     }
-  }, [queue.result, queueId])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div

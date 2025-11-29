@@ -7,6 +7,7 @@
     margin-right: var(--space-s);
     cursor: pointer;
     transition: opacity .3s linear;
+    flex-shrink: 0;
   }
 }
 

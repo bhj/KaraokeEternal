@@ -41,30 +41,25 @@ const playerCmdOptions = createAction<{
 // ------------------------------------
 // Actions for emitting to room
 // ------------------------------------
-export function playerStatus (status = {}, deferEmit = false): AppThunk {
+export function playerStatus (status: Partial<PlayerState> = {}, deferEmit = false): AppThunk {
   return (dispatch, getState) => {
     const { player, playerVisualizer } = getState()
 
+    // update "internal" state (player slice); status is partial
     dispatch(playerUpdate(status))
+
+    // emit full updated status (excluding "private" properties)
+    const emitStatus = Object.fromEntries(
+      Object.entries({
+        ...player, // previous complete state
+        ...status, // current partial state
+      }).filter(([key]) => !key.startsWith('_')),
+    )
 
     dispatch({
       type: PLAYER_EMIT_STATUS,
       payload: {
-        cdgAlpha: player.cdgAlpha,
-        cdgSize: player.cdgSize,
-        errorMessage: player.errorMessage,
-        historyJSON: player.historyJSON,
-        isAtQueueEnd: player.isAtQueueEnd,
-        isErrored: player.isErrored,
-        isPlaying: player.isPlaying,
-        isWebGLSupported: player.isWebGLSupported,
-        isVideoKeyingEnabled: player.isVideoKeyingEnabled,
-        mediaType: player.mediaType,
-        mp4Alpha: player.mp4Alpha,
-        nextUserId: player.nextUserId,
-        position: player.position,
-        queueId: player.queueId,
-        volume: player.volume,
+        ...emitStatus,
         visualizer: playerVisualizer,
       },
       meta: {

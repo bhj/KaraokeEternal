@@ -14,6 +14,7 @@
   overflow: hidden;
   direction: rtl;
   text-align: left;
+  white-space: nowrap;
 }
 
 .btnDrag {

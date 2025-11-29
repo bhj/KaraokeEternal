@@ -1,4 +1,6 @@
 .container {
+  --artist-item-height: 48px;
+
   display: flex;
   height: var(--artist-item-height);
   align-items: center;
@@ -17,23 +19,27 @@
 }
 
 .folderContainer {
-  height: var(--artist-item-height);
+  position: relative;
   color: var(--artist-folder-bg-color);
-}
 
-.count {
-  position: relative;
-  top: -30px;
-  text-align: center;
-  font-size: 16px;
-  color: var(--artist-name-color);
-}
+  svg {
+    height: var(--artist-item-height);
+  }
 
-.iconChevron {
-  position: relative;
-  top: -34px;
-  text-align: center;
-  color: var(--text-color);
+  .iconChevronContainer svg {
+    height: 24px;
+  }
+
+  div {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .hasStarred .folderContainer {
@@ -41,7 +47,7 @@
   filter: var(--artist-folder-starred-filter);
 }
 
-.hasStarred .iconChevron,
+.hasStarred .iconChevronContainer,
 .hasStarred .count {
   color: #000;
 }
@@ -50,7 +56,7 @@
   animation: var(--animation-text-shadow-glow);
 }
 
-.isChildQueued {
+.isChildUpcoming {
   color: var(--queued-item-color);
   text-shadow: var(--queued-item-text-shadow);
 }

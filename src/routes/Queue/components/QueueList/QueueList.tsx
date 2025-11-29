@@ -4,14 +4,14 @@ import { ensureState } from 'redux-optimistic-ui'
 import QueueItem from '../QueueItem/QueueItem'
 import QueueListAnimator from '../QueueListAnimator/QueueListAnimator'
 import { formatSeconds } from 'lib/dateTime'
-import { moveItem } from '../../modules/queue'
+import { moveItem, removeUpcomingItems } from '../../modules/queue'
 import getPlayerHistory from '../../selectors/getPlayerHistory'
 import getRoundRobinQueue from '../../selectors/getRoundRobinQueue'
 import getWaits from '../../selectors/getWaits'
 
 const QueueList = () => {
   const artists = useAppSelector(state => state.artists)
-  const { errorMessage, isAtQueueEnd, isErrored, position, queueId } = useAppSelector(state => state.status)
+  const { errorMessage, isAtQueueEnd, isErrored, isPlaying, position, queueId } = useAppSelector(state => state.status)
 
   const playerHistory = useAppSelector(getPlayerHistory)
   const queue = useAppSelector(getRoundRobinQueue)
@@ -37,6 +37,10 @@ const QueueList = () => {
     dispatch(moveItem({ queueId: qId, prevQueueId: lastPlayed }))
   }, [dispatch, queueId, queue.entities, queue.result])
 
+  const handleRemoveUpcoming = useCallback((userId: number) => {
+    dispatch(removeUpcomingItems(userId))
+  }, [dispatch])
+
   // build children array
   const items = queue.result.map((qId) => {
     const item = queue.entities[qId]
@@ -57,6 +61,7 @@ const QueueList = () => {
         isMovable={isUpcoming && (isOwner || user.isAdmin)}
         isOwner={isOwner}
         isPlayed={!isUpcoming && !isCurrent}
+        isPlaying={isCurrent && isPlaying}
         isRemovable={isUpcoming && (isOwner || user.isAdmin)}
         isReplayable={(!isUpcoming || isCurrent) && user.isAdmin}
         isSkippable={isCurrent && (isOwner || user.isAdmin)}
@@ -67,6 +72,7 @@ const QueueList = () => {
         wait={formatSeconds(waits[qId], true)} // fuzzy
         // actions
         onMoveClick={handleMoveClick}
+        onRemoveUpcoming={handleRemoveUpcoming}
       />
     )
   })

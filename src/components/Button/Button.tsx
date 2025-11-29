@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import Icon from '../Icon/Icon'
 import styles from './Button.css'
@@ -7,6 +7,7 @@ type ButtonElementType = 'button' | 'span'
 
 type ButtonBaseProps = {
   animateClassName?: string
+  cancelAnimation?: boolean
   children?: React.ReactNode
   className?: string
   icon?: React.ComponentProps<typeof Icon>['icon']
@@ -24,6 +25,7 @@ type ButtonProps<E extends ButtonElementType = 'button'> = E extends 'button' ? 
 
 const Button = <E extends ButtonElementType = 'button'>({
   animateClassName,
+  cancelAnimation,
   className,
   children,
   icon,
@@ -33,11 +35,15 @@ const Button = <E extends ButtonElementType = 'button'>({
   as,
   ...rest
 }: ButtonProps<E>) => {
+  const elementRef = useRef<HTMLButtonElement | HTMLSpanElement>(null)
   const [isAnimating, setAnimating] = useState(false)
   const ElementType = as || 'button' as E
 
-  // Single ref using callback ref pattern for better performance
-  const elementRef = useRef<HTMLButtonElement | HTMLSpanElement>(null)
+  useEffect(() => {
+    if (cancelAnimation) {
+      setAnimating(false)
+    }
+  }, [cancelAnimation])
 
   const handleAnimationEnd = useCallback(() => {
     setAnimating(false)

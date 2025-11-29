@@ -33,8 +33,12 @@
   position: absolute;
   top: 0;
   left: 0;
-  color: hsl(var(--hue-pink), 100%, 70%);
   z-index: 99;
+
+  svg {
+    color: hsl(var(--hue-pink), 100%, 70%);
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 1));
+  }
 }
 
 .placeholder {

@@ -19,8 +19,9 @@ interface SongItemProps {
   onSongQueue(songId: number): void
   onSongStarClick(songId: number): void
   onSongInfo(songId: number): void
-  isQueued: boolean
+  isPlayed: boolean
   isStarred: boolean
+  isUpcoming: boolean
   isAdmin: boolean
   numStars: number
   numMedia: number
@@ -35,8 +36,9 @@ const SongItem = ({
   onSongQueue,
   onSongStarClick,
   onSongInfo,
-  isQueued,
+  isPlayed,
   isStarred,
+  isUpcoming,
   isAdmin,
   numStars,
   numMedia,
@@ -46,8 +48,8 @@ const SongItem = ({
 
   const handleClick = useCallback(() => {
     if (ignoreMouseup) ignoreMouseup = false
-    else onSongQueue(songId)
-  }, [onSongQueue, songId])
+    else if (!isUpcoming) onSongQueue(songId)
+  }, [isUpcoming, onSongQueue, songId])
   const handleInfoClick = useCallback(() => onSongInfo(songId), [onSongInfo, songId])
   const handleStarClick = useCallback(() => onSongStarClick(songId), [onSongStarClick, songId])
 
@@ -67,10 +69,16 @@ const SongItem = ({
   return (
     <div
       {...swipeHandlers}
-      style={{ height: artist ? 60 : 44 }}
-      className={clsx(styles.container, isQueued && styles.queued, isStarred && styles.starred, isExpanded && styles.expanded)}
+      className={clsx(
+        styles.container,
+        isPlayed && styles.played,
+        isUpcoming && styles.upcoming,
+        isStarred && styles.starred,
+        isExpanded && styles.expanded,
+        artist && styles.withArtist,
+      )}
     >
-      <ToggleAnimation toggle={isQueued} className={styles.animateGlow}>
+      <ToggleAnimation toggle={isUpcoming} className={styles.animateGlow}>
         <div className={styles.duration}>
           {formatDuration(duration)}
         </div>
@@ -90,17 +98,17 @@ const SongItem = ({
         </div>
       </ToggleAnimation>
 
-      <Buttons btnWidth={52} isExpanded={isExpanded}>
+      <Buttons btnWidth={56} isExpanded={isExpanded}>
         <Button onClick={handleStarClick} className={clsx(styles.btn, styles.star)}>
           <ToggleAnimation toggle={isStarred} className={styles.animateStar}>
-            <Icon size={44} icon='STAR_FULL' />
+            <Icon icon='STAR_FULL' />
           </ToggleAnimation>
           <div className={styles.starCount}>
             {numStars || ''}
           </div>
         </Button>
         <Button onClick={handleInfoClick} className={clsx(styles.btn, styles.info)} data-hide>
-          <Icon size={44} icon='INFO_OUTLINE' />
+          <Icon icon='INFO_OUTLINE' />
         </Button>
       </Buttons>
     </div>

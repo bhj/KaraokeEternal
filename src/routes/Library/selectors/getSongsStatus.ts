@@ -6,16 +6,23 @@ const getQueue = (state: RootState) => ensureState(state.queue)
 const getCurrentQueueId = (state: RootState) => state.status.queueId
 const getPlayerHistoryJSON = (state: RootState) => state.status.historyJSON
 
-const getUpcomingSongs = createSelector(
+const getSongsStatus = createSelector(
   [getQueue, getCurrentQueueId, getPlayerHistoryJSON],
   (queue, curId, historyJSON) => {
     const history = JSON.parse(historyJSON)
+    const playedSongs: number[] = []
+    const upcomingSongs: number[] = []
 
-    // not (re)ordering since it doesn't currently matter in library view
-    return queue.result
-      .filter(queueId => !history.includes(queueId))
-      .map(queueId => queue.entities[queueId].songId)
+    queue.result.forEach((queueId) => {
+      if (history.includes(queueId)) {
+        playedSongs.push(queue.entities[queueId].songId)
+      } else if (queueId !== curId) {
+        upcomingSongs.push(queue.entities[queueId].songId)
+      }
+    })
+
+    return { playedSongs, upcomingSongs }
   },
 )
 
-export default getUpcomingSongs
+export default getSongsStatus

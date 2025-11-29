@@ -1,7 +1,9 @@
 .artistsHeading,
 .songsHeading {
-  color: var(--search-results-heading-color);
-  background-color: var(--search-results-heading-bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  background-color: hsl(var(--hue-blue), 90%, 25%);
   font-size: 18px;
-  text-align: center;
 }

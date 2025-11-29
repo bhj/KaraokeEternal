@@ -34,6 +34,7 @@ const PlayerView = () => {
           top: screenfull.isFullscreen ? 0 : headerHeight,
           width: innerWidth,
           height: screenfull.isFullscreen ? innerHeight : viewportHeight,
+          overflow: 'hidden',
         }}
       >
         <PlayerController

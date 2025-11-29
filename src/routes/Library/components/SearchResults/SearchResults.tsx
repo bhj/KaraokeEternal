@@ -4,17 +4,17 @@ import { RootState } from 'store/store'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { toggleArtistResultExpanded } from '../../modules/library'
 import getSearchResults from '../../selectors/getSearchResults'
-import getQueuedSongs from '../../selectors/getQueuedSongs'
+import getSongsStatus from '../../selectors/getSongsStatus'
 import PaddedList from 'components/PaddedList/PaddedList'
 import ArtistItem from '../ArtistItem/ArtistItem'
 import SongList from '../SongList/SongList'
 import type { ListImperativeAPI, RowComponentProps } from 'react-window'
 import styles from './SearchResults.css'
 
-const ARTIST_HEADER_HEIGHT = 22
-const ARTIST_RESULT_HEIGHT = 44
-const SONG_HEADER_HEIGHT = 22
-const SONG_RESULT_HEIGHT = 60
+const ROW_HEIGHT_RESULT_HEADING = 24
+const ROW_HEIGHT_ARTIST = 48
+const ROW_HEIGHT_SONG = 56
+const ROW_HEIGHT_SONG_WITH_ARTIST = 64
 
 interface SearchResultsProps {
   // starredArtistCounts: Record<number, number> // @todo
@@ -47,7 +47,7 @@ const RowComponent = ({
   expandedArtistResults,
 }: RowComponentProps<CustomRowProps>) => {
   const { starredSongs } = useAppSelector(state => ensureState(state.userStars))
-  const queuedSongs = useAppSelector(getQueuedSongs)
+  const { upcomingSongs } = useAppSelector(getSongsStatus)
 
   // # artist results heading
   if (index === 0) {
@@ -76,7 +76,7 @@ const RowComponent = ({
         name={artist.name}
         numStars={0}
         onArtistClick={() => dispatch(toggleArtistResultExpanded(artistId))}
-        queuedSongs={queuedSongs}
+        upcomingSongs={upcomingSongs}
         starredSongs={starredSongs}
         style={style}
       />
@@ -119,25 +119,25 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
 
   const rowHeight = useCallback((index: number) => {
     // artists heading
-    if (index === 0) return ARTIST_HEADER_HEIGHT
+    if (index === 0) return ROW_HEIGHT_RESULT_HEADING
 
     // artist results
     if (index > 0 && index < artistsResult.length + 1) {
-      let rows = 1
       const artistId = artistsResult[index - 1]
+      let height = ROW_HEIGHT_ARTIST
 
       if (expandedArtistResults.includes(artistId)) {
-        rows += artists.entities[artistId].songIds.length
+        height += artists.entities[artistId].songIds.length * ROW_HEIGHT_SONG
       }
 
-      return rows * ARTIST_RESULT_HEIGHT
+      return height
     }
 
     // songs heading
-    if (index === artistsResult.length + 1) return SONG_HEADER_HEIGHT
+    if (index === artistsResult.length + 1) return ROW_HEIGHT_RESULT_HEADING
 
     // song results
-    return songsResult.length * SONG_RESULT_HEIGHT
+    return songsResult.length * ROW_HEIGHT_SONG_WITH_ARTIST
   }, [artistsResult, expandedArtistResults, artists.entities, songsResult.length])
 
   const handleRef = useCallback((ref: ListImperativeAPI) => {

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react'
+import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { setFilterStr, resetFilterStr, toggleFilterStarred } from '../../modules/library'
 import Button from 'components/Button/Button'
@@ -29,10 +30,9 @@ const LibraryHeader = () => {
   return (
     <div className={styles.container}>
       <Button
-        className={filterStr ? styles.btnActive : styles.btn}
+        className={clsx(styles.btnMagnifier, filterStr && styles.active)}
         icon='MAGNIFIER'
         onClick={handleMagnifierClick}
-        size={40}
       />
       <input
         type='search'
@@ -46,15 +46,13 @@ const LibraryHeader = () => {
         <Button
           icon='CLEAR'
           onClick={clearSearch}
-          className={styles.btnActive}
-          size={40}
+          className={clsx(styles.btnClear, styles.active)}
         />
       )}
       <Button
-        className={filterStarred ? styles.btnActive : styles.btn}
+        className={clsx(styles.btnStar, filterStarred && styles.active)}
         icon='STAR_FULL'
         onClick={() => dispatch(toggleFilterStarred())}
-        size={44}
       />
     </div>
   )

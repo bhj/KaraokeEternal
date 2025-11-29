@@ -19,8 +19,9 @@
 .danger {
   padding: var(--space-m);
   width: 100%;
-  color: var(--btn-default-color);
+  font-size: var(--font-size-s);
   font-weight: var(--font-weight-bold);
+  color: var(--btn-default-color);
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
 }

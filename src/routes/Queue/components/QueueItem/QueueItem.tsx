@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import clsx from 'clsx'
-import { useAppDispatch } from 'store/hooks'
 import { useSwipeable } from 'react-swipeable'
+import { useLongPress } from 'use-long-press'
+import { useAppDispatch } from 'store/hooks'
 import Button from 'components/Button/Button'
 import Buttons from 'components/Buttons/Buttons'
 import UserImage from 'components/UserImage/UserImage'
@@ -12,6 +13,8 @@ import { showErrorMessage } from 'store/modules/ui'
 import { queueSong, removeItem } from '../../modules/queue'
 import styles from './QueueItem.css'
 
+const LONG_PRESS_THRESHOLD_MS = 700
+
 interface QueueItemProps {
   artist: string
   errorMessage: string
@@ -21,6 +24,7 @@ interface QueueItemProps {
   isMovable: boolean
   isOwner: boolean
   isPlayed: boolean
+  isPlaying: boolean
   isRemovable: boolean
   isReplayable: boolean
   isSkippable: boolean
@@ -36,6 +40,7 @@ interface QueueItemProps {
   wait?: string
   // actions
   onMoveClick(queueId: number): void
+  onRemoveUpcoming: (userId: number) => void
 }
 
 const QueueItem = ({
@@ -47,12 +52,14 @@ const QueueItem = ({
   isMovable,
   isOwner,
   isPlayed,
+  isPlaying,
   isRemovable,
   isReplayable,
   isSkippable,
   isStarred,
   isUpcoming,
   onMoveClick,
+  onRemoveUpcoming,
   pctPlayed,
   queueId,
   songId,
@@ -63,6 +70,7 @@ const QueueItem = ({
   wait,
 }: QueueItemProps) => {
   const [isExpanded, setExpanded] = useState(false)
+  const longPressActiveRef = useRef(false)
 
   const dispatch = useAppDispatch()
   const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(errorMessage)), [dispatch, errorMessage])
@@ -92,10 +100,23 @@ const QueueItem = ({
     trackMouse: true,
   })
 
+  const bindPressHandlers = useLongPress(() => {
+    const confirmText = isOwner ? 'Remove all your upcoming songs?' : `Remove all upcoming songs for "${userDisplayName}"?`
+    longPressActiveRef.current = true
+
+    if (confirm(confirmText)) {
+      onRemoveUpcoming(userId)
+    }
+  }, { threshold: LONG_PRESS_THRESHOLD_MS, cancelOnMovement: true })
+
   return (
     <div
       {...swipeHandlers}
-      className={clsx(styles.container, isCurrent && styles.current)}
+      className={clsx(
+        styles.container,
+        isCurrent && styles.current,
+        isCurrent && !isPlaying && styles.paused,
+      )}
       style={{ '--progress': (isCurrent && pctPlayed < 2 ? 2 : pctPlayed) + '%' } as React.CSSProperties}
     >
       <div className={styles.content}>
@@ -120,74 +141,81 @@ const QueueItem = ({
           </div>
         </div>
 
-        <Buttons btnWidth={52} isExpanded={isExpanded} className={styles.btnContainer}>
+        <Buttons btnWidth={56} isExpanded={isExpanded} className={styles.btnContainer}>
           {isErrored && (
             <Button
-              className={clsx(styles.btn, styles.danger)}
+              className={styles.danger}
               icon='INFO_OUTLINE'
               onClick={handleErrorInfoClick}
-              size={44}
             />
           )}
           <Button
             animateClassName={styles.animateStar}
-            className={clsx(styles.btn, isStarred && styles.active)}
+            className={clsx(isStarred && styles.active)}
             icon='STAR_FULL'
             onClick={handleStarClick}
-            size={44}
           />
           {isReplayable && (
             <Button
-              className={clsx(styles.btn, styles.active)}
+              className={styles.active}
               data-hide
               icon='REPLAY'
               onClick={handleReplayClick}
-              size={44}
             />
           )}
           {isPlayed && (
             <Button
-              className={clsx(styles.btn, styles.active)}
+              className={clsx(styles.btnAdd, styles.active)}
               data-hide
               icon='PLUS'
               onClick={handleRequeueClick}
-              size={48}
             />
           )}
           {isMovable && (
             <Button
-              className={clsx(styles.btn, styles.active)}
+              className={clsx(styles.btnMove, styles.active)}
               data-hide
               icon='MOVE_TOP'
               onClick={handleMoveClick}
-              size={44}
             />
           )}
           {isInfoable && (
             <Button
-              className={clsx(styles.btn, styles.active)}
+              className={styles.active}
               data-hide
               icon='INFO_OUTLINE'
               onClick={handleInfoClick}
-              size={44}
             />
           )}
           {isRemovable && (
             <Button
-              className={clsx(styles.btn, styles.danger)}
+              className={styles.danger}
               data-hide
               icon='DELETE'
-              onClick={handleRemoveClick}
-              size={44}
+              onTouchEnd={(e: React.TouchEvent<HTMLButtonElement>) => {
+                if (longPressActiveRef.current) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  longPressActiveRef.current = false
+                  return
+                }
+              }}
+              onClick={() => {
+                if (longPressActiveRef.current) {
+                  longPressActiveRef.current = false
+                  return
+                }
+                handleRemoveClick()
+              }}
+              {...bindPressHandlers()}
             />
           )}
           {isSkippable && (
             <Button
-              className={clsx(styles.btn, styles.danger)}
+              className={clsx(styles.btnPlayNext, styles.danger)}
               data-hide
               icon='PLAY_NEXT'
               onClick={handleSkipClick}
-              size={44}
             />
           )}
         </Buttons>
