@@ -113,7 +113,7 @@ const PlayerController = (props: PlayerControllerProps) => {
     player.mp4Alpha,
     player.volume,
     playerVisualizer,
-    queueItem.isVideoKeyingEnabled,
+    queueItem?.isVideoKeyingEnabled,
   ])
 
   // on unmount
