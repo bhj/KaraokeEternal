@@ -1,4 +1,4 @@
-## v2.0.0-beta.0
+## v2.0.0-beta.2
 
 **Sponsored by**: [candre23](https://github.com/candre23), [nellisdev](https://github.com/nellisdev), [astrobyte](https://github.com/astrobyte), [jfeldhamer](https://github.com/jfeldhamer), (cubandaddy)[https://github.com/cubandaddy], [Backroads4Me](https://github.com/Backroads4Me) and other private sponsors. Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
 

@@ -1,0 +1,26 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "paths": {
+      "*": [
+        "../src/*"
+      ]
+    },
+    "moduleResolution": "Bundler",
+    "module": "esnext",
+    "jsx": "react",
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "customMatcher": "\\.css$"
+        }
+      }
+    ]
+  },
+  "include": [
+    "../src/**/*",
+    "./declarations.d.ts"
+  ]
+}

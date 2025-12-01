@@ -22,7 +22,7 @@ let config = {
   },
   output: {
     filename: __DEV__ ? '[name].js' : '[name].[fullhash].js',
-    path: path.join(baseDir, 'build'),
+    path: path.join(baseDir, 'build', 'client'),
     clean: true,
   },
   resolve: {

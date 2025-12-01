@@ -141,7 +141,7 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
 
   updateSources = () => {
     this.stopChroma()
-    this.video.src = `/api/media/${this.props.mediaId}?type=video`
+    this.video.src = `${document.baseURI}api/media/${this.props.mediaId}?type=video`
     this.video.load()
   }
 

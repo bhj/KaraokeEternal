@@ -1,6 +1,6 @@
 {
   "name": "karaoke-eternal",
-  "version": "0.0.0-dev.0",
+  "version": "2.0.0-beta.0",
   "description": "Open karaoke party system",
   "keywords": [
     "karaoke",
@@ -15,7 +15,7 @@
   ],
   "homepage": "https://www.karaoke-eternal.com",
   "type": "module",
-  "main": "./server/main.js",
+  "main": "./build/server/main.js",
   "engines": {
     "node": ">=24",
     "npm": ">=11"
@@ -24,20 +24,20 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development nodemon --watch server --watch shared -- -p 3000",
-    "build": "webpack --config config/webpack.config.js",
-    "serve": "node server/main.js",
+    "dev": "NODE_ENV=development tsx watch server/main.ts -p 3000",
+    "build": "npm run build:server ; npm run build:client",
+    "build:client": "webpack --config config/webpack.config.js",
+    "build:server": "rm -rf build/server ; tsc -p config/tsconfig.server.json --noEmitOnError false ; mkdir -p build/server/lib ; cp -R server/lib/schemas build/server/lib/",
+    "serve": "node build/server/main.js",
     "serve:docs": "hugo serve --source docs -b http://$(hostname) --bind 0.0.0.0",
     "server": "npm run serve"
   },
   "files": [
     "assets/**",
-    "build/**",
-    "server/**",
-    "shared/**"
+    "build/**"
   ],
   "bin": {
-    "karaoke-eternal-server": "server/main.js"
+    "karaoke-eternal-server": "build/server/main.js"
   },
   "repository": {
     "type": "git",
@@ -46,6 +46,10 @@
   "productName": "Karaoke Eternal Server",
   "author": "RadRoot LLC",
   "license": "ISC",
+  "overrides": {
+    "is-generator-function": "1.0.10",
+    "get-generator-function": "1.0.10"
+  },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
     "@jcoreio/async-throttle": "^1.7.0",
@@ -84,7 +88,16 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@reduxjs/toolkit": "^2.11.0",
     "@stylistic/eslint-plugin": "^5.6.1",
+    "@types/bcrypt": "^6.0.0",
     "@types/blueimp-load-image": "^5.16.6",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/koa__router": "^12.0.5",
+    "@types/koa-favicon": "^2.1.4",
+    "@types/koa-logger": "^3.1.5",
+    "@types/koa-mount": "^4.0.5",
+    "@types/koa-range": "^0.3.6",
+    "@types/koa-static": "^4.0.4",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/react-highlight-words": "^0.20.0",
@@ -92,6 +105,8 @@
     "@types/react-window": "^1.8.8",
     "@types/redux-optimistic-ui": "^0.4.14",
     "@types/webpack-env": "^1.18.8",
+    "@types/webpack-hot-middleware": "^2.25.12",
+    "@types/yargs": "^17.0.35",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
     "babel-loader": "^10.0.0",
@@ -139,6 +154,7 @@
     "redux-throttle": "^0.1.1",
     "screenfull": "^6.0.2",
     "socket.io-client": "^4.8.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
     "typescript-plugin-css-modules": "^5.2.0",

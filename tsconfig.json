@@ -1,28 +1,26 @@
 {
+  "files": [],
+  "references": [
+    {
+      "path": "./config/tsconfig.client.json"
+    },
+    {
+      "path": "./config/tsconfig.server.json"
+    }
+  ],
   "compilerOptions": {
     "paths": {
-      "*": ["./src/*"],
-      "shared/*": ["./shared/*"],
+      "shared/*": [
+        "./shared/*"
+      ]
     },
     "skipLibCheck": true,
     "noImplicitAny": true,
     "downlevelIteration": true,
     "esModuleInterop": true,
-    "moduleResolution": "Bundler",
-    "module": "esnext",
-    "jsx": "react",
     "typeRoots": [
       "types",
       "node_modules/@types"
-    ],
-    "plugins": [
-      {
-        "name": "typescript-plugin-css-modules",
-        "options": {
-          "customMatcher": "\\.css$",
-        },
-      },
-    ],
-  },
-  "include": ["src/**/*", "config/declarations.d.ts"],
+    ]
+  }
 }

@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../build",
+    "rootDir": "..",
+    "noEmit": false,
+    "module": "node16",
+    "moduleResolution": "node16",
+    "target": "es2022",
+    "noImplicitAny": false,
+    "declaration": false
+  },
+  "include": [
+    "../server/**/*.ts",
+    "../shared/**/*.ts"
+  ],
+  "exclude": [
+    "src",
+    "node_modules"
+  ]
+}
