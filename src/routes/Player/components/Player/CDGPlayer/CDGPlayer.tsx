@@ -45,14 +45,10 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   }
 
   componentDidUpdate (prevProps: CDGPlayerProps) {
-    if (prevProps.mediaKey !== this.props.mediaKey) {
-      if (prevProps.mediaId !== this.props.mediaId) {
-        this.updateSources()
-      } else {
-        this.audio.current.currentTime = 0
-      }
-
-      // return
+    if (prevProps.mediaId !== this.props.mediaId) {
+      this.updateSources()
+    } else if (prevProps.mediaKey !== this.props.mediaKey) {
+      this.audio.current.currentTime = 0
     }
 
     if (prevProps.isPlaying !== this.props.isPlaying) {

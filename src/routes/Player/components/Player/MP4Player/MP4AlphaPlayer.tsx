@@ -53,12 +53,10 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   }
 
   componentDidUpdate (prevProps: MP4AlphaPlayerProps) {
-    if (prevProps.mediaKey !== this.props.mediaKey) {
-      if (prevProps.mediaId !== this.props.mediaId) {
-        this.updateSources()
-      } else {
-        this.video.currentTime = 0
-      }
+    if (prevProps.mediaId !== this.props.mediaId) {
+      this.updateSources()
+    } else if (prevProps.mediaKey !== this.props.mediaKey) {
+      this.video.currentTime = 0
     }
 
     if (prevProps.isPlaying !== this.props.isPlaying) {

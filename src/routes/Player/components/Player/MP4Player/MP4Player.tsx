@@ -25,12 +25,10 @@ class MP4Player extends React.Component<MP4PlayerProps> {
   }
 
   componentDidUpdate (prevProps: MP4PlayerProps) {
-    if (prevProps.mediaKey !== this.props.mediaKey) {
-      if (prevProps.mediaId !== this.props.mediaId) {
-        this.updateSources()
-      } else {
-        this.video.current.currentTime = 0
-      }
+    if (prevProps.mediaId !== this.props.mediaId) {
+      this.updateSources()
+    } else if (prevProps.mediaKey !== this.props.mediaKey) {
+      this.video.current.currentTime = 0
     }
 
     if (prevProps.isPlaying !== this.props.isPlaying) {
