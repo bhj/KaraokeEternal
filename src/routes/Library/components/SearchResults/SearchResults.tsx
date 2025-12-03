@@ -47,7 +47,7 @@ const RowComponent = ({
   expandedArtistResults,
 }: RowComponentProps<CustomRowProps>) => {
   const { starredSongs } = useAppSelector(state => ensureState(state.userStars))
-  const { upcomingSongs } = useAppSelector(getSongsStatus)
+  const { upcoming } = useAppSelector(getSongsStatus)
 
   // # artist results heading
   if (index === 0) {
@@ -76,7 +76,7 @@ const RowComponent = ({
         name={artist.name}
         numStars={0}
         onArtistClick={() => dispatch(toggleArtistResultExpanded(artistId))}
-        upcomingSongs={upcomingSongs}
+        upcomingSongs={upcoming}
         starredSongs={starredSongs}
         style={style}
       />

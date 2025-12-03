@@ -35,9 +35,10 @@ const RowComponent = ({
 }: RowComponentProps<CustomRowProps>) => {
   const starredArtistCounts = useAppSelector(state => state.starCounts.artists)
   const { starredSongs } = useAppSelector(state => ensureState(state.userStars))
-  const { upcomingSongs } = useAppSelector(getSongsStatus)
+  const { upcoming, current } = useAppSelector(getSongsStatus)
 
   const artist = artists.entities[artists.result[index]]
+  if (current) upcoming.push(current)
 
   return (
     <ArtistItem
@@ -47,7 +48,7 @@ const RowComponent = ({
       name={artist.name}
       numStars={starredArtistCounts[artist.artistId] || 0}
       onArtistClick={() => dispatch(toggleArtistExpanded(artist.artistId))}
-      upcomingSongs={upcomingSongs}
+      upcomingSongs={upcoming}
       starredSongs={starredSongs}
       style={style}
     />
