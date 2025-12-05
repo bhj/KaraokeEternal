@@ -74,6 +74,10 @@ const Slider = ({
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledby,
       'className': styles.handle,
+      'onTouchEnd': (e: React.TouchEvent<HTMLDivElement>) => {
+        // Prevent focus outline on touch in mobile Safari
+        (e.currentTarget as HTMLDivElement).blur()
+      },
     }, (
       <Icon icon='CIRCLE' />
     ))
