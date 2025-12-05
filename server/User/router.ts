@@ -363,13 +363,6 @@ router.post('/setup', async (ctx) => {
     ctx.throw(403)
   }
 
-  // create admin user
-  try {
-    await User.create({ ...ctx.request.body, image }, 'admin')
-  } catch (err) {
-    ctx.throw(403, err.message)
-  }
-
   // create default room
   const fields = new Map()
   fields.set('name', 'Room 1')
@@ -386,20 +379,32 @@ router.post('/setup', async (ctx) => {
     ctx.throw(500, 'Invalid default room lastID')
   }
 
-  // unset isFirstRun
-  {
+  // create admin user
+  try {
+    const userId = await User.create({ ...ctx.request.body, image }, 'admin')
+    const user = await User.getById(userId, true)
+    const userCtx = createUserCtx(user, res.lastID)
+
+    // create JWT
+    const token = jwtSign(userCtx, ctx.jwtKey)
+
+    // set JWT as an httpOnly cookie
+    ctx.cookies.set('keToken', token, {
+      httpOnly: true,
+    })
+
+    // unset isFirstRun
     const query = sql`
       UPDATE prefs
       SET data = 'false'
       WHERE key = 'isFirstRun'
     `
     await db.run(String(query))
-  }
 
-  // success
-  ctx.status = 200
-  ctx.body = {
-    roomId: res.lastID,
+    // success
+    ctx.body = userCtx
+  } catch (err) {
+    ctx.throw(403, err.message)
   }
 })
 
