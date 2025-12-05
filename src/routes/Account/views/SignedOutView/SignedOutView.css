@@ -3,7 +3,7 @@
   overflow: hidden;
   padding: var(--container-padding);
 
-  h2 {
+  h1 {
     margin: var(--space-l) 0 var(--space-m) 0;
     font-family: var(--font-family-custom);
     font-size: var(--font-size-l);

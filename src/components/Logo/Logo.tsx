@@ -8,14 +8,14 @@ interface LogoProps {
 
 const Logo = (props: LogoProps) => {
   return (
-    <div className={clsx(styles.container, props.className)}>
-      <h1 className={styles.title}>
+    <div className={clsx(styles.container, props.className)} role='img' aria-label='Karaoke Eternal'>
+      <span className={styles.title} aria-hidden='true'>
         Karaoke
         <span className={styles.eternal}>
           Eterna
           <span className={styles.lastChar}>l</span>
         </span>
-      </h1>
+      </span>
     </div>
   )
 }

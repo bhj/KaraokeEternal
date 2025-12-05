@@ -129,7 +129,7 @@ const SignedOutView = () => {
 
       {showRoomSection && (
         <>
-          <h2>Select room...</h2>
+          <h1>Join room...</h1>
           <SelectRoom
             rooms={rooms}
             roomId={roomId}
@@ -145,7 +145,7 @@ const SignedOutView = () => {
         {allowNew
           ? (
               <>
-                <h2>Join as...</h2>
+                <h1>Join as...</h1>
                 <div className={styles.radioContainer}>
                   <InputRadio name='type' value='returning' checked={mode === 'returning'} onChange={setMode} label='Returning user' />
                   {allowNewStandard && <InputRadio name='type' value='new' checked={mode === 'new'} onChange={setMode} label='New user' />}
@@ -153,7 +153,7 @@ const SignedOutView = () => {
                 </div>
               </>
             )
-          : <h2>Sign in</h2>}
+          : <h1>Sign in</h1>}
 
         {(mode === 'returning' || !allowNew) && (
           <SignIn
