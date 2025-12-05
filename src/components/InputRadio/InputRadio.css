@@ -4,6 +4,10 @@
   gap: var(--space-s);
   cursor: pointer;
 
+  &:has(:focus-visible) {
+    outline: var(--focus-outline);
+  }
+
   input[type="radio"] {
     -webkit-appearance: none;
     appearance: none;
