@@ -1,4 +1,4 @@
-## v2.0.0-beta.3
+## v2.0.0-beta.4
 
 **Sponsored by**: [candre23](https://github.com/candre23), [nellisdev](https://github.com/nellisdev), [astrobyte](https://github.com/astrobyte), [jfeldhamer](https://github.com/jfeldhamer), [cubandaddy](https://github.com/cubandaddy), [Backroads4Me](https://github.com/Backroads4Me) and other private sponsors. Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
 
@@ -33,7 +33,7 @@ In v2, the parser instead uses `_kes.v2.json` files. These JSON files allow the 
 - Fixed an error when listing drives on Windows due to removal of `wmic` (thanks Microsoft! /s)
 - Usernames/emails are no longer case sensitive (thanks **gazugafan**)
 
-This release includes contributions from [gazugafan](https://github.com/gazugafan), (gausie)[https://github.com/gausie] and [EffakT](https://github.com/EffakT). Thanks!
+This release includes contributions from [gazugafan](https://github.com/gazugafan), (gausie)[https://github.com/gausie] and [EffakT](https://github.com/EffakT), as well as testing by **mjmeans**. Thanks!
 
 ## v1.0.0 (2022-05-17)
 
