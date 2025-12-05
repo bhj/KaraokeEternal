@@ -20,6 +20,8 @@
     padding: var(--container-padding);
     border: 1px solid var(--btn-bg-color);
     border-radius: var(--border-radius);
+    /* Prevent fieldset from overflowing parent */
+    min-width: 0;
   }
 
   legend {
