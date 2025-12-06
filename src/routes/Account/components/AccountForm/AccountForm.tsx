@@ -4,6 +4,7 @@ import { User } from 'shared/types'
 import styles from './AccountForm.css'
 
 interface AccountFormProps {
+  autoFocus?: boolean
   children?: React.ReactNode
   onDirtyChange?(isDirty: boolean): void
   onSubmit(formData: FormData): void
@@ -18,6 +19,7 @@ interface UserWithRole extends User {
 }
 
 const AccountForm = ({
+  autoFocus,
   children,
   onDirtyChange,
   onSubmit,
@@ -118,12 +120,13 @@ const AccountForm = ({
         <input
           type='email'
           autoComplete='off'
+          autoFocus={autoFocus}
           onChange={updateDirty}
           placeholder={isUser ? 'change username (optional)' : 'username or email'}
           // https://github.com/facebook/react/issues/23301
           ref={(r) => {
             if (r) username.current = r
-            if (!isUser) r?.setAttribute('autofocus', 'true')
+            if (autoFocus) r?.setAttribute('autofocus', 'true')
           }}
         />
       )}

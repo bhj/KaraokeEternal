@@ -25,7 +25,7 @@ const FirstRun = () => {
         {' '}
         account to get started. All data is locally stored and never shared.
       </p>
-      <AccountForm onSubmit={handleCreate}>
+      <AccountForm onSubmit={handleCreate} autoFocus>
         <Button variant='primary' type='submit'>
           Create Account
         </Button>

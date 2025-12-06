@@ -31,7 +31,7 @@ const EditUser = (props: EditUserProps) => {
       onClose={props.onClose}
       title={props.user ? props.user.username : 'Create User'}
     >
-      <AccountForm user={props.user} onSubmit={handleSubmit} showRole>
+      <AccountForm user={props.user} onSubmit={handleSubmit} showRole autoFocus={!props.user}>
         <div className={styles.btnContainer}>
           {!props.user && (
             <Button type='submit' className={styles.btn} variant='primary'>
