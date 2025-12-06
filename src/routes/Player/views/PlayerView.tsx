@@ -25,6 +25,11 @@ const PlayerView = () => {
     dispatch(fetchCurrentRoom())
   }, [dispatch])
 
+  // set page title
+  useEffect(() => {
+    document.title = 'Karaoke Eternal | Player'
+  }, [])
+
   return (
     <div style={{ overflow: 'hidden' }}>
       <div

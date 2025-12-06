@@ -1,4 +1,5 @@
 import React, { useCallback, useRef } from 'react'
+import { useMatch } from 'react-router'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import useResizeObserver from 'use-resize-observer'
 // global stylesheets should be imported before any
@@ -13,6 +14,7 @@ import Routes from '../Routes/Routes'
 import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
 
 const CoreLayout = () => {
+  const isPlayerRoute = useMatch('/player')
   const dispatch = useAppDispatch()
   const headerRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLDivElement>(null)
@@ -36,7 +38,7 @@ const CoreLayout = () => {
 
       <Routes />
 
-      <Navigation ref={navRef} />
+      {!isPlayerRoute && <Navigation ref={navRef} />}
 
       <SongInfo />
 
