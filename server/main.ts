@@ -23,7 +23,7 @@ const log = initLogger('server', {
   },
 }).scope(`main[${process.pid}]`)
 
-const refs: { scanner?: childProcess.ChildProcess; watcher?: childProcess.ChildProcess } = {}
+const refs: { scanner?: childProcess.ChildProcess, watcher?: childProcess.ChildProcess } = {}
 const shutdownHandlers: Array<() => Promise<void>> = []
 let IPC
 

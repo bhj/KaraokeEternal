@@ -16,7 +16,7 @@ class Database {
     }
   }
 
-  static async open ({ file, ro = true }: { file: string; ro?: boolean } = { file: '', ro: true }) {
+  static async open ({ file, ro = true }: { file: string, ro?: boolean } = { file: '', ro: true }) {
     if (Database.refs.db) throw new Error('Database already open')
     log.info('Opening database file %s %s', ro ? '(read-only)' : '(writeable)', file)
 

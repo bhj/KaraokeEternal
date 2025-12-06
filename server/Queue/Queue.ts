@@ -197,7 +197,7 @@ class Queue {
    * @param  {number|number[]} queueId
    * @return {boolean}
    */
-  static async isOwner(userId, queueId) {
+  static async isOwner (userId, queueId) {
     const ids = Array.isArray(queueId) ? queueId : [queueId]
     if (ids.length === 0) return false
 

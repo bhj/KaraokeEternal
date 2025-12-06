@@ -125,9 +125,9 @@ class Rooms {
       validatePassword = true,
       role,
     }: {
-      isOpen?: boolean;
-      validatePassword?: boolean;
-      role?: any;
+      isOpen?: boolean
+      validatePassword?: boolean
+      role?: any
     } = {},
   ) {
     const res = await Rooms.get(roomId, { includePassword: true })

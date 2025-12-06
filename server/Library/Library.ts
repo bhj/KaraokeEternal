@@ -8,8 +8,8 @@ const log = getLogger('Library')
 const { db } = Database
 
 class Library {
-  static cache: { version: any; artists?: any; songs?: any } = { version: null }
-  static starCountsCache: { version: any; artists?: any; songs?: any } = { version: null }
+  static cache: { version: any, artists?: any, songs?: any } = { version: null }
+  static starCountsCache: { version: any, artists?: any, songs?: any } = { version: null }
 
   /**
   * Get artists and songs in a format suitable for sending to clients.
@@ -126,7 +126,7 @@ class Library {
   * @return {object}          { artistId, songId }
   */
   static async matchSong (parsed) {
-    const match: { artistId?: any; artist?: string; artistNorm?: string; songId?: any; title?: string; titleNorm?: string } = {}
+    const match: { artistId?: any, artist?: string, artistNorm?: string, songId?: any, title?: string, titleNorm?: string } = {}
 
     // match artist
     {
