@@ -336,6 +336,14 @@ router.post('/user', async (ctx) => {
   // create user
   try {
     const userId = await User.create({ ...ctx.request.body, image }, ctx.request.body.role)
+
+    // if admin creating another user, we're done
+    if (ctx.user.isAdmin) {
+      ctx.status = 200
+      ctx.body = {}
+      return
+    }
+
     const user = await User.getById(userId, true)
     const userCtx = createUserCtx(user, ctx.request.body.roomId || null)
 
