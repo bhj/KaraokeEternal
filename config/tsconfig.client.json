@@ -5,6 +5,9 @@
     "paths": {
       "*": [
         "../src/*"
+      ],
+      "shared/*": [
+        "../shared/*"
       ]
     },
     "moduleResolution": "Bundler",
@@ -21,6 +24,7 @@
   },
   "include": [
     "../src/**/*",
+    "../shared/**/*",
     "./declarations.d.ts"
   ]
 }
