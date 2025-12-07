@@ -13,8 +13,8 @@ import styles from './SearchResults.css'
 
 const ROW_HEIGHT_RESULT_HEADING = 24
 const ROW_HEIGHT_ARTIST = 48
-const ROW_HEIGHT_SONG = 56
-const ROW_HEIGHT_SONG_WITH_ARTIST = 64
+const ROW_HEIGHT_SONG = 56 // 52px + 4px margin
+const ROW_HEIGHT_SONG_WITH_ARTIST = 68 // 64px + 4px margin
 
 interface SearchResultsProps {
   // starredArtistCounts: Record<number, number> // @todo
