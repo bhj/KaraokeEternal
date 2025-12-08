@@ -83,7 +83,7 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
 
     this.chroma.unload()
     this.video.removeAttribute('src')
-    this.video.remove()
+    this.video.load() // reset to ensure playback stops
   }
 
   render () {
