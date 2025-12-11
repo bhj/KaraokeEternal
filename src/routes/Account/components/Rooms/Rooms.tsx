@@ -36,7 +36,7 @@ const Rooms = () => {
     const room = rooms.entities[roomId]
     return (
       <tr key={String(roomId)}>
-        <td><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
+        <td translate='no'><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
         <td>
           {room.status}
           {room.numUsers > 0 && (

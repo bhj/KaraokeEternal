@@ -32,7 +32,7 @@ const ArtistItem = ({
   const isChildStarred = artistSongIds.some(songId => starredSongs.includes(songId))
 
   return (
-    <div style={style}>
+    <div style={style} translate='no'>
       <div onClick={onArtistClick} className={clsx(styles.container, isChildStarred && styles.hasStarred)}>
         <div className={styles.folderContainer}>
           <Icon icon='FOLDER' />

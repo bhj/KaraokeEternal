@@ -58,7 +58,7 @@ const UpNow = ({ queueItem }: UpNowProps) => {
         exitActive: styles.exitActive,
       }}
     >
-      <div ref={nodeRef} className={styles.container}>
+      <div ref={nodeRef} className={styles.container} translate='no'>
         <div className={styles.innerContainer}>
           <UserImage
             userId={queueItem.userId}

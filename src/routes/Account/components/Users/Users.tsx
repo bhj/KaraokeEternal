@@ -40,7 +40,7 @@ const Users = () => {
     return (
       <tr key={userId}>
         {userId === curUserId && (
-          <td>
+          <td translate='no'>
             <strong>{user.username}</strong>
             {' '}
             (
