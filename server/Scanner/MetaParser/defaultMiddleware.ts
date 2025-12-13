@@ -167,7 +167,7 @@ function moveArticles (str, articles) {
       const parens = /[([{].*$/.exec(str)
 
       if (parens) {
-        str = str.substring(search.length, parens.index - search.length)
+        str = str.substring(search.length, parens.index)
           .trim() + `, ${article} ${parens[0]}`
       } else {
         str = str.substring(search.length) + `, ${article}`
