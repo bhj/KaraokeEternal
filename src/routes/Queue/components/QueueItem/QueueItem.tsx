@@ -131,7 +131,7 @@ const QueueItem = ({
           </div>
         </div>
 
-        <div className={clsx(styles.primary, isPlayed && styles.greyed)}>
+        <div className={clsx(styles.primary, isPlayed && styles.greyed)} translate='no'>
           <div className={styles.innerPrimary}>
             <div className={styles.title}>{title}</div>
             <div className={styles.artist}>{artist}</div>

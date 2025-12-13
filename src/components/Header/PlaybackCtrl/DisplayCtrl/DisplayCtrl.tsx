@@ -114,6 +114,7 @@ const DisplayCtrl = ({
                     id='visualizer-preset-name'
                     className={styles.presetName}
                     aria-live='polite'
+                    translate='no'
                   >
                     {visualizerPresetName}
                   </p>

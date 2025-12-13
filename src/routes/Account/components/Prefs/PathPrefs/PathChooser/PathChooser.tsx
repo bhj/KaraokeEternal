@@ -72,7 +72,7 @@ const PathChooser = ({ onCancel, onChoose }: PathChooserProps) => {
         </div>
       )}
     >
-      <div className={styles.container}>
+      <div className={styles.container} translate='no'>
         <div className={styles.folderCurrent}>
           {pathInfo.current || '\u00a0'}
         </div>
