@@ -7,7 +7,12 @@ import {
 } from 'shared/actionTypes'
 import { PlaybackOptions } from 'shared/types'
 
-const _presetKeys = Object.keys(presets)
+const BAD_PRESETS = [
+  'Flexi + Martin - astral projection',
+  'Rovastar & Loadus + Zylot - FractalDrop (Spark Machine v2.0)',
+]
+
+const _presetKeys = Object.keys(presets).filter(key => !BAD_PRESETS.includes(key))
 
 const getPreset = (i: number) => ({
   presetKey: _presetKeys[i],
