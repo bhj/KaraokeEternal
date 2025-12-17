@@ -102,10 +102,10 @@ class Player extends React.Component<PlayerProps> {
 
     if (isReplayGainEnabled && typeof rgTrackGain === 'number' && typeof rgTrackPeak === 'number') {
       const gainDb = this.props.rgTrackGain
-      const peakDb = 10 * Math.log10(this.props.rgTrackPeak) // ratio to dB
+      const peakDb = 20 * Math.log10(this.props.rgTrackPeak) // linear amplitude factor to dB
       const safeGainDb = (gainDb + peakDb >= 0) ? -0.01 - peakDb : gainDb
 
-      vol = vol * Math.pow(10, safeGainDb / 10) // dB to ratio
+      vol = vol * Math.pow(10, safeGainDb / 20) // dB to linear amplitude factor
     }
 
     this.audioGainNode.gain.setValueAtTime(vol, this.audioCtx.currentTime)
