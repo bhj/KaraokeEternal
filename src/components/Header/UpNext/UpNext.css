@@ -8,29 +8,36 @@
 }
 
 .upNext {
-  composes: container;
   animation-name: up-next-bg-animation;
   filter: var(--up-next-filter);
 }
 
 @keyframes up-next-bg-animation {
-  0% { background-color: var(--up-next-bg-color-to); }
-  100% { background-color: var(--up-next-bg-color-from); }
+  0% {
+    background-color: var(--up-next-bg-color-to);
+  }
+
+  100% {
+    background-color: var(--up-next-bg-color-from);
+  }
 }
 
 .upNow {
-  composes: container;
   animation-name: up-now-bg-animation;
   filter: var(--up-now-filter);
 }
 
 @keyframes up-now-bg-animation {
-  0% { background-color: var(--up-now-bg-color-to); }
-  100% { background-color: var(--up-now-bg-color-from); }
+  0% {
+    background-color: var(--up-now-bg-color-to);
+  }
+
+  100% {
+    background-color: var(--up-now-bg-color-from);
+  }
 }
 
 .inQueue {
-  composes: container;
   background-color: var(--up-next-bg-color-from);
 }
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import { formatSeconds } from 'lib/dateTime'
 import styles from './UpNext.css'
 
@@ -11,7 +12,7 @@ interface UpNextProps {
 const UpNext = (props: UpNextProps) => {
   if (props.isUpNow) {
     return (
-      <div className={styles.upNow}>
+      <div className={clsx(styles.container, styles.upNow)}>
         <p className={styles.msg}>
           You&rsquo;re up
           {' '}
@@ -23,7 +24,7 @@ const UpNext = (props: UpNextProps) => {
 
   if (props.isUpNext) {
     return (
-      <div className={styles.upNext}>
+      <div className={clsx(styles.container, styles.upNext)}>
         <p className={styles.msg}>
           You&rsquo;re up
           {' '}
@@ -36,7 +37,7 @@ const UpNext = (props: UpNextProps) => {
 
   if (props.wait) {
     return (
-      <div className={styles.inQueue}>
+      <div className={clsx(styles.container, styles.inQueue)}>
         <p className={styles.msg}>
           You&rsquo;re up in
           {' '}
