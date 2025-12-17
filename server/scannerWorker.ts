@@ -57,8 +57,15 @@ let IPC
   q.queue(pathIds)
 })()
 
-// @todo
+const totals = { new: 0, existing: 0, removed: 0 }
+
 function onIteration (stats) {
+  if (stats) {
+    totals.new += stats.new
+    totals.existing += stats.existing
+    totals.removed += stats.removed
+  }
+
   return stats
 }
 
@@ -68,7 +75,7 @@ function onDone () {
     payload: {
       isScanning: false,
       pct: 100,
-      text: 'Finished',
+      text: `Scan finished (${totals.new} new, ${totals.removed} removed)`,
     },
   })
 

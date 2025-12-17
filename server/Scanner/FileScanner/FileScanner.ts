@@ -30,12 +30,13 @@ class FileScanner extends Scanner {
   async scan (pathId) {
     const dir = this.paths.entities[pathId]?.path
     const validMediaIds = []
+    const stats = { new: 0, removed: 0, existing: 0 }
     let files // { file, stats }[]
     let prevDir
 
     if (!dir) {
       log.error('invalid pathId: %s', pathId)
-      return
+      return stats
     }
 
     log.info('Searching: %s', dir)
@@ -50,7 +51,7 @@ class FileScanner extends Scanner {
       )
     } catch (err) {
       log.error(`  => ${err.message} (path offline)`)
-      return
+      return stats
     }
 
     for (let i = 0; i < files.length; i++) {
@@ -65,27 +66,33 @@ class FileScanner extends Scanner {
       }
 
       log.info('[%s/%s] %s', i + 1, files.length, files[i].file)
-      this.emitStatus(`Processing (${i + 1} of ${files.length})`, (i + 1) / files.length)
+      this.emitStatus(`Scanning (${i + 1} of ${files.length})`, (i + 1) / files.length)
 
       // process file
       try {
         const res = await this.process(files[i], pathId)
         validMediaIds.push(res.mediaId)
+
+        if (res.isNew) stats.new++
+        else stats.existing++
       } catch (err) {
         log.warn(`  => ${err.message}`)
       }
 
       if (this.isCanceling) {
         this.emitStatus('Stopped', 100, false)
-        return
+        return stats
       }
     } // end for
 
-    log.info('Processed %s valid media files', validMediaIds.length.toLocaleString())
+    log.info('Scanned %s valid media files', validMediaIds.length.toLocaleString())
     log.info('Searching for invalid media entries')
 
     const numRemoved = await this.removeInvalid(pathId, validMediaIds)
+    stats.removed = numRemoved
     log.info(`Removed ${numRemoved} invalid media entries`)
+
+    return stats
   }
 
   async process ({ file }, pathId) {
