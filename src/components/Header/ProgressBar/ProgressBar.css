@@ -1,9 +1,11 @@
 .container {
+  --progress-color: hsl(var(--hue-blue), 100%, 20%);
+
   display: flex;
   align-items: center;
   height: 40px;
   width: 100%;
-  background-image: linear-gradient(to right, var(--active-item-from-bg-color), var(--active-item-from-bg-color));
+  background-image: linear-gradient(to right, var(--progress-color), var(--progress-color));
   background-repeat: no-repeat;
 }
 
@@ -17,18 +19,12 @@
   color: var(--text-color);
 }
 
-.btn {
-  cursor: pointer;
-}
-
 .cancel {
-  composes: btn;
   color: var(--btn-danger-bg-color);
   filter: var(--btn-danger-filter);
 }
 
 .close {
-  composes: btn;
   color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }
