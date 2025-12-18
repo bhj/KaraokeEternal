@@ -149,8 +149,9 @@ export default function (io, jwtKey) {
 
     // beyond this point assumes there is a room
 
-    // add user to room
+    // add user to room and track membership
     sock.join(Rooms.prefix(sock.user.roomId))
+    Rooms.trackUser(sock.user.roomId, sock.user.userId)
 
     // if there's a player in room, emit its last known status
     // @todo this just emits the first status found

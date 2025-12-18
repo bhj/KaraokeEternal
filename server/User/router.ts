@@ -421,10 +421,8 @@ router.get('/user/:userId/image', async (ctx) => {
   const targetId = parseInt(ctx.params.userId, 10)
 
   if (ctx.user.userId !== targetId && !ctx.user.isAdmin) {
-    // ensure users are in the same room
-    const sockets = await ctx.io.in(Rooms.prefix(ctx.user.roomId)).fetchSockets()
-
-    if (!sockets.some(s => s?.user && s?.user.userId === targetId)) {
+    // ensure target user has been in the same room
+    if (!Rooms.hasUserBeenInRoom(ctx.user.roomId, targetId)) {
       ctx.throw(403)
     }
   }

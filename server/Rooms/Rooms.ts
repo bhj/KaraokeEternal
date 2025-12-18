@@ -11,6 +11,9 @@ const PASSWORD_MIN_LENGTH = 5
 
 export const STATUSES = ['open', 'closed']
 
+// Remember which users have been seen in each room
+const roomUsers: Map<number, Set<number>> = new Map()
+
 class Rooms {
   /**
    * Get all rooms
@@ -207,6 +210,31 @@ class Rooms {
     }
 
     return false
+  }
+
+  /**
+   * Remember that a user has been in a room
+   *
+   * @param  {Number}  roomId
+   * @param  {Number}  userId
+   */
+  static trackUser (roomId: number, userId: number) {
+    if (!roomUsers.has(roomId)) {
+      roomUsers.set(roomId, new Set())
+    }
+
+    roomUsers.get(roomId)!.add(userId)
+  }
+
+  /**
+   * Check if a user has been in a room (since server start)
+   *
+   * @param  {Number}  roomId
+   * @param  {Number}  userId
+   * @return {Boolean}
+   */
+  static hasUserBeenInRoom (roomId: number, userId: number): boolean {
+    return roomUsers.get(roomId)?.has(userId) ?? false
   }
 }
 
