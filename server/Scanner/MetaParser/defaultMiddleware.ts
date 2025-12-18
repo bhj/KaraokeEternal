@@ -93,7 +93,11 @@ m.set('remove quotes', (ctx, next) => {
 // some artist-specific tweaks
 m.set('artist tweaks', (ctx, next) => {
   // Last, First [Middle] -> First [Middle] Last
-  ctx.artist = ctx.artist.replace(/^(\w+), (\w+ ?\w+)$/ig, '$2 $1')
+  // Use negative lookahead to avoid matching when second part starts with an article (e.g., "Tyler, The Creator")
+  const articles = Array.isArray(ctx.cfg.articles) ? ctx.cfg.articles.join(' |') + ' ' : ''
+  const articleLookahead = articles ? `(?!${articles})` : ''
+  const pattern = new RegExp(`^([\\w ]+), ${articleLookahead}(\\w+ ?\\w+)$`, 'i')
+  ctx.artist = ctx.artist.replace(pattern, '$2 $1')
 
   // featuring/feat/ft -> ft.
   ctx.artist = ctx.artist.replace(/ featuring /i, ' ft. ')
