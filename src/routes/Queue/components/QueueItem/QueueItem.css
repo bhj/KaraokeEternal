@@ -99,7 +99,6 @@
 .btnContainer {
   button {
     position: relative;
-    /* overflow: hidden; */
     width: var(--queue-item-btn-size);
     height: var(--queue-item-btn-size);
     color: var(--song-item-btn-bg-color);
@@ -118,19 +117,28 @@
   svg {
     width: var(--queue-item-btn-size);
     height: var(--queue-item-btn-size);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 }
 
 .btnAdd svg,
-.btnMove svg,
 .btnPlayNext svg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
   width: 60px;
   height: 60px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+}
+
+.btnMove svg {
+  width: 56px;
+  height: 56px;
+}
+
+.btnRemove svg {
+  width: 52px;
+  height: 52px;
 }
 
 .animateStar {

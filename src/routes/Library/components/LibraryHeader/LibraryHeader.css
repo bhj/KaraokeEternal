@@ -15,9 +15,10 @@
 }
 
 .searchInput {
+  align-self: stretch;
   flex: 1;
   margin: 0;
-  margin-left: -4px;
+  padding: 0 var(--space-s) 0 var(--space-xs) !important;
   border: none !important;
   font-size: var(--font-size-m) !important;
   color: var(--text-color) !important;
@@ -41,6 +42,10 @@
   }
 }
 
-.btnStar svg {
-  height: 2.75rem;
+.btnStar {
+  margin-right: var(--space-s);
+
+  svg {
+    height: 3rem;
+  }
 }
