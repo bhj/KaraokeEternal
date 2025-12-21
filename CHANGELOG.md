@@ -15,7 +15,7 @@ Visualizations are now supported with video files. By automatically detecting a 
 Enhancements to the queue include:
 
 - The queue can be restarted from any previously played song, or the beginning of the current song
-- All upcoming songs for a user can be removed at once by long-pressing the *Remove* button
+- All upcoming songs for a user can be removed at once by long-pressing the *Remove* or *Skip* buttons
 - When a standard user or guest signs out, their upcoming songs are now automatically removed from the queue
 
 ### Metadata parser changes
@@ -26,14 +26,16 @@ In v2, the parser instead uses `_kes.v2.json` files. These JSON files allow the 
 
 ### Other features and fixes
 
-- Zipped MP3+G media is now supported
-- Media folders can now be watched for changes, as well as manually scanned individually
-- In the Library view, songs that have already been played in the current session appear greyed
-- In the Library view, tapping a song that is already upcoming no longer queues it again
-- Fixed an error when listing drives on Windows due to removal of `wmic` (thanks Microsoft! /s)
-- Usernames/emails are no longer case sensitive (thanks **gazugafan**)
+- **(Server)** Zipped MP3+G media is now supported
+- **(Server)** Media folders can now be watched for changes, as well as manually scanned individually
+- **(Server)** Fixed an error when listing drives on Windows due to removal of `wmic` (thanks Microsoft! /s)
+- **(Server)** Usernames/emails are no longer case sensitive (thanks **gazugafan**)
+- **(Library)** Songs that have already been played in the current session appear greyed
+- **(Library)** Tapping a song that is already upcoming no longer queues it again
+- **(Player)** Fixed incorrect calculation of ReplayGain values (thanks **laberning**)
+- **(General)** Prevent auto-translation of some UI elements (thanks **laberning**)
 
-This release includes contributions from [gazugafan](https://github.com/gazugafan), (gausie)[https://github.com/gausie] and [EffakT](https://github.com/EffakT), as well as testing by **mjmeans**. Thanks!
+This release includes contributions from [gazugafan](https://github.com/gazugafan), (gausie)[https://github.com/gausie], [EffakT](https://github.com/EffakT) and [laberning](https://github.com/laberning), as well as testing by **mjmeans**. Thanks!
 
 ## v1.0.0 (2022-05-17)
 

@@ -100,12 +100,22 @@ const QueueItem = ({
     trackMouse: true,
   })
 
-  const bindPressHandlers = useLongPress(() => {
+  const bindRemovePressHandlers = useLongPress(() => {
     const confirmText = isOwner ? 'Remove all your upcoming songs?' : `Remove all upcoming songs for "${userDisplayName}"?`
     longPressActiveRef.current = true
 
     if (confirm(confirmText)) {
       onRemoveUpcoming(userId)
+    }
+  }, { threshold: LONG_PRESS_THRESHOLD_MS, cancelOnMovement: true })
+
+  const bindSkipPressHandlers = useLongPress(() => {
+    const confirmText = isOwner ? 'Skip and remove all your upcoming songs?' : `Skip and remove all upcoming songs for "${userDisplayName}"?`
+    longPressActiveRef.current = true
+
+    if (confirm(confirmText)) {
+      onRemoveUpcoming(userId)
+      handleSkipClick()
     }
   }, { threshold: LONG_PRESS_THRESHOLD_MS, cancelOnMovement: true })
 
@@ -155,20 +165,12 @@ const QueueItem = ({
             icon='STAR_FULL'
             onClick={handleStarClick}
           />
-          {isReplayable && (
+          {isInfoable && (
             <Button
               className={styles.active}
               data-hide
-              icon='REPLAY'
-              onClick={handleReplayClick}
-            />
-          )}
-          {isPlayed && (
-            <Button
-              className={clsx(styles.btnAdd, styles.active)}
-              data-hide
-              icon='PLUS'
-              onClick={handleRequeueClick}
+              icon='INFO_OUTLINE'
+              onClick={handleInfoClick}
             />
           )}
           {isMovable && (
@@ -179,17 +181,25 @@ const QueueItem = ({
               onClick={handleMoveClick}
             />
           )}
-          {isInfoable && (
+          {isPlayed && (
             <Button
-              className={styles.active}
+              className={clsx(styles.btnAdd, styles.active)}
               data-hide
-              icon='INFO_OUTLINE'
-              onClick={handleInfoClick}
+              icon='PLUS'
+              onClick={handleRequeueClick}
+            />
+          )}
+          {isReplayable && (
+            <Button
+              className={clsx(styles.active, styles.danger)}
+              data-hide
+              icon='REPLAY'
+              onClick={handleReplayClick}
             />
           )}
           {isRemovable && (
             <Button
-              className={styles.danger}
+              className={clsx(styles.btnRemove, styles.danger)}
               data-hide
               icon='DELETE'
               onTouchEnd={(e: React.TouchEvent<HTMLButtonElement>) => {
@@ -207,7 +217,7 @@ const QueueItem = ({
                 }
                 handleRemoveClick()
               }}
-              {...bindPressHandlers()}
+              {...bindRemovePressHandlers()}
             />
           )}
           {isSkippable && (
@@ -215,7 +225,22 @@ const QueueItem = ({
               className={clsx(styles.btnPlayNext, styles.danger)}
               data-hide
               icon='PLAY_NEXT'
-              onClick={handleSkipClick}
+              onTouchEnd={(e: React.TouchEvent<HTMLButtonElement>) => {
+                if (longPressActiveRef.current) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  longPressActiveRef.current = false
+                  return
+                }
+              }}
+              onClick={() => {
+                if (longPressActiveRef.current) {
+                  longPressActiveRef.current = false
+                  return
+                }
+                handleSkipClick()
+              }}
+              {...bindSkipPressHandlers()}
             />
           )}
         </Buttons>
