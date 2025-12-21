@@ -25,6 +25,10 @@
     .title {
       color: var(--color-gray-5);
     }
+
+    .artist {
+      color: var(--color-gray-4);
+    }
   }
 
   &.starred {
