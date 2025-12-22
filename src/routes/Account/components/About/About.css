@@ -56,6 +56,10 @@
   margin-right: 5px;
 }
 
+.ghButton.star svg {
+  color: #E3B341;
+}
+
 .ghButton.sponsor svg {
   color: #db61a2;
 }

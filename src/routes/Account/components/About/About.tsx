@@ -48,7 +48,7 @@ const About = () => {
               GitHub
             </a>
           </div>
-          <div className={styles.ghButton}>
+          <div className={clsx(styles.ghButton, styles.star)}>
             {/* @ts-expect-error: global via Webpack */}
             <a href={__KE_URL_REPO__} target='_blank' rel='noreferrer'>
               <Icon icon='GITHUB_STAR' size={16} />
