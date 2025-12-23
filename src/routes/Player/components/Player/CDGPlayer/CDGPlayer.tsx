@@ -48,7 +48,9 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     if (prevProps.mediaId !== this.props.mediaId) {
       this.updateSources()
     } else if (prevProps.mediaKey !== this.props.mediaKey) {
-      this.audio.current.currentTime = 0
+      if (this.audio.current) {
+        this.audio.current.currentTime = 0
+      }
     }
 
     if (prevProps.isPlaying !== this.props.isPlaying) {
@@ -141,6 +143,8 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   }
 
   updateIsPlaying = () => {
+    if (!this.audio.current) return
+
     if (this.props.isPlaying) {
       this.audio.current.play()
         .catch(err => this.props.onError(err.message))
@@ -169,6 +173,8 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   }
 
   handleTimeUpdate = () => {
+    if (!this.audio.current) return
+
     this.props.onStatus({
       position: this.audio.current.currentTime,
     })
@@ -189,6 +195,8 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
   startCDG = () => {
     this.frameId = requestAnimationFrame(this.startCDG)
+    if (!this.audio.current) return
+
     const frame = this.cdg.render(this.audio.current.currentTime, { forceKey: true })
     if (!frame.isChanged) return
 

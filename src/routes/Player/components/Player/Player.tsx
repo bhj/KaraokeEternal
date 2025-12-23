@@ -59,7 +59,7 @@ class Player extends React.Component<PlayerProps> {
   componentDidUpdate (prevProps: PlayerProps) {
     // may have been suspended by browser if no user interaction yet
     if (this.props.isPlaying && !prevProps.isPlaying) {
-      this.audioCtx.resume()
+      this.audioCtx?.resume()
     }
 
     // prevent applying next song's RG vals prematurely
@@ -108,7 +108,9 @@ class Player extends React.Component<PlayerProps> {
       vol = vol * Math.pow(10, safeGainDb / 20) // dB to linear amplitude factor
     }
 
-    this.audioGainNode.gain.setValueAtTime(vol, this.audioCtx.currentTime)
+    if (this.audioCtx && this.audioGainNode) {
+      this.audioGainNode.gain.setValueAtTime(vol, this.audioCtx.currentTime)
+    }
   }
 
   render () {
