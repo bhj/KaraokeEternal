@@ -31,7 +31,7 @@
 }
 
 .btnAnimate {
-  animation: nav-glow 5s var(--activate-1);
+  animation: nav-glow 1s var(--activate-1);
 }
 
 @keyframes nav-glow {

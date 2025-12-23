@@ -55,12 +55,12 @@
   --btn-bg-color: hsl(var(--hue-blue), 40%, 30%);
   --btn-active-bg-color: var(--link-color);
   --btn-active-filter: drop-shadow(0 0 10px hsla(var(--hue-blue), 100%, 100%, .5));
-  --btn-activate-filter: drop-shadow(-.25rem 0 .75rem hsl(var(--hue-blue), 80%, 50%)) drop-shadow(.25rem 0 .75rem hsl(var(--hue-blue), 80%, 50%)) drop-shadow(0 0 1rem hsl(var(--hue-blue), 80%, 50%));
+  --btn-activate-filter: drop-shadow(-.25rem 0 .75rem hsl(var(--hue-blue), 80%, 50%)) drop-shadow(.25rem 0 .75rem hsl(var(--hue-blue), 80%, 50%)) drop-shadow(0 0 1rem hsla(var(--hue-blue), 80%, 50%, 0.5));
 
   --btn-danger-bg-color: hsl(var(--hue-pink), 60%, 57%);
   --btn-danger-filter: drop-shadow(0 0 10px hsla(var(--hue-pink), 100%, 100%, .5));
   --btn-danger-activate-filter:
-    drop-shadow(-5px 0 10px hsl(var(--hue-pink), 80%, 70%)) drop-shadow(5px 0 10px hsl(var(--hue-pink), 80%, 70%)) drop-shadow(0 0 10px hsl(var(--hue-pink), 80%, 70%));
+    drop-shadow(-5px 0 10px hsl(var(--hue-pink), 80%, 70%)) drop-shadow(5px 0 10px hsl(var(--hue-pink), 80%, 70%)) drop-shadow(0 0 10px hsla(var(--hue-pink), 80%, 70%, 0.5));
 
   /* UI chrome (header/footer) */
   --chrome-bg-color: hsla(var(--hue-blue), 100%, 5%, .8);
@@ -112,14 +112,14 @@
   --spring-duration: .5s;
   --spring-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --animation-text-shadow-glow: glow .25s ease-out;
-  --animation-btn-danger-activate: btn-danger-activate .1s ease-out;
+  --animation-btn-danger-activate: btn-danger-activate 1s var(--activate-1);
   --text-shadow-glow: 0 0 .25em hsl(var(--hue-pink), 100%, 50%), 0 0 .5em hsl(var(--hue-pink), 100%, 50%);
 
   --animation-btn-star: starBounce .5s var(--bounce-1);
   --bounce-1: linear(0, 0.74 5.9%, 0.911 8.5%, 0.954 9.8%, 0.969 11.1%, 0.956 12.4%, 0.919 13.7%, 0.766 16.5%, -0.246 28.6%, -0.382 31.4%, -0.449 34.2%, -0.456 35.4%, -0.452 36.6%, -0.405 39.3%, 0.012 50.9%, 0.09 54.1%, 0.131 57.3%, 0.138 59.7%, 0.127 62.4%, 0.022 72.7%, -0.011 78.2%, -0.016 82.9%, 0);
 
-  --animation-btn-activate: btn-activate 5s var(--activate-1);
-  --activate-1: linear(0, 0.027 1%, 0.206 4.8%, 0.331 7.9%, 0.437 11%, 0.532 14.3%, 0.623 18.2%, 0.7 22.3%, 0.766 26.8%, 0.821 31.6%, 0.865 36.7%, 0.902 42.4%, 0.954 56%, 0.983 73.7%, 1);
+  --animation-btn-activate: btn-activate 1s var(--activate-1);
+  --activate-1: ease-out;
 }
 
 @keyframes starBounce {
@@ -162,6 +162,6 @@
   }
 
   to {
-    filter: none;
+    filter: var(--btn-danger-filter);
   }
 }
