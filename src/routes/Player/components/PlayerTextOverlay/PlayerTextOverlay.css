@@ -6,6 +6,69 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+
+  --color-pink: hsl(var(--hue-pink), 62%, 57%);
+  --color-blue: hsl(var(--hue-blue), 90%, 50%);
+  --color-pink-glow: hsla(var(--hue-pink), 62%, 57%, 0.8);
+  --color-blue-glow: hsla(var(--hue-blue), 90%, 50%, 0.8);
+}
+
+.playButton {
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+
+  &:focus-visible {
+    outline: var(--focus-outline);
+  }
+
+  svg {
+    width: 33vh;
+    height: 33vh;
+    fill: url(#play-icon-gradient);
+    animation: bloom-pulse 6s infinite;
+    will-change: filter;
+
+    path {
+      fill: url(#play-icon-gradient);
+    }
+  }
+}
+
+.gradientStop1 {
+  --color-start: var(--color-pink);
+  --color-end: var(--color-blue);
+  animation: gradient-pulse 4s infinite;
+}
+
+.gradientStop2 {
+  --color-start: var(--color-blue);
+  --color-end: var(--color-pink);
+  animation: gradient-pulse 7s infinite;
+}
+
+@keyframes gradient-pulse {
+
+  0%,
+  100% {
+    stop-color: var(--color-start);
+  }
+
+  50% {
+    stop-color: var(--color-end);
+  }
+}
+
+@keyframes bloom-pulse {
+
+  0%,
+  100% {
+    filter: var(--drop-shadow-filter) drop-shadow(0 0 10px var(--color-pink-glow));
+  }
+
+  50% {
+    filter: var(--drop-shadow-filter) drop-shadow(0 0 20px var(--color-blue-glow));
+  }
 }
 
 .backdrop {
