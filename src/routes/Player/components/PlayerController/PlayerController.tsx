@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
@@ -14,7 +14,6 @@ interface PlayerControllerProps {
 }
 
 const PlayerController = (props: PlayerControllerProps) => {
-  const lastReplayTimeRef = useRef(0)
   const queue = useAppSelector(getRoundRobinQueue)
   const player = useAppSelector(state => state.player)
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
@@ -36,10 +35,9 @@ const PlayerController = (props: PlayerControllerProps) => {
     const nextItem = queue.entities[queueId]
     if (!nextItem) return
 
-    lastReplayTimeRef.current = Date.now()
     const history = JSON.parse(player.historyJSON)
 
-    if (queueId !== queueItem?.queueId) {
+    if (queueId !== player.queueId) {
       // reset history up to and including the replaying queueId
       const idx = history.lastIndexOf(queueId)
       if (idx !== -1) history.splice(idx)
@@ -56,7 +54,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       nextUserId: null,
       _isReplayingQueueId: null,
     })
-  }, [handleStatus, player.historyJSON, queue.entities, queueItem?.queueId])
+  }, [handleStatus, player.queueId, player.historyJSON, queue.entities])
 
   const handleLoadNext = useCallback(() => {
     const history = JSON.parse(player.historyJSON)
@@ -158,7 +156,8 @@ const PlayerController = (props: PlayerControllerProps) => {
         isVideoKeyingEnabled={!!queueItem?.isVideoKeyingEnabled}
         isWebGLSupported={player.isWebGLSupported}
         mediaId={queueItem ? queueItem.mediaId : null}
-        mediaKey={queueItem ? `${queueItem.queueId}-${lastReplayTimeRef.current}` : null}
+        mediaKey={queueItem ? queueItem.queueId : null}
+        mediaReplayKey={player._lastReplayTime}
         mediaType={queueItem ? queueItem.mediaType : null}
         mp4Alpha={player.mp4Alpha}
         onEnd={handleLoadNext}

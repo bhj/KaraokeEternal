@@ -16,7 +16,8 @@ interface PlayerProps {
   isVideoKeyingEnabled: boolean
   isWebGLSupported: boolean
   mediaId: number
-  mediaKey: string
+  mediaKey: number
+  mediaReplayKey?: number
   mediaType?: string
   mp4Alpha: number
   rgTrackGain?: number

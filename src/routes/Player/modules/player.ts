@@ -115,6 +115,7 @@ export interface PlayerState {
   _isFetching: boolean
   _isPlayingNext: boolean
   _isReplayingQueueId: number | null
+  _lastReplayTime: number
 }
 
 const initialState: PlayerState = {
@@ -139,6 +140,7 @@ const initialState: PlayerState = {
   _isFetching: false,
   _isPlayingNext: false,
   _isReplayingQueueId: null,
+  _lastReplayTime: 0,
 }
 
 const playerReducer = createReducer(initialState, (builder) => {
@@ -160,6 +162,7 @@ const playerReducer = createReducer(initialState, (builder) => {
     })
     .addCase(playerCmdReplay, (state, { payload }) => {
       state._isReplayingQueueId = payload.queueId
+      state._lastReplayTime = Date.now()
     })
     .addCase(playerCmdVolume, (state, { payload }) => {
       state.volume = payload
