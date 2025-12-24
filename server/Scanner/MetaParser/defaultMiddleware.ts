@@ -55,7 +55,7 @@ m.set('split', (ctx, next) => {
 m.set('clean parts', cleanParts([
   /^\d*\.?$/, // looks like a track number
   /^\W*$/, // all non-word chars
-  /^[a-zA-Z]{2,4}[ -]?\d{1,}/i, // 2-4 letters followed by 1 or more digits
+  /^[a-zA-Z]{2,6}[ -]?\d{1,}/i, // 2-6 letters followed by 1 or more digits
 ]))
 
 // set title
