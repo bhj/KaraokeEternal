@@ -13,6 +13,7 @@
 .media {
   margin-bottom: 1em;
   overflow-wrap: break-word;
+  line-height: normal;
 }
 
 .label {

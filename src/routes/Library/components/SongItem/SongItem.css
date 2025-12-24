@@ -65,10 +65,11 @@
 }
 
 .title {
+  overflow: hidden;
   color: var(--color-gray-9);
   font-size: 18px;
+  line-height: normal;
   text-overflow: ellipsis;
-  overflow: hidden;
 }
 
 .artist {

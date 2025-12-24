@@ -106,3 +106,17 @@ mark {
   color: inherit;
   background-color: var(--mark-bg-color);
 }
+
+/* override modern-normalize's bad defaults */
+html {
+  line-height: normal;
+}
+
+body,
+button,
+input,
+optgroup,
+select,
+textarea {
+  line-height: 1.4;
+}
