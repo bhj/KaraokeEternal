@@ -16,11 +16,9 @@
 
 .searchInput {
   align-self: stretch;
-  flex: 1;
-  margin: 0;
-  padding: 0 var(--space-s) 0 var(--space-xs) !important;
-  border: none !important;
+  padding: var(--space-xs) var(--space-s) var(--space-xs) var(--space-xs) !important;
   font-size: var(--font-size-m) !important;
+  line-height: normal;
   color: var(--text-color) !important;
   background-color: transparent !important;
   box-shadow: none !important;

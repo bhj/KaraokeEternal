@@ -55,11 +55,13 @@
 }
 
 .primary {
-  cursor: pointer;
   flex: 1;
+  align-self: stretch;
+  align-content: center;
   overflow: hidden;
   white-space: nowrap;
   margin-left: 14px;
+  cursor: pointer;
 }
 
 .title {
