@@ -4,7 +4,7 @@
 
 html {
   font: 16px/1.5 sans-serif;
-  font-size: unquote("min(max(calc(.5rem + 1vw), 16px), 22px)"); // min=16, max=22, fluid between
+  font-size: unquote("min(max(calc(.5rem + 1vw), 1rem), 1.5rem)"); // min=16, max=24, fluid between
   font-family: var(--font-family);
 }
 
@@ -109,12 +109,11 @@ hr {
   padding-bottom: 4rem;
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 960px) {
   .content {
     padding-top: 6rem;
-    padding-left: 2rem;
-    max-width: 60rem;
-    margin-left: 20rem;
+    max-width: 1440px;
+    margin-left: 22rem;
     margin-right: 0;
   }
 }
@@ -122,19 +121,19 @@ hr {
 /*
  * Sidebar
  */
-@media (min-width: 60rem) {
+@media (min-width: 960px) {
   .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     padding-top: 3rem;
-    width: 20rem;
+    width: 22rem;
     overflow-y: scroll;
 
     nav {
       display: block;
-      margin: 1.5rem;
+      margin: 2rem;
       padding: 0;
     }
   }
@@ -186,13 +185,8 @@ nav li.active>a {
 }
 
 /* Level 2 active items (parents of TOC) */
-nav>ul>li>ul>li.active>a {
+nav>ul>li>ul>li:has(.active).active>a {
   background-color: var(--nav-parent-bg-color);
-}
-
-/* Level 3 active items (TOC items) */
-nav>ul>li>ul>li>ul>li.active>a {
-  background-color: var(--info-bg-color);
 }
 
 .nav-item {
@@ -382,7 +376,7 @@ figure {
   object-fit: contain;
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 960px) {
   ul.screenshots {
     margin-left: 5vw;
     margin-right: 5vw;

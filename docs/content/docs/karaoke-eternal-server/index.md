@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 {{< /highlight >}}
 
-At a minimum, replace `<path_to_database>`, `<path_to_media>` and `<host_port>` with the desired values. See the [CLI & ENV]({{< ref "docs/karaoke-eternal-server#cli--env" >}}) section for the full list of available environment settings.
+At a minimum, replace `<path_to_database>`, `<path_to_media>` and `<host_port>` with the desired values. See the [CLI & ENV]({{< ref "docs/karaoke-eternal-server#cli--env" >}}) section for additional environment settings.
 
 Once the container is running, see [Getting Started]({{< ref "docs/getting-started" >}}) if you're new to Karaoke Eternal.
 
@@ -141,7 +141,7 @@ Field templates are defined using [JSON-e syntax](https://json-e.js.org){{% icon
 {{< /highlight >}}
 
 {{< highlight js >}}
-// remove the text "junk" from anywhere in the parsed artist field
+// remove "junk" from anywhere in the parsed artist field
 {
   artist: {
     $eval: 'replace(artist, "junk", "")'
@@ -150,8 +150,8 @@ Field templates are defined using [JSON-e syntax](https://json-e.js.org){{% icon
 {{< /highlight >}}
 
 {{< highlight js >}}
-// remove the word "junk" case-insensitively from the start of the parsed artist field (regex syntax)
-// the double-backslash resolves to a single backslash in the string
+// remove "junk" case-insensitively from the start of the parsed artist field (regex syntax)
+// note: double backslash escapes to a single backslash
 {
   artist: {
     $eval: 'replace(artist, "^junk\\s", "i", "")'
@@ -192,17 +192,19 @@ Karaoke Eternal Server supports the following CLI options and environment variab
 
 ## File Locations
 
-The default locations for the database (`database.sqlite3`), web server log (`server.log`) and media scanner log (`scanner.log`) are as follows:
+If using the Docker image, the database will be located in the folder you mapped to the container's `/config` folder. The container doesn't write log files by default; use the [Docker logs](https://docs.docker.com/reference/cli/docker/container/logs/) command instead to see the container's output.
 
-### macOS
-
- - Database: `~/Library/Application Support/Karaoke Eternal Server`
- - Logs: `~/Library/Logs/Karaoke Eternal Server`
+If using the `npm` installation method, the default locations for the database (`database.sqlite3`), web server log (`server.log`) and media scanner log (`scanner.log`) are as follows:
 
 ### Windows
 
 - Database: `%USERPROFILE%\AppData\Roaming\Karaoke Eternal Server`
 - Logs: `%USERPROFILE%\AppData\Roaming\Karaoke Eternal Server\logs`
+
+### macOS
+
+ - Database: `~/Library/Application Support/Karaoke Eternal Server`
+ - Logs: `~/Library/Logs/Karaoke Eternal Server`
 
 ### Linux
 
