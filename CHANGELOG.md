@@ -1,4 +1,4 @@
-## v2.0.0-beta.4
+## v2.0.0 (2025-12-26)
 
 **Sponsored by**: [candre23](https://github.com/candre23), [nellisdev](https://github.com/nellisdev), [astrobyte](https://github.com/astrobyte), [jfeldhamer](https://github.com/jfeldhamer), [cubandaddy](https://github.com/cubandaddy), [Backroads4Me](https://github.com/Backroads4Me) and other private sponsors. Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
 
@@ -35,7 +35,7 @@ In v2, the parser instead uses `_kes.v2.json` files. These JSON files allow the 
 - **(Player)** Fixed incorrect calculation of ReplayGain values (thanks **laberning**)
 - **(General)** Prevent auto-translation of some UI elements (thanks **laberning**)
 
-This release includes contributions from [gazugafan](https://github.com/gazugafan), (gausie)[https://github.com/gausie], [EffakT](https://github.com/EffakT) and [laberning](https://github.com/laberning), as well as testing by **mjmeans**. Thanks!
+This release includes contributions from [gazugafan](https://github.com/gazugafan), [gausie](https://github.com/gausie), [EffakT](https://github.com/EffakT) and [laberning](https://github.com/laberning), as well as testing by **mjmeans**. Thanks!
 
 ## v1.0.0 (2022-05-17)
 
