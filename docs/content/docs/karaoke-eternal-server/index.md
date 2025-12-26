@@ -1,142 +1,94 @@
 ---
 title: Karaoke Eternal Server
 description: Documentation for Karaoke Eternal Server
-resources:
-- src: 'server-macos.png'
-- src: 'server-windows.png'
 ---
 
-The server hosts the web app and your media files, and can run on pretty much anything, including a Windows PC, Mac, or a dedicated server like a Raspberry Pi or Synology NAS.
+The server hosts the web app and your media files, and can run on pretty much anything including a Raspberry Pi, NAS or Windows/Mac/Linux desktop. Since the [player]({{< ref "docs/karaoke-eternal-app#player" >}}) is fully browser-based, it doesn't need to run on the same system as the server, but it can.
 
-Note that because the <a href="{{< ref "docs/karaoke-eternal-app#player" >}}">player</a> is fully browser-based, it doesn't need to run on the same system as the server, but it can.
+## Installation
 
-# Installation
+Karaoke Eternal Server is available as both a Docker image and an `npm` package. Both options are multi-platform and multi-architecture (64-bit required).
 
-- <a href='{{< ref "docs/karaoke-eternal-server#windows-and-macos" >}}'>Windows and macOS</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#docker-cli-and-compose-v2" >}}'>Docker (CLI and Compose v2)</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#docker-synology-nas" >}}'>Docker (Synology NAS)</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#npm" >}}'>NPM</a>
+- [Docker]({{< ref "docs/karaoke-eternal-server#docker" >}})
+- [NPM]({{< ref "docs/karaoke-eternal-server#npm" >}})
 
-### Windows and macOS
+### Docker
 
-The <a href="{{% baseurl %}}download">Releases page</a>{{% icon-external %}} has the latest packages available for Windows and macOS. Once started, Karaoke Eternal Server will appear in the tray or menu bar:
+Docker is the preferred way to run Karaoke Eternal Server if you're using a dedicated server or NAS. The [Karaoke Eternal docker image](https://hub.docker.com/r/radrootllc/karaoke-eternal) is modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers) images and supports both `amd64` and `arm64`.
 
-<div class="row">
-  {{% img "server-windows.png" "Karaoke Eternal Server (Windows)" "1x" /%}}
-  {{% img "server-macos.png" "Karaoke Eternal Server (macOS)" "1x" /%}}
-</div>
+The easiest way to use the Docker image is via a [Compose](https://docs.docker.com/compose/) file, which is a simple YAML format for configuring your container.
 
-<aside class="info">
-  {{% icon-info %}}
-  <p>These packages are not currently signed. On macOS, <strong>do not</strong> disable Gatekeeper; simply right-click <code>Karaoke Eternal Server.app</code> in your Applications folder and choose Open. On Windows, click More Info and then Run Anyway.</p>
-</aside>
-
-<aside class="info">
-  {{% icon-info %}}
-  <p>The server chooses a random port at startup unless <a href="#cli--env">otherwise specified</a>.</p>
-</aside>
-
-See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
-
-### Docker (CLI and Compose V2)
-
-The [Karaoke Eternal docker image](https://hub.docker.com/r/radrootllc/karaoke-eternal) supports `amd64`, `arm64` and `arm/v7`. It's modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers) images:
-
-  - `/config` should be mapped to a host volume (the database will be stored here)
-  - media folder(s) should be mapped to host volume(s) (once inside the app, you'll add these as <a href="{{< ref "docs/karaoke-eternal-app#preferences-admin-only" >}}">Media Folders</a>)
-  - port `8080` should be published to the desired host port
-  - `PUID`, `PGID` and `TZ` environment variables are optional
-
-Example CLI usage:
-
-{{< highlight shell >}}
-  $ docker run \
-    --name=karaoke-eternal \
-    -v <path_to_database>:/config \
-    -v <path_to_media>:/mnt/karaoke \
-    -p <host_port>:8080 \
-    --restart unless-stopped \
-    radrootllc/karaoke-eternal
-{{< /highlight >}}  
-
-Example `docker compose` usage:
+Below is an example `docker compose` file:
 
 {{< highlight yaml >}}
 services:
   karaoke-eternal:
-    image: radrootllc/karaoke-eternal
     container_name: karaoke-eternal
+    image: radrootllc/karaoke-eternal
     volumes:
+      # Folder where the Karaoke Eternal Server database will be created
       - <path_to_database>:/config
+      # Folder(s) containing your media 
+      # (inside the app, you'll add /mnt/karaoke to Media Folders)
       - <path_to_media>:/mnt/karaoke
     ports:
+      # Web server port
       - <host_port>:8080
+    # environment:
+    #   - PUID=1000 # optional: user ID to run as
+    #   - PGID=1000 # optional: group ID to run as
+    #   - TZ=America/New_York # optional: timezone
     restart: unless-stopped
-{{< /highlight >}}  
+{{< /highlight >}}
 
-See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
+At a minimum, replace `<path_to_database>`, `<path_to_media>` and `<host_port>` with the desired values. See the [CLI & ENV]({{< ref "docs/karaoke-eternal-server#cli--env" >}}) section for the full list of available environment settings.
 
-### Docker (Synology NAS)
-
-This assumes your Synology DiskStation is running DSM 7.2 or later.
-
-1. In Package Center, open Container Manager.
-    - If Container Manager doesn't appear in the "Installed" section, install it from the "All Packages" section.
-2. In the Registry section, search for and download the `radrootllc/karaoke-eternal` image.
-3. In the Image section, select the `radrootllc/karaoke-eternal` image and click Run.
-4. At the **General Settings** page of the container creation dialog:
-    - Choose `Enable auto-restart` (if desired)
-    - Click Next.
-5. At the **Advanced Settings** page:
-
-<div class="row">
-  {{% img "server-synology.png" "Create Container > Advanced Settings " /%}}
-</div>
-
-  - **Port Settings**
-    - Set the Local Port to `8080` or another if desired (this will be the port used when browsing to the app URL)
-  - **Volume Settings**
-    - Click Add Folder, select `docker` and create a new `karaoke-eternal` subfolder. Select that subfolder and click Select, then map it to `/config`. This path will be used to store the database.
-    - Click Add Folder again, and this time select your media folder. Map it to `/mnt/karaoke` (once inside the app, you'll add this path in <a href="{{< ref "docs/karaoke-eternal-app#preferences-admin-only" >}}">Media Folders</a>.
-  - Click Next.
-
-6. Click Done.
-    - Karaoke Eternal Server will run and you should be able to browse to the app URL at `http://<your_synology_ip>:8080` (or whichever Local Port you chose in step 5)
-
-See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
+Once the container is running, see [Getting Started]({{< ref "docs/getting-started" >}}) if you're new to Karaoke Eternal.
 
 ### NPM
 
-Karaoke Eternal is available as an `npm` package for systems running [Node.js](https://nodejs.org){{% icon-external %}} 16 or later.
+Karaoke Eternal Server is also available as an `npm` package:
 
-1. Install via ```npm```
+1. Install [Node.js](https://nodejs.org){{% icon-external %}} v24 or later if it's not already installed.
 
-{{< highlight shell >}}
-  $ npm i -g karaoke-eternal
-{{< /highlight >}}
-
-2. Start the server
+2. In your terminal or command prompt, run the following:
 
 {{< highlight shell >}}
-  $ karaoke-eternal-server
+npm i -g karaoke-eternal
 {{< /highlight >}}
 
-3. Look for "Web server running at..." and browse to the **server URL**.
+<aside class="info">
+  {{% icon-info %}}
+  <p>In the above command, <code>i</code> is short for "install", and <code>-g</code> means "global" so that the command in the next step will work everywhere.</p>
+</aside>
 
-See <a href="{{< ref "docs/getting-started" >}}">Getting Started</a> if you're new to Karaoke Eternal.
+3. Start the server by running:
+
+{{< highlight shell >}}
+karaoke-eternal-server
+{{< /highlight >}}
+
+<aside class="info">
+  {{% icon-info %}}
+  <p>The server chooses a random port at startup unless <a href="#cli--env">otherwise specified</a>. For example, to use port 8888, run <code>karaoke-eternal-server --port 8888</code></p>
+</aside>
+
+4. Look for "Web server running at..." and browse to that **server URL**.
+
+See [Getting Started]({{< ref "docs/getting-started" >}}) if you're new to Karaoke Eternal.
 
 ## Media Files
 
-The following types are supported:
+The following file types are supported:
 
 - [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (including zipped; also supports .m4a instead of .mp3)
-- MP4 video (codec support can vary depending on the browser running the <a href="{{< ref "docs/karaoke-eternal-app#player" >}}">player</a>).
+- MP4 video (codec support can vary depending on the browser running the [player]({{< ref "docs/karaoke-eternal-app#player" >}}))
 
-Your media files should be named in **"Artist - Title"** format by default (you can [configure this](#configuring-the-metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
+Karaoke Eternal Server expects your media files to be named in **"Artist - Title"** format by default (you can [configure this](#metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
 
 ## Metadata Parser
 
-You can customize Karaoke Eternal's metadata parser by creating a file named `_kes.v2.json` in a media folder. It will apply to all media files in the folder, including subfolders. If any subfolders contain their own `_kes.v2.json` file, that will take precedence instead. These files can be in JSON or JSON5 format - JSON5 is used in the examples below since it's friendlier for humans.
+You can customize the metadata parser by creating a file named `_kes.v2.json` in a media folder. It will apply to all media files in the folder, including subfolders. If any subfolders contain their own `_kes.v2.json` file, that will take precedence instead. These files can be in JSON or JSON5 format - JSON5 is used in the examples below since it's friendlier for humans.
 
 ### Basic Configuration
 
@@ -144,9 +96,14 @@ At the most basic, your `_kes.v2.json` file can alter some or all of the parser'
 
 {{< highlight js >}}
 {
-  articles: ['A', 'An', 'The'], // used to normalize artist/title; set false to disable
-  artistOnLeft: true, // assumes filenames are in "Artist - Title" format
-  delimiter: '-', // assumes a hyphen separates the artist and title 
+  // used to normalize artist/title; set false to disable
+  articles: ['A', 'An', 'The'],
+
+  // assumes filenames are in "Artist - Title" format
+  artistOnLeft: true,
+
+  // assumes a hyphen separates the artist and title 
+  delimiter: '-',
 }
 {{< /highlight >}}
 

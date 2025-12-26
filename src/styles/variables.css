@@ -36,7 +36,7 @@
   --container-padding: 12px;
 
   --bg-color: hsl(var(--hue-blue), 40%, 2%);
-  --text-color: hsl(var(--hue-blue), 10%, 80%);
+  --text-color: var(--color-gray-8);
   --link-color: hsl(var(--hue-blue), 92%, 69%);
   --mark-bg-color: hsl(var(--hue-blue), 50%, 30%);
 

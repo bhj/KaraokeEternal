@@ -1,16 +1,23 @@
 <ul class="screenshots">
-{{ with .Site.GetPage "docs/karaoke-eternal-app" }}
-  {{ range sort ((.Resources.ByType "image").Match "app-*") ".Params.galleryOrder" }}
-    {{ if .Params.galleryOrder }}
+  {{ with .Site.GetPage "docs/karaoke-eternal-app" }}
+    {{ $images := (.Resources.ByType "image").Match "app-*" }}
+    {{ $sorted := slice }}
+    {{ range $images }}
+      {{ if .Params.galleryOrder }}
+        {{ $sorted = $sorted | append . }}
+      {{ end }}
+    {{ end }}
+    {{ range sort $sorted ".Params.galleryOrder" "asc" }}
       <li>
-        <a href="#{{ anchorize (.RelPermalink) }}">
-          <img srcset="{{.Permalink }} 2x" src="{{.Permalink }}" alt="{{.Title }}" width="{{.Width }}" height="{{.Height }}"/>
+        <a href="#{{ anchorize (.RelPermalink) }}" class="screenshot-link">
+          <img srcset="{{.Permalink }} 2x" src="{{.Permalink }}" alt="{{.Title }}" width="{{.Width }}"
+            height="{{.Height }}" />
         </a>
         <a href="#_" class="overlay" id="{{ anchorize (.RelPermalink) }}">
-          <img srcset="{{.Permalink }} 2x" src="{{.Permalink }}" alt="{{.Title }}" width="{{.Width }}" height="{{.Height }}"/>
+          <img srcset="{{.Permalink }} 2x" src="{{.Permalink }}" alt="{{.Title }}" width="{{.Width }}"
+            height="{{.Height }}" />
         </a>
       </li>
     {{ end }}
   {{ end }}
-{{ end }}
 </ul>

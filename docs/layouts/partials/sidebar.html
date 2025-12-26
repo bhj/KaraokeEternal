@@ -1,4 +1,4 @@
-{{ $lastSeg := index (last 1 (split (delimit (split .Permalink "/") "," "") ",")) 0 }}
+{{ $lastSeg := path.Base .RelPermalink }}
 <div class="sidebar">
   <header>
     <div class="logo">
@@ -7,16 +7,12 @@
       </a>
       <div class="tagline">Open karaoke party system</div>
     </div>
-    <ul class="github">
-      <li>
-        <a class="github-button" href="{{ .Site.BaseURL }}download" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-cloud-download" data-size="large" aria-label="Download Karaoke Eternal on GitHub">Download</a>
-        <a class="github-button" href="{{ .Site.BaseURL }}repo" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-star" aria-label="Star Karaoke Eternal on GitHub">Star</a>
-        <a class="github-button" href="{{ .Site.BaseURL }}sponsor" data-size="large" data-color-scheme="no-preference: dark; light: dark;" data-icon="octicon-heart" aria-label="Sponsor @bhj on GitHub">Sponsor</a>
-      </li>
-    </ul>
-    <div id="btn-nav" class="active" onclick="toggleNav()">
+
+    {{ partial "github-buttons.html" . }}
+
+    <div id="btn-nav" class="active">
       <svg class="icon" viewBox="0 0 24 24">
-        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
       </svg>
     </div>
   </header>
@@ -24,28 +20,32 @@
   <nav class="active">
     <ul>
       <li class="{{ if .IsHome }} active{{ end }}">
-        <a  href="{{ .Site.BaseURL }}">Overview</a>
+        <a href="{{ .Site.BaseURL }}">Overview</a>
       </li>
       <li>
         <a rel="external" href="{{ .Site.BaseURL }}repo">GitHub</a>
         <svg class="icon external" viewBox="0 0 24 24">
-          <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+          <path
+            d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
         </svg>
       </li>
       <li>
         <a rel="external" href="{{ .Site.BaseURL }}discord">Discord</a>
         <svg class="icon external" viewBox="0 0 24 24">
-          <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+          <path
+            d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
         </svg>
       </li>
-      <li class="{{ if eq $lastSeg "faq"}} active{{ end }}">
+      <li class="{{ if eq .RelPermalink "/faq/" }} active{{ end }}">
         <a href="{{ .Site.BaseURL }}faq/">F.A.Q.</a>
       </li>
-      <li class="{{ if eq $lastSeg "docs"}} active{{ end }}">
+      <li class="{{ if eq .RelPermalink "/docs/" }} active{{ end }}">
         <a href="{{ .Site.BaseURL }}docs/">Documentation</a>
         <ul>
-          <li class="{{ if eq $lastSeg "getting-started"}} active{{ end }}"><a href="{{ .Site.BaseURL }}docs/getting-started/">Getting Started</a></li>
-          <li class="{{ if eq $lastSeg "karaoke-eternal-app"}} active{{ end }}"><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/">Karaoke Eternal</a> <span>(the app)</span>
+          <li class="{{ if eq $lastSeg "getting-started" }} active{{ end }}"><a
+              href="{{ .Site.BaseURL }}docs/getting-started/">Getting Started</a></li>
+          <li class="{{ if eq $lastSeg "karaoke-eternal-app" }} active{{ end }}"><a
+              href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/">Karaoke Eternal <span>(the app)</span></a>
             <ul id="karaoke-eternal-app-toc">
               <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/#library">Library</a></li>
               <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/#queue">Queue</a></li>
@@ -54,7 +54,8 @@
               <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/#player">Player</a></li>
             </ul>
           </li>
-          <li class="{{ if eq $lastSeg "karaoke-eternal-server"}} active{{ end }}"><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/">Karaoke Eternal Server</a>
+          <li class="{{ if eq $lastSeg "karaoke-eternal-server" }} active{{ end }}"><a
+              href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/">Karaoke Eternal Server</a>
             <ul id="karaoke-eternal-server-toc">
               <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/#installation">Installation</a></li>
               <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/#media-files">Media Files</a></li>

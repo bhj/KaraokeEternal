@@ -5,22 +5,17 @@ description: Getting started with Karaoke Eternal and Karaoke Eternal Server
 
 You'll want to have a few things to get started with Karaoke Eternal:
 
-- **Songs**: Karaoke Eternal supports MP4 video files as well as MP3 audio files that have lyrics in an accompanying CDG file (commonly known as [MP3+G](https://en.wikipedia.org/wiki/MP3%2BGz){{% icon-external %}}). See the <a href='{{< ref "faq#where-can-i-download-karaoke-songs" >}}'>F.A.Q.</a> if you're looking for songs!
+- **Songs**: Karaoke Eternal supports MP4 video files as well as MP3 audio files that have lyrics in an accompanying CDG file (commonly known as [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}}). See the <a href='{{< ref "faq#where-can-i-download-karaoke-songs" >}}'>F.A.Q.</a> if you're looking for songs!
 
-- **Server**: This can be a Windows PC, Mac, or a dedicated server like a Raspberry Pi or Synology NAS. Karaoke Eternal Server runs on pretty much anything to serve the web app and your media files.
+- **Server**: This can be a Windows PC, Mac, or a dedicated server like a Raspberry Pi or NAS. Karaoke Eternal Server runs on pretty much anything to serve the web app and your media files.
 
-- **Player**: This will be the system that runs Karaoke Eternal's player in a browser and is connected to your display and speakers. It could be the same system that runs the server, but because the player is fully browser-based it doesn't need to be.
+- **Player**: This will be the system that is connected to your display and speakers, running Karaoke Eternal's player in a browser. It could be the same system as the server, but because the player is fully browser-based it doesn't need to be.
 
-Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the <a href='{{< ref "faq#whats-the-recommended-audiomicrophone-setup" >}}'>F.A.Q.</a> for more information.
+Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the <a href='{{< ref "faq#recommended-audio-microphone-setup" >}}'>F.A.Q.</a> for more information.
 
 ## 1. Install Karaoke Eternal Server
 
-On the system that will serve the web app and your media files, install and run Karaoke Eternal Server. There are a few installation methods available, so jump to the instructions for your preferred one below, then head back here when finished:
-
-- <a href='{{< ref "docs/karaoke-eternal-server#windows-and-macos" >}}'>Windows and macOS</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#docker-synology-nas" >}}'>Docker (Synology NAS)</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#docker-cli-and-docker-compose" >}}'>Docker (CLI and docker-compose)</a>
-- <a href='{{< ref "docs/karaoke-eternal-server#npm" >}}'>NPM</a>
+On the system that will serve the web app and your media files, <a href='{{< ref "docs/karaoke-eternal-server#installation" >}}'>install and run Karaoke Eternal Server</a>, then head back here and continue.
 
 ## 2. Browse to the Server URL
 
@@ -30,13 +25,6 @@ Once the server is running, browse to the web app at the **server URL**.
   {{% icon-info %}}
   <p>Since the app is designed for mobile, it's recommended to use your phone for the best experience once you're finished with the initial setup here.</p>
 </aside>
-
-If you're using the Windows or macOS package, you can open or copy the server URL using the tray or menu icon:
-
-<div class="row">
-  {{% img "server-macos.png" "Karaoke Eternal Server (macOS)" "1x" /%}}
-  {{% img "server-windows.png" "Karaoke Eternal Server (Windows)" "1x" /%}}
-</div>
 
 ## 3. Create Admin Account
 
@@ -88,12 +76,13 @@ By now you've probably noticed a **"No player in room"** message at the top of t
 
 Now that there's a player in the room, playback and display controls will appear. Admins will always see these, as well as the user who is currently singing.
 
-Go ahead and press play to start the party!
+Go ahead and press play in the player to start the party!
 
 <aside class="info">
   {{% icon-info %}}
-  <p>Starting playback inside the player (rather than on a remote device) helps avoid browser auto-play restrictions. These can also be disabled.</p>
+  <p>Starting playback inside the player (rather than on a remote device) helps avoid browser auto-play restrictions. See the <a href="{{< ref "faq#enabling-autoplay" >}}">F.A.Q.</a> for more on how to enable auto-play in your browser.</p>
 </aside>
+
 
 ## 7. Next Steps
 

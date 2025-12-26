@@ -1,32 +1,17 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  {{ partial "head.html" . }}
-  <body>
-    {{ partial "sidebar.html" . }}
-    <div class="content container">
-      {{ block "main" . }}
-      {{ end }}
-    </div>
-    <script src='{{ (resources.Get "js/buttons.min.js").Permalink }}'></script>
-    <script src='{{ (resources.Get "js/gumshoe.min.js").Permalink }}'></script>
-    <script>
-      const segs = new URL(document.URL).pathname.split('/').filter(s => !!s)
-      let btn, nav
+{{ partial "head.html" . }}
 
-      document.addEventListener("DOMContentLoaded", e => {
-        btn = document.getElementById('btn-nav')
-        nav = document.getElementsByTagName('nav')[0]
-        toggleNav()
+<body>
+  {{ partial "sidebar.html" . }}
+  <div class="content container">
+    {{ block "main" . }}
+    {{ end }}
+  </div>
+  <script src='{{ (resources.Get "js/gumshoe.min.js").Permalink }}'></script>
+  <script src='{{ (resources.Get "js/main.js").Permalink }}'></script>
+  <script src='{{ (resources.Get "js/copy-code.js").Permalink }}'></script>
+  {{ partial "footer.html" . }}
+</body>
 
-        // init nav highlighter if we're in docs
-        if (segs[0] === 'docs') new Gumshoe(`#${segs[1]}-toc a`)
-      })
-
-      function toggleNav () {
-        btn.classList.toggle('active')
-        nav.classList.toggle('active')
-      }
-    </script>
-    {{ partial "footer.html" . }}
-  </body>
 </html>

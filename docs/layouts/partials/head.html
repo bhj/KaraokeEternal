@@ -7,18 +7,11 @@
   <title>{{ if .Params.seoTitle }}{{ .Params.seoTitle }}{{ else }}{{ .Site.Title }} | {{ .Title }}{{ end }}</title>
   <style>
     @font-face {
-      font-family: 'Raleway';
-      font-style: normal;
-      font-weight: 200;
-      src: local('Raleway ExtraLight'), local('Raleway-ExtraLight'),
-           url('{{ (resources.Get "fonts/raleway-v14-latin-200.woff2").Permalink }}') format('woff2');
-    }
-    @font-face {
       font-family: 'Beon';
       font-style: normal;
       font-weight: normal;
       src: local('Beon'),
-           url('{{ (resources.Get "fonts/beon.woff2").Permalink }}') format('woff2');
+      url('{{ (resources.Get "fonts/beon.woff2").Permalink }}') format('woff2');
     }
   </style>
   {{ $style := resources.Get "css/style.scss" | toCSS | minify | fingerprint }}

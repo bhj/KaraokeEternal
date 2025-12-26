@@ -1,0 +1,14 @@
+{{ define "main" }}
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+
+  {{ range .Pages.GroupByParam "category" }}
+    <h2>{{ .Key }}</h2>
+    {{ range .Pages.ByWeight }}
+      <details id="{{ .File.TranslationBaseName }}">
+        <summary><span>{{ .Title }}</span></summary>
+        {{ .Content }}
+      </details>
+    {{ end }}
+  {{ end }}
+{{ end }}

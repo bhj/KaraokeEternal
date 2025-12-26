@@ -21,15 +21,15 @@
     "npm": ">=11"
   },
   "scripts": {
+    "docs:serve": "hugo serve --source docs -b http://localhost:1313 --bind 0.0.0.0",
+    "dev": "NODE_ENV=development tsx watch server/main.ts -p 3000",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development tsx watch server/main.ts -p 3000",
     "build": "npm run build:server ; npm run build:client",
     "build:client": "webpack --config config/webpack.config.js",
     "build:server": "rm -rf build/server ; tsc -p config/tsconfig.server.json --noEmitOnError false ; mkdir -p build/server/lib ; cp -R server/lib/schemas build/server/lib/",
     "serve": "node build/server/main.js",
-    "serve:docs": "hugo serve --source docs -b http://$(hostname) --bind 0.0.0.0",
     "server": "npm run serve"
   },
   "files": [

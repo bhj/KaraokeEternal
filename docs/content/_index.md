@@ -9,31 +9,31 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 {{< screenshots >}}
 
 <p style="text-align: center;">
-  <i>App in mobile browser (top) controlling player in Firefox/Chrome (bottom)</i>
+  <i>App in mobile browser (top) controlling player in desktop browser (bottom)</i>
 </p>
 
 ## Features
 
-- Supports:
-  - MP3+G with Winamp/MilkDrop visualizations (WebGL 2)
+- Plays:
+  - MP3+G (MP3 with CDG lyrics; including zipped)
   - MP4 videos
-  - ReplayGain tags for volume normalization
+  - Music-synced visualizations (with automatic lyrics background removal)
 - Fast, modern mobile browser app designed for "karaoke conditions"
+- Easy joining with QR codes and guest accounts
 - Multiple simultaneous rooms/queues (optionally password-protected)
 - Dynamic queues keep parties fair, fun and no-fuss
 - Fully self-hosted
 - No ads or telemetry
 
-Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the <a href='{{< ref "faq.md/#whats-the-recommended-audiomicrophone-setup" >}}'>F.A.Q.</a> for more information.
+Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the <a href='{{< ref "faq.md/#recommended-audio-microphone-setup" >}}'>F.A.Q.</a> for more information.
 
 ## Getting Started
 
  Karaoke Eternal basically has 3 parts. See <a href='{{< ref "docs/getting-started" >}}'>Getting Started</a> to get up and running step-by-step, or jump to the documentation for each part below:
 
-- **<a href='{{< ref "docs/karaoke-eternal-server" >}}'>Server:</a>** Runs on pretty much anything to serve the web app and your media files, including a Windows PC, Mac, or a dedicated server like a Raspberry Pi or Synology NAS.
+- **<a href='{{< ref "docs/karaoke-eternal-server" >}}'>Server:</a>** Runs on pretty much anything to serve the web app and your media files.
 - **<a href='{{< ref "docs/karaoke-eternal-app" >}}'>App:</a>** Fast, modern mobile web app designed for "karaoke conditions".
 - **<a href='{{< ref "docs/karaoke-eternal-app/#player" >}}'>Player:</a>** Just another part of the app, but meant to run fullscreen on the system handling audio/video for a <a href='{{< ref "docs/karaoke-eternal-app/#rooms-admin-only" >}}'>room</a>.
-
 
 ## Installation
 

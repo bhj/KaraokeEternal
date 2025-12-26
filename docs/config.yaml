@@ -3,8 +3,9 @@ languageCode: en-us
 title: Karaoke Eternal
 permalinks:
   page: "/:slug/"
-pygmentsStyle: solarized-dark256
 markup:
+  highlight:
+    style: github-dark
   goldmark:
     renderer:
       unsafe: true
