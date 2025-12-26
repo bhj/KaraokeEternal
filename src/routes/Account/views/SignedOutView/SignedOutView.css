@@ -17,7 +17,8 @@
   font-size: 30px;
 
   @media (min-width: 42em) {
-    margin: var(--space-xl) 0;
+    margin-top: var(--space-xl);
+    margin-bottom: calc(var(--space-xl) * 2);
     font-size: 36px;
   }
 }
