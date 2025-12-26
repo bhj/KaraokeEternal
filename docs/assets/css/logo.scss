@@ -33,7 +33,7 @@
   text-transform: uppercase;
   display: block;
   letter-spacing: .9em;
-  border: .1em solid hsl(var(--hue-blue), 100%, 90%);
+  border: .1em solid transparent;
   border-radius: .25em;
   padding: .25em;
   text-shadow:
@@ -41,6 +41,10 @@
     0 0 .25em hsl(var(--hue-blue), 100%, 90%),
     0 0 .25em hsl(var(--hue-blue), 100%, 50%),
     0 0 .5em hsl(var(--hue-blue), 100%, 50%);
+}
+
+.fonts-loaded .logo-eternal {
+  border-color: hsl(var(--hue-blue), 100%, 90%);
   box-shadow:
     0 0 .1em hsl(var(--hue-blue), 100%, 90%),
     0 0 .25em hsl(var(--hue-blue), 100%, 90%),
@@ -61,9 +65,9 @@
   text-shadow: var(--text-shadow-glow);
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 960px) {
   .logo {
-    font-size: 36px;
+    font-size: 1.75rem;
   }
 
   .logo a {

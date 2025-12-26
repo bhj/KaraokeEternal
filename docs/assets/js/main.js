@@ -21,6 +21,15 @@
       toggleNav()
     }
 
+    // Wait for font to load before showing logo effects
+    if (document.fonts) {
+      document.fonts.load('1em Beon').then(() => {
+        document.documentElement.classList.add('fonts-loaded')
+      })
+    } else {
+      document.documentElement.classList.add('fonts-loaded')
+    }
+
     // init nav highlighter if we're in docs
     if (segs[0] === 'docs' && typeof Gumshoe !== 'undefined') {
       new Gumshoe(`#${segs[1]}-toc a`)
