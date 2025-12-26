@@ -5,22 +5,23 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
 [![Karaoke Eternal](/docs/assets/images/README.jpg?raw=true)](/docs/assets/images/README.jpg?raw=true)
 
 <p align="center">
-  <i>App in mobile browser (top) controlling player in Firefox/Chrome (bottom)</i>
+  <i>App in mobile browser (top) controlling player in desktop browser (bottom)</i>
 </p>
 
 ## Features
 
-- Supports:
-  - MP3+G with Winamp/MilkDrop visualizations (WebGL 2)
+- Plays:
+  - MP3+G (MP3 with CDG lyrics; including zipped)
   - MP4 videos
-  - ReplayGain tags for volume normalization
+  - Music-synced visualizations (with automatic lyrics background removal)
 - Fast, modern mobile browser app designed for "karaoke conditions"
+- Easy joining with QR codes and guest accounts
 - Multiple simultaneous rooms/queues (optionally password-protected)
 - Dynamic queues keep parties fair, fun and no-fuss
 - Fully self-hosted
 - No ads or telemetry
 
-Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the [F.A.Q.](https://www.karaoke-eternal.com/faq/#whats-the-recommended-audiomicrophone-setup) for more information.
+Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the [F.A.Q.](https://www.karaoke-eternal.com/faq/#recommended-audio-microphone-setup) for more information.
 
 ## Getting Started
 
@@ -42,7 +43,7 @@ Join the [Karaoke Eternal Discord Server](https://discord.gg/PgqVtFq) for genera
 
 Contributions are welcome! Please join the `#dev` channel of the [Discord Server](https://discord.gg/PgqVtFq) before embarking on major features; the project's scope is limited to ensure success.
 
-Make sure you have [Node.js](https://nodejs.org/en/) 16 or later, then:
+Make sure you have [Node.js](https://nodejs.org/en/) v24 or later, then:
 
 1. Fork and clone the repo
 2. `npm i`
