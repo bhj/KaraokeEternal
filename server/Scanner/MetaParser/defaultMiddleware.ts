@@ -154,7 +154,7 @@ function normalizeStr (str, articles) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(' & ', ' and ') // normalize ampersand
-    .replace(/[^\w\s]|_/g, '') // remove punctuation
+    .replace(/[^\p{L}\p{N}\s\p{M}]/gu, '') // remove punctuation
 
   return str
 }
