@@ -62,7 +62,7 @@ class FileScanner extends Scanner {
 
         // (re)init parser with this folder's config, if any
         const cfg = getConfig(curDir, dir)
-        this.parser = new MetaParser(cfg)
+        this.parser = MetaParser(cfg)
       }
 
       log.info('[%s/%s] %s', i + 1, files.length, files[i].file)

@@ -34,57 +34,55 @@ function getDefaultParser (cfg: { articles?: string[] } = {}) {
   }
 }
 
-class MetaParser {
-  constructor (userCfg = {}) {
-    const parserCfg = {}
-    const template = {}
+const MetaParser = (userCfg = {}) => {
+  const parserCfg = {}
+  const template = {}
 
-    // we accept parser config and JSON-e template items (both
-    // user-supplied) in a flat object format; separate them here
-    for (const [key, val] of Object.entries(userCfg)) {
-      if (parserCfgProps.includes(key)) parserCfg[key] = val
-      else template[key] = val
+  // we accept parser config and JSON-e template items (both
+  // user-supplied) in a flat object format; separate them here
+  for (const [key, val] of Object.entries(userCfg)) {
+    if (parserCfgProps.includes(key)) parserCfg[key] = val
+    else template[key] = val
+  }
+
+  const parser = getDefaultParser(parserCfg)
+  const isUserTemplate = !!Object.keys(template).length
+
+  return (scannerCtx) => {
+    let ctx = {
+      cfg: parserCfg,
+      ...scannerCtx,
     }
 
-    const parser = getDefaultParser(parserCfg)
-    const isUserTemplate = !!Object.keys(template).length
+    parser(ctx, () => {})
 
-    return (scannerCtx) => {
-      let ctx = {
-        cfg: parserCfg,
-        ...scannerCtx,
-      }
+    if (isUserTemplate) {
+      const res = jsone(template, { ...ctx, ...customFunctions })
 
-      parser(ctx, () => {})
+      Object.keys(res).forEach((key) => {
+        if (typeof res[key] === 'string') res[key] = res[key].trim()
+      })
 
-      if (isUserTemplate) {
-        const res = jsone(template, { ...ctx, ...customFunctions })
+      if (res.artist) res.artistNorm = res.artistNorm ?? res.artist
+      if (res.title) res.titleNorm = res.titleNorm ?? res.title
 
-        Object.keys(res).forEach((key) => {
-          if (typeof res[key] === 'string') res[key] = res[key].trim()
-        })
+      log.debug('User template:')
+      log.debug(template)
+      log.debug('Result:')
+      log.debug(res)
 
-        if (res.artist) res.artistNorm = res.artistNorm ?? res.artist
-        if (res.title) res.titleNorm = res.titleNorm ?? res.title
+      ctx = { ...ctx, ...res }
+    }
 
-        log.debug('User template:')
-        log.debug(template)
-        log.debug('Result:')
-        log.debug(res)
+    if (!ctx.artist || !ctx.title) {
+      throw new Error('could not determine artist or title')
+    }
 
-        ctx = { ...ctx, ...res }
-      }
-
-      if (!ctx.artist || !ctx.title) {
-        throw new Error('could not determine artist or title')
-      }
-
-      return {
-        artist: ctx.artist,
-        artistNorm: ctx.artistNorm ?? ctx.artist,
-        title: ctx.title,
-        titleNorm: ctx.titleNorm ?? ctx.title,
-      }
+    return {
+      artist: ctx.artist,
+      artistNorm: ctx.artistNorm ?? ctx.artist,
+      title: ctx.title,
+      titleNorm: ctx.titleNorm ?? ctx.title,
     }
   }
 }
