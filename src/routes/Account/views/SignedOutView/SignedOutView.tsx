@@ -103,8 +103,8 @@ const SignedOutView = () => {
       data.append('image', image)
     }
 
-    if (mode === 'guest') {
-      data.append('role', 'guest')
+    if (mode !== 'returning') {
+      data.append('role', mode)
     }
 
     dispatch(createAccount(data))
@@ -148,7 +148,7 @@ const SignedOutView = () => {
                 <h1>Join as...</h1>
                 <div className={styles.radioContainer}>
                   <InputRadio name='type' value='returning' checked={mode === 'returning'} onChange={setMode} label='Returning user' />
-                  {allowNewStandard && <InputRadio name='type' value='new' checked={mode === 'new'} onChange={setMode} label='New user' />}
+                  {allowNewStandard && <InputRadio name='type' value='standard' checked={mode === 'standard'} onChange={setMode} label='New user' />}
                   {allowNewGuest && <InputRadio name='type' value='guest' checked={mode === 'guest'} onChange={setMode} label='Guest' />}
                 </div>
               </>
