@@ -26,6 +26,7 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "test": "vitest run --config config/vitest.config.ts",
+    "typecheck": "tsc -b --noEmit",
     "build": "npm run build:server ; npm run build:client",
     "build:client": "webpack --config config/webpack.config.js",
     "build:server": "rm -rf build/server ; tsc -p config/tsconfig.server.json --noEmitOnError false ; mkdir -p build/server/lib ; cp -R server/lib/schemas build/server/lib/",

@@ -12,6 +12,15 @@ import User from '../User/User.js'
 import { QUEUE_PUSH } from '../../shared/actionTypes.js'
 import { BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, PASSWORD_MIN_LENGTH, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from './User.js'
 
+interface File {
+  filepath: string
+}
+
+interface RequestWithBody {
+  body: Record<string, any>
+  files?: Record<string, File | File[]>
+}
+
 const router = new KoaRouter({ prefix: '/api' })
 const { db } = Database
 const readFile = promisify(fs.readFile)
@@ -36,14 +45,15 @@ const createUserCtx = (user, roomId) => {
 
 // login
 router.post('/login', async (ctx) => {
-  const roomId = parseInt(ctx.request.body.roomId, 10) || null
+  const req = ctx.request as unknown as RequestWithBody
+  const roomId = parseInt(req.body.roomId, 10) || null
   let user
 
   try {
-    user = await User.validate(ctx.request.body)
+    user = await User.validate(req.body as any)
 
     if (roomId) {
-      await Rooms.validate(roomId, ctx.request.body.roomPassword, {
+      await Rooms.validate(roomId, req.body.roomPassword, {
         isOpen: user.role !== 'admin', // admins can sign in to closed rooms
         validatePassword: true,
       })
@@ -162,7 +172,9 @@ router.put('/user/:userId', async (ctx) => {
     ctx.throw(401)
   }
 
-  let { name, username, password, newPassword, newPasswordConfirm } = ctx.request.body
+  const req = ctx.request as unknown as RequestWithBody
+  let { name, username } = req.body
+  const { password, newPassword, newPasswordConfirm } = req.body
 
   // validate current password if updating own account
   if (targetId === user.userId && !ctx.user.isGuest) {
@@ -219,23 +231,23 @@ router.put('/user/:userId', async (ctx) => {
   }
 
   // changing user image?
-  if (ctx.request.files.image) {
-    const imageFile = Array.isArray(ctx.request.files.image) ? ctx.request.files.image[0] : ctx.request.files.image
+  if (req.files && req.files.image) {
+    const imageFile = Array.isArray(req.files.image) ? req.files.image[0] : req.files.image
     fields.set('image', await readFile(imageFile.filepath))
     await deleteFile(imageFile.filepath)
-  } else if (ctx.request.body.image === 'null') {
+  } else if (req.body.image === 'null') {
     fields.set('image', null)
   }
 
   // changing role?
-  if (ctx.request.body.role) {
+  if (req.body.role) {
     // @todo since we're not ensuring there'd be at least one admin
     // remaining, changing one's own role is currently disallowed
     if (user.role !== 'admin' || targetId === user.userId) {
       ctx.throw(403)
     }
 
-    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${ctx.request.body.role})`)
+    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${req.body.role})`)
   }
 
   fields.set('dateUpdated', Math.floor(Date.now() / 1000))
@@ -302,6 +314,7 @@ router.put('/user/:userId', async (ctx) => {
 
 // create account
 router.post('/user', async (ctx) => {
+  const req = ctx.request as unknown as RequestWithBody
   let image
 
   if (!ctx.user.isAdmin) {
@@ -311,31 +324,31 @@ router.post('/user', async (ctx) => {
     }
 
     // only possible roles; further validated per-room below
-    if (!['guest', 'standard'].includes(ctx.request.body.role)) {
+    if (!['guest', 'standard'].includes(req.body.role)) {
       ctx.throw(401, 'Invalid role')
     }
 
     // new users must choose a room at the same time
     try {
       await Rooms.validate(
-        ctx.request.body.roomId,
-        ctx.request.body.roomPassword,
-        { role: ctx.request.body.role },
+        req.body.roomId,
+        req.body.roomPassword,
+        { role: req.body.role },
       )
     } catch (err) {
       ctx.throw(401, err.message)
     }
   }
 
-  if (ctx.request.files.image) {
-    const imageFile = Array.isArray(ctx.request.files.image) ? ctx.request.files.image[0] : ctx.request.files.image
+  if (req.files && req.files.image) {
+    const imageFile = Array.isArray(req.files.image) ? req.files.image[0] : req.files.image
     image = await readFile(imageFile.filepath)
     await deleteFile(imageFile.filepath)
   }
 
   // create user
   try {
-    const userId = await User.create({ ...ctx.request.body, image }, ctx.request.body.role)
+    const userId = await User.create({ ...req.body, image } as any, req.body.role)
 
     // if admin creating another user, we're done
     if (ctx.user.isAdmin) {
@@ -345,7 +358,7 @@ router.post('/user', async (ctx) => {
     }
 
     const user = await User.getById(userId, true)
-    const userCtx = createUserCtx(user, ctx.request.body.roomId || null)
+    const userCtx = createUserCtx(user, req.body.roomId || null)
 
     // create JWT
     const token = jwtSign(userCtx, ctx.jwtKey)
@@ -389,7 +402,8 @@ router.post('/setup', async (ctx) => {
 
   // create admin user
   try {
-    const userId = await User.create({ ...ctx.request.body, image }, 'admin')
+    const req = ctx.request as unknown as RequestWithBody
+    const userId = await User.create({ ...req.body, image } as any, 'admin')
     const user = await User.getById(userId, true)
     const userCtx = createUserCtx(user, res.lastID)
 

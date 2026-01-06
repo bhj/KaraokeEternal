@@ -108,3 +108,18 @@ export interface Media {
   relPath: string
   duration: number
 }
+
+export interface Prefs {
+  isFirstRun?: boolean
+  isScanning: boolean
+  isReplayGainEnabled: boolean
+  paths: {
+    result: number[]
+    entities: Record<number, Path>
+  }
+  roles: {
+    result: number[]
+    entities: Record<number, Role>
+  }
+  [key: string]: unknown
+}

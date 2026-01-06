@@ -9,13 +9,18 @@ import pushQueuesAndLibrary from '../lib/pushQueuesAndLibrary.js'
 import Rooms from '../Rooms/Rooms.js'
 import Queue from '../Queue/Queue.js'
 import { PREFS_PATHS_CHANGED, QUEUE_PUSH } from '../../shared/actionTypes.js'
+import type { Prefs as PrefsType } from '../../shared/types.js'
+
+interface RequestWithBody {
+  body: Record<string, unknown>
+}
 
 const log = getLogger('Prefs')
 const router = new KoaRouter({ prefix: '/api/prefs' })
 
 // get all prefs (including media paths)
 router.get('/', async (ctx) => {
-  const prefs: any = await Prefs.get()
+  const prefs = await Prefs.get() as unknown as PrefsType
 
   // must be admin or firstrun
   if (prefs.isFirstRun || ctx.user.isAdmin) {
@@ -41,15 +46,15 @@ router.post('/path', async (ctx) => {
   }
 
   const pathId = await Prefs.addPath(dir, {
-    prefs: ctx.request.body,
+    prefs: (ctx.request as unknown as RequestWithBody).body,
   })
 
   // respond with updated prefs
-  const prefs = await Prefs.get()
+  const prefs = await Prefs.get() as unknown as PrefsType
   ctx.body = prefs
 
   // (re)start watcher
-  ;(process as any).emit(PREFS_PATHS_CHANGED, prefs.paths)
+  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
 
   ctx.startScanner(pathId)
 })
@@ -66,19 +71,19 @@ router.put('/path/:pathId', async (ctx) => {
     ctx.throw(422, 'Invalid pathId')
   }
 
-  await Prefs.setPathData(pathId, 'prefs.', ctx.request.body)
+  await Prefs.setPathData(pathId, 'prefs.', (ctx.request as unknown as RequestWithBody).body)
 
   // respond with updated prefs
-  const prefs = await Prefs.get()
+  const prefs = await Prefs.get() as unknown as PrefsType
   ctx.body = prefs
 
   // (re)start watcher?
-  if ('isWatchingEnabled' in ctx.request.body) {
-    ;(process as any).emit(PREFS_PATHS_CHANGED, prefs.paths)
+  if ('isWatchingEnabled' in (ctx.request as unknown as RequestWithBody).body) {
+    process.emit(PREFS_PATHS_CHANGED, prefs.paths)
   }
 
   // need to push updated queue items?
-  if ('isVideoKeyingEnabled' in ctx.request.body) {
+  if ('isVideoKeyingEnabled' in (ctx.request as unknown as RequestWithBody).body) {
     for (const { room, roomId } of Rooms.getActive(ctx.io)) {
       ctx.io.to(room).emit('action', {
         type: QUEUE_PUSH,
@@ -105,11 +110,11 @@ router.delete('/path/:pathId', async (ctx) => {
   await Prefs.removePath(pathId)
 
   // respond with updated prefs
-  const prefs = await Prefs.get()
+  const prefs = await Prefs.get() as unknown as PrefsType
   ctx.body = prefs
 
   // (re)start watcher
-  ;(process as any).emit(PREFS_PATHS_CHANGED, prefs.paths)
+  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
 
   await Media.cleanup()
 

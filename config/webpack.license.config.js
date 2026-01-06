@@ -1,6 +1,6 @@
 import fs from 'fs'
 import licenseWebpackPlugin from 'license-webpack-plugin'
-import TerserPlugin from 'terser-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin' // eslint-disable-line n/no-extraneous-import
 
 const { LicenseWebpackPlugin } = licenseWebpackPlugin
 

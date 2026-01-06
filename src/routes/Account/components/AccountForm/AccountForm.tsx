@@ -42,24 +42,22 @@ const AccountForm = ({
 
   const isUser = user && user.userId !== null
 
-  useEffect(() => {
-    if (user && prevUser.current?.dateUpdated !== user.dateUpdated) {
-      setState(prev => ({ ...prev, isDirty: false }))
-    }
-  }, [user])
+  const [prevDateUpdated, setPrevDateUpdated] = useState(user?.dateUpdated)
 
-  const prevUser = useRef<User | undefined>(undefined)
+  if (user && user.dateUpdated !== prevDateUpdated) {
+    setPrevDateUpdated(user.dateUpdated)
+    setState(prev => ({ ...prev, isDirty: false }))
+  }
+
   const prevIsDirty = useRef(state.isDirty)
 
   useEffect(() => {
-    prevUser.current = user
-
     if (onDirtyChange && prevIsDirty.current !== state.isDirty) {
       onDirtyChange(state.isDirty)
     }
 
     prevIsDirty.current = state.isDirty
-  }, [user, state.isDirty, onDirtyChange])
+  }, [state.isDirty, onDirtyChange])
 
   const updateDirty = () => {
     if (!user || user.userId === null) return

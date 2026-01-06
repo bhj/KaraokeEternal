@@ -12,6 +12,7 @@ const __TEST__ = NODE_ENV === 'test'
 const __PROD__ = NODE_ENV === 'production'
 const baseDir = path.resolve(import.meta.dirname, '..')
 
+/** @type {import('webpack').Configuration} */
 let config = {
   mode: __PROD__ ? 'production' : 'development',
   entry: {

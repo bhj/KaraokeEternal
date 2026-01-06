@@ -1,6 +1,5 @@
 // based on https://github.com/tnnevol/webpack-hot-middleware-for-koa2
 
-// eslint-disable-next-line n/no-unpublished-import
 import webpackHotMiddleware from 'webpack-hot-middleware'
 
 export default (compiler, opts?) => {
@@ -10,8 +9,8 @@ export default (compiler, opts?) => {
     const { end: originalEnd } = ctx.res
 
     const runNext = await new Promise((resolve) => {
-      ctx.res.end = function () {
-        originalEnd.apply(this, arguments)
+      ctx.res.end = function (...args) {
+        originalEnd.apply(this, args)
         resolve(false)
       }
 

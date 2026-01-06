@@ -21,6 +21,7 @@ interface HandleProps {
   'aria-label'?: string
   'aria-labelledby'?: string
   'className'?: string
+  'onTouchEnd'?: React.TouchEventHandler<HTMLDivElement>
 }
 
 const Slider = ({

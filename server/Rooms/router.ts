@@ -5,6 +5,10 @@ import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
 
+interface RequestWithBody {
+  body: Record<string, unknown>
+}
+
 const log = getLogger('Rooms')
 const { db } = Database
 const router = new KoaRouter({ prefix: '/api/rooms' })
@@ -37,7 +41,7 @@ router.post('/', async (ctx) => {
   }
 
   try {
-    const res = await Rooms.set(undefined, ctx.request.body)
+    const res = await Rooms.set(undefined, (ctx.request as unknown as RequestWithBody).body)
     log.verbose('%s created a room (roomId: %s)', ctx.user.name, res.lastID)
   } catch (err) {
     if (err instanceof ValidationError) ctx.throw(422, err.message)
@@ -57,7 +61,7 @@ router.put('/:roomId', async (ctx) => {
   const roomId = parseInt(ctx.params.roomId, 10)
 
   try {
-    await Rooms.set(roomId, ctx.request.body)
+    await Rooms.set(roomId, (ctx.request as unknown as RequestWithBody).body)
   } catch (err) {
     if (err instanceof ValidationError) ctx.throw(422, err.message)
     throw err

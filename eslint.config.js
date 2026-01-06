@@ -1,6 +1,6 @@
 // @ts-check
 
-import eslint from '@eslint/js'
+import eslint from '@eslint/js' // eslint-disable-line n/no-extraneous-import
 import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 import stylistic from '@stylistic/eslint-plugin'
@@ -37,6 +37,7 @@ export default defineConfig(
     files: ['src/**/*.{js,jsx,ts,tsx}', 'shared/**/*.{js,ts}'],
     plugins: {
       'react': pluginReact,
+      // @ts-expect-error - eslint-plugin-react-hooks types are incomplete
       'react-hooks': pluginReactHooks,
       'react-refresh': pluginRefresh,
     },
@@ -59,8 +60,12 @@ export default defineConfig(
   },
   // server-only config
   {
-    files: ['server/**/*.js', 'config/webpack.config.js'],
-    ...pluginNode.configs['flat/recommended-script'],
+    files: ['server/**/*.{ts,js}', 'config/**/*.{js,ts}', '*.js'],
+    ...pluginNode.configs['flat/recommended-module'],
+    rules: {
+      ...pluginNode.configs['flat/recommended-module'].rules,
+      'n/hashbang': 'off', // suppress incorrect warning
+    },
     languageOptions: {
       globals: globals.node,
       parserOptions: {

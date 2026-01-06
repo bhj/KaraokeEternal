@@ -47,7 +47,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     server.on('error', function (err) {
       log.error(err.message)
 
-      ;(process as any).emit('serverWorker', {
+      process.emit('serverWorker', {
         type: SERVER_WORKER_ERROR,
         error: err.message,
       })
@@ -75,7 +75,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       const url = `http://${getIPAddress()}${port === 80 ? '' : ':' + port}${urlPath}`
       log.info(`Web server running at ${url}`)
 
-      ;(process as any).emit('serverWorker', {
+      process.emit('serverWorker', {
         type: SERVER_WORKER_STATUS,
         payload: { url },
       })
@@ -225,8 +225,9 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   // Development middleware
   // ----------------------
   log.info('Enabling webpack dev and HMR middleware')
-  const { default: webpack } = await import('webpack') // eslint-disable-line n/no-unpublished-import
-  const { default: webpackConfig } = await import('../config/webpack.config.js') // eslint-disable-line n/no-unpublished-import
+  const { default: webpack } = await import('webpack')
+  // eslint-disable-next-line n/no-missing-import
+  const { default: webpackConfig } = await import('../config/webpack.config.js')
   const compiler = webpack(webpackConfig)
 
   compiler.hooks.done.tap('indexPlugin', async () => {
@@ -244,7 +245,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     }
   })
 
-  const { default: webpackDevMiddleware } = await import('webpack-dev-middleware') // eslint-disable-line n/no-unpublished-import
+  const { default: webpackDevMiddleware } = await import('webpack-dev-middleware')
   app.use(webpackDevMiddleware.koaWrapper(compiler, { publicPath: urlPath }))
 
   const { default: hotMiddleware } = await import('./lib/getHotMiddleware.js')

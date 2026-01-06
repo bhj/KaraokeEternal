@@ -1,4 +1,4 @@
-import log from 'electron-log/node.js'
+import log from 'electron-log/node.js' // eslint-disable-line n/no-missing-import
 const LEVELS = [false, 'error', 'warn', 'info', 'verbose', 'debug']
 
 class Logger {
