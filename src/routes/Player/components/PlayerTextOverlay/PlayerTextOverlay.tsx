@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { requestPlay } from 'store/modules/status'
 import ColorCycle from './ColorCycle/ColorCycle'
@@ -28,6 +28,8 @@ const PlayerTextOverlay = ({
 }: PlayerTextOverlayProps) => {
   const dispatch = useAppDispatch()
   const handlePlay = useCallback(() => dispatch(requestPlay()), [dispatch])
+  const [errorOffset] = useState(() => Math.random() * -300)
+
   let Component
 
   if (isQueueEmpty || (isAtQueueEnd && !nextQueueItem)) {
@@ -49,11 +51,10 @@ const PlayerTextOverlay = ({
       </>
     )
   } else if (isErrored) {
-    const offset = Math.random() * -300
     Component = (
       <>
-        <ColorCycle text='OOPS...' offset={offset} className={styles.backdrop} />
-        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={offset} className={styles.backdrop} />
+        <ColorCycle text='OOPS...' offset={errorOffset} className={styles.backdrop} />
+        <ColorCycle text='SEE QUEUE FOR DETAILS' offset={errorOffset} className={styles.backdrop} />
       </>
     )
   } else {

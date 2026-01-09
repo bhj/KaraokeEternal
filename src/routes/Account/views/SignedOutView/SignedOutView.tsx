@@ -26,6 +26,8 @@ const SignedOutView = () => {
   const [roomPassword, setRoomPassword] = useState('')
   const [showRoomSection, setShowRoomSection] = useState(false)
   const [showAllRooms, setShowAllRooms] = useState(true)
+  const [prevRooms, setPrevRooms] = useState<typeof rooms | null>(null)
+  const [focusRequest, setFocusRequest] = useState(0)
 
   // once per mount
   useEffect(() => {
@@ -33,7 +35,9 @@ const SignedOutView = () => {
   }, [dispatch])
 
   // room selection visibility/defaults
-  useEffect(() => {
+  // https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  if (rooms !== prevRooms) {
+    setPrevRooms(rooms)
     const searchParams = new URLSearchParams(location.search)
     const roomIdParam = searchParams.get('roomId')
     const id = roomIdParam ? parseInt(roomIdParam, 10) : null
@@ -42,18 +46,17 @@ const SignedOutView = () => {
     if (id && rooms.entities[id]) {
       setRoomId(id)
       setShowAllRooms(false)
-      userSectionRef.current.classList.remove(styles.hidden)
 
       if (rooms.entities[id]?.hasPassword) {
         if (password) {
           setRoomPassword(atob(password))
           setShowRoomSection(false)
-          firstFieldRef.current?.focus()
+          setFocusRequest(r => r + 1)
         } else {
           setShowRoomSection(true)
         }
       } else {
-        firstFieldRef.current?.focus()
+        setFocusRequest(r => r + 1)
       }
     } else if (rooms.result.length === 1) {
       setRoomId(rooms.result[0])
@@ -61,16 +64,15 @@ const SignedOutView = () => {
     } else {
       setShowRoomSection(rooms.result.length !== 0)
     }
-  }, [rooms])
+  }
 
   const handleRoomSelect = useCallback((id: number) => {
     setRoomId(id)
     setMode('returning')
-    userSectionRef.current.classList.remove(styles.hidden)
 
     if (!rooms.entities[id]?.hasPassword || !showRoomSection) {
-      firstFieldRef.current?.focus()
-      userSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setFocusRequest(r => r + 1)
+      userSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [rooms.entities, showRoomSection])
 
@@ -110,10 +112,6 @@ const SignedOutView = () => {
     dispatch(createAccount(data))
   }, [dispatch, mode, password, roomId, username])
 
-  useEffect(() => {
-    firstFieldRef.current?.focus()
-  }, [mode])
-
   const getAllowed = useCallback((roleName: string) => {
     const roleId = prefs.roles.result.find(id => prefs.roles.entities[id].name === roleName)
     return !!rooms.entities[roomId]?.prefs?.roles?.[roleId]?.allowNew
@@ -122,6 +120,10 @@ const SignedOutView = () => {
   const allowNewGuest = getAllowed('guest')
   const allowNewStandard = getAllowed('standard')
   const allowNew = allowNewStandard || allowNewGuest
+
+  useEffect(() => {
+    firstFieldRef.current?.focus()
+  }, [focusRequest, mode])
 
   return (
     <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
@@ -141,7 +143,7 @@ const SignedOutView = () => {
         </>
       )}
 
-      <div ref={userSectionRef} className={clsx(rooms.result.length > 1 && styles.hidden)}>
+      <div ref={userSectionRef} className={clsx(rooms.result.length > 1 && roomId === null && styles.hidden)}>
         {allowNew
           ? (
               <>

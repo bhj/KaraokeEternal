@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createRoom, removeRoom, updateRoom, requestPrefsPush } from 'store/modules/rooms'
 import { getFormData } from 'lib/util'
@@ -18,8 +18,14 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
   const formRef = useRef(null)
   const [roomPassword, setRoomPassword] = useState(room && room.hasPassword ? '*'.repeat(32) : '')
   const [prefs, setPrefs] = useState<IRoomPrefs>(room?.prefs || {} as IRoomPrefs)
+  const [prevRoom, setPrevRoom] = useState(room)
   const [isPasswordDirty, setIsPasswordDirty] = useState(false)
   const dispatch = useAppDispatch()
+
+  if (room !== prevRoom) {
+    setPrevRoom(room)
+    if (room?.prefs) setPrefs(room.prefs)
+  }
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -61,10 +67,6 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
     setIsPasswordDirty(true)
     setRoomPassword(e.target.value)
   }, [])
-
-  useEffect(() => {
-    if (room?.prefs) setPrefs(room.prefs)
-  }, [room])
 
   return (
     <Modal

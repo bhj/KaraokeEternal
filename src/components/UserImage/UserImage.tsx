@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import clsx from 'clsx'
 import Icon from 'components/Icon/Icon'
 import styles from './UserImage.css'
@@ -9,7 +9,7 @@ interface UserImageProps {
   userId: number
 }
 
-const UserImage = ({ className, dateUpdated, userId }: UserImageProps) => {
+const UserImageContent = ({ dateUpdated, userId }: { dateUpdated: number, userId: number }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isErrored, setIsErrored] = useState(false)
 
@@ -20,13 +20,8 @@ const UserImage = ({ className, dateUpdated, userId }: UserImageProps) => {
     setIsErrored(true)
   }, [])
 
-  useEffect(() => {
-    setIsLoading(true)
-    setIsErrored(false)
-  }, [userId, dateUpdated])
-
   return (
-    <div className={clsx(styles.container, className)}>
+    <>
       {(isLoading || isErrored) && (
         <Icon icon='ACCOUNT' />
       )}
@@ -41,8 +36,18 @@ const UserImage = ({ className, dateUpdated, userId }: UserImageProps) => {
           }}
         />
       )}
-    </div>
+    </>
   )
 }
+
+const UserImage = ({ className, dateUpdated, userId }: UserImageProps) => (
+  <div className={clsx(styles.container, className)}>
+    <UserImageContent
+      key={`${userId}-${dateUpdated}`}
+      userId={userId}
+      dateUpdated={dateUpdated}
+    />
+  </div>
+)
 
 export default UserImage

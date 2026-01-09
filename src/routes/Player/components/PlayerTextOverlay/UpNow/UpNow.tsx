@@ -13,33 +13,20 @@ const UpNow = ({ queueItem }: UpNowProps) => {
   const timeoutID = useRef<ReturnType<typeof setTimeout> | null>(null)
   const nodeRef = useRef<HTMLDivElement | null>(null)
 
-  const animate = () => {
+  useEffect(() => {
     if (timeoutID.current) {
       clearTimeout(timeoutID.current)
     }
 
-    setShow(true)
+    requestAnimationFrame(() => {
+      setShow(true)
+    })
 
     timeoutID.current = setTimeout(() => {
       setShow(false)
     }, 5000)
-  }
 
-  useEffect(() => {
-    animate()
-
-    // Cleanup when component unmounts
-    return () => {
-      if (timeoutID.current) {
-        clearTimeout(timeoutID.current)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    animate()
-
-    // Cleanup the timeout when queueItem changes
+    // Cleanup the timeout when component unmounts or queueItem changes
     return () => {
       if (timeoutID.current) {
         clearTimeout(timeoutID.current)

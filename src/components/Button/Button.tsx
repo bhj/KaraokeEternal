@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import clsx from 'clsx'
 import Icon from '../Icon/Icon'
 import styles from './Button.css'
@@ -37,13 +37,16 @@ const Button = <E extends ButtonElementType = 'button'>({
 }: ButtonProps<E>) => {
   const elementRef = useRef<HTMLButtonElement | HTMLSpanElement>(null)
   const [isAnimating, setAnimating] = useState(false)
+  const [prevCancelAnimation, setPrevCancelAnimation] = useState(cancelAnimation)
   const ElementType = as || 'button' as E
 
-  useEffect(() => {
+  if (cancelAnimation !== prevCancelAnimation) {
+    setPrevCancelAnimation(cancelAnimation)
+
     if (cancelAnimation) {
       setAnimating(false)
     }
-  }, [cancelAnimation])
+  }
 
   const handleAnimationEnd = useCallback(() => {
     setAnimating(false)

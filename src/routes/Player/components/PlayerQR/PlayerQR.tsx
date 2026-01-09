@@ -18,10 +18,9 @@ interface PlayerQRProps {
 const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const maxTimerID = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lastToggleTime = useRef<number>(Date.now())
+  const lastToggleTime = useRef<number>(0)
   const [show, setShow] = useState(true)
   const [alternate, setAlternate] = useState(false)
-
   const { isPlaying } = useAppSelector(state => state.player)
   const { roomId } = useAppSelector(state => state.user)
 
@@ -44,6 +43,10 @@ const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
   }, [isPlaying])
 
   useEffect(() => {
+    lastToggleTime.current = Date.now()
+  }, [])
+
+  useEffect(() => {
     scheduleNextToggle()
 
     return () => {
@@ -56,7 +59,8 @@ const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
     const timeSinceLastToggle = now - lastToggleTime.current
 
     if (timeSinceLastToggle > MIN_STATIC_MS) {
-      setShow(false)
+      const timeout = setTimeout(() => setShow(false), 0)
+      return () => clearTimeout(timeout)
     }
   }, [queueItem?.queueId])
 

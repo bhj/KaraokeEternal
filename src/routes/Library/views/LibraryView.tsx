@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { Link } from 'react-router'
 import ArtistList from '../components/ArtistList/ArtistList'
@@ -14,17 +14,15 @@ const LibraryView = () => {
   const ui = useAppSelector(state => state.ui)
 
   const isSearching = !!filterStr.trim().length || filterStarred
-  const initialHeaderHeight = useRef(ui.headerHeight)
+  const [initialHeaderHeight] = useState(ui.headerHeight)
   const [finalHeaderHeight, setFinalHeaderHeight] = useState(null)
 
   // don't render ArtistList until headerHeight is stable; otherwise
   // scroll position restoration does not work well (appears OBO)
   // @todo - this is hacky
-  useEffect(() => {
-    if (ui.headerHeight > initialHeaderHeight.current) {
-      setFinalHeaderHeight(ui.headerHeight)
-    }
-  }, [ui.headerHeight, finalHeaderHeight])
+  if (finalHeaderHeight === null && ui.headerHeight > initialHeaderHeight) {
+    setFinalHeaderHeight(ui.headerHeight)
+  }
 
   if (!finalHeaderHeight) return null
 
