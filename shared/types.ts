@@ -85,6 +85,10 @@ export interface User {
   dateUpdated: number
 }
 
+export interface UserWithRole extends User {
+  role?: string
+}
+
 export interface PlaybackOptions {
   cdgAlpha?: number
   cdgSize?: number
