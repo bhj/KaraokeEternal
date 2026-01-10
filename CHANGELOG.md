@@ -1,3 +1,7 @@
+## v2.0.1 (2026-01-10)
+
+- Obligatory bug fixes and performance improvements
+
 ## v2.0.0 (2025-12-26)
 
 **Sponsored by**: [candre23](https://github.com/candre23), [nellisdev](https://github.com/nellisdev), [astrobyte](https://github.com/astrobyte), [jfeldhamer](https://github.com/jfeldhamer), [cubandaddy](https://github.com/cubandaddy), [Backroads4Me](https://github.com/Backroads4Me) and other private sponsors. Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
