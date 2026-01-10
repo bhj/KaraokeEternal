@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from 'react'
-import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { requestLogout, updateAccount } from 'store/modules/user'
 import { removeItem } from 'routes/Queue/modules/queue'
@@ -78,16 +77,18 @@ const Account = () => {
             />
 
           )}
-          {isDirty && (
-            <Button type='submit' className={clsx('primary', styles.updateAccount)} variant='primary'>
-              Update Account
-            </Button>
-          )}
-        </AccountForm>
 
-        <Button onClick={handleSignOut} className={styles.signOut} variant='default'>
-          Sign Out
-        </Button>
+          <div className={styles.btnContainer}>
+            {isDirty && (
+              <Button type='submit' variant='primary'>
+                Update Account
+              </Button>
+            )}
+            <Button onClick={handleSignOut} variant='default'>
+              Sign Out
+            </Button>
+          </div>
+        </AccountForm>
       </>
     </Panel>
   )
