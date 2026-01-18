@@ -98,7 +98,7 @@ const SignedOutView = () => {
     data.append('newPassword', password)
     data.append('newPasswordConfirm', passwordConfirm)
     data.append('roomId', String(roomId))
-    data.append('roomPassword', password)
+    data.append('roomPassword', roomPassword)
     data.append('name', name.trim())
 
     if (typeof image !== 'undefined') {
