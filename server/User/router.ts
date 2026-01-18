@@ -10,10 +10,19 @@ import Queue from '../Queue/Queue.js'
 import Rooms from '../Rooms/Rooms.js'
 import User from '../User/User.js'
 import { QUEUE_PUSH } from '../../shared/actionTypes.js'
-import { BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, PASSWORD_MIN_LENGTH, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from './User.js'
+import {
+  BCRYPT_ROUNDS,
+  USERNAME_MIN_LENGTH,
+  USERNAME_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  NAME_MIN_LENGTH,
+  NAME_MAX_LENGTH,
+  IMG_MAX_LENGTH,
+} from './User.js'
 
 interface File {
   filepath: string
+  size: number
 }
 
 interface RequestWithBody {
@@ -72,6 +81,7 @@ router.post('/login', async (ctx) => {
   // set JWT as an httpOnly cookie
   ctx.cookies.set('keToken', token, {
     httpOnly: true,
+    sameSite: 'lax',
   })
 
   ctx.body = userCtx
@@ -233,6 +243,12 @@ router.put('/user/:userId', async (ctx) => {
   // changing user image?
   if (req.files && req.files.image) {
     const imageFile = Array.isArray(req.files.image) ? req.files.image[0] : req.files.image
+
+    if (imageFile.size > IMG_MAX_LENGTH) {
+      await deleteFile(imageFile.filepath)
+      ctx.throw(413, `Image must not exceed ${Math.floor(IMG_MAX_LENGTH / 1024)}KB`)
+    }
+
     fields.set('image', await readFile(imageFile.filepath))
     await deleteFile(imageFile.filepath)
   } else if (req.body.image === 'null') {
@@ -306,6 +322,7 @@ router.put('/user/:userId', async (ctx) => {
 
   // set JWT as an httpOnly cookie
   ctx.cookies.set('keToken', token, {
+    sameSite: 'lax',
     httpOnly: true,
   })
 
@@ -342,6 +359,12 @@ router.post('/user', async (ctx) => {
 
   if (req.files && req.files.image) {
     const imageFile = Array.isArray(req.files.image) ? req.files.image[0] : req.files.image
+
+    if (imageFile.size > IMG_MAX_LENGTH) {
+      await deleteFile(imageFile.filepath)
+      ctx.throw(413, `Image must not exceed ${Math.floor(IMG_MAX_LENGTH / 1024)}KB`)
+    }
+
     image = await readFile(imageFile.filepath)
     await deleteFile(imageFile.filepath)
   }
@@ -365,6 +388,7 @@ router.post('/user', async (ctx) => {
 
     // set JWT as an httpOnly cookie
     ctx.cookies.set('keToken', token, {
+      sameSite: 'lax',
       httpOnly: true,
     })
 
@@ -412,6 +436,7 @@ router.post('/setup', async (ctx) => {
 
     // set JWT as an httpOnly cookie
     ctx.cookies.set('keToken', token, {
+      sameSite: 'lax',
       httpOnly: true,
     })
 

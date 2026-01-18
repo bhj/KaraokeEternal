@@ -110,7 +110,7 @@ const SignedOutView = () => {
     }
 
     dispatch(createAccount(data))
-  }, [dispatch, mode, password, roomId, username])
+  }, [dispatch, mode, password, roomId, roomPassword, username])
 
   const getAllowed = useCallback((roleName: string) => {
     const roleId = prefs.roles.result.find(id => prefs.roles.entities[id].name === roleName)

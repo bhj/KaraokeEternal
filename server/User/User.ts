@@ -4,7 +4,7 @@ import bcrypt from '../lib/bcrypt.js'
 import Queue from '../Queue/Queue.js'
 import { randomChars } from '../lib/util.js'
 
-export const IMG_MAX_LENGTH = 50000 // bytes
+export const IMG_MAX_LENGTH = 51200 // 50KB
 export const BCRYPT_ROUNDS = 12
 export const USERNAME_MIN_LENGTH = 3
 export const USERNAME_MAX_LENGTH = 128
