@@ -8,7 +8,8 @@ const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1
 const NAME_MAX_LENGTH = 50
 const PASSWORD_MIN_LENGTH = 5
-const IDLE_TIMEOUT_MS = 4 * 60 * 60 * 1000 // 4 hours
+const IDLE_TIMEOUT_MINUTES = parseInt(process.env.KES_ROOM_IDLE_TIMEOUT || '240', 10)
+const IDLE_TIMEOUT_MS = IDLE_TIMEOUT_MINUTES * 60 * 1000
 
 export const STATUSES = ['open', 'closed']
 

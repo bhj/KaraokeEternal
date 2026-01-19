@@ -173,31 +173,43 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       return next()
     }
 
-    // Check for Authentik header auth (SSO)
-    const authentikUsername = ctx.request.header['x-authentik-username']
-    if (authentikUsername && typeof authentikUsername === 'string') {
-      try {
-        // Get or create user from header
-        const user = await User.getOrCreateFromHeader(authentikUsername)
+    // SSO header auth (configurable headers)
+    const authHeader = (process.env.KES_AUTH_HEADER || 'x-authentik-username').toLowerCase()
+    const groupsHeader = (process.env.KES_GROUPS_HEADER || 'x-authentik-groups').toLowerCase()
+    const adminGroup = process.env.KES_ADMIN_GROUP || 'admin'
+    const ephemeralEnabled = process.env.KES_EPHEMERAL_ROOMS !== 'false'
 
-        // Get or create ephemeral room for this user
-        let room = await Rooms.getByOwnerId(user.userId)
-        if (!room) {
+    const headerUsername = ctx.request.header[authHeader]
+    if (headerUsername && typeof headerUsername === 'string') {
+      try {
+        // Check if user is admin via groups header
+        const groupsRaw = ctx.request.header[groupsHeader] || ''
+        const groups = typeof groupsRaw === 'string' ? groupsRaw.split(',').map(g => g.trim()) : []
+        const isAdmin = groups.includes(adminGroup)
+
+        // Get or create user from header
+        const user = await User.getOrCreateFromHeader(headerUsername, isAdmin)
+
+        // Get or create ephemeral room for this user (if enabled)
+        let room = ephemeralEnabled ? await Rooms.getByOwnerId(user.userId) : null
+        if (ephemeralEnabled && !room) {
           const roomId = await Rooms.createEphemeral(user.userId, user.username)
           room = { roomId }
         }
 
         // Update room activity
-        await Rooms.updateActivity(room.roomId)
+        if (room) {
+          await Rooms.updateActivity(room.roomId)
+        }
 
-        // Build JWT payload
+        // Build JWT payload - admin from groups header takes precedence
         const jwtPayload = {
           userId: user.userId,
           username: user.username,
           name: user.name,
-          isAdmin: user.role === 'admin',
+          isAdmin: isAdmin || user.role === 'admin',
           isGuest: false,
-          roomId: room.roomId,
+          roomId: room?.roomId,
           dateUpdated: user.dateUpdated,
         }
 

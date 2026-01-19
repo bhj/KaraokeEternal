@@ -1,50 +1,162 @@
-# Karaoke Eternal
+# Karaoke Eternal Automated
 
-Host awesome karaoke parties where everyone can easily find and queue songs from their phone's browser. The player is also fully browser-based with support for MP3+G, MP4 videos and WebGL visualizations. The server is self-hosted and runs on nearly everything.
+Fork of [Karaoke Eternal](https://github.com/bhj/KaraokeEternal) with Authentik SSO integration and ephemeral rooms for automated multi-user deployments.
 
-[![Karaoke Eternal](/docs/assets/images/README.jpg?raw=true)](/docs/assets/images/README.jpg?raw=true)
+## Fork Features
 
-<p align="center">
-  <i>App in mobile browser (top) controlling player in desktop browser (bottom)</i>
-</p>
+This fork adds:
 
-## Features
+- **Header-based SSO**: Reads `X-Authentik-Username` header for automatic authentication (no login page)
+- **Ephemeral Rooms**: Auto-creates a personal room per user on login
+- **Auto Cleanup**: Rooms are automatically destroyed when empty or after 4 hours idle
+- **NixOS Support**: Includes `flake.nix` with devshell for development
 
-- Plays:
-  - MP3+G (MP3 with CDG lyrics; including zipped)
-  - MP4 videos
-  - Music-synced visualizations (with automatic lyrics background removal)
-- Fast, modern mobile browser app designed for "karaoke conditions"
-- Easy joining with QR codes and guest accounts
-- Multiple simultaneous rooms/queues (optionally password-protected)
-- Dynamic queues keep parties fair, fun and no-fuss
-- Fully self-hosted
-- No ads or telemetry
+These features are designed for deployments behind a reverse proxy (Caddy, nginx, Traefik) with Authentik forward auth.
 
-Microphones are *not* required since the player itself only outputs music - this allows your audio setup to be as simple or complex as you like. See the [F.A.Q.](https://www.karaoke-eternal.com/faq/#recommended-audio-microphone-setup) for more information.
+## Upstream Features
 
-## Getting Started
+All upstream Karaoke Eternal features are preserved:
 
- Karaoke Eternal basically has 3 parts. See [Getting Started](https://www.karaoke-eternal.com/docs/getting-started/) to get up and running step-by-step, or jump to the documentation for each part below:
- 
-- **[Server:](https://www.karaoke-eternal.com/docs/karaoke-eternal-server/)** Runs on pretty much anything to serve the web app and your media files, including a Windows PC, Mac, or a dedicated server like a Raspberry Pi or Synology NAS.
-- **[App:](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/)** Fast, modern mobile web app designed for "karaoke conditions".
-- **[Player:](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/#player)** Just another part of the app, but meant to run fullscreen on the system handling audio/video for a [room](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/#rooms-admin-only)
+- MP3+G (CDG) and MP4 video playback
+- Mobile-friendly web app for song search and queue management
+- WebGL visualizations with automatic lyrics background removal
+- Self-hosted with no ads or telemetry
 
-## Installation
+See the [upstream documentation](https://www.karaoke-eternal.com/docs/) for general usage.
 
-There are several [installation methods](https://www.karaoke-eternal.com/docs/karaoke-eternal-server/#installation) available for Karaoke Eternal Server.
+## Deployment
 
-## Discord & Support
+### NixOS
 
-Join the [Karaoke Eternal Discord Server](https://discord.gg/PgqVtFq) for general support and development chat, or just to say hi!
+Add to your NixOS configuration:
 
-## Contributing & Development
+```nix
+# In your flake.nix inputs:
+karaoke-eternal.url = "github:Zardoz8901/KaraokeEternalAutomated";
 
-Contributions are welcome! Please join the `#dev` channel of the [Discord Server](https://discord.gg/PgqVtFq) before embarking on major features; the project's scope is limited to ensure success.
+# In your configuration:
+services.karaoke-eternal = {
+  enable = true;
+  port = 8280;
+  dataDir = "/apps/karaoke-eternal";
+  mediaPath = "/media/karaoke";
+};
+```
 
-Make sure you have [Node.js](https://nodejs.org/en/) v24 or later, then:
+### Docker
 
-1. Fork and clone the repo
-2. `npm i`
-3. `npm run dev` and look for "Web server running at" for the **server URL**
+```bash
+docker build -t karaoke-eternal-automated .
+docker-compose up -d
+```
+
+See `docker-compose.yml` for configuration options.
+
+### Development
+
+```bash
+# Enter development shell (requires Nix with flakes)
+nix develop
+
+# Or manually with Node.js 24+
+npm install
+npm run dev     # Start dev server (port 3000)
+npm run build   # Build for production
+npm run test    # Run tests
+npm run lint    # Run linter
+```
+
+## Configuration
+
+### Core Settings
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KES_PORT` | 3000 | Server port |
+| `KES_PATH_DATA` | Platform-specific | Database and config location |
+| `KES_PATH_MEDIA` | - | Media library path |
+
+### SSO Header Auth
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KES_AUTH_HEADER` | `X-Authentik-Username` | Header containing username |
+| `KES_GROUPS_HEADER` | `X-Authentik-Groups` | Header containing groups (comma-separated) |
+| `KES_ADMIN_GROUP` | `admin` | Group name that grants admin privileges |
+| `KES_EPHEMERAL_ROOMS` | `true` | Enable auto-create rooms per user |
+| `KES_ROOM_IDLE_TIMEOUT` | `240` | Minutes before idle room cleanup |
+
+## Authentik Integration
+
+This fork is designed to work with [Authentik](https://goauthentik.io/) forward auth.
+
+### Authentik Setup
+
+1. **Create Application**
+   - Go to Applications > Applications > Create
+   - Name: `Karaoke Eternal`
+   - Slug: `karaoke-eternal`
+   - Provider: (create in next step)
+
+2. **Create Forward Auth Provider**
+   - Go to Applications > Providers > Create
+   - Type: `Proxy Provider`
+   - Name: `karaoke-eternal-provider`
+   - Authorization flow: Select your default
+   - Mode: `Forward auth (single application)`
+   - External host: `https://karaoke.yourdomain.com`
+
+3. **Create Outpost** (if not already exists)
+   - Go to Applications > Outposts
+   - Create or use existing `authentik Embedded Outpost`
+   - Ensure the Karaoke Eternal application is selected
+
+### Reverse Proxy (Caddy)
+
+```caddyfile
+karaoke.yourdomain.com {
+    # Proxy outpost endpoints
+    reverse_proxy /outpost.goauthentik.io/* localhost:9000
+
+    # Forward auth
+    forward_auth localhost:9000 {
+        uri /outpost.goauthentik.io/auth/caddy
+        copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Email X-Authentik-Name X-Authentik-Uid
+        trusted_proxies private_ranges
+    }
+
+    # WebSocket support for Socket.IO
+    @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websocket localhost:8280
+    reverse_proxy localhost:8280
+}
+```
+
+### How It Works
+
+1. User visits `karaoke.yourdomain.com`
+2. Caddy's `forward_auth` checks with Authentik
+3. If not logged in, user is redirected to Authentik login
+4. After login, Authentik adds `X-Authentik-Username` header
+5. Karaoke Eternal reads the header and auto-creates/joins the user's room
+6. No additional login required - SSO handles everything
+
+## Database Migrations
+
+This fork adds migration `006-ephemeral-rooms.sql` which adds:
+- `isEphemeral` column to rooms table
+- `roomCreatedAt` column for cleanup tracking
+
+Migrations run automatically on server start.
+
+## License
+
+ISC (same as upstream)
+
+## Credits
+
+- Upstream: [Karaoke Eternal](https://github.com/bhj/KaraokeEternal) by bhj
+- Fork: Authentik integration and ephemeral rooms by Zardoz8901

@@ -180,13 +180,14 @@ class User {
   }
 
   /**
-   * Create or get a user from Authentik header (SSO)
+   * Create or get a user from SSO header
    * Creates the user if they don't exist, returns existing user if they do
    *
-   * @param  {String}  username  Username from X-Authentik-Username header
+   * @param  {String}  username  Username from auth header
+   * @param  {Boolean} isAdmin   Whether user should have admin role
    * @return {Promise}           User object
    */
-  static async getOrCreateFromHeader (username: string) {
+  static async getOrCreateFromHeader (username: string, isAdmin: boolean = false) {
     if (!username || typeof username !== 'string') {
       throw new Error('Username is required')
     }
@@ -194,18 +195,19 @@ class User {
     username = username.trim()
 
     // Check if user already exists
-    let user = await User.getByUsername(username, true)
-    if (user) {
-      return user
+    const existingUser = await User.getByUsername(username, true)
+    if (existingUser) {
+      return existingUser
     }
 
     // Create new user with random UUID password (they'll never use it - header auth only)
+    const role = isAdmin ? 'admin' : 'standard'
     const fields = new Map()
     fields.set('username', username)
     fields.set('password', await bcrypt.hash(crypto.randomUUID(), BCRYPT_ROUNDS))
     fields.set('name', username) // Display name = username
     fields.set('dateCreated', Math.floor(Date.now() / 1000))
-    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = 'standard')`)
+    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${role})`)
 
     const query = sql`
       INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
