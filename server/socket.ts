@@ -58,7 +58,7 @@ export default function (io, jwtKey) {
     }
 
     // attach disconnect handler
-    sock.on('disconnect', (reason) => {
+    sock.on('disconnect', async (reason) => {
       log.verbose('%s (%s) disconnected (%s)',
         sock.user.name, sock.id, reason,
       )
@@ -66,17 +66,37 @@ export default function (io, jwtKey) {
       if (typeof sock.user.roomId !== 'number') return
 
       // beyond this point assumes there is a room
+      const roomId = sock.user.roomId
 
       log.verbose('%s (%s) left room %s (%s; %s in room)',
-        sock.user.name, sock.id, sock.user.roomId, reason, sock.adapter.rooms.size,
+        sock.user.name, sock.id, roomId, reason, sock.adapter.rooms.size,
       )
 
       // any players left in room?
-      if (!Rooms.isPlayerPresent(io, sock.user.roomId)) {
-        io.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      if (!Rooms.isPlayerPresent(io, roomId)) {
+        io.to(Rooms.prefix(roomId)).emit('action', {
           type: PLAYER_LEAVE,
           payload: { socketId: sock.id },
         })
+      }
+
+      // Check if this is an ephemeral room that should be cleaned up
+      try {
+        const isEphemeral = await Rooms.isEphemeral(roomId)
+        if (!isEphemeral) return
+
+        // Check if anyone else is still connected to this room
+        const roomPrefix = Rooms.prefix(roomId)
+        const roomSockets = io.sockets.adapter.rooms.get(roomPrefix)
+        const socketsInRoom = roomSockets ? roomSockets.size : 0
+
+        // If no one left in the room, delete it
+        if (socketsInRoom === 0) {
+          log.info('Cleaning up empty ephemeral room %s', roomId)
+          await Rooms.delete(roomId)
+        }
+      } catch (err) {
+        log.error('Error cleaning up ephemeral room: %s', err.message)
       }
     })
 

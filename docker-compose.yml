@@ -1,0 +1,52 @@
+# Karaoke Eternal with Authentik Header Auth
+#
+# This setup assumes Authentik is already running and configured.
+# The karaoke service should be behind Authentik's forward auth proxy
+# which adds the X-Authentik-Username header.
+#
+# Example Traefik/nginx proxy config needed to:
+# 1. Route to Authentik for authentication
+# 2. Pass X-Authentik-Username header to this service
+
+services:
+  karaoke:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: karaoke-eternal-automated:latest
+    container_name: karaoke-eternal
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Persistent data (database, config)
+      - karaoke_data:/data
+      # Media library - mount your karaoke files here
+      - /media/karaoke:/media:ro
+    environment:
+      - NODE_ENV=production
+      - KES_PORT=3000
+      - KES_PATH_DATA=/data
+      - KES_PATH_MEDIA=/media
+      # Uncomment to rotate JWT key on restart
+      # - KES_ROTATE_KEY=1
+    labels:
+      # Example Traefik labels for Authentik forward auth
+      # Adjust these for your reverse proxy setup
+      - "traefik.enable=true"
+      - "traefik.http.routers.karaoke.rule=Host(`karaoke.example.com`)"
+      - "traefik.http.routers.karaoke.entrypoints=websecure"
+      - "traefik.http.routers.karaoke.tls.certresolver=letsencrypt"
+      # Forward auth middleware (configure this in Traefik for Authentik)
+      - "traefik.http.routers.karaoke.middlewares=authentik@docker"
+      - "traefik.http.services.karaoke.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  karaoke_data:
+    driver: local

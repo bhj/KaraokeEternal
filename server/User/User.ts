@@ -180,6 +180,48 @@ class User {
   }
 
   /**
+   * Create or get a user from Authentik header (SSO)
+   * Creates the user if they don't exist, returns existing user if they do
+   *
+   * @param  {String}  username  Username from X-Authentik-Username header
+   * @return {Promise}           User object
+   */
+  static async getOrCreateFromHeader (username: string) {
+    if (!username || typeof username !== 'string') {
+      throw new Error('Username is required')
+    }
+
+    username = username.trim()
+
+    // Check if user already exists
+    let user = await User.getByUsername(username, true)
+    if (user) {
+      return user
+    }
+
+    // Create new user with random UUID password (they'll never use it - header auth only)
+    const fields = new Map()
+    fields.set('username', username)
+    fields.set('password', await bcrypt.hash(crypto.randomUUID(), BCRYPT_ROUNDS))
+    fields.set('name', username) // Display name = username
+    fields.set('dateCreated', Math.floor(Date.now() / 1000))
+    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = 'standard')`)
+
+    const query = sql`
+      INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = await db.run(String(query), query.parameters)
+
+    if (typeof res.lastID !== 'number') {
+      throw new Error('Unable to create user from header')
+    }
+
+    // Return the newly created user
+    return await User.getById(res.lastID, true)
+  }
+
+  /**
    * Remove a user
    *
    * @param  {Number}  userId

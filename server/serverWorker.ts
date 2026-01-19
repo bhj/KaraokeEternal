@@ -28,6 +28,10 @@ import IPC from './lib/IPCBridge.js'
 import IPCLibraryActions from './Library/ipc.js'
 import IPCMediaActions from './Media/ipc.js'
 import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from '../shared/actionTypes.js'
+import User from './User/User.js'
+import Rooms from './Rooms/Rooms.js'
+
+const { sign: jwtSign } = jsonWebToken
 
 const log = getLogger('server')
 const { verify: jwtVerify } = jsonWebToken
@@ -89,8 +93,28 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       await pushQueuesAndLibrary(io)
     })
 
+    // Cleanup idle ephemeral rooms every 30 minutes
+    const IDLE_CLEANUP_INTERVAL_MS = 30 * 60 * 1000
+    const idleCleanupInterval = setInterval(async () => {
+      try {
+        const idleRooms = await Rooms.getIdleEphemeral()
+        for (const room of idleRooms) {
+          log.info(`Cleaning up idle ephemeral room: ${room.roomId} (${room.name})`)
+          await Rooms.delete(room.roomId)
+        }
+        if (idleRooms.length > 0) {
+          log.info(`Cleaned up ${idleRooms.length} idle ephemeral room(s)`)
+        }
+      } catch (err) {
+        log.error(`Error during idle room cleanup: ${err.message}`)
+      }
+    }, IDLE_CLEANUP_INTERVAL_MS)
+
     // handle shutdown gracefully
     shutdownHandlers.push(() => new Promise((resolve) => {
+      // Stop idle cleanup interval
+      clearInterval(idleCleanupInterval)
+
       // also calls http server's close method, which ultimately handles the callback
       io.close(resolve)
 
@@ -147,6 +171,53 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       || ctx.request.path === `${urlPath}api/login`
       || ctx.request.path === `${urlPath}api/logout`) {
       return next()
+    }
+
+    // Check for Authentik header auth (SSO)
+    const authentikUsername = ctx.request.header['x-authentik-username']
+    if (authentikUsername && typeof authentikUsername === 'string') {
+      try {
+        // Get or create user from header
+        const user = await User.getOrCreateFromHeader(authentikUsername)
+
+        // Get or create ephemeral room for this user
+        let room = await Rooms.getByOwnerId(user.userId)
+        if (!room) {
+          const roomId = await Rooms.createEphemeral(user.userId, user.username)
+          room = { roomId }
+        }
+
+        // Update room activity
+        await Rooms.updateActivity(room.roomId)
+
+        // Build JWT payload
+        const jwtPayload = {
+          userId: user.userId,
+          username: user.username,
+          name: user.name,
+          isAdmin: user.role === 'admin',
+          isGuest: false,
+          roomId: room.roomId,
+          dateUpdated: user.dateUpdated,
+        }
+
+        // Set JWT cookie (httpOnly for security)
+        const token = jwtSign(jwtPayload, jwtKey)
+        ctx.cookies.set('keToken', token, {
+          httpOnly: true,
+          sameSite: 'lax',
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        })
+
+        ctx.user = jwtPayload
+        ctx.io = io
+        ctx.startScanner = startScanner
+        ctx.stopScanner = stopScanner
+        return next()
+      } catch (err) {
+        log.error(`Header auth failed: ${err.message}`)
+        // Fall through to normal JWT verification
+      }
     }
 
     // verify JWT

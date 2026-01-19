@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build outputs (will be rebuilt in container)
+build/
+dist/
+
+# Development files
+.git/
+.github/
+.vscode/
+*.md
+!README.md
+
+# Test files
+__tests__/
+*.test.ts
+*.test.js
+coverage/
+
+# Environment files
+.env*
+*.local
+
+# Docs
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db

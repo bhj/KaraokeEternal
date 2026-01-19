@@ -8,6 +8,7 @@ const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1
 const NAME_MAX_LENGTH = 50
 const PASSWORD_MIN_LENGTH = 5
+const IDLE_TIMEOUT_MS = 4 * 60 * 60 * 1000 // 4 hours
 
 export const STATUSES = ['open', 'closed']
 
@@ -235,6 +236,104 @@ class Rooms {
    */
   static hasUserBeenInRoom (roomId: number, userId: number): boolean {
     return roomUsers.get(roomId)?.has(userId) ?? false
+  }
+
+  /**
+   * Create an ephemeral room for a user
+   *
+   * @param  {Number}  userId   Owner's userId
+   * @param  {String}  name     Room name (usually username)
+   * @return {Promise}          The created room
+   */
+  static async createEphemeral (userId: number, name: string) {
+    const now = Math.floor(Date.now() / 1000)
+    const query = sql`
+      INSERT INTO rooms (name, status, dateCreated, ownerId, lastActivity, data)
+      VALUES (${name}, 'open', ${now}, ${userId}, ${now}, '{}')
+    `
+    const res = await db.run(String(query), query.parameters)
+    return res.lastID
+  }
+
+  /**
+   * Get a room by its owner's userId
+   *
+   * @param  {Number}  userId
+   * @return {Promise}
+   */
+  static async getByOwnerId (userId: number) {
+    const query = sql`SELECT * FROM rooms WHERE ownerId = ${userId}`
+    return await db.get(String(query), query.parameters)
+  }
+
+  /**
+   * Get a room by name
+   *
+   * @param  {String}  name
+   * @return {Promise}
+   */
+  static async getByName (name: string) {
+    const query = sql`SELECT * FROM rooms WHERE name = ${name} COLLATE NOCASE`
+    return await db.get(String(query), query.parameters)
+  }
+
+  /**
+   * Update last activity timestamp for a room
+   *
+   * @param  {Number}  roomId
+   * @return {Promise}
+   */
+  static async updateActivity (roomId: number) {
+    const now = Math.floor(Date.now() / 1000)
+    const query = sql`UPDATE rooms SET lastActivity = ${now} WHERE roomId = ${roomId}`
+    return await db.run(String(query), query.parameters)
+  }
+
+  /**
+   * Delete a room and its queue
+   *
+   * @param  {Number}  roomId
+   * @return {Promise}
+   */
+  static async delete (roomId: number) {
+    // Delete queue first
+    const queueQuery = sql`DELETE FROM queue WHERE roomId = ${roomId}`
+    await db.run(String(queueQuery), queueQuery.parameters)
+
+    // Delete room
+    const roomQuery = sql`DELETE FROM rooms WHERE roomId = ${roomId}`
+    await db.run(String(roomQuery), roomQuery.parameters)
+
+    // Clean up memory tracking
+    roomUsers.delete(roomId)
+  }
+
+  /**
+   * Get all ephemeral rooms that have been idle beyond the timeout
+   *
+   * @param  {Number}  timeoutMs  Idle timeout in milliseconds
+   * @return {Promise}            Array of idle rooms
+   */
+  static async getIdleEphemeral (timeoutMs: number = IDLE_TIMEOUT_MS) {
+    const cutoff = Math.floor((Date.now() - timeoutMs) / 1000)
+    const query = sql`
+      SELECT * FROM rooms
+      WHERE ownerId IS NOT NULL
+        AND lastActivity < ${cutoff}
+    `
+    return await db.all(String(query), query.parameters)
+  }
+
+  /**
+   * Check if a room is ephemeral (has an owner)
+   *
+   * @param  {Number}  roomId
+   * @return {Promise}
+   */
+  static async isEphemeral (roomId: number): Promise<boolean> {
+    const query = sql`SELECT ownerId FROM rooms WHERE roomId = ${roomId}`
+    const row = await db.get(String(query), query.parameters)
+    return row?.ownerId !== null && row?.ownerId !== undefined
   }
 }
 
