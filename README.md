@@ -86,6 +86,24 @@ npm run lint    # Run linter
 | `KES_EPHEMERAL_ROOMS` | `true` | Enable auto-create rooms per user |
 | `KES_ROOM_IDLE_TIMEOUT` | `240` | Minutes before idle room cleanup |
 
+### Proxy Security
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KES_REQUIRE_PROXY` | `true` (prod), `false` (dev) | Reject requests not from trusted proxy |
+| `KES_TRUSTED_PROXIES` | _(empty)_ | Comma-separated IPs/CIDRs (e.g., `10.0.0.1,192.168.0.0/16`) |
+
+When `KES_REQUIRE_PROXY=true`, only requests from loopback addresses (`127.0.0.1`, `::1`) or IPs matching `KES_TRUSTED_PROXIES` are allowed. This prevents attackers from bypassing authentication by accessing the server directly.
+
+**Important**: When proxy enforcement is enabled, configure `KES_TRUSTED_PROXIES` to match your reverse proxy's IP address.
+
+### Admin Role Behavior
+
+Admin privileges are **strictly synced** with the SSO groups header on every request:
+- If a user is in the admin group, they become admin
+- If a user is removed from the admin group, they are **demoted** to standard user
+- This ensures SSO is the source of truth for access control
+
 ## Authentik Integration
 
 This fork is designed to work with [Authentik](https://goauthentik.io/) forward auth.
@@ -141,8 +159,10 @@ karaoke.yourdomain.com {
 2. Caddy's `forward_auth` checks with Authentik
 3. If not logged in, user is redirected to Authentik login
 4. After login, Authentik adds `X-Authentik-Username` header
-5. Karaoke Eternal reads the header and auto-creates/joins the user's room
-6. No additional login required - SSO handles everything
+5. Karaoke Eternal reads the header and sets a session cookie
+6. On page load, the app automatically checks for an existing session
+7. User lands directly in their room - **no login UI ever shown**
+8. Admin privileges sync automatically based on Authentik groups
 
 ## Database Migrations
 

@@ -12,6 +12,7 @@ import {
   ACCOUNT_REQUEST,
   ACCOUNT_CREATE,
   ACCOUNT_UPDATE,
+  BOOTSTRAP_COMPLETE,
   LOGIN,
   LOGOUT,
   SOCKET_AUTH_ERROR,
@@ -22,6 +23,29 @@ const api = new HttpApi('')
 const basename = new URL(document.baseURI).pathname
 
 const receiveAccount = createAction<object>(ACCOUNT_RECEIVE)
+const bootstrapComplete = createAction(BOOTSTRAP_COMPLETE)
+
+// ------------------------------------
+// Check for existing SSO session on bootstrap
+// ------------------------------------
+export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
+  'user/CHECK_SESSION',
+  async (_, thunkAPI) => {
+    try {
+      const user = await api.get('user')
+      // Server returned valid user - we have a session from SSO header auth
+      Persistor.get().purge()
+      thunkAPI.dispatch(receiveAccount(user))
+      thunkAPI.dispatch(fetchPrefs())
+      thunkAPI.dispatch(connectSocket())
+      socket.open()
+    } catch {
+      // No valid session - expected for users without SSO/header auth
+    } finally {
+      thunkAPI.dispatch(bootstrapComplete())
+    }
+  },
+)
 
 // ------------------------------------
 // Login
@@ -164,6 +188,7 @@ interface UserState {
   roomId: number | null
   isAdmin: boolean
   isGuest: boolean
+  isBootstrapping: boolean
   dateCreated: number
   dateUpdated: number
 }
@@ -175,6 +200,7 @@ const initialState: UserState = {
   roomId: null,
   isAdmin: false,
   isGuest: false,
+  isBootstrapping: true,
   dateCreated: 0,
   dateUpdated: 0,
 }
@@ -185,15 +211,22 @@ const userReducer = createReducer(initialState, (builder) => {
       ...state,
       ...payload,
     }))
+    .addCase(bootstrapComplete, (state) => ({
+      ...state,
+      isBootstrapping: false,
+    }))
     .addCase(LOGOUT, () => ({
       ...initialState,
+      isBootstrapping: false,
     }))
     .addCase(SOCKET_AUTH_ERROR, () => ({
       ...initialState,
+      isBootstrapping: false,
     }))
 })
 
 export default persistReducer({
   key: 'user',
   storage,
+  blacklist: ['isBootstrapping'],
 }, userReducer)

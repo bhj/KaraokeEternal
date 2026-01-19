@@ -193,32 +193,34 @@ class User {
     }
 
     username = username.trim()
+    const targetRole = isAdmin ? 'admin' : 'standard'
 
     // Check if user already exists
     const existingUser = await User.getByUsername(username, true)
     if (existingUser) {
-      // Sync admin status from SSO groups header
-      if (isAdmin && existingUser.role !== 'admin') {
+      // Strict sync: always update role to match groups header (promotes AND demotes)
+      if (existingUser.role !== targetRole) {
+        const now = Math.floor(Date.now() / 1000)
         const updateQuery = sql`
           UPDATE users
-          SET roleId = (SELECT roleId FROM roles WHERE name = 'admin'),
-              dateUpdated = ${Math.floor(Date.now() / 1000)}
+          SET roleId = (SELECT roleId FROM roles WHERE name = ${targetRole}),
+              dateUpdated = ${now}
           WHERE userId = ${existingUser.userId}
         `
         await db.run(String(updateQuery), updateQuery.parameters)
-        existingUser.role = 'admin'
+        existingUser.role = targetRole
+        existingUser.dateUpdated = now
       }
       return existingUser
     }
 
     // Create new user with random UUID password (they'll never use it - header auth only)
-    const role = isAdmin ? 'admin' : 'standard'
     const fields = new Map()
     fields.set('username', username)
     fields.set('password', await bcrypt.hash(crypto.randomUUID(), BCRYPT_ROUNDS))
     fields.set('name', username) // Display name = username
     fields.set('dateCreated', Math.floor(Date.now() / 1000))
-    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${role})`)
+    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${targetRole})`)
 
     const query = sql`
       INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}

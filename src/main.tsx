@@ -4,15 +4,18 @@ import { RouterProvider } from 'react-router'
 import store from './store/store'
 import socket from 'lib/socket'
 import AppRouter from 'lib/AppRouter'
-import { connectSocket } from './store/modules/user'
+import { checkSession, connectSocket } from './store/modules/user'
 import Persistor from 'store/Persistor'
 
 Persistor.init(store, () => {
-  // rehydration complete; open socket connection
-  // if it looks like we have a valid session
+  // rehydration complete
   if (store.getState().user.userId !== null) {
+    // local session exists - connect socket directly
     store.dispatch(connectSocket())
     socket.open()
+  } else {
+    // no local session - check for SSO session (proxy may have set JWT cookie)
+    store.dispatch(checkSession())
   }
 })
 

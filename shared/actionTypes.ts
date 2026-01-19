@@ -55,6 +55,7 @@ export const ACCOUNT_RECEIVE = 'user/ACCOUNT_RECEIVE'
 export const ACCOUNT_CREATE = 'user/ACCOUNT_CREATE'
 export const ACCOUNT_UPDATE = 'user/ACCOUNT_UPDATE'
 export const ACCOUNT_REQUEST = 'user/ACCOUNT_REQUEST'
+export const BOOTSTRAP_COMPLETE = 'user/BOOTSTRAP_COMPLETE'
 
 // Rooms
 export const ROOMS_RECEIVE = 'rooms/RECEIVE'

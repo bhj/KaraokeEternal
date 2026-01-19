@@ -30,6 +30,7 @@ import IPCMediaActions from './Media/ipc.js'
 import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from '../shared/actionTypes.js'
 import User from './User/User.js'
 import Rooms from './Rooms/Rooms.js'
+import { createProxyValidator } from './lib/proxyValidator.js'
 
 const { sign: jwtSign } = jsonWebToken
 
@@ -40,6 +41,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   const indexFile = path.join(env.KES_PATH_WEBROOT, 'index.html')
   const urlPath = env.KES_URL_PATH.replace(/\/?$/, '/') // force trailing slash
   const jwtKey = await Prefs.getJwtKey(env.KES_ROTATE_KEY)
+  const validateProxySource = createProxyValidator(env)
   const app = new Koa()
   let server, io
 
@@ -67,7 +69,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     })
 
     // attach socket.io handlers
-    socketActions(io, jwtKey)
+    socketActions(io, jwtKey, validateProxySource)
 
     // attach IPC action handlers
     IPC.use(IPCLibraryActions(io))
@@ -161,6 +163,17 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   app.use(koaFavicon(path.join(env.KES_PATH_ASSETS, 'favicon.ico')))
   app.use(koaRange)
   app.use(koaBody({ multipart: true }))
+
+  // proxy source validation
+  app.use(async (ctx, next) => {
+    const remoteAddress = ctx.request.socket?.remoteAddress || ctx.ip
+    if (!validateProxySource(remoteAddress)) {
+      ctx.status = 403
+      ctx.body = 'Direct access not permitted'
+      return
+    }
+    await next()
+  })
 
   // all http requests
   app.use(async (ctx, next) => {

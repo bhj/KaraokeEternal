@@ -34,8 +34,16 @@ const handlers = {
 
 const { verify: jwtVerify } = jsonWebToken
 
-export default function (io, jwtKey) {
+export default function (io, jwtKey, validateProxySource: (ip: string) => boolean) {
   io.on('connection', async (sock) => {
+    // validate proxy source before doing anything else
+    const remoteAddress = sock.handshake.address
+    if (!validateProxySource(remoteAddress)) {
+      log.verbose('rejected socket connection from untrusted IP: %s', remoteAddress)
+      sock.disconnect(true)
+      return
+    }
+
     const { keToken } = parseCookie(sock.handshake.headers.cookie)
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
     const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
