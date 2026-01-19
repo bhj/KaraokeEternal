@@ -2,6 +2,7 @@ import bcrypt from '../lib/bcrypt.js'
 import sql from 'sqlate'
 import Database from '../lib/Database.js'
 import { ValidationError } from '../lib/Errors.js'
+import { AuthentikClient } from '../lib/AuthentikClient.js'
 
 const { db } = Database
 const BCRYPT_ROUNDS = 12
@@ -55,6 +56,7 @@ class Rooms {
     res.forEach((row) => {
       const data = JSON.parse(row.data)
       row.prefs = data.prefs ?? {}
+      row.invitationToken = data.invitationToken ?? null
       delete row.data
 
       row.hasPassword = !!row.password
@@ -244,7 +246,7 @@ class Rooms {
    *
    * @param  {Number}  userId   Owner's userId
    * @param  {String}  name     Room name (usually username)
-   * @return {Promise}          The created room
+   * @return {Promise}          The created room ID
    */
   static async createEphemeral (userId: number, name: string) {
     const now = Math.floor(Date.now() / 1000)
@@ -253,7 +255,20 @@ class Rooms {
       VALUES (${name}, 'open', ${now}, ${userId}, ${now}, '{}')
     `
     const res = await db.run(String(query), query.parameters)
-    return res.lastID
+    const roomId = res.lastID
+
+    // Create Authentik invitation and store token
+    const invitationToken = await AuthentikClient.createInvitation(roomId)
+    if (invitationToken) {
+      const updateQuery = sql`
+        UPDATE rooms
+        SET data = json_set(data, '$.invitationToken', ${invitationToken})
+        WHERE roomId = ${roomId}
+      `
+      await db.run(String(updateQuery), updateQuery.parameters)
+    }
+
+    return roomId
   }
 
   /**
@@ -307,6 +322,21 @@ class Rooms {
 
     // Clean up memory tracking
     roomUsers.delete(roomId)
+  }
+
+  /**
+   * Delete a room with Authentik cleanup (for explicit admin delete)
+   * This cleans up Authentik invitations and guest users for the room
+   *
+   * @param  {Number}  roomId
+   * @return {Promise}
+   */
+  static async deleteWithCleanup (roomId: number) {
+    // Cleanup Authentik resources first
+    await AuthentikClient.cleanupRoom(roomId)
+
+    // Then delete room normally
+    await Rooms.delete(roomId)
   }
 
   /**

@@ -19,6 +19,8 @@ const PlayerController = (props: PlayerControllerProps) => {
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
   const prefs = useAppSelector(state => state.prefs)
   const roomPrefs = useAppSelector(getRoomPrefs)
+  const roomId = useAppSelector(state => state.user.roomId)
+  const room = useAppSelector(state => roomId ? state.rooms.entities[roomId] : null)
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
@@ -185,6 +187,7 @@ const PlayerController = (props: PlayerControllerProps) => {
         <PlayerQR
           height={props.height}
           prefs={roomPrefs.qr}
+          invitationToken={room?.invitationToken}
           queueItem={queueItem}
         />
       )}

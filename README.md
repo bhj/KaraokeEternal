@@ -81,10 +81,21 @@ npm run lint    # Run linter
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `KES_AUTH_HEADER` | `X-Authentik-Username` | Header containing username |
-| `KES_GROUPS_HEADER` | `X-Authentik-Groups` | Header containing groups (comma-separated) |
+| `KES_GROUPS_HEADER` | `X-Authentik-Groups` | Header containing groups (pipe-separated) |
 | `KES_ADMIN_GROUP` | `admin` | Group name that grants admin privileges |
+| `KES_GUEST_GROUP` | `karaoke-guests` | Group name for guest users |
+| `KES_ROOM_ID_HEADER` | `X-Authentik-Karaoke-Room-Id` | Header for guest room assignment |
 | `KES_EPHEMERAL_ROOMS` | `true` | Enable auto-create rooms per user |
 | `KES_ROOM_IDLE_TIMEOUT` | `240` | Minutes before idle room cleanup |
+
+### Authentik Guest Invitations
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KES_AUTHENTIK_URL` | - | Internal Authentik URL for API calls |
+| `KES_AUTHENTIK_API_TOKEN` | - | Authentik API token |
+| `KES_AUTHENTIK_PUBLIC_URL` | - | External Authentik URL for QR codes |
+| `KES_AUTHENTIK_ENROLLMENT_FLOW` | `karaoke-guest-enrollment` | Enrollment flow slug |
 
 ### Proxy Security
 
@@ -139,7 +150,7 @@ karaoke.yourdomain.com {
     # Forward auth
     forward_auth localhost:9000 {
         uri /outpost.goauthentik.io/auth/caddy
-        copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Email X-Authentik-Name X-Authentik-Uid
+        copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Karaoke-Room-Id
         trusted_proxies private_ranges
     }
 
@@ -163,6 +174,30 @@ karaoke.yourdomain.com {
 6. On page load, the app automatically checks for an existing session
 7. User lands directly in their room - **no login UI ever shown**
 8. Admin privileges sync automatically based on Authentik groups
+
+### Guest Invitations
+
+Guests can join rooms via QR code without needing existing Authentik accounts:
+
+1. **Host opens Player** - QR code displays with Authentik enrollment URL
+2. **Guest scans QR** - Lands on Authentik enrollment page
+3. **Guest enters display name** - Authentik creates account in `karaoke-guests` group
+4. **Guest is redirected** - Automatically joined to host's room via `X-Authentik-Karaoke-Room-Id` header
+
+**Authentik Setup for Guest Invitations:**
+
+1. Create `karaoke-guests` group (bind only to karaoke app)
+2. Create enrollment flow `karaoke-guest-enrollment`:
+   - **Invitation Stage**: Require `itoken` parameter
+   - **Prompt Stage**: Display name only (auto-generate username)
+   - **User Write Stage**: Add to `karaoke-guests` group, copy `karaoke_room_id` from invitation to user attributes
+   - **Redirect Stage**: Use `?next` URL parameter
+3. Create API token with permissions: `flows.instances` (read), `stages.invitation.invitations` (create, delete, list), `core.users` (list, delete)
+4. Configure proxy outpost to pass `X-Authentik-Karaoke-Room-Id` header: `{{ user.attributes.karaoke_room_id|default('') }}`
+
+**Guest Cleanup:**
+- When an admin explicitly deletes a room, Authentik invitations and guest accounts for that room are automatically deleted
+- Idle room cleanup does NOT delete Authentik accounts (prevents accidental data loss)
 
 ## Database Migrations
 

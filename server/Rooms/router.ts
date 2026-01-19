@@ -1,6 +1,4 @@
 import KoaRouter from '@koa/router'
-import sql from 'sqlate'
-import Database from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
@@ -10,7 +8,6 @@ interface RequestWithBody {
 }
 
 const log = getLogger('Rooms')
-const { db } = Database
 const router = new KoaRouter({ prefix: '/api/rooms' })
 
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
@@ -92,23 +89,12 @@ router.delete('/:roomId', async (ctx) => {
 
   const roomId = parseInt(ctx.params.roomId, 10)
 
-  if (typeof roomId !== 'number') {
+  if (isNaN(roomId)) {
     ctx.throw(422, 'Invalid roomId')
   }
 
-  // remove room's queue first
-  const queueQuery = sql`
-    DELETE FROM queue
-    WHERE roomId = ${roomId}
-  `
-  await db.run(String(queueQuery), queueQuery.parameters)
-
-  // remove room
-  const roomQuery = sql`
-    DELETE FROM rooms
-    WHERE roomId = ${roomId}
-  `
-  await db.run(String(roomQuery), roomQuery.parameters)
+  // Use deleteWithCleanup for explicit admin delete (cleans up Authentik resources)
+  await Rooms.deleteWithCleanup(roomId)
 
   log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
 

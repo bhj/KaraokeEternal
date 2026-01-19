@@ -18,6 +18,15 @@ interface RequestWithBody {
 const log = getLogger('Prefs')
 const router = new KoaRouter({ prefix: '/api/prefs' })
 
+// GET /api/prefs/public - Returns non-sensitive config for client (e.g., Authentik URL for QR codes)
+router.get('/public', async (ctx) => {
+  ctx.body = {
+    // Use PUBLIC_URL for client-facing QR codes (external), not internal API URL
+    authentikUrl: process.env.KES_AUTHENTIK_PUBLIC_URL || null,
+    enrollmentFlow: process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment',
+  }
+})
+
 // get all prefs (including media paths)
 router.get('/', async (ctx) => {
   const prefs = await Prefs.get() as unknown as PrefsType

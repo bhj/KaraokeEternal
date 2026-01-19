@@ -58,6 +58,7 @@ export interface Room {
   hasPassword: boolean
   numUsers: number
   prefs?: IRoomPrefs
+  invitationToken?: string | null
 }
 
 export interface Role {

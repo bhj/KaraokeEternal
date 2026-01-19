@@ -187,15 +187,17 @@ class User {
    *
    * @param  {String}  username  Username from auth header
    * @param  {Boolean} isAdmin   Whether user should have admin role
+   * @param  {Boolean} isGuest   Whether user should have guest role
    * @return {Promise}           User object
    */
-  static async getOrCreateFromHeader (username: string, isAdmin: boolean = false) {
+  static async getOrCreateFromHeader (username: string, isAdmin: boolean = false, isGuest: boolean = false) {
     if (!username || typeof username !== 'string') {
       throw new Error('Username is required')
     }
 
     username = username.trim()
-    const targetRole = isAdmin ? 'admin' : 'standard'
+    // Priority: admin > standard > guest
+    const targetRole = isAdmin ? 'admin' : (isGuest ? 'guest' : 'standard')
 
     // Check if user already exists
     const existingUser = await User.getByUsername(username, true)

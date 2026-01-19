@@ -190,31 +190,58 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     const authHeader = (process.env.KES_AUTH_HEADER || 'x-authentik-username').toLowerCase()
     const groupsHeader = (process.env.KES_GROUPS_HEADER || 'x-authentik-groups').toLowerCase()
     const adminGroup = process.env.KES_ADMIN_GROUP || 'admin'
+    const guestGroup = process.env.KES_GUEST_GROUP || 'karaoke-guests'
+    const roomIdHeader = (process.env.KES_ROOM_ID_HEADER || 'x-authentik-karaoke-room-id').toLowerCase()
     const ephemeralEnabled = process.env.KES_EPHEMERAL_ROOMS !== 'false'
 
     const headerUsername = ctx.request.header[authHeader]
     if (headerUsername && typeof headerUsername === 'string') {
       try {
-        // Check if user is admin via groups header
+        // Check if user is admin/guest via groups header
         const groupsRaw = ctx.request.header[groupsHeader] || ''
         // Authentik uses pipe separator for groups
         const groups = typeof groupsRaw === 'string' ? groupsRaw.split('|').map(g => g.trim()) : []
         const isAdmin = groups.includes(adminGroup)
-        log.info('SSO auth: user=%s groups=%j adminGroup=%s isAdmin=%s', headerUsername, groups, adminGroup, isAdmin)
+        const isGuest = groups.includes(guestGroup)
+        log.info('SSO auth: user=%s groups=%j isAdmin=%s isGuest=%s', headerUsername, groups, isAdmin, isGuest)
 
         // Get or create user from header
-        const user = await User.getOrCreateFromHeader(headerUsername, isAdmin)
+        const user = await User.getOrCreateFromHeader(headerUsername, isAdmin, isGuest)
 
-        // Get or create ephemeral room for this user (if enabled)
-        let room = ephemeralEnabled ? await Rooms.getByOwnerId(user.userId) : null
-        if (ephemeralEnabled && !room) {
-          const roomId = await Rooms.createEphemeral(user.userId, user.username)
-          room = { roomId }
-        }
+        let room
 
-        // Update room activity
-        if (room) {
-          await Rooms.updateActivity(room.roomId)
+        if (isGuest) {
+          // GUESTS: Use room from Authentik attribute header (set during enrollment)
+          // Guests do NOT get their own ephemeral room
+          const guestRoomIdRaw = ctx.request.header[roomIdHeader]
+          // Defensive: header can be string or array
+          const guestRoomId = Array.isArray(guestRoomIdRaw) ? guestRoomIdRaw[0] : guestRoomIdRaw
+
+          if (guestRoomId) {
+            const roomIdNum = parseInt(guestRoomId, 10)
+            if (!isNaN(roomIdNum)) {
+              try {
+                // Validate room: must exist, be open, and allow guests
+                await Rooms.validate(roomIdNum, null, { isOpen: true, role: 'guest' })
+                room = { roomId: roomIdNum }
+                await Rooms.updateActivity(roomIdNum)
+              } catch (err) {
+                // Room validation failed - guest cannot join
+                log.warn('Guest %s cannot join room %d: %s', headerUsername, roomIdNum, (err as Error).message)
+                // Guest has no room - they'll see an error or be redirected
+              }
+            }
+          }
+          // If no valid room header or validation failed, guest has no room
+        } else if (ephemeralEnabled) {
+          // NON-GUESTS: Get or create ephemeral room
+          room = await Rooms.getByOwnerId(user.userId)
+          if (!room) {
+            const roomId = await Rooms.createEphemeral(user.userId, user.username)
+            room = { roomId }
+          } else {
+            await Rooms.updateActivity(room.roomId)
+          }
         }
 
         // Build JWT payload - admin from groups header takes precedence
@@ -223,8 +250,8 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
           username: user.username,
           name: user.name,
           isAdmin: isAdmin || user.role === 'admin',
-          isGuest: false,
-          roomId: room?.roomId,
+          isGuest: isGuest || user.role === 'guest',
+          roomId: room?.roomId ?? null,
           dateUpdated: user.dateUpdated,
         }
 
