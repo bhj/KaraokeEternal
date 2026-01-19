@@ -1,6 +1,5 @@
 build/
-coverage/
-dist/
+dockerfiles/
 docs/public/
 docs/resources/
 node_modules/
@@ -12,5 +11,4 @@ node_modules/
 *.sqlite3-wal
 *.tsbuildinfo
 .hugo_build.lock
-.nova
 .vscode
