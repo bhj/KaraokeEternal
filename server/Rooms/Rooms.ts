@@ -1,9 +1,8 @@
 import bcrypt from '../lib/bcrypt.js'
 import sql from 'sqlate'
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import { ValidationError } from '../lib/Errors.js'
 
-const { db } = Database
 const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1
 const NAME_MAX_LENGTH = 50
@@ -48,7 +47,16 @@ class Rooms {
       ${whereClause}
       ORDER BY dateCreated DESC
     `
-    const res = await db.all(String(query), query.parameters)
+    const res = db.all<{
+      roomId: number,
+      name: string, // assuming name exists
+      status: string, // assuming status exists
+      data: string,
+      password?: string | null,
+      dateCreated: string | number,
+      prefs?: any,
+      hasPassword?: boolean
+    }>(String(query), query.parameters)
 
     res.forEach((row) => {
       const data = JSON.parse(row.data)
@@ -58,7 +66,7 @@ class Rooms {
       row.hasPassword = !!row.password
       if (!includePassword) delete row.password
 
-      row.dateCreated = parseInt(row.dateCreated, 10) // v1.0 schema used 'text' column
+      row.dateCreated = parseInt(String(row.dateCreated), 10) // v1.0 schema used 'text' column
 
       result.push(row.roomId)
       entities[row.roomId] = row
@@ -111,7 +119,7 @@ class Rooms {
       `
     }
 
-    return await db.run(String(query), query.parameters)
+    return db.run(String(query), query.parameters)
   }
 
   /**
@@ -156,7 +164,7 @@ class Rooms {
 
     if (role) {
       const query = sql`SELECT roleId FROM roles WHERE name = ${role}`
-      const row = await db.get(String(query), query.parameters)
+      const row = db.get<{ roleId: number }>(String(query), query.parameters)
       const roleId = row?.roleId
 
       if (!roleId) {

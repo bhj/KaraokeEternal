@@ -1,11 +1,11 @@
 import sql from 'sqlate'
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
 import { performance } from 'perf_hooks'
+import { Song, Artist } from '../../shared/types.js'
 import Media from '../Media/Media.js'
 
 const log = getLogger('Library')
-const { db } = Database
 
 class Library {
   static cache: { version: any, artists?: any, songs?: any } = { version: null }
@@ -44,7 +44,7 @@ class Library {
         GROUP BY songId
         ORDER BY songs.titleNorm, paths.priority ASC
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<Song & { isPreferred: number }>(String(query), query.parameters)
 
       for (const row of rows) {
         delete row.isPreferred
@@ -67,7 +67,7 @@ class Library {
         FROM artists
         ORDER BY nameNorm ASC
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<Artist>(String(query), query.parameters)
 
       for (const row of rows) {
         if (SongIdsByArtist[row.artistId]) {
@@ -135,7 +135,7 @@ class Library {
         FROM artists
         WHERE nameNorm = ${parsed.artistNorm}
       `
-      const row = await db.get(String(query), query.parameters)
+      const row = db.get<{ artistId: number, name: string, nameNorm: string }>(String(query), query.parameters)
 
       if (row) {
         log.debug('matched artist: %s', row.name)
@@ -153,7 +153,7 @@ class Library {
           INSERT INTO artists ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
           VALUES ${sql.tuple(Array.from(fields.values()))}
         `
-        const res = await db.run(String(query), query.parameters)
+        const res = db.run(String(query), query.parameters)
 
         if (!Number.isInteger(res.lastID)) {
           throw new Error('invalid artistId after insert')
@@ -172,7 +172,7 @@ class Library {
         FROM songs
         WHERE artistId = ${match.artistId} AND titleNorm = ${parsed.titleNorm}
       `
-      const row = await db.get(String(query), query.parameters)
+      const row = db.get<{ songId: number, title: string, titleNorm: string }>(String(query), query.parameters)
 
       if (row) {
         log.debug('matched song: %s', row.title)
@@ -191,7 +191,7 @@ class Library {
           INSERT INTO songs ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
           VALUES ${sql.tuple(Array.from(fields.values()))}
         `
-        const res = await db.run(String(query), query.parameters)
+        const res = db.run(String(query), query.parameters)
 
         if (!Number.isInteger(res.lastID)) {
           throw new Error('invalid songId after insert')
@@ -222,7 +222,7 @@ class Library {
         FROM artistStars
         WHERE userId = ${userId}
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<{ artistId: number }>(String(query), query.parameters)
 
       starredArtists = rows.map(row => row.artistId)
     }
@@ -234,7 +234,7 @@ class Library {
         FROM songStars
         WHERE userId = ${userId}
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<{ songId: number }>(String(query), query.parameters)
 
       starredSongs = rows.map(row => row.songId)
     }
@@ -258,7 +258,7 @@ class Library {
       INSERT OR IGNORE INTO songStars ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
       VALUES ${sql.tuple(Array.from(fields.values()))}
     `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
 
     if (res.changes) {
       // invalidate cache
@@ -280,7 +280,7 @@ class Library {
       DELETE FROM songStars
       WHERE userId = ${userId} AND songId = ${songId}
     `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
 
     if (res.changes) {
       // invalidate cache
@@ -311,7 +311,7 @@ class Library {
         FROM artistStars
         GROUP BY artistId
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<{ artistId: number, count: number }>(String(query), query.parameters)
 
       rows.forEach((row) => {
         artists[row.artistId] = row.count
@@ -325,7 +325,7 @@ class Library {
         FROM songStars
         GROUP BY songId
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<{ songId: number, count: number }>(String(query), query.parameters)
 
       rows.forEach((row) => {
         songs[row.songId] = row.count

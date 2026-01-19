@@ -1,10 +1,9 @@
 import sql from 'sqlate'
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
 import Queue from '../Queue/Queue.js'
 
 const log = getLogger('Media')
-const { db } = Database
 
 class Media {
   /**
@@ -36,7 +35,7 @@ class Media {
       WHERE ${whereClause}
       ORDER BY paths.priority ASC
     `
-    const rows = await db.all(String(query), query.parameters)
+    const rows = db.all<{ mediaId: number } & Record<string, any>>(String(query), query.parameters)
 
     for (const row of rows) {
       media.result.push(row.mediaId)
@@ -64,7 +63,7 @@ class Media {
       INSERT INTO media ${sql.tuple(Object.keys(media).map(sql.column))}
       VALUES ${sql.tuple(Object.values(media))}
     `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
 
     if (!Number.isInteger(res.lastID)) {
       throw new Error('invalid lastID from media insert')
@@ -94,7 +93,7 @@ class Media {
       SET ${sql.tuple(Object.keys(media).map(sql.column))} = ${sql.tuple(Object.values(media))}
       WHERE mediaId = ${mediaId}
     `
-    await db.run(String(query), query.parameters)
+    db.run(String(query), query.parameters)
   }
 
   /**
@@ -111,7 +110,7 @@ class Media {
         DELETE FROM media
         WHERE mediaId IN ${sql.in(mediaIds.splice(0, batchSize))}
       `
-      const res = await db.run(String(query), query.parameters)
+      const res = db.run(String(query), query.parameters)
 
       log.info(`removed ${res.changes} media`)
     }
@@ -126,7 +125,7 @@ class Media {
     let res
 
     // remove media in nonexistent paths
-    res = await db.run(`
+    res = db.run(`
       DELETE FROM media WHERE mediaId IN (
         SELECT media.mediaId FROM media LEFT JOIN paths USING(pathId) WHERE paths.pathId IS NULL
       )
@@ -134,7 +133,7 @@ class Media {
     log.info(`cleanup: ${res.changes} media in nonexistent paths`)
 
     // remove songs without associated media
-    res = await db.run(`
+    res = db.run(`
       DELETE FROM songs WHERE songId IN (
         SELECT songs.songId FROM songs LEFT JOIN media USING(songId) WHERE media.mediaId IS NULL
       )
@@ -142,7 +141,7 @@ class Media {
     log.info(`cleanup: ${res.changes} songs with no associated media`)
 
     // remove stars for nonexistent songs
-    res = await db.run(`
+    res = db.run(`
       DELETE FROM songStars WHERE songId IN (
         SELECT songStars.songId FROM songStars LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
       )
@@ -150,7 +149,7 @@ class Media {
     log.info(`cleanup: ${res.changes} stars for nonexistent songs`)
 
     // remove queue items for nonexistent songs
-    const rows = await db.all(`
+    const rows = db.all<{ queueId: number }>(`
       SELECT queue.queueId FROM queue LEFT JOIN songs USING(songId) WHERE songs.songId IS NULL
     `)
 
@@ -161,7 +160,7 @@ class Media {
     log.info(`cleanup: ${rows.length} queue items for nonexistent songs`)
 
     log.info('cleanup: vacuuming database')
-    await db.run('VACUUM')
+    db.run('VACUUM')
   }
 
   /**
@@ -190,7 +189,7 @@ class Media {
       SET isPreferred = 0
       WHERE songId = ${songId}
     `
-    await db.run(String(query), query.parameters)
+    db.run(String(query), query.parameters)
 
     if (isPreferred) {
       await Media.update({ mediaId, isPreferred: 1 })

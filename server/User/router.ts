@@ -1,6 +1,6 @@
 import { promisify } from 'util'
 import fs from 'fs'
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import sql from 'sqlate'
 import jsonWebToken from 'jsonwebtoken'
 import bcrypt from '../lib/bcrypt.js'
@@ -31,7 +31,6 @@ interface RequestWithBody {
 }
 
 const router = new KoaRouter({ prefix: '/api' })
-const { db } = Database
 const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
 const { sign: jwtSign } = jsonWebToken
@@ -178,8 +177,14 @@ router.put('/user/:userId', async (ctx) => {
   const user = await User.getById(ctx.user.userId, true)
 
   // must be admin if updating another user
-  if (!user || (targetId !== user.userId && user.role !== 'admin')) {
+  if (!user) {
     ctx.throw(401)
+    return
+  }
+
+  if (targetId !== user.userId && user.role !== 'admin') {
+    ctx.throw(401)
+    return
   }
 
   const req = ctx.request as unknown as RequestWithBody
@@ -273,7 +278,7 @@ router.put('/user/:userId', async (ctx) => {
     SET ${sql.tuple(Array.from(fields.keys()).map(sql.column))} = ${sql.tuple(Array.from(fields.values()))}
     WHERE userId = ${targetId}
   `
-  const res = await db.run(String(query), query.parameters)
+  const res = db.run(String(query), query.parameters)
 
   if (!res.changes) {
     ctx.throw(404, `userId ${targetId} not found`)
@@ -381,6 +386,11 @@ router.post('/user', async (ctx) => {
     }
 
     const user = await User.getById(userId, true)
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
     const userCtx = createUserCtx(user, req.body.roomId || null)
 
     // create JWT
@@ -418,7 +428,7 @@ router.post('/setup', async (ctx) => {
     INSERT INTO rooms ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
     VALUES ${sql.tuple(Array.from(fields.values()))}
   `
-  const res = await db.run(String(query), query.parameters)
+  const res = db.run(String(query), query.parameters)
 
   if (typeof res.lastID !== 'number') {
     ctx.throw(500, 'Invalid default room lastID')
@@ -434,6 +444,11 @@ router.post('/setup', async (ctx) => {
     // create JWT
     const token = jwtSign(userCtx, ctx.jwtKey)
 
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
     // set JWT as an httpOnly cookie
     ctx.cookies.set('keToken', token, {
       sameSite: 'lax',
@@ -446,7 +461,7 @@ router.post('/setup', async (ctx) => {
       SET data = 'false'
       WHERE key = 'isFirstRun'
     `
-    await db.run(String(query))
+    db.run(String(query))
 
     // success
     ctx.body = userCtx
@@ -470,6 +485,7 @@ router.get('/user/:userId/image', async (ctx) => {
 
   if (!user || !user.image) {
     ctx.throw(404)
+    return
   }
 
   if (typeof ctx.query.v !== 'undefined') {

@@ -1,8 +1,6 @@
 import path from 'path'
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import sql from 'sqlate'
-
-const { db } = Database
 
 class Queue {
   /**
@@ -30,7 +28,7 @@ class Queue {
       INSERT INTO queue ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
       VALUES ${sql.tuple(Array.from(fields.values()))}
     `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
 
     if (res.changes !== 1) {
       throw new Error('Could not add song to queue')
@@ -64,7 +62,12 @@ class Queue {
       GROUP BY queueId
       ORDER BY queueId, paths.priority ASC
     `
-    const rows = await db.all(String(query), query.parameters)
+    const rows = db.all<{
+      queueId: number, songId: number, userId: number, prevQueueId: number,
+      mediaId: number, relPath: string, rgTrackGain: number, rgTrackPeak: number,
+      userDisplayName: string, userDateUpdated: number,
+      pathId: number, pathData: string, isPreferred: number
+    }>(String(query), query.parameters)
 
     for (const row of rows) {
       if (!pathData.has(row.pathId)) {
@@ -143,7 +146,7 @@ class Queue {
       )
       WHERE roomId = ${roomId}
     `
-    await db.run(String(query), query.parameters)
+    db.run(String(query), query.parameters)
   }
 
   /**
@@ -177,14 +180,14 @@ class Queue {
       )
       WHERE queueId = curChild
     `
-    await db.run(String(updateQuery), updateQuery.parameters)
+    db.run(String(updateQuery), updateQuery.parameters)
 
     // delete item
     const deleteQuery = sql`
       DELETE FROM queue
       WHERE queueId = ${queueId}
     `
-    const deleteRes = await db.run(String(deleteQuery), deleteQuery.parameters)
+    const deleteRes = db.run(String(deleteQuery), deleteQuery.parameters)
 
     if (!deleteRes.changes) {
       throw new Error(`Could not remove queueId: ${queueId}`)
@@ -206,7 +209,7 @@ class Queue {
       FROM queue
       WHERE userId = ${userId} AND queueId IN ${sql.tuple(ids)}
     `
-    const res = await db.get(String(query), query.parameters)
+    const res = db.get<{ count: number }>(String(query), query.parameters)
     return res.count === ids.length
   }
 

@@ -1,10 +1,10 @@
 import path from 'path'
 import sql from 'sqlate'
 import crypto from 'crypto'
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
+
 const log = getLogger('Prefs')
-const { db } = Database
 
 class Prefs {
   /**
@@ -20,9 +20,9 @@ class Prefs {
     {
       const query = sql`
         SELECT * FROM prefs
-        WHERE key != "jwtKey"
+        WHERE key != 'jwtKey'
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<{ key: string, data: string }>(String(query), query.parameters)
 
       // json-decode key/val pairs
       rows.forEach((row) => {
@@ -36,7 +36,7 @@ class Prefs {
         SELECT roleId, name
         FROM roles
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<{ roleId: number, name: string }>(String(query), query.parameters)
 
       for (const row of rows) {
         prefs.roles.entities[row.roleId] = row
@@ -50,7 +50,7 @@ class Prefs {
         SELECT * FROM paths
         ORDER BY priority
       `
-      const rows = await db.all(String(query), query.parameters)
+      const rows = db.all<{ pathId: number, path: string, priority: number, data: string }>(String(query), query.parameters)
 
       for (const row of rows) {
         const data = JSON.parse(row.data)
@@ -74,7 +74,7 @@ class Prefs {
       REPLACE INTO prefs (key, data)
       VALUES (${key}, ${JSON.stringify(data)})
     `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
     return res.changes === 1
   }
 
@@ -103,7 +103,7 @@ class Prefs {
       INSERT INTO paths ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
       VALUES ${sql.tuple(Array.from(fields.values()))}
     `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
 
     if (!Number.isInteger(res.lastID)) {
       throw new Error('invalid lastID from path insert')
@@ -121,7 +121,7 @@ class Prefs {
       DELETE FROM paths
       WHERE pathId = ${pathId}
     `
-    await db.run(String(query), query.parameters)
+    db.run(String(query), query.parameters)
   }
 
   /**
@@ -140,7 +140,7 @@ class Prefs {
         END
       WHERE pathId IN ${sql.tuple(pathIds)}
       `
-    await db.run(String(query), query.parameters)
+    db.run(String(query), query.parameters)
   }
 
   /**
@@ -159,7 +159,7 @@ class Prefs {
       SET data = json_set(data, ${keys[0]}, json(${JSON.stringify(values[0])}))
       WHERE pathId = ${pathId}
     `
-    await db.run(String(query), query.parameters)
+    db.run(String(query), query.parameters)
   }
 
   /**
@@ -171,9 +171,9 @@ class Prefs {
 
     const query = sql`
       SELECT * FROM prefs
-      WHERE key = "jwtKey"
+      WHERE key = 'jwtKey'
     `
-    const row = await db.get(String(query), query.parameters)
+    const row = db.get<{ key: string, data: string }>(String(query), query.parameters)
 
     if (row && row.data) {
       const jwtKey = JSON.parse(row.data)
@@ -192,9 +192,9 @@ class Prefs {
 
     const query = sql`
       REPLACE INTO prefs (key, data)
-      VALUES ("jwtKey", ${JSON.stringify(jwtKey)})
+      VALUES ('jwtKey', ${JSON.stringify(jwtKey)})
     `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
 
     if (!res.changes) {
       throw new Error('Unable to update JWT secret key')

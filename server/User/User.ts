@@ -1,8 +1,9 @@
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import sql from 'sqlate'
 import bcrypt from '../lib/bcrypt.js'
 import Queue from '../Queue/Queue.js'
 import { randomChars } from '../lib/util.js'
+import { User as UserType } from '../../shared/types.js'
 
 export const IMG_MAX_LENGTH = 51200 // 50KB
 export const BCRYPT_ROUNDS = 12
@@ -11,8 +12,6 @@ export const USERNAME_MAX_LENGTH = 128
 export const PASSWORD_MIN_LENGTH = 6
 export const NAME_MIN_LENGTH = 2
 export const NAME_MAX_LENGTH = 50
-
-const { db } = Database
 
 class User {
   /**
@@ -60,7 +59,7 @@ class User {
         INNER JOIN roles USING (roleId)
       ORDER BY dateCreated DESC
     `
-    const res = await db.all(String(query), query.parameters)
+    const res = db.all<UserType & { role: string }>(String(query), query.parameters)
 
     res.forEach((row) => {
       result.push(row.userId)
@@ -125,7 +124,7 @@ class User {
         FROM users
         WHERE username = ${fields.get('username')}
         `
-        res = await db.get(String(query), query.parameters) as { count: number }
+        res = db.get(String(query), query.parameters) as { count: number }
       } while (res.count > 0)
 
       fields.set('password', 'guest')
@@ -156,7 +155,7 @@ class User {
     INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
     VALUES ${sql.tuple(Array.from(fields.values()))}
   `
-    const res = await db.run(String(query), query.parameters)
+    const res = db.run(String(query), query.parameters)
 
     if (typeof res.lastID !== 'number') {
       throw new Error('Unable to create user')
@@ -196,7 +195,7 @@ class User {
       FROM queue
       WHERE userId = ${userId}
     `
-    const queueRows = await db.all(String(queueQuery), queueQuery.parameters)
+    const queueRows = db.all<{ queueId: number }>(String(queueQuery), queueQuery.parameters)
 
     for (const row of queueRows) {
       await Queue.remove(row.queueId)
@@ -207,21 +206,21 @@ class User {
       DELETE FROM songStars
       WHERE userId = ${userId}
     `
-    await db.run(String(songStarsQuery), songStarsQuery.parameters)
+    db.run(String(songStarsQuery), songStarsQuery.parameters)
 
     // remove user's artist stars
     const artistStarsQuery = sql`
       DELETE FROM artistStars
       WHERE userId = ${userId}
     `
-    await db.run(String(artistStarsQuery), artistStarsQuery.parameters)
+    db.run(String(artistStarsQuery), artistStarsQuery.parameters)
 
     // remove the user
     const usersQuery = sql`
       DELETE FROM users
       WHERE userId = ${userId}
     `
-    const usersQueryRes = await db.run(String(usersQuery), usersQuery.parameters)
+    const usersQueryRes = db.run(String(usersQuery), usersQuery.parameters)
 
     if (!usersQueryRes.changes) {
       throw new Error(`unable to remove userId: ${userId}`)
@@ -242,7 +241,7 @@ class User {
       WHERE ${typeof userId === 'number' ? sql`userId = ${userId}` : sql`LOWER(username) = ${username.toLowerCase()}`}
     `
 
-    const user = await db.get(String(query), query.parameters)
+    const user = db.get<UserType & { role: string, password?: string, image?: string }>(String(query), query.parameters)
     if (!user) return false
 
     if (!creds) {

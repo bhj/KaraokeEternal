@@ -74,8 +74,6 @@
     "music-metadata": "^11.10.5",
     "socket.io": "^4.8.3",
     "sqlate": "^2.2.0",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7",
     "unzipit": "^1.4.3",
     "yargs": "^18.0.0"
   },

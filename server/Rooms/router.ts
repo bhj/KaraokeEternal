@@ -1,6 +1,6 @@
 import KoaRouter from '@koa/router'
 import sql from 'sqlate'
-import Database from '../lib/Database.js'
+import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
@@ -10,7 +10,6 @@ interface RequestWithBody {
 }
 
 const log = getLogger('Rooms')
-const { db } = Database
 const router = new KoaRouter({ prefix: '/api/rooms' })
 
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
@@ -101,14 +100,14 @@ router.delete('/:roomId', async (ctx) => {
     DELETE FROM queue
     WHERE roomId = ${roomId}
   `
-  await db.run(String(queueQuery), queueQuery.parameters)
+  db.run(String(queueQuery), queueQuery.parameters)
 
   // remove room
   const roomQuery = sql`
     DELETE FROM rooms
     WHERE roomId = ${roomId}
   `
-  await db.run(String(roomQuery), roomQuery.parameters)
+  db.run(String(roomQuery), roomQuery.parameters)
 
   log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
 
