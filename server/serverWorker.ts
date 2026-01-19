@@ -197,8 +197,10 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       try {
         // Check if user is admin via groups header
         const groupsRaw = ctx.request.header[groupsHeader] || ''
-        const groups = typeof groupsRaw === 'string' ? groupsRaw.split(',').map(g => g.trim()) : []
+        // Authentik uses pipe separator for groups
+        const groups = typeof groupsRaw === 'string' ? groupsRaw.split('|').map(g => g.trim()) : []
         const isAdmin = groups.includes(adminGroup)
+        log.info('SSO auth: user=%s groups=%j adminGroup=%s isAdmin=%s', headerUsername, groups, adminGroup, isAdmin)
 
         // Get or create user from header
         const user = await User.getOrCreateFromHeader(headerUsername, isAdmin)
