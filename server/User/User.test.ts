@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
-import path from 'path'
 import fse from 'fs-extra'
 
 const TEST_DB_PATH = '/tmp/karaoke-eternal-test-user.sqlite'
@@ -124,6 +123,51 @@ describe('User.getOrCreateFromHeader', () => {
       const user2 = await User.getOrCreateFromHeader('casesensitiveuser', false)
 
       expect(user2.userId).toBe(user1.userId) // Same user
+    })
+  })
+
+  describe('isFirstRun clearing on first SSO admin', () => {
+    beforeEach(async () => {
+      // Reset isFirstRun to true before each test
+      await db.db?.run('REPLACE INTO prefs (key, data) VALUES (\'isFirstRun\', \'true\')')
+    })
+
+    it('should clear isFirstRun when first SSO admin logs in', async () => {
+      // Verify isFirstRun is true initially
+      const before = await db.db?.get('SELECT data FROM prefs WHERE key = \'isFirstRun\'')
+      expect(JSON.parse(before.data)).toBe(true)
+
+      // Admin logs in
+      await User.getOrCreateFromHeader('firstadmin', true)
+
+      // isFirstRun should now be false
+      const after = await db.db?.get('SELECT data FROM prefs WHERE key = \'isFirstRun\'')
+      expect(JSON.parse(after.data)).toBe(false)
+    })
+
+    it('should NOT clear isFirstRun when non-admin SSO user logs in', async () => {
+      // Verify isFirstRun is true initially
+      const before = await db.db?.get('SELECT data FROM prefs WHERE key = \'isFirstRun\'')
+      expect(JSON.parse(before.data)).toBe(true)
+
+      // Non-admin logs in
+      await User.getOrCreateFromHeader('normaluser', false)
+
+      // isFirstRun should still be true
+      const after = await db.db?.get('SELECT data FROM prefs WHERE key = \'isFirstRun\'')
+      expect(JSON.parse(after.data)).toBe(true)
+    })
+
+    it('should NOT change isFirstRun when it is already false', async () => {
+      // Set isFirstRun to false (system already initialized)
+      await db.db?.run('REPLACE INTO prefs (key, data) VALUES (\'isFirstRun\', \'false\')')
+
+      // Admin logs in
+      await User.getOrCreateFromHeader('lateradmin', true)
+
+      // isFirstRun should still be false
+      const after = await db.db?.get('SELECT data FROM prefs WHERE key = \'isFirstRun\'')
+      expect(JSON.parse(after.data)).toBe(false)
     })
   })
 })

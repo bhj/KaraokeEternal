@@ -3,6 +3,8 @@ import sql from 'sqlate'
 import bcrypt from '../lib/bcrypt.js'
 import Queue from '../Queue/Queue.js'
 import { randomChars } from '../lib/util.js'
+import getLogger from '../lib/Log.js'
+const log = getLogger('User')
 
 export const IMG_MAX_LENGTH = 50000 // bytes
 export const BCRYPT_ROUNDS = 12
@@ -211,6 +213,18 @@ class User {
         existingUser.role = targetRole
         existingUser.dateUpdated = now
       }
+
+      // Clear isFirstRun on first SSO admin login (only if currently true)
+      if (isAdmin) {
+        const clearQuery = sql`
+          UPDATE prefs SET data = 'false' WHERE key = 'isFirstRun' AND data = 'true'
+        `
+        const res = await db.run(String(clearQuery), clearQuery.parameters)
+        if (res.changes) {
+          log.info('System initialized by first SSO admin: %s', username)
+        }
+      }
+
       return existingUser
     }
 
@@ -230,6 +244,17 @@ class User {
 
     if (typeof res.lastID !== 'number') {
       throw new Error('Unable to create user from header')
+    }
+
+    // Clear isFirstRun on first SSO admin login (only if currently true)
+    if (isAdmin) {
+      const clearQuery = sql`
+        UPDATE prefs SET data = 'false' WHERE key = 'isFirstRun' AND data = 'true'
+      `
+      const clearRes = await db.run(String(clearQuery), clearQuery.parameters)
+      if (clearRes.changes) {
+        log.info('System initialized by first SSO admin: %s', username)
+      }
     }
 
     // Return the newly created user

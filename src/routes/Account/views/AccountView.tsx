@@ -34,7 +34,7 @@ const AccountView = () => {
       {!isFirstRun && !isSignedIn
         && <SignedOutView />}
 
-      {isFirstRun
+      {isFirstRun && !isSignedIn
         && <FirstRun />}
     </div>
   )
