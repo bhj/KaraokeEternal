@@ -14,3 +14,10 @@ node_modules/
 .hugo_build.lock
 .nova
 .vscode
+reference/AGENTS.md
+reference/CLAUDE.md
+reference/GEMINI.md
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+reference/
