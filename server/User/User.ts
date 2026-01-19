@@ -197,6 +197,17 @@ class User {
     // Check if user already exists
     const existingUser = await User.getByUsername(username, true)
     if (existingUser) {
+      // Sync admin status from SSO groups header
+      if (isAdmin && existingUser.role !== 'admin') {
+        const updateQuery = sql`
+          UPDATE users
+          SET roleId = (SELECT roleId FROM roles WHERE name = 'admin'),
+              dateUpdated = ${Math.floor(Date.now() / 1000)}
+          WHERE userId = ${existingUser.userId}
+        `
+        await db.run(String(updateQuery), updateQuery.parameters)
+        existingUser.role = 'admin'
+      }
       return existingUser
     }
 
