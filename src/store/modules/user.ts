@@ -23,7 +23,7 @@ const api = new HttpApi('')
 const basename = new URL(document.baseURI).pathname
 
 const receiveAccount = createAction<object>(ACCOUNT_RECEIVE)
-const bootstrapComplete = createAction(BOOTSTRAP_COMPLETE)
+export const bootstrapComplete = createAction(BOOTSTRAP_COMPLETE)
 
 // ------------------------------------
 // Check for existing SSO session on bootstrap
