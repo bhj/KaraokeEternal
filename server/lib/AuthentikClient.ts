@@ -4,6 +4,7 @@ const log = getLogger('AuthentikClient')
 const AUTHENTIK_URL = process.env.KES_AUTHENTIK_URL
 const AUTHENTIK_TOKEN = process.env.KES_AUTHENTIK_API_TOKEN
 const ENROLLMENT_FLOW_SLUG = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+const GUEST_GROUP = process.env.KES_GUEST_GROUP || 'karaoke-guests'
 
 export class AuthentikClient {
   static isConfigured (): boolean {
@@ -79,19 +80,27 @@ export class AuthentikClient {
         log.info('Deleted invitation %s for room %d', inv.pk, roomId)
       }
 
-      // Delete users with matching room attribute
+      // Delete ONLY guest users (in karaoke-guests group) with matching room attribute
+      // CRITICAL: Must filter by BOTH group AND attribute to avoid deleting regular users
       const usersRes = await fetch(
-        `${AUTHENTIK_URL}/api/v3/core/users/?attributes__karaoke_room_id=${roomId}`,
+        `${AUTHENTIK_URL}/api/v3/core/users/?groups_by_name=${encodeURIComponent(GUEST_GROUP)}&attributes__karaoke_room_id=${roomId}`,
         { headers: { Authorization: `Bearer ${AUTHENTIK_TOKEN}` } },
       )
       const users = await usersRes.json()
 
       for (const user of users.results || []) {
+        // Double-check: verify user is in guest group before deleting
+        const isGuest = user.groups_obj?.some((g: { name: string }) => g.name === GUEST_GROUP)
+        if (!isGuest) {
+          log.warn('Skipping non-guest user %s (not in %s group)', user.username, GUEST_GROUP)
+          continue
+        }
+
         await fetch(`${AUTHENTIK_URL}/api/v3/core/users/${user.pk}/`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${AUTHENTIK_TOKEN}` },
         })
-        log.info('Deleted Authentik user %s for room %d', user.username, roomId)
+        log.info('Deleted Authentik guest user %s for room %d', user.username, roomId)
       }
     } catch (err) {
       log.error('Authentik cleanup error for room %d: %s', roomId, (err as Error).message)
