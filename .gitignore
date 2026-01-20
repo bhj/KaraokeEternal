@@ -3,6 +3,7 @@ coverage/
 dist/
 docs/public/
 docs/resources/
+docs/analysis/
 node_modules/
 
 .DS_Store
