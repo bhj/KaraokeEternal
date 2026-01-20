@@ -210,6 +210,36 @@ For SSO via forward auth headers (Authentik, Authelia, etc.):
 | `KES_GUEST_GROUP` | Group name for guest users | `karaoke-guests` |
 | `KES_SSO_SIGNOUT_URL` | URL to redirect to for SSO logout (IdP signout endpoint) | |
 
+### Authentik Configuration
+
+When using Authentik as your SSO provider, ensure the following are configured:
+
+#### Required Groups
+Create these groups in Authentik Admin → Directory → Groups:
+- **`karaoke-admin`** (or your custom `KES_ADMIN_GROUP`) - Members receive admin privileges
+- **`karaoke-guests`** (or your custom `KES_GUEST_GROUP`) - Members are treated as guest users
+
+#### Guest Enrollment Flow
+For guest invitations to work, create an enrollment flow in Authentik Admin → Flows & Stages:
+
+1. Create a new flow with slug matching `KES_AUTHENTIK_ENROLLMENT_FLOW` (default: `karaoke-guest-enrollment`)
+2. The flow should:
+   - Accept the invitation token
+   - Create a user in the `karaoke-guests` group
+   - Set the `karaoke_room_id` custom attribute
+
+#### Custom Attributes
+For room-based guest assignment:
+- **`karaoke_room_id`** - Numeric room ID the guest is assigned to
+
+This attribute should be passed via the header configured in `KES_ROOM_ID_HEADER` (default: `x-authentik-karaoke-room-id`).
+
+#### Proxy Provider Headers
+Configure your Authentik Proxy Provider to forward these headers:
+- `X-authentik-username` - Authenticated user's username
+- `X-authentik-groups` - User's group memberships (pipe or comma separated)
+- `X-authentik-karaoke-room-id` - Custom attribute for guest room assignment
+
 ## File Locations
 
 If using the Docker image, the database will be located in the folder you mapped to the container's `/config` folder. The container doesn't write log files by default; use the [Docker logs](https://docs.docker.com/reference/cli/docker/container/logs/) command instead to see the container's output.

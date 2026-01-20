@@ -34,6 +34,9 @@ const handlers = {
 
 const { verify: jwtVerify } = jsonWebToken
 
+// Track pending room cleanups for grace period
+const pendingCleanups = new Map<number, NodeJS.Timeout>()
+
 export default function (io, jwtKey, validateProxySource: (ip: string) => boolean) {
   io.on('connection', async (sock) => {
     // validate proxy source before doing anything else
@@ -71,6 +74,12 @@ export default function (io, jwtKey, validateProxySource: (ip: string) => boolea
         sock.user.name, sock.id, reason,
       )
 
+      // Log potential socket instability for debugging
+      if (reason === 'transport error' || reason === 'transport close') {
+        log.warn('Potential socket instability for user %s - reason: %s',
+          sock.user.name, reason)
+      }
+
       if (typeof sock.user.roomId !== 'number') return
 
       // beyond this point assumes there is a room
@@ -98,10 +107,29 @@ export default function (io, jwtKey, validateProxySource: (ip: string) => boolea
         const roomSockets = io.sockets.adapter.rooms.get(roomPrefix)
         const socketsInRoom = roomSockets ? roomSockets.size : 0
 
-        // If no one left in the room, delete it
+        // Cancel any existing pending cleanup for this room
+        const existingTimeout = pendingCleanups.get(roomId)
+        if (existingTimeout) {
+          clearTimeout(existingTimeout)
+          pendingCleanups.delete(roomId)
+        }
+
+        // If no one left in the room, schedule cleanup with grace period
         if (socketsInRoom === 0) {
-          log.info('Cleaning up empty ephemeral room %s', roomId)
-          await Rooms.delete(roomId)
+          log.info('Scheduling cleanup of empty ephemeral room %s (30s grace period)', roomId)
+
+          const timeout = setTimeout(async () => {
+            const currentRoomSockets = io.sockets.adapter.rooms.get(roomPrefix)
+            if (!currentRoomSockets || currentRoomSockets.size === 0) {
+              log.info('Cleaning up empty ephemeral room %s (after grace period)', roomId)
+              await Rooms.delete(roomId)
+            } else {
+              log.verbose('Room %s cleanup cancelled - users reconnected', roomId)
+            }
+            pendingCleanups.delete(roomId)
+          }, 30000) // 30 second grace period
+
+          pendingCleanups.set(roomId, timeout)
         }
       } catch (err) {
         log.error('Error cleaning up ephemeral room: %s', err.message)
@@ -180,6 +208,14 @@ export default function (io, jwtKey, validateProxySource: (ip: string) => boolea
     // add user to room and track membership
     sock.join(Rooms.prefix(sock.user.roomId))
     Rooms.trackUser(sock.user.roomId, sock.user.userId)
+
+    // Cancel any pending cleanup for this room (user reconnected within grace period)
+    const existingCleanup = pendingCleanups.get(sock.user.roomId)
+    if (existingCleanup) {
+      clearTimeout(existingCleanup)
+      pendingCleanups.delete(sock.user.roomId)
+      log.verbose('Cancelled pending cleanup for room %s - user reconnected', sock.user.roomId)
+    }
 
     // if there's a player in room, emit its last known status
     // @todo this just emits the first status found
