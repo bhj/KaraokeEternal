@@ -33,7 +33,7 @@ const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.en
 // Takes the "raw" object returned by the User class and massages it
 // into the shape used by the client (state.user) and in server-side
 // routers. Should be used to generate the JWT.
-const createUserCtx = (user, roomId) => {
+const createUserCtx = (user, roomId, ownRoomId: number | null = null) => {
   return {
     dateCreated: user.dateCreated,
     dateUpdated: user.dateUpdated,
@@ -41,6 +41,7 @@ const createUserCtx = (user, roomId) => {
     isGuest: user.role === 'guest',
     name: user.name,
     roomId: parseInt(roomId, 10) || null,
+    ownRoomId: ownRoomId !== null ? parseInt(String(ownRoomId), 10) : null,
     userId: user.userId,
     username: user.username,
   }
@@ -108,7 +109,7 @@ router.get('/user', async (ctx) => {
     ctx.throw(404)
   }
 
-  ctx.body = createUserCtx(user, ctx.user.roomId)
+  ctx.body = createUserCtx(user, ctx.user.roomId, ctx.user.ownRoomId ?? null)
 })
 
 // list all users (admin only)

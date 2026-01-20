@@ -1,0 +1,141 @@
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
+import fse from 'fs-extra'
+
+const TEST_DB_PATH = '/tmp/karaoke-eternal-test-user-router.sqlite'
+
+// We need to dynamically import after database is open
+let User: typeof import('./User.js').default
+let Rooms: typeof import('../Rooms/Rooms.js').default
+let db: typeof import('../lib/Database.js').default
+
+describe('User Router - createUserCtx', () => {
+  beforeAll(async () => {
+    // Remove any existing test database
+    await fse.remove(TEST_DB_PATH)
+
+    // Open fresh test database with migrations FIRST
+    const Database = await import('../lib/Database.js')
+    await Database.open({ file: TEST_DB_PATH, ro: false })
+    db = Database.default
+
+    // NOW import modules (after db is initialized)
+    const UserModule = await import('./User.js')
+    User = UserModule.default
+
+    const RoomsModule = await import('../Rooms/Rooms.js')
+    Rooms = RoomsModule.default
+  })
+
+  afterAll(async () => {
+    const Database = await import('../lib/Database.js')
+    await Database.close()
+    await fse.remove(TEST_DB_PATH)
+  })
+
+  beforeEach(async () => {
+    // Clean up between tests
+    await db.db?.run('DELETE FROM rooms')
+    await db.db?.run('DELETE FROM queue')
+    await db.db?.run('DELETE FROM users')
+  })
+
+  describe('GET /api/user', () => {
+    it('should include ownRoomId in response when user has an own room', async () => {
+      // Create a test user
+      const testUser = await User.getOrCreateFromHeader('testuser', false, false)
+
+      // Create an ephemeral room owned by the user
+      const ownRoomId = await Rooms.createEphemeral(testUser.userId, 'testuser')
+
+      // Import router and extract handler
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      // Find the GET /api/user handler
+      type Layer = {
+        path: string
+        methods: string[]
+        stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>>
+      }
+      const userLayer = (router as unknown as { stack: Layer[] }).stack
+        .find((l: Layer) => l.path === '/api/user' && l.methods.includes('GET'))
+
+      expect(userLayer).toBeDefined()
+
+      const ctx = {
+        user: {
+          userId: testUser.userId,
+          username: testUser.username,
+          roomId: ownRoomId,
+          ownRoomId: ownRoomId,
+          isAdmin: false,
+          isGuest: false,
+        },
+        body: undefined as unknown,
+        throw: (status: number) => {
+          const err = new Error() as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = userLayer!.stack[userLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // The response should include ownRoomId
+      expect(ctx.body).toBeDefined()
+      expect((ctx.body as { ownRoomId?: number }).ownRoomId).toBe(ownRoomId)
+    })
+
+    it('should return ownRoomId as null when user has no own room', async () => {
+      // Create a test user
+      const testUser = await User.getOrCreateFromHeader('testuser', false, false)
+
+      // Create a room that is NOT owned by the user (just a standard room)
+      const now = Math.floor(Date.now() / 1000)
+      const insertRoom = await db.db?.run(
+        'INSERT INTO rooms (name, status, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?)',
+        ['Shared Room', 'open', now, now, '{}'],
+      )
+      const sharedRoomId = insertRoom?.lastID
+
+      // Import router and extract handler
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      type Layer = {
+        path: string
+        methods: string[]
+        stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>>
+      }
+      const userLayer = (router as unknown as { stack: Layer[] }).stack
+        .find((l: Layer) => l.path === '/api/user' && l.methods.includes('GET'))
+
+      expect(userLayer).toBeDefined()
+
+      const ctx = {
+        user: {
+          userId: testUser.userId,
+          username: testUser.username,
+          roomId: sharedRoomId,
+          ownRoomId: null, // User doesn't own a room
+          isAdmin: false,
+          isGuest: false,
+        },
+        body: undefined as unknown,
+        throw: (status: number) => {
+          const err = new Error() as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = userLayer!.stack[userLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // The response should include ownRoomId as null
+      expect(ctx.body).toBeDefined()
+      expect((ctx.body as { ownRoomId?: number | null }).ownRoomId).toBeNull()
+    })
+  })
+})
