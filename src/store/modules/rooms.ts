@@ -81,6 +81,26 @@ export const removeRoom = createAsyncThunk(
   },
 )
 
+// Join another user's room (standard users only)
+export const joinRoom = createAsyncThunk(
+  'rooms/join',
+  async (roomId: number) => {
+    await api.post(`/${roomId}/join`)
+    // Reload page to get new session with visited room
+    window.location.reload()
+  },
+)
+
+// Leave visited room and return to own room
+export const leaveRoom = createAsyncThunk(
+  'rooms/leave',
+  async () => {
+    await api.post('/leave')
+    // Reload page to get new session with own room
+    window.location.reload()
+  },
+)
+
 export const openRoomEditor = createAction(ROOM_EDITOR_OPEN)
 export const closeRoomEditor = createAction(ROOM_EDITOR_CLOSE)
 export const filterByStatus = createAction<boolean | string>(ROOM_FILTER_STATUS)

@@ -1,0 +1,18 @@
+.message {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: var(--font-size-lg);
+}
+
+.note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.btnCancel {
+  margin-right: var(--spacing-md);
+}
+
+.btnJoin {
+  background-color: var(--btn-bg-primary);
+}

@@ -1,0 +1,208 @@
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi, Mock } from 'vitest'
+import fse from 'fs-extra'
+
+const TEST_DB_PATH = '/tmp/karaoke-eternal-test-rooms-router.sqlite'
+
+// Mock AuthentikClient to avoid external calls
+vi.mock('../lib/AuthentikClient.js', () => ({
+  AuthentikClient: {
+    createInvitation: vi.fn().mockResolvedValue('mock-invitation-token'),
+    cleanupRoom: vi.fn().mockResolvedValue(undefined),
+  },
+}))
+
+// We need to dynamically import after database is open
+let Rooms: typeof import('./Rooms.js').default
+let db: typeof import('../lib/Database.js').default
+let User: typeof import('../User/User.js').default
+
+describe('Rooms Router - Room Joining', () => {
+  let testRoomId: number
+  let testUser: Awaited<ReturnType<typeof User.getOrCreateFromHeader>>
+  let guestUser: Awaited<ReturnType<typeof User.getOrCreateFromHeader>>
+
+  beforeAll(async () => {
+    // Remove any existing test database
+    await fse.remove(TEST_DB_PATH)
+
+    // Open fresh test database with migrations FIRST
+    const Database = await import('../lib/Database.js')
+    await Database.open({ file: TEST_DB_PATH, ro: false })
+    db = Database.default
+
+    // NOW import modules (after db is initialized)
+    const RoomsModule = await import('./Rooms.js')
+    Rooms = RoomsModule.default
+
+    const UserModule = await import('../User/User.js')
+    User = UserModule.default
+  })
+
+  afterAll(async () => {
+    const Database = await import('../lib/Database.js')
+    await Database.close()
+    await fse.remove(TEST_DB_PATH)
+  })
+
+  beforeEach(async () => {
+    // Clean up between tests
+    await db.db?.run('DELETE FROM rooms')
+    await db.db?.run('DELETE FROM queue')
+    await db.db?.run('DELETE FROM users')
+
+    // Create test users
+    testUser = await User.getOrCreateFromHeader('testuser', false, false)
+    guestUser = await User.getOrCreateFromHeader('guestuser', false, true)
+
+    // Create a test room (open status)
+    const now = Math.floor(Date.now() / 1000)
+    const insertRoom = await db.db?.run(
+      'INSERT INTO rooms (name, status, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?)',
+      ['Test Room', 'open', now, now, '{}']
+    )
+    testRoomId = insertRoom?.lastID ?? 0
+  })
+
+  describe('POST /api/rooms/:roomId/join', () => {
+    it('should set keVisitedRoom cookie for standard user', async () => {
+      // Import router and extract handler
+      const routerModule = await import('./router.ts')
+      const router = routerModule.default
+
+      // Find the join handler
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
+
+      expect(joinLayer).toBeDefined()
+
+      const mockCookieSet = vi.fn()
+      const ctx = {
+        params: { roomId: String(testRoomId) },
+        state: { user: { userId: testUser.userId, isGuest: false, isAdmin: false } },
+        cookies: { set: mockCookieSet, get: vi.fn() },
+        body: undefined as unknown,
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }) as Mock,
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      expect(ctx.body).toEqual({ success: true })
+      expect(mockCookieSet).toHaveBeenCalledWith('keVisitedRoom', String(testRoomId), {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+    })
+
+    it('should return 403 for guest users', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId) },
+        state: { user: { userId: guestUser.userId, isGuest: true, isAdmin: false } },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        body: undefined as unknown,
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }) as Mock,
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 403 })
+    })
+
+    it('should throw error for non-existent room', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: '99999' },
+        state: { user: { userId: testUser.userId, isGuest: false, isAdmin: false } },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        body: undefined as unknown,
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }) as Mock,
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+
+      await expect(handler(ctx, async () => {})).rejects.toThrow()
+    })
+
+    it('should throw error for closed room', async () => {
+      // Close the test room
+      await db.db?.run('UPDATE rooms SET status = ? WHERE roomId = ?', ['closed', testRoomId])
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId) },
+        state: { user: { userId: testUser.userId, isGuest: false, isAdmin: false } },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        body: undefined as unknown,
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }) as Mock,
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+
+      await expect(handler(ctx, async () => {})).rejects.toThrow()
+    })
+  })
+
+  describe('POST /api/rooms/leave', () => {
+    it('should clear keVisitedRoom cookie', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const leaveLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/leave' && l.methods.includes('POST'))
+
+      expect(leaveLayer).toBeDefined()
+
+      const mockCookieSet = vi.fn()
+      const ctx = {
+        state: { user: { userId: testUser.userId, isGuest: false, isAdmin: false } },
+        cookies: { set: mockCookieSet, get: vi.fn() },
+        body: undefined as unknown,
+      }
+
+      const handler = leaveLayer!.stack[leaveLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      expect(ctx.body).toEqual({ success: true })
+      expect(mockCookieSet).toHaveBeenCalledWith('keVisitedRoom', '', { maxAge: 0 })
+    })
+  })
+})

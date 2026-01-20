@@ -6,9 +6,11 @@ import { Routes, Route, useLocation } from 'react-router'
 import { createSelector } from '@reduxjs/toolkit'
 
 import { requestScanStop } from 'store/modules/prefs'
+import { leaveRoom } from 'store/modules/rooms'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import getWaits from 'routes/Queue/selectors/getWaits'
 import LibraryHeader from 'routes/Library/components/LibraryHeader/LibraryHeader'
+import Button from 'components/Button/Button'
 import PlaybackCtrl from './PlaybackCtrl/PlaybackCtrl'
 import ProgressBar from './ProgressBar/ProgressBar'
 import UpNext from './UpNext/UpNext'
@@ -56,14 +58,30 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   const { isUpNext, isUpNow } = useAppSelector(getStatusProps)
   const wait = useAppSelector(getUserWait)
 
+  // Check if user is visiting another room
+  const roomId = useAppSelector(state => state.user.roomId)
+  const ownRoomId = useAppSelector(state => state.user.ownRoomId)
+  const isVisiting = roomId !== null && ownRoomId !== null && roomId !== ownRoomId
+
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const dispatch = useAppDispatch()
   const cancelScan = useCallback(() => dispatch(requestScanStop()), [dispatch])
+  const handleLeaveRoom = useCallback(() => dispatch(leaveRoom()), [dispatch])
 
   return (
     <div className={clsx(styles.container, 'bg-blur')} ref={ref}>
+      {isVisiting && (
+        <Button
+          className={styles.visitingBanner}
+          onClick={handleLeaveRoom}
+          icon='HOME'
+        >
+          Back to My Room
+        </Button>
+      )}
+
       {!isPlayer && isPlayerPresent
         && <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />}
 

@@ -102,4 +102,36 @@ router.delete('/:roomId', async (ctx) => {
   ctx.body = await Rooms.get(null, { status: STATUSES })
 })
 
+// join another user's room (standard users only)
+router.post('/:roomId/join', async (ctx) => {
+  const user = ctx.state?.user ?? ctx.user
+
+  // Guests cannot switch rooms - they're bound to their enrollment room
+  if (user.isGuest) {
+    ctx.throw(403, 'Guests cannot switch rooms')
+  }
+
+  const roomId = parseInt(ctx.params.roomId, 10)
+
+  // Validate room exists and is open (no password check for cookie-based join)
+  await Rooms.validate(roomId, null, { isOpen: true })
+
+  // Set visitation cookie (httpOnly for security)
+  ctx.cookies.set('keVisitedRoom', String(roomId), {
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+
+  log.verbose('%s joined room %d', user.name || user.username, roomId)
+
+  ctx.body = { success: true }
+})
+
+// leave visited room and return to own room
+router.post('/leave', async (ctx) => {
+  ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 })
+  ctx.body = { success: true }
+})
+
 export default router

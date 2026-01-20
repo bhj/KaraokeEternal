@@ -234,14 +234,45 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
           }
           // If no valid room header or validation failed, guest has no room
         } else if (ephemeralEnabled) {
-          // NON-GUESTS: Get or create ephemeral room
-          room = await Rooms.getByOwnerId(user.userId)
-          if (!room) {
-            const roomId = await Rooms.createEphemeral(user.userId, user.username)
-            room = { roomId }
-          } else {
-            await Rooms.updateActivity(room.roomId)
+          // NON-GUESTS: Check for visitation cookie first
+          const visitedRoomId = ctx.cookies.get('keVisitedRoom')
+
+          if (visitedRoomId) {
+            const roomIdNum = parseInt(visitedRoomId, 10)
+            if (!isNaN(roomIdNum)) {
+              try {
+                // CRITICAL: Validate room - prevents cookie spoofing attacks
+                // Room must exist AND be open (no password check via cookie)
+                await Rooms.validate(roomIdNum, null, { isOpen: true })
+                room = { roomId: roomIdNum }
+                await Rooms.updateActivity(roomIdNum)
+                log.info('User %s visiting room %d', headerUsername, roomIdNum)
+              } catch (err) {
+                // "Locked Door" fail-safe: room closed/deleted while visiting
+                // Clear bad cookie, fall through to home room (no crash/403)
+                ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 })
+                log.info('Cleared invalid visitation cookie for user %s: %s', headerUsername, (err as Error).message)
+              }
+            }
           }
+
+          // Default: own ephemeral room (home base)
+          if (!room) {
+            room = await Rooms.getByOwnerId(user.userId)
+            if (!room) {
+              const roomId = await Rooms.createEphemeral(user.userId, user.username)
+              room = { roomId }
+            } else {
+              await Rooms.updateActivity(room.roomId)
+            }
+          }
+        }
+
+        // Get user's own room ID (for tracking visiting state)
+        let ownRoomId: number | null = null
+        if (ephemeralEnabled && !isGuest) {
+          const ownRoom = await Rooms.getByOwnerId(user.userId)
+          ownRoomId = ownRoom?.roomId ?? null
         }
 
         // Build JWT payload - admin from groups header takes precedence
@@ -252,6 +283,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
           isAdmin: isAdmin || user.role === 'admin',
           isGuest: isGuest || user.role === 'guest',
           roomId: room?.roomId ?? null,
+          ownRoomId,
           dateUpdated: user.dateUpdated,
         }
 

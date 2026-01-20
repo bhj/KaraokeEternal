@@ -186,6 +186,7 @@ interface UserState {
   username: string | null
   name: string | null
   roomId: number | null
+  ownRoomId: number | null // user's own ephemeral room (null if visiting)
   isAdmin: boolean
   isGuest: boolean
   isBootstrapping: boolean
@@ -198,6 +199,7 @@ const initialState: UserState = {
   username: null,
   name: null,
   roomId: null,
+  ownRoomId: null,
   isAdmin: false,
   isGuest: false,
   isBootstrapping: true,
