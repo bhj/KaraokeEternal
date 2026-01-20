@@ -237,6 +237,7 @@ class User {
     fields.set('name', username) // Display name = username
     fields.set('dateCreated', Math.floor(Date.now() / 1000))
     fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${targetRole})`)
+    fields.set('authProvider', 'sso') // Mark as SSO-managed user
 
     const query = sql`
       INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}

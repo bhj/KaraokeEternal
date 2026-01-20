@@ -35,6 +35,7 @@ const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.en
 // routers. Should be used to generate the JWT.
 const createUserCtx = (user, roomId, ownRoomId: number | null = null) => {
   return {
+    authProvider: user.authProvider || 'local',
     dateCreated: user.dateCreated,
     dateUpdated: user.dateUpdated,
     isAdmin: user.role === 'admin',
@@ -187,8 +188,14 @@ router.put('/user/:userId', async (ctx) => {
   let { name, username } = req.body
   const { password, newPassword, newPasswordConfirm } = req.body
 
+  // SSO users cannot change their username or password (managed by identity provider)
+  const isSsoUser = user.authProvider === 'sso'
+  if (isSsoUser && (username || newPassword)) {
+    ctx.throw(403, 'SSO users cannot change their username or password')
+  }
+
   // validate current password if updating own account
-  if (targetId === user.userId && !ctx.user.isGuest) {
+  if (targetId === user.userId && !ctx.user.isGuest && !isSsoUser) {
     if (!password) {
       ctx.throw(422, 'Current password is required')
     }

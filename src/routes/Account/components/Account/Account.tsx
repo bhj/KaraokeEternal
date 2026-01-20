@@ -40,7 +40,8 @@ const Account = () => {
   }, [dispatch, upcomingQueueIds, user.isAdmin, user.isGuest])
 
   const handleSubmit = useCallback((data: FormData) => {
-    if (!user.isGuest) {
+    // SSO users don't need to provide current password (they can only change display name/image)
+    if (!user.isGuest && user.authProvider !== 'sso') {
       if (!curPassword.current.value.trim()) {
         alert('Please enter your current password to make changes.')
         curPassword.current.focus()
@@ -51,7 +52,7 @@ const Account = () => {
     }
 
     dispatch(updateAccount(data))
-  }, [dispatch, user.isGuest])
+  }, [dispatch, user.isGuest, user.authProvider])
 
   return (
     <Panel title='My Account' contentClassName={styles.content}>
@@ -65,10 +66,10 @@ const Account = () => {
           user={user}
           onDirtyChange={setDirty}
           onSubmit={handleSubmit}
-          showUsername={!user.isGuest}
-          showPassword={!user.isGuest}
+          showUsername={!user.isGuest && user.authProvider !== 'sso'}
+          showPassword={!user.isGuest && user.authProvider !== 'sso'}
         >
-          {isDirty && !user.isGuest && (
+          {isDirty && !user.isGuest && user.authProvider !== 'sso' && (
             <input
               type='password'
               autoComplete='current-password'

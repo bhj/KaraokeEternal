@@ -28,6 +28,10 @@ export class AuthentikClient {
         return null
       }
 
+      // Set 8-hour expiry to prevent premature invitation invalidation
+      const expiresDate = new Date()
+      expiresDate.setHours(expiresDate.getHours() + 8)
+
       const res = await fetch(`${AUTHENTIK_URL}/api/v3/stages/invitation/invitations/`, {
         method: 'POST',
         headers: {
@@ -39,6 +43,7 @@ export class AuthentikClient {
           flow: flowPk,
           fixed_data: { karaoke_room_id: String(roomId) },
           single_use: false,
+          expires: expiresDate.toISOString(),
         }),
       })
 
