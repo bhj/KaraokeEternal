@@ -86,6 +86,13 @@ export const joinRoom = createAsyncThunk(
   'rooms/join',
   async (roomId: number) => {
     await api.post(`/${roomId}/join`)
+
+    // Clear the roomId param BEFORE reload to prevent modal loop
+    // (Redux-persist would rehydrate stale roomId, causing modal to reappear)
+    const url = new URL(window.location.href)
+    url.searchParams.delete('roomId')
+    window.history.replaceState({}, '', url.toString())
+
     // Reload page to get new session with visited room
     window.location.reload()
   },

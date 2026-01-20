@@ -85,9 +85,12 @@ const logout = createAction(LOGOUT)
 export const requestLogout = createAsyncThunk(
   LOGOUT,
   async (_, thunkAPI) => {
+    let ssoSignoutUrl: string | null = null
+
     try {
-      // server response should clear our cookie
-      await api.get('logout')
+      // server response should clear our cookie and return SSO signout URL if configured
+      const response = await api.get<{ ssoSignoutUrl: string | null }>('logout')
+      ssoSignoutUrl = response.ssoSignoutUrl
     } catch {
       // ignore errors
     }
@@ -95,6 +98,12 @@ export const requestLogout = createAsyncThunk(
     thunkAPI.dispatch(logout())
     Persistor.get().purge()
     socket.close()
+
+    // If SSO is configured, redirect to IdP signout to terminate the SSO session
+    // This prevents the "logout loop" where SSO re-authenticates immediately
+    if (ssoSignoutUrl) {
+      window.location.href = ssoSignoutUrl
+    }
   },
 )
 

@@ -11,6 +11,7 @@ const ACTION_HANDLERS = {
         type: PREFS_SET + _ERROR,
         error: 'Unauthorized',
       })
+      return // CRITICAL: Must return to prevent unauthorized execution
     }
 
     await Prefs.set(payload.key, payload.data)
@@ -24,6 +25,7 @@ const ACTION_HANDLERS = {
         type: PREFS_PATH_SET_PRIORITY + _ERROR,
         error: 'Unauthorized',
       })
+      return // CRITICAL: Must return to prevent unauthorized execution
     }
 
     await Prefs.setPathPriority(payload)

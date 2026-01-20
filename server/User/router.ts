@@ -81,8 +81,13 @@ router.post('/login', async (ctx) => {
 router.get('/logout', async (ctx) => {
   // @todo force socket room leave
   ctx.cookies.set('keToken', '')
+  ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 }) // Clear room visitation cookie too
   ctx.status = 200
-  ctx.body = {}
+
+  // Return SSO signout URL if configured (for SSO environments like Authentik)
+  // Client will redirect here to terminate the IdP session
+  const ssoSignoutUrl = process.env.KES_SSO_SIGNOUT_URL || null
+  ctx.body = { ssoSignoutUrl }
 })
 
 // get own account (helps sync account changes across devices)
