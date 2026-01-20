@@ -190,6 +190,26 @@ Karaoke Eternal Server supports the following CLI options and environment variab
 | <span style="white-space: nowrap;">`--urlPath <string>`</span>| <span style="white-space: nowrap;">`KES_URL_PATH`</span> | Web server base URL path (must begin with a forward slash) | / |
 | <span style="white-space: nowrap;">`-v, --version`</span>| | Show version and exit | |
 
+### Reverse Proxy & SSO
+
+When running behind a reverse proxy (nginx, Caddy, Authentik, etc.) that terminates TLS:
+
+| ENV | Description | Default |
+| --- | --- | --- |
+| `KES_REQUIRE_PROXY` | Only allow requests from trusted proxy IPs (see below) | |
+| `KES_TRUSTED_PROXIES` | Comma-separated list of trusted proxy IPs or CIDRs (e.g., `172.16.0.0/12,192.168.1.100`) | `10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1,::1` |
+| `KES_TRUST_PROXY` | Trust `X-Forwarded-Proto` header for secure cookies. **Required when TLS terminates at the proxy.** | |
+
+For SSO via forward auth headers (Authentik, Authelia, etc.):
+
+| ENV | Description | Default |
+| --- | --- | --- |
+| `KES_AUTH_HEADER` | Header containing the authenticated username | `x-authentik-username` |
+| `KES_GROUPS_HEADER` | Header containing user's groups (comma or pipe separated) | `x-authentik-groups` |
+| `KES_ADMIN_GROUP` | Group name that grants admin privileges | `admin` |
+| `KES_GUEST_GROUP` | Group name for guest users | `karaoke-guests` |
+| `KES_SSO_SIGNOUT_URL` | URL to redirect to for SSO logout (IdP signout endpoint) | |
+
 ## File Locations
 
 If using the Docker image, the database will be located in the folder you mapped to the container's `/config` folder. The container doesn't write log files by default; use the [Docker logs](https://docs.docker.com/reference/cli/docker/container/logs/) command instead to see the container's output.
