@@ -43,6 +43,15 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   const jwtKey = await Prefs.getJwtKey(env.KES_ROTATE_KEY)
   const validateProxySource = createProxyValidator(env)
   const app = new Koa()
+
+  // Trust proxy headers (X-Forwarded-Proto, etc.) when behind a reverse proxy
+  // This allows secure cookies to work when TLS is terminated at the proxy
+  // Enabled automatically when KES_REQUIRE_PROXY=true
+  if (env.KES_REQUIRE_PROXY === 'true') {
+    app.proxy = true
+    log.info('Trusting proxy headers (X-Forwarded-Proto) for secure cookies')
+  }
+
   let server, io
 
   // called when middleware is finalized
