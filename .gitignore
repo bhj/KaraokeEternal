@@ -5,6 +5,7 @@ docs/public/
 docs/resources/
 docs/analysis/
 node_modules/
+.claude/
 
 .DS_Store
 *.log
