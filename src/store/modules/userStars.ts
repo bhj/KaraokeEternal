@@ -1,5 +1,4 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
-import { REHYDRATE } from 'redux-persist'
 import { ensureState } from 'redux-optimistic-ui'
 import {
   ACCOUNT_RECEIVE,
@@ -84,12 +83,6 @@ const userStarsReducer = createReducer(initialState, (builder) => {
     }))
     .addCase(accountReceive, (state, { payload }) => {
       state.userId = payload.userId
-    })
-    // @ts-expect-error: payload exists; action type appears to be erroneous
-    .addCase(REHYDRATE, (state, { payload }) => {
-      if (typeof payload?.userId === 'number') {
-        state.userId = payload.userId
-      }
     })
     .addCase(LOGOUT, () => ({
       ...initialState,

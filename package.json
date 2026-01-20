@@ -153,7 +153,6 @@
     "react-transition-group": "^4.4.5",
     "react-window": "^2.2.4",
     "redux-optimistic-ui": "^3.1.0",
-    "redux-persist": "^6.0.0",
     "redux-throttle": "^0.1.1",
     "screenfull": "^6.0.2",
     "socket.io-client": "^4.8.3",

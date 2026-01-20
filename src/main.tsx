@@ -5,13 +5,10 @@ import store from './store/store'
 import socket from 'lib/socket'
 import AppRouter from 'lib/AppRouter'
 import { checkSession, connectSocket } from './store/modules/user'
-import Persistor from 'store/Persistor'
 
-Persistor.init(store, () => {
-  // ALWAYS validate session against server - SSO is the source of truth
-  // This ensures the keToken cookie is set correctly before socket connects
-  store.dispatch(checkSession())
-})
+// ALWAYS validate session against server - SSO is the source of truth
+// This ensures the keToken cookie is set correctly before socket connects
+store.dispatch(checkSession())
 
 socket.on('reconnect_attempt', () => {
   store.dispatch(connectSocket())

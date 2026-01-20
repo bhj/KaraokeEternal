@@ -3,14 +3,6 @@ import rootReducer from './reducers'
 import socket from 'lib/socket'
 import createSocketMiddleware from './socketMiddleware'
 import createThrottle from 'redux-throttle'
-import {
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from 'redux-persist'
 import { windowResize } from './modules/ui'
 
 // resize action
@@ -41,12 +33,8 @@ const socketMiddleware = createSocketMiddleware(socket, 'server/')
 // ======================================================
 const store = configureStore({
   reducer: rootReducer,
-  middleware: getDefaultMiddleware => getDefaultMiddleware({
-    // https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
-    serializableCheck: {
-      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    },
-  }).concat(throttle, socketMiddleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware()
+    .concat(throttle, socketMiddleware),
 })
 
 // @todo: this doesn't handle dynamically injected (lazy-loaded) reducers

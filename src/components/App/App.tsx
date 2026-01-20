@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Provider, useSelector } from 'react-redux'
-import { PersistGate } from 'redux-persist/es/integration/react'
 import store, { RootState } from 'store/store'
-import Persistor from 'store/Persistor'
 import CoreLayout from './CoreLayout/CoreLayout'
 import Spinner from '../Spinner/Spinner'
 import RoomJoinPrompt from '../RoomJoinPrompt/RoomJoinPrompt'
@@ -67,9 +65,7 @@ const AppContent = () => {
 
 const App = () => (
   <Provider store={store}>
-    <PersistGate loading={<Spinner />} persistor={Persistor.get()}>
-      <AppContent />
-    </PersistGate>
+    <AppContent />
   </Provider>
 )
 
