@@ -1,11 +1,8 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
-import { persistReducer } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
 import socket from 'lib/socket'
 import AppRouter from 'lib/AppRouter'
 import { RootState } from 'store/store'
 import HttpApi from 'lib/HttpApi'
-import Persistor from 'store/Persistor'
 import { fetchPrefs } from './prefs'
 import {
   ACCOUNT_RECEIVE,
@@ -34,7 +31,6 @@ export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
     try {
       const user = await api.get('user')
       // Server returned valid user - we have a session from SSO header auth
-      Persistor.get().purge()
       thunkAPI.dispatch(receiveAccount(user))
       thunkAPI.dispatch(fetchPrefs())
       thunkAPI.dispatch(connectSocket())
@@ -58,10 +54,6 @@ export const login = createAsyncThunk(
     const user = await api.post('login', {
       body: creds,
     })
-
-    // signing in can cause additional reducers to be injected and
-    // trigger rehydration with stale data, so purge here first
-    Persistor.get().purge()
 
     thunkAPI.dispatch(receiveAccount(user))
     thunkAPI.dispatch(fetchPrefs())
@@ -96,7 +88,6 @@ export const requestLogout = createAsyncThunk(
     }
 
     thunkAPI.dispatch(logout())
-    Persistor.get().purge()
     socket.close()
 
     // If SSO is configured, redirect to IdP signout to terminate the SSO session
@@ -118,10 +109,6 @@ export const createAccount = createAsyncThunk<void, FormData, { state: RootState
     const user = await api.post(isFirstRun ? 'setup' : 'user', {
       body: data,
     })
-
-    // signing in can cause additional reducers to be injected and
-    // trigger rehydration with stale data, so purge here first
-    Persistor.get().purge()
 
     thunkAPI.dispatch(receiveAccount(user))
     thunkAPI.dispatch(fetchPrefs())
@@ -236,8 +223,6 @@ const userReducer = createReducer(initialState, (builder) => {
     }))
 })
 
-export default persistReducer({
-  key: 'user',
-  storage,
-  blacklist: ['isBootstrapping'],
-}, userReducer)
+// User state is NOT persisted - SSO is the source of truth
+// checkSession always fetches fresh user state from server
+export default userReducer

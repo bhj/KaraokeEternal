@@ -250,9 +250,38 @@ class Rooms {
    */
   static async createEphemeral (userId: number, name: string) {
     const now = Math.floor(Date.now() / 1000)
+
+    // Get role IDs for guest and standard to set default permissions
+    const guestRole = await db.get('SELECT roleId FROM roles WHERE name = ?', ['guest'])
+    const standardRole = await db.get('SELECT roleId FROM roles WHERE name = ?', ['standard'])
+
+    // Set sensible defaults for party rooms:
+    // - QR code enabled so visitors can easily join
+    // - Guest and standard accounts allowed so visitors can enroll
+    const defaultPrefs: Record<string, unknown> = {
+      prefs: {
+        qr: {
+          isEnabled: true,
+          opacity: 0.625,
+          password: '',
+          size: 0.5,
+        },
+        roles: {},
+      },
+    }
+
+    // Add role permissions if roles exist
+    const roles = (defaultPrefs.prefs as Record<string, unknown>).roles as Record<number, { allowNew: boolean }>
+    if (guestRole?.roleId) {
+      roles[guestRole.roleId] = { allowNew: true }
+    }
+    if (standardRole?.roleId) {
+      roles[standardRole.roleId] = { allowNew: true }
+    }
+
     const query = sql`
       INSERT INTO rooms (name, status, dateCreated, ownerId, lastActivity, data)
-      VALUES (${name}, 'open', ${now}, ${userId}, ${now}, '{}')
+      VALUES (${name}, 'open', ${now}, ${userId}, ${now}, ${JSON.stringify(defaultPrefs)})
     `
     const res = await db.run(String(query), query.parameters)
     const roomId = res.lastID
