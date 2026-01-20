@@ -63,6 +63,9 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   const ownRoomId = useAppSelector(state => state.user.ownRoomId)
   const isVisiting = roomId !== null && ownRoomId !== null && roomId !== ownRoomId
 
+  // Check if user is the owner of the current room (can control playback)
+  const isRoomOwner = ownRoomId !== null && ownRoomId === roomId
+
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
@@ -85,7 +88,7 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
       {!isPlayer && isPlayerPresent
         && <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />}
 
-      {(isUpNow || isAdmin)
+      {(isUpNow || isAdmin || isRoomOwner)
         && <PlaybackCtrl />}
 
       {isAdmin && !isPlayer

@@ -2,6 +2,12 @@ import Queue from './Queue.js'
 import Rooms from '../Rooms/Rooms.js'
 import { QUEUE_ADD, QUEUE_MOVE, QUEUE_REMOVE, QUEUE_PUSH } from '../../shared/actionTypes.js'
 
+// Helper to check if user is the room owner
+const isRoomOwner = async (userId: number, roomId: number): Promise<boolean> => {
+  const res = await Rooms.get(roomId, { status: ['open', 'closed'] })
+  return res.entities[roomId]?.ownerId === userId
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -45,7 +51,11 @@ const ACTION_HANDLERS = {
       })
     }
 
-    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, queueId))) {
+    if (
+      !sock.user.isAdmin
+      && !(await isRoomOwner(sock.user.userId, sock.user.roomId))
+      && !(await Queue.isOwner(sock.user.userId, queueId))
+    ) {
       return acknowledge({
         type: QUEUE_MOVE + '_ERROR',
         error: 'Cannot move another user\'s song',
@@ -71,7 +81,11 @@ const ACTION_HANDLERS = {
     const { queueId } = payload
     const ids = Array.isArray(queueId) ? queueId : [queueId]
 
-    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, ids))) {
+    if (
+      !sock.user.isAdmin
+      && !(await isRoomOwner(sock.user.userId, sock.user.roomId))
+      && !(await Queue.isOwner(sock.user.userId, ids))
+    ) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         error: 'Cannot remove another user\'s song',

@@ -20,6 +20,9 @@ const QueueList = () => {
   const user = useAppSelector(state => state.user)
   const waits = useAppSelector(getWaits)
 
+  // Room owner can moderate all songs in their own room
+  const isRoomOwner = user.ownRoomId !== null && user.ownRoomId === user.roomId
+
   // actions
   const dispatch = useAppDispatch()
   const handleMoveClick = useCallback((qId: number) => {
@@ -57,14 +60,14 @@ const QueueList = () => {
         isCurrent={isCurrent}
         key={qId}
         isErrored={isCurrent && isErrored}
-        isInfoable={user.isAdmin}
-        isMovable={isUpcoming && (isOwner || user.isAdmin)}
+        isInfoable={user.isAdmin || isRoomOwner}
+        isMovable={isUpcoming && (isOwner || user.isAdmin || isRoomOwner)}
         isOwner={isOwner}
         isPlayed={!isUpcoming && !isCurrent}
         isPlaying={isCurrent && isPlaying}
-        isRemovable={isUpcoming && (isOwner || user.isAdmin)}
-        isReplayable={(!isUpcoming || isCurrent) && user.isAdmin}
-        isSkippable={isCurrent && (isOwner || user.isAdmin)}
+        isRemovable={isUpcoming && (isOwner || user.isAdmin || isRoomOwner)}
+        isReplayable={(!isUpcoming || isCurrent) && (user.isAdmin || isRoomOwner)}
+        isSkippable={isCurrent && (isOwner || user.isAdmin || isRoomOwner)}
         isStarred={starredSongs.includes(item.songId)}
         isUpcoming={isUpcoming}
         pctPlayed={isCurrent ? position / duration * 100 : 0}
