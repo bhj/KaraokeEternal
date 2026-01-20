@@ -63,10 +63,11 @@ const RequireAuth = ({
   path,
   redirectTo,
 }: RequireAuthProps) => {
-  const { isAdmin, userId } = useAppSelector(state => state.user)
+  const { isAdmin, isGuest, userId } = useAppSelector(state => state.user)
   const location = useLocation()
 
-  if (path === '/player' && !isAdmin) {
+  // Player route requires non-guest user (admins and standard users can launch player)
+  if (path === '/player' && isGuest) {
     return <Navigate to='/' replace />
   }
 

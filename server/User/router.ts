@@ -27,6 +27,9 @@ const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
 const { sign: jwtSign } = jsonWebToken
 
+// Cookie security: use secure flag in production or when proxy is required (HTTPS)
+const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.env.KES_REQUIRE_PROXY === 'true'
+
 // Takes the "raw" object returned by the User class and massages it
 // into the shape used by the client (state.user) and in server-side
 // routers. Should be used to generate the JWT.
@@ -69,9 +72,11 @@ router.post('/login', async (ctx) => {
   // create JWT
   const token = jwtSign(userCtx, ctx.jwtKey)
 
-  // set JWT as an httpOnly cookie
+  // set JWT as an httpOnly cookie (secure in production)
   ctx.cookies.set('keToken', token, {
     httpOnly: true,
+    sameSite: 'lax',
+    secure: isSecureCookie(),
   })
 
   ctx.body = userCtx
@@ -309,9 +314,11 @@ router.put('/user/:userId', async (ctx) => {
   // @todo: this should not extend the JWT expiry date
   const token = jwtSign(userCtx, ctx.jwtKey)
 
-  // set JWT as an httpOnly cookie
+  // set JWT as an httpOnly cookie (secure in production)
   ctx.cookies.set('keToken', token, {
     httpOnly: true,
+    sameSite: 'lax',
+    secure: isSecureCookie(),
   })
 
   ctx.body = userCtx
@@ -368,9 +375,11 @@ router.post('/user', async (ctx) => {
     // create JWT
     const token = jwtSign(userCtx, ctx.jwtKey)
 
-    // set JWT as an httpOnly cookie
+    // set JWT as an httpOnly cookie (secure in production)
     ctx.cookies.set('keToken', token, {
       httpOnly: true,
+      sameSite: 'lax',
+      secure: isSecureCookie(),
     })
 
     ctx.body = userCtx
@@ -415,9 +424,11 @@ router.post('/setup', async (ctx) => {
     // create JWT
     const token = jwtSign(userCtx, ctx.jwtKey)
 
-    // set JWT as an httpOnly cookie
+    // set JWT as an httpOnly cookie (secure in production)
     ctx.cookies.set('keToken', token, {
       httpOnly: true,
+      sameSite: 'lax',
+      secure: isSecureCookie(),
     })
 
     // unset isFirstRun

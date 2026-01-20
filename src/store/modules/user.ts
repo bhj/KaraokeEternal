@@ -25,18 +25,30 @@ export const bootstrapComplete = createAction(BOOTSTRAP_COMPLETE)
 // ------------------------------------
 // Check for existing SSO session on bootstrap
 // ------------------------------------
+const SESSION_CHECK_TIMEOUT_MS = 5000 // 5 second timeout to prevent perpetual loading
+
 export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
   'user/CHECK_SESSION',
   async (_, thunkAPI) => {
     try {
-      const user = await api.get('user')
+      // Create a timeout promise to prevent perpetual loading if server is unreachable
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Session check timeout')), SESSION_CHECK_TIMEOUT_MS)
+      })
+
+      // Race between the actual API call and the timeout
+      const user = await Promise.race([
+        api.get('user'),
+        timeoutPromise,
+      ])
+
       // Server returned valid user - we have a session from SSO header auth
       thunkAPI.dispatch(receiveAccount(user))
       thunkAPI.dispatch(fetchPrefs())
       thunkAPI.dispatch(connectSocket())
       socket.open()
     } catch {
-      // No valid session - expected for users without SSO/header auth
+      // No valid session, timeout, or network error - expected for users without SSO/header auth
     } finally {
       thunkAPI.dispatch(bootstrapComplete())
     }

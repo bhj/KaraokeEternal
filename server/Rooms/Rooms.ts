@@ -301,6 +301,23 @@ class Rooms {
   }
 
   /**
+   * Get raw room data (including invitation token)
+   *
+   * @param  {Number}  roomId
+   * @return {Promise}
+   */
+  static async getRoomData (roomId: number): Promise<{ invitationToken?: string, prefs?: Record<string, unknown> } | null> {
+    const query = sql`SELECT data FROM rooms WHERE roomId = ${roomId}`
+    const row = await db.get(String(query), query.parameters)
+    if (!row) return null
+    try {
+      return JSON.parse(row.data)
+    } catch {
+      return null
+    }
+  }
+
+  /**
    * Get a room by its owner's userId
    *
    * @param  {Number}  userId

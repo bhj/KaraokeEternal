@@ -24,6 +24,7 @@ const PlaybackCtrl = () => {
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const isGuest = useAppSelector(state => state.user.isGuest)
   const isInRoom = useAppSelector(state => state.user.roomId !== null)
   const status = useAppSelector(state => state.status)
 
@@ -39,7 +40,8 @@ const PlaybackCtrl = () => {
   }, [isDisplayCtrlVisible])
 
   if (!status.isPlayerPresent) {
-    return (isAdmin && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
+    // Show launch button for non-guest users in a room (admins and standard users)
+    return (!isGuest && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
   }
 
   return (

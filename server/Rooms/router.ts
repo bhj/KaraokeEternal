@@ -10,7 +10,62 @@ interface RequestWithBody {
 const log = getLogger('Rooms')
 const router = new KoaRouter({ prefix: '/api/rooms' })
 
+// Cookie security: use secure flag in production or when proxy is required (HTTPS)
+const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.env.KES_REQUIRE_PROXY === 'true'
+
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
+
+// GET /api/rooms/:roomId/enrollment - Returns enrollment URL for unauthenticated users to redirect to SSO
+// This is a public endpoint that doesn't require authentication
+router.get('/:roomId/enrollment', async (ctx) => {
+  const roomId = parseInt(ctx.params.roomId, 10)
+
+  if (isNaN(roomId)) {
+    ctx.throw(400, 'Invalid roomId')
+  }
+
+  // Check if Authentik is configured
+  const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+
+  if (!authentikUrl) {
+    // SSO not configured
+    ctx.body = { enrollmentUrl: null }
+    return
+  }
+
+  // Get room to check if it exists and has an invitation token
+  const res = await Rooms.get(roomId, { status: ['open'] })
+  const room = res.entities[roomId]
+
+  if (!room) {
+    ctx.throw(404, 'Room not found or closed')
+  }
+
+  // Get invitation token from room data
+  const data = await Rooms.getRoomData(roomId)
+  const invitationToken = data?.invitationToken
+
+  if (!invitationToken) {
+    // No invitation token - can't enroll
+    ctx.body = { enrollmentUrl: null }
+    return
+  }
+
+  // Build enrollment URL
+  const authUrl = new URL(authentikUrl)
+  authUrl.pathname = `/if/flow/${enrollmentFlow}/`
+  authUrl.searchParams.set('itoken', invitationToken)
+
+  // Build the next URL (where to redirect after enrollment)
+  // Use the app's base URL with the roomId param
+  const baseUrl = process.env.KES_PUBLIC_URL || `http://${ctx.request.host}`
+  const nextUrl = new URL(baseUrl)
+  nextUrl.searchParams.set('roomId', String(roomId))
+  authUrl.searchParams.set('next', nextUrl.toString())
+
+  ctx.body = { enrollmentUrl: authUrl.toString() }
+})
 
 // list rooms
 router.get('/:roomId?', async (ctx) => {
@@ -116,10 +171,11 @@ router.post('/:roomId/join', async (ctx) => {
   // Validate room exists and is open (no password check for cookie-based join)
   await Rooms.validate(roomId, null, { isOpen: true })
 
-  // Set visitation cookie (httpOnly for security)
+  // Set visitation cookie (httpOnly for security, secure in production)
   ctx.cookies.set('keVisitedRoom', String(roomId), {
     httpOnly: true,
     sameSite: 'lax',
+    secure: isSecureCookie(),
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 

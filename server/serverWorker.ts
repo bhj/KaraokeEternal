@@ -152,7 +152,13 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       await next()
     } catch (err) {
       ctx.status = err.status || 500
-      ctx.body = err.message
+      // Sanitize error messages: only expose details for 4xx errors (user-facing)
+      // 5xx errors should show generic message to clients, full details in logs
+      if (ctx.status >= 500) {
+        ctx.body = 'Internal server error'
+      } else {
+        ctx.body = err.message
+      }
       ctx.app.emit('error', err, ctx)
     }
   })
@@ -199,8 +205,8 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       try {
         // Check if user is admin/guest via groups header
         const groupsRaw = ctx.request.header[groupsHeader] || ''
-        // Authentik uses pipe separator for groups
-        const groups = typeof groupsRaw === 'string' ? groupsRaw.split('|').map(g => g.trim()) : []
+        // Support both pipe (|) and comma (,) separators for groups (Authentik may use either)
+        const groups = typeof groupsRaw === 'string' ? groupsRaw.split(/[,|]/).map(g => g.trim()).filter(g => g) : []
         const isAdmin = groups.includes(adminGroup)
         const isGuest = groups.includes(guestGroup)
         log.info('SSO auth: user=%s groups=%j isAdmin=%s isGuest=%s', headerUsername, groups, isAdmin, isGuest)
@@ -287,11 +293,13 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
           dateUpdated: user.dateUpdated,
         }
 
-        // Set JWT cookie (httpOnly for security)
+        // Set JWT cookie (httpOnly for security, secure in production)
         const token = jwtSign(jwtPayload, jwtKey)
+        const isSecure = env.NODE_ENV === 'production' || env.KES_REQUIRE_PROXY === 'true'
         ctx.cookies.set('keToken', token, {
           httpOnly: true,
           sameSite: 'lax',
+          secure: isSecure,
           maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         })
 
@@ -309,7 +317,42 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     // verify JWT
     try {
       const { keToken } = parseCookie(ctx.request.header.cookie)
-      ctx.user = jwtVerify(keToken, jwtKey)
+      // Type assertion to match expected user context shape
+      const jwtPayload = jwtVerify(keToken, jwtKey) as {
+        userId: number | null
+        username: string | null
+        name: string | null
+        isAdmin: boolean
+        isGuest: boolean
+        roomId: number | null
+        ownRoomId?: number | null
+        dateUpdated: number | null
+      }
+
+      // Check for room visitation cookie (allows standard users to visit other rooms)
+      // Only non-guests can visit other rooms - guests are bound to their enrollment room
+      if (!jwtPayload.isGuest && ephemeralEnabled) {
+        const visitedRoomId = ctx.cookies.get('keVisitedRoom')
+        if (visitedRoomId) {
+          const roomIdNum = parseInt(visitedRoomId, 10)
+          if (!isNaN(roomIdNum) && roomIdNum !== jwtPayload.roomId) {
+            try {
+              // Validate room exists and is open
+              await Rooms.validate(roomIdNum, null, { isOpen: true })
+              // Update roomId in the user context for this request
+              jwtPayload.roomId = roomIdNum
+              await Rooms.updateActivity(roomIdNum)
+              log.verbose('JWT user %s visiting room %d', jwtPayload.username, roomIdNum)
+            } catch (err) {
+              // Room no longer valid - clear cookie silently
+              ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 })
+              log.info('Cleared invalid visitation cookie for user %s: %s', jwtPayload.username, (err as Error).message)
+            }
+          }
+        }
+      }
+
+      ctx.user = jwtPayload
     } catch {
       ctx.user = {
         dateUpdated: null,

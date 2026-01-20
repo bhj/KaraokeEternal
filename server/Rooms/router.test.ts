@@ -95,6 +95,7 @@ describe('Rooms Router - Room Joining', () => {
       expect(mockCookieSet).toHaveBeenCalledWith('keVisitedRoom', String(testRoomId), {
         httpOnly: true,
         sameSite: 'lax',
+        secure: false, // false in test environment (not production/proxy)
         maxAge: 24 * 60 * 60 * 1000,
       })
     })
