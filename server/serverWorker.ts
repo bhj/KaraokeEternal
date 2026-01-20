@@ -46,10 +46,10 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
 
   // Trust proxy headers (X-Forwarded-Proto, etc.) when behind a reverse proxy
   // This allows secure cookies to work when TLS is terminated at the proxy
-  // Enabled automatically when KES_REQUIRE_PROXY=true
-  if (env.KES_REQUIRE_PROXY === 'true') {
+  // Set KES_TRUST_PROXY=true in your environment/NixOS config
+  if (process.env.KES_TRUST_PROXY === 'true') {
     app.proxy = true
-    log.info('Trusting proxy headers (X-Forwarded-Proto) for secure cookies')
+    log.info('KES_TRUST_PROXY enabled: trusting X-Forwarded-Proto header')
   }
 
   let server, io
