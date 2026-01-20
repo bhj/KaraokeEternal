@@ -5,12 +5,13 @@ import { fetchAccount } from 'store/modules/user'
 import usersReducer, { sliceInjectNoOp } from '../../modules/users'
 import About from '../../components/About/About'
 import Account from '../../components/Account/Account'
+import MyRoom from '../../components/MyRoom/MyRoom'
 import Prefs from '../../components/Prefs/Prefs'
 import Rooms from '../../components/Rooms/Rooms'
 import Users from '../../components/Users/Users'
 
 const SignedInView = () => {
-  const { isAdmin } = useAppSelector(state => state.user)
+  const { isAdmin, isGuest } = useAppSelector(state => state.user)
   const sliceExists = !!useAppSelector(state => state.users)
   const dispatch = useAppDispatch()
 
@@ -34,6 +35,9 @@ const SignedInView = () => {
 
       {isAdmin
         && <Prefs />}
+
+      {!isAdmin && !isGuest
+        && <MyRoom />}
 
       <Account />
 

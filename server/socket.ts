@@ -37,6 +37,14 @@ const { verify: jwtVerify } = jsonWebToken
 // Track pending room cleanups for grace period
 const pendingCleanups = new Map<number, NodeJS.Timeout>()
 
+// Clear all pending cleanups (called on shutdown to prevent SQLITE_MISUSE errors)
+export function clearPendingCleanups () {
+  for (const timeout of pendingCleanups.values()) {
+    clearTimeout(timeout)
+  }
+  pendingCleanups.clear()
+}
+
 export default function (io, jwtKey, validateProxySource: (ip: string) => boolean) {
   io.on('connection', async (sock) => {
     // validate proxy source before doing anything else

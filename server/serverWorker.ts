@@ -23,7 +23,7 @@ import roomsRouter from './Rooms/router.js'
 import userRouter from './User/router.js'
 import pushQueuesAndLibrary from './lib/pushQueuesAndLibrary.js'
 import { Server as SocketIO } from 'socket.io'
-import socketActions from './socket.js'
+import socketActions, { clearPendingCleanups } from './socket.js'
 import IPC from './lib/IPCBridge.js'
 import IPCLibraryActions from './Library/ipc.js'
 import IPCMediaActions from './Media/ipc.js'
@@ -128,6 +128,9 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     shutdownHandlers.push(() => new Promise((resolve) => {
       // Stop idle cleanup interval
       clearInterval(idleCleanupInterval)
+
+      // Clear pending room cleanup timeouts to prevent SQLITE_MISUSE errors
+      clearPendingCleanups()
 
       // also calls http server's close method, which ultimately handles the callback
       io.close(resolve)

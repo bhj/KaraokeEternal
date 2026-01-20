@@ -23,7 +23,8 @@ const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.s
 router.get('/:mediaId', async (ctx) => {
   const { type } = ctx.query
 
-  if (!ctx.user.isAdmin) {
+  // Allow any authenticated user to stream media (not just admins)
+  if (!ctx.user.userId) {
     ctx.throw(401)
   }
 

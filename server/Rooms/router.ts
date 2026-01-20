@@ -190,4 +190,52 @@ router.post('/leave', async (ctx) => {
   ctx.body = { success: true }
 })
 
+// GET /api/rooms/my - Get the current user's own room (for standard users)
+router.get('/my', async (ctx) => {
+  // Must be authenticated and not a guest
+  if (!ctx.user.userId || ctx.user.isGuest) {
+    ctx.throw(401)
+  }
+
+  // Get user's own room
+  const room = await Rooms.getByOwnerId(ctx.user.userId)
+
+  if (!room) {
+    ctx.body = { room: null }
+    return
+  }
+
+  // Get room data (includes invitationToken)
+  const roomData = await Rooms.getRoomData(room.roomId)
+
+  // Build enrollment URL if Authentik is configured
+  let enrollmentUrl = null
+  const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+
+  if (authentikUrl && roomData?.invitationToken) {
+    const authUrl = new URL(authentikUrl)
+    authUrl.pathname = `/if/flow/${enrollmentFlow}/`
+    authUrl.searchParams.set('itoken', roomData.invitationToken)
+
+    // Build the next URL (where to redirect after enrollment)
+    const baseUrl = process.env.KES_PUBLIC_URL || `https://${ctx.request.host}`
+    const nextUrl = new URL(baseUrl)
+    nextUrl.searchParams.set('roomId', String(room.roomId))
+    authUrl.searchParams.set('next', nextUrl.toString())
+
+    enrollmentUrl = authUrl.toString()
+  }
+
+  ctx.body = {
+    room: {
+      roomId: room.roomId,
+      name: room.name,
+      status: room.status,
+      invitationToken: roomData?.invitationToken ?? null,
+      enrollmentUrl,
+    },
+  }
+})
+
 export default router
