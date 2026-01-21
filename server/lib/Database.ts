@@ -1,5 +1,5 @@
 import path from 'path'
-import fse from 'fs-extra'
+import fs from 'node:fs'
 import { DatabaseSync } from 'node:sqlite' // eslint-disable-line n/no-unsupported-features/node-builtins
 import getLogger from './Log.js'
 
@@ -76,14 +76,14 @@ export class DatabaseWrapper {
       down TEXT
     )`)
 
-    const files = await fse.readdir(migrationsPath)
+    const files = await fs.promises.readdir(migrationsPath)
     const migrations = []
 
     for (const file of files) {
       const match = file.match(/^(\d+)-(.*)\.sql$/)
 
       if (match) {
-        const content = await fse.readFile(path.join(migrationsPath, file), 'utf8')
+        const content = await fs.promises.readFile(path.join(migrationsPath, file), 'utf8')
         const parts = content.split(/^--\s*Down/mi)
         const upSql = parts[0].replace(/^--\s*Up/mi, '').trim()
         const downSql = (parts[1] || '').trim()
@@ -165,7 +165,7 @@ class Database {
     log.info('Opening database file %s %s', ro ? '(read-only)' : '(writeable)', file)
 
     // create path if it doesn't exist
-    fse.ensureDirSync(path.dirname(file))
+    fs.mkdirSync(path.dirname(file), { recursive: true })
 
     const instance = new DatabaseWrapper(file)
 
