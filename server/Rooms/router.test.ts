@@ -182,6 +182,111 @@ describe('Rooms Router - Room Joining', () => {
     })
   })
 
+  describe('GET /api/rooms/:roomId/enrollment', () => {
+    it('should use relative URL for next parameter (not absolute)', async () => {
+      // Set up Authentik env vars
+      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
+
+      // Add invitation token to room data
+      await db.db?.run(
+        'UPDATE rooms SET data = ? WHERE roomId = ?',
+        [JSON.stringify({ invitationToken: 'test-token' }), testRoomId]
+      )
+
+      const routerModule = await import('./router.ts')
+      const router = routerModule.default
+
+      const enrollmentLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/:roomId/enrollment' && l.methods.includes('GET'))
+
+      expect(enrollmentLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId) },
+        request: { host: 'karaoke.example.com' },
+        body: undefined as unknown,
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }) as Mock,
+      }
+
+      const handler = enrollmentLayer!.stack[enrollmentLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // Parse the enrollment URL and check the next parameter
+      const enrollmentUrl = new URL((ctx.body as { enrollmentUrl: string }).enrollmentUrl)
+      const nextParam = enrollmentUrl.searchParams.get('next')
+
+      // next should be a relative URL, not absolute
+      // Authentik rejects absolute URLs as open redirect protection
+      expect(nextParam).toBe('/')
+
+      // Restore env
+      if (originalAuthUrl !== undefined) {
+        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      } else {
+        delete process.env.KES_AUTHENTIK_PUBLIC_URL
+      }
+    })
+  })
+
+  describe('GET /api/rooms/my - enrollment URL', () => {
+    it('should use relative URL for next parameter (not absolute)', async () => {
+      // Set up Authentik env vars
+      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
+
+      // Create a room owned by the test user
+      const now = Math.floor(Date.now() / 1000)
+      const insertRoom = await db.db?.run(
+        'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
+        ['User Room', 'open', testUser.userId, now, now, JSON.stringify({ invitationToken: 'test-token-2' })]
+      )
+      const userRoomId = insertRoom?.lastID ?? 0
+
+      const routerModule = await import('./router.ts')
+      const router = routerModule.default
+
+      const myLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/my' && l.methods.includes('GET'))
+
+      expect(myLayer).toBeDefined()
+
+      const ctx = {
+        user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
+        request: { host: 'karaoke.example.com' },
+        body: undefined as unknown,
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }) as Mock,
+      }
+
+      const handler = myLayer!.stack[myLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // Parse the enrollment URL and check the next parameter
+      const responseBody = ctx.body as { room: { enrollmentUrl: string } }
+      const enrollmentUrl = new URL(responseBody.room.enrollmentUrl)
+      const nextParam = enrollmentUrl.searchParams.get('next')
+
+      // next should be a relative URL, not absolute
+      // Authentik rejects absolute URLs as open redirect protection
+      expect(nextParam).toBe('/')
+
+      // Restore env
+      if (originalAuthUrl !== undefined) {
+        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      } else {
+        delete process.env.KES_AUTHENTIK_PUBLIC_URL
+      }
+    })
+  })
+
   describe('POST /api/rooms/leave', () => {
     it('should clear keVisitedRoom cookie', async () => {
       const routerModule = await import('./router.js')

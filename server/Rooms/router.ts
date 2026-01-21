@@ -57,12 +57,9 @@ router.get('/:roomId/enrollment', async (ctx) => {
   authUrl.pathname = `/if/flow/${enrollmentFlow}/`
   authUrl.searchParams.set('itoken', invitationToken)
 
-  // Build the next URL (where to redirect after enrollment)
-  // Use the app's base URL with the roomId param
-  const baseUrl = process.env.KES_PUBLIC_URL || `http://${ctx.request.host}`
-  const nextUrl = new URL(baseUrl)
-  nextUrl.searchParams.set('roomId', String(roomId))
-  authUrl.searchParams.set('next', nextUrl.toString())
+  // Use relative URL - Authentik rejects absolute URLs in ?next (open redirect protection)
+  // Guest's room assignment comes from X-Authentik-Karaoke-Room-Id header instead
+  authUrl.searchParams.set('next', '/')
 
   ctx.body = { enrollmentUrl: authUrl.toString() }
 })
@@ -96,11 +93,9 @@ router.get('/my', async (ctx) => {
     authUrl.pathname = `/if/flow/${enrollmentFlow}/`
     authUrl.searchParams.set('itoken', roomData.invitationToken)
 
-    // Build the next URL (where to redirect after enrollment)
-    const baseUrl = process.env.KES_PUBLIC_URL || `https://${ctx.request.host}`
-    const nextUrl = new URL(baseUrl)
-    nextUrl.searchParams.set('roomId', String(room.roomId))
-    authUrl.searchParams.set('next', nextUrl.toString())
+    // Use relative URL - Authentik rejects absolute URLs in ?next (open redirect protection)
+    // Guest's room assignment comes from X-Authentik-Karaoke-Room-Id header instead
+    authUrl.searchParams.set('next', '/')
 
     enrollmentUrl = authUrl.toString()
   }
