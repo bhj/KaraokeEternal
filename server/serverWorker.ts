@@ -250,6 +250,10 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
           const isAdmin = groups.includes(adminGroup)
           const isGuest = groups.includes(guestGroup)
           log.info('SSO auth: user=%s groups=%j isAdmin=%s isGuest=%s', headerUsername, groups, isAdmin, isGuest)
+          // DEBUG: Log all x-authentik headers
+          const authHeaders = Object.entries(ctx.request.header).filter(([k]) => k.toLowerCase().includes('authentik'))
+          log.info('DEBUG x-authentik headers: %j', Object.fromEntries(authHeaders))
+          log.info('DEBUG roomIdHeader=%s expected=%s', roomIdHeader, ctx.request.header[roomIdHeader])
 
           // Get or create user from header
           const user = await User.getOrCreateFromHeader(headerUsername, isAdmin, isGuest)
