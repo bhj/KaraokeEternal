@@ -3,7 +3,7 @@ import fs from 'fs'
 import { db } from '../lib/Database.js'
 import sql from 'sqlate'
 import jsonWebToken from 'jsonwebtoken'
-import bcrypt from '../lib/bcrypt.js'
+import crypto from '../lib/crypto.js'
 import KoaRouter from '@koa/router'
 import Prefs from '../Prefs/Prefs.js'
 import Queue from '../Queue/Queue.js'
@@ -11,7 +11,6 @@ import Rooms from '../Rooms/Rooms.js'
 import User from '../User/User.js'
 import { QUEUE_PUSH } from '../../shared/actionTypes.js'
 import {
-  BCRYPT_ROUNDS,
   USERNAME_MIN_LENGTH,
   USERNAME_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
@@ -70,6 +69,16 @@ router.post('/login', async (ctx) => {
     }
   } catch (err) {
     ctx.throw(401, err.message)
+  }
+
+  if (crypto.isLegacy(user.password)) {
+    const newHash = await crypto.hash(req.body.password)
+    const query = sql`
+      UPDATE users
+      SET password = ${newHash}, dateUpdated = ${Math.floor(Date.now() / 1000)}
+      WHERE userId = ${user.userId}
+    `
+    db.run(String(query), query.parameters)
   }
 
   const userCtx = createUserCtx(user, roomId)
@@ -197,7 +206,7 @@ router.put('/user/:userId', async (ctx) => {
       ctx.throw(422, 'Current password is required')
     }
 
-    if (!(await bcrypt.compare(password, user.password))) {
+    if (!(await crypto.compare(password, user.password))) {
       ctx.throw(401, 'Incorrect current password')
     }
   }
@@ -242,7 +251,7 @@ router.put('/user/:userId', async (ctx) => {
       ctx.throw(422, 'New passwords do not match')
     }
 
-    fields.set('password', await bcrypt.hash(newPassword, BCRYPT_ROUNDS))
+    fields.set('password', await crypto.hash(newPassword))
   }
 
   // changing user image?
@@ -443,7 +452,6 @@ router.post('/setup', async (ctx) => {
 
     // create JWT
     const token = jwtSign(userCtx, ctx.jwtKey)
-
 
     if (!user) {
       throw new Error('User not found')

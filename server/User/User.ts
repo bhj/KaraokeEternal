@@ -1,12 +1,11 @@
 import { db } from '../lib/Database.js'
 import sql from 'sqlate'
-import bcrypt from '../lib/bcrypt.js'
+import crypto from '../lib/crypto.js'
 import Queue from '../Queue/Queue.js'
 import { randomChars } from '../lib/util.js'
 import { User as UserType } from '../../shared/types.js'
 
 export const IMG_MAX_LENGTH = 51200 // 50KB
-export const BCRYPT_ROUNDS = 12
 export const USERNAME_MIN_LENGTH = 3
 export const USERNAME_MAX_LENGTH = 128
 export const PASSWORD_MIN_LENGTH = 6
@@ -111,7 +110,7 @@ class User {
       }
 
       fields.set('username', username)
-      fields.set('password', await bcrypt.hash(newPassword, BCRYPT_ROUNDS))
+      fields.set('password', await crypto.hash(newPassword))
     } else {
       let res: { count?: number } = {}
 
@@ -171,7 +170,7 @@ class User {
 
     const user = await User.getByUsername(username, true)
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await crypto.compare(password, user.password))) {
       throw new Error('Incorrect username/email or password')
     }
 

@@ -1,9 +1,8 @@
-import bcrypt from '../lib/bcrypt.js'
+import crypto from '../lib/crypto.js'
 import sql from 'sqlate'
 import { db } from '../lib/Database.js'
 import { ValidationError } from '../lib/Errors.js'
 
-const BCRYPT_ROUNDS = 12
 const NAME_MIN_LENGTH = 1
 const NAME_MAX_LENGTH = 50
 const PASSWORD_MIN_LENGTH = 5
@@ -48,13 +47,13 @@ class Rooms {
       ORDER BY dateCreated DESC
     `
     const res = db.all<{
-      roomId: number,
-      name: string, // assuming name exists
-      status: string, // assuming status exists
-      data: string,
-      password?: string | null,
-      dateCreated: string | number,
-      prefs?: any,
+      roomId: number
+      name: string // assuming name exists
+      status: string // assuming status exists
+      data: string
+      password?: string | null
+      dateCreated: string | number
+      prefs?: any
       hasPassword?: boolean
     }>(String(query), query.parameters)
 
@@ -96,7 +95,7 @@ class Rooms {
         // leave unchanged
         ? sql``
         // empty string unsets password
-        : sql`password = ${password === '' ? null : await bcrypt.hash(password, BCRYPT_ROUNDS)},`
+        : sql`password = ${password === '' ? null : await crypto.hash(password)},`
 
       query = sql`
         UPDATE rooms
@@ -111,7 +110,7 @@ class Rooms {
         INSERT INTO rooms (name, password, status, dateCreated, data)
         VALUES (
           ${name},
-          ${typeof password === 'undefined' ? null : await bcrypt.hash(password, BCRYPT_ROUNDS)},
+          ${typeof password === 'undefined' ? null : await crypto.hash(password)},
           ${status},
           ${Math.floor(Date.now() / 1000)},
           json_set('{}', '$.prefs', json(${JSON.stringify(prefs)}))
@@ -157,8 +156,18 @@ class Rooms {
         throw new Error('Room password is required')
       }
 
-      if (!(await bcrypt.compare(password, room.password))) {
+      if (!(await crypto.compare(password, room.password))) {
         throw new Error('Incorrect room password')
+      }
+
+      if (crypto.isLegacy(room.password)) {
+        const newHash = await crypto.hash(password)
+        const query = sql`
+          UPDATE rooms
+          SET password = ${newHash}
+          WHERE roomId = ${roomId}
+        `
+        db.run(String(query), query.parameters)
       }
     }
 
