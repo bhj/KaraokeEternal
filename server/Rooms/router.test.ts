@@ -314,8 +314,15 @@ describe('Rooms Router - Room Joining', () => {
 
   describe('GET /api/rooms/join/:roomId/:inviteCode - Smart QR Entry', () => {
     const validInviteCode = '12345678-1234-1234-1234-123456789012'
+    const wrongInviteCode = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
 
-    it('should set cookie and redirect to / for logged-in user with valid room', async () => {
+    it('should set cookie and redirect to / for logged-in user with valid invite code', async () => {
+      // Set up room with matching invitation token
+      await db.db?.run(
+        'UPDATE rooms SET data = ? WHERE roomId = ?',
+        [JSON.stringify({ invitationToken: validInviteCode }), testRoomId]
+      )
+
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
@@ -350,6 +357,72 @@ describe('Rooms Router - Room Joining', () => {
         maxAge: 24 * 60 * 60 * 1000,
       })
       expect(redirectUrl).toBe('/')
+    })
+
+    it('should return 403 for logged-in user with wrong invite code', async () => {
+      // Room has token X, user provides token Y
+      await db.db?.run(
+        'UPDATE rooms SET data = ? WHERE roomId = ?',
+        [JSON.stringify({ invitationToken: validInviteCode }), testRoomId]
+      )
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId), inviteCode: wrongInviteCode },
+        user: { userId: testUser.userId, name: 'testuser', isGuest: false, isAdmin: false },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: vi.fn(),
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 403, message: 'Invalid invite code' })
+    })
+
+    it('should return 403 for room without invitation token', async () => {
+      // Room exists but has no invitationToken in data
+      await db.db?.run(
+        'UPDATE rooms SET data = ? WHERE roomId = ?',
+        [JSON.stringify({}), testRoomId]
+      )
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId), inviteCode: validInviteCode },
+        user: { userId: testUser.userId, name: 'testuser', isGuest: false, isAdmin: false },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: vi.fn(),
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 403, message: 'Invalid invite code' })
     })
 
     it('should return 404 for logged-in user with non-existent room', async () => {

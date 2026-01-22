@@ -137,6 +137,12 @@ router.get('/join/:roomId/:inviteCode', async (ctx) => {
       ctx.throw(404, 'Room not found')
     }
 
+    // Verify invite code matches room's stored token
+    const roomData = await Rooms.getRoomData(roomId)
+    if (!roomData?.invitationToken || roomData.invitationToken !== inviteCode) {
+      ctx.throw(403, 'Invalid invite code')
+    }
+
     // Set visitation cookie (same logic as POST /rooms/:roomId/join)
     ctx.cookies.set('keVisitedRoom', String(roomId), {
       httpOnly: true,
