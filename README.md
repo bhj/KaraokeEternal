@@ -1,217 +1,214 @@
-# Karaoke Eternal Automated
+<div align="center">
 
-Fork of [Karaoke Eternal](https://github.com/bhj/KaraokeEternal) with Authentik SSO integration and ephemeral rooms for automated multi-user deployments.
+# Karaoke Eternal
 
-## Fork Features
+### Automated Edition
 
-This fork adds:
+A **Zero-Touch Party Hosting** fork of [Karaoke Eternal](https://github.com/bhj/KaraokeEternal)
 
-- **Header-based SSO**: Reads `X-Authentik-Username` header for automatic authentication (no login page)
-- **Ephemeral Rooms**: Auto-creates a personal room per user on login
-- **Auto Cleanup**: Rooms are automatically destroyed when empty or after 4 hours idle
-- **NixOS Support**: Includes `flake.nix` with devshell for development
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-20%2B-brightgreen)](https://nodejs.org/)
+[![Authentik](https://img.shields.io/badge/SSO-Authentik-fd4b2d)](https://goauthentik.io/)
 
-These features are designed for deployments behind a reverse proxy (Caddy, nginx, Traefik) with Authentik forward auth.
+*No login screens. No user management. Just karaoke.*
 
-## Upstream Features
+---
 
-All upstream Karaoke Eternal features are preserved:
+</div>
 
-- MP3+G (CDG) and MP4 video playback
-- Mobile-friendly web app for song search and queue management
-- WebGL visualizations with automatic lyrics background removal
-- Self-hosted with no ads or telemetry
+## Features
 
-See the [upstream documentation](https://www.karaoke-eternal.com/docs/) for general usage.
+- **SSO Auto-Login** — Authentication handled upstream; land directly in your room
+- **Per-User Rooms** — Every standard user gets their own private party room
+- **QR Guest Enrollment** — Guests scan a code and join instantly
+- **Multi-Tenancy** — Multiple hosts can run separate parties simultaneously
+- **Room Roaming** — Standard users can visit other rooms via QR code
 
-## Deployment
+---
 
-### NixOS
+## Architecture
 
-Add to your NixOS configuration:
-
-```nix
-# In your flake.nix inputs:
-karaoke-eternal.url = "github:Zardoz8901/KaraokeEternalAutomated";
-
-# In your configuration:
-services.karaoke-eternal = {
-  enable = true;
-  port = 8280;
-  dataDir = "/apps/karaoke-eternal";
-  mediaPath = "/media/karaoke";
-};
+```
+┌─────────┐      ┌─────────────┐      ┌──────────┐
+│  User   │─────▶│    Caddy    │─────▶│ Karaoke  │
+└─────────┘      │   Proxy     │      │   App    │
+                 └──────┬──────┘      └──────────┘
+                        │ forward_auth
+                 ┌──────▼──────┐
+                 │  Authentik  │
+                 └─────────────┘
 ```
 
-### Docker
+The app trusts headers from the reverse proxy (`KES_REQUIRE_PROXY=true`):
+
+| Header | Purpose |
+|--------|---------|
+| `X-Authentik-Username` | User identity |
+| `X-Authentik-Groups` | Role assignment (admin/standard/guest) |
+| `X-Authentik-Karaoke-Room-Id` | Guest room routing |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js** 20+
+- **Reverse Proxy** (Caddy recommended)
+- **Identity Provider** (Authentik)
+- **SQLite** (bundled)
+
+### Installation
 
 ```bash
-docker build -t karaoke-eternal-automated .
-docker-compose up -d
-```
-
-See `docker-compose.yml` for configuration options.
-
-### Development
-
-```bash
-# Enter development shell (requires Nix with flakes)
-nix develop
-
-# Or manually with Node.js 24+
+git clone https://github.com/YOUR_USERNAME/KaraokeEternalAutomated.git
+cd KaraokeEternalAutomated
 npm install
-npm run dev     # Start dev server (port 3000)
-npm run build   # Build for production
-npm run test    # Run tests
-npm run lint    # Run linter
+npm run build
 ```
+
+### Running
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm start
+```
+
+---
 
 ## Configuration
 
-### Core Settings
+<details>
+<summary><strong>Required Environment Variables</strong></summary>
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `KES_REQUIRE_PROXY` | Trust proxy headers only | `true` |
+| `KES_TRUSTED_PROXIES` | Allowed proxy IPs | `127.0.0.1,::1` |
+
+</details>
+
+<details>
+<summary><strong>SSO Headers</strong></summary>
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `KES_PORT` | 3000 | Server port |
-| `KES_PATH_DATA` | Platform-specific | Database and config location |
-| `KES_PATH_MEDIA` | - | Media library path |
+| `KES_AUTH_HEADER` | `X-Authentik-Username` | Username header |
+| `KES_GROUPS_HEADER` | `X-Authentik-Groups` | Groups header |
+| `KES_ADMIN_GROUP` | `karaoke-admins` | Admin group name |
+| `KES_GUEST_GROUP` | `karaoke-guests` | Guest group name |
+| `KES_SSO_SIGNOUT_URL` | — | Logout redirect (e.g., `/outpost.goauthentik.io/sign_out`) |
 
-### SSO Header Auth
+</details>
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `KES_AUTH_HEADER` | `X-Authentik-Username` | Header containing username |
-| `KES_GROUPS_HEADER` | `X-Authentik-Groups` | Header containing groups (pipe-separated) |
-| `KES_ADMIN_GROUP` | `admin` | Group name that grants admin privileges |
-| `KES_GUEST_GROUP` | `karaoke-guests` | Group name for guest users |
-| `KES_ROOM_ID_HEADER` | `X-Authentik-Karaoke-Room-Id` | Header for guest room assignment |
-| `KES_EPHEMERAL_ROOMS` | `true` | Enable auto-create rooms per user |
-| `KES_ROOM_IDLE_TIMEOUT` | `240` | Minutes before idle room cleanup |
+<details>
+<summary><strong>Authentik API (Guest Invitations)</strong></summary>
 
-### Authentik Guest Invitations
+| Variable | Description |
+|----------|-------------|
+| `KES_AUTHENTIK_URL` | Internal API URL (e.g., `http://authentik:9000`) |
+| `KES_AUTHENTIK_PUBLIC_URL` | Public URL for redirects (e.g., `https://auth.example.com`) |
+| `KES_AUTHENTIK_API_TOKEN` | API token with invitation permissions |
+| `KES_AUTHENTIK_ENROLLMENT_FLOW` | Flow slug (default: `karaoke-guest-enrollment`) |
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `KES_AUTHENTIK_URL` | - | Internal Authentik URL for API calls |
-| `KES_AUTHENTIK_API_TOKEN` | - | Authentik API token |
-| `KES_AUTHENTIK_PUBLIC_URL` | - | External Authentik URL for QR codes |
-| `KES_AUTHENTIK_ENROLLMENT_FLOW` | `karaoke-guest-enrollment` | Enrollment flow slug |
+</details>
 
-### Proxy Security
+---
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `KES_REQUIRE_PROXY` | `true` (prod), `false` (dev) | Reject requests not from trusted proxy |
-| `KES_TRUSTED_PROXIES` | _(empty)_ | Comma-separated IPs/CIDRs (e.g., `10.0.0.1,192.168.0.0/16`) |
+## Authentik Setup
 
-When `KES_REQUIRE_PROXY=true`, only requests from loopback addresses (`127.0.0.1`, `::1`) or IPs matching `KES_TRUSTED_PROXIES` are allowed. This prevents attackers from bypassing authentication by accessing the server directly.
+### 1. Property Mapping (Guest Room Header)
 
-**Important**: When proxy enforcement is enabled, configure `KES_TRUSTED_PROXIES` to match your reverse proxy's IP address.
+Create a Property Mapping to pass the guest's room assignment.
 
-### Admin Role Behavior
+**Name:** `karaoke-room-id`
 
-Admin privileges are **strictly synced** with the SSO groups header on every request:
-- If a user is in the admin group, they become admin
-- If a user is removed from the admin group, they are **demoted** to standard user
-- This ensures SSO is the source of truth for access control
-
-## Authentik Integration
-
-This fork is designed to work with [Authentik](https://goauthentik.io/) forward auth.
-
-### Authentik Setup
-
-1. **Create Application**
-   - Go to Applications > Applications > Create
-   - Name: `Karaoke Eternal`
-   - Slug: `karaoke-eternal`
-   - Provider: (create in next step)
-
-2. **Create Forward Auth Provider**
-   - Go to Applications > Providers > Create
-   - Type: `Proxy Provider`
-   - Name: `karaoke-eternal-provider`
-   - Authorization flow: Select your default
-   - Mode: `Forward auth (single application)`
-   - External host: `https://karaoke.yourdomain.com`
-
-3. **Create Outpost** (if not already exists)
-   - Go to Applications > Outposts
-   - Create or use existing `authentik Embedded Outpost`
-   - Ensure the Karaoke Eternal application is selected
-
-### Reverse Proxy (Caddy)
-
-```caddyfile
-karaoke.yourdomain.com {
-    # Proxy outpost endpoints
-    reverse_proxy /outpost.goauthentik.io/* localhost:9000
-
-    # Forward auth
-    forward_auth localhost:9000 {
-        uri /outpost.goauthentik.io/auth/caddy
-        copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Karaoke-Room-Id
-        trusted_proxies private_ranges
+**Expression** (Proxy Provider forward-auth):
+```python
+return {
+    "ak_proxy": {
+        "user_attributes": {
+            "additionalHeaders": {
+                "X-Authentik-Karaoke-Room-Id": request.user.attributes.get("karaoke_room_id", "")
+            }
+        }
     }
-
-    # WebSocket support for Socket.IO
-    @websocket {
-        header Connection *Upgrade*
-        header Upgrade websocket
-    }
-    reverse_proxy @websocket localhost:8280
-    reverse_proxy localhost:8280
 }
 ```
 
-### How It Works
+> Assign this mapping to your Proxy Provider under **Property Mappings**.
 
-1. User visits `karaoke.yourdomain.com`
-2. Caddy's `forward_auth` checks with Authentik
-3. If not logged in, user is redirected to Authentik login
-4. After login, Authentik adds `X-Authentik-Username` header
-5. Karaoke Eternal reads the header and sets a session cookie
-6. On page load, the app automatically checks for an existing session
-7. User lands directly in their room - **no login UI ever shown**
-8. Admin privileges sync automatically based on Authentik groups
+### 2. Caddy forward_auth
 
-### Guest Invitations
+```caddyfile
+forward_auth authentik:9000 {
+    uri /outpost.goauthentik.io/auth/caddy
+    copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Karaoke-Room-Id
+}
+```
 
-Guests can join rooms via QR code without needing existing Authentik accounts:
+### 3. Guest Enrollment Flow
 
-1. **Host opens Player** - QR code displays with Authentik enrollment URL
-2. **Guest scans QR** - Lands on Authentik enrollment page
-3. **Guest enters display name** - Authentik creates account in `karaoke-guests` group
-4. **Guest is redirected** - Automatically joined to host's room via `X-Authentik-Karaoke-Room-Id` header
+Create an enrollment flow with stages:
 
-**Authentik Setup for Guest Invitations:**
+1. **Invitation** — Validates invite token
+2. **Prompt** — Collects guest display name
+3. **User Write** — Creates user with `karaoke_room_id` attribute
+4. **Login** — Authenticates the new user
 
-1. Create `karaoke-guests` group (bind only to karaoke app)
-2. Create enrollment flow `karaoke-guest-enrollment`:
-   - **Invitation Stage**: Require `itoken` parameter
-   - **Prompt Stage**: Display name only (auto-generate username)
-   - **User Write Stage**: Add to `karaoke-guests` group, copy `karaoke_room_id` from invitation to user attributes
-   - **Redirect Stage**: Use `?next` URL parameter
-3. Create API token with permissions: `flows.instances` (read), `stages.invitation.invitations` (create, delete, list), `core.users` (list, delete)
-4. Configure proxy outpost to pass `X-Authentik-Karaoke-Room-Id` header: `{{ user.attributes.karaoke_room_id|default('') }}`
+**Expiration:**
+- Invitations: **8 hours**
+- Guest users: **7 days** (via `goauthentik.io/user/expires`)
 
-**Guest Cleanup:**
-- When an admin explicitly deletes a room, Authentik invitations and guest accounts for that room are automatically deleted
-- Idle room cleanup does NOT delete Authentik accounts (prevents accidental data loss)
+---
 
-## Database Migrations
+## Security
 
-This fork adds migration `006-ephemeral-rooms.sql` which adds:
-- `isEphemeral` column to rooms table
-- `roomCreatedAt` column for cleanup tracking
+| Risk | Mitigation |
+|------|------------|
+| Header spoofing | `KES_REQUIRE_PROXY=true` + IP whitelist |
+| Direct port access | Never expose 8280; use reverse proxy |
+| Cookie theft | `httpOnly`, `Secure`, `SameSite=Lax` |
+| Guest persistence | 7-day auto-expiration |
 
-Migrations run automatically on server start.
+> **HTTPS required** for secure cookies.
+
+---
+
+## Running Tests
+
+```bash
+npm test
+```
+
+---
+
+## Built With
+
+- [Koa](https://koajs.com/) — Web framework
+- [Socket.io](https://socket.io/) — Real-time communication
+- [SQLite](https://sqlite.org/) — Database
+- [React](https://react.dev/) — Frontend
+- [Authentik](https://goauthentik.io/) — Identity Provider
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
 
 ## License
 
-ISC (same as upstream)
+[ISC License](LICENSE) — Forked from [Karaoke Eternal](https://github.com/bhj/KaraokeEternal) by RadRoot LLC.
 
-## Credits
+---
 
-- Upstream: [Karaoke Eternal](https://github.com/bhj/KaraokeEternal) by bhj
-- Fork: Authentik integration and ephemeral rooms by Zardoz8901
+## Acknowledgments
+
+- [bhj/KaraokeEternal](https://github.com/bhj/KaraokeEternal) — Original project
+- [Authentik](https://goauthentik.io/) — Identity provider
