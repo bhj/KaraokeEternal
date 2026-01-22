@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, vi, Mock } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
 import fse from 'fs-extra'
 
 const TEST_DB_PATH = '/tmp/karaoke-eternal-test-rooms-router.sqlite'
@@ -66,7 +66,7 @@ describe('Rooms Router - Room Joining', () => {
   describe('POST /api/rooms/:roomId/join', () => {
     it('should set keVisitedRoom cookie for standard user', async () => {
       // Import router and extract handler
-      const routerModule = await import('./router.ts')
+      const routerModule = await import('./router.js')
       const router = routerModule.default
 
       // Find the join handler
@@ -85,7 +85,7 @@ describe('Rooms Router - Room Joining', () => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }) as Mock,
+        }),
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -118,7 +118,7 @@ describe('Rooms Router - Room Joining', () => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }) as Mock,
+        }),
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -144,7 +144,7 @@ describe('Rooms Router - Room Joining', () => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }) as Mock,
+        }),
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -173,7 +173,7 @@ describe('Rooms Router - Room Joining', () => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }) as Mock,
+        }),
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -194,7 +194,7 @@ describe('Rooms Router - Room Joining', () => {
         [JSON.stringify({ invitationToken: 'test-token' }), testRoomId]
       )
 
-      const routerModule = await import('./router.ts')
+      const routerModule = await import('./router.js')
       const router = routerModule.default
 
       const enrollmentLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
@@ -210,7 +210,7 @@ describe('Rooms Router - Room Joining', () => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }) as Mock,
+        }),
       }
 
       const handler = enrollmentLayer!.stack[enrollmentLayer!.stack.length - 1]
@@ -247,7 +247,7 @@ describe('Rooms Router - Room Joining', () => {
       )
       const userRoomId = insertRoom?.lastID ?? 0
 
-      const routerModule = await import('./router.ts')
+      const routerModule = await import('./router.js')
       const router = routerModule.default
 
       const myLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
@@ -263,7 +263,7 @@ describe('Rooms Router - Room Joining', () => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }) as Mock,
+        }),
       }
 
       const handler = myLayer!.stack[myLayer!.stack.length - 1]
@@ -309,6 +309,210 @@ describe('Rooms Router - Room Joining', () => {
 
       expect(ctx.body).toEqual({ success: true })
       expect(mockCookieSet).toHaveBeenCalledWith('keVisitedRoom', '', { maxAge: 0 })
+    })
+  })
+
+  describe('GET /api/rooms/join/:roomId/:inviteCode - Smart QR Entry', () => {
+    const validInviteCode = '12345678-1234-1234-1234-123456789012'
+
+    it('should set cookie and redirect to / for logged-in user with valid room', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      const mockCookieSet = vi.fn()
+      let redirectUrl: string | undefined
+      const ctx = {
+        params: { roomId: String(testRoomId), inviteCode: validInviteCode },
+        user: { userId: testUser.userId, name: 'testuser', isGuest: false, isAdmin: false },
+        cookies: { set: mockCookieSet, get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: (url: string) => { redirectUrl = url },
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      expect(mockCookieSet).toHaveBeenCalledWith('keVisitedRoom', String(testRoomId), {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      expect(redirectUrl).toBe('/')
+    })
+
+    it('should return 404 for logged-in user with non-existent room', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: '99999', inviteCode: validInviteCode },
+        user: { userId: testUser.userId, name: 'testuser', isGuest: false, isAdmin: false },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: vi.fn(),
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 404 })
+    })
+
+    it('should redirect to Authentik enrollment for unauthenticated user', async () => {
+      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+      const originalEnrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
+      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
+      process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = 'karaoke-guest-enrollment'
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      let redirectUrl: string | undefined
+      const ctx = {
+        params: { roomId: String(testRoomId), inviteCode: validInviteCode },
+        user: null, // Not logged in
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: (url: string) => { redirectUrl = url },
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      expect(redirectUrl).toBe(`https://auth.example.com/if/flow/karaoke-guest-enrollment/?itoken=${validInviteCode}`)
+
+      // Restore env
+      if (originalAuthUrl !== undefined) {
+        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      } else {
+        delete process.env.KES_AUTHENTIK_PUBLIC_URL
+      }
+      if (originalEnrollmentFlow !== undefined) {
+        process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = originalEnrollmentFlow
+      } else {
+        delete process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
+      }
+    })
+
+    it('should return 400 for invalid room ID format', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: 'not-a-number', inviteCode: validInviteCode },
+        user: { userId: testUser.userId, name: 'testuser', isGuest: false, isAdmin: false },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: vi.fn(),
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+    })
+
+    it('should return 400 for invalid invite code format', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId), inviteCode: 'invalid-code' },
+        user: { userId: testUser.userId, name: 'testuser', isGuest: false, isAdmin: false },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: vi.fn(),
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+    })
+
+    it('should return 500 when SSO not configured for unauthenticated user', async () => {
+      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+      delete process.env.KES_AUTHENTIK_PUBLIC_URL
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId), inviteCode: validInviteCode },
+        user: null, // Not logged in
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: vi.fn(),
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 500 })
+
+      // Restore env
+      if (originalAuthUrl !== undefined) {
+        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      }
     })
   })
 })

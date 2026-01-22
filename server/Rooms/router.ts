@@ -111,6 +111,56 @@ router.get('/my', async (ctx) => {
   }
 })
 
+// GET /api/rooms/join/:roomId/:inviteCode - Smart QR entry point
+// Routes logged-in users vs guests appropriately
+router.get('/join/:roomId/:inviteCode', async (ctx) => {
+  const roomId = parseInt(ctx.params.roomId, 10)
+  const inviteCode = ctx.params.inviteCode
+
+  // Validate room ID
+  if (isNaN(roomId)) {
+    ctx.throw(400, 'Invalid room ID')
+  }
+
+  // Validate invite code format (UUID)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!uuidRegex.test(inviteCode)) {
+    ctx.throw(400, 'Invalid invite code')
+  }
+
+  if (ctx.user) {
+    // LOGGED IN: Validate room and set visitation cookie
+    const res = await Rooms.get(roomId)
+    const room = res.entities[roomId]
+
+    if (!room) {
+      ctx.throw(404, 'Room not found')
+    }
+
+    // Set visitation cookie (same logic as POST /rooms/:roomId/join)
+    ctx.cookies.set('keVisitedRoom', String(roomId), {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isSecureCookie(),
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    })
+
+    log.info('%s joined room %d via Smart QR', ctx.user.name, roomId)
+    ctx.redirect('/')
+  } else {
+    // NOT LOGGED IN: Redirect to Authentik enrollment
+    const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+    const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+
+    if (!authentikUrl) {
+      ctx.throw(500, 'SSO not configured')
+    }
+
+    const enrollUrl = `${authentikUrl}/if/flow/${enrollmentFlow}/?itoken=${inviteCode}`
+    ctx.redirect(enrollUrl)
+  }
+})
+
 // list rooms
 router.get('/:roomId?', async (ctx) => {
   const roomId = ctx.params.roomId ? parseInt(ctx.params.roomId, 10) : undefined

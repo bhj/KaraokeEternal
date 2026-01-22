@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { QRCode } from 'react-qrcode-logo'
 import Panel from 'components/Panel/Panel'
 import Button from 'components/Button/Button'
@@ -11,7 +11,6 @@ interface MyRoomData {
     name: string
     status: string
     invitationToken: string | null
-    enrollmentUrl: string | null
   } | null
 }
 
@@ -26,13 +25,23 @@ const MyRoom = () => {
       .catch(() => setData(null))
   }, [])
 
+  // Build Smart QR URL client-side using roomId and invitationToken
+  const smartQrUrl = useMemo(() => {
+    if (data?.room?.roomId && data?.room?.invitationToken) {
+      const joinUrl = new URL(window.location.origin)
+      joinUrl.pathname = `/api/rooms/join/${data.room.roomId}/${data.room.invitationToken}`
+      return joinUrl.toString()
+    }
+    return null
+  }, [data])
+
   const handleCopy = useCallback(() => {
-    if (data?.room?.enrollmentUrl) {
-      navigator.clipboard.writeText(data.room.enrollmentUrl)
+    if (smartQrUrl) {
+      navigator.clipboard.writeText(smartQrUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
-  }, [data])
+  }, [smartQrUrl])
 
   if (!data) {
     return null // Loading
@@ -54,11 +63,11 @@ const MyRoom = () => {
         Room: <strong>{room.name}</strong> ({room.status})
       </p>
 
-      {room.enrollmentUrl ? (
+      {smartQrUrl ? (
         <>
           <div className={styles.qrContainer}>
             <QRCode
-              value={room.enrollmentUrl}
+              value={smartQrUrl}
               ecLevel='L'
               size={180}
               quietZone={10}
@@ -68,15 +77,15 @@ const MyRoom = () => {
               logoOpacity={0.5}
               qrStyle='dots'
             />
-            <span className={styles.qrLabel}>Scan to join as guest</span>
+            <span className={styles.qrLabel}>Scan to join room</span>
           </div>
 
           <div className={styles.urlContainer}>
-            <label>Guest invite link:</label>
+            <label>Invite link:</label>
             <input
               type='text'
               className={styles.urlInput}
-              value={room.enrollmentUrl}
+              value={smartQrUrl}
               readOnly
               onFocus={e => e.target.select()}
             />
