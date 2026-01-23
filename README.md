@@ -141,14 +141,35 @@ return {
 
 > Assign this mapping to your Proxy Provider under **Property Mappings**.
 
-### 2. Caddy forward_auth
+### 2. Caddy Configuration
+
+The Smart QR endpoint must bypass Authentik so the app can handle routing logic (redirect logged-in users vs. send guests to enrollment).
 
 ```caddyfile
-forward_auth authentik:9000 {
-    uri /outpost.goauthentik.io/auth/caddy
-    copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Karaoke-Room-Id
+karaoke.example.com {
+    # Smart QR endpoint - bypass auth (app handles routing)
+    @guest_join path /api/rooms/join/*
+    handle @guest_join {
+        reverse_proxy karaoke:3000
+    }
+
+    # Everything else - require Authentik auth
+    handle {
+        forward_auth authentik:9000 {
+            uri /outpost.goauthentik.io/auth/caddy
+            copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Karaoke-Room-Id
+        }
+        reverse_proxy karaoke:3000
+    }
 }
 ```
+
+> **Important:** The `@guest_join` handler MUST come before the default `handle` block.
+
+**Why this is safe:**
+- Logged-in users: app validates invite code, sets cookie, redirects to `/`
+- Guests: app redirects to Authentik enrollment with invite token
+- No sensitive data exposed; UUIDs are unguessable (2^122 possibilities)
 
 ### 3. Guest Enrollment Flow
 
