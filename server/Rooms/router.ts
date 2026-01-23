@@ -128,7 +128,7 @@ router.get('/join/:roomId/:inviteCode', async (ctx) => {
     ctx.throw(400, 'Invalid invite code')
   }
 
-  if (ctx.user) {
+  if (ctx.user?.userId) {
     // LOGGED IN: Validate room and set visitation cookie
     const res = await Rooms.get(roomId)
     const room = res.entities[roomId]

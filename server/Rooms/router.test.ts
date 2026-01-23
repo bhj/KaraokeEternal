@@ -469,7 +469,7 @@ describe('Rooms Router - Room Joining', () => {
       let redirectUrl: string | undefined
       const ctx = {
         params: { roomId: String(testRoomId), inviteCode: validInviteCode },
-        user: null, // Not logged in
+        user: { userId: null, username: null, isAdmin: false, isGuest: false }, // Realistic unauthenticated context
         cookies: { set: vi.fn(), get: vi.fn() },
         status: 200 as number,
         body: undefined as unknown,
@@ -567,7 +567,7 @@ describe('Rooms Router - Room Joining', () => {
 
       const ctx = {
         params: { roomId: String(testRoomId), inviteCode: validInviteCode },
-        user: null, // Not logged in
+        user: { userId: null, username: null, isAdmin: false, isGuest: false }, // Realistic unauthenticated context
         cookies: { set: vi.fn(), get: vi.fn() },
         status: 200 as number,
         body: undefined as unknown,
