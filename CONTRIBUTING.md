@@ -1,43 +1,50 @@
 # Contributing to Karaoke Eternal Automated
 
-First off, thank you for considering contributing! It's people like you that make this a great tool for the community.
+Thank you for your interest in contributing!
 
-## ⚖️ Contributor License Agreement (CLA)
+## How to Contribute
 
-By contributing to this project, you agree to the [Contributor License Agreement](.github/CLA.md).
+**All contributions start in [GitHub Discussions](https://github.com/Zardoz8901/KaraokeEternalAutomated/discussions).**
 
-**Why do we have a CLA?**
-This project aims to be a sustainable, long-term solution for self-hosted karaoke. To protect the project from "patent trolls" or legal challenges, and to ensure we can always keep the core software free and open, we require a simple agreement that grants the project a license to use your code while you retain ownership.
+This project follows a discussion-first model:
 
-## 🛠️ Getting Started
+1. **Open a Discussion** — Share your bug report, feature idea, or question in Discussions
+2. **Community Input** — Get feedback and refine the idea with the community
+3. **Maintainer Triage** — The maintainer will promote relevant discussions to Issues when ready for implementation
+4. **Implementation** — Once an Issue exists, you can submit a Pull Request
 
-### Development Environment
-This project uses **Nix** for a reproducible development environment.
+**Do not open Issues directly.** Issues are reserved for maintainer-tracked work items.
 
-1.  Clone the repo.
-2.  Run `nix develop` to enter the shell.
-3.  Run `npm install`.
-4.  Run `npm run dev`.
+## Why This Model?
 
-### Coding Standards
-*   **ESM First:** Use ES Modules (imports/exports).
-*   **Atomic Commits:** Keep your commits small and focused.
-*   **TDD:** If you're adding logic, please add a test. Use `npm test` to run the suite.
+- Keeps the issue tracker focused and actionable
+- Allows ideas to be refined before committing to implementation
+- Reduces noise from duplicates and incomplete reports
+- Ensures alignment with project direction before work begins
 
-## 🚀 How to Contribute
+## Pull Requests
 
-1.  **Search for existing issues.** If you find a bug or have a feature idea, open an issue first to discuss it.
-2.  **Fork the repo** and create your branch from `main`.
-3.  **Implement your changes.**
-4.  **Verify.** Run linting and tests:
-    ```bash
-    npm run lint
-    npm test
-    ```
-5.  **Submit a Pull Request.** Provide a clear description of what your PR does and why.
+PRs are welcome for existing Issues. Before submitting:
 
-## 🛡️ Security
-If you find a security vulnerability, please do **not** open an issue. Email the maintainers directly or use the GitHub Security Advisory feature.
+1. Reference the Issue number in your PR
+2. Run linting and tests: `npm run lint && npm test`
+3. Keep commits atomic and focused
+4. Follow existing code patterns
 
----
-*Happy Singing!*
+## Development Environment
+
+This project uses **Nix** for reproducible builds:
+
+```bash
+nix develop
+npm install
+npm run dev
+```
+
+## Contributor License Agreement
+
+By contributing, you agree to the [CLA](.github/CLA.md). This protects the project while you retain ownership of your work.
+
+## Security
+
+For security vulnerabilities, **do not** open a Discussion or Issue. Use [GitHub Security Advisories](https://github.com/Zardoz8901/KaraokeEternalAutomated/security/advisories) or contact the maintainer directly.

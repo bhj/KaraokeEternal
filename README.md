@@ -61,7 +61,7 @@ The app trusts headers from the reverse proxy (`KES_REQUIRE_PROXY=true`):
 ### Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/KaraokeEternalAutomated.git
+git clone https://github.com/Zardoz8901/KaraokeEternalAutomated.git
 cd KaraokeEternalAutomated
 npm install
 npm run build
