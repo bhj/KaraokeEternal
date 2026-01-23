@@ -1,4 +1,5 @@
 import KoaRouter from '@koa/router'
+import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
@@ -26,7 +27,7 @@ router.get('/:roomId/enrollment', async (ctx) => {
 
   // Check if Authentik is configured
   const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-unified'
 
   if (!authentikUrl) {
     // SSO not configured
@@ -86,7 +87,7 @@ router.get('/my', async (ctx) => {
   // Build enrollment URL if Authentik is configured
   let enrollmentUrl = null
   const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-unified'
 
   if (authentikUrl && roomData?.invitationToken) {
     const authUrl = new URL(authentikUrl)
@@ -156,13 +157,20 @@ router.get('/join/:roomId/:inviteCode', async (ctx) => {
   } else {
     // NOT LOGGED IN: Redirect to Authentik enrollment
     const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-    const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+    const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-unified'
 
     if (!authentikUrl) {
       ctx.throw(500, 'SSO not configured')
     }
 
-    const enrollUrl = `${authentikUrl}/if/flow/${enrollmentFlow}/?itoken=${inviteCode}`
+    // Generate a friendly guest name (e.g., "RedPenguin", "BlueDolphin")
+    const guestName = uniqueNamesGenerator({
+      dictionaries: [colors, animals],
+      separator: '',
+      style: 'capital',
+    })
+
+    const enrollUrl = `${authentikUrl}/if/flow/${enrollmentFlow}/?itoken=${inviteCode}&guest_name=${encodeURIComponent(guestName)}`
     ctx.redirect(enrollUrl)
   }
 })

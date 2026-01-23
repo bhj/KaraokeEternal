@@ -76,6 +76,7 @@
     "sqlate": "^2.2.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
+    "unique-names-generator": "^4.7.1",
     "unzipit": "^1.4.3",
     "yargs": "^18.0.0"
   },

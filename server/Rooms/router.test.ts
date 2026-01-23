@@ -456,7 +456,7 @@ describe('Rooms Router - Room Joining', () => {
       const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
       const originalEnrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
       process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
-      process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = 'karaoke-guest-enrollment'
+      process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = 'karaoke-unified'
 
       const routerModule = await import('./router.js')
       const router = routerModule.default
@@ -484,7 +484,11 @@ describe('Rooms Router - Room Joining', () => {
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
       await handler(ctx, async () => {})
 
-      expect(redirectUrl).toBe(`https://auth.example.com/if/flow/karaoke-guest-enrollment/?itoken=${validInviteCode}`)
+      // URL should contain itoken and guest_name parameters
+      expect(redirectUrl).toBeDefined()
+      expect(redirectUrl).toContain('https://auth.example.com/if/flow/karaoke-unified/')
+      expect(redirectUrl).toContain(`itoken=${validInviteCode}`)
+      expect(redirectUrl).toContain('guest_name=')
 
       // Restore env
       if (originalAuthUrl !== undefined) {
@@ -585,6 +589,65 @@ describe('Rooms Router - Room Joining', () => {
       // Restore env
       if (originalAuthUrl !== undefined) {
         process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      }
+    })
+
+    it('should include guest_name parameter in Authentik enrollment URL for unauthenticated user', async () => {
+      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+      const originalEnrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
+      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
+      process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = 'karaoke-unified'
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+
+      expect(joinLayer).toBeDefined()
+
+      let redirectUrl: string | undefined
+      const ctx = {
+        params: { roomId: String(testRoomId), inviteCode: validInviteCode },
+        user: { userId: null, username: null, isAdmin: false, isGuest: false },
+        cookies: { set: vi.fn(), get: vi.fn() },
+        status: 200 as number,
+        body: undefined as unknown,
+        redirect: (url: string) => { redirectUrl = url },
+        throw: ((status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        }),
+      }
+
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // Parse redirect URL
+      expect(redirectUrl).toBeDefined()
+      const url = new URL(redirectUrl!)
+
+      // Should have itoken parameter
+      expect(url.searchParams.get('itoken')).toBe(validInviteCode)
+
+      // Should have guest_name parameter with a generated name (Color + Animal, capitalized)
+      const guestName = url.searchParams.get('guest_name')
+      expect(guestName).toBeDefined()
+      expect(guestName).not.toBe('')
+      // Name should be two capitalized words (e.g., "RedPenguin", "BlueDolphin")
+      expect(guestName).toMatch(/^[A-Z][a-z]+[A-Z][a-z]+$/)
+
+      // Restore env
+      if (originalAuthUrl !== undefined) {
+        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      } else {
+        delete process.env.KES_AUTHENTIK_PUBLIC_URL
+      }
+      if (originalEnrollmentFlow !== undefined) {
+        process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = originalEnrollmentFlow
+      } else {
+        delete process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
       }
     })
   })
