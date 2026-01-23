@@ -85,10 +85,13 @@ export const login = createAsyncThunk(
 // Logout
 // ------------------------------------
 const logout = createAction(LOGOUT)
+const logoutStart = createAction('user/LOGOUT_START')
 
 export const requestLogout = createAsyncThunk(
   LOGOUT,
   async (_, thunkAPI) => {
+    thunkAPI.dispatch(logoutStart())
+
     let ssoSignoutUrl: string | null = null
 
     try {
@@ -106,6 +109,8 @@ export const requestLogout = createAsyncThunk(
     // This prevents the "logout loop" where SSO re-authenticates immediately
     if (ssoSignoutUrl) {
       window.location.href = ssoSignoutUrl
+    } else {
+      window.location.href = '/'
     }
   },
 )
@@ -199,6 +204,7 @@ interface UserState {
   isAdmin: boolean
   isGuest: boolean
   isBootstrapping: boolean
+  isLoggingOut: boolean
   dateCreated: number
   dateUpdated: number
 }
@@ -213,6 +219,7 @@ const initialState: UserState = {
   isAdmin: false,
   isGuest: false,
   isBootstrapping: true,
+  isLoggingOut: false,
   dateCreated: 0,
   dateUpdated: 0,
 }
@@ -227,9 +234,14 @@ const userReducer = createReducer(initialState, (builder) => {
       ...state,
       isBootstrapping: false,
     }))
+    .addCase(logoutStart, (state) => ({
+      ...state,
+      isLoggingOut: true,
+    }))
     .addCase(LOGOUT, () => ({
       ...initialState,
       isBootstrapping: false,
+      isLoggingOut: false,
     }))
     .addCase(SOCKET_AUTH_ERROR, () => ({
       ...initialState,

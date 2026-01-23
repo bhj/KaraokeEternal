@@ -10,7 +10,7 @@ const api = new HttpApi('rooms')
 
 // Inner component that can use hooks to check bootstrap state
 const AppContent = () => {
-  const { isBootstrapping, roomId, isGuest, userId } = useSelector((state: RootState) => state.user)
+  const { isBootstrapping, isLoggingOut, roomId, isGuest, userId } = useSelector((state: RootState) => state.user)
   const [targetRoomId, setTargetRoomId] = useState<number | null>(null)
   const [isRedirecting, setIsRedirecting] = useState(false)
   const enrollmentCheckDone = useRef(false)
@@ -29,6 +29,14 @@ const AppContent = () => {
       if (!isNaN(targetId)) {
         enrollmentCheckDone.current = true
         setIsRedirecting(true)
+
+        // Clean up roomId param BEFORE redirect to prevent loop on return
+        const cleanParams = new URLSearchParams(window.location.search)
+        cleanParams.delete('roomId')
+        const cleanUrl = cleanParams.toString()
+          ? `${window.location.pathname}?${cleanParams}`
+          : window.location.pathname
+        window.history.replaceState({}, '', cleanUrl)
 
         // Check if SSO enrollment is available for this room
         api.get<{ enrollmentUrl: string | null }>(`/${targetId}/enrollment`)
@@ -85,7 +93,7 @@ const AppContent = () => {
     window.history.replaceState({}, '', newUrl)
   }
 
-  if (isBootstrapping || isRedirecting) {
+  if (isBootstrapping || isLoggingOut || isRedirecting) {
     return <Spinner />
   }
 
