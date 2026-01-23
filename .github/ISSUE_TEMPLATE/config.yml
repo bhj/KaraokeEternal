@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a Bug
+    url: https://github.com/Zardoz8901/KaraokeEternalAutomated/discussions/new?category=issue-triage
+    about: Found a bug? Start a discussion and it will be promoted to an Issue once confirmed.
+  - name: Request a Feature
+    url: https://github.com/Zardoz8901/KaraokeEternalAutomated/discussions/new?category=feature-requests
+    about: Have an idea? Share it in Discussions first.
+  - name: Ask a Question
+    url: https://github.com/Zardoz8901/KaraokeEternalAutomated/discussions/new?category=q-a
+    about: Questions, help requests, and general discussion.
