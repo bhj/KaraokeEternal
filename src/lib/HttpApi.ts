@@ -37,10 +37,11 @@ export default class HttpApi {
     const res = await fetch(`${document.baseURI}api/${this.prefix}${url}`, opts)
 
     if (res.ok) {
-      const type = res.headers.get('Content-Type')
-      return (type && type.includes('application/json'))
-        ? res.json()
-        : res as unknown as T
+      const contentType = res.headers.get('content-type')
+      if (!contentType?.includes('application/json')) {
+        throw new Error('Invalid API response')
+      }
+      return res.json()
     }
 
     const txt = await res.text()

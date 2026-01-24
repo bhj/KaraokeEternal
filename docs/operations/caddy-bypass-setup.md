@@ -4,6 +4,8 @@ To enable the guest enrollment flow (allowing both guests and logged-in users to
 
 1. **Landing Page** (`/join*`) - The UI where users choose to login or join as guest
 2. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
+3. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
+4. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
 
 This allows the Karaoke App to handle the routing logic instead of Authentik blocking the request immediately.
 
@@ -34,7 +36,23 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 3. Gatekeeper (Everything Else) ---
+    # --- 3. Bypass: Public Prefs API ---
+    # Returns public configuration (Authentik URL, SSO mode, etc.)
+    # Needed by the landing page to display login/enrollment options.
+    @public_prefs path /api/prefs/public
+    handle @public_prefs {
+        reverse_proxy localhost:8280
+    }
+
+    # --- 4. Bypass: Session Check API ---
+    # Returns current user session or 401. App handles auth state properly.
+    # Must bypass forward_auth to avoid HTML redirect on unauthenticated requests.
+    @session_check path /api/user
+    handle @session_check {
+        reverse_proxy localhost:8280
+    }
+
+    # --- 5. Gatekeeper (Everything Else) ---
     # All other traffic MUST be authenticated by Authentik.
     handle {
         forward_auth localhost:9000 {
@@ -66,6 +84,18 @@ virtualHosts."karaoke.thedb.club" = {
       reverse_proxy localhost:8280
     }
 
+    # Bypass: Public Prefs API
+    @public_prefs path /api/prefs/public
+    handle @public_prefs {
+      reverse_proxy localhost:8280
+    }
+
+    # Bypass: Session Check API
+    @session_check path /api/user
+    handle @session_check {
+      reverse_proxy localhost:8280
+    }
+
     # Gatekeeper: Authenticated Route
     handle {
       forward_auth localhost:9000 {
@@ -92,6 +122,17 @@ virtualHosts."karaoke.thedb.club" = {
 - For unauthenticated users: returns redirect URL to Authentik enrollment
 - Does not expose user data
 
+### `/api/prefs/public` (Public Prefs API)
+- Read-only endpoint returning public configuration
+- Returns: `authentikUrl`, `enrollmentFlow`, `ssoMode`, `ssoLoginUrl`
+- No sensitive data - just URLs and feature flags needed by the landing page
+
+### `/api/user` (Session Check API)
+- Read-only endpoint checking authentication state
+- Returns current user object if authenticated (cookie present)
+- Returns 401 if not authenticated
+- Must bypass forward_auth because Authentik returns HTML redirect instead of 401 for unauthenticated API requests, causing client-side state corruption
+
 ## Verification
 
 Test that bypasses work correctly:
@@ -101,9 +142,17 @@ Test that bypasses work correctly:
 curl -I https://karaoke.example.com/join?itoken=test
 # Expected: HTTP/2 200
 
-# API should return JSON (not redirect to Authentik)
+# Smart QR API should return JSON (not redirect to Authentik)
 curl https://karaoke.example.com/api/rooms/join/1/test-token
 # Expected: JSON response (error is fine, just not HTML redirect)
+
+# Public prefs should return JSON (not redirect to Authentik)
+curl https://karaoke.example.com/api/prefs/public
+# Expected: {"authentikUrl":"...","enrollmentFlow":"...","ssoMode":true,...}
+
+# Session check should return 401 (not HTML redirect)
+curl -s -w "%{http_code}" https://karaoke.example.com/api/user
+# Expected: 401 (not 200 with HTML body)
 
 # Other routes should redirect to Authentik
 curl -I https://karaoke.example.com/library
