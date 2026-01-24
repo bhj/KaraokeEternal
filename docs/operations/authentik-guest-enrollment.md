@@ -12,7 +12,7 @@ The enrollment flow:
 1. Captures `guest_name` and `itoken` from URL parameters
 2. Creates a user account (handling username collisions)
 3. Logs the user in
-4. Redirects back to `/join?itoken=xxx` to complete the room join
+4. Redirects back to `/` where forward_auth establishes SSO session with room assignment
 
 ## Flow Configuration
 
@@ -140,7 +140,7 @@ https://auth.example.com/if/flow/karaoke-guest-enrollment/?guest_name=TestUser&i
 
 Expected:
 - Account created as `TestUser` (or `TestUser1` if collision)
-- Redirects to `/join?itoken=abc123`
+- Redirects to `/` (where forward_auth establishes session with room from X-Authentik-Karaoke-Room-Id)
 
 ### 2. Collision Test
 
@@ -160,11 +160,6 @@ Expected:
 
 ### "User already exists" error
 The username expression isn't handling collisions. Check the Python expression in the User Write stage.
-
-### Redirect goes to `/` instead of `/join?itoken=...`
-The itoken isn't being captured. Ensure:
-1. The prompt stage has an `itoken` hidden field
-2. The redirect expression reads from `context.get('prompt_data', {}).get('itoken', '')`
 
 ### User not in `karaoke-guests` group
 Check the User Write stage has the group configured.
