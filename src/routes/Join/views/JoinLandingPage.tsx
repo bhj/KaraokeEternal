@@ -58,19 +58,21 @@ const JoinLandingPage = () => {
     fetchData()
   }, [itoken])
 
-  // Auto-complete join when user returns logged in
+  // Auto-complete join for users who already have a session
+  // (e.g., logged-in user who manually navigates to a /join link)
   useEffect(() => {
     if (userId && itoken && roomInfo) {
-      // User just logged in via "Login with Account", complete the join
       window.location.href = `/api/rooms/join/${roomInfo.roomId}/${itoken}`
     }
   }, [userId, itoken, roomInfo])
 
-  // Handle "Login with Account" - proper URL encoding
+  // Handle "Login with Account" - redirect to non-bypassed route for session establishment
   const handleLoginWithAccount = () => {
-    if (!config?.ssoLoginUrl || !itoken) return
+    if (!config?.ssoLoginUrl || !roomInfo) return
 
-    const returnUrl = `/join?itoken=${encodeURIComponent(itoken)}${guestName ? `&guest_name=${encodeURIComponent(guestName)}` : ''}`
+    // Return to /library?roomId=X (not bypassed) so forward_auth establishes session
+    // App.tsx handles roomId param and shows RoomJoinPrompt for standard users
+    const returnUrl = `/library?roomId=${roomInfo.roomId}`
     const loginUrl = `${config.ssoLoginUrl}?rd=${encodeURIComponent(returnUrl)}`
     window.location.href = loginUrl
   }
