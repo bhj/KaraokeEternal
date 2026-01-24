@@ -6,6 +6,7 @@ To enable the guest enrollment flow (allowing both guests and logged-in users to
 2. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
 3. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
 4. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
+5. **Enrollment API** (`/api/rooms/*/enrollment`) - Returns SSO enrollment URL for guest flow
 
 This allows the Karaoke App to handle the routing logic instead of Authentik blocking the request immediately.
 
@@ -52,7 +53,15 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 5. Gatekeeper (Everything Else) ---
+    # --- 5. Bypass: Enrollment API ---
+    # Returns the SSO enrollment URL for guests scanning QR codes.
+    # Called by App.tsx before user is authenticated.
+    @enrollment path /api/rooms/*/enrollment
+    handle @enrollment {
+        reverse_proxy localhost:8280
+    }
+
+    # --- 6. Gatekeeper (Everything Else) ---
     # All other traffic MUST be authenticated by Authentik.
     handle {
         forward_auth localhost:9000 {
@@ -96,6 +105,12 @@ virtualHosts."karaoke.thedb.club" = {
       reverse_proxy localhost:8280
     }
 
+    # Bypass: Enrollment API
+    @enrollment path /api/rooms/*/enrollment
+    handle @enrollment {
+      reverse_proxy localhost:8280
+    }
+
     # Gatekeeper: Authenticated Route
     handle {
       forward_auth localhost:9000 {
@@ -133,6 +148,12 @@ virtualHosts."karaoke.thedb.club" = {
 - Returns 401 if not authenticated
 - Must bypass forward_auth because Authentik returns HTML redirect instead of 401 for unauthenticated API requests, causing client-side state corruption
 
+### `/api/rooms/*/enrollment` (Enrollment API)
+- Read-only endpoint returning the SSO enrollment URL for a room
+- Called by the app before user authentication to get the guest enrollment redirect URL
+- Returns `{ enrollmentUrl: "..." }` if room has invitation token, or `{ enrollmentUrl: null }` otherwise
+- Does not expose sensitive data - just constructs a URL from public configuration
+
 ## Verification
 
 Test that bypasses work correctly:
@@ -153,6 +174,10 @@ curl https://karaoke.example.com/api/prefs/public
 # Session check should return 401 (not HTML redirect)
 curl -s -w "%{http_code}" https://karaoke.example.com/api/user
 # Expected: 401 (not 200 with HTML body)
+
+# Enrollment API should return JSON (not redirect to Authentik)
+curl https://karaoke.example.com/api/rooms/1/enrollment
+# Expected: {"enrollmentUrl":"..."} or {"enrollmentUrl":null}
 
 # Other routes should redirect to Authentik
 curl -I https://karaoke.example.com/library

@@ -59,8 +59,8 @@ router.get('/:roomId/enrollment', async (ctx) => {
   authUrl.searchParams.set('itoken', invitationToken)
 
   // Use relative URL - Authentik rejects absolute URLs in ?next (open redirect protection)
-  // Guest's room assignment comes from X-Authentik-Karaoke-Room-Id header instead
-  authUrl.searchParams.set('next', '/')
+  // Guest returns to /join where Smart QR logic completes room assignment
+  authUrl.searchParams.set('next', '/join')
 
   ctx.body = { enrollmentUrl: authUrl.toString() }
 })
@@ -120,8 +120,8 @@ router.get('/my', async (ctx) => {
     authUrl.searchParams.set('itoken', roomData.invitationToken)
 
     // Use relative URL - Authentik rejects absolute URLs in ?next (open redirect protection)
-    // Guest's room assignment comes from X-Authentik-Karaoke-Room-Id header instead
-    authUrl.searchParams.set('next', '/')
+    // Guest returns to /join where Smart QR logic completes room assignment
+    authUrl.searchParams.set('next', '/join')
 
     enrollmentUrl = authUrl.toString()
   }
