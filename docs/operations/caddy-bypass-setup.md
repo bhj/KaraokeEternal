@@ -2,11 +2,12 @@
 
 To enable the guest enrollment flow (allowing both guests and logged-in users to join rooms via a single QR code), you must configure Caddy to **bypass authentication** for:
 
-1. **Landing Page** (`/join*`) - The UI where users choose to login or join as guest
-2. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
-3. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
-4. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
-5. **Enrollment API** (`/api/rooms/*/enrollment`) - Returns SSO enrollment URL for guest flow
+1. **Static Assets** (`*.js`, `*.css`, etc.) - Required for the app to load at all
+2. **Landing Page** (`/join*`) - The UI where users choose to login or join as guest
+3. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
+4. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
+5. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
+6. **Enrollment API** (`/api/rooms/*/enrollment`) - Returns SSO enrollment URL for guest flow
 
 This allows the Karaoke App to handle the routing logic instead of Authentik blocking the request immediately.
 
@@ -19,7 +20,15 @@ Add the bypass matchers and handle blocks **BEFORE** your main authentication bl
 ```caddy
 karaoke.yourdomain.com {
 
-    # --- 1. Bypass: Landing Page (unauthenticated access) ---
+    # --- 1. Bypass: Static Assets ---
+    # JS, CSS, and other static files must load without authentication.
+    # Without this, the React app cannot load on any bypassed page.
+    @static path *.js *.css *.map *.ico *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2 *.ttf *.eot
+    handle @static {
+        reverse_proxy localhost:8280
+    }
+
+    # --- 2. Bypass: Landing Page (unauthenticated access) ---
     # The join landing page must be accessible before login.
     # Shows room name, offers "Login with Account" or "Join as Guest" options.
     @landing_page path /join*
@@ -27,7 +36,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 2. Bypass: Smart QR API ---
+    # --- 3. Bypass: Smart QR API ---
     # Allow the join endpoint to reach the app directly.
     # The App will check for a session cookie:
     # - If Logged In: Joins the room immediately.
@@ -37,7 +46,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 3. Bypass: Public Prefs API ---
+    # --- 4. Bypass: Public Prefs API ---
     # Returns public configuration (Authentik URL, SSO mode, etc.)
     # Needed by the landing page to display login/enrollment options.
     @public_prefs path /api/prefs/public
@@ -45,7 +54,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 4. Bypass: Session Check API ---
+    # --- 5. Bypass: Session Check API ---
     # Returns current user session or 401. App handles auth state properly.
     # Must bypass forward_auth to avoid HTML redirect on unauthenticated requests.
     @session_check path /api/user
@@ -53,7 +62,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 5. Bypass: Enrollment API ---
+    # --- 6. Bypass: Enrollment API ---
     # Returns the SSO enrollment URL for guests scanning QR codes.
     # Called by App.tsx before user is authenticated.
     @enrollment path /api/rooms/*/enrollment
@@ -61,7 +70,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 6. Gatekeeper (Everything Else) ---
+    # --- 7. Gatekeeper (Everything Else) ---
     # All other traffic MUST be authenticated by Authentik.
     handle {
         forward_auth localhost:9000 {
@@ -81,6 +90,12 @@ If you are using NixOS, update your Caddy virtual host config:
 ```nix
 virtualHosts."karaoke.thedb.club" = {
   extraConfig = ''
+    # Bypass: Static Assets (required for React app to load)
+    @static path *.js *.css *.map *.ico *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2 *.ttf *.eot
+    handle @static {
+      reverse_proxy localhost:8280
+    }
+
     # Bypass: Landing Page
     @landing_page path /join*
     handle @landing_page {
@@ -126,6 +141,12 @@ virtualHosts."karaoke.thedb.club" = {
 
 ## Security Notes
 
+### Static Assets (`*.js`, `*.css`, etc.)
+- Contains only bundled frontend code (no secrets)
+- Required for the React app to load on ANY page
+- Without this bypass, users see a white screen on bypassed routes
+- The app server handles these files directly
+
 ### `/join*` (Landing Page)
 - Exposes only the join UI - displays room name from the invitation token
 - No sensitive data - just a preview of what room you're joining
@@ -159,6 +180,14 @@ virtualHosts."karaoke.thedb.club" = {
 Test that bypasses work correctly:
 
 ```bash
+# CRITICAL: Static assets must return 200 (not redirect to Authentik)
+# Get the JS filename from the HTML first
+curl -s https://karaoke.example.com/join | grep -oP 'main\.[a-f0-9]+\.js'
+# Then test it directly:
+curl -I https://karaoke.example.com/main.HASH.js
+# Expected: HTTP/2 200 (not 302 redirect!)
+# If you see 302 → Authentik, the static bypass is missing!
+
 # Landing page should return 200 (not redirect to Authentik)
 curl -I https://karaoke.example.com/join?itoken=test
 # Expected: HTTP/2 200
