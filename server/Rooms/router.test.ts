@@ -12,7 +12,6 @@ vi.mock('../lib/AuthentikClient.js', () => ({
 }))
 
 // We need to dynamically import after database is open
-let Rooms: typeof import('./Rooms.js').default
 let db: typeof import('../lib/Database.js').default
 let User: typeof import('../User/User.js').default
 
@@ -31,9 +30,6 @@ describe('Rooms Router - Room Joining', () => {
     db = Database.default
 
     // NOW import modules (after db is initialized)
-    const RoomsModule = await import('./Rooms.js')
-    Rooms = RoomsModule.default
-
     const UserModule = await import('../User/User.js')
     User = UserModule.default
   })
@@ -58,7 +54,7 @@ describe('Rooms Router - Room Joining', () => {
     const now = Math.floor(Date.now() / 1000)
     const insertRoom = await db.db?.run(
       'INSERT INTO rooms (name, status, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?)',
-      ['Test Room', 'open', now, now, '{}']
+      ['Test Room', 'open', now, now, '{}'],
     )
     testRoomId = insertRoom?.lastID ?? 0
   })
@@ -70,7 +66,7 @@ describe('Rooms Router - Room Joining', () => {
       const router = routerModule.default
 
       // Find the join handler
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
 
       expect(joinLayer).toBeDefined()
@@ -81,11 +77,11 @@ describe('Rooms Router - Room Joining', () => {
         state: { user: { userId: testUser.userId, isGuest: false, isAdmin: false } },
         cookies: { set: mockCookieSet, get: vi.fn() },
         body: undefined as unknown,
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -104,7 +100,7 @@ describe('Rooms Router - Room Joining', () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
 
       expect(joinLayer).toBeDefined()
@@ -114,11 +110,11 @@ describe('Rooms Router - Room Joining', () => {
         state: { user: { userId: guestUser.userId, isGuest: true, isAdmin: false } },
         cookies: { set: vi.fn(), get: vi.fn() },
         body: undefined as unknown,
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -130,7 +126,7 @@ describe('Rooms Router - Room Joining', () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
 
       expect(joinLayer).toBeDefined()
@@ -140,11 +136,11 @@ describe('Rooms Router - Room Joining', () => {
         state: { user: { userId: testUser.userId, isGuest: false, isAdmin: false } },
         cookies: { set: vi.fn(), get: vi.fn() },
         body: undefined as unknown,
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -159,7 +155,7 @@ describe('Rooms Router - Room Joining', () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/:roomId/join' && l.methods.includes('POST'))
 
       expect(joinLayer).toBeDefined()
@@ -169,11 +165,11 @@ describe('Rooms Router - Room Joining', () => {
         state: { user: { userId: testUser.userId, isGuest: false, isAdmin: false } },
         cookies: { set: vi.fn(), get: vi.fn() },
         body: undefined as unknown,
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -191,13 +187,13 @@ describe('Rooms Router - Room Joining', () => {
       // Add invitation token to room data
       await db.db?.run(
         'UPDATE rooms SET data = ? WHERE roomId = ?',
-        [JSON.stringify({ invitationToken: 'test-token' }), testRoomId]
+        [JSON.stringify({ invitationToken: 'test-token' }), testRoomId],
       )
 
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const enrollmentLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const enrollmentLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/:roomId/enrollment' && l.methods.includes('GET'))
 
       expect(enrollmentLayer).toBeDefined()
@@ -206,11 +202,11 @@ describe('Rooms Router - Room Joining', () => {
         params: { roomId: String(testRoomId) },
         request: { host: 'karaoke.example.com' },
         body: undefined as unknown,
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = enrollmentLayer!.stack[enrollmentLayer!.stack.length - 1]
@@ -241,16 +237,15 @@ describe('Rooms Router - Room Joining', () => {
 
       // Create a room owned by the test user
       const now = Math.floor(Date.now() / 1000)
-      const insertRoom = await db.db?.run(
+      await db.db?.run(
         'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
-        ['User Room', 'open', testUser.userId, now, now, JSON.stringify({ invitationToken: 'test-token-2' })]
+        ['User Room', 'open', testUser.userId, now, now, JSON.stringify({ invitationToken: 'test-token-2' })],
       )
-      const userRoomId = insertRoom?.lastID ?? 0
 
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const myLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const myLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/my' && l.methods.includes('GET'))
 
       expect(myLayer).toBeDefined()
@@ -259,11 +254,11 @@ describe('Rooms Router - Room Joining', () => {
         user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
         request: { host: 'karaoke.example.com' },
         body: undefined as unknown,
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = myLayer!.stack[myLayer!.stack.length - 1]
@@ -292,7 +287,7 @@ describe('Rooms Router - Room Joining', () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const leaveLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const leaveLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/leave' && l.methods.includes('POST'))
 
       expect(leaveLayer).toBeDefined()
@@ -320,13 +315,13 @@ describe('Rooms Router - Room Joining', () => {
       // Set up room with matching invitation token
       await db.db?.run(
         'UPDATE rooms SET data = ? WHERE roomId = ?',
-        [JSON.stringify({ invitationToken: validInviteCode }), testRoomId]
+        [JSON.stringify({ invitationToken: validInviteCode }), testRoomId],
       )
 
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
 
       expect(joinLayer).toBeDefined()
@@ -340,11 +335,11 @@ describe('Rooms Router - Room Joining', () => {
         status: 200 as number,
         body: undefined as unknown,
         redirect: (url: string) => { redirectUrl = url },
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -363,13 +358,13 @@ describe('Rooms Router - Room Joining', () => {
       // Room has token X, user provides token Y
       await db.db?.run(
         'UPDATE rooms SET data = ? WHERE roomId = ?',
-        [JSON.stringify({ invitationToken: validInviteCode }), testRoomId]
+        [JSON.stringify({ invitationToken: validInviteCode }), testRoomId],
       )
 
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
 
       expect(joinLayer).toBeDefined()
@@ -381,11 +376,11 @@ describe('Rooms Router - Room Joining', () => {
         status: 200 as number,
         body: undefined as unknown,
         redirect: vi.fn(),
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -396,13 +391,13 @@ describe('Rooms Router - Room Joining', () => {
       // Room exists but has no invitationToken in data
       await db.db?.run(
         'UPDATE rooms SET data = ? WHERE roomId = ?',
-        [JSON.stringify({}), testRoomId]
+        [JSON.stringify({}), testRoomId],
       )
 
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
 
       expect(joinLayer).toBeDefined()
@@ -414,11 +409,11 @@ describe('Rooms Router - Room Joining', () => {
         status: 200 as number,
         body: undefined as unknown,
         redirect: vi.fn(),
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -429,7 +424,7 @@ describe('Rooms Router - Room Joining', () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
 
       expect(joinLayer).toBeDefined()
@@ -441,27 +436,22 @@ describe('Rooms Router - Room Joining', () => {
         status: 200 as number,
         body: undefined as unknown,
         redirect: vi.fn(),
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
       await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 404 })
     })
 
-    it('should redirect to Authentik enrollment for unauthenticated user', async () => {
-      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-      const originalEnrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
-      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
-      process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = 'karaoke-unified'
-
+    it('should redirect to app landing page for unauthenticated user', async () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
 
       expect(joinLayer).toBeDefined()
@@ -474,40 +464,32 @@ describe('Rooms Router - Room Joining', () => {
         status: 200 as number,
         body: undefined as unknown,
         redirect: (url: string) => { redirectUrl = url },
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
       await handler(ctx, async () => {})
 
-      // URL should contain itoken and guest_name parameters
+      // Should redirect to app landing page with itoken and guest_name parameters
       expect(redirectUrl).toBeDefined()
-      expect(redirectUrl).toContain('https://auth.example.com/if/flow/karaoke-unified/')
-      expect(redirectUrl).toContain(`itoken=${validInviteCode}`)
+      expect(redirectUrl).toContain(`/join?itoken=${validInviteCode}`)
       expect(redirectUrl).toContain('guest_name=')
 
-      // Restore env
-      if (originalAuthUrl !== undefined) {
-        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
-      } else {
-        delete process.env.KES_AUTHENTIK_PUBLIC_URL
-      }
-      if (originalEnrollmentFlow !== undefined) {
-        process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = originalEnrollmentFlow
-      } else {
-        delete process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
-      }
+      // Parse URL to verify guest_name format (ColorAnimal, capitalized)
+      const url = new URL(redirectUrl!, 'http://localhost')
+      const guestName = url.searchParams.get('guest_name')
+      expect(guestName).toMatch(/^[A-Z][a-z]+[A-Z][a-z]+$/)
     })
 
     it('should return 400 for invalid room ID format', async () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
 
       expect(joinLayer).toBeDefined()
@@ -519,11 +501,11 @@ describe('Rooms Router - Room Joining', () => {
         status: 200 as number,
         body: undefined as unknown,
         redirect: vi.fn(),
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
@@ -534,7 +516,7 @@ describe('Rooms Router - Room Joining', () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      const joinLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
         .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
 
       expect(joinLayer).toBeDefined()
@@ -546,109 +528,150 @@ describe('Rooms Router - Room Joining', () => {
         status: 200 as number,
         body: undefined as unknown,
         redirect: vi.fn(),
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
       await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
     })
+  })
 
-    it('should return 500 when SSO not configured for unauthenticated user', async () => {
-      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-      delete process.env.KES_AUTHENTIK_PUBLIC_URL
+  describe('GET /api/rooms/join/validate - Token Validation', () => {
+    const validToken = '12345678-1234-1234-1234-123456789012'
 
-      const routerModule = await import('./router.js')
-      const router = routerModule.default
-
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
-        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
-
-      expect(joinLayer).toBeDefined()
-
-      const ctx = {
-        params: { roomId: String(testRoomId), inviteCode: validInviteCode },
-        user: { userId: null, username: null, isAdmin: false, isGuest: false }, // Realistic unauthenticated context
-        cookies: { set: vi.fn(), get: vi.fn() },
-        status: 200 as number,
-        body: undefined as unknown,
-        redirect: vi.fn(),
-        throw: ((status: number, message?: string) => {
-          const err = new Error(message) as Error & { status: number }
-          err.status = status
-          throw err
-        }),
-      }
-
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 500 })
-
-      // Restore env
-      if (originalAuthUrl !== undefined) {
-        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
-      }
-    })
-
-    it('should include guest_name parameter in Authentik enrollment URL for unauthenticated user', async () => {
-      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-      const originalEnrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
-      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
-      process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = 'karaoke-unified'
+    it('should return room info for valid token', async () => {
+      // Add invitation token to room data
+      await db.db?.run(
+        'UPDATE rooms SET data = ? WHERE roomId = ?',
+        [JSON.stringify({ invitationToken: validToken }), testRoomId],
+      )
 
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      const joinLayer = (router as unknown as { stack: Array<{ path: string; methods: string[]; stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
-        .find(l => l.path === '/api/rooms/join/:roomId/:inviteCode' && l.methods.includes('GET'))
+      const validateLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/validate' && l.methods.includes('GET'))
 
-      expect(joinLayer).toBeDefined()
+      expect(validateLayer).toBeDefined()
 
-      let redirectUrl: string | undefined
       const ctx = {
-        params: { roomId: String(testRoomId), inviteCode: validInviteCode },
-        user: { userId: null, username: null, isAdmin: false, isGuest: false },
-        cookies: { set: vi.fn(), get: vi.fn() },
-        status: 200 as number,
+        query: { itoken: validToken },
         body: undefined as unknown,
-        redirect: (url: string) => { redirectUrl = url },
-        throw: ((status: number, message?: string) => {
+        throw: (status: number, message?: string) => {
           const err = new Error(message) as Error & { status: number }
           err.status = status
           throw err
-        }),
+        },
       }
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      const handler = validateLayer!.stack[validateLayer!.stack.length - 1]
       await handler(ctx, async () => {})
 
-      // Parse redirect URL
-      expect(redirectUrl).toBeDefined()
-      const url = new URL(redirectUrl!)
+      expect(ctx.body).toEqual({
+        roomName: 'Test Room',
+        roomId: testRoomId,
+      })
+    })
 
-      // Should have itoken parameter
-      expect(url.searchParams.get('itoken')).toBe(validInviteCode)
+    it('should return 400 for missing itoken', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
 
-      // Should have guest_name parameter with a generated name (Color + Animal, capitalized)
-      const guestName = url.searchParams.get('guest_name')
-      expect(guestName).toBeDefined()
-      expect(guestName).not.toBe('')
-      // Name should be two capitalized words (e.g., "RedPenguin", "BlueDolphin")
-      expect(guestName).toMatch(/^[A-Z][a-z]+[A-Z][a-z]+$/)
+      const validateLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/validate' && l.methods.includes('GET'))
 
-      // Restore env
-      if (originalAuthUrl !== undefined) {
-        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
-      } else {
-        delete process.env.KES_AUTHENTIK_PUBLIC_URL
+      expect(validateLayer).toBeDefined()
+
+      const ctx = {
+        query: {},
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
       }
-      if (originalEnrollmentFlow !== undefined) {
-        process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = originalEnrollmentFlow
-      } else {
-        delete process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
+
+      const handler = validateLayer!.stack[validateLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+    })
+
+    it('should return 400 for invalid token format', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const validateLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/validate' && l.methods.includes('GET'))
+
+      expect(validateLayer).toBeDefined()
+
+      const ctx = {
+        query: { itoken: 'not-a-uuid' },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
       }
+
+      const handler = validateLayer!.stack[validateLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+    })
+
+    it('should return 404 for non-existent token (generic error to prevent oracle attack)', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const validateLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/validate' && l.methods.includes('GET'))
+
+      expect(validateLayer).toBeDefined()
+
+      const ctx = {
+        query: { itoken: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = validateLayer!.stack[validateLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 404, message: 'Invalid invitation' })
+    })
+
+    it('should return 404 for closed room', async () => {
+      // Close the test room
+      await db.db?.run('UPDATE rooms SET status = ?, data = ? WHERE roomId = ?',
+        ['closed', JSON.stringify({ invitationToken: validToken }), testRoomId],
+      )
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const validateLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/join/validate' && l.methods.includes('GET'))
+
+      expect(validateLayer).toBeDefined()
+
+      const ctx = {
+        query: { itoken: validToken },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = validateLayer!.stack[validateLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 404 })
     })
   })
 })

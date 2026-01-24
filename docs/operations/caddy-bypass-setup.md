@@ -1,29 +1,40 @@
-# Caddy Configuration: Smart QR Bypass
+# Caddy Configuration: Authentication Bypass
 
-To enable the "Smart QR" feature (allowing both guests and logged-in users to join rooms via a single QR code), you must configure Caddy to **bypass authentication** for the specific join endpoint.
+To enable the guest enrollment flow (allowing both guests and logged-in users to join rooms via a single QR code), you must configure Caddy to **bypass authentication** for:
 
-This allows the Karaoke App to handle the routing logic ("Join Room" vs "Redirect to Enrollment") instead of Authentik blocking the request immediately.
+1. **Landing Page** (`/join*`) - The UI where users choose to login or join as guest
+2. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
+
+This allows the Karaoke App to handle the routing logic instead of Authentik blocking the request immediately.
 
 ## The Configuration
 
-Add the `@smart_join` matcher and `handle` block **BEFORE** your main authentication block.
+Add the bypass matchers and handle blocks **BEFORE** your main authentication block. Order matters in Caddy - first match wins.
 
 ### Caddyfile Example
 
 ```caddy
 karaoke.yourdomain.com {
-    
-    # --- 1. The Bypass (Public Join Endpoint) ---
-    # Allow requests to the join endpoint to reach the app directly.
+
+    # --- 1. Bypass: Landing Page (unauthenticated access) ---
+    # The join landing page must be accessible before login.
+    # Shows room name, offers "Login with Account" or "Join as Guest" options.
+    @landing_page path /join*
+    handle @landing_page {
+        reverse_proxy localhost:8280
+    }
+
+    # --- 2. Bypass: Smart QR API ---
+    # Allow the join endpoint to reach the app directly.
     # The App will check for a session cookie:
     # - If Logged In: Joins the room immediately.
-    # - If Guest: Manually redirects the browser to Authentik Enrollment.
+    # - If Guest: Redirects to Authentik Enrollment.
     @smart_join path /api/rooms/join/*
     handle @smart_join {
         reverse_proxy localhost:8280
     }
 
-    # --- 2. The Gatekeeper (Everything Else) ---
+    # --- 3. Gatekeeper (Everything Else) ---
     # All other traffic MUST be authenticated by Authentik.
     handle {
         forward_auth localhost:9000 {
@@ -43,13 +54,19 @@ If you are using NixOS, update your Caddy virtual host config:
 ```nix
 virtualHosts."karaoke.thedb.club" = {
   extraConfig = ''
-    # Bypass Auth for Smart QR
+    # Bypass: Landing Page
+    @landing_page path /join*
+    handle @landing_page {
+      reverse_proxy localhost:8280
+    }
+
+    # Bypass: Smart QR API
     @smart_join path /api/rooms/join/*
     handle @smart_join {
       reverse_proxy localhost:8280
     }
 
-    # Default Authenticated Route
+    # Gatekeeper: Authenticated Route
     handle {
       forward_auth localhost:9000 {
         uri /outpost.goauthentik.io/auth/caddy
@@ -62,8 +79,33 @@ virtualHosts."karaoke.thedb.club" = {
 };
 ```
 
-## Security Note
-This exposes **only** the `/api/rooms/join/*` endpoint to the public. 
-*   This endpoint is read-only.
-*   It validates the Invitation UUID before performing any action.
-*   It does not expose user data.
+## Security Notes
+
+### `/join*` (Landing Page)
+- Exposes only the join UI - displays room name from the invitation token
+- No sensitive data - just a preview of what room you're joining
+- The actual join action requires authentication
+
+### `/api/rooms/join/*` (Smart QR API)
+- Read-only endpoint that validates invitation tokens
+- For authenticated users: joins the room and sets cookie
+- For unauthenticated users: returns redirect URL to Authentik enrollment
+- Does not expose user data
+
+## Verification
+
+Test that bypasses work correctly:
+
+```bash
+# Landing page should return 200 (not redirect to Authentik)
+curl -I https://karaoke.example.com/join?itoken=test
+# Expected: HTTP/2 200
+
+# API should return JSON (not redirect to Authentik)
+curl https://karaoke.example.com/api/rooms/join/1/test-token
+# Expected: JSON response (error is fine, just not HTML redirect)
+
+# Other routes should redirect to Authentik
+curl -I https://karaoke.example.com/library
+# Expected: HTTP/2 302 or 401 (redirect to Authentik)
+```

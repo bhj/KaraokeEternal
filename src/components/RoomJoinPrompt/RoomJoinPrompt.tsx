@@ -31,7 +31,7 @@ const RoomJoinPrompt = ({ roomId, onClose }: RoomJoinPromptProps) => {
 
   return (
     <Modal
-      title="Join Room"
+      title='Join Room'
       onClose={onClose}
       buttons={buttons}
     >

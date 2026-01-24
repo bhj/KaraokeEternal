@@ -5,6 +5,7 @@ import { useAppSelector } from 'store/hooks'
 import AccountView from 'routes/Account/views/AccountView'
 import LibraryView from 'routes/Library/views/LibraryView'
 import QueueView from 'routes/Queue/views/QueueView'
+import JoinLandingPage from 'routes/Join/views/JoinLandingPage'
 
 const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
 
@@ -35,6 +36,7 @@ const AppRoutes = () => (
         </RequireAuth>
       )}
     />
+    <Route path='/join' element={<JoinLandingPage />} />
     <Route
       path='/'
       element={(

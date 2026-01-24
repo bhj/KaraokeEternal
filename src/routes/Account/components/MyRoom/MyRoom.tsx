@@ -60,49 +60,57 @@ const MyRoom = () => {
   return (
     <Panel title='My Room' contentClassName={styles.content}>
       <p>
-        Room: <strong>{room.name}</strong> ({room.status})
+        Room:
+        {' '}
+        <strong>{room.name}</strong>
+        {' '}
+        (
+        {room.status}
+        )
       </p>
 
-      {smartQrUrl ? (
-        <>
-          <div className={styles.qrContainer}>
-            <QRCode
-              value={smartQrUrl}
-              ecLevel='L'
-              size={180}
-              quietZone={10}
-              logoImage={`${document.baseURI}assets/app.png`}
-              logoWidth={60}
-              logoHeight={60}
-              logoOpacity={0.5}
-              qrStyle='dots'
-            />
-            <span className={styles.qrLabel}>Scan to join room</span>
-          </div>
+      {smartQrUrl
+        ? (
+            <>
+              <div className={styles.qrContainer}>
+                <QRCode
+                  value={smartQrUrl}
+                  ecLevel='L'
+                  size={180}
+                  quietZone={10}
+                  logoImage={`${document.baseURI}assets/app.png`}
+                  logoWidth={60}
+                  logoHeight={60}
+                  logoOpacity={0.5}
+                  qrStyle='dots'
+                />
+                <span className={styles.qrLabel}>Scan to join room</span>
+              </div>
 
-          <div className={styles.urlContainer}>
-            <label>Invite link:</label>
-            <input
-              type='text'
-              className={styles.urlInput}
-              value={smartQrUrl}
-              readOnly
-              onFocus={e => e.target.select()}
-            />
-            <Button
-              className={styles.copyBtn}
-              onClick={handleCopy}
-              variant='default'
-            >
-              {copied ? 'Copied!' : 'Copy Link'}
-            </Button>
-          </div>
-        </>
-      ) : (
-        <p className={styles.noRoom}>
-          Guest invitations not configured. Contact admin to set up Authentik integration.
-        </p>
-      )}
+              <div className={styles.urlContainer}>
+                <label>Invite link:</label>
+                <input
+                  type='text'
+                  className={styles.urlInput}
+                  value={smartQrUrl}
+                  readOnly
+                  onFocus={e => e.target.select()}
+                />
+                <Button
+                  className={styles.copyBtn}
+                  onClick={handleCopy}
+                  variant='default'
+                >
+                  {copied ? 'Copied!' : 'Copy Link'}
+                </Button>
+              </div>
+            </>
+          )
+        : (
+            <p className={styles.noRoom}>
+              Guest invitations not configured. Contact admin to set up Authentik integration.
+            </p>
+          )}
     </Panel>
   )
 }

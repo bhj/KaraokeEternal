@@ -3,12 +3,21 @@ import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchRooms } from 'store/modules/rooms'
 import { createAccount, login } from 'store/modules/user'
+import HttpApi from 'lib/HttpApi'
 import Logo from 'components/Logo/Logo'
+import Button from 'components/Button/Button'
 import SelectRoom from './SelectRoom/SelectRoom'
 import InputRadio from 'components/InputRadio/InputRadio'
 import Create from './Create/Create'
 import SignIn from './SignIn/SignIn'
 import styles from './SignedOutView.css'
+
+const api = new HttpApi('')
+
+interface SsoConfig {
+  ssoMode: boolean
+  ssoLoginUrl: string | null
+}
 
 const SignedOutView = () => {
   const userSectionRef = useRef<HTMLDivElement | null>(null)
@@ -28,10 +37,16 @@ const SignedOutView = () => {
   const [showAllRooms, setShowAllRooms] = useState(true)
   const [prevRooms, setPrevRooms] = useState<typeof rooms | null>(null)
   const [focusRequest, setFocusRequest] = useState(0)
+  const [ssoConfig, setSsoConfig] = useState<SsoConfig | null>(null)
 
   // once per mount
   useEffect(() => {
     dispatch(fetchRooms())
+
+    // Fetch SSO config
+    api.get<SsoConfig>('prefs/public')
+      .then(setSsoConfig)
+      .catch(() => {})
   }, [dispatch])
 
   // room selection visibility/defaults
@@ -124,6 +139,22 @@ const SignedOutView = () => {
   useEffect(() => {
     firstFieldRef.current?.focus()
   }, [focusRequest, mode])
+
+  // SSO-only mode: hide local login form, show only SSO button
+  if (ssoConfig?.ssoMode && ssoConfig?.ssoLoginUrl) {
+    return (
+      <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
+        <Logo className={styles.logo} />
+        <h1>Sign in</h1>
+        <Button
+          variant='primary'
+          onClick={() => { window.location.href = ssoConfig.ssoLoginUrl! }}
+        >
+          Login with SSO
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>

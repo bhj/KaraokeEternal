@@ -230,11 +230,11 @@ const userReducer = createReducer(initialState, (builder) => {
       ...state,
       ...payload,
     }))
-    .addCase(bootstrapComplete, (state) => ({
+    .addCase(bootstrapComplete, state => ({
       ...state,
       isBootstrapping: false,
     }))
-    .addCase(logoutStart, (state) => ({
+    .addCase(logoutStart, state => ({
       ...state,
       isLoggingOut: true,
     }))

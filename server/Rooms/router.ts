@@ -1,5 +1,5 @@
 import KoaRouter from '@koa/router'
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
+import { uniqueNamesGenerator, colors, animals } from 'unique-names-generator'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
@@ -27,7 +27,7 @@ router.get('/:roomId/enrollment', async (ctx) => {
 
   // Check if Authentik is configured
   const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-unified'
+  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
 
   if (!authentikUrl) {
     // SSO not configured
@@ -65,6 +65,31 @@ router.get('/:roomId/enrollment', async (ctx) => {
   ctx.body = { enrollmentUrl: authUrl.toString() }
 })
 
+// GET /api/rooms/join/validate - Validate invitation token and return room info
+// This is a public endpoint for the landing page to display room name
+router.get('/join/validate', async (ctx) => {
+  const itoken = ctx.query.itoken as string
+
+  if (!itoken) {
+    ctx.throw(400, 'Invalid invitation')
+  }
+
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!uuidRegex.test(itoken)) {
+    ctx.throw(400, 'Invalid invitation')
+  }
+
+  // Direct SQL lookup - O(1) instead of O(N)
+  const room = await Rooms.getByInvitationToken(itoken)
+
+  // Generic error for both invalid and not-found (prevent oracle attack)
+  if (!room) {
+    ctx.throw(404, 'Invalid invitation')
+  }
+
+  ctx.body = { roomName: room.name, roomId: room.roomId }
+})
+
 // GET /api/rooms/my - Get the current user's own room (for standard users)
 // IMPORTANT: Must be defined before /:roomId? to avoid being caught by that route
 router.get('/my', async (ctx) => {
@@ -87,7 +112,7 @@ router.get('/my', async (ctx) => {
   // Build enrollment URL if Authentik is configured
   let enrollmentUrl = null
   const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-unified'
+  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
 
   if (authentikUrl && roomData?.invitationToken) {
     const authUrl = new URL(authentikUrl)
@@ -155,23 +180,16 @@ router.get('/join/:roomId/:inviteCode', async (ctx) => {
     log.info('%s joined room %d via Smart QR', ctx.user.name, roomId)
     ctx.redirect('/')
   } else {
-    // NOT LOGGED IN: Redirect to Authentik enrollment
-    const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-    const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-unified'
-
-    if (!authentikUrl) {
-      ctx.throw(500, 'SSO not configured')
-    }
-
-    // Generate a friendly guest name (e.g., "RedPenguin", "BlueDolphin")
+    // NOT LOGGED IN: Redirect to app landing page
+    // Generate a friendly guest name for UX preview (e.g., "Join as RedPenguin 🎉")
+    // Authentik handles collision detection if name is taken
     const guestName = uniqueNamesGenerator({
       dictionaries: [colors, animals],
       separator: '',
       style: 'capital',
     })
 
-    const enrollUrl = `${authentikUrl}/if/flow/${enrollmentFlow}/?itoken=${inviteCode}&guest_name=${encodeURIComponent(guestName)}`
-    ctx.redirect(enrollUrl)
+    ctx.redirect(`/join?itoken=${inviteCode}&guest_name=${encodeURIComponent(guestName)}`)
   }
 })
 

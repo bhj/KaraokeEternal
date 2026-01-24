@@ -4,13 +4,13 @@
 
 ### Automated Edition
 
-A **Zero-Touch Party Hosting** fork of [Karaoke Eternal](https://github.com/bhj/KaraokeEternal)
+A **Multi-Tenant SSO** fork of [Karaoke Eternal](https://github.com/bhj/KaraokeEternal)
 
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-20%2B-brightgreen)](https://nodejs.org/)
 [![Authentik](https://img.shields.io/badge/SSO-Authentik-fd4b2d)](https://goauthentik.io/)
 
-*No login screens. No user management. Just karaoke.*
+*SSO-powered karaoke with QR-based guest enrollment.*
 
 ---
 
@@ -18,9 +18,9 @@ A **Zero-Touch Party Hosting** fork of [Karaoke Eternal](https://github.com/bhj/
 
 ## Features
 
-- **SSO Auto-Login** — Authentication handled upstream; land directly in your room
+- **SSO Integration** — Authenticate via Authentik; standard users land in their own room
 - **Per-User Rooms** — Every standard user gets their own private party room
-- **QR Guest Enrollment** — Guests scan a code and join instantly
+- **QR Guest Enrollment** — Guests scan a QR code, see a landing page, and join with one click
 - **Multi-Tenancy** — Multiple hosts can run separate parties simultaneously
 - **Room Roaming** — Standard users can visit other rooms via QR code
 
@@ -28,15 +28,48 @@ A **Zero-Touch Party Hosting** fork of [Karaoke Eternal](https://github.com/bhj/
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    subgraph Public
+        User([User])
+        QR[QR Code]
+    end
+
+    subgraph Caddy[Caddy Proxy]
+        bypass["/join*, /api/rooms/join/*"]
+        auth[forward_auth]
+    end
+
+    subgraph Backend
+        App[Karaoke App]
+        Authentik[Authentik SSO]
+    end
+
+    User --> Caddy
+    QR -.-> User
+    bypass --> App
+    auth --> Authentik
+    Authentik --> App
 ```
-┌─────────┐      ┌─────────────┐      ┌──────────┐
-│  User   │─────▶│    Caddy    │─────▶│ Karaoke  │
-└─────────┘      │   Proxy     │      │   App    │
-                 └──────┬──────┘      └──────────┘
-                        │ forward_auth
-                 ┌──────▼──────┐
-                 │  Authentik  │
-                 └─────────────┘
+
+### User Flows
+
+```mermaid
+flowchart TD
+    QR[Scan QR Code] --> API["/api/rooms/join/{id}/{token}"]
+    API --> LoggedIn{Logged in?}
+
+    LoggedIn -->|Yes| SetCookie[Set room cookie]
+    SetCookie --> Library[Go to Library]
+
+    LoggedIn -->|No| Landing["/join?itoken=xxx"]
+    Landing --> Choice{User choice}
+
+    Choice -->|Login with Account| Outpost[Authentik Outpost]
+    Outpost --> Landing
+
+    Choice -->|Join as Guest| Enroll[Authentik Enrollment]
+    Enroll --> Landing
 ```
 
 The app trusts headers from the reverse proxy (`KES_REQUIRE_PROXY=true`):
@@ -143,11 +176,22 @@ return {
 
 ### 2. Caddy Configuration
 
-The Smart QR endpoint must bypass Authentik so the app can handle routing logic (redirect logged-in users vs. send guests to enrollment).
+Two endpoints must bypass Authentik:
+1. **Landing page** (`/join*`) — Shows room preview and login options
+2. **Smart QR API** (`/api/rooms/join/*`) — Validates invitations and routes users
 
 ```caddyfile
 karaoke.example.com {
-    # Smart QR endpoint - bypass auth (app handles routing)
+    # Proxy outpost endpoints
+    reverse_proxy /outpost.goauthentik.io/* authentik:9000
+
+    # Landing page - bypass auth (shows join options)
+    @landing_page path /join*
+    handle @landing_page {
+        reverse_proxy karaoke:3000
+    }
+
+    # Smart QR API - bypass auth (app handles routing)
     @guest_join path /api/rooms/join/*
     handle @guest_join {
         reverse_proxy karaoke:3000
@@ -164,25 +208,34 @@ karaoke.example.com {
 }
 ```
 
-> **Important:** The `@guest_join` handler MUST come before the default `handle` block.
+> **Important:** Bypass handlers MUST come before the default `handle` block.
 
-**Why this is safe:**
-- Logged-in users: app validates invite code, sets cookie, redirects to `/`
-- Guests: app redirects to Authentik enrollment with invite token
-- No sensitive data exposed; UUIDs are unguessable (2^122 possibilities)
+**Security notes:**
+- `/join*` only shows room name preview — no sensitive data
+- `/api/rooms/join/*` validates UUIDs (2^122 possibilities) before any action
+- Logged-in users: validates invite, sets cookie, redirects to library
+- Guests: redirects to Authentik enrollment flow
 
 ### 3. Guest Enrollment Flow
 
-Create an enrollment flow with stages:
+Create an enrollment flow (`karaoke-guest-enrollment`) with stages:
 
-1. **Invitation** — Validates invite token
-2. **Prompt** — Collects guest display name
-3. **User Write** — Creates user with `karaoke_room_id` attribute
-4. **Login** — Authenticates the new user
+1. **Prompt** — Captures `username` (pre-filled from `guest_name` URL param) and `itoken` (hidden)
+2. **User Write** — Creates user in `karaoke-guests` group with collision handling
+3. **Login** — Issues session cookie
+4. **Redirect** — Returns to `/join?itoken={itoken}` to complete room join
 
-**Expiration:**
-- Invitations: **8 hours**
-- Guest users: **7 days** (via `goauthentik.io/user/expires`)
+**Flow:**
+```
+Guest scans QR → /api/rooms/join/{roomId}/{itoken}
+  → Redirects to /join?itoken=xxx&guest_name=RedPenguin
+  → Landing page: "Login with Account" or "Join as RedPenguin"
+  → Guest clicks join → Authentik enrollment
+  → Account created → Redirect to /join?itoken=xxx
+  → App auto-completes join → Library
+```
+
+> See `docs/operations/authentik-guest-enrollment.md` for detailed setup.
 
 ---
 

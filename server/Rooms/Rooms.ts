@@ -340,6 +340,22 @@ class Rooms {
   }
 
   /**
+   * Get a room by invitation token (only open rooms)
+   *
+   * @param  {String}  token
+   * @return {Promise}
+   */
+  static async getByInvitationToken (token: string): Promise<{ roomId: number, name: string, status: string } | null> {
+    const query = sql`
+      SELECT * FROM rooms
+      WHERE json_extract(data, '$.invitationToken') = ${token}
+      AND status = 'open'
+    `
+    const row = await db.get(String(query), query.parameters)
+    return row || null
+  }
+
+  /**
    * Update last activity timestamp for a room
    *
    * @param  {Number}  roomId

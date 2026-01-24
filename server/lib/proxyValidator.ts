@@ -9,7 +9,7 @@ interface ParsedCIDR {
 /**
  * Parse CIDR notation (e.g., "192.168.1.0/24") into structured form
  */
-function parseCIDR(cidr: string): ParsedCIDR | null {
+function parseCIDR (cidr: string): ParsedCIDR | null {
   const trimmed = cidr.trim()
   const parts = trimmed.split('/')
 
@@ -40,7 +40,7 @@ function parseCIDR(cidr: string): ParsedCIDR | null {
 /**
  * Expand IPv6 shorthand (e.g., "::1" -> "0000:0000:0000:0000:0000:0000:0000:0001")
  */
-function expandIPv6(ip: string): string {
+function expandIPv6 (ip: string): string {
   // Handle IPv4-mapped IPv6 (e.g., ::ffff:192.168.1.1)
   if (ip.includes('.')) {
     const lastColon = ip.lastIndexOf(':')
@@ -68,13 +68,13 @@ function expandIPv6(ip: string): string {
 /**
  * Convert IP string to BigInt for bitwise comparison
  */
-function ipToBigInt(ip: string, version: 4 | 6): bigint {
+function ipToBigInt (ip: string, version: 4 | 6): bigint {
   if (version === 4) {
     const parts = ip.split('.').map(Number)
-    return BigInt((parts[0] << 24) >>> 0) +
-           BigInt((parts[1] << 16) >>> 0) +
-           BigInt((parts[2] << 8) >>> 0) +
-           BigInt(parts[3])
+    return BigInt((parts[0] << 24) >>> 0)
+      + BigInt((parts[1] << 16) >>> 0)
+      + BigInt((parts[2] << 8) >>> 0)
+      + BigInt(parts[3])
   }
 
   // IPv6
@@ -90,7 +90,7 @@ function ipToBigInt(ip: string, version: 4 | 6): bigint {
 /**
  * Check if IP is within CIDR range
  */
-function ipInCIDR(ip: string, cidr: ParsedCIDR): boolean {
+function ipInCIDR (ip: string, cidr: ParsedCIDR): boolean {
   const ipVersion = net.isIP(ip)
   if (!ipVersion || ipVersion !== cidr.version) {
     return false
@@ -113,7 +113,7 @@ function ipInCIDR(ip: string, cidr: ParsedCIDR): boolean {
 /**
  * Check if IP is loopback (127.0.0.0/8 or ::1)
  */
-function isLoopback(ip: string): boolean {
+function isLoopback (ip: string): boolean {
   const version = net.isIP(ip)
   if (version === 4) {
     return ip.startsWith('127.')
@@ -128,7 +128,7 @@ function isLoopback(ip: string): boolean {
 /**
  * Normalize IPv6-mapped IPv4 addresses (::ffff:192.168.1.1 -> 192.168.1.1)
  */
-function normalizeIP(ip: string): string {
+function normalizeIP (ip: string): string {
   if (ip.startsWith('::ffff:')) {
     const ipv4Part = ip.slice(7)
     // Check if it's actually an IPv4 address
@@ -142,8 +142,8 @@ function normalizeIP(ip: string): string {
 /**
  * Create a proxy validator function based on environment configuration
  */
-export function createProxyValidator(
-  env: Record<string, string | undefined>
+export function createProxyValidator (
+  env: Record<string, string | undefined>,
 ): (remoteAddress: string) => boolean {
   const isDev = env.NODE_ENV === 'development'
 
@@ -161,7 +161,7 @@ export function createProxyValidator(
     .map(parseCIDR)
     .filter((c): c is ParsedCIDR => c !== null)
 
-  return function validateProxySource(remoteAddress: string): boolean {
+  return function validateProxySource (remoteAddress: string): boolean {
     if (!requireProxy) {
       return true
     }

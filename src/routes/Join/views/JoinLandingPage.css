@@ -1,0 +1,60 @@
+.container {
+  margin: 0 auto;
+  padding: var(--container-padding);
+  max-width: 400px;
+  text-align: center;
+
+  h1 {
+    margin: var(--space-l) 0 var(--space-m) 0;
+    font-family: var(--font-family-custom);
+    font-size: var(--font-size-l);
+    color: hsl(var(--hue-blue), 10%, 60%);
+  }
+}
+
+.logo {
+  margin-bottom: var(--space-xl);
+  text-align: center;
+  font-size: 30px;
+
+  @media (min-width: 42em) {
+    margin-top: var(--space-xl);
+    margin-bottom: calc(var(--space-xl) * 2);
+    font-size: 36px;
+  }
+}
+
+.roomName {
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  color: hsl(var(--hue-blue), 50%, 70%);
+  margin-bottom: var(--space-l);
+}
+
+.guestPreview {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-m);
+  background: hsla(var(--hue-blue), 20%, 20%, 0.5);
+  border-radius: var(--border-radius);
+}
+
+.guestName {
+  font-size: var(--font-size-l);
+  font-weight: bold;
+  color: hsl(var(--hue-green), 60%, 60%);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.error {
+  color: hsl(var(--hue-red), 60%, 60%);
+  margin-top: var(--space-l);
+}
+
+.loading {
+  color: hsl(var(--hue-blue), 10%, 60%);
+}

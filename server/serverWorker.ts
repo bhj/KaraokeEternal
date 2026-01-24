@@ -75,8 +75,8 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     io = new SocketIO(server, {
       path: urlPath + 'socket.io',
       serveClient: false,
-      pingTimeout: 60000,    // 60s (default 20s) - longer timeout for proxy environments
-      pingInterval: 25000,   // 25s (default 25s)
+      pingTimeout: 60000, // 60s (default 20s) - longer timeout for proxy environments
+      pingInterval: 25000, // 25s (default 25s)
       transports: ['websocket', 'polling'], // prefer websocket, fallback to polling
     })
 
