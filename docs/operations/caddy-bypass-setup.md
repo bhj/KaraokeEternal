@@ -7,7 +7,7 @@ To enable the guest enrollment flow (allowing both guests and logged-in users to
 3. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
 4. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
 5. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
-6. **Enrollment API** (`/api/rooms/*/enrollment`) - Returns SSO enrollment URL for guest flow
+6. **Guest Join API** (`/api/guest/join`) - Creates app-managed guest sessions (no Authentik dependency)
 
 This allows the Karaoke App to handle the routing logic instead of Authentik blocking the request immediately.
 
@@ -62,11 +62,11 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 6. Bypass: Enrollment API ---
-    # Returns the SSO enrollment URL for guests scanning QR codes.
-    # Called by App.tsx before user is authenticated.
-    @enrollment path /api/rooms/*/enrollment
-    handle @enrollment {
+    # --- 6. Bypass: Guest Join API ---
+    # Creates app-managed guest sessions (no Authentik dependency).
+    # Called by the landing page when user clicks "Join as Guest".
+    @guest_join path /api/guest/join
+    handle @guest_join {
         reverse_proxy localhost:8280
     }
 
@@ -120,9 +120,9 @@ virtualHosts."karaoke.thedb.club" = {
       reverse_proxy localhost:8280
     }
 
-    # Bypass: Enrollment API
-    @enrollment path /api/rooms/*/enrollment
-    handle @enrollment {
+    # Bypass: Guest Join API
+    @guest_join path /api/guest/join
+    handle @guest_join {
       reverse_proxy localhost:8280
     }
 
@@ -169,11 +169,12 @@ virtualHosts."karaoke.thedb.club" = {
 - Returns 401 if not authenticated
 - Must bypass forward_auth because Authentik returns HTML redirect instead of 401 for unauthenticated API requests, causing client-side state corruption
 
-### `/api/rooms/*/enrollment` (Enrollment API)
-- Read-only endpoint returning the SSO enrollment URL for a room
-- Called by the app before user authentication to get the guest enrollment redirect URL
-- Returns `{ enrollmentUrl: "..." }` if room has invitation token, or `{ enrollmentUrl: null }` otherwise
-- Does not expose sensitive data - just constructs a URL from public configuration
+### `/api/guest/join` (Guest Join API)
+- POST endpoint that creates app-managed guest sessions
+- Called by the landing page when user clicks "Join as Guest"
+- Validates invitation token and room status
+- Creates guest user in local database and issues JWT cookie
+- Rate-limited to 10 requests/minute per IP to prevent abuse
 
 ## Verification
 
@@ -204,9 +205,11 @@ curl https://karaoke.example.com/api/prefs/public
 curl -s -w "%{http_code}" https://karaoke.example.com/api/user
 # Expected: 401 (not 200 with HTML body)
 
-# Enrollment API should return JSON (not redirect to Authentik)
-curl https://karaoke.example.com/api/rooms/1/enrollment
-# Expected: {"enrollmentUrl":"..."} or {"enrollmentUrl":null}
+# Guest Join API should return JSON (not redirect to Authentik)
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"roomId":1,"inviteCode":"test","guestName":"Test"}' \
+  https://karaoke.example.com/api/guest/join
+# Expected: JSON response (error is fine, just not HTML redirect)
 
 # Other routes should redirect to Authentik
 curl -I https://karaoke.example.com/library
