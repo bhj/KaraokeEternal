@@ -41,7 +41,7 @@ karaoke.yourdomain.com {
     # The App will check for a session cookie:
     # - If Logged In: Joins the room immediately.
     # - If Guest: Redirects to Authentik Enrollment.
-    @smart_join path /api/rooms/join/*
+    @smart_join path /api/rooms/join/*/*
     handle @smart_join {
         reverse_proxy localhost:8280
     }
@@ -103,7 +103,7 @@ virtualHosts."karaoke.thedb.club" = {
     }
 
     # Bypass: Smart QR API
-    @smart_join path /api/rooms/join/*
+    @smart_join path /api/rooms/join/*/*
     handle @smart_join {
       reverse_proxy localhost:8280
     }

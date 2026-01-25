@@ -60,7 +60,7 @@ handle @landing_page {
 }
 
 # 2. Smart QR Bypass
-@smart_join path /api/rooms/join/*
+@smart_join path /api/rooms/join/*/*
 handle @smart_join {
   reverse_proxy localhost:8280
 }

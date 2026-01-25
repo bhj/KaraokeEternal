@@ -192,7 +192,7 @@ karaoke.example.com {
     }
 
     # Smart QR API - bypass auth (app handles routing)
-    @guest_join path /api/rooms/join/*
+    @guest_join path /api/rooms/join/*/*
     handle @guest_join {
         reverse_proxy karaoke:3000
     }
