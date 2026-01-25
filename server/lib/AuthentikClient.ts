@@ -5,9 +5,70 @@ const AUTHENTIK_URL = process.env.KES_AUTHENTIK_URL
 const AUTHENTIK_TOKEN = process.env.KES_AUTHENTIK_API_TOKEN
 const ENROLLMENT_FLOW_SLUG = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
 
+interface InvitationData {
+  pk: string
+  name: string
+  expires: string
+  fixed_data: Record<string, string>
+}
+
 export class AuthentikClient {
   static isConfigured (): boolean {
     return !!(AUTHENTIK_URL && AUTHENTIK_TOKEN)
+  }
+
+  /**
+   * Get an existing invitation by its token (pk)
+   * Returns the invitation data if found and valid, null otherwise
+   */
+  static async getInvitation (token: string): Promise<InvitationData | null> {
+    if (!this.isConfigured()) return null
+
+    try {
+      const res = await fetch(`${AUTHENTIK_URL}/api/v3/stages/invitation/invitations/${token}/`, {
+        headers: { Authorization: `Bearer ${AUTHENTIK_TOKEN}` },
+      })
+
+      if (!res.ok) {
+        return null
+      }
+
+      return await res.json()
+    } catch (err) {
+      log.error('Authentik API error checking invitation: %s', (err as Error).message)
+      return null
+    }
+  }
+
+  /**
+   * Get an existing valid invitation or create a new one for a room
+   * This ensures there's always a valid invitation for guest enrollment
+   *
+   * @param roomId - The room ID to get/create invitation for
+   * @param existingToken - Optional existing token from room data to check first
+   * @returns The invitation token (pk) or null on failure
+   */
+  static async getOrCreateInvitation (roomId: number, existingToken: string | null): Promise<string | null> {
+    if (!this.isConfigured()) return null
+
+    // If there's an existing token, check if it's still valid
+    if (existingToken) {
+      const invitation = await this.getInvitation(existingToken)
+      if (invitation) {
+        // Check if not expired (Authentik returns ISO date string)
+        const expires = new Date(invitation.expires)
+        if (expires > new Date()) {
+          log.verbose('Using existing valid invitation %s for room %d', existingToken, roomId)
+          return existingToken
+        }
+        log.info('Existing invitation %s for room %d has expired, creating new one', existingToken, roomId)
+      } else {
+        log.info('Existing invitation %s for room %d not found, creating new one', existingToken, roomId)
+      }
+    }
+
+    // Create a new invitation
+    return await this.createInvitation(roomId)
   }
 
   /**

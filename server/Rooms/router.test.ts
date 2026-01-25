@@ -4,10 +4,13 @@ import fse from 'fs-extra'
 const TEST_DB_PATH = '/tmp/karaoke-eternal-test-rooms-router.sqlite'
 
 // Mock AuthentikClient to avoid external calls
+const mockGetOrCreateInvitation = vi.fn()
 vi.mock('../lib/AuthentikClient.js', () => ({
   AuthentikClient: {
     createInvitation: vi.fn().mockResolvedValue('mock-invitation-token'),
     cleanupRoom: vi.fn().mockResolvedValue(undefined),
+    isConfigured: vi.fn().mockReturnValue(true),
+    getOrCreateInvitation: mockGetOrCreateInvitation,
   },
 }))
 
@@ -190,6 +193,9 @@ describe('Rooms Router - Room Joining', () => {
         [JSON.stringify({ invitationToken: 'test-token' }), testRoomId],
       )
 
+      // Mock getOrCreateInvitation to return existing token
+      mockGetOrCreateInvitation.mockResolvedValue('test-token')
+
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
@@ -219,6 +225,105 @@ describe('Rooms Router - Room Joining', () => {
       // next should be a relative URL, not absolute
       // Authentik rejects absolute URLs as open redirect protection
       expect(nextParam).toBe('/')
+
+      // Restore env
+      if (originalAuthUrl !== undefined) {
+        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      } else {
+        delete process.env.KES_AUTHENTIK_PUBLIC_URL
+      }
+    })
+
+    it('should create invitation on-demand when room has no valid token', async () => {
+      // Set up Authentik env vars
+      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
+
+      // Room has no invitation token
+      await db.db?.run(
+        'UPDATE rooms SET data = ? WHERE roomId = ?',
+        [JSON.stringify({}), testRoomId],
+      )
+
+      // Mock getOrCreateInvitation to create and return a new token
+      const newToken = 'newly-created-invitation-token'
+      mockGetOrCreateInvitation.mockResolvedValue(newToken)
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const enrollmentLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/:roomId/enrollment' && l.methods.includes('GET'))
+
+      expect(enrollmentLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId) },
+        request: { host: 'karaoke.example.com' },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = enrollmentLayer!.stack[enrollmentLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // Should have called getOrCreateInvitation with room ID and null (no existing token)
+      expect(mockGetOrCreateInvitation).toHaveBeenCalledWith(testRoomId, null)
+
+      // Should return a valid enrollment URL with the new token
+      const enrollmentUrl = new URL((ctx.body as { enrollmentUrl: string }).enrollmentUrl)
+      expect(enrollmentUrl.searchParams.get('itoken')).toBe(newToken)
+
+      // Restore env
+      if (originalAuthUrl !== undefined) {
+        process.env.KES_AUTHENTIK_PUBLIC_URL = originalAuthUrl
+      } else {
+        delete process.env.KES_AUTHENTIK_PUBLIC_URL
+      }
+    })
+
+    it('should return null enrollmentUrl when invitation creation fails', async () => {
+      // Set up Authentik env vars
+      const originalAuthUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+      process.env.KES_AUTHENTIK_PUBLIC_URL = 'https://auth.example.com'
+
+      // Room has no invitation token
+      await db.db?.run(
+        'UPDATE rooms SET data = ? WHERE roomId = ?',
+        [JSON.stringify({}), testRoomId],
+      )
+
+      // Mock getOrCreateInvitation to fail (return null)
+      mockGetOrCreateInvitation.mockResolvedValue(null)
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const enrollmentLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/:roomId/enrollment' && l.methods.includes('GET'))
+
+      expect(enrollmentLayer).toBeDefined()
+
+      const ctx = {
+        params: { roomId: String(testRoomId) },
+        request: { host: 'karaoke.example.com' },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = enrollmentLayer!.stack[enrollmentLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // Should return null enrollment URL when invitation creation fails
+      expect((ctx.body as { enrollmentUrl: string | null }).enrollmentUrl).toBeNull()
 
       // Restore env
       if (originalAuthUrl !== undefined) {

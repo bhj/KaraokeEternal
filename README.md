@@ -20,7 +20,7 @@ A **Multi-Tenant SSO** fork of [Karaoke Eternal](https://github.com/bhj/KaraokeE
 
 - **SSO Integration** — Authenticate via Authentik; standard users land in their own room
 - **Per-User Rooms** — Every standard user gets their own private party room
-- **QR Guest Enrollment** — Guests scan a QR code, see a landing page, and join with one click
+- **QR Guest Enrollment** — Guests scan a QR code, see a landing page, and join with one click (invitations created on-demand)
 - **Multi-Tenancy** — Multiple hosts can run separate parties simultaneously
 - **Room Roaming** — Standard users can visit other rooms via QR code
 
@@ -220,22 +220,32 @@ karaoke.example.com {
 
 Create an enrollment flow (`karaoke-guest-enrollment`) with stages:
 
-1. **Prompt** — Captures `username` (pre-filled from `guest_name` URL param) and `itoken` (hidden)
-2. **User Write** — Creates user in `karaoke-guests` group with collision handling
-3. **Login** — Issues session cookie
-4. **Redirect** — Returns to `/join?itoken={itoken}` to complete room join
+1. **Invitation** — Validates `itoken` (continue without invitation enabled for on-demand creation)
+2. **Prompt** — Captures `guest_name` (pre-filled from URL param)
+3. **User Write** — Creates user with policy `set-guest-expiry-and-room`
+4. **Login** — Issues session cookie
+5. **Redirect** — Returns to `/` to complete room join
+
+**On-Demand Invitation Creation:**
+
+The app automatically validates and creates Authentik invitations:
+- When a guest requests enrollment, the server checks if the room's invitation is still valid
+- If expired or missing, a new invitation is created via Authentik API
+- This ensures guests can always enroll even hours after room creation
 
 **Flow:**
 ```
 Guest scans QR → /api/rooms/join/{roomId}/{itoken}
   → Redirects to /join?itoken=xxx&guest_name=RedPenguin
   → Landing page: "Login with Account" or "Join as RedPenguin"
-  → Guest clicks join → Authentik enrollment
-  → Account created → Redirect to /join?itoken=xxx
-  → App auto-completes join → Library
+  → Guest clicks join → GET /api/rooms/{id}/enrollment
+  → Server validates/creates invitation on-demand
+  → Redirect to Authentik enrollment
+  → Account created → Redirect to /
+  → App routes to room via SSO headers
 ```
 
-> See `docs/operations/authentik-guest-enrollment.md` for detailed setup.
+> See `docs/analysis/invitation_fix_2026_01_25.md` for implementation details.
 
 ---
 

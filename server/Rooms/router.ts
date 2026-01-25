@@ -3,6 +3,7 @@ import { uniqueNamesGenerator, colors, animals } from 'unique-names-generator'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
+import { AuthentikClient } from '../lib/AuthentikClient.js'
 
 interface RequestWithBody {
   body: Record<string, unknown>
@@ -35,7 +36,7 @@ router.get('/:roomId/enrollment', async (ctx) => {
     return
   }
 
-  // Get room to check if it exists and has an invitation token
+  // Get room to check if it exists
   const res = await Rooms.get(roomId, { status: ['open'] })
   const room = res.entities[roomId]
 
@@ -43,12 +44,16 @@ router.get('/:roomId/enrollment', async (ctx) => {
     ctx.throw(404, 'Room not found or closed')
   }
 
-  // Get invitation token from room data
+  // Get existing invitation token from room data (if any)
   const data = await Rooms.getRoomData(roomId)
-  const invitationToken = data?.invitationToken
+  const existingToken = data?.invitationToken ?? null
+
+  // Get or create a valid invitation token on-demand
+  // This ensures guests can always enroll even if the room's invitation has expired
+  const invitationToken = await AuthentikClient.getOrCreateInvitation(roomId, existingToken)
 
   if (!invitationToken) {
-    // No invitation token - can't enroll
+    // Couldn't get or create invitation token
     ctx.body = { enrollmentUrl: null }
     return
   }
