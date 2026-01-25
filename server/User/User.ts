@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import Database from '../lib/Database.js'
 import sql from 'sqlate'
 import bcrypt from '../lib/bcrypt.js'
@@ -265,6 +266,64 @@ class User {
   }
 
   /**
+   * Create a guest user for app-managed guest sessions
+   * Guests are created directly by the app (not via Authentik)
+   *
+   * @param  {String}  name     Display name for the guest
+   * @param  {Number}  roomId   Room ID the guest is joining
+   * @return {Promise}          User object
+   */
+  static async createGuest (name: string, roomId: number) {
+    name = name?.trim()
+
+    // Validate display name
+    if (!name) {
+      throw new Error('Display name is required')
+    }
+
+    if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+      throw new Error(`Display name must have ${NAME_MIN_LENGTH}-${NAME_MAX_LENGTH} characters`)
+    }
+
+    // Validate room exists and is open
+    const Rooms = (await import('../Rooms/Rooms.js')).default
+    const roomRes = await Rooms.get(roomId, { status: ['open'] })
+    const room = roomRes.entities[roomId]
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    // Generate unique username: guest-{roomId}-{8 hex chars}
+    // This format is traceable to the room and guaranteed unique
+    const randomHex = crypto.randomBytes(4).toString('hex')
+    const username = `guest-${roomId}-${randomHex}`
+
+    const fields = new Map()
+    fields.set('username', username)
+    fields.set('password', await bcrypt.hash(crypto.randomUUID(), BCRYPT_ROUNDS)) // Random password (never used)
+    fields.set('name', name)
+    fields.set('dateCreated', Math.floor(Date.now() / 1000))
+    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = 'guest')`)
+    fields.set('authProvider', 'app') // Mark as app-managed guest
+
+    const query = sql`
+      INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = await db.run(String(query), query.parameters)
+
+    if (typeof res.lastID !== 'number') {
+      throw new Error('Unable to create guest user')
+    }
+
+    log.info('Created app-managed guest: %s (userId: %d, roomId: %d)', username, res.lastID, roomId)
+
+    // Return the newly created user
+    return await User.getById(res.lastID, true)
+  }
+
+  /**
    * Remove a user
    *
    * @param  {Number}  userId
@@ -311,6 +370,49 @@ class User {
     if (!usersQueryRes.changes) {
       throw new Error(`unable to remove userId: ${userId}`)
     }
+  }
+
+  /**
+   * Clean up app-managed guest users whose rooms are closed
+   * This is called periodically by the serverWorker cleanup job
+   *
+   * @return {Promise<number>} Number of guests removed
+   */
+  static async cleanupGuests (): Promise<number> {
+    // Find guests whose rooms are closed or deleted
+    // App-managed guests have username format: guest-{roomId}-{hex}
+    // and authProvider = 'app'
+    const query = sql`
+      SELECT u.userId, u.username
+      FROM users u
+      INNER JOIN roles r ON u.roleId = r.roleId
+      WHERE r.name = 'guest'
+        AND u.authProvider = 'app'
+        AND NOT EXISTS (
+          SELECT 1 FROM rooms rm
+          WHERE rm.status = 'open'
+            AND u.username LIKE 'guest-' || rm.roomId || '-%'
+        )
+    `
+
+    const guestsToRemove = await db.all(String(query), query.parameters)
+
+    let removed = 0
+    for (const guest of guestsToRemove) {
+      try {
+        await User.remove(guest.userId)
+        removed++
+        log.info('Cleaned up guest user: %s (userId: %d)', guest.username, guest.userId)
+      } catch (err) {
+        log.error('Failed to clean up guest %s: %s', guest.username, (err as Error).message)
+      }
+    }
+
+    if (removed > 0) {
+      log.info('Guest cleanup: removed %d app-managed guest(s)', removed)
+    }
+
+    return removed
   }
 
   /**

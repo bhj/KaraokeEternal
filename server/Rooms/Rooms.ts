@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import bcrypt from '../lib/bcrypt.js'
 import sql from 'sqlate'
 import Database from '../lib/Database.js'
@@ -279,25 +280,22 @@ class Rooms {
       roles[standardRole.roleId] = { allowNew: true }
     }
 
-    const query = sql`
-      INSERT INTO rooms (name, status, dateCreated, ownerId, lastActivity, data)
-      VALUES (${name}, 'open', ${now}, ${userId}, ${now}, ${JSON.stringify(defaultPrefs)})
-    `
-    const res = await db.run(String(query), query.parameters)
-    const roomId = res.lastID
+    // Generate local invitation token (no Authentik dependency for room creation)
+    // Guests use app-managed sessions, standard users use SSO
+    const invitationToken = crypto.randomUUID()
 
-    // Create Authentik invitation and store token
-    const invitationToken = await AuthentikClient.createInvitation(roomId)
-    if (invitationToken) {
-      const updateQuery = sql`
-        UPDATE rooms
-        SET data = json_set(data, '$.invitationToken', ${invitationToken})
-        WHERE roomId = ${roomId}
-      `
-      await db.run(String(updateQuery), updateQuery.parameters)
+    const roomData = {
+      ...defaultPrefs,
+      invitationToken,
     }
 
-    return roomId
+    const query = sql`
+      INSERT INTO rooms (name, status, dateCreated, ownerId, lastActivity, data)
+      VALUES (${name}, 'open', ${now}, ${userId}, ${now}, ${JSON.stringify(roomData)})
+    `
+    const res = await db.run(String(query), query.parameters)
+
+    return res.lastID
   }
 
   /**

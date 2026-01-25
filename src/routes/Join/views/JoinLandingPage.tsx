@@ -31,6 +31,7 @@ const JoinLandingPage = () => {
   const [config, setConfig] = useState<PublicPrefs | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [joining, setJoining] = useState(false)
 
   // Fetch room info and public config on mount
   useEffect(() => {
@@ -77,16 +78,27 @@ const JoinLandingPage = () => {
     window.location.href = loginUrl
   }
 
-  // Handle "Join as Guest" - enrollment flow with guest name
-  const handleJoinAsGuest = () => {
-    if (!config?.authentikUrl || !itoken) return
+  // Handle "Join as Guest" - app-managed guest session (no Authentik involvement)
+  const handleJoinAsGuest = async () => {
+    if (!roomInfo || !itoken || !guestName) return
 
-    const enrollUrl = new URL(`${config.authentikUrl}/if/flow/${config.enrollmentFlow}/`)
-    enrollUrl.searchParams.set('itoken', itoken)
-    if (guestName) {
-      enrollUrl.searchParams.set('guest_name', guestName)
+    setJoining(true)
+    setError(null)
+
+    try {
+      await api.post('guest/join', {
+        body: {
+          roomId: roomInfo.roomId,
+          inviteCode: itoken,
+          guestName: guestName,
+        },
+      })
+      // Success - redirect to library (cookie is set by server)
+      window.location.href = '/library'
+    } catch (err) {
+      setError((err as Error).message || 'Failed to join room')
+      setJoining(false)
     }
-    window.location.href = enrollUrl.toString()
   }
 
   if (loading) {
@@ -124,13 +136,13 @@ const JoinLandingPage = () => {
 
       <div className={styles.buttons}>
         {config?.ssoLoginUrl && (
-          <Button onClick={handleLoginWithAccount} variant='primary'>
+          <Button onClick={handleLoginWithAccount} variant='primary' disabled={joining}>
             Login with Account
           </Button>
         )}
-        {config?.authentikUrl && (
-          <Button onClick={handleJoinAsGuest}>
-            {guestName ? `Join as ${guestName}` : 'Join as Guest'}
+        {guestName && (
+          <Button onClick={handleJoinAsGuest} disabled={joining}>
+            {joining ? 'Joining...' : `Join as ${guestName}`}
           </Button>
         )}
       </div>

@@ -16,6 +16,7 @@ import koaRange from 'koa-range'
 import koaStatic from 'koa-static'
 import Media from './Media/Media.js'
 import Prefs from './Prefs/Prefs.js'
+import guestRouter from './Guest/router.js'
 import libraryRouter from './Library/router.js'
 import mediaRouter from './Media/router.js'
 import prefsRouter from './Prefs/router.js'
@@ -124,10 +125,21 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       }
     }, IDLE_CLEANUP_INTERVAL_MS)
 
+    // Cleanup app-managed guests from closed rooms every hour
+    const GUEST_CLEANUP_INTERVAL_MS = 60 * 60 * 1000
+    const guestCleanupInterval = setInterval(async () => {
+      try {
+        await User.cleanupGuests()
+      } catch (err) {
+        log.error(`Error during guest cleanup: ${err.message}`)
+      }
+    }, GUEST_CLEANUP_INTERVAL_MS)
+
     // handle shutdown gracefully
     shutdownHandlers.push(() => new Promise((resolve) => {
-      // Stop idle cleanup interval
+      // Stop cleanup intervals
       clearInterval(idleCleanupInterval)
+      clearInterval(guestCleanupInterval)
 
       // Clear pending room cleanup timeouts to prevent SQLITE_MISUSE errors
       clearPendingCleanups()
@@ -430,6 +442,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     prefix: urlPath.replace(/\/$/, ''), // avoid double slashes with /api prefix
   })
 
+  baseRouter.use(guestRouter.routes())
   baseRouter.use(libraryRouter.routes())
   baseRouter.use(mediaRouter.routes())
   baseRouter.use(prefsRouter.routes())

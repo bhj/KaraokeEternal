@@ -19,12 +19,10 @@ describe('AuthentikClient', () => {
     // Save original env vars
     originalEnv.KES_AUTHENTIK_URL = process.env.KES_AUTHENTIK_URL
     originalEnv.KES_AUTHENTIK_API_TOKEN = process.env.KES_AUTHENTIK_API_TOKEN
-    originalEnv.KES_AUTHENTIK_ENROLLMENT_FLOW = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW
 
     // Set test env vars
     process.env.KES_AUTHENTIK_URL = 'http://localhost:9000'
     process.env.KES_AUTHENTIK_API_TOKEN = 'test-token'
-    process.env.KES_AUTHENTIK_ENROLLMENT_FLOW = 'karaoke-guest-enrollment'
 
     // Reset module cache to pick up new env vars
     vi.resetModules()
@@ -42,159 +40,87 @@ describe('AuthentikClient', () => {
     vi.restoreAllMocks()
   })
 
-  describe('getInvitation', () => {
-    it('should return invitation data when invitation exists', async () => {
-      const mockInvitationPk = '12345678-1234-1234-1234-123456789012'
-      const mockInvitationData = {
-        pk: mockInvitationPk,
-        name: 'karaoke-room-1-1234567890',
-        expires: '2026-01-26T00:00:00Z',
-        fixed_data: { karaoke_room_id: '1' },
-      }
-
-      // Mock fetch for invitation lookup
-      const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockInvitationData,
-      } as Response)
-
+  describe('isConfigured', () => {
+    it('should return true when both URL and token are set', async () => {
       const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getInvitation(mockInvitationPk)
-
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `http://localhost:9000/api/v3/stages/invitation/invitations/${mockInvitationPk}/`,
-        { headers: { Authorization: 'Bearer test-token' } },
-      )
-      expect(result).toEqual(mockInvitationData)
+      expect(AuthentikClient.isConfigured()).toBe(true)
     })
 
-    it('should return null when invitation does not exist', async () => {
-      const mockInvitationPk = 'nonexistent-token'
-
-      vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-      } as Response)
-
-      const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getInvitation(mockInvitationPk)
-
-      expect(result).toBeNull()
-    })
-
-    it('should return null when Authentik is not configured', async () => {
+    it('should return false when URL is not set', async () => {
       delete process.env.KES_AUTHENTIK_URL
       vi.resetModules()
 
       const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getInvitation('any-token')
+      expect(AuthentikClient.isConfigured()).toBe(false)
+    })
 
-      expect(result).toBeNull()
+    it('should return false when token is not set', async () => {
+      delete process.env.KES_AUTHENTIK_API_TOKEN
+      vi.resetModules()
+
+      const { AuthentikClient } = await import('./AuthentikClient.js')
+      expect(AuthentikClient.isConfigured()).toBe(false)
     })
   })
 
-  describe('getOrCreateInvitation', () => {
-    it('should return existing valid invitation token from room data', async () => {
+  describe('cleanupRoom', () => {
+    it('should delete invitations for a room', async () => {
       const roomId = 1
-      const existingToken = '12345678-1234-1234-1234-123456789012'
-
-      // Mock: invitation exists and is valid
-      const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          pk: existingToken,
-          expires: '2026-01-26T00:00:00Z',
-        }),
-      } as Response)
-
-      const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getOrCreateInvitation(roomId, existingToken)
-
-      expect(result).toBe(existingToken)
-      expect(fetchSpy).toHaveBeenCalledTimes(1) // Only checked, didn't create
-    })
-
-    it('should create new invitation when existing token is invalid/expired', async () => {
-      const roomId = 1
-      const expiredToken = 'expired-token-uuid'
-      const newToken = 'new-valid-token-uuid'
+      const mockInvitations = {
+        results: [
+          { pk: 'inv-1', name: 'karaoke-room-1-123' },
+          { pk: 'inv-2', name: 'karaoke-room-1-456' },
+        ],
+      }
 
       const fetchSpy = vi.spyOn(global, 'fetch')
-        // First call: check existing invitation - returns 404 (not found/expired)
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 404,
-        } as Response)
-        // Second call: get flow pk
+        // First call: list invitations
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ results: [{ pk: 'flow-pk-uuid' }] }),
+          json: async () => mockInvitations,
         } as Response)
-        // Third call: create new invitation
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ pk: newToken }),
-        } as Response)
+        // Second call: delete first invitation
+        .mockResolvedValueOnce({ ok: true } as Response)
+        // Third call: delete second invitation
+        .mockResolvedValueOnce({ ok: true } as Response)
 
       const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getOrCreateInvitation(roomId, expiredToken)
+      await AuthentikClient.cleanupRoom(roomId)
 
-      expect(result).toBe(newToken)
       expect(fetchSpy).toHaveBeenCalledTimes(3)
+      expect(fetchSpy).toHaveBeenNthCalledWith(
+        1,
+        'http://localhost:9000/api/v3/stages/invitation/invitations/?name__startswith=karaoke-room-1-',
+        { headers: { Authorization: 'Bearer test-token' } },
+      )
+      expect(fetchSpy).toHaveBeenNthCalledWith(
+        2,
+        'http://localhost:9000/api/v3/stages/invitation/invitations/inv-1/',
+        { method: 'DELETE', headers: { Authorization: 'Bearer test-token' } },
+      )
     })
 
-    it('should create new invitation when no existing token provided', async () => {
-      const roomId = 1
-      const newToken = 'brand-new-token-uuid'
-
-      const fetchSpy = vi.spyOn(global, 'fetch')
-        // First call: get flow pk
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ results: [{ pk: 'flow-pk-uuid' }] }),
-        } as Response)
-        // Second call: create new invitation
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ pk: newToken }),
-        } as Response)
-
-      const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getOrCreateInvitation(roomId, null)
-
-      expect(result).toBe(newToken)
-      expect(fetchSpy).toHaveBeenCalledTimes(2)
-    })
-
-    it('should return null when Authentik is not configured', async () => {
+    it('should do nothing when Authentik is not configured', async () => {
       delete process.env.KES_AUTHENTIK_URL
       vi.resetModules()
 
+      const fetchSpy = vi.spyOn(global, 'fetch')
       const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getOrCreateInvitation(1, null)
 
-      expect(result).toBeNull()
+      await AuthentikClient.cleanupRoom(1)
+
+      expect(fetchSpy).not.toHaveBeenCalled()
     })
 
-    it('should return null when invitation creation fails', async () => {
+    it('should handle cleanup errors gracefully', async () => {
       const roomId = 1
 
-      vi.spyOn(global, 'fetch')
-        // First call: get flow pk
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ results: [{ pk: 'flow-pk-uuid' }] }),
-        } as Response)
-        // Second call: create invitation fails
-        .mockResolvedValueOnce({
-          ok: false,
-          text: async () => 'API Error',
-        } as Response)
+      vi.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'))
 
       const { AuthentikClient } = await import('./AuthentikClient.js')
-      const result = await AuthentikClient.getOrCreateInvitation(roomId, null)
 
-      expect(result).toBeNull()
+      // Should not throw
+      await expect(AuthentikClient.cleanupRoom(roomId)).resolves.toBeUndefined()
     })
   })
 })

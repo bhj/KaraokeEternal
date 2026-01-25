@@ -17,59 +17,8 @@ const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.en
 
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
 
-// GET /api/rooms/:roomId/enrollment - Returns enrollment URL for unauthenticated users to redirect to SSO
-// This is a public endpoint that doesn't require authentication
-router.get('/:roomId/enrollment', async (ctx) => {
-  const roomId = parseInt(ctx.params.roomId, 10)
-
-  if (isNaN(roomId)) {
-    ctx.throw(400, 'Invalid roomId')
-  }
-
-  // Check if Authentik is configured
-  const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
-
-  if (!authentikUrl) {
-    // SSO not configured
-    ctx.body = { enrollmentUrl: null }
-    return
-  }
-
-  // Get room to check if it exists
-  const res = await Rooms.get(roomId, { status: ['open'] })
-  const room = res.entities[roomId]
-
-  if (!room) {
-    ctx.throw(404, 'Room not found or closed')
-  }
-
-  // Get existing invitation token from room data (if any)
-  const data = await Rooms.getRoomData(roomId)
-  const existingToken = data?.invitationToken ?? null
-
-  // Get or create a valid invitation token on-demand
-  // This ensures guests can always enroll even if the room's invitation has expired
-  const invitationToken = await AuthentikClient.getOrCreateInvitation(roomId, existingToken)
-
-  if (!invitationToken) {
-    // Couldn't get or create invitation token
-    ctx.body = { enrollmentUrl: null }
-    return
-  }
-
-  // Build enrollment URL
-  const authUrl = new URL(authentikUrl)
-  authUrl.pathname = `/if/flow/${enrollmentFlow}/`
-  authUrl.searchParams.set('itoken', invitationToken)
-
-  // Use relative URL - Authentik rejects absolute URLs in ?next (open redirect protection)
-  // Guest returns to / which goes through forward_auth to establish SSO session
-  // The X-Authentik-Karaoke-Room-Id header sets their room during session creation
-  authUrl.searchParams.set('next', '/')
-
-  ctx.body = { enrollmentUrl: authUrl.toString() }
-})
+// NOTE: Enrollment endpoint removed - guests now use app-managed sessions via /api/guest/join
+// Standard users use SSO login via Authentik, not enrollment
 
 // GET /api/rooms/join/validate - Validate invitation token and return room info
 // This is a public endpoint for the landing page to display room name

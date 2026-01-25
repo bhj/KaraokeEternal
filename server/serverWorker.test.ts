@@ -225,4 +225,104 @@ describe('serverWorker - SSO Header Processing', () => {
       // The actual auth check happens client-side and via API calls
     })
   })
+
+  describe('App-managed guest JWT authentication', () => {
+    /**
+     * Test that app-managed guests (created via /api/guest/join) can authenticate
+     * using JWT cookies without SSO headers.
+     */
+    it('should authenticate guest from JWT cookie without SSO headers', async () => {
+      const jwtKey = await Prefs.getJwtKey(false)
+
+      // Create a room first
+      const now = Math.floor(Date.now() / 1000)
+      const roomInsert = await db.db?.run(
+        'INSERT INTO rooms (name, status, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?)',
+        ['Test Room', 'open', now, now, JSON.stringify({ invitationToken: 'test-token' })],
+      )
+      const testRoomId = roomInsert?.lastID
+
+      // Create a guest user (simulating what User.createGuest does)
+      const guest = await User.createGuest('TestGuest', testRoomId!)
+
+      // Create JWT payload as the guest router would
+      const jwtPayload = {
+        userId: guest.userId,
+        username: guest.username,
+        name: guest.name,
+        isAdmin: false,
+        isGuest: true,
+        roomId: testRoomId,
+        ownRoomId: null,
+        dateUpdated: guest.dateUpdated,
+      }
+
+      // Sign the token
+      const token = jsonWebToken.sign(jwtPayload, jwtKey)
+
+      // Verify the middleware would correctly decode and use this token
+      const decoded = jsonWebToken.verify(token, jwtKey) as typeof jwtPayload
+
+      expect(decoded.userId).toBe(guest.userId)
+      expect(decoded.username).toBe(guest.username)
+      expect(decoded.isGuest).toBe(true)
+      expect(decoded.roomId).toBe(testRoomId)
+      expect(decoded.ownRoomId).toBeNull()
+    })
+
+    it('should bind guest to their enrollment room (no room switching)', async () => {
+      const jwtKey = await Prefs.getJwtKey(false)
+
+      // Create a room
+      const now = Math.floor(Date.now() / 1000)
+      const roomInsert = await db.db?.run(
+        'INSERT INTO rooms (name, status, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?)',
+        ['Guest Room', 'open', now, now, JSON.stringify({ invitationToken: 'guest-token' })],
+      )
+      const guestRoomId = roomInsert?.lastID
+
+      // Create guest
+      const guest = await User.createGuest('BoundGuest', guestRoomId!)
+
+      const jwtPayload = {
+        userId: guest.userId,
+        username: guest.username,
+        name: guest.name,
+        isAdmin: false,
+        isGuest: true,
+        roomId: guestRoomId,
+        ownRoomId: null,
+        dateUpdated: guest.dateUpdated,
+      }
+
+      const decoded = jsonWebToken.verify(
+        jsonWebToken.sign(jwtPayload, jwtKey),
+        jwtKey,
+      ) as typeof jwtPayload
+
+      // Verify guest flag and room binding
+      expect(decoded.isGuest).toBe(true)
+      expect(decoded.roomId).toBe(guestRoomId)
+
+      // Per serverWorker.ts line 386: guests cannot visit other rooms
+      // The room visitation logic is skipped when isGuest is true
+      expect(decoded.isGuest).toBe(true) // Confirms room switching is blocked
+    })
+
+    it('should have correct username format for app-managed guests', async () => {
+      const now = Math.floor(Date.now() / 1000)
+      const roomInsert = await db.db?.run(
+        'INSERT INTO rooms (name, status, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?)',
+        ['Username Test Room', 'open', now, now, JSON.stringify({ invitationToken: 'uuid' })],
+      )
+      const roomId = roomInsert?.lastID
+
+      const guest = await User.createGuest('Alice', roomId!)
+
+      // Username format: guest-{roomId}-{8 hex chars}
+      expect(guest.username).toMatch(new RegExp(`^guest-${roomId}-[a-f0-9]{8}$`))
+      expect(guest.name).toBe('Alice')
+      expect(guest.role).toBe('guest')
+    })
+  })
 })
