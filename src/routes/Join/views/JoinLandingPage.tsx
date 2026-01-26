@@ -168,7 +168,7 @@ const JoinLandingPage = () => {
           </Button>
         )}
         {guestName && (
-          <Button onClick={handleJoinAsGuest} disabled={joining}>
+          <Button onClick={handleJoinAsGuest} variant='default' disabled={joining}>
             {joining ? 'Joining...' : `Join as ${guestName}`}
           </Button>
         )}
