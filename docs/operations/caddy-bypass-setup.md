@@ -8,6 +8,7 @@ To enable the guest enrollment flow (allowing both guests and logged-in users to
 4. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
 5. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
 6. **Guest Join API** (`/api/guest/join`) - Creates app-managed guest sessions (no Authentik dependency)
+7. **OIDC Auth API** (`/api/auth/*`) - App-managed OIDC login/callback flow
 
 This allows the Karaoke App to handle the routing logic instead of Authentik blocking the request immediately.
 
@@ -41,7 +42,8 @@ karaoke.yourdomain.com {
     # The App will check for a session cookie:
     # - If Logged In: Joins the room immediately.
     # - If Guest: Redirects to Authentik Enrollment.
-    @smart_join path /api/rooms/join/*/*
+    # NOTE: Two patterns needed - /api/rooms/join/* for /validate, /api/rooms/join/*/* for /roomId/token
+    @smart_join path /api/rooms/join/* /api/rooms/join/*/*
     handle @smart_join {
         reverse_proxy localhost:8280
     }
@@ -70,7 +72,15 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 7. Gatekeeper (Everything Else) ---
+    # --- 7. Bypass: OIDC Auth Endpoints ---
+    # App-managed OIDC login flow (initiates auth and handles callback).
+    # Must bypass forward_auth to allow the app to manage the OIDC state.
+    @oidc_auth path /api/auth/*
+    handle @oidc_auth {
+        reverse_proxy localhost:8280
+    }
+
+    # --- 8. Gatekeeper (Everything Else) ---
     # All other traffic MUST be authenticated by Authentik.
     handle {
         forward_auth localhost:9000 {
@@ -102,8 +112,8 @@ virtualHosts."karaoke.thedb.club" = {
       reverse_proxy localhost:8280
     }
 
-    # Bypass: Smart QR API
-    @smart_join path /api/rooms/join/*/*
+    # Bypass: Smart QR API (both /validate and /roomId/token patterns)
+    @smart_join path /api/rooms/join/* /api/rooms/join/*/*
     handle @smart_join {
       reverse_proxy localhost:8280
     }
@@ -126,7 +136,13 @@ virtualHosts."karaoke.thedb.club" = {
       reverse_proxy localhost:8280
     }
 
-    # Gatekeeper: Authenticated Route
+    # Bypass: OIDC Auth Endpoints (app-managed login flow)
+    @oidc_auth path /api/auth/*
+    handle @oidc_auth {
+      reverse_proxy localhost:8280
+    }
+
+    # Gatekeeper: Authenticated Route (must be last)
     handle {
       forward_auth localhost:9000 {
         uri /outpost.goauthentik.io/auth/caddy
@@ -176,6 +192,13 @@ virtualHosts."karaoke.thedb.club" = {
 - Creates guest user in local database and issues JWT cookie
 - Rate-limited to 10 requests/minute per IP to prevent abuse
 
+### `/api/auth/*` (OIDC Auth API)
+- App-managed OIDC login flow endpoints (`/api/auth/login`, `/api/auth/callback`)
+- Must bypass forward_auth to allow the app to manage OIDC state/PKCE
+- Protected by PKCE (code verifier) and state parameter validation
+- Callback validates the authorization code with the IdP before issuing session
+- No sensitive data exposed - just initiates and completes the OAuth flow
+
 ## Verification
 
 Test that bypasses work correctly:
@@ -197,6 +220,11 @@ curl -I https://karaoke.example.com/join?itoken=test
 curl https://karaoke.example.com/api/rooms/join/1/test-token
 # Expected: JSON response (error is fine, just not HTML redirect)
 
+# IMPORTANT: Validate endpoint (single wildcard) must also return JSON
+curl -s https://karaoke.example.com/api/rooms/join/validate?itoken=test | head -c 100
+# Expected: JSON like {"error":"..."} - NOT HTML redirect to Authentik
+# If you see HTML or "authentik" in response, the bypass pattern is wrong!
+
 # Public prefs should return JSON (not redirect to Authentik)
 curl https://karaoke.example.com/api/prefs/public
 # Expected: {"authentikUrl":"...","enrollmentFlow":"...","ssoMode":true,...}
@@ -210,6 +238,11 @@ curl -X POST -H "Content-Type: application/json" \
   -d '{"roomId":1,"inviteCode":"test","guestName":"Test"}' \
   https://karaoke.example.com/api/guest/join
 # Expected: JSON response (error is fine, just not HTML redirect)
+
+# OIDC login should return 302 redirect to Authentik (not forward_auth loop)
+curl -I https://karaoke.example.com/api/auth/login?redirect=/library
+# Expected: 302 with Location header pointing to Authentik authorization URL
+# BAD: 302 to authentik outpost (forward_auth intercepting)
 
 # Other routes should redirect to Authentik
 curl -I https://karaoke.example.com/library

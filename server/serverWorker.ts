@@ -35,8 +35,6 @@ import Rooms from './Rooms/Rooms.js'
 import { createProxyValidator } from './lib/proxyValidator.js'
 import { isPublicApiPath } from './lib/publicPaths.js'
 
-const { sign: jwtSign } = jsonWebToken
-
 const log = getLogger('server')
 const { verify: jwtVerify } = jsonWebToken
 
@@ -216,222 +214,67 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
 
     const path = ctx.request.path
 
-    // Skip SSO/auth processing for static assets (performance optimization)
-    // These don't need cookies or authentication
+    // Skip auth for static assets (performance optimization)
     if (path.startsWith(`${urlPath}assets/`)
       || /\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/i.test(path)) {
       return next()
     }
 
-    // SSO header auth (configurable headers)
-    // IMPORTANT: Process for ALL requests (not just API) to set cookie on initial page load
-    const authHeader = (process.env.KES_AUTH_HEADER || 'x-authentik-username').toLowerCase()
-    const groupsHeader = (process.env.KES_GROUPS_HEADER || 'x-authentik-groups').toLowerCase()
-    const adminGroup = process.env.KES_ADMIN_GROUP || 'admin'
-    const guestGroup = process.env.KES_GUEST_GROUP || 'karaoke-guests'
-    const roomIdHeader = (process.env.KES_ROOM_ID_HEADER || 'x-authentik-karaoke-room-id').toLowerCase()
-    const ephemeralEnabled = process.env.KES_EPHEMERAL_ROOMS !== 'false'
-
-    const headerUsername = ctx.request.header[authHeader]
-    let ssoProcessed = false
-
-    if (headerUsername && typeof headerUsername === 'string') {
-      // Check if we need to process SSO (cookie missing or different user)
-      // This prevents database hammering on every request
-      let needsSsoProcessing = true
-      const existingToken = ctx.cookies.get('keToken')
-
-      if (existingToken) {
-        try {
-          const existingPayload = jwtVerify(existingToken, jwtKey) as { username: string }
-          // Skip SSO if cookie already has the same user
-          if (existingPayload.username === headerUsername.trim()) {
-            needsSsoProcessing = false
-            ctx.user = existingPayload
-            ssoProcessed = true
-          }
-        } catch {
-          // Invalid/expired token - need to reprocess SSO
-        }
-      }
-
-      if (needsSsoProcessing) {
-        try {
-          // Check if user is admin/guest via groups header
-          const groupsRaw = ctx.request.header[groupsHeader] || ''
-          // Support both pipe (|) and comma (,) separators for groups (Authentik may use either)
-          const groups = typeof groupsRaw === 'string' ? groupsRaw.split(/[,|]/).map(g => g.trim()).filter(g => g) : []
-          const isAdmin = groups.includes(adminGroup)
-          const isGuest = groups.includes(guestGroup)
-          log.info('SSO auth: user=%s groups=%j isAdmin=%s isGuest=%s', headerUsername, groups, isAdmin, isGuest)
-          // DEBUG: Log all x-authentik headers
-          const authHeaders = Object.entries(ctx.request.header).filter(([k]) => k.toLowerCase().includes('authentik'))
-          log.info('DEBUG x-authentik headers: %j', Object.fromEntries(authHeaders))
-          log.info('DEBUG roomIdHeader=%s expected=%s', roomIdHeader, ctx.request.header[roomIdHeader])
-
-          // Get or create user from header
-          const user = await User.getOrCreateFromHeader(headerUsername, isAdmin, isGuest)
-
-          let room
-
-          if (isGuest) {
-            // GUESTS: Use room from Authentik attribute header (set during enrollment)
-            // Guests do NOT get their own ephemeral room
-            const guestRoomIdRaw = ctx.request.header[roomIdHeader]
-            // Defensive: header can be string or array
-            const guestRoomId = Array.isArray(guestRoomIdRaw) ? guestRoomIdRaw[0] : guestRoomIdRaw
-
-            if (guestRoomId) {
-              const roomIdNum = parseInt(guestRoomId, 10)
-              if (!isNaN(roomIdNum)) {
-                try {
-                  // Validate room: must exist, be open, and allow guests
-                  await Rooms.validate(roomIdNum, null, { isOpen: true, role: 'guest' })
-                  room = { roomId: roomIdNum }
-                  await Rooms.updateActivity(roomIdNum)
-                } catch (err) {
-                  // Room validation failed - guest cannot join
-                  log.warn('Guest %s cannot join room %d: %s', headerUsername, roomIdNum, (err as Error).message)
-                  // Guest has no room - they'll see an error or be redirected
-                }
-              }
-            }
-            // If no valid room header or validation failed, guest has no room
-          } else if (ephemeralEnabled) {
-            // NON-GUESTS: Check for visitation cookie first
-            const visitedRoomId = ctx.cookies.get('keVisitedRoom')
-
-            if (visitedRoomId) {
-              const roomIdNum = parseInt(visitedRoomId, 10)
-              if (!isNaN(roomIdNum)) {
-                try {
-                  // CRITICAL: Validate room - prevents cookie spoofing attacks
-                  // Room must exist AND be open (no password check via cookie)
-                  await Rooms.validate(roomIdNum, null, { isOpen: true })
-                  room = { roomId: roomIdNum }
-                  await Rooms.updateActivity(roomIdNum)
-                  log.info('User %s visiting room %d', headerUsername, roomIdNum)
-                } catch (err) {
-                  // "Locked Door" fail-safe: room closed/deleted while visiting
-                  // Clear bad cookie, fall through to home room (no crash/403)
-                  ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 })
-                  log.info('Cleared invalid visitation cookie for user %s: %s', headerUsername, (err as Error).message)
-                }
-              }
-            }
-
-            // Default: own ephemeral room (home base)
-            if (!room) {
-              room = await Rooms.getByOwnerId(user.userId)
-              if (!room) {
-                const roomId = await Rooms.createEphemeral(user.userId, user.username)
-                room = { roomId }
-              } else {
-                await Rooms.updateActivity(room.roomId)
-              }
-            }
-          }
-
-          // Get user's own room ID (for tracking visiting state)
-          let ownRoomId: number | null = null
-          if (ephemeralEnabled && !isGuest) {
-            const ownRoom = await Rooms.getByOwnerId(user.userId)
-            ownRoomId = ownRoom?.roomId ?? null
-          }
-
-          // Build JWT payload - admin from groups header takes precedence
-          const jwtPayload = {
-            userId: user.userId,
-            username: user.username,
-            name: user.name,
-            isAdmin: isAdmin || user.role === 'admin',
-            isGuest: isGuest || user.role === 'guest',
-            roomId: room?.roomId ?? null,
-            ownRoomId,
-            dateUpdated: user.dateUpdated,
-          }
-
-          // Set JWT cookie (httpOnly for security, secure in production)
-          const token = jwtSign(jwtPayload, jwtKey)
-          const isSecure = env.NODE_ENV === 'production' || env.KES_REQUIRE_PROXY === 'true'
-          ctx.cookies.set('keToken', token, {
-            httpOnly: true,
-            sameSite: 'lax',
-            secure: isSecure,
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-          })
-
-          ctx.user = jwtPayload
-          ssoProcessed = true
-        } catch (err) {
-          log.error(`Header auth failed: ${err.message}`)
-          // Fall through to JWT verification for API paths
-        }
-      }
-    }
-
-    // For non-API paths (and login/logout), we're done - no auth required
-    // The cookie has been set if SSO headers were present
+    // For non-API paths, no auth required (SPA serves index.html)
+    // Also skip auth for login/logout endpoints
     if (!path.startsWith(`${urlPath}api/`)
       || path === `${urlPath}api/login`
       || path === `${urlPath}api/logout`) {
       return next()
     }
 
-    // For API paths: if SSO didn't process, verify JWT from cookie
-    if (!ssoProcessed) {
-      try {
-        const { keToken } = parseCookie(ctx.request.header.cookie)
-        // Type assertion to match expected user context shape
-        const jwtPayload = jwtVerify(keToken, jwtKey) as {
-          userId: number | null
-          username: string | null
-          name: string | null
-          isAdmin: boolean
-          isGuest: boolean
-          roomId: number | null
-          ownRoomId?: number | null
-          dateUpdated: number | null
-        }
+    const ephemeralEnabled = process.env.KES_EPHEMERAL_ROOMS !== 'false'
 
-        // Check for room visitation cookie (allows standard users to visit other rooms)
-        // Only non-guests can visit other rooms - guests are bound to their enrollment room
-        if (!jwtPayload.isGuest && ephemeralEnabled) {
-          const visitedRoomId = ctx.cookies.get('keVisitedRoom')
-          if (visitedRoomId) {
-            const roomIdNum = parseInt(visitedRoomId, 10)
-            if (!isNaN(roomIdNum) && roomIdNum !== jwtPayload.roomId) {
-              try {
-                // Validate room exists and is open
-                await Rooms.validate(roomIdNum, null, { isOpen: true })
-                // Update roomId in the user context for this request
-                jwtPayload.roomId = roomIdNum
-                await Rooms.updateActivity(roomIdNum)
-                log.verbose('JWT user %s visiting room %d', jwtPayload.username, roomIdNum)
-              } catch (err) {
-                // Room no longer valid - clear cookie silently
-                ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 })
-                log.info('Cleared invalid visitation cookie for user %s: %s', jwtPayload.username, (err as Error).message)
-              }
+    // Verify JWT from cookie
+    try {
+      const { keToken } = parseCookie(ctx.request.header.cookie)
+      const jwtPayload = jwtVerify(keToken, jwtKey) as {
+        userId: number | null
+        username: string | null
+        name: string | null
+        isAdmin: boolean
+        isGuest: boolean
+        roomId: number | null
+        ownRoomId?: number | null
+        dateUpdated: number | null
+      }
+
+      // Room visitation (standard users can visit other rooms)
+      if (!jwtPayload.isGuest && ephemeralEnabled) {
+        const visitedRoomId = ctx.cookies.get('keVisitedRoom')
+        if (visitedRoomId) {
+          const roomIdNum = parseInt(visitedRoomId, 10)
+          if (!isNaN(roomIdNum) && roomIdNum !== jwtPayload.roomId) {
+            try {
+              await Rooms.validate(roomIdNum, null, { isOpen: true })
+              jwtPayload.roomId = roomIdNum
+              await Rooms.updateActivity(roomIdNum)
+            } catch {
+              ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 })
             }
           }
         }
+      }
 
-        ctx.user = jwtPayload
-      } catch {
-        ctx.user = {
-          dateUpdated: null,
-          isAdmin: false,
-          isGuest: false,
-          name: null,
-          roomId: null,
-          userId: null,
-          username: null,
-        }
+      ctx.user = jwtPayload
+    } catch {
+      // No valid token - anonymous user
+      ctx.user = {
+        dateUpdated: null,
+        isAdmin: false,
+        isGuest: false,
+        name: null,
+        roomId: null,
+        userId: null,
+        username: null,
       }
     }
 
-    // validated
     ctx.io = io
     ctx.startScanner = startScanner
     ctx.stopScanner = stopScanner
