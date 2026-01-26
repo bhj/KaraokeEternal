@@ -47,7 +47,8 @@ router.get('/login', async (ctx) => {
     const codeVerifier = generateCodeVerifier()
 
     // Build callback URL (must match Authentik app configuration)
-    const protocol = ctx.request.protocol
+    // Force HTTPS when behind proxy (Caddy terminates TLS)
+    const protocol = process.env.KES_REQUIRE_PROXY === 'true' ? 'https' : ctx.request.protocol
     const host = ctx.request.host
     const urlPath = process.env.KES_URL_PATH?.replace(/\/?$/, '/') || '/'
     const callbackUrl = `${protocol}://${host}${urlPath}api/auth/callback`
@@ -136,7 +137,8 @@ router.get('/callback', async (ctx) => {
     ctx.cookies.set(STATE_COOKIE, '', { maxAge: 0 })
 
     // Build the full callback URL with query params (as received from Authentik)
-    const protocol = ctx.request.protocol
+    // Force HTTPS when behind proxy (Caddy terminates TLS)
+    const protocol = process.env.KES_REQUIRE_PROXY === 'true' ? 'https' : ctx.request.protocol
     const host = ctx.request.host
     const urlPath = process.env.KES_URL_PATH?.replace(/\/?$/, '/') || '/'
     const fullCallbackUrl = `${protocol}://${host}${urlPath}api/auth/callback?code=${encodeURIComponent(code as string)}&state=${encodeURIComponent(state as string)}`
