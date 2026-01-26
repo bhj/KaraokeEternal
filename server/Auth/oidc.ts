@@ -202,8 +202,11 @@ export async function buildEndSessionUrl(
       params.set('post_logout_redirect_uri', postLogoutRedirectUri)
     }
 
-    return client.buildEndSessionUrl(config, params).href
-  } catch {
+    const url = client.buildEndSessionUrl(config, params).href
+    log('buildEndSessionUrl: success, url=%s', url)
+    return url
+  } catch (err) {
+    log('buildEndSessionUrl: error building end session URL: %s', err instanceof Error ? err.message : err)
     return null
   }
 }

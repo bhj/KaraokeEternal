@@ -12,6 +12,9 @@ import User from '../User/User.js'
 import { QUEUE_PUSH } from '../../shared/actionTypes.js'
 import { BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, PASSWORD_MIN_LENGTH, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from './User.js'
 import { isOidcConfigured, buildEndSessionUrl } from '../Auth/oidc.js'
+import getLogger from '../lib/Log.js'
+
+const log = getLogger('User')
 
 interface File {
   filepath: string
@@ -98,11 +101,15 @@ router.get('/logout', async (ctx) => {
   if (isOidcConfigured()) {
     const baseUrl = process.env.KES_PUBLIC_URL || `https://${ctx.host}`
     ssoSignoutUrl = await buildEndSessionUrl(undefined, baseUrl)
+    log('Logout: isOidcConfigured=true, baseUrl=%s, ssoSignoutUrl=%s', baseUrl, ssoSignoutUrl)
+  } else {
+    log('Logout: isOidcConfigured=false')
   }
 
   // Fallback to legacy env var if OIDC not configured or failed
   if (!ssoSignoutUrl) {
     ssoSignoutUrl = process.env.KES_SSO_SIGNOUT_URL || null
+    log('Logout: using fallback KES_SSO_SIGNOUT_URL=%s', ssoSignoutUrl)
   }
 
   ctx.body = { ssoSignoutUrl }
