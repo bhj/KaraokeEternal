@@ -181,6 +181,39 @@ export function extractUserClaims(tokenResponse: client.TokenEndpointResponse & 
 }
 
 /**
+ * Validate post_logout_redirect_uri to prevent open redirect attacks.
+ * Only allows URIs that start with KES_PUBLIC_URL.
+ * CRITICAL SECURITY: This prevents attackers from redirecting users to malicious sites after logout.
+ */
+export function validatePostLogoutRedirectUri(uri: string | null | undefined): string | null {
+  if (!uri || typeof uri !== 'string') {
+    return null
+  }
+
+  const allowedOrigin = process.env.KES_PUBLIC_URL
+  if (!allowedOrigin) {
+    log.debug('validatePostLogoutRedirectUri: KES_PUBLIC_URL not configured, rejecting redirect URI')
+    return null
+  }
+
+  // Must start exactly with KES_PUBLIC_URL (no partial match attacks like evil.com/https://good.com)
+  // Also guards against karaoke.example.com.evil.com by requiring exact match at origin boundary
+  if (!uri.startsWith(allowedOrigin)) {
+    log.debug('validatePostLogoutRedirectUri: rejected invalid redirect URI: %s (does not match %s)', uri, allowedOrigin)
+    return null
+  }
+
+  // After the origin, must either end or continue with / or ?
+  const afterOrigin = uri.slice(allowedOrigin.length)
+  if (afterOrigin && !afterOrigin.startsWith('/') && !afterOrigin.startsWith('?') && afterOrigin !== '') {
+    log.debug('validatePostLogoutRedirectUri: rejected invalid redirect URI: %s (invalid character after origin)', uri)
+    return null
+  }
+
+  return uri
+}
+
+/**
  * Build the end session URL for logout.
  */
 export async function buildEndSessionUrl(
@@ -198,15 +231,18 @@ export async function buildEndSessionUrl(
     if (idToken) {
       params.set('id_token_hint', idToken)
     }
-    if (postLogoutRedirectUri) {
-      params.set('post_logout_redirect_uri', postLogoutRedirectUri)
+
+    // CRITICAL: Validate redirect URI before using it
+    const validatedRedirectUri = validatePostLogoutRedirectUri(postLogoutRedirectUri)
+    if (validatedRedirectUri) {
+      params.set('post_logout_redirect_uri', validatedRedirectUri)
     }
 
     const url = client.buildEndSessionUrl(config, params).href
-    log('buildEndSessionUrl: success, url=%s', url)
+    log.debug('buildEndSessionUrl: success, url=%s', url)
     return url
   } catch (err) {
-    log('buildEndSessionUrl: error building end session URL: %s', err instanceof Error ? err.message : err)
+    log.debug('buildEndSessionUrl: error building end session URL: %s', err instanceof Error ? err.message : err)
     return null
   }
 }

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { generateState, validateRedirectUri, isOidcConfigured } from './oidc.js'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { generateState, validateRedirectUri, isOidcConfigured, validatePostLogoutRedirectUri } from './oidc.js'
 
 describe('OIDC Utilities', () => {
   describe('generateState', () => {
@@ -45,6 +45,53 @@ describe('OIDC Utilities', () => {
     it('should return false when env vars are not set', () => {
       // Env vars are not set in test environment
       expect(isOidcConfigured()).toBe(false)
+    })
+  })
+
+  describe('validatePostLogoutRedirectUri - CRITICAL: Open Redirect Prevention', () => {
+    let originalPublicUrl: string | undefined
+
+    beforeEach(() => {
+      originalPublicUrl = process.env.KES_PUBLIC_URL
+    })
+
+    afterEach(() => {
+      if (originalPublicUrl !== undefined) {
+        process.env.KES_PUBLIC_URL = originalPublicUrl
+      } else {
+        delete process.env.KES_PUBLIC_URL
+      }
+    })
+
+    it('should return null when KES_PUBLIC_URL is not configured', () => {
+      delete process.env.KES_PUBLIC_URL
+      expect(validatePostLogoutRedirectUri('https://anything.com/')).toBeNull()
+    })
+
+    it('should allow URIs that start with KES_PUBLIC_URL', () => {
+      process.env.KES_PUBLIC_URL = 'https://karaoke.example.com'
+      expect(validatePostLogoutRedirectUri('https://karaoke.example.com')).toBe('https://karaoke.example.com')
+      expect(validatePostLogoutRedirectUri('https://karaoke.example.com/')).toBe('https://karaoke.example.com/')
+      expect(validatePostLogoutRedirectUri('https://karaoke.example.com/library')).toBe('https://karaoke.example.com/library')
+    })
+
+    it('should reject URIs that do not start with KES_PUBLIC_URL', () => {
+      process.env.KES_PUBLIC_URL = 'https://karaoke.example.com'
+      expect(validatePostLogoutRedirectUri('https://evil.com')).toBeNull()
+      expect(validatePostLogoutRedirectUri('https://karaoke.example.com.evil.com')).toBeNull()
+      expect(validatePostLogoutRedirectUri('https://attacker.com/https://karaoke.example.com')).toBeNull()
+    })
+
+    it('should reject null and undefined URIs', () => {
+      process.env.KES_PUBLIC_URL = 'https://karaoke.example.com'
+      expect(validatePostLogoutRedirectUri(null)).toBeNull()
+      expect(validatePostLogoutRedirectUri(undefined)).toBeNull()
+      expect(validatePostLogoutRedirectUri('')).toBeNull()
+    })
+
+    it('should handle protocol-relative URLs as attacks', () => {
+      process.env.KES_PUBLIC_URL = 'https://karaoke.example.com'
+      expect(validatePostLogoutRedirectUri('//evil.com')).toBeNull()
     })
   })
 })

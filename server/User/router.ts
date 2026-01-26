@@ -88,12 +88,24 @@ router.post('/login', async (ctx) => {
   ctx.body = userCtx
 })
 
-// logout
-router.get('/logout', async (ctx) => {
-  // @todo force socket room leave
-  ctx.cookies.set('keToken', '')
-  ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 }) // Clear room visitation cookie too
+// logout - MUST be POST to prevent CSRF via img tags or link prefetching
+router.post('/logout', async (ctx) => {
+  const userId = ctx.user?.userId
+
+  // SECURITY FIX: Clear cookies with maxAge: 0 for reliable deletion
+  ctx.cookies.set('keToken', '', { maxAge: 0 })
+  ctx.cookies.set('keVisitedRoom', '', { maxAge: 0 })
   ctx.status = 200
+
+  // SECURITY FIX: Force disconnect user's sockets immediately to prevent session window
+  if (userId) {
+    const sockets = await ctx.io.fetchSockets()
+    for (const sock of sockets) {
+      if (sock.user?.userId === userId) {
+        sock.disconnect(true)
+      }
+    }
+  }
 
   let ssoSignoutUrl: string | null = null
 
@@ -101,15 +113,15 @@ router.get('/logout', async (ctx) => {
   if (isOidcConfigured()) {
     const baseUrl = process.env.KES_PUBLIC_URL || `https://${ctx.host}`
     ssoSignoutUrl = await buildEndSessionUrl(undefined, baseUrl)
-    log('Logout: isOidcConfigured=true, baseUrl=%s, ssoSignoutUrl=%s', baseUrl, ssoSignoutUrl)
+    log.debug('Logout: isOidcConfigured=true, baseUrl=%s, ssoSignoutUrl=%s', baseUrl, ssoSignoutUrl)
   } else {
-    log('Logout: isOidcConfigured=false')
+    log.debug('Logout: isOidcConfigured=false')
   }
 
   // Fallback to legacy env var if OIDC not configured or failed
   if (!ssoSignoutUrl) {
     ssoSignoutUrl = process.env.KES_SSO_SIGNOUT_URL || null
-    log('Logout: using fallback KES_SSO_SIGNOUT_URL=%s', ssoSignoutUrl)
+    log.debug('Logout: using fallback KES_SSO_SIGNOUT_URL=%s', ssoSignoutUrl)
   }
 
   ctx.body = { ssoSignoutUrl }

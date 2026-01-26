@@ -139,7 +139,7 @@ describe('User Router - createUserCtx', () => {
     })
   })
 
-  describe('GET /api/logout - OIDC integration', () => {
+  describe('POST /api/logout - OIDC integration', () => {
     it('should use OIDC logout functions from oidc.ts', async () => {
       // Test that the OIDC module exports the required functions
       const oidcModule = await import('../Auth/oidc.js')
@@ -179,6 +179,111 @@ describe('User Router - createUserCtx', () => {
       // The logout endpoint should call these functions
       expect(routerContent).toMatch(/isOidcConfigured\(\)/)
       expect(routerContent).toMatch(/buildEndSessionUrl/)
+    })
+  })
+
+  describe('POST /api/logout - Security Hardening', () => {
+    it('MEDIUM: should be POST endpoint not GET (CSRF protection)', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      type Layer = {
+        path: string
+        methods: string[]
+        stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>>
+      }
+
+      // Find the logout endpoint
+      const logoutLayer = (router as unknown as { stack: Layer[] }).stack
+        .find((l: Layer) => l.path === '/api/logout')
+
+      expect(logoutLayer).toBeDefined()
+      // Should only support POST, not GET
+      expect(logoutLayer!.methods).toContain('POST')
+      expect(logoutLayer!.methods).not.toContain('GET')
+    })
+
+    it('HIGH: should clear keToken cookie with maxAge: 0', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      type Layer = {
+        path: string
+        methods: string[]
+        stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>>
+      }
+
+      const logoutLayer = (router as unknown as { stack: Layer[] }).stack
+        .find((l: Layer) => l.path === '/api/logout' && l.methods.includes('POST'))
+
+      expect(logoutLayer).toBeDefined()
+
+      const cookieSetCalls: Array<{ name: string, value: string, options?: { maxAge?: number } }> = []
+
+      const ctx = {
+        user: { userId: 123 },
+        status: 0,
+        body: undefined as unknown,
+        io: {
+          fetchSockets: async () => [],
+        },
+        cookies: {
+          set: (name: string, value: string, options?: { maxAge?: number }) => {
+            cookieSetCalls.push({ name, value, options })
+          },
+        },
+      }
+
+      const handler = logoutLayer!.stack[logoutLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // Find the keToken cookie call
+      const keTokenCall = cookieSetCalls.find(c => c.name === 'keToken')
+      expect(keTokenCall).toBeDefined()
+      expect(keTokenCall!.value).toBe('')
+      expect(keTokenCall!.options?.maxAge).toBe(0)
+    })
+
+    it('MEDIUM: should disconnect user sockets on logout', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      type Layer = {
+        path: string
+        methods: string[]
+        stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>>
+      }
+
+      const logoutLayer = (router as unknown as { stack: Layer[] }).stack
+        .find((l: Layer) => l.path === '/api/logout' && l.methods.includes('POST'))
+
+      expect(logoutLayer).toBeDefined()
+
+      const disconnectedSockets: number[] = []
+      const mockSockets = [
+        { user: { userId: 123 }, disconnect: (close: boolean) => { if (close) disconnectedSockets.push(123) } },
+        { user: { userId: 456 }, disconnect: (close: boolean) => { if (close) disconnectedSockets.push(456) } },
+        { user: { userId: 123 }, disconnect: (close: boolean) => { if (close) disconnectedSockets.push(123) } },
+      ]
+
+      const ctx = {
+        user: { userId: 123 },
+        status: 0,
+        body: undefined as unknown,
+        io: {
+          fetchSockets: async () => mockSockets,
+        },
+        cookies: {
+          set: () => {},
+        },
+      }
+
+      const handler = logoutLayer!.stack[logoutLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      // Should have disconnected user 123's sockets (two of them), but not 456
+      expect(disconnectedSockets).toEqual([123, 123])
+      expect(disconnectedSockets).not.toContain(456)
     })
   })
 })

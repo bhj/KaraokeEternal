@@ -98,7 +98,8 @@ export const requestLogout = createAsyncThunk(
 
     try {
       // server response should clear our cookie and return SSO signout URL if configured
-      const response = await api.get<{ ssoSignoutUrl: string | null }>('logout')
+      // SECURITY: Must use POST to prevent CSRF via img tags or link prefetching
+      const response = await api.post<{ ssoSignoutUrl: string | null }>('logout')
       ssoSignoutUrl = response.ssoSignoutUrl
     } catch {
       // ignore errors
