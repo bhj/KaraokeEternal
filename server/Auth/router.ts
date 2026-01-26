@@ -147,6 +147,7 @@ router.get('/callback', async (ctx) => {
     const tokenResponse = await exchangeCode(
       fullCallbackUrl,
       stateData.codeVerifier,
+      stateData.state,
     )
 
     // Extract user claims from ID token
@@ -198,7 +199,12 @@ router.get('/callback', async (ctx) => {
     // Redirect to original destination (validated earlier)
     ctx.redirect(stateData.redirect)
   } catch (err) {
-    log.error('OIDC callback error: %s', (err as Error).message)
+    const error = err as Error & { cause?: unknown }
+    log.error('OIDC callback error: %s', error.message)
+    log.error('OIDC callback error stack: %s', error.stack)
+    if (error.cause) {
+      log.error('OIDC callback error cause: %j', error.cause)
+    }
     ctx.status = 500
     ctx.body = 'Authentication failed'
   }

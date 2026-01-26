@@ -92,16 +92,19 @@ export async function buildAuthorizationUrl(
  * Exchange authorization code for tokens.
  * @param callbackUrl - The full callback URL including code and state query params
  * @param codeVerifier - The PKCE code verifier
+ * @param expectedState - The state we sent in the authorization request
  */
 export async function exchangeCode(
   callbackUrl: string,
   codeVerifier: string,
+  expectedState: string,
 ): Promise<client.TokenEndpointResponse & client.TokenEndpointResponseHelpers> {
   const config = await getOidcConfig()
 
   // authorizationCodeGrant expects the full callback URL with query params
   return client.authorizationCodeGrant(config, new URL(callbackUrl), {
     pkceCodeVerifier: codeVerifier,
+    expectedState: expectedState,
   })
 }
 
