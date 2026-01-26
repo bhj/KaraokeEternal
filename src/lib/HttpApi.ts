@@ -1,3 +1,8 @@
+interface RequestOptions extends RequestInit {
+  body?: BodyInit | Record<string, unknown> | null
+  skipAuthRedirect?: boolean // Don't auto-redirect to login on 401
+}
+
 export default class HttpApi {
   prefix: string
   options: RequestInit
@@ -9,19 +14,20 @@ export default class HttpApi {
     }
   }
 
-  put = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('PUT', url, options)
-  post = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('POST', url, options)
-  get = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('GET', url, options)
-  delete = <T = Record<string, unknown>>(url: string, options = {}) => this.request<T>('DELETE', url, options)
+  put = <T = Record<string, unknown>>(url: string, options: RequestOptions = {}) => this.request<T>('PUT', url, options)
+  post = <T = Record<string, unknown>>(url: string, options: RequestOptions = {}) => this.request<T>('POST', url, options)
+  get = <T = Record<string, unknown>>(url: string, options: RequestOptions = {}) => this.request<T>('GET', url, options)
+  delete = <T = Record<string, unknown>>(url: string, options: RequestOptions = {}) => this.request<T>('DELETE', url, options)
 
   request = async <T = Record<string, unknown> | Response>(
     method: string,
     url: string,
-    options = {},
+    options: RequestOptions = {},
   ): Promise<T> => {
+    const { skipAuthRedirect, ...fetchOptions } = options
     const opts = {
       ...this.options,
-      ...options,
+      ...fetchOptions,
       method,
     }
 
@@ -38,7 +44,8 @@ export default class HttpApi {
 
     // Auto-redirect to OIDC login on 401 (Unauthorized)
     // This enables seamless SSO: protected API → 401 → login → callback → original page
-    if (res.status === 401) {
+    // Skip redirect for session checks (let caller handle 401 gracefully)
+    if (res.status === 401 && !skipAuthRedirect) {
       const redirect = encodeURIComponent(window.location.pathname + window.location.search)
       window.location.href = `${document.baseURI}api/auth/login?redirect=${redirect}`
       // Throw to stop execution (redirect will navigate away)

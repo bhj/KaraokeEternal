@@ -37,18 +37,20 @@ export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
       })
 
       // Race between the actual API call and the timeout
+      // Use skipAuthRedirect to prevent 401 from triggering OIDC login redirect
+      // (guests and unauthenticated users should stay on the current page)
       const user = await Promise.race([
-        api.get('user'),
+        api.get('user', { skipAuthRedirect: true }),
         timeoutPromise,
       ])
 
-      // Server returned valid user - we have a session from SSO header auth
+      // Server returned valid user - we have a session
       thunkAPI.dispatch(receiveAccount(user))
       thunkAPI.dispatch(fetchPrefs())
       thunkAPI.dispatch(connectSocket())
       socket.open()
     } catch {
-      // No valid session, timeout, or network error - expected for users without SSO/header auth
+      // No valid session, timeout, or network error - expected for unauthenticated users
     } finally {
       thunkAPI.dispatch(bootstrapComplete())
     }
