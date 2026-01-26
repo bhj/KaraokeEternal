@@ -36,6 +36,15 @@ export default class HttpApi {
 
     const res = await fetch(`${document.baseURI}api/${this.prefix}${url}`, opts)
 
+    // Auto-redirect to OIDC login on 401 (Unauthorized)
+    // This enables seamless SSO: protected API → 401 → login → callback → original page
+    if (res.status === 401) {
+      const redirect = encodeURIComponent(window.location.pathname + window.location.search)
+      window.location.href = `${document.baseURI}api/auth/login?redirect=${redirect}`
+      // Throw to stop execution (redirect will navigate away)
+      throw new Error('Unauthorized - redirecting to login')
+    }
+
     if (res.ok) {
       const contentType = res.headers.get('content-type')
       if (!contentType?.includes('application/json')) {

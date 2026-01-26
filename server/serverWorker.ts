@@ -16,6 +16,7 @@ import koaRange from 'koa-range'
 import koaStatic from 'koa-static'
 import Media from './Media/Media.js'
 import Prefs from './Prefs/Prefs.js'
+import authRouter from './Auth/router.js'
 import guestRouter from './Guest/router.js'
 import libraryRouter from './Library/router.js'
 import mediaRouter from './Media/router.js'
@@ -32,6 +33,7 @@ import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from
 import User from './User/User.js'
 import Rooms from './Rooms/Rooms.js'
 import { createProxyValidator } from './lib/proxyValidator.js'
+import { isPublicApiPath } from './lib/publicPaths.js'
 
 const { sign: jwtSign } = jsonWebToken
 
@@ -437,11 +439,35 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     await next()
   })
 
+  // API Gatekeeper: Return 401 for unauthenticated API requests (except public paths)
+  // This enables OIDC auth flow - client gets 401 → redirects to /api/auth/login
+  app.use(async (ctx, next) => {
+    // Only gate API paths
+    if (!ctx.path.startsWith(urlPath + 'api/')) {
+      return next()
+    }
+
+    // Allow public API paths without authentication
+    if (isPublicApiPath(ctx.path, urlPath)) {
+      return next()
+    }
+
+    // Require authentication for all other API paths
+    if (!ctx.user?.userId) {
+      ctx.status = 401
+      ctx.body = 'Unauthorized'
+      return
+    }
+
+    await next()
+  })
+
   // http api endpoints
   const baseRouter = new koaRouter({
     prefix: urlPath.replace(/\/$/, ''), // avoid double slashes with /api prefix
   })
 
+  baseRouter.use(authRouter.routes())
   baseRouter.use(guestRouter.routes())
   baseRouter.use(libraryRouter.routes())
   baseRouter.use(mediaRouter.routes())

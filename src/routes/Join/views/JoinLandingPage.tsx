@@ -23,6 +23,7 @@ interface PublicPrefs {
 const JoinLandingPage = () => {
   const [searchParams] = useSearchParams()
   const itoken = searchParams.get('itoken')
+  const roomIdParam = searchParams.get('roomId')
   const guestName = searchParams.get('guest_name')
 
   const { userId } = useAppSelector(state => state.user)
@@ -35,6 +36,30 @@ const JoinLandingPage = () => {
 
   // Fetch room info and public config on mount
   useEffect(() => {
+    // If we have a roomId but no itoken, redirect to SSO login
+    // This handles unauthenticated users who came from a roomId link
+    if (!itoken && roomIdParam) {
+      // Fetch public prefs to get SSO login URL
+      api.get<PublicPrefs>('prefs/public')
+        .then((prefs) => {
+          if (prefs.ssoLoginUrl) {
+            // Redirect to SSO with return to library (where RoomJoinPrompt will show)
+            const returnUrl = `/library?roomId=${roomIdParam}`
+            // Use 'redirect' for app-managed OIDC, 'rd' for Authentik outpost
+            const redirectParam = prefs.ssoLoginUrl.startsWith('/api/') ? 'redirect' : 'rd'
+            window.location.href = `${prefs.ssoLoginUrl}?${redirectParam}=${encodeURIComponent(returnUrl)}`
+          } else {
+            // No SSO configured - redirect to account page
+            window.location.href = `/account?redirect=${encodeURIComponent(`/library?roomId=${roomIdParam}`)}`
+          }
+        })
+        .catch(() => {
+          setError('Failed to load configuration')
+          setLoading(false)
+        })
+      return
+    }
+
     if (!itoken) {
       setError('Invalid invitation link')
       setLoading(false)
@@ -67,14 +92,16 @@ const JoinLandingPage = () => {
     }
   }, [userId, itoken, roomInfo])
 
-  // Handle "Login with Account" - redirect to non-bypassed route for session establishment
+  // Handle "Login with Account" - redirect to OIDC login for session establishment
   const handleLoginWithAccount = () => {
     if (!config?.ssoLoginUrl || !roomInfo) return
 
-    // Return to /library?roomId=X (not bypassed) so forward_auth establishes session
+    // Return to /library?roomId=X after login
     // App.tsx handles roomId param and shows RoomJoinPrompt for standard users
     const returnUrl = `/library?roomId=${roomInfo.roomId}`
-    const loginUrl = `${config.ssoLoginUrl}?rd=${encodeURIComponent(returnUrl)}`
+    // Use 'redirect' for app-managed OIDC, 'rd' for Authentik outpost
+    const redirectParam = config.ssoLoginUrl.startsWith('/api/') ? 'redirect' : 'rd'
+    const loginUrl = `${config.ssoLoginUrl}?${redirectParam}=${encodeURIComponent(returnUrl)}`
     window.location.href = loginUrl
   }
 

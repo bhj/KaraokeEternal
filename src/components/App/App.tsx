@@ -4,9 +4,6 @@ import store, { RootState } from 'store/store'
 import CoreLayout from './CoreLayout/CoreLayout'
 import Spinner from '../Spinner/Spinner'
 import RoomJoinPrompt from '../RoomJoinPrompt/RoomJoinPrompt'
-import HttpApi from 'lib/HttpApi'
-
-const api = new HttpApi('rooms')
 
 // Inner component that can use hooks to check bootstrap state
 const AppContent = () => {
@@ -38,21 +35,9 @@ const AppContent = () => {
           : window.location.pathname
         window.history.replaceState({}, '', cleanUrl)
 
-        // Check if SSO enrollment is available for this room
-        api.get<{ enrollmentUrl: string | null }>(`/${targetId}/enrollment`)
-          .then(({ enrollmentUrl }) => {
-            if (enrollmentUrl) {
-              // Redirect to SSO enrollment
-              window.location.href = enrollmentUrl
-            } else {
-              // No SSO - show normal login flow
-              setIsRedirecting(false)
-            }
-          })
-          .catch(() => {
-            // Error or room not found - show normal login flow
-            setIsRedirecting(false)
-          })
+        // Redirect to join landing page for unauthenticated users with roomId
+        // The join page handles SSO login initiation
+        window.location.href = `${document.baseURI}join?roomId=${targetId}`
       }
     }
   }, [isBootstrapping, userId])

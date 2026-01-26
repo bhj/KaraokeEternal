@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
 import fse from 'fs-extra'
+import { PUBLIC_API_PATHS, isPublicApiPath } from './lib/publicPaths.js'
 
 const TEST_DB_PATH = '/tmp/karaoke-eternal-test-server-worker.sqlite'
 
@@ -324,5 +325,101 @@ describe('serverWorker - SSO Header Processing', () => {
       expect(guest.name).toBe('Alice')
       expect(guest.role).toBe('guest')
     })
+  })
+})
+
+describe('API Gatekeeper - Public Paths', () => {
+  it('should allow unauthenticated access to public paths', () => {
+    const publicPaths = [
+      '/api/login',
+      '/api/logout',
+      '/api/guest/join',
+      '/api/rooms/join/validate',
+      '/api/setup',
+      '/api/prefs/public',
+      '/api/auth/login',
+      '/api/auth/callback',
+    ]
+
+    for (const path of publicPaths) {
+      expect(isPublicApiPath(path, '/')).toBe(true)
+    }
+  })
+
+  it('should require authentication for protected API paths', () => {
+    const protectedPaths = [
+      '/api/user',
+      '/api/rooms',
+      '/api/library',
+      '/api/queue',
+      '/api/prefs',
+    ]
+
+    for (const path of protectedPaths) {
+      expect(isPublicApiPath(path, '/')).toBe(false)
+    }
+  })
+
+  it('should handle URL path prefix correctly', () => {
+    // With /karaoke/ prefix
+    expect(isPublicApiPath('/karaoke/api/login', '/karaoke/')).toBe(true)
+    expect(isPublicApiPath('/karaoke/api/user', '/karaoke/')).toBe(false)
+    expect(isPublicApiPath('/karaoke/api/prefs/public', '/karaoke/')).toBe(true)
+    expect(isPublicApiPath('/karaoke/api/prefs', '/karaoke/')).toBe(false)
+  })
+
+  it('should export PUBLIC_API_PATHS constant', () => {
+    expect(Array.isArray(PUBLIC_API_PATHS)).toBe(true)
+    expect(PUBLIC_API_PATHS.length).toBeGreaterThan(0)
+    expect(PUBLIC_API_PATHS).toContain('/api/login')
+    expect(PUBLIC_API_PATHS).toContain('/api/auth/login')
+    expect(PUBLIC_API_PATHS).toContain('/api/auth/callback')
+  })
+})
+
+describe('API Gatekeeper - Middleware Behavior', () => {
+  /**
+   * Test the gatekeeper middleware logic directly.
+   * This simulates how the middleware decides to return 401 or continue.
+   */
+  it('should return 401 for unauthenticated requests to protected API paths', () => {
+    // Simulate the gatekeeper middleware logic
+    const gatekeeperCheck = (path: string, userId: number | null, urlPath: string) => {
+      // Not an API path - allow
+      if (!path.startsWith(urlPath + 'api/')) {
+        return { shouldBlock: false }
+      }
+
+      // Public API path - allow
+      if (isPublicApiPath(path, urlPath)) {
+        return { shouldBlock: false }
+      }
+
+      // Protected path without auth - block
+      if (!userId) {
+        return { shouldBlock: true, status: 401 }
+      }
+
+      return { shouldBlock: false }
+    }
+
+    // Test protected path without auth
+    expect(gatekeeperCheck('/api/user', null, '/')).toEqual({ shouldBlock: true, status: 401 })
+    expect(gatekeeperCheck('/api/rooms', null, '/')).toEqual({ shouldBlock: true, status: 401 })
+    expect(gatekeeperCheck('/api/library', null, '/')).toEqual({ shouldBlock: true, status: 401 })
+
+    // Test protected path WITH auth
+    expect(gatekeeperCheck('/api/user', 123, '/')).toEqual({ shouldBlock: false })
+    expect(gatekeeperCheck('/api/rooms', 456, '/')).toEqual({ shouldBlock: false })
+
+    // Test public paths (no auth needed)
+    expect(gatekeeperCheck('/api/login', null, '/')).toEqual({ shouldBlock: false })
+    expect(gatekeeperCheck('/api/prefs/public', null, '/')).toEqual({ shouldBlock: false })
+    expect(gatekeeperCheck('/api/auth/login', null, '/')).toEqual({ shouldBlock: false })
+    expect(gatekeeperCheck('/api/auth/callback', null, '/')).toEqual({ shouldBlock: false })
+
+    // Test non-API paths (always allowed, auth handled client-side)
+    expect(gatekeeperCheck('/library', null, '/')).toEqual({ shouldBlock: false })
+    expect(gatekeeperCheck('/', null, '/')).toEqual({ shouldBlock: false })
   })
 })

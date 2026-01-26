@@ -148,7 +148,14 @@ const SignedOutView = () => {
         <h1>Sign in</h1>
         <Button
           variant='primary'
-          onClick={() => { window.location.href = ssoConfig.ssoLoginUrl! }}
+          onClick={() => {
+            // Pass current path as redirect to return here after login
+            const redirect = encodeURIComponent(window.location.pathname + window.location.search)
+            const loginUrl = ssoConfig.ssoLoginUrl!.startsWith('/api/')
+              ? `${ssoConfig.ssoLoginUrl}?redirect=${redirect}`
+              : `${ssoConfig.ssoLoginUrl}?rd=${redirect}` // Authentik outpost uses 'rd'
+            window.location.href = loginUrl
+          }}
         >
           Login with SSO
         </Button>
