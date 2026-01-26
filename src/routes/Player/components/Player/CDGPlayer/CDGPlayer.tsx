@@ -1,9 +1,6 @@
 import React from 'react'
 import CDGraphics from 'cdgraphics'
-import HttpApi from 'lib/HttpApi'
 import styles from './CDGPlayer.css'
-
-const api = new HttpApi('media')
 const BACKDROP_PADDING = 10 // px at 1:1 scale
 const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue('--border-radius'))
 
@@ -130,8 +127,12 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
     // load .cdg file
     try {
-      const response = await api.get(`/${this.props.mediaId}?type=cdg`)
-      if (!(response instanceof Response)) return
+      const response = await fetch(`${document.baseURI}api/media/${this.props.mediaId}?type=cdg`, {
+        credentials: 'same-origin'
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch CDG: ${response.status}`)
+      }
       const buffer = await response.arrayBuffer()
       // in case we've unmounted by this point
       if (!this.audio.current) return
