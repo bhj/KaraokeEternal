@@ -334,7 +334,8 @@ describe('API Gatekeeper - Public Paths', () => {
       '/api/login',
       '/api/logout',
       '/api/guest/join',
-      '/api/rooms/join/validate',
+      '/api/rooms/join', // Base path for join endpoints
+      '/api/rooms/join/validate', // Should also match via prefix
       '/api/setup',
       '/api/prefs/public',
       '/api/auth/login',
@@ -344,6 +345,17 @@ describe('API Gatekeeper - Public Paths', () => {
     for (const path of publicPaths) {
       expect(isPublicApiPath(path, '/')).toBe(true)
     }
+  })
+
+  it('should allow unauthenticated access to Smart QR join endpoint', () => {
+    // Smart QR endpoint: /api/rooms/join/:roomId/:inviteCode
+    // This must be public so guests can scan QR codes without being authenticated
+    expect(isPublicApiPath('/api/rooms/join/118/abc123', '/')).toBe(true)
+    expect(isPublicApiPath('/api/rooms/join/1/test-token', '/')).toBe(true)
+    expect(isPublicApiPath('/api/rooms/join/999/invite-code-here', '/')).toBe(true)
+
+    // Should also work with URL path prefix
+    expect(isPublicApiPath('/karaoke/api/rooms/join/118/abc123', '/karaoke/')).toBe(true)
   })
 
   it('should require authentication for protected API paths', () => {

@@ -138,4 +138,47 @@ describe('User Router - createUserCtx', () => {
       expect((ctx.body as { ownRoomId?: number | null }).ownRoomId).toBeNull()
     })
   })
+
+  describe('GET /api/logout - OIDC integration', () => {
+    it('should use OIDC logout functions from oidc.ts', async () => {
+      // Test that the OIDC module exports the required functions
+      const oidcModule = await import('../Auth/oidc.js')
+
+      expect(typeof oidcModule.isOidcConfigured).toBe('function')
+      expect(typeof oidcModule.buildEndSessionUrl).toBe('function')
+
+      // isOidcConfigured should check environment variables
+      const originalIssuerUrl = process.env.KES_OIDC_ISSUER_URL
+      const originalClientId = process.env.KES_OIDC_CLIENT_ID
+      const originalClientSecret = process.env.KES_OIDC_CLIENT_SECRET
+
+      // When env vars are not set, should return false
+      delete process.env.KES_OIDC_ISSUER_URL
+      delete process.env.KES_OIDC_CLIENT_ID
+      delete process.env.KES_OIDC_CLIENT_SECRET
+      expect(oidcModule.isOidcConfigured()).toBe(false)
+
+      // Restore env vars
+      if (originalIssuerUrl) process.env.KES_OIDC_ISSUER_URL = originalIssuerUrl
+      if (originalClientId) process.env.KES_OIDC_CLIENT_ID = originalClientId
+      if (originalClientSecret) process.env.KES_OIDC_CLIENT_SECRET = originalClientSecret
+    })
+
+    it('should import OIDC functions in router for logout endpoint', async () => {
+      // Read the router.ts file and verify it imports OIDC functions
+      const fs = await import('fs/promises')
+      const routerContent = await fs.readFile(
+        new URL('./router.ts', import.meta.url).pathname.replace('/router.test.ts', '/router.ts'),
+        'utf-8',
+      )
+
+      // The router should import these OIDC functions
+      expect(routerContent).toMatch(/import.*isOidcConfigured.*from.*oidc/i)
+      expect(routerContent).toMatch(/import.*buildEndSessionUrl.*from.*oidc/i)
+
+      // The logout endpoint should call these functions
+      expect(routerContent).toMatch(/isOidcConfigured\(\)/)
+      expect(routerContent).toMatch(/buildEndSessionUrl/)
+    })
+  })
 })

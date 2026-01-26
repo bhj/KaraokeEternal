@@ -6,10 +6,10 @@ export const PUBLIC_API_PATHS = [
   '/api/login',
   '/api/logout',
   '/api/guest/join',
-  '/api/rooms/join/validate',
+  '/api/rooms/join', // Smart QR + validate (covers /api/rooms/join/*)
   '/api/setup',
   '/api/prefs/public',
-  '/api/auth/login',    // OIDC login initiation
+  '/api/auth/login', // OIDC login initiation
   '/api/auth/callback', // OIDC callback handler
 ]
 
