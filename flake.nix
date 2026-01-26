@@ -13,6 +13,44 @@
         nodejs = pkgs.nodejs_24;
       in
       {
+        # Production package
+        packages.default = pkgs.buildNpmPackage rec {
+          pname = "karaoke-eternal-automated";
+          version = "unstable-2026-01-24-2";
+
+          src = ./.;
+
+          inherit nodejs;
+          npmDepsHash = "sha256-Unt71lHNRwtNnwZitzIJyi+DnR93v/WYcWaYHV6tGK0=";
+
+          nativeBuildInputs = with pkgs; [ python3 gnumake gcc ];
+
+          buildPhase = ''
+            runHook preBuild
+            npm run build
+            runHook postBuild
+          '';
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/{bin,lib/karaoke-eternal}
+            cp -r build assets package.json node_modules $out/lib/karaoke-eternal/
+
+            cat > $out/bin/karaoke-eternal << EOF
+            #!${pkgs.bash}/bin/bash
+            exec ${nodejs}/bin/node $out/lib/karaoke-eternal/build/server/main.js "\$@"
+            EOF
+            chmod +x $out/bin/karaoke-eternal
+            runHook postInstall
+          '';
+
+          meta = with pkgs.lib; {
+            description = "Karaoke Eternal with Authentik header auth";
+            homepage = "https://github.com/Zardoz8901/KaraokeEternalAutomated";
+            license = licenses.isc;
+          };
+        };
+
         # Development shell
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
