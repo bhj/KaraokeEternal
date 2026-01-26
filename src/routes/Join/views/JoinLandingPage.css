@@ -35,17 +35,16 @@
   margin-bottom: var(--space-l);
 }
 
-.guestPreview {
+.guestIdentity {
   margin-bottom: var(--space-xl);
-  padding: var(--space-m);
-  background: hsla(var(--hue-blue), 20%, 20%, 0.5);
-  border-radius: var(--border-radius);
+  text-align: center;
 }
 
 .guestName {
-  font-size: var(--font-size-l);
+  font-size: var(--font-size-xl);
   font-weight: bold;
   color: hsl(var(--hue-green), 60%, 60%);
+  margin: 0;
 }
 
 .buttons {

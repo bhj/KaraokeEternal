@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import screenfull from 'screenfull'
 import combinedReducer from 'store/reducers'
 import { useAppSelector, useAppDispatch } from 'store/hooks'
@@ -12,6 +12,11 @@ const PlayerView = () => {
   const { innerWidth, innerHeight, headerHeight, footerHeight } = useAppSelector(state => state.ui)
   const viewportHeight = innerHeight - headerHeight - footerHeight
   const dispatch = useAppDispatch()
+  const [showAudioOverlay, setShowAudioOverlay] = useState(true)
+
+  const handleEnableAudio = () => {
+    setShowAudioOverlay(false)
+  }
 
   // @todo: find better place for this?
   if (!useAppSelector(state => state.player)) {
@@ -32,6 +37,13 @@ const PlayerView = () => {
 
   return (
     <div style={{ overflow: 'hidden' }}>
+      {showAudioOverlay && (
+        <div className={styles.audioOverlay} onClick={handleEnableAudio}>
+          <div className={styles.audioOverlayContent}>
+            <p>Click anywhere to enable audio</p>
+          </div>
+        </div>
+      )}
       <div
         id='player-fs-container'
         className={styles.container}

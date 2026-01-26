@@ -155,21 +155,20 @@ const JoinLandingPage = () => {
       <p className={styles.roomName}>{roomInfo.roomName}</p>
 
       {guestName && (
-        <div className={styles.guestPreview}>
-          <p>Join as</p>
+        <div className={styles.guestIdentity}>
           <p className={styles.guestName}>{guestName}</p>
         </div>
       )}
 
       <div className={styles.buttons}>
-        {config?.ssoLoginUrl && (
-          <Button onClick={handleLoginWithAccount} variant='primary' disabled={joining}>
-            Login with Account
+        {guestName && (
+          <Button onClick={handleJoinAsGuest} variant='primary' disabled={joining}>
+            {joining ? 'Joining...' : 'Join as Guest'}
           </Button>
         )}
-        {guestName && (
-          <Button onClick={handleJoinAsGuest} variant='default' disabled={joining}>
-            {joining ? 'Joining...' : `Join as ${guestName}`}
+        {config?.ssoLoginUrl && (
+          <Button onClick={handleLoginWithAccount} variant='default' disabled={joining}>
+            Login with Account
           </Button>
         )}
       </div>
