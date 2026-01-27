@@ -28,7 +28,7 @@ interface SongItemProps {
   filterKeywords: string[]
 }
 
-const SongItem = ({
+const SongItem = React.memo(({
   songId,
   artist,
   title,
@@ -113,6 +113,8 @@ const SongItem = ({
       </Buttons>
     </div>
   )
-}
+})
+
+SongItem.displayName = 'SongItem'
 
 export default SongItem

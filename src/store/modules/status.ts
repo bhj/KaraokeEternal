@@ -1,4 +1,4 @@
-import { createAction, createReducer } from '@reduxjs/toolkit'
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { type PlayerVisualizerState } from 'routes/Player/modules/playerVisualizer'
 import {
   PLAYER_REQ_NEXT,
@@ -13,40 +13,7 @@ import {
 import { MediaType, PlaybackOptions } from 'shared/types'
 
 // ------------------------------------
-// Actions
-// ------------------------------------
-export const requestPlay = createAction(PLAYER_REQ_PLAY)
-export const requestPause = createAction(PLAYER_REQ_PAUSE)
-export const requestPlayNext = createAction(PLAYER_REQ_NEXT)
-const playerStatus = createAction<object>(PLAYER_STATUS)
-const playerLeave = createAction(PLAYER_LEAVE)
-
-export const requestReplay = createAction(PLAYER_REQ_REPLAY, (queueId: number) => ({
-  payload: { queueId },
-}))
-
-export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
-  payload: vol,
-  meta: {
-    throttle: {
-      wait: 200,
-      leading: false,
-    },
-  },
-}))
-
-export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOptions) => ({
-  payload: opts,
-  meta: {
-    throttle: {
-      wait: 200,
-      leading: true,
-    },
-  },
-}))
-
-// ------------------------------------
-// Reducer
+// State & Slice
 // ------------------------------------
 interface StatusState {
   cdgAlpha: number
@@ -72,7 +39,7 @@ const initialState: StatusState = {
   cdgAlpha: 0,
   cdgSize: 0.8,
   errorMessage: '',
-  historyJSON: '[]', // queueIds in JSON array
+  historyJSON: '[]',
   isAtQueueEnd: false,
   isErrored: false,
   isPlayerPresent: false,
@@ -88,16 +55,50 @@ const initialState: StatusState = {
   volume: 1,
 }
 
-const statusReducer = createReducer(initialState, (builder) => {
-  builder
-    .addCase(playerLeave, (state) => {
-      state.isPlayerPresent = false
-    })
-    .addCase(playerStatus, (state, { payload }) => ({
-      ...state,
-      ...payload,
-      isPlayerPresent: true,
-    }))
+const statusSlice = createSlice({
+  name: 'status',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(PLAYER_LEAVE, (state) => {
+        state.isPlayerPresent = false
+      })
+      .addCase(PLAYER_STATUS, (state, action: PayloadAction<Partial<StatusState>>) => ({
+        ...state,
+        ...action.payload,
+        isPlayerPresent: true,
+      }))
+  },
 })
 
-export default statusReducer
+// Actions with specific action types for socket middleware
+export const requestPlay = createAction(PLAYER_REQ_PLAY)
+export const requestPause = createAction(PLAYER_REQ_PAUSE)
+export const requestPlayNext = createAction(PLAYER_REQ_NEXT)
+
+export const requestReplay = createAction(PLAYER_REQ_REPLAY, (queueId: number) => ({
+  payload: { queueId },
+}))
+
+export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
+  payload: vol,
+  meta: {
+    throttle: {
+      wait: 200,
+      leading: false,
+    },
+  },
+}))
+
+export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOptions) => ({
+  payload: opts,
+  meta: {
+    throttle: {
+      wait: 200,
+      leading: true,
+    },
+  },
+}))
+
+export default statusSlice.reducer

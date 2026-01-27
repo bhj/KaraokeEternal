@@ -1,4 +1,4 @@
-import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
+import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import socket from 'lib/socket'
 import AppRouter from 'lib/AppRouter'
 import { RootState } from 'store/store'
@@ -9,7 +9,6 @@ import {
   ACCOUNT_REQUEST,
   ACCOUNT_CREATE,
   ACCOUNT_UPDATE,
-  BOOTSTRAP_COMPLETE,
   LOGIN,
   LOGOUT,
   SOCKET_AUTH_ERROR,
@@ -19,183 +18,8 @@ import {
 const api = new HttpApi('')
 const basename = new URL(document.baseURI).pathname
 
-const receiveAccount = createAction<object>(ACCOUNT_RECEIVE)
-export const bootstrapComplete = createAction(BOOTSTRAP_COMPLETE)
-
 // ------------------------------------
-// Check for existing SSO session on bootstrap
-// ------------------------------------
-const SESSION_CHECK_TIMEOUT_MS = 5000 // 5 second timeout to prevent perpetual loading
-
-export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
-  'user/CHECK_SESSION',
-  async (_, thunkAPI) => {
-    try {
-      // Create a timeout promise to prevent perpetual loading if server is unreachable
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Session check timeout')), SESSION_CHECK_TIMEOUT_MS)
-      })
-
-      // Race between the actual API call and the timeout
-      // Use skipAuthRedirect to prevent 401 from triggering OIDC login redirect
-      // (guests and unauthenticated users should stay on the current page)
-      const user = await Promise.race([
-        api.get('user', { skipAuthRedirect: true }),
-        timeoutPromise,
-      ])
-
-      // Server returned valid user - we have a session
-      thunkAPI.dispatch(receiveAccount(user))
-      thunkAPI.dispatch(fetchPrefs())
-      thunkAPI.dispatch(connectSocket())
-      socket.open()
-    } catch {
-      // No valid session, timeout, or network error - expected for unauthenticated users
-    } finally {
-      thunkAPI.dispatch(bootstrapComplete())
-    }
-  },
-)
-
-// ------------------------------------
-// Login
-// ------------------------------------
-export const login = createAsyncThunk(
-  LOGIN,
-  async (creds: object, thunkAPI) => {
-    // calls api endpoint that should set an httpOnly cookie with
-    // our JWT, then establish the sockiet.io connection
-    const user = await api.post('login', {
-      body: creds,
-    })
-
-    thunkAPI.dispatch(receiveAccount(user))
-    thunkAPI.dispatch(fetchPrefs())
-    thunkAPI.dispatch(connectSocket())
-    socket.open()
-
-    // redirect in query string?
-    const redirect = new URLSearchParams(window.location.search).get('redirect')
-
-    if (redirect) {
-      AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
-    }
-  },
-)
-
-// ------------------------------------
-// Logout
-// ------------------------------------
-const logoutStart = createAction('user/LOGOUT_START')
-
-export const requestLogout = createAsyncThunk(
-  LOGOUT,
-  async (_, thunkAPI) => {
-    thunkAPI.dispatch(logoutStart())
-
-    let ssoSignoutUrl: string | null = null
-
-    try {
-      // server response should clear our cookie and return SSO signout URL if configured
-      // SECURITY: Must use POST to prevent CSRF via img tags or link prefetching
-      const response = await api.post<{ ssoSignoutUrl: string | null }>('logout')
-      ssoSignoutUrl = response.ssoSignoutUrl
-    } catch {
-      // ignore errors
-    }
-
-    // Close socket before redirect - don't dispatch logout() as it resets Redux state
-    // and causes re-renders that can trigger 401 redirects before navigation completes
-    socket.close()
-
-    // If SSO is configured, redirect to IdP signout to terminate the SSO session
-    // This prevents the "logout loop" where SSO re-authenticates immediately
-    if (ssoSignoutUrl) {
-      window.location.href = ssoSignoutUrl
-    } else {
-      window.location.href = '/'
-    }
-  },
-)
-
-// ------------------------------------
-// Create account
-// ------------------------------------
-export const createAccount = createAsyncThunk<void, FormData, { state: RootState }>(
-  ACCOUNT_CREATE,
-  async (data: FormData, thunkAPI) => {
-    const isFirstRun = thunkAPI.getState().prefs.isFirstRun
-
-    const user = await api.post(isFirstRun ? 'setup' : 'user', {
-      body: data,
-    })
-
-    thunkAPI.dispatch(receiveAccount(user))
-    thunkAPI.dispatch(fetchPrefs())
-    thunkAPI.dispatch(connectSocket())
-    socket.open()
-
-    // redirect in query string?
-    const redirect = new URLSearchParams(window.location.search).get('redirect')
-
-    if (redirect) {
-      AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
-    }
-  },
-)
-
-// ------------------------------------
-// Update account
-// ------------------------------------
-export const updateAccount = createAsyncThunk<void, FormData, { state: RootState }>(
-  ACCOUNT_UPDATE,
-  async (data: FormData, thunkAPI) => {
-    const { userId } = thunkAPI.getState().user
-
-    const user = await api.put(`user/${userId}`, {
-      body: data,
-    })
-
-    thunkAPI.dispatch(receiveAccount(user))
-    alert('Account updated successfully.')
-  },
-)
-
-// ------------------------------------
-// Request account (does not refresh JWT)
-// ------------------------------------
-export const fetchAccount = createAsyncThunk(
-  ACCOUNT_REQUEST,
-  async (_, thunkAPI) => {
-    try {
-      const user = await api.get('user')
-      thunkAPI.dispatch(receiveAccount(user))
-    } catch {
-      // ignore errors
-    }
-  },
-)
-
-// ------------------------------------
-// Socket actions
-// ------------------------------------
-const requestSocketConnect = createAction<object>(SOCKET_REQUEST_CONNECT)
-
-export const connectSocket = createAsyncThunk<void, void, { state: RootState }>(
-  'user/SOCKET_CONNECT',
-  async (_, { dispatch, getState }) => {
-    const versions = {
-      library: getState().library.version,
-      stars: getState().starCounts.version,
-    }
-
-    dispatch(requestSocketConnect(versions))
-    socket.io.opts.query = versions
-  },
-)
-
-// ------------------------------------
-// Reducer
+// State & Slice
 // ------------------------------------
 interface UserState {
   userId: number | null
@@ -227,31 +51,170 @@ const initialState: UserState = {
   dateUpdated: 0,
 }
 
-const userReducer = createReducer(initialState, (builder) => {
-  builder
-    .addCase(receiveAccount, (state, { payload }) => ({
-      ...state,
-      ...payload,
-    }))
-    .addCase(bootstrapComplete, state => ({
-      ...state,
-      isBootstrapping: false,
-    }))
-    .addCase(logoutStart, state => ({
-      ...state,
-      isLoggingOut: true,
-    }))
-    .addCase(LOGOUT, () => ({
-      ...initialState,
-      isBootstrapping: false,
-      isLoggingOut: false,
-    }))
-    .addCase(SOCKET_AUTH_ERROR, () => ({
-      ...initialState,
-      isBootstrapping: false,
-    }))
+const userSlice = createSlice({
+  name: 'user',
+  initialState,
+  reducers: {
+    logoutStart: (state) => {
+      state.isLoggingOut = true
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(ACCOUNT_RECEIVE, (state, action: PayloadAction<Partial<UserState>>) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase('user/BOOTSTRAP_COMPLETE', (state) => {
+        state.isBootstrapping = false
+      })
+      .addCase(LOGOUT, () => ({
+        ...initialState,
+        isBootstrapping: false,
+        isLoggingOut: false,
+      }))
+      .addCase(SOCKET_AUTH_ERROR, () => ({
+        ...initialState,
+        isBootstrapping: false,
+      }))
+  },
 })
+
+// Extract internal actions from slice
+const { logoutStart } = userSlice.actions
+
+// Actions with specific action types for socket middleware compatibility
+const receiveAccount = createAction<Partial<UserState>>(ACCOUNT_RECEIVE)
+export const bootstrapComplete = createAction('user/BOOTSTRAP_COMPLETE')
+const requestSocketConnect = createAction<object>(SOCKET_REQUEST_CONNECT)
+
+// ------------------------------------
+// Async Thunks
+// ------------------------------------
+const SESSION_CHECK_TIMEOUT_MS = 5000 // 5 second timeout to prevent perpetual loading
+
+export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
+  'user/CHECK_SESSION',
+  async (_, thunkAPI) => {
+    try {
+      const timeoutPromise = new Promise<never>((_resolve, reject) => {
+        setTimeout(() => reject(new Error('Session check timeout')), SESSION_CHECK_TIMEOUT_MS)
+      })
+
+      const user = await Promise.race([
+        api.get('user', { skipAuthRedirect: true }),
+        timeoutPromise,
+      ])
+
+      thunkAPI.dispatch(receiveAccount(user))
+      thunkAPI.dispatch(fetchPrefs())
+      thunkAPI.dispatch(connectSocket())
+      socket.open()
+    } catch {
+      // No valid session, timeout, or network error - expected for unauthenticated users
+    } finally {
+      thunkAPI.dispatch(bootstrapComplete())
+    }
+  },
+)
+
+export const login = createAsyncThunk(
+  LOGIN,
+  async (creds: object, thunkAPI) => {
+    const user = await api.post('login', { body: creds })
+
+    thunkAPI.dispatch(receiveAccount(user))
+    thunkAPI.dispatch(fetchPrefs())
+    thunkAPI.dispatch(connectSocket())
+    socket.open()
+
+    const redirect = new URLSearchParams(window.location.search).get('redirect')
+    if (redirect) {
+      AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
+    }
+  },
+)
+
+export const requestLogout = createAsyncThunk(
+  LOGOUT,
+  async (_, thunkAPI) => {
+    thunkAPI.dispatch(logoutStart())
+
+    let ssoSignoutUrl: string | null = null
+
+    try {
+      const response = await api.post<{ ssoSignoutUrl: string | null }>('logout')
+      ssoSignoutUrl = response.ssoSignoutUrl
+    } catch {
+      // ignore errors
+    }
+
+    socket.close()
+
+    if (ssoSignoutUrl) {
+      window.location.href = ssoSignoutUrl
+    } else {
+      window.location.href = '/'
+    }
+  },
+)
+
+export const createAccount = createAsyncThunk<void, FormData, { state: RootState }>(
+  ACCOUNT_CREATE,
+  async (data: FormData, thunkAPI) => {
+    const isFirstRun = thunkAPI.getState().prefs.isFirstRun
+
+    const user = await api.post(isFirstRun ? 'setup' : 'user', { body: data })
+
+    thunkAPI.dispatch(receiveAccount(user))
+    thunkAPI.dispatch(fetchPrefs())
+    thunkAPI.dispatch(connectSocket())
+    socket.open()
+
+    const redirect = new URLSearchParams(window.location.search).get('redirect')
+    if (redirect) {
+      AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
+    }
+  },
+)
+
+export const updateAccount = createAsyncThunk<void, FormData, { state: RootState }>(
+  ACCOUNT_UPDATE,
+  async (data: FormData, thunkAPI) => {
+    const { userId } = thunkAPI.getState().user
+
+    const user = await api.put(`user/${userId}`, { body: data })
+
+    thunkAPI.dispatch(receiveAccount(user))
+    alert('Account updated successfully.')
+  },
+)
+
+export const fetchAccount = createAsyncThunk(
+  ACCOUNT_REQUEST,
+  async (_, thunkAPI) => {
+    try {
+      const user = await api.get('user')
+      thunkAPI.dispatch(receiveAccount(user))
+    } catch {
+      // ignore errors
+    }
+  },
+)
+
+export const connectSocket = createAsyncThunk<void, void, { state: RootState }>(
+  'user/SOCKET_CONNECT',
+  async (_, { dispatch, getState }) => {
+    const versions = {
+      library: getState().library.version,
+      stars: getState().starCounts.version,
+    }
+
+    dispatch(requestSocketConnect(versions))
+    socket.io.opts.query = versions
+  },
+)
 
 // User state is NOT persisted - SSO is the source of truth
 // checkSession always fetches fresh user state from server
-export default userReducer
+export default userSlice.reducer

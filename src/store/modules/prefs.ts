@@ -1,4 +1,4 @@
-import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
+import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from 'store/store'
 import type { Path, Role } from 'shared/types'
 import {
@@ -18,28 +18,79 @@ import HttpApi from 'lib/HttpApi'
 const api = new HttpApi('prefs')
 
 // ------------------------------------
-// Actions
+// State & Slice
 // ------------------------------------
+interface PrefsState {
+  isFirstRun?: boolean
+  isScanning: boolean
+  isReplayGainEnabled: boolean
+  paths: {
+    result: number[]
+    entities: Record<number, Path>
+  }
+  roles: {
+    result: number[]
+    entities: Record<number, Role>
+  }
+  scannerPct: number
+  scannerText: string
+}
+
+const initialState: PrefsState = {
+  isScanning: false,
+  isReplayGainEnabled: false,
+  paths: {
+    result: [],
+    entities: {},
+  },
+  roles: {
+    result: [],
+    entities: {},
+  },
+  scannerPct: 0,
+  scannerText: '',
+}
+
+const prefsSlice = createSlice({
+  name: 'prefs',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(PREFS_REQUEST + '/fulfilled', (state, action: PayloadAction<Partial<PrefsState>>) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(PREFS_RECEIVE, (state, action: PayloadAction<Partial<PrefsState>>) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(PREFS_PUSH, (state, action: PayloadAction<Partial<PrefsState>>) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(SCANNER_WORKER_STATUS, (state, action: PayloadAction<{ isScanning: boolean, pct: number, text: string }>) => ({
+        ...state,
+        isScanning: action.payload.isScanning,
+        scannerPct: action.payload.pct,
+        scannerText: action.payload.text,
+      }))
+  },
+})
+
+// Actions with specific action types for socket middleware compatibility
 const logout = createAction(LOGOUT)
 export const setPref = createAction<{ key: string, data: unknown }>(PREFS_SET)
-export const receivePrefs = createAction<object>(PREFS_RECEIVE)
+export const receivePrefs = createAction<Partial<PrefsState>>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_PATH_SET_PRIORITY)
-const prefsPush = createAction<PrefsState>(PREFS_PUSH)
-const scannerWorkerStatus = createAction<{ isScanning: boolean, pct: number, text: string }>(SCANNER_WORKER_STATUS)
 
+// ------------------------------------
+// Async Thunks
+// ------------------------------------
 export const setPathPrefs = createAsyncThunk(
   PREFS_PATH_UPDATE,
-  async ({
-    pathId,
-    data,
-  }: {
-    pathId: number
-    data: FormData
-  }, thunkAPI) => {
-    const response = await api.put(`/path/${pathId}`, {
-      body: data,
-    })
-
+  async ({ pathId, data }: { pathId: number, data: FormData }, thunkAPI) => {
+    const response = await api.put(`/path/${pathId}`, { body: data })
     thunkAPI.dispatch(receivePrefs(response))
   },
 )
@@ -73,60 +124,4 @@ export const requestScanStop = createAsyncThunk(
   async () => await api.get('/paths/scan/stop'),
 )
 
-// ------------------------------------
-// Reducer
-// ------------------------------------
-interface PrefsState {
-  isFirstRun?: boolean
-  isScanning: boolean
-  isReplayGainEnabled: boolean
-  paths: {
-    result: number[]
-    entities: Record<number, Path>
-  }
-  roles: {
-    result: number[]
-    entities: Record<number, Role>
-  }
-  scannerPct: number
-  scannerText: string
-}
-
-const initialState: PrefsState = {
-  isScanning: false,
-  isReplayGainEnabled: false,
-  paths: {
-    result: [],
-    entities: {},
-  },
-  roles: {
-    result: [],
-    entities: {},
-  },
-  scannerPct: 0,
-  scannerText: '',
-}
-
-const prefsReducer = createReducer(initialState, (builder) => {
-  builder
-    .addCase(fetchPrefs.fulfilled, (state, { payload }) => ({
-      ...state,
-      ...payload,
-    }))
-    .addCase(receivePrefs, (state, { payload }) => ({
-      ...state,
-      ...payload,
-    }))
-    .addCase(prefsPush, (state, { payload }) => ({
-      ...state,
-      ...payload,
-    }))
-    .addCase(scannerWorkerStatus, (state, { payload }) => ({
-      ...state,
-      isScanning: payload.isScanning,
-      scannerPct: payload.pct,
-      scannerText: payload.text,
-    }))
-})
-
-export default prefsReducer
+export default prefsSlice.reducer
