@@ -151,14 +151,7 @@ const JoinLandingPage = () => {
     <div className={styles.container}>
       <Logo className={styles.logo} />
 
-      <h1>Join Room</h1>
-      <p className={styles.roomName}>{roomInfo.roomName}</p>
-
-      {guestName && (
-        <div className={styles.guestIdentity}>
-          <p className={styles.guestName}>{guestName}</p>
-        </div>
-      )}
+      <h1>Join {roomInfo.roomName}'s Party</h1>
 
       <div className={styles.buttons}>
         {guestName && (

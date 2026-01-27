@@ -28,25 +28,6 @@
   }
 }
 
-.roomName {
-  font-size: var(--font-size-xl);
-  font-weight: bold;
-  color: hsl(var(--hue-blue), 50%, 70%);
-  margin-bottom: var(--space-l);
-}
-
-.guestIdentity {
-  margin-bottom: var(--space-xl);
-  text-align: center;
-}
-
-.guestName {
-  font-size: var(--font-size-xl);
-  font-weight: bold;
-  color: hsl(var(--hue-green), 60%, 60%);
-  margin: 0;
-}
-
 .buttons {
   display: flex;
   flex-direction: column;
