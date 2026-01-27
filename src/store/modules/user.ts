@@ -86,7 +86,6 @@ export const login = createAsyncThunk(
 // ------------------------------------
 // Logout
 // ------------------------------------
-const logout = createAction(LOGOUT)
 const logoutStart = createAction('user/LOGOUT_START')
 
 export const requestLogout = createAsyncThunk(
@@ -105,7 +104,8 @@ export const requestLogout = createAsyncThunk(
       // ignore errors
     }
 
-    thunkAPI.dispatch(logout())
+    // Close socket before redirect - don't dispatch logout() as it resets Redux state
+    // and causes re-renders that can trigger 401 redirects before navigation completes
     socket.close()
 
     // If SSO is configured, redirect to IdP signout to terminate the SSO session
