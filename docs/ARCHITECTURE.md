@@ -12,20 +12,18 @@ flowchart LR
     end
 
     subgraph Caddy[Caddy Proxy]
-        bypass["/join*, /api/rooms/join/*"]
-        auth[forward_auth]
+        proxy[reverse_proxy]
     end
 
     subgraph Backend
         App[Karaoke App]
-        Authentik[Authentik SSO]
+        Authentik[Authentik OIDC]
     end
 
     User --> Caddy
     QR -.-> User
-    bypass --> App
-    auth --> Authentik
-    Authentik --> App
+    proxy --> App
+    App <-->|OIDC| Authentik
 ```
 
 ## User Flows
@@ -50,15 +48,16 @@ flowchart TD
     Enroll --> Landing
 ```
 
-## Proxy Headers
+## Authentication
 
-The app trusts headers from the reverse proxy when `KES_REQUIRE_PROXY=true`:
+The app uses app-managed OIDC with Authentik:
 
-| Header | Purpose |
-|--------|---------|
-| `X-Authentik-Username` | User identity |
-| `X-Authentik-Groups` | Role assignment (admin/standard/guest) |
-| `X-Authentik-Karaoke-Room-Id` | Guest room routing |
+| OIDC Claim | Purpose |
+|------------|---------|
+| `preferred_username` | User identity |
+| `groups` | Role assignment (admin/standard/guest) |
+
+Guest room assignment is handled via invitation tokens, not headers.
 
 ## Components
 
@@ -74,12 +73,12 @@ The app trusts headers from the reverse proxy when `KES_REQUIRE_PROXY=true`:
 - **Socket.io-client** — Real-time updates
 
 ### Infrastructure
-- **Caddy** — Reverse proxy with forward_auth
-- **Authentik** — Identity provider (OIDC/SAML)
+- **Caddy** — Reverse proxy (simple passthrough)
+- **Authentik** — Identity provider (OIDC)
 
 ## Data Flow
 
-1. **Authentication**: User → Caddy → Authentik → Headers injected → App
+1. **Authentication**: User → App → OIDC redirect → Authentik → Callback → App issues JWT
 2. **Room Access**: QR scan → Validate token → Set cookie → Route to room
 3. **Queue Updates**: Client ↔ Socket.io ↔ Server → Broadcast to room
 

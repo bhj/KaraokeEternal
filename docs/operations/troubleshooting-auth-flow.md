@@ -1,125 +1,119 @@
-# Debugging: Authentik + Caddy + App Flow
+# Debugging: App-Managed OIDC Auth Flow
 
 ## Architecture Reference
 
 ```mermaid
 graph TD
     Browser --> Caddy
-    
-    subgraph "Caddy Proxy"
-        direction TB
-        Bypass1["/join* (Landing Page)"]
-        Bypass2["/api/rooms/join/* (Smart QR)"]
-        Bypass3["/api/user (Session Check)"]
-        Gatekeeper["/* (Everything Else)"]
-    end
-    
-    Caddy -- "Bypass" --> App[Karaoke App :8280]
-    Caddy -- "Gatekeeper" --> Authentik[Authentik Outpost]
-    Authentik -- "Auth OK" --> App
-    Authentik -- "Auth Fail" --> Login[Authentik Login]
+    Caddy --> App[Karaoke App :8280]
+    App <-->|OIDC| Authentik[Authentik IdP]
 ```
 
 ---
 
-## 1. Quick Checks (The "Is it Plugged In?" Test)
+## 1. Quick Checks
 
 Run these from your local machine or server. Replace `karaoke.thedb.club` with your domain.
 
-### A. Test Caddy Bypass (Landing Page)
-**Goal:** Should return the React App HTML, **NOT** an Authentik redirect.
+### A. Test API Access
+**Goal:** Should return `401 Unauthorized` JSON for unauthenticated requests.
 ```bash
-curl -I https://karaoke.thedb.club/join?itoken=test
+curl -s -w "\n%{http_code}" https://karaoke.thedb.club/api/user
 ```
-*   ✅ **Good:** `HTTP/2 200` (content-type: text/html)
-*   ❌ **Bad:** `HTTP/2 302` (Location: auth.thedb.club/...) -> **Fix Caddy Config.**
+* ✅ **Good:** `401`
+* ❌ **Bad:** `200` with HTML body → **App misconfiguration**
 
-### B. Test API Bypass (Session Check)
-**Goal:** Should return `401 Unauthorized` JSON, **NOT** an HTML Login Page.
+### B. Test OIDC Login
+**Goal:** Should redirect to Authentik authorization URL.
 ```bash
-curl -I https://karaoke.thedb.club/api/user
+curl -I https://karaoke.thedb.club/api/auth/login
 ```
-*   ✅ **Good:** `HTTP/2 401`
-*   ❌ **Bad:** `HTTP/2 200` (content-type: text/html) -> **Fix: Add `/api/user` to Caddy bypass.**
-*   *Note:* If this returns HTML, the app state will corrupt ("White Screen of Death").
+* ✅ **Good:** `302` with `Location: https://auth.thedb.club/application/o/authorize/...`
+* ❌ **Bad:** `500` or error → **Check OIDC env vars**
+
+### C. Test Public Prefs
+**Goal:** Should return JSON with OIDC configuration.
+```bash
+curl https://karaoke.thedb.club/api/prefs/public | jq
+```
+* ✅ **Good:** `{"ssoLoginUrl":"/api/auth/login",...}`
+* ❌ **Bad:** Empty or error → **Check app startup logs**
 
 ---
 
-## 2. Infrastructure Config (The Source of Truth)
+## 2. OIDC Configuration
 
-### Caddy Configuration
-**File:** `~/nix-config/hosts/thedb-server/nixos/caddy.nix`
+### Environment Variables
 
-Verify these blocks exist **BEFORE** the main `handle` block:
+```bash
+# Required
+KES_OIDC_ISSUER_URL=https://auth.thedb.club/application/o/karaoke-eternal/
+KES_OIDC_CLIENT_ID=<from-authentik>
+KES_OIDC_CLIENT_SECRET=<from-authentik>
 
-```nix
-# 1. Landing Page Bypass
-@landing_page path /join*
-handle @landing_page {
-  reverse_proxy localhost:8280
-}
-
-# 2. Smart QR Bypass
-@smart_join path /api/rooms/join/*/*
-handle @smart_join {
-  reverse_proxy localhost:8280
-}
-
-# 3. API Bypass (Prevents State Corruption)
-@session_check path /api/user
-handle @session_check {
-  reverse_proxy localhost:8280
-}
+# Group mapping
+KES_ADMIN_GROUP=karaoke-admin
+KES_GUEST_GROUP=karaoke-guests
 ```
 
-### Authentik Configuration
-**Flow:** `karaoke-guest-enrollment`
+### Authentik Provider Settings
 
-1.  **Prompt Stage:**
-    *   Fields: `username` (Text), `itoken` (Hidden).
-    *   *Critical:* Must capture `itoken` from URL.
-2.  **Redirect Stage:**
-    *   Expression: `return f"/join?itoken={request.context.prompt_data.itoken}"`
-    *   *Critical:* Must send user back to the App Landing Page, not the Root.
+1. **Provider Type:** OAuth2/OpenID Provider
+2. **Client Type:** Confidential
+3. **Redirect URI:** `https://karaoke.thedb.club/api/auth/callback`
+4. **Scopes:** `openid`, `profile`, `email`, `groups`
+5. **Subject Mode:** Based on User's username
 
 ---
 
-## 3. Browser Debugging (Console)
+## 3. Browser Debugging
 
 If the app loads but behaves strangely:
 
-1.  **Network Tab:** Filter for `user`.
-    *   Look at the request to `GET /api/user`.
-    *   **Response:** Is it JSON `{"userId":...}` or HTML `<!DOCTYPE html>`?
-    *   *HTML means Caddy is NOT bypassing the route.*
+1. **Network Tab:** Filter for `user`.
+   * Look at the request to `GET /api/user`.
+   * **Response:** Is it JSON `{"userId":...}` or error?
 
-2.  **Redux State:**
-    *   If `user.userId` looks like `http://...` or garbage string -> **State Corruption**.
-    *   **Fix:** Clear Local Storage (Application -> Local Storage -> Clear).
+2. **Redux State:**
+   * If `user.userId` looks garbage → **Clear Local Storage**.
+   * Application → Local Storage → Clear
 
 ---
 
 ## 4. The Full Trace (Step-by-Step)
 
 ### Guest Flow
-1.  **Scan:** Guest scans QR -> `https://karaoke.thedb.club/api/rooms/join/77/uuid`
-2.  **App:** Server receives request (unauthenticated).
-3.  **App:** Redirects to -> `/join?itoken=uuid&guest_name=BlueWolf`
-4.  **Landing:** User sees "Join as BlueWolf". Clicks Button.
-5.  **Authentik:** User redirected to `auth.thedb.club/...`
-6.  **Authentik:** Creates User `BlueWolf`. Logs them in. Sets `karaoke_room_id` attribute.
-7.  **Authentik:** Redirects back to -> `https://karaoke.thedb.club/` (goes through forward_auth)
-8.  **Caddy:** forward_auth adds `X-Authentik-Karaoke-Room-Id: 77` header
-9.  **App:** Creates session with room already assigned from header
-10. **Success:** User lands in library, in their room.
+1. **Scan:** Guest scans QR → `https://karaoke.thedb.club/api/rooms/join/77/uuid`
+2. **App:** Server receives request (unauthenticated).
+3. **App:** Redirects to → `/join?itoken=uuid&guest_name=BlueWolf`
+4. **Landing:** User sees "Join as BlueWolf". Clicks "Join as Guest".
+5. **App:** Creates guest session, sets JWT cookie, redirects to library.
+6. **Success:** User lands in library, in their room.
 
-### Login Flow (Standard User)
-1.  **Scan:** User scans QR.
-2.  **App:** Server receives request (unauthenticated).
-3.  **App:** Redirects to -> `/join?itoken=uuid`
-4.  **Landing:** User clicks "Login with Account".
-5.  **Authentik:** User logs in. Redirects to `/join?itoken=uuid`
-6.  **Landing:** App detects login + token (userId in Redux).
-7.  **Action:** App auto-redirects to `/api/rooms/join/:roomId/:itoken`
-8.  **App:** Server validates token, sets `keVisitedRoom` cookie
-9.  **Success:** User lands in their room.
+### SSO Login Flow (Standard User)
+1. **Scan:** User scans QR.
+2. **App:** Server receives request (unauthenticated).
+3. **App:** Redirects to → `/join?itoken=uuid`
+4. **Landing:** User clicks "Login with Account".
+5. **App:** Redirects to `/api/auth/login?redirect=/join?itoken=uuid`
+6. **Authentik:** User authenticates. Redirects to `/api/auth/callback`.
+7. **App:** Validates code, fetches user info, creates session, redirects.
+8. **Landing:** App detects login + token (userId in Redux).
+9. **Action:** App auto-joins room via `/api/rooms/join/:roomId/:itoken`
+10. **Success:** User lands in their room.
+
+---
+
+## 5. Common Issues
+
+### "Missing or expired state cookie"
+**Cause:** OIDC callback received without matching state from login.
+**Fix:** Ensure `/api/auth/login` is called before callback. Check cookie settings.
+
+### "Invalid client credentials"
+**Cause:** Wrong `KES_OIDC_CLIENT_ID` or `KES_OIDC_CLIENT_SECRET`.
+**Fix:** Copy credentials from Authentik provider settings.
+
+### "Groups claim missing"
+**Cause:** Authentik not sending groups in ID token.
+**Fix:** Add `groups` scope to provider and ensure user has group memberships.

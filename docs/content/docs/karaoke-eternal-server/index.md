@@ -190,55 +190,49 @@ Karaoke Eternal Server supports the following CLI options and environment variab
 | <span style="white-space: nowrap;">`--urlPath <string>`</span>| <span style="white-space: nowrap;">`KES_URL_PATH`</span> | Web server base URL path (must begin with a forward slash) | / |
 | <span style="white-space: nowrap;">`-v, --version`</span>| | Show version and exit | |
 
-### Reverse Proxy & SSO
+### Reverse Proxy
 
-When running behind a reverse proxy (nginx, Caddy, Authentik, etc.) that terminates TLS:
+When running behind a reverse proxy (nginx, Caddy, etc.) that terminates TLS:
 
 | ENV | Description | Default |
 | --- | --- | --- |
-| `KES_REQUIRE_PROXY` | Only allow requests from trusted proxy IPs (see below) | |
-| `KES_TRUSTED_PROXIES` | Comma-separated list of trusted proxy IPs or CIDRs (e.g., `172.16.0.0/12,192.168.1.100`) | `10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1,::1` |
 | `KES_TRUST_PROXY` | Trust `X-Forwarded-Proto` header for secure cookies. **Required when TLS terminates at the proxy.** | |
 
-For SSO via forward auth headers (Authentik, Authelia, etc.):
+### OIDC Authentication
+
+For SSO via OpenID Connect (Authentik, Keycloak, etc.):
 
 | ENV | Description | Default |
 | --- | --- | --- |
-| `KES_AUTH_HEADER` | Header containing the authenticated username | `x-authentik-username` |
-| `KES_GROUPS_HEADER` | Header containing user's groups (comma or pipe separated) | `x-authentik-groups` |
-| `KES_ADMIN_GROUP` | Group name that grants admin privileges | `admin` |
+| `KES_OIDC_ISSUER_URL` | OIDC issuer URL (e.g., `https://auth.example.com/application/o/karaoke-eternal/`) | |
+| `KES_OIDC_CLIENT_ID` | OAuth2 client ID from your identity provider | |
+| `KES_OIDC_CLIENT_SECRET` | OAuth2 client secret from your identity provider | |
+| `KES_ADMIN_GROUP` | Group name (from OIDC `groups` claim) that grants admin privileges | `karaoke-admin` |
 | `KES_GUEST_GROUP` | Group name for guest users | `karaoke-guests` |
-| `KES_SSO_SIGNOUT_URL` | URL to redirect to for SSO logout (IdP signout endpoint) | |
 
 ### Authentik Configuration
 
-When using Authentik as your SSO provider, ensure the following are configured:
+When using Authentik as your OIDC provider:
 
-#### Required Groups
+#### 1. Create OAuth2/OIDC Provider
+In Authentik Admin → Applications → Providers → Create:
+- **Provider type**: OAuth2/OpenID Provider
+- **Client type**: Confidential
+- **Redirect URI**: `https://your-domain.com/api/auth/callback`
+- **Scopes**: `openid`, `profile`, `email`, `groups`
+
+#### 2. Create Application
+- **Provider**: Select the provider created above
+- **Launch URL**: `https://your-domain.com`
+
+#### 3. Required Groups
 Create these groups in Authentik Admin → Directory → Groups:
-- **`karaoke-admin`** (or your custom `KES_ADMIN_GROUP`) - Members receive admin privileges
-- **`karaoke-guests`** (or your custom `KES_GUEST_GROUP`) - Members are treated as guest users
+- **`karaoke-admin`** - Members receive admin privileges
+- **`karaoke-guests`** - Members are treated as guest users
 
-#### Guest Enrollment Flow
-For guest invitations to work, create an enrollment flow in Authentik Admin → Flows & Stages:
-
-1. Create a new flow with slug matching `KES_AUTHENTIK_ENROLLMENT_FLOW` (default: `karaoke-guest-enrollment`)
-2. The flow should:
-   - Accept the invitation token
-   - Create a user in the `karaoke-guests` group
-   - Set the `karaoke_room_id` custom attribute
-
-#### Custom Attributes
-For room-based guest assignment:
-- **`karaoke_room_id`** - Numeric room ID the guest is assigned to
-
-This attribute should be passed via the header configured in `KES_ROOM_ID_HEADER` (default: `x-authentik-karaoke-room-id`).
-
-#### Proxy Provider Headers
-Configure your Authentik Proxy Provider to forward these headers:
-- `X-authentik-username` - Authenticated user's username
-- `X-authentik-groups` - User's group memberships (pipe or comma separated)
-- `X-authentik-karaoke-room-id` - Custom attribute for guest room assignment
+#### 4. Signout URL (Optional)
+For proper logout flow, configure:
+- `KES_SSO_SIGNOUT_URL`: `https://auth.example.com/application/o/karaoke-eternal/end-session/`
 
 ## File Locations
 

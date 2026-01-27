@@ -10,7 +10,6 @@ The system handles:
 - **Session management** via cookies
 
 Primary threats:
-- Header spoofing to impersonate users
 - Direct backend access bypassing authentication
 - Session hijacking
 - Guest account persistence beyond intended lifetime
@@ -19,9 +18,9 @@ Primary threats:
 
 | Risk | Mitigation |
 |------|------------|
-| Header spoofing | `KES_REQUIRE_PROXY=true` + IP whitelist (`KES_TRUSTED_PROXIES`) |
-| Direct port access | Never expose port 3000; always use reverse proxy |
+| Direct port access | Never expose app port; always use reverse proxy |
 | Cookie theft | `httpOnly`, `Secure`, `SameSite=Lax` flags |
+| OIDC state tampering | PKCE (code verifier) + state parameter validation |
 | Guest persistence | 7-day auto-expiration via Authentik policy |
 | SSO logout loop | Redirect to IdP signout before clearing client state |
 
@@ -30,11 +29,14 @@ Primary threats:
 ### Required Settings
 
 ```bash
-# Trust only proxy-injected headers
-KES_REQUIRE_PROXY=true
+# OIDC Configuration
+KES_OIDC_ISSUER_URL=https://auth.example.com/application/o/karaoke-eternal/
+KES_OIDC_CLIENT_ID=<client-id>
+KES_OIDC_CLIENT_SECRET=<client-secret>
 
-# Whitelist your proxy IPs
-KES_TRUSTED_PROXIES=127.0.0.1,::1,10.0.0.0/8
+# Group names for role mapping
+KES_ADMIN_GROUP=karaoke-admin
+KES_GUEST_GROUP=karaoke-guests
 ```
 
 ### HTTPS Requirement
@@ -42,7 +44,6 @@ KES_TRUSTED_PROXIES=127.0.0.1,::1,10.0.0.0/8
 Secure cookies require HTTPS. The reverse proxy should:
 - Terminate TLS
 - Set `X-Forwarded-Proto: https`
-- Forward authentication headers
 
 ### Bypass Endpoints
 

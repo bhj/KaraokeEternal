@@ -5,75 +5,103 @@ This guide covers configuring Authentik as the identity provider for Karaoke Ete
 ## Prerequisites
 
 - Authentik instance running and accessible
-- Admin access to create applications, providers, and flows
+- Admin access to create applications and providers
 - Caddy (or similar) reverse proxy
 
-## 1. Property Mapping (Guest Room Header)
+## 1. Create OAuth2/OIDC Provider
 
-Create a Property Mapping to pass the guest's room assignment via headers.
+In Authentik Admin → Applications → Providers → Create:
 
-**Name:** `karaoke-room-id`
+| Setting | Value |
+|---------|-------|
+| **Name** | `karaoke-eternal` |
+| **Authorization flow** | `default-provider-authorization-implicit-consent` |
+| **Client type** | Confidential |
+| **Client ID** | (auto-generated, copy this) |
+| **Client Secret** | (auto-generated, copy this) |
+| **Redirect URIs** | `https://karaoke.example.com/api/auth/callback` |
+| **Signing Key** | Select your signing key |
 
-**Expression** (Proxy Provider forward-auth):
+### Scopes
 
+Enable these scopes:
+- `openid`
+- `profile`
+- `email`
+- `groups` (requires scope mapping, see below)
+
+### Groups Scope Mapping
+
+Create a Property Mapping (Applications → Property Mappings → Create):
+
+**Name:** `OIDC-groups`
+**Scope name:** `groups`
+**Expression:**
 ```python
-return {
-    "ak_proxy": {
-        "user_attributes": {
-            "additionalHeaders": {
-                "X-Authentik-Karaoke-Room-Id": request.user.attributes.get("karaoke_room_id", "")
-            }
-        }
-    }
-}
+return list(request.user.ak_groups.values_list("name", flat=True))
 ```
 
-Assign this mapping to your Proxy Provider under **Property Mappings**.
+Add this mapping to your provider's **Scope Mapping** list.
 
-## 2. Caddy Configuration
+## 2. Create Application
 
-Two endpoints must bypass Authentik:
-1. **Landing page** (`/join*`) — Shows room preview and login options
-2. **Smart QR API** (`/api/rooms/join/*`) — Validates invitations and routes users
+In Authentik Admin → Applications → Create:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `Karaoke Eternal` |
+| **Slug** | `karaoke-eternal` |
+| **Provider** | Select `karaoke-eternal` (created above) |
+| **Launch URL** | `https://karaoke.example.com/` |
+
+## 3. Caddy Configuration
+
+Unlike header-based auth, OIDC uses simple reverse proxy (no `forward_auth`):
 
 ```caddyfile
 karaoke.example.com {
-    # Proxy outpost endpoints
-    reverse_proxy /outpost.goauthentik.io/* authentik:9000
-
-    # Landing page - bypass auth (shows join options)
-    @landing_page path /join*
-    handle @landing_page {
-        reverse_proxy karaoke:3000
-    }
-
-    # Smart QR API - bypass auth (app handles routing)
-    @guest_join path /api/rooms/join/*/*
-    handle @guest_join {
-        reverse_proxy karaoke:3000
-    }
-
-    # Everything else - require Authentik auth
-    handle {
-        forward_auth authentik:9000 {
-            uri /outpost.goauthentik.io/auth/caddy
-            copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Karaoke-Room-Id
-        }
-        reverse_proxy karaoke:3000
-    }
+    reverse_proxy karaoke:3000
 }
 ```
 
-**Important:** Bypass handlers MUST come before the default `handle` block.
+That's it. The app handles authentication directly with Authentik via OIDC.
 
-### Security Notes
+## 4. Environment Variables
 
-- `/join*` only shows room name preview — no sensitive data exposed
-- `/api/rooms/join/*` validates UUIDs (2^122 entropy) before any action
-- Logged-in users: validates invite, sets cookie, redirects to library
-- Guests: redirects to Authentik enrollment flow
+### Required for OIDC
 
-## 3. Guest Enrollment Flow
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `KES_OIDC_ISSUER_URL` | Authentik OIDC issuer URL | `https://auth.example.com/application/o/karaoke-eternal/` |
+| `KES_OIDC_CLIENT_ID` | OAuth2 Client ID | `abc123...` |
+| `KES_OIDC_CLIENT_SECRET` | OAuth2 Client Secret | `secret...` |
+| `KES_PUBLIC_URL` | Public URL (for logout redirect) | `https://karaoke.example.com` |
+
+### Role Mapping
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KES_ADMIN_GROUP` | `admin` | Authentik group for admin role |
+| `KES_GUEST_GROUP` | `karaoke-guests` | Authentik group for guest role |
+
+### Proxy Settings
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `KES_REQUIRE_PROXY` | Enable secure cookies | `true` |
+
+### Guest Enrollment (Authentik API)
+
+For guest QR enrollment, the app needs Authentik API access:
+
+| Variable | Description |
+|----------|-------------|
+| `KES_AUTHENTIK_URL` | Internal API URL (e.g., `http://authentik:9000`) |
+| `KES_AUTHENTIK_PUBLIC_URL` | Public URL for redirects |
+| `KES_AUTHENTIK_API_TOKEN` | API token with invitation permissions |
+| `KES_AUTHENTIK_ENROLLMENT_FLOW` | Flow slug (default: `karaoke-guest-enrollment`) |
+
+## 5. Guest Enrollment Flow
 
 Create an enrollment flow (`karaoke-guest-enrollment`) with these stages:
 
@@ -85,57 +113,18 @@ Create an enrollment flow (`karaoke-guest-enrollment`) with these stages:
 | **Login** | Issues session cookie |
 | **Redirect** | Returns to `/` to complete room join |
 
-### On-Demand Invitation Creation
-
-The app automatically validates and creates Authentik invitations:
-- When a guest requests enrollment, the server checks if the room's invitation is still valid
-- If expired or missing, a new invitation is created via Authentik API
-- This ensures guests can always enroll even hours after room creation
-
 ### Guest Join Flow
 
 ```
 Guest scans QR → /api/rooms/join/{roomId}/{itoken}
   → Redirects to /join?itoken=xxx&guest_name=RedPenguin
-  → Landing page: "Login with Account" or "Join as RedPenguin"
-  → Guest clicks join → GET /api/rooms/{id}/enrollment
-  → Server validates/creates invitation on-demand
-  → Redirect to Authentik enrollment
+  → Landing page: "Login with Account" or "Join as Guest"
+  → Guest clicks join → Redirect to Authentik enrollment
   → Account created → Redirect to /
-  → App routes to room via SSO headers
+  → OIDC callback → Session established → Room joined
 ```
 
 See [invitation_fix_2026_01_25.md](analysis/invitation_fix_2026_01_25.md) for implementation details.
-
-## 4. Environment Variables
-
-Configure these variables in your Karaoke Eternal deployment:
-
-### Required for SSO
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `KES_REQUIRE_PROXY` | Trust proxy headers only | `true` |
-| `KES_TRUSTED_PROXIES` | Allowed proxy IPs | `127.0.0.1,::1` |
-
-### SSO Headers
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `KES_AUTH_HEADER` | `X-Authentik-Username` | Username header |
-| `KES_GROUPS_HEADER` | `X-Authentik-Groups` | Groups header |
-| `KES_ADMIN_GROUP` | `karaoke-admins` | Admin group name |
-| `KES_GUEST_GROUP` | `karaoke-guests` | Guest group name |
-| `KES_SSO_SIGNOUT_URL` | — | Logout redirect URL |
-
-### Authentik API (Guest Invitations)
-
-| Variable | Description |
-|----------|-------------|
-| `KES_AUTHENTIK_URL` | Internal API URL (e.g., `http://authentik:9000`) |
-| `KES_AUTHENTIK_PUBLIC_URL` | Public URL for redirects |
-| `KES_AUTHENTIK_API_TOKEN` | API token with invitation permissions |
-| `KES_AUTHENTIK_ENROLLMENT_FLOW` | Flow slug (default: `karaoke-guest-enrollment`) |
 
 ## Troubleshooting
 

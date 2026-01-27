@@ -1,46 +1,48 @@
 # Authentik Guest Enrollment Flow
 
-This document describes how to configure Authentik to handle guest enrollment for Karaoke Eternal.
+This document describes guest enrollment options for Karaoke Eternal.
 
 ## Overview
 
 When a guest scans a QR code, they see a landing page with two options:
-1. **Login with Account** - Uses existing Authentik outpost (no changes needed)
-2. **Join as Guest** - Creates a new guest account via this enrollment flow
+1. **Login with Account** - Uses OIDC login flow
+2. **Join as Guest** - Creates an app-managed guest session (recommended)
 
-The enrollment flow:
-1. Captures `guest_name` and `itoken` from URL parameters
-2. Creates a user account (handling username collisions)
-3. Logs the user in
-4. Redirects back to `/` where forward_auth establishes SSO session with room assignment
+## Guest Join Options
 
-## Flow Configuration
+### Option 1: App-Managed Guests (Recommended)
+
+The app creates guest sessions internally without involving Authentik:
+- Guest clicks "Join as Guest" on landing page
+- App creates local guest user with JWT session
+- No Authentik account created
+- Session tied to room via invitation token
+
+This is simpler and doesn't pollute Authentik with guest accounts.
+
+### Option 2: Authentik Enrollment Flow (Legacy)
+
+For scenarios requiring Authentik guest accounts:
 
 **Flow name**: `karaoke-guest-enrollment`
 **Slug**: `karaoke-guest-enrollment`
 **Designation**: Enrollment
 
-This slug must match the `KES_AUTHENTIK_ENROLLMENT_FLOW` environment variable.
+#### Stages
 
-## Stages
-
-### Stage 1: Prompt (Capture URL Parameters)
+##### Stage 1: Prompt (Capture URL Parameters)
 
 **Name**: `karaoke-guest-prompt`
 **Type**: Prompt Stage
 
 Create two fields:
 
-| Field Key | Type | Label | Required | Placeholder |
-|-----------|------|-------|----------|-------------|
-| `guest_name` | Text | Guest Name | No | (leave empty - populated from URL) |
-| `itoken` | Hidden | - | No | - |
+| Field Key | Type | Label | Required |
+|-----------|------|-------|----------|
+| `guest_name` | Text | Guest Name | No |
+| `itoken` | Hidden | - | No |
 
-**Settings**:
-- Check "Fields are editable by user" for `guest_name` only
-- The hidden `itoken` field passes through to the redirect stage
-
-### Stage 2: User Write (Create Account)
+##### Stage 2: User Write (Create Account)
 
 **Name**: `karaoke-guest-user-write`
 **Type**: User Write Stage
@@ -57,16 +59,13 @@ Create two fields:
 from authentik.core.models import User
 import random
 
-# Get suggested name from prompt
 suggested = context.get('prompt_data', {}).get('guest_name', '').strip()
 
-# Fallback: generate random name if none provided
 if not suggested:
     adjectives = ['Red', 'Blue', 'Green', 'Gold', 'Silver', 'Swift', 'Bright', 'Lucky']
     animals = ['Penguin', 'Dolphin', 'Tiger', 'Eagle', 'Wolf', 'Fox', 'Bear', 'Hawk']
     suggested = random.choice(adjectives) + random.choice(animals)
 
-# Handle username collision by appending numbers
 username = suggested
 counter = 1
 while User.objects.filter(username=username).exists():
@@ -76,43 +75,26 @@ while User.objects.filter(username=username).exists():
 return username
 ```
 
-**Password**: Set to generate a random password (guests authenticate via SSO, not password).
-
-### Stage 3: User Login
+##### Stage 3: User Login
 
 **Name**: `karaoke-guest-login`
 **Type**: User Login Stage
 
-**Settings**:
-- Session duration: Use default or match your main authentication flow
-- Stay signed in offset: Optional
-
-This issues the session cookie that Authentik uses to identify the user.
-
-### Stage 4: Redirect
+##### Stage 4: Redirect
 
 **Name**: `karaoke-guest-redirect`
 **Type**: Redirect Stage
 
-**Mode**: Static
 **URL Expression**:
 
 ```python
-# Pass itoken back to the app to complete the join
 itoken = context.get('prompt_data', {}).get('itoken', '')
 if itoken:
     return f"/join?itoken={itoken}"
 return "/"
 ```
 
-This redirects back to the landing page with the itoken. The app will:
-1. Detect the user is now logged in (via Authentik headers)
-2. Auto-complete the join using the itoken
-3. Redirect to the library
-
-## Flow Bindings
-
-Bind the stages in order:
+#### Flow Bindings
 
 | Order | Stage |
 |-------|-------|
@@ -127,49 +109,29 @@ Create a group for guests:
 
 **Name**: `karaoke-guests`
 
-This group is used by the app to identify guest users. Guests have limited permissions (e.g., cannot be admins).
+This group is used by the app to identify guest users (via OIDC `groups` claim).
 
 ## Testing
 
-### 1. Direct Flow Test
+### App-Managed Guest Test
 
-Visit the enrollment URL directly:
+1. Scan QR code (unauthenticated)
+2. Click "Join as Guest"
+3. Should land in room library immediately
+
+### Authentik Enrollment Test
+
+1. Visit enrollment URL:
 ```
 https://auth.example.com/if/flow/karaoke-guest-enrollment/?guest_name=TestUser&itoken=abc123
 ```
-
-Expected:
-- Account created as `TestUser` (or `TestUser1` if collision)
-- Redirects to `/` (where forward_auth establishes session with room from X-Authentik-Karaoke-Room-Id)
-
-### 2. Collision Test
-
-1. Create a user named `RedPenguin`
-2. Visit enrollment with `guest_name=RedPenguin`
-3. Should create `RedPenguin1`
-
-### 3. Full Flow Test
-
-1. Scan QR code (unauthenticated)
-2. See landing page with room name
-3. Click "Join as [GuestName]"
-4. Should redirect through Authentik enrollment
-5. Should end up in the room's library
-
-## Troubleshooting
-
-### "User already exists" error
-The username expression isn't handling collisions. Check the Python expression in the User Write stage.
-
-### User not in `karaoke-guests` group
-Check the User Write stage has the group configured.
+2. Account should be created
+3. User redirected back to app
+4. OIDC login completes the flow
 
 ## Security Considerations
 
-1. **No password required**: Guests authenticate via SSO only. Random password is set to prevent password-based login.
-
-2. **itoken validation**: The app validates the itoken, not Authentik. Authentik just passes it through.
-
-3. **Rate limiting**: Consider enabling rate limiting on the enrollment flow to prevent abuse.
-
-4. **Guest cleanup**: Guest accounts accumulate over time. Consider a separate cleanup job (outside the app - see "Janitor Prohibition" in CLAUDE.md).
+1. **No password required**: Guests authenticate via SSO only.
+2. **itoken validation**: The app validates the itoken, not Authentik.
+3. **Rate limiting**: Consider enabling rate limiting on the enrollment flow.
+4. **Guest cleanup**: Guest accounts accumulate over time. Consider a separate cleanup job (outside the app).

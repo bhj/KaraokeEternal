@@ -32,9 +32,10 @@ git clone https://github.com/Zardoz8901/KaraokeEternalAutomated.git
 cd KaraokeEternalAutomated
 npm install
 
-# 2. Configure (see below)
-export KES_REQUIRE_PROXY=true
-export KES_TRUSTED_PROXIES=127.0.0.1,::1
+# 2. Configure OIDC (see below)
+export KES_OIDC_ISSUER_URL=https://auth.example.com/application/o/karaoke-eternal/
+export KES_OIDC_CLIENT_ID=your-client-id
+export KES_OIDC_CLIENT_SECRET=your-client-secret
 
 # 3. Run
 npm run build && npm start
@@ -48,9 +49,11 @@ Open `http://localhost:3000` (behind your reverse proxy).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `KES_REQUIRE_PROXY` | Yes | Trust proxy headers only (`true`) |
-| `KES_TRUSTED_PROXIES` | Yes | Allowed proxy IPs |
-| `KES_SSO_SIGNOUT_URL` | Recommended | IdP logout URL |
+| `KES_OIDC_ISSUER_URL` | Yes | OIDC issuer URL from Authentik |
+| `KES_OIDC_CLIENT_ID` | Yes | OAuth2 client ID |
+| `KES_OIDC_CLIENT_SECRET` | Yes | OAuth2 client secret |
+| `KES_ADMIN_GROUP` | Yes | Authentik group name for admins |
+| `KES_GUEST_GROUP` | Yes | Authentik group name for guests |
 
 Full configuration: [docs/AUTHENTIK_SETUP.md](docs/AUTHENTIK_SETUP.md#4-environment-variables)
 

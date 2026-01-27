@@ -216,4 +216,7 @@ curl https://karaoke.thedb.club/api/prefs/public | jq
 
 ## Rollback
 
-If issues occur, revert to old Caddy config with `forward_auth` - the app still supports SSO header auth as fallback (until you remove that code).
+If issues occur, check the app logs for OIDC configuration errors. Common issues:
+- Invalid client credentials
+- Incorrect issuer URL
+- Missing redirect URI in Authentik
