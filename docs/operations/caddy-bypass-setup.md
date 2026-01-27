@@ -3,12 +3,13 @@
 To enable the guest enrollment flow (allowing both guests and logged-in users to join rooms via a single QR code), you must configure Caddy to **bypass authentication** for:
 
 1. **Static Assets** (`*.js`, `*.css`, etc.) - Required for the app to load at all
-2. **Landing Page** (`/join*`) - The UI where users choose to login or join as guest
-3. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
-4. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
-5. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
-6. **Guest Join API** (`/api/guest/join`) - Creates app-managed guest sessions (no Authentik dependency)
-7. **OIDC Auth API** (`/api/auth/*`) - App-managed OIDC login/callback flow
+2. **Root Path** (`/`) - Post-logout redirect landing (prevents auto re-auth)
+3. **Landing Page** (`/join*`) - The UI where users choose to login or join as guest
+4. **Smart QR API** (`/api/rooms/join/*`) - The endpoint that validates invitation tokens
+5. **Public Prefs API** (`/api/prefs/public`) - Returns public configuration needed by the landing page
+6. **Session Check API** (`/api/user`) - Returns current user or 401 (app handles auth state properly)
+7. **Guest Join API** (`/api/guest/join`) - Creates app-managed guest sessions (no Authentik dependency)
+8. **OIDC Auth API** (`/api/auth/*`) - App-managed OIDC login/callback flow
 
 This allows the Karaoke App to handle the routing logic instead of Authentik blocking the request immediately.
 
@@ -29,7 +30,16 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 2. Bypass: Landing Page (unauthenticated access) ---
+    # --- 2. Bypass: Root Path (post-logout redirect) ---
+    # The root path must be accessible for post-logout redirect to work.
+    # Without this bypass, forward_auth triggers auto re-authentication after logout,
+    # causing "Missing or expired state cookie" errors at /api/auth/callback.
+    @root_path path /
+    handle @root_path {
+        reverse_proxy localhost:8280
+    }
+
+    # --- 3. Bypass: Landing Page (unauthenticated access) ---
     # The join landing page must be accessible before login.
     # Shows room name, offers "Login with Account" or "Join as Guest" options.
     @landing_page path /join*
@@ -37,7 +47,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 3. Bypass: Smart QR API ---
+    # --- 4. Bypass: Smart QR API ---
     # Allow the join endpoint to reach the app directly.
     # The App will check for a session cookie:
     # - If Logged In: Joins the room immediately.
@@ -48,7 +58,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 4. Bypass: Public Prefs API ---
+    # --- 5. Bypass: Public Prefs API ---
     # Returns public configuration (Authentik URL, SSO mode, etc.)
     # Needed by the landing page to display login/enrollment options.
     @public_prefs path /api/prefs/public
@@ -56,7 +66,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 5. Bypass: Session Check API ---
+    # --- 6. Bypass: Session Check API ---
     # Returns current user session or 401. App handles auth state properly.
     # Must bypass forward_auth to avoid HTML redirect on unauthenticated requests.
     @session_check path /api/user
@@ -64,7 +74,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 6. Bypass: Guest Join API ---
+    # --- 7. Bypass: Guest Join API ---
     # Creates app-managed guest sessions (no Authentik dependency).
     # Called by the landing page when user clicks "Join as Guest".
     @guest_join path /api/guest/join
@@ -72,7 +82,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 7. Bypass: OIDC Auth Endpoints ---
+    # --- 8. Bypass: OIDC Auth Endpoints ---
     # App-managed OIDC login flow (initiates auth and handles callback).
     # Must bypass forward_auth to allow the app to manage the OIDC state.
     @oidc_auth path /api/auth/*
@@ -80,7 +90,7 @@ karaoke.yourdomain.com {
         reverse_proxy localhost:8280
     }
 
-    # --- 8. Gatekeeper (Everything Else) ---
+    # --- 9. Gatekeeper (Everything Else) ---
     # All other traffic MUST be authenticated by Authentik.
     handle {
         forward_auth localhost:9000 {
@@ -103,6 +113,13 @@ virtualHosts."karaoke.thedb.club" = {
     # Bypass: Static Assets (required for React app to load)
     @static path *.js *.css *.map *.ico *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2 *.ttf *.eot
     handle @static {
+      reverse_proxy localhost:8280
+    }
+
+    # Bypass: Root Path (post-logout redirect)
+    # Prevents auto re-auth after logout causing "Missing or expired state cookie" error
+    @root_path path /
+    handle @root_path {
       reverse_proxy localhost:8280
     }
 
@@ -163,6 +180,14 @@ virtualHosts."karaoke.thedb.club" = {
 - Without this bypass, users see a white screen on bypassed routes
 - The app server handles these files directly
 
+### `/` (Root Path)
+- Required for post-logout redirect flow to work correctly
+- Authentik redirects here after SSO session is ended
+- Without this bypass, forward_auth triggers automatic re-authentication
+- This causes "Missing or expired state cookie" errors because `/api/auth/login` was never called
+- The app serves the homepage with the user logged out (JWT cookie already cleared)
+- No sensitive data exposed - just the public homepage
+
 ### `/join*` (Landing Page)
 - Exposes only the join UI - displays room name from the invitation token
 - No sensitive data - just a preview of what room you're joining
@@ -211,6 +236,12 @@ curl -s https://karaoke.example.com/join | grep -oP 'main\.[a-f0-9]+\.js'
 curl -I https://karaoke.example.com/main.HASH.js
 # Expected: HTTP/2 200 (not 302 redirect!)
 # If you see 302 → Authentik, the static bypass is missing!
+
+# Root path should return 200 (not redirect to Authentik)
+# This is CRITICAL for the logout flow to work correctly
+curl -I https://karaoke.example.com/
+# Expected: HTTP/2 200 (not 302 redirect!)
+# If you see 302 → Authentik, logout will cause "Missing or expired state cookie" error
 
 # Landing page should return 200 (not redirect to Authentik)
 curl -I https://karaoke.example.com/join?itoken=test
