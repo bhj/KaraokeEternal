@@ -204,16 +204,22 @@ class User {
     const existingUser = await User.getByUsername(username, true)
     if (existingUser) {
       // Strict sync: always update role to match groups header (promotes AND demotes)
-      if (existingUser.role !== targetRole) {
+      // Also ensure authProvider is set to 'sso' for users logging in via SSO
+      const roleChanged = existingUser.role !== targetRole
+      const authProviderChanged = existingUser.authProvider !== 'sso'
+
+      if (roleChanged || authProviderChanged) {
         const now = Math.floor(Date.now() / 1000)
         const updateQuery = sql`
           UPDATE users
           SET roleId = (SELECT roleId FROM roles WHERE name = ${targetRole}),
+              authProvider = 'sso',
               dateUpdated = ${now}
           WHERE userId = ${existingUser.userId}
         `
         await db.run(String(updateQuery), updateQuery.parameters)
         existingUser.role = targetRole
+        existingUser.authProvider = 'sso'
         existingUser.dateUpdated = now
       }
 
