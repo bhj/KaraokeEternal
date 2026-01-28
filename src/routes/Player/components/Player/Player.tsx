@@ -149,6 +149,8 @@ class Player extends React.Component<PlayerProps> {
             sensitivity={this.props.visualizer.sensitivity}
             width={this.props.width}
             height={this.props.height}
+            mode={this.props.visualizer.mode}
+            colorPalette={this.props.visualizer.colorPalette}
           />
         )}
       </>

@@ -1,8 +1,10 @@
-import React from 'react'
-import butterchurn, { type Visualizer } from 'butterchurn'
-import presets from 'butterchurn-presets/all'
-import imageData from 'butterchurn-presets/imageData'
+import React, { Suspense } from 'react'
+import type { ColorPalette, VisualizerMode } from 'shared/types'
 import styles from './PlayerVisualizer.css'
+
+// Lazy load visualizers to reduce initial bundle
+const MilkdropVisualizer = React.lazy(() => import('./MilkdropVisualizer'))
+const ThreeVisualizer = React.lazy(() => import('./ThreeVisualizer'))
 
 interface PlayerVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode
@@ -12,102 +14,60 @@ interface PlayerVisualizerProps {
   sensitivity: number
   width: number
   height: number
+  mode: VisualizerMode
+  colorPalette: ColorPalette
 }
 
-class PlayerVisualizer extends React.Component<PlayerVisualizerProps> {
-  audioGainNode: GainNode | null = null
-  canvas = React.createRef<HTMLCanvasElement>()
-  frameId: number | null = null
-  visualizer: Visualizer | null = null
+// Modes that use the Three.js visualizer
+const THREE_MODES: VisualizerMode[] = ['particles', 'geometry', 'shader', 'spectrum', 'reactive']
 
-  componentDidMount () {
-    try {
-      this.visualizer = butterchurn.createVisualizer(this.props.audioSourceNode.context, this.canvas.current, {
-        width: this.props.width,
-        height: this.props.height,
-      })
-
-      this.visualizer.loadExtraImages(imageData)
-    } catch (err) {
-      this.props.onError(err.message) // @todo pass error object instead of msg only
-      return
-    }
-
-    // @todo
-    // this.visualizer.setOutputAA(true)
-
-    const preset = presets[this.props.presetKey]
-
-    if (preset) {
-      this.visualizer.loadPreset(preset, 0.0) // 2nd arg is # of seconds to blend presets
-    }
-
-    this.updateAudioSource()
-    this.updatePlaying()
+function PlayerVisualizer ({
+  audioSourceNode,
+  isPlaying,
+  onError,
+  presetKey,
+  sensitivity,
+  width,
+  height,
+  mode,
+  colorPalette,
+}: PlayerVisualizerProps) {
+  // Don't render if mode is 'off'
+  if (mode === 'off') {
+    return null
   }
 
-  componentDidUpdate (prevProps: PlayerVisualizerProps) {
-    const { props } = this
+  const isThreeMode = THREE_MODES.includes(mode)
 
-    if (props.audioSourceNode !== prevProps.audioSourceNode) {
-      this.updateAudioSource()
-    }
-
-    if (props.isPlaying !== prevProps.isPlaying) {
-      this.updatePlaying()
-    }
-
-    if (props.width !== prevProps.width || props.height !== prevProps.height) {
-      this.visualizer.setRendererSize(props.width, props.height)
-    }
-
-    if (props.presetKey !== prevProps.presetKey) {
-      this.visualizer.loadPreset(presets[props.presetKey], 1) // 2nd arg is # of seconds to blend presets
-    }
-
-    if (this.audioGainNode && props.sensitivity !== prevProps.sensitivity) {
-      this.audioGainNode.gain.setValueAtTime(props.sensitivity, this.audioGainNode.context.currentTime)
-    }
-  }
-
-  componentWillUnmount () {
-    cancelAnimationFrame(this.frameId)
-    this.frameId = null
-  }
-
-  render () {
-    const { width, height } = this.props
-
-    return (
-      <div style={{ width, height }} className={styles.container}>
-        <canvas
-          width={width}
-          height={height}
-          ref={this.canvas}
-        />
-      </div>
-    )
-  }
-
-  updateAudioSource = () => {
-    this.audioGainNode = this.props.audioSourceNode.context.createGain()
-    this.props.audioSourceNode.connect(this.audioGainNode)
-    this.visualizer.connectAudio(this.audioGainNode)
-  }
-
-  updatePlaying = () => {
-    if (this.props.isPlaying && !this.frameId) {
-      this.renderVisualizerFrame()
-    } else {
-      cancelAnimationFrame(this.frameId)
-      this.frameId = null
-    }
-  }
-
-  renderVisualizerFrame = () => {
-    this.frameId = requestAnimationFrame(this.renderVisualizerFrame)
-    this.visualizer.render()
-  }
+  return (
+    <div style={{ width, height }} className={styles.container}>
+      <Suspense fallback={null}>
+        {isThreeMode
+          ? (
+              <ThreeVisualizer
+                audioSourceNode={audioSourceNode}
+                isPlaying={isPlaying}
+                mode={mode}
+                colorPalette={colorPalette}
+                sensitivity={sensitivity}
+                width={width}
+                height={height}
+              />
+            )
+          : (
+              <MilkdropVisualizer
+                audioSourceNode={audioSourceNode}
+                isPlaying={isPlaying}
+                onError={onError}
+                presetKey={presetKey}
+                sensitivity={sensitivity}
+                width={width}
+                height={height}
+              />
+            )}
+      </Suspense>
+    </div>
+  )
 }
 
 export default PlayerVisualizer

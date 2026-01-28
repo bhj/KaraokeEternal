@@ -98,6 +98,7 @@ export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
 export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOptions) => ({
   payload: opts,
   meta: {
+    isOptimistic: true,
     throttle: {
       wait: 200,
       leading: true,
