@@ -15,7 +15,7 @@ const router = new KoaRouter({ prefix: '/api/rooms' })
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
 
 // list rooms
-router.get('/:roomId?', async (ctx) => {
+router.get(['/', '/:roomId'], async (ctx) => {
   const roomId = ctx.params.roomId ? parseInt(ctx.params.roomId, 10) : undefined
   const status = ctx.user.isAdmin ? STATUSES : undefined
   const res = await Rooms.get(roomId, { status })
