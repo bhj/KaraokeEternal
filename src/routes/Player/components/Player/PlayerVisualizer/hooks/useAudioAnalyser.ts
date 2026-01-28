@@ -8,6 +8,11 @@ export interface AudioData {
   treble: number // High freq average (0-1)
   isBeat: boolean // Beat detection
   beatIntensity: number // 0-1 strength
+  // Energy metrics for genre-responsive visualizers
+  energy: number // 0-1 overall energy (RMS of waveform)
+  energySmooth: number // Smoothed over ~2 seconds (genre indicator)
+  spectralCentroid: number // 0-1 brightness - high for metal, low for ballad
+  beatFrequency: number // Estimated BPM (0-1 normalized, 0.5 = 120bpm)
 }
 
 interface UseAudioAnalyserOptions {
@@ -35,6 +40,12 @@ export function useAudioAnalyser (
   const waveformDataRef = useRef<Float32Array | null>(null)
   const previousBassRef = useRef<number>(0)
   const beatThresholdRef = useRef<number>(0.3)
+
+  // Energy tracking for genre detection
+  const energySmoothRef = useRef<number>(0)
+  const spectralCentroidSmoothRef = useRef<number>(0)
+  const beatTimestampsRef = useRef<number[]>([])
+  const lastBeatTimeRef = useRef<number>(0)
 
   // Initialize analyser when audio source changes
   useEffect(() => {
@@ -98,6 +109,10 @@ export function useAudioAnalyser (
         treble: 0,
         isBeat: false,
         beatIntensity: 0,
+        energy: 0,
+        energySmooth: 0,
+        spectralCentroid: 0.5,
+        beatFrequency: 0.5,
       }
     }
 
@@ -149,6 +164,61 @@ export function useAudioAnalyser (
     // Adaptive beat threshold
     beatThresholdRef.current = beatThresholdRef.current * 0.95 + 0.05 * 0.3
 
+    // --- Energy Detection for Genre Response ---
+
+    // Calculate RMS energy from waveform (instant loudness)
+    let sumSquares = 0
+    for (let i = 0; i < waveformData.length; i++) {
+      sumSquares += waveformData[i] * waveformData[i]
+    }
+    const energy = Math.sqrt(sumSquares / waveformData.length)
+
+    // Exponential moving average for energy smoothing (~2 second window at 60fps)
+    // Alpha ~= 1 - e^(-1/(fps*seconds)) ≈ 0.008 for 2s at 60fps
+    const energySmoothAlpha = 0.008
+    energySmoothRef.current = energySmoothRef.current * (1 - energySmoothAlpha) + energy * energySmoothAlpha
+    const energySmooth = energySmoothRef.current
+
+    // Calculate spectral centroid (brightness indicator)
+    // Weighted average of frequencies - higher = brighter/harsher sound
+    let weightedSum = 0
+    let totalWeight = 0
+    for (let i = 0; i < normalizedFreq.length; i++) {
+      const weight = normalizedFreq[i]
+      weightedSum += i * weight
+      totalWeight += weight
+    }
+    const rawCentroid = totalWeight > 0 ? weightedSum / totalWeight / normalizedFreq.length : 0.5
+    // Smooth the spectral centroid
+    spectralCentroidSmoothRef.current = spectralCentroidSmoothRef.current * 0.9 + rawCentroid * 0.1
+    const spectralCentroid = spectralCentroidSmoothRef.current
+
+    // Beat frequency estimation (BPM tracking)
+    const now = performance.now()
+    if (isBeat && now - lastBeatTimeRef.current > 200) { // Minimum 200ms between beats (300 BPM max)
+      beatTimestampsRef.current.push(now)
+      lastBeatTimeRef.current = now
+
+      // Keep only last 16 beats for BPM calculation
+      if (beatTimestampsRef.current.length > 16) {
+        beatTimestampsRef.current.shift()
+      }
+    }
+
+    // Calculate BPM from beat intervals
+    let beatFrequency = 0.5 // Default to mid-range
+    const timestamps = beatTimestampsRef.current
+    if (timestamps.length >= 4) {
+      let totalInterval = 0
+      for (let i = 1; i < timestamps.length; i++) {
+        totalInterval += timestamps[i] - timestamps[i - 1]
+      }
+      const avgInterval = totalInterval / (timestamps.length - 1)
+      const bpm = 60000 / avgInterval
+      // Normalize BPM to 0-1 range: 60 BPM = 0, 120 BPM = 0.5, 180 BPM = 1
+      beatFrequency = Math.max(0, Math.min(1, (bpm - 60) / 120))
+    }
+
     return {
       frequencyData: normalizedFreq,
       waveformData: new Float32Array(waveformData),
@@ -157,6 +227,10 @@ export function useAudioAnalyser (
       treble,
       isBeat,
       beatIntensity,
+      energy,
+      energySmooth,
+      spectralCentroid,
+      beatFrequency,
     }
   }, [])
 

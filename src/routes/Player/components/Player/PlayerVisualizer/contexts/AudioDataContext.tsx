@@ -16,6 +16,10 @@ const defaultAudioData: AudioData = {
   treble: 0,
   isBeat: false,
   beatIntensity: 0,
+  energy: 0,
+  energySmooth: 0,
+  spectralCentroid: 0.5,
+  beatFrequency: 0.5,
 }
 
 const AudioDataContext = createContext<AudioDataContextValue | null>(null)
