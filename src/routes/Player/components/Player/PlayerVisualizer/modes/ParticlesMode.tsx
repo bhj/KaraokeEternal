@@ -9,78 +9,36 @@ interface ParticlesModeProps {
   colorPalette: ColorPalette
 }
 
-// Orbital ring configuration
-const RING_CONFIG = [
-  { particles: 3000, baseRadius: 1.5, spread: 0.3, baseSpeed: 1.2, sizeBase: 0.02 }, // Inner - fast, small
-  { particles: 5000, baseRadius: 3.0, spread: 0.5, baseSpeed: 0.7, sizeBase: 0.03 }, // Middle - medium
-  { particles: 4000, baseRadius: 5.0, spread: 0.8, baseSpeed: 0.4, sizeBase: 0.04 }, // Outer - slow, large
-]
-const TOTAL_PARTICLES = RING_CONFIG.reduce((sum, r) => sum + r.particles, 0)
+// Gravitational system configuration
+const ATTRACTOR_COUNT = 7 // Gravity wells
+const PARTICLE_COUNT = 3000 // Small flowing particles
 
-// Comet burst particles
-const COMET_COUNT = 500
-const COMET_LIFETIME = 2.0 // seconds
+// Physics constants
+const GRAVITY_STRENGTH = 0.8
+const VELOCITY_DAMPING = 0.985
+const MAX_VELOCITY = 0.5
+const EXPLOSION_FORCE = 2.0
 
-// Vertex shader for orbital particles
+// Vertex shader for particles - receives pre-calculated positions
 const vertexShader = `
   attribute float size;
   attribute vec3 customColor;
-  attribute float orbitRadius;
-  attribute float orbitSpeed;
-  attribute float orbitPhase;
-  attribute float orbitInclination;
-  attribute float freqIndex;
 
   varying vec3 vColor;
-  varying float vIntensity;
 
-  uniform float time;
-  uniform float bass;
-  uniform float mid;
-  uniform float treble;
-  uniform float beatIntensity;
-  uniform float energy;
   uniform float energySmooth;
-  uniform float spectralCentroid;
-  uniform float chaosAmount;
-  uniform float[64] frequencyData;
+  uniform float beatIntensity;
 
   void main() {
     vColor = customColor;
 
-    // Get frequency intensity for this particle
-    int idx = int(freqIndex * 63.0);
-    float freqIntensity = frequencyData[idx];
-    vIntensity = freqIntensity;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
 
-    // Base orbital position
-    float angle = orbitPhase + time * orbitSpeed * (1.0 + energySmooth * 2.0);
+    // Size responds to energy
+    float energySize = 1.0 + energySmooth * 0.8;
+    float finalSize = size * energySize * (1.0 + beatIntensity * 0.3);
 
-    // Add chaos based on energy (metal = chaotic, ballad = ordered)
-    float chaos = chaosAmount * energySmooth * spectralCentroid;
-    angle += sin(time * 3.0 + orbitPhase * 10.0) * chaos * 0.5;
-
-    // Calculate orbital position with inclination
-    float r = orbitRadius * (1.0 + bass * 0.2);
-    float x = cos(angle) * r;
-    float z = sin(angle) * r;
-    float y = sin(angle) * sin(orbitInclination) * r * 0.3;
-
-    // Frequency-based vertical displacement
-    y += freqIntensity * 0.8;
-
-    // Beat burst - particles fly outward
-    float burstMult = 1.0 + beatIntensity * 0.4;
-    vec3 pos = vec3(x, y, z) * burstMult;
-
-    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-
-    // Size: base + energy response + frequency response
-    float energySize = 1.0 + energySmooth * 1.5;
-    float freqSize = 1.0 + freqIntensity * 0.8;
-    float finalSize = size * energySize * freqSize;
-
-    gl_PointSize = finalSize * (300.0 / -mvPosition.z);
+    gl_PointSize = finalSize * (200.0 / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
   }
 `
@@ -88,11 +46,9 @@ const vertexShader = `
 // Fragment shader for glowing particles
 const fragmentShader = `
   varying vec3 vColor;
-  varying float vIntensity;
 
   uniform float energySmooth;
   uniform float beatIntensity;
-  uniform float spectralCentroid;
 
   void main() {
     vec2 center = gl_PointCoord - vec2(0.5);
@@ -101,29 +57,23 @@ const fragmentShader = `
     if (dist > 0.5) discard;
 
     // Soft glowing edge with bright core
-    float alpha = 1.0 - smoothstep(0.15, 0.5, dist);
-    float core = 1.0 - smoothstep(0.0, 0.25, dist);
+    float alpha = 1.0 - smoothstep(0.1, 0.5, dist);
+    float core = 1.0 - smoothstep(0.0, 0.2, dist);
 
-    // Enhanced glow based on energy and frequency
-    float glow = 0.7 + energySmooth * 0.6 + vIntensity * 0.4;
-
-    vec3 color = vColor * glow;
+    vec3 color = vColor * (0.8 + energySmooth * 0.4);
 
     // Add hot core for bloom
-    color += vColor * core * 0.6;
+    color += vColor * core * 0.5;
 
     // Beat flash
-    color += vec3(beatIntensity * 0.3);
+    color += vec3(beatIntensity * 0.2);
 
-    // High energy = more saturated/bright
-    color *= 1.0 + spectralCentroid * 0.3;
-
-    gl_FragColor = vec4(color, alpha * 0.9);
+    gl_FragColor = vec4(color, alpha * 0.85);
   }
 `
 
-// Central star vertex shader
-const starVertexShader = `
+// Attractor vertex shader
+const attractorVertexShader = `
   varying vec3 vNormal;
   varying vec3 vPosition;
 
@@ -134,87 +84,29 @@ const starVertexShader = `
   }
 `
 
-// Central star fragment shader - pulsing emissive
-const starFragmentShader = `
+// Attractor fragment shader - glowing orbs
+const attractorFragmentShader = `
   uniform float time;
   uniform float bass;
   uniform float energySmooth;
-  uniform float spectralCentroid;
-  uniform vec3 starColor;
+  uniform vec3 attractorColor;
+  uniform float intensity;
 
   varying vec3 vNormal;
   varying vec3 vPosition;
 
   void main() {
-    // Fresnel glow
     vec3 viewDir = normalize(-vPosition);
-    float fresnel = pow(1.0 - abs(dot(viewDir, vNormal)), 2.0);
+    float fresnel = pow(1.0 - abs(dot(viewDir, vNormal)), 2.5);
 
-    // Pulsing intensity based on bass and energy
-    float pulse = 0.5 + bass * 0.5 + sin(time * 2.0) * 0.1;
-    float intensity = pulse * (0.5 + energySmooth * 1.5);
+    // Pulsing glow
+    float pulse = 0.6 + bass * 0.4 + sin(time * 3.0) * 0.1;
+    float glow = pulse * (0.5 + energySmooth * 1.0) * intensity;
 
-    // Color shifts with energy - cool for low, hot for high
-    vec3 coolColor = starColor * vec3(0.5, 0.7, 1.0);
-    vec3 hotColor = starColor * vec3(1.2, 0.9, 0.6);
-    vec3 color = mix(coolColor, hotColor, spectralCentroid);
+    vec3 color = attractorColor * glow;
+    color += attractorColor * fresnel * 0.6;
 
-    // Core glow + fresnel rim
-    vec3 finalColor = color * intensity + fresnel * color * 0.5;
-
-    gl_FragColor = vec4(finalColor, 1.0);
-  }
-`
-
-// Comet trail vertex shader
-const cometVertexShader = `
-  attribute float size;
-  attribute vec3 velocity;
-  attribute float lifetime;
-  attribute float startTime;
-
-  varying float vAlpha;
-  varying vec3 vColor;
-
-  uniform float time;
-  uniform vec3 cometColor;
-
-  void main() {
-    float age = time - startTime;
-    float life = age / lifetime;
-
-    if (life > 1.0 || life < 0.0) {
-      gl_Position = vec4(0.0, 0.0, -1000.0, 1.0);
-      gl_PointSize = 0.0;
-      return;
-    }
-
-    vAlpha = 1.0 - life;
-    vColor = cometColor;
-
-    // Position based on velocity and time
-    vec3 pos = position + velocity * age;
-
-    // Trail fades and shrinks
-    float finalSize = size * vAlpha;
-
-    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    gl_PointSize = finalSize * (200.0 / -mvPosition.z);
-    gl_Position = projectionMatrix * mvPosition;
-  }
-`
-
-const cometFragmentShader = `
-  varying float vAlpha;
-  varying vec3 vColor;
-
-  void main() {
-    vec2 center = gl_PointCoord - vec2(0.5);
-    float dist = length(center);
-    if (dist > 0.5) discard;
-
-    float alpha = (1.0 - smoothstep(0.2, 0.5, dist)) * vAlpha;
-    gl_FragColor = vec4(vColor * 1.5, alpha);
+    gl_FragColor = vec4(color, 0.9);
   }
 `
 
@@ -224,90 +116,103 @@ function seededRandom (seed: number): number {
   return x - Math.floor(x)
 }
 
-function ParticlesMode ({ colorPalette }: ParticlesModeProps) {
-  const orbitPointsRef = useRef<THREE.Points>(null)
-  const centralStarRef = useRef<THREE.Mesh>(null)
-  const cometPointsRef = useRef<THREE.Points>(null)
-  const { audioData } = useAudioData()
-  const cometBurstTimeRef = useRef<number>(0)
+// Attractor state (position + velocity + properties)
+interface Attractor {
+  position: THREE.Vector3
+  velocity: THREE.Vector3
+  basePosition: THREE.Vector3
+  mass: number
+  freqBand: number // Which frequency band affects this attractor
+}
 
-  // Create orbital particle geometry
-  const orbitGeometry = useMemo(() => {
+function ParticlesMode ({ colorPalette }: ParticlesModeProps) {
+  const particlePointsRef = useRef<THREE.Points>(null)
+  const attractorMeshesRef = useRef<THREE.Mesh[]>([])
+  const { audioData } = useAudioData()
+
+  // Track last beat time for explosion cooldown
+  const lastBeatTimeRef = useRef<number>(0)
+
+  // Particle velocities (maintained separately from positions for physics)
+  const velocitiesRef = useRef<Float32Array | null>(null)
+
+  // Initialize attractors
+  const attractors = useMemo<Attractor[]>(() => {
+    const result: Attractor[] = []
+    for (let i = 0; i < ATTRACTOR_COUNT; i++) {
+      const angle = (i / ATTRACTOR_COUNT) * Math.PI * 2
+      const radius = 3 + seededRandom(i * 13) * 2
+      const y = (seededRandom(i * 17) - 0.5) * 3
+
+      const basePos = new THREE.Vector3(
+        Math.cos(angle) * radius,
+        y,
+        Math.sin(angle) * radius,
+      )
+
+      result.push({
+        position: basePos.clone(),
+        velocity: new THREE.Vector3(),
+        basePosition: basePos,
+        mass: 0.5 + seededRandom(i * 23) * 1.0,
+        freqBand: i / ATTRACTOR_COUNT, // Each attractor responds to different frequency
+      })
+    }
+    return result
+  }, [])
+
+  // Create particle geometry
+  const particleGeometry = useMemo(() => {
     const geo = new THREE.BufferGeometry()
 
-    const positions = new Float32Array(TOTAL_PARTICLES * 3)
-    const colors = new Float32Array(TOTAL_PARTICLES * 3)
-    const sizes = new Float32Array(TOTAL_PARTICLES)
-    const orbitRadii = new Float32Array(TOTAL_PARTICLES)
-    const orbitSpeeds = new Float32Array(TOTAL_PARTICLES)
-    const orbitPhases = new Float32Array(TOTAL_PARTICLES)
-    const orbitInclinations = new Float32Array(TOTAL_PARTICLES)
-    const freqIndices = new Float32Array(TOTAL_PARTICLES)
+    const positions = new Float32Array(PARTICLE_COUNT * 3)
+    const colors = new Float32Array(PARTICLE_COUNT * 3)
+    const sizes = new Float32Array(PARTICLE_COUNT)
 
-    let particleIndex = 0
+    // Initialize particle velocities
+    const velocities = new Float32Array(PARTICLE_COUNT * 3)
+    velocitiesRef.current = velocities
 
-    RING_CONFIG.forEach((ring, ringIndex) => {
-      for (let i = 0; i < ring.particles; i++) {
-        const idx = particleIndex * 3
-        const seed = particleIndex * 7 + ringIndex * 1000
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const i3 = i * 3
+      const seed = i * 7
 
-        // Random position within ring
-        const radius = ring.baseRadius + (seededRandom(seed) - 0.5) * ring.spread * 2
-        const phase = seededRandom(seed + 1) * Math.PI * 2
-        const inclination = (seededRandom(seed + 2) - 0.5) * Math.PI * 0.4
+      // Spread particles in a sphere around the scene
+      const r = 2 + seededRandom(seed) * 6
+      const theta = seededRandom(seed + 1) * Math.PI * 2
+      const phi = Math.acos(2 * seededRandom(seed + 2) - 1)
 
-        // Initial position on orbit
-        positions[idx] = Math.cos(phase) * radius
-        positions[idx + 1] = Math.sin(phase) * Math.sin(inclination) * radius * 0.3
-        positions[idx + 2] = Math.sin(phase) * radius
+      positions[i3] = r * Math.sin(phi) * Math.cos(theta)
+      positions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta)
+      positions[i3 + 2] = r * Math.cos(phi)
 
-        // Orbit parameters
-        orbitRadii[particleIndex] = radius
-        orbitSpeeds[particleIndex] = ring.baseSpeed * (0.8 + seededRandom(seed + 3) * 0.4)
-        orbitPhases[particleIndex] = phase
-        orbitInclinations[particleIndex] = inclination
+      // Small random initial velocity
+      velocities[i3] = (seededRandom(seed + 3) - 0.5) * 0.02
+      velocities[i3 + 1] = (seededRandom(seed + 4) - 0.5) * 0.02
+      velocities[i3 + 2] = (seededRandom(seed + 5) - 0.5) * 0.02
 
-        // Size with some variation
-        sizes[particleIndex] = ring.sizeBase * (0.7 + seededRandom(seed + 4) * 0.6)
+      // Size variation
+      sizes[i] = 0.03 + seededRandom(seed + 6) * 0.04
 
-        // Frequency index for audio mapping
-        freqIndices[particleIndex] = seededRandom(seed + 5)
-
-        // Initial white color (will be updated per frame)
-        colors[idx] = 1
-        colors[idx + 1] = 1
-        colors[idx + 2] = 1
-
-        particleIndex++
-      }
-    })
+      // Initial white color (updated per frame)
+      colors[i3] = 1
+      colors[i3 + 1] = 1
+      colors[i3 + 2] = 1
+    }
 
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     geo.setAttribute('customColor', new THREE.BufferAttribute(colors, 3))
     geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
-    geo.setAttribute('orbitRadius', new THREE.BufferAttribute(orbitRadii, 1))
-    geo.setAttribute('orbitSpeed', new THREE.BufferAttribute(orbitSpeeds, 1))
-    geo.setAttribute('orbitPhase', new THREE.BufferAttribute(orbitPhases, 1))
-    geo.setAttribute('orbitInclination', new THREE.BufferAttribute(orbitInclinations, 1))
-    geo.setAttribute('freqIndex', new THREE.BufferAttribute(freqIndices, 1))
 
     return geo
   }, [])
 
-  // Create orbital particle material
-  const orbitMaterial = useMemo(() => {
+  // Create particle material
+  const particleMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
-        time: { value: 0 },
-        bass: { value: 0 },
-        mid: { value: 0 },
-        treble: { value: 0 },
-        beatIntensity: { value: 0 },
-        energy: { value: 0 },
         energySmooth: { value: 0 },
-        spectralCentroid: { value: 0.5 },
-        chaosAmount: { value: 1.0 },
-        frequencyData: { value: new Float32Array(64) },
+        beatIntensity: { value: 0 },
       },
       vertexShader,
       fragmentShader,
@@ -317,75 +222,28 @@ function ParticlesMode ({ colorPalette }: ParticlesModeProps) {
     })
   }, [])
 
-  // Create central star material
-  const starMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0 },
-        bass: { value: 0 },
-        energySmooth: { value: 0 },
-        spectralCentroid: { value: 0.5 },
-        starColor: { value: new THREE.Color(1, 1, 1) },
-      },
-      vertexShader: starVertexShader,
-      fragmentShader: starFragmentShader,
-      transparent: true,
-    })
-  }, [])
+  // Create attractor materials (one per attractor for individual colors)
+  const attractorMaterials = useMemo(() => {
+    return attractors.map(() =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+          bass: { value: 0 },
+          energySmooth: { value: 0 },
+          attractorColor: { value: new THREE.Color(1, 1, 1) },
+          intensity: { value: 1.0 },
+        },
+        vertexShader: attractorVertexShader,
+        fragmentShader: attractorFragmentShader,
+        transparent: true,
+      }),
+    )
+  }, [attractors])
 
-  // Create comet burst geometry
-  const cometGeometry = useMemo(() => {
-    const geo = new THREE.BufferGeometry()
-
-    const positions = new Float32Array(COMET_COUNT * 3)
-    const velocities = new Float32Array(COMET_COUNT * 3)
-    const sizes = new Float32Array(COMET_COUNT)
-    const lifetimes = new Float32Array(COMET_COUNT)
-    const startTimes = new Float32Array(COMET_COUNT)
-
-    for (let i = 0; i < COMET_COUNT; i++) {
-      // All start at origin, inactive
-      positions[i * 3] = 0
-      positions[i * 3 + 1] = 0
-      positions[i * 3 + 2] = 0
-      velocities[i * 3] = 0
-      velocities[i * 3 + 1] = 0
-      velocities[i * 3 + 2] = 0
-      sizes[i] = 0.05 + seededRandom(i * 11) * 0.05
-      lifetimes[i] = COMET_LIFETIME
-      startTimes[i] = -1000 // Inactive
-    }
-
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    geo.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3))
-    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
-    geo.setAttribute('lifetime', new THREE.BufferAttribute(lifetimes, 1))
-    geo.setAttribute('startTime', new THREE.BufferAttribute(startTimes, 1))
-
-    return geo
-  }, [])
-
-  // Create comet material
-  const cometMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0 },
-        cometColor: { value: new THREE.Color(1, 0.8, 0.4) },
-      },
-      vertexShader: cometVertexShader,
-      fragmentShader: cometFragmentShader,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
-  }, [])
-
-  // Animation loop
+  // Animation loop - performs physics simulation
   useFrame((state) => {
-    const orbitPoints = orbitPointsRef.current
-    const star = centralStarRef.current
-    const cometPoints = cometPointsRef.current
-    if (!orbitPoints || !star) return
+    const particlePoints = particlePointsRef.current
+    if (!particlePoints || !velocitiesRef.current) return
 
     const {
       bass,
@@ -394,115 +252,167 @@ function ParticlesMode ({ colorPalette }: ParticlesModeProps) {
       frequencyData,
       isBeat,
       beatIntensity,
-      energy,
       energySmooth,
       spectralCentroid,
     } = audioData.current
     const time = state.clock.elapsedTime
+    const dt = Math.min(state.clock.getDelta(), 0.05) // Cap delta time
 
-    // Update orbital particle uniforms
-    orbitMaterial.uniforms.time.value = time
-    orbitMaterial.uniforms.bass.value = bass
-    orbitMaterial.uniforms.mid.value = mid
-    orbitMaterial.uniforms.treble.value = treble
-    orbitMaterial.uniforms.beatIntensity.value = beatIntensity
-    orbitMaterial.uniforms.energy.value = energy
-    orbitMaterial.uniforms.energySmooth.value = energySmooth
-    orbitMaterial.uniforms.spectralCentroid.value = spectralCentroid
-    orbitMaterial.uniforms.frequencyData.value = frequencyData
+    // === UPDATE ATTRACTORS ===
+    attractors.forEach((attractor, i) => {
+      // Get frequency intensity for this attractor
+      const freqIdx = Math.floor(attractor.freqBand * (frequencyData.length - 1))
+      const freqIntensity = frequencyData[freqIdx] ?? 0
 
-    // Update star uniforms
-    starMaterial.uniforms.time.value = time
-    starMaterial.uniforms.bass.value = bass
-    starMaterial.uniforms.energySmooth.value = energySmooth
-    starMaterial.uniforms.spectralCentroid.value = spectralCentroid
+      // Attractors drift based on their frequency band
+      const driftSpeed = 0.3 + freqIntensity * 0.5
+      const driftAngle = time * driftSpeed + i * Math.PI * 0.5
+      const driftRadius = 0.5 + mid * 1.5
 
-    // Update particle colors based on energy and palette
-    const colors = orbitGeometry.attributes.customColor as THREE.BufferAttribute
+      attractor.position.x = attractor.basePosition.x + Math.cos(driftAngle) * driftRadius
+      attractor.position.y = attractor.basePosition.y + Math.sin(driftAngle * 0.7) * driftRadius * 0.5
+      attractor.position.z = attractor.basePosition.z + Math.sin(driftAngle) * driftRadius
+
+      // Update attractor mesh
+      const mesh = attractorMeshesRef.current[i]
+      if (mesh) {
+        mesh.position.copy(attractor.position)
+
+        // Scale with bass
+        const scale = 0.15 + bass * 0.15 + freqIntensity * 0.1
+        mesh.scale.setScalar(scale)
+
+        // Update material
+        const material = attractorMaterials[i]
+        material.uniforms.time.value = time
+        material.uniforms.bass.value = bass
+        material.uniforms.energySmooth.value = energySmooth
+        material.uniforms.intensity.value = 0.5 + freqIntensity * 1.0
+
+        // Color from palette based on attractor position
+        const color = getColorFromPalette(colorPalette, attractor.freqBand)
+        material.uniforms.attractorColor.value = color
+      }
+    })
+
+    // === PARTICLE PHYSICS ===
+    const positions = particleGeometry.attributes.position as THREE.BufferAttribute
+    const posArray = positions.array as Float32Array
+    const velocities = velocitiesRef.current
+    const colors = particleGeometry.attributes.customColor as THREE.BufferAttribute
     const colorArray = colors.array as Float32Array
-    const freqIndices = orbitGeometry.attributes.freqIndex as THREE.BufferAttribute
-    const freqIndexArray = freqIndices.array as Float32Array
 
-    for (let i = 0; i < TOTAL_PARTICLES; i++) {
-      const i3 = i * 3
-      const freqIdx = Math.floor(freqIndexArray[i] * frequencyData.length)
-      const intensity = frequencyData[freqIdx] ?? 0
-
-      // Color position: energy determines warmth, frequency determines position in palette
-      // Low energy = cool blues/purples, high energy = hot oranges/whites
-      const warmth = energySmooth * spectralCentroid
-      const colorPos = (freqIndexArray[i] + treble * 0.2 + warmth * 0.3) % 1
-
-      const baseColor = getColorFromPalette(colorPalette, colorPos)
-
-      // Shift toward hot colors when energy is high
-      const r = baseColor.r * (0.6 + intensity * 0.4 + warmth * 0.3)
-      const g = baseColor.g * (0.6 + intensity * 0.3)
-      const b = baseColor.b * (0.6 + intensity * 0.2 - warmth * 0.2)
-
-      colorArray[i3] = Math.min(1.2, r)
-      colorArray[i3 + 1] = Math.max(0.1, Math.min(1.0, g))
-      colorArray[i3 + 2] = Math.max(0.1, Math.min(1.0, b))
+    // Check for beat explosion
+    const shouldExplode = isBeat && beatIntensity > 0.4 && time - lastBeatTimeRef.current > 0.2
+    if (shouldExplode) {
+      lastBeatTimeRef.current = time
     }
-    colors.needsUpdate = true
 
-    // Update star color based on energy
-    const starBaseColor = getColorFromPalette(colorPalette, 0.5)
-    starMaterial.uniforms.starColor.value = starBaseColor
+    // Gravity strength varies with energy
+    const gravityMult = GRAVITY_STRENGTH * (0.5 + energySmooth * 1.0)
 
-    // Star scale pulses with bass
-    const starScale = 0.3 + bass * 0.2 + energySmooth * 0.3
-    star.scale.setScalar(starScale)
+    // Process each particle
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const i3 = i * 3
 
-    // Trigger comet burst on beat
-    if (isBeat && cometPoints && beatIntensity > 0.3 && time - cometBurstTimeRef.current > 0.3) {
-      cometBurstTimeRef.current = time
+      // Current position
+      const px = posArray[i3]
+      const py = posArray[i3 + 1]
+      const pz = posArray[i3 + 2]
 
-      const positions = cometGeometry.attributes.position as THREE.BufferAttribute
-      const velocities = cometGeometry.attributes.velocity as THREE.BufferAttribute
-      const startTimes = cometGeometry.attributes.startTime as THREE.BufferAttribute
-      const posArray = positions.array as Float32Array
-      const velArray = velocities.array as Float32Array
-      const startArray = startTimes.array as Float32Array
+      // Accumulate acceleration from all attractors
+      let ax = 0
+      let ay = 0
+      let az = 0
 
-      // Spawn burst of comets
-      const burstCount = Math.floor(50 + beatIntensity * 100)
-      for (let i = 0; i < burstCount && i < COMET_COUNT; i++) {
-        const idx = i * 3
+      for (const attractor of attractors) {
+        const dx = attractor.position.x - px
+        const dy = attractor.position.y - py
+        const dz = attractor.position.z - pz
 
-        // Start from slightly randomized central position
-        posArray[idx] = (Math.random() - 0.5) * 0.5
-        posArray[idx + 1] = (Math.random() - 0.5) * 0.5
-        posArray[idx + 2] = (Math.random() - 0.5) * 0.5
+        const distSq = dx * dx + dy * dy + dz * dz
+        const dist = Math.sqrt(distSq)
 
-        // Random outward velocity - faster when high energy
-        const speed = (2 + energySmooth * 4 + Math.random() * 2) * (1 + beatIntensity)
-        const theta = Math.random() * Math.PI * 2
-        const phi = Math.acos(2 * Math.random() - 1)
-        velArray[idx] = Math.sin(phi) * Math.cos(theta) * speed
-        velArray[idx + 1] = Math.sin(phi) * Math.sin(theta) * speed
-        velArray[idx + 2] = Math.cos(phi) * speed
+        // Avoid division by zero and extreme forces at close range
+        const minDist = 0.5
+        const effectiveDist = Math.max(dist, minDist)
+        const effectiveDistSq = effectiveDist * effectiveDist
 
-        startArray[i] = time
+        // Gravitational acceleration: a = G * M / r^2
+        const force = (gravityMult * attractor.mass) / effectiveDistSq
+
+        // Direction toward attractor
+        ax += (dx / dist) * force
+        ay += (dy / dist) * force
+        az += (dz / dist) * force
       }
 
-      positions.needsUpdate = true
-      velocities.needsUpdate = true
-      startTimes.needsUpdate = true
+      // Beat explosion - push outward from center
+      if (shouldExplode) {
+        const centerDist = Math.sqrt(px * px + py * py + pz * pz)
+        const explosionStrength = EXPLOSION_FORCE * beatIntensity * (1 + energySmooth)
+        if (centerDist > 0.1) {
+          velocities[i3] += (px / centerDist) * explosionStrength
+          velocities[i3 + 1] += (py / centerDist) * explosionStrength
+          velocities[i3 + 2] += (pz / centerDist) * explosionStrength
+        }
+      }
 
-      // Update comet color based on energy
-      const cometColor = getColorFromPalette(colorPalette, 0.8 + energySmooth * 0.2)
-      cometMaterial.uniforms.cometColor.value = cometColor
+      // Update velocity with acceleration
+      velocities[i3] += ax * dt
+      velocities[i3 + 1] += ay * dt
+      velocities[i3 + 2] += az * dt
+
+      // Apply velocity damping
+      velocities[i3] *= VELOCITY_DAMPING
+      velocities[i3 + 1] *= VELOCITY_DAMPING
+      velocities[i3 + 2] *= VELOCITY_DAMPING
+
+      // Clamp velocity
+      const velMag = Math.sqrt(
+        velocities[i3] ** 2 + velocities[i3 + 1] ** 2 + velocities[i3 + 2] ** 2,
+      )
+      if (velMag > MAX_VELOCITY) {
+        const scale = MAX_VELOCITY / velMag
+        velocities[i3] *= scale
+        velocities[i3 + 1] *= scale
+        velocities[i3 + 2] *= scale
+      }
+
+      // Update position
+      // eslint-disable-next-line react-hooks/immutability -- Three.js buffer updates
+      posArray[i3] += velocities[i3]
+      posArray[i3 + 1] += velocities[i3 + 1]
+      posArray[i3 + 2] += velocities[i3 + 2]
+
+      // Soft boundary - push back if too far
+      const posMag = Math.sqrt(posArray[i3] ** 2 + posArray[i3 + 1] ** 2 + posArray[i3 + 2] ** 2)
+      const maxRadius = 10
+      if (posMag > maxRadius) {
+        const pushBack = 0.1
+        posArray[i3] -= (posArray[i3] / posMag) * pushBack
+        posArray[i3 + 1] -= (posArray[i3 + 1] / posMag) * pushBack
+        posArray[i3 + 2] -= (posArray[i3 + 2] / posMag) * pushBack
+      }
+
+      // Update color based on velocity (faster = brighter/warmer)
+      const speedRatio = velMag / MAX_VELOCITY
+      const colorPos = (i / PARTICLE_COUNT + treble * 0.2 + speedRatio * 0.3) % 1
+      const baseColor = getColorFromPalette(colorPalette, colorPos)
+
+      // Shift toward hot colors when moving fast
+      colorArray[i3] = baseColor.r * (0.6 + speedRatio * 0.6)
+      colorArray[i3 + 1] = baseColor.g * (0.6 + speedRatio * 0.3)
+      colorArray[i3 + 2] = baseColor.b * (0.6 + speedRatio * 0.2 - spectralCentroid * 0.1)
     }
 
-    // Update comet time uniform
-    if (cometPoints) {
-      cometMaterial.uniforms.time.value = time
-    }
+    positions.needsUpdate = true
+    colors.needsUpdate = true
 
-    // Gentle whole-system rotation
-    orbitPoints.rotation.y += 0.001 + energySmooth * 0.003
-    orbitPoints.rotation.x = Math.sin(time * 0.3) * 0.1 * (1 - energySmooth * 0.5)
+    // Update particle material uniforms
+    // eslint-disable-next-line react-hooks/immutability -- Three.js uniform updates
+    particleMaterial.uniforms.energySmooth.value = energySmooth
+    particleMaterial.uniforms.beatIntensity.value = beatIntensity
   })
 
   return (
@@ -510,17 +420,21 @@ function ParticlesMode ({ colorPalette }: ParticlesModeProps) {
       {/* eslint-disable react/no-unknown-property */}
       <ambientLight intensity={0.1} />
 
-      {/* Central star */}
-      <mesh ref={centralStarRef}>
-        <icosahedronGeometry args={[1, 3]} />
-        <primitive object={starMaterial} attach='material' />
-      </mesh>
+      {/* Attractors (gravity wells) */}
+      {attractors.map((_, i) => (
+        <mesh
+          key={i}
+          ref={(el) => {
+            if (el) attractorMeshesRef.current[i] = el
+          }}
+        >
+          <icosahedronGeometry args={[1, 2]} />
+          <primitive object={attractorMaterials[i]} attach='material' />
+        </mesh>
+      ))}
 
-      {/* Orbital particles */}
-      <points ref={orbitPointsRef} geometry={orbitGeometry} material={orbitMaterial} />
-
-      {/* Comet bursts */}
-      <points ref={cometPointsRef} geometry={cometGeometry} material={cometMaterial} />
+      {/* Particles */}
+      <points ref={particlePointsRef} geometry={particleGeometry} material={particleMaterial} />
       {/* eslint-enable react/no-unknown-property */}
     </>
   )
