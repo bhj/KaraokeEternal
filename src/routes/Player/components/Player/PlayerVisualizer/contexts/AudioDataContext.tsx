@@ -3,6 +3,10 @@ import React, { createContext, useContext, useRef, useCallback, useMemo } from '
 import { useFrame } from '@react-three/fiber'
 import { type AudioData, useAudioAnalyser } from '../hooks/useAudioAnalyser'
 
+// Re-export useSmoothedAudio for convenience
+export { useSmoothedAudio } from '../hooks/useSmoothedAudio'
+export type { SmoothedAudioData } from '../hooks/useSmoothedAudio'
+
 interface AudioDataContextValue {
   audioData: React.MutableRefObject<AudioData>
   getAudioData: () => AudioData
