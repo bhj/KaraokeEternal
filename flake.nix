@@ -16,12 +16,12 @@
         # Production package
         packages.default = pkgs.buildNpmPackage rec {
           pname = "karaoke-eternal-automated";
-          version = "unstable-2026-01-24-2";
+          version = "unstable-2026-01-28";
 
           src = ./.;
 
           inherit nodejs;
-          npmDepsHash = "sha256-L6lUlCclD6uk1lyzMBRvTxWapOIlprtiM312n0ehP/k=";
+          npmDepsHash = "sha256-BmAdpKB3WcvZa3q4TcCj39qTufJNOVwyoma2CoioKRE=";
 
           nativeBuildInputs = with pkgs; [ python3 gnumake gcc ];
 
