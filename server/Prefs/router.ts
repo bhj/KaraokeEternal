@@ -22,9 +22,9 @@ const router = new KoaRouter({ prefix: '/api/prefs' })
 router.get('/public', async (ctx) => {
   const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL || null
   const oidcConfigured = !!(
-    process.env.KES_OIDC_ISSUER_URL &&
-    process.env.KES_OIDC_CLIENT_ID &&
-    process.env.KES_OIDC_CLIENT_SECRET
+    process.env.KES_OIDC_ISSUER_URL
+    && process.env.KES_OIDC_CLIENT_ID
+    && process.env.KES_OIDC_CLIENT_SECRET
   )
 
   ctx.body = {

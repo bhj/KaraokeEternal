@@ -13,7 +13,6 @@ const PlayerView = () => {
   const viewportHeight = innerHeight - headerHeight - footerHeight
   const dispatch = useAppDispatch()
 
-
   // @todo: find better place for this?
   if (!useAppSelector(state => state.player)) {
     combinedReducer.inject({ reducerPath: 'player', reducer: playerReducer })

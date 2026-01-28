@@ -34,6 +34,13 @@ export interface OptimisticQueueItem {
   songId: number
 }
 
+export interface IRoomVisualizerPrefs {
+  mode?: VisualizerMode
+  colorPalette?: ColorPalette
+  lyricsMode?: LyricsMode
+  sensitivity?: number
+}
+
 export interface IRoomPrefs {
   qr: {
     isEnabled: boolean
@@ -48,6 +55,7 @@ export interface IRoomPrefs {
   roles?: Record<number, {
     allowNew: boolean
   }>
+  visualizer?: IRoomVisualizerPrefs
 }
 
 export interface Room {
@@ -90,6 +98,19 @@ export interface UserWithRole extends User {
   role?: string
 }
 
+export type VisualizerMode
+  = 'particles' // GPU particle system (Cinema4D-style)
+    | 'geometry' // Mesh deformation (blob, sphere)
+    | 'shader' // Full-screen shader effects
+    | 'spectrum' // Clean frequency bars
+    | 'reactive' // Beat-reactive colors only
+    | 'milkdrop' // Legacy Butterchurn (fallback)
+    | 'off'
+
+export type ColorPalette = 'warm' | 'cool' | 'neon' | 'monochrome' | 'rainbow'
+
+export type LyricsMode = 'cdgOnly' | 'msdfOverlay' | 'msdfOnly' | 'off'
+
 export interface PlaybackOptions {
   cdgAlpha?: number
   cdgSize?: number
@@ -100,6 +121,10 @@ export interface PlaybackOptions {
     nextPreset?: boolean
     prevPreset?: boolean
     randomPreset?: boolean
+    // New visualizer options
+    mode?: VisualizerMode
+    colorPalette?: ColorPalette
+    lyricsMode?: LyricsMode
   }
 }
 

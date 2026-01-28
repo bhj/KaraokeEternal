@@ -1,4 +1,4 @@
-import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import socket from 'lib/socket'
 import AppRouter from 'lib/AppRouter'
 import { RootState } from 'store/store'
@@ -51,6 +51,13 @@ const initialState: UserState = {
   dateUpdated: 0,
 }
 
+// Action creators (defined before slice so they can be used in extraReducers)
+const receiveAccount = createAction<Partial<UserState>>(ACCOUNT_RECEIVE)
+export const bootstrapComplete = createAction('user/BOOTSTRAP_COMPLETE')
+const requestSocketConnect = createAction<Record<string, unknown>>(SOCKET_REQUEST_CONNECT)
+const logoutInternal = createAction(LOGOUT)
+const socketAuthErrorInternal = createAction(SOCKET_AUTH_ERROR)
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -61,32 +68,23 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(ACCOUNT_RECEIVE, (state, action: PayloadAction<Partial<UserState>>) => ({
-        ...state,
-        ...action.payload,
-      }))
-      .addCase('user/BOOTSTRAP_COMPLETE', (state) => {
+      .addCase(receiveAccount, (state, action) => {
+        Object.assign(state, action.payload)
+      })
+      .addCase(bootstrapComplete, (state) => {
         state.isBootstrapping = false
       })
-      .addCase(LOGOUT, () => ({
-        ...initialState,
-        isBootstrapping: false,
-        isLoggingOut: false,
-      }))
-      .addCase(SOCKET_AUTH_ERROR, () => ({
-        ...initialState,
-        isBootstrapping: false,
-      }))
+      .addCase(logoutInternal, () => {
+        return { ...initialState, isBootstrapping: false, isLoggingOut: false }
+      })
+      .addCase(socketAuthErrorInternal, () => {
+        return { ...initialState, isBootstrapping: false }
+      })
   },
 })
 
 // Extract internal actions from slice
 const { logoutStart } = userSlice.actions
-
-// Actions with specific action types for socket middleware compatibility
-const receiveAccount = createAction<Partial<UserState>>(ACCOUNT_RECEIVE)
-export const bootstrapComplete = createAction('user/BOOTSTRAP_COMPLETE')
-const requestSocketConnect = createAction<object>(SOCKET_REQUEST_CONNECT)
 
 // ------------------------------------
 // Async Thunks
@@ -120,7 +118,7 @@ export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
 
 export const login = createAsyncThunk(
   LOGIN,
-  async (creds: object, thunkAPI) => {
+  async (creds: Record<string, unknown>, thunkAPI) => {
     const user = await api.post('login', { body: creds })
 
     thunkAPI.dispatch(receiveAccount(user))

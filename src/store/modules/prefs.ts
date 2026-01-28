@@ -20,7 +20,7 @@ const api = new HttpApi('prefs')
 // ------------------------------------
 // State & Slice
 // ------------------------------------
-interface PrefsState {
+export interface PrefsState {
   isFirstRun?: boolean
   isScanning: boolean
   isReplayGainEnabled: boolean
@@ -51,54 +51,21 @@ const initialState: PrefsState = {
   scannerText: '',
 }
 
-const prefsSlice = createSlice({
-  name: 'prefs',
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(PREFS_REQUEST + '/fulfilled', (state, action: PayloadAction<Partial<PrefsState>>) => ({
-        ...state,
-        ...action.payload,
-      }))
-      .addCase(PREFS_RECEIVE, (state, action: PayloadAction<Partial<PrefsState>>) => ({
-        ...state,
-        ...action.payload,
-      }))
-      .addCase(PREFS_PUSH, (state, action: PayloadAction<Partial<PrefsState>>) => ({
-        ...state,
-        ...action.payload,
-      }))
-      .addCase(SCANNER_WORKER_STATUS, (state, action: PayloadAction<{ isScanning: boolean, pct: number, text: string }>) => ({
-        ...state,
-        isScanning: action.payload.isScanning,
-        scannerPct: action.payload.pct,
-        scannerText: action.payload.text,
-      }))
-  },
-})
-
 // Actions with specific action types for socket middleware compatibility
 const logout = createAction(LOGOUT)
 export const setPref = createAction<{ key: string, data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<Partial<PrefsState>>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_PATH_SET_PRIORITY)
 
-// ------------------------------------
-// Async Thunks
-// ------------------------------------
-export const setPathPrefs = createAsyncThunk(
-  PREFS_PATH_UPDATE,
-  async ({ pathId, data }: { pathId: number, data: FormData }, thunkAPI) => {
-    const response = await api.put(`/path/${pathId}`, { body: data })
-    thunkAPI.dispatch(receivePrefs(response))
-  },
-)
+// Internal action creators for extraReducers (defined before slice)
+const prefsPushInternal = createAction<Partial<PrefsState>>(PREFS_PUSH)
+const scannerStatusInternal = createAction<{ isScanning: boolean, pct: number, text: string }>(SCANNER_WORKER_STATUS)
 
-export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
+// Async Thunks (defined before slice so we can use .fulfilled in extraReducers)
+export const fetchPrefs = createAsyncThunk<Partial<PrefsState>, void, { state: RootState }>(
   PREFS_REQUEST,
   async (_, thunkAPI) => {
-    const response = await api.get('', { skipAuthRedirect: true })
+    const response = await api.get<Partial<PrefsState>>('', { skipAuthRedirect: true })
 
     // sign out if we see isFirstRun flag
     if (response.isFirstRun && thunkAPI.getState().user.userId !== null) {
@@ -108,6 +75,41 @@ export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
     return response
   },
 )
+
+export const setPathPrefs = createAsyncThunk(
+  PREFS_PATH_UPDATE,
+  async ({ pathId, data }: { pathId: number, data: FormData }, thunkAPI) => {
+    const response = await api.put(`/path/${pathId}`, { body: data })
+    thunkAPI.dispatch(receivePrefs(response))
+  },
+)
+
+const prefsSlice = createSlice({
+  name: 'prefs',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPrefs.fulfilled, (state, action) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(receivePrefs, (state, action: PayloadAction<Partial<PrefsState>>) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(prefsPushInternal, (state, action: PayloadAction<Partial<PrefsState>>) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(scannerStatusInternal, (state, action) => ({
+        ...state,
+        isScanning: action.payload.isScanning,
+        scannerPct: action.payload.pct,
+        scannerText: action.payload.text,
+      }))
+  },
+})
 
 export const requestScan = createAsyncThunk(
   PREFS_REQ_SCANNER_START,

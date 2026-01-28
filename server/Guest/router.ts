@@ -1,5 +1,6 @@
 import KoaRouter from '@koa/router'
 import jsonWebToken from 'jsonwebtoken'
+import 'koa-body' // Import for module augmentation (adds body to ctx.request)
 import getLogger from '../lib/Log.js'
 import Rooms from '../Rooms/Rooms.js'
 import User from '../User/User.js'
@@ -15,7 +16,7 @@ const joinAttempts = new Map<string, number[]>()
 const RATE_LIMIT_MAX = 10 // Max requests per window
 const RATE_LIMIT_WINDOW_MS = 60 * 1000 // 1 minute window
 
-function rateLimit(ip: string): boolean {
+function rateLimit (ip: string): boolean {
   const now = Date.now()
   const attempts = (joinAttempts.get(ip) || []).filter(t => t > now - RATE_LIMIT_WINDOW_MS)
 
@@ -58,7 +59,7 @@ router.post('/join', async (ctx) => {
     ctx.throw(429, 'Too many requests. Please try again later.')
   }
 
-  const body = ctx.request.body as GuestJoinBody
+  const body = (ctx.request as unknown as { body: GuestJoinBody }).body
   const { roomId, inviteCode, guestName } = body
 
   // Validate required fields

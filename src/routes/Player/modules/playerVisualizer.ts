@@ -5,7 +5,7 @@ import {
   PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
 } from 'shared/actionTypes'
-import { PlaybackOptions } from 'shared/types'
+import type { ColorPalette, LyricsMode, PlaybackOptions, VisualizerMode } from 'shared/types'
 
 const BAD_PRESETS = [
   'Flexi + Martin - astral projection',
@@ -37,6 +37,10 @@ export interface PlayerVisualizerState {
   presetKey: string
   presetName: string
   sensitivity: number
+  // New visualizer state
+  mode: VisualizerMode
+  colorPalette: ColorPalette
+  lyricsMode: LyricsMode
 }
 
 const initialState: PlayerVisualizerState = {
@@ -44,6 +48,10 @@ const initialState: PlayerVisualizerState = {
   isSupported: true,
   ...getRandomPreset(),
   sensitivity: 1,
+  // New defaults
+  mode: 'particles',
+  colorPalette: 'warm',
+  lyricsMode: 'cdgOnly',
 }
 
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
@@ -73,6 +81,10 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         ...preset,
         isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
+        // New visualizer options
+        mode: visualizer.mode ?? state.mode,
+        colorPalette: visualizer.colorPalette ?? state.colorPalette,
+        lyricsMode: visualizer.lyricsMode ?? state.lyricsMode,
       }
     })
     .addCase(playerVisualizerError, (state) => {

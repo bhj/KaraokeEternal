@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import styles from './Panel.css'
 
 interface PanelProps {
-  children: React.ReactElement
+  children: React.ReactNode
   className?: string
   contentClassName?: string
   title: string

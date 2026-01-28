@@ -15,7 +15,7 @@ import { MediaType, PlaybackOptions } from 'shared/types'
 // ------------------------------------
 // State & Slice
 // ------------------------------------
-interface StatusState {
+export interface StatusState {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
@@ -55,16 +55,20 @@ const initialState: StatusState = {
   volume: 1,
 }
 
+// Internal action creators for extraReducers (defined before slice)
+const playerLeaveInternal = createAction(PLAYER_LEAVE)
+const playerStatusInternal = createAction<Partial<StatusState>>(PLAYER_STATUS)
+
 const statusSlice = createSlice({
   name: 'status',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(PLAYER_LEAVE, (state) => {
+      .addCase(playerLeaveInternal, (state) => {
         state.isPlayerPresent = false
       })
-      .addCase(PLAYER_STATUS, (state, action: PayloadAction<Partial<StatusState>>) => ({
+      .addCase(playerStatusInternal, (state, action: PayloadAction<Partial<StatusState>>) => ({
         ...state,
         ...action.payload,
         isPlayerPresent: true,

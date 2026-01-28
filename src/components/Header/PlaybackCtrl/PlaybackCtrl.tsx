@@ -23,7 +23,6 @@ const PlaybackCtrl = () => {
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
-  const isAdmin = useAppSelector(state => state.user.isAdmin)
   const isGuest = useAppSelector(state => state.user.isGuest)
   const isInRoom = useAppSelector(state => state.user.roomId !== null)
   const status = useAppSelector(state => state.status)
@@ -97,6 +96,9 @@ const PlaybackCtrl = () => {
           onRequestOptions={handleOptions}
           sensitivity={status.visualizer.sensitivity}
           visualizerPresetName={status.visualizer.presetName}
+          visualizerMode={status.visualizer.mode}
+          colorPalette={status.visualizer.colorPalette}
+          lyricsMode={status.visualizer.lyricsMode}
         />
       )}
     </div>

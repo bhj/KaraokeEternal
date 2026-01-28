@@ -17,7 +17,7 @@ export const PUBLIC_API_PATHS = [
  * Check if a request path is a public API path that doesn't require authentication.
  * Handles URL path prefixes (e.g., /karaoke/api/login when KES_URL_PATH=/karaoke/).
  */
-export function isPublicApiPath(requestPath: string, urlPath: string): boolean {
+export function isPublicApiPath (requestPath: string, urlPath: string): boolean {
   // Normalize urlPath to always end with /
   const normalizedUrlPath = urlPath.replace(/\/?$/, '/')
 

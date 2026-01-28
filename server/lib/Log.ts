@@ -1,5 +1,7 @@
 import log from 'electron-log/node.js' // eslint-disable-line n/no-missing-import
-const LEVELS = [false, 'error', 'warn', 'info', 'verbose', 'debug']
+
+type LogLevel = false | 'error' | 'warn' | 'info' | 'verbose' | 'debug'
+const LEVELS: LogLevel[] = [false, 'error', 'warn', 'info', 'verbose', 'debug']
 
 class Logger {
   static #instance
@@ -13,7 +15,7 @@ class Logger {
 
     for (const transport in cfg) {
       for (const key in cfg[transport]) {
-        if (key === 'level') log.transports[transport].level = LEVELS[cfg[transport].level] as any
+        if (key === 'level') log.transports[transport].level = LEVELS[cfg[transport].level]
         else log.transports[transport][key] = cfg[transport][key]
       }
     }

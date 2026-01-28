@@ -7,9 +7,40 @@ import Media from '../Media/Media.js'
 const log = getLogger('Library')
 const { db } = Database
 
+interface NormalizedEntities<T> {
+  result: number[]
+  entities: Record<number, T>
+}
+
+interface ArtistEntity {
+  artistId: number
+  name: string
+  songIds?: number[]
+}
+
+interface SongEntity {
+  songId: number
+  artistId: number
+  title: string
+  duration: number
+  numMedia: number
+}
+
+interface LibraryCache {
+  version: number | null
+  artists?: NormalizedEntities<ArtistEntity>
+  songs?: NormalizedEntities<SongEntity>
+}
+
+interface StarCountsCache {
+  version: number | null
+  artists?: Record<number, number>
+  songs?: Record<number, number>
+}
+
 class Library {
-  static cache: { version: any, artists?: any, songs?: any } = { version: null }
-  static starCountsCache: { version: any, artists?: any, songs?: any } = { version: null }
+  static cache: LibraryCache = { version: null }
+  static starCountsCache: StarCountsCache = { version: null }
 
   /**
   * Get artists and songs in a format suitable for sending to clients.
@@ -126,7 +157,7 @@ class Library {
   * @return {object}          { artistId, songId }
   */
   static async matchSong (parsed) {
-    const match: { artistId?: any, artist?: string, artistNorm?: string, songId?: any, title?: string, titleNorm?: string } = {}
+    const match: { artistId?: number, artist?: string, artistNorm?: string, songId?: number, title?: string, titleNorm?: string } = {}
 
     // match artist
     {

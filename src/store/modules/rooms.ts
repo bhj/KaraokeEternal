@@ -21,7 +21,7 @@ const api = new HttpApi('rooms')
 // ------------------------------------
 // State & Slice
 // ------------------------------------
-interface RoomsState {
+export interface RoomsState {
   result: number[]
   entities: Record<number, Room>
   filterStatus: boolean | string
@@ -35,52 +35,54 @@ const initialState: RoomsState = {
   isEditorOpen: false,
 }
 
-const roomsSlice = createSlice({
-  name: 'rooms',
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(ROOMS_REQUEST + '/fulfilled', (state, action: PayloadAction<Partial<RoomsState>>) => ({
-        ...state,
-        ...action.payload,
-      }))
-      .addCase(ROOMS_RECEIVE, (state, action: PayloadAction<Partial<RoomsState>>) => ({
-        ...state,
-        ...action.payload,
-      }))
-      .addCase(ROOM_EDITOR_OPEN, (state) => {
-        state.isEditorOpen = true
-      })
-      .addCase(ROOM_EDITOR_CLOSE, (state) => {
-        state.isEditorOpen = false
-      })
-      .addCase(ROOM_FILTER_STATUS, (state, action: PayloadAction<boolean | string>) => {
-        state.filterStatus = action.payload
-      })
-      .addCase(ROOM_PREFS_PUSH, (state, action: PayloadAction<{ roomId: number, prefs: IRoomPrefs }>) => {
-        const { roomId, prefs } = action.payload
-        if (state.entities[roomId]) {
-          state.entities[roomId].prefs = prefs
-        }
-      })
-      .addCase(LOGOUT, () => initialState)
-  },
-})
-
 // Actions with specific action types for socket middleware compatibility
 export const receiveRooms = createAction<Partial<RoomsState>>(ROOMS_RECEIVE)
 export const openRoomEditor = createAction(ROOM_EDITOR_OPEN)
 export const closeRoomEditor = createAction(ROOM_EDITOR_CLOSE)
 export const filterByStatus = createAction<boolean | string>(ROOM_FILTER_STATUS)
 
-// ------------------------------------
-// Async Thunks
-// ------------------------------------
-export const fetchRooms = createAsyncThunk(
+// Internal action creators for extraReducers (defined before slice)
+const roomPrefsPushInternal = createAction<{ roomId: number, prefs: IRoomPrefs }>(ROOM_PREFS_PUSH)
+const logoutInternal = createAction(LOGOUT)
+
+// Async Thunks (defined before slice so we can use .fulfilled in extraReducers)
+export const fetchRooms = createAsyncThunk<Partial<RoomsState>>(
   ROOMS_REQUEST,
-  async () => await api.get(''),
+  async () => await api.get<Partial<RoomsState>>(''),
 )
+
+const roomsSlice = createSlice({
+  name: 'rooms',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchRooms.fulfilled, (state, action) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(receiveRooms, (state, action: PayloadAction<Partial<RoomsState>>) => ({
+        ...state,
+        ...action.payload,
+      }))
+      .addCase(openRoomEditor, (state) => {
+        state.isEditorOpen = true
+      })
+      .addCase(closeRoomEditor, (state) => {
+        state.isEditorOpen = false
+      })
+      .addCase(filterByStatus, (state, action) => {
+        state.filterStatus = action.payload
+      })
+      .addCase(roomPrefsPushInternal, (state, action) => {
+        const { roomId, prefs } = action.payload
+        if (state.entities[roomId]) {
+          state.entities[roomId].prefs = prefs
+        }
+      })
+      .addCase(logoutInternal, () => initialState)
+  },
+})
 
 export const fetchCurrentRoom = createAsyncThunk<object, void, { state: RootState }>(
   ROOMS_REQUEST,
@@ -97,7 +99,7 @@ export const fetchCurrentRoom = createAsyncThunk<object, void, { state: RootStat
 
 export const createRoom = createAsyncThunk(
   ROOM_CREATE,
-  async (data: object, thunkAPI) => {
+  async (data: Record<string, unknown>, thunkAPI) => {
     const response = await api.post('', { body: data })
     thunkAPI.dispatch(receiveRooms(response))
     thunkAPI.dispatch(closeRoomEditor())
@@ -106,7 +108,7 @@ export const createRoom = createAsyncThunk(
 
 export const updateRoom = createAsyncThunk(
   ROOM_UPDATE,
-  async ({ roomId, data }: { roomId: number, data: object }, thunkAPI) => {
+  async ({ roomId, data }: { roomId: number, data: Record<string, unknown> }, thunkAPI) => {
     const response = await api.put(`/${roomId}`, { body: data })
     thunkAPI.dispatch(receiveRooms(response))
     thunkAPI.dispatch(closeRoomEditor())

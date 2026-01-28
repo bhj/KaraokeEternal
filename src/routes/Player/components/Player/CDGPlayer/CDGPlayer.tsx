@@ -4,6 +4,14 @@ import styles from './CDGPlayer.css'
 const BACKDROP_PADDING = 10 // px at 1:1 scale
 const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue('--border-radius'))
 
+export interface CDGFrameData {
+  imageData: ImageData
+  isChanged: boolean
+  backgroundRGBA: [number, number, number, number]
+  contentBounds: [number, number, number, number]
+  currentTime: number
+}
+
 interface CDGPlayerProps {
   cdgAlpha: number
   cdgSize: number
@@ -20,6 +28,8 @@ interface CDGPlayerProps {
   onLoad(): void
   onPlay(): void
   onStatus(status: { position: number }): void
+  // Optional callback for lyrics overlay
+  onFrameData?(frame: CDGFrameData): void
 }
 
 class CDGPlayer extends React.Component<CDGPlayerProps> {
@@ -128,7 +138,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     // load .cdg file
     try {
       const response = await fetch(`${document.baseURI}api/media/${this.props.mediaId}?type=cdg`, {
-        credentials: 'same-origin'
+        credentials: 'same-origin',
       })
       if (!response.ok) {
         throw new Error(`Failed to fetch CDG: ${response.status}`)
@@ -201,7 +211,20 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     this.frameId = requestAnimationFrame(this.startCDG)
     if (!this.audio.current) return
 
-    const frame = this.cdg.render(this.audio.current.currentTime, { forceKey: true })
+    const currentTime = this.audio.current.currentTime
+    const frame = this.cdg.render(currentTime, { forceKey: true })
+
+    // Expose frame data for lyrics overlay (always, not just when changed)
+    if (this.props.onFrameData) {
+      this.props.onFrameData({
+        imageData: frame.imageData,
+        isChanged: frame.isChanged,
+        backgroundRGBA: frame.backgroundRGBA,
+        contentBounds: frame.contentBounds,
+        currentTime,
+      })
+    }
+
     if (!frame.isChanged) return
 
     // background color changed?

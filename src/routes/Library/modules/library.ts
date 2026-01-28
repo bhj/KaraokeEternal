@@ -32,7 +32,7 @@ export const setFilterStr = createAction(LIBRARY_FILTER_STRING, (payload: string
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface LibraryState {
+export interface LibraryState {
   isLoading: boolean
   version: number
   filterStr: string

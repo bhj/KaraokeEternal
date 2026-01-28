@@ -10,7 +10,7 @@ let cachedConfig: client.Configuration | null = null
 /**
  * Get or discover the OIDC configuration from the issuer.
  */
-export async function getOidcConfig(): Promise<client.Configuration> {
+export async function getOidcConfig (): Promise<client.Configuration> {
   if (cachedConfig) {
     return cachedConfig
   }
@@ -37,39 +37,39 @@ export async function getOidcConfig(): Promise<client.Configuration> {
 /**
  * Check if OIDC is configured.
  */
-export function isOidcConfigured(): boolean {
+export function isOidcConfigured (): boolean {
   return !!(
-    process.env.KES_OIDC_ISSUER_URL &&
-    process.env.KES_OIDC_CLIENT_ID &&
-    process.env.KES_OIDC_CLIENT_SECRET
+    process.env.KES_OIDC_ISSUER_URL
+    && process.env.KES_OIDC_CLIENT_ID
+    && process.env.KES_OIDC_CLIENT_SECRET
   )
 }
 
 /**
  * Generate a random state string for CSRF protection.
  */
-export function generateState(): string {
+export function generateState (): string {
   return crypto.randomBytes(32).toString('base64url')
 }
 
 /**
  * Generate PKCE code_verifier.
  */
-export function generateCodeVerifier(): string {
+export function generateCodeVerifier (): string {
   return client.randomPKCECodeVerifier()
 }
 
 /**
  * Calculate PKCE code_challenge from code_verifier.
  */
-export async function calculateCodeChallenge(codeVerifier: string): Promise<string> {
+export async function calculateCodeChallenge (codeVerifier: string): Promise<string> {
   return client.calculatePKCECodeChallenge(codeVerifier)
 }
 
 /**
  * Build the authorization URL for login.
  */
-export async function buildAuthorizationUrl(
+export async function buildAuthorizationUrl (
   redirectUri: string,
   state: string,
   codeVerifier: string,
@@ -94,7 +94,7 @@ export async function buildAuthorizationUrl(
  * @param codeVerifier - The PKCE code verifier
  * @param expectedState - The state we sent in the authorization request
  */
-export async function exchangeCode(
+export async function exchangeCode (
   callbackUrl: string,
   codeVerifier: string,
   expectedState: string,
@@ -112,7 +112,7 @@ export async function exchangeCode(
  * Validate redirect URI to prevent open redirect attacks.
  * Only allows relative paths starting with /.
  */
-export function validateRedirectUri(redirect: string | undefined | null): string {
+export function validateRedirectUri (redirect: string | undefined | null): string {
   if (!redirect || typeof redirect !== 'string') {
     return '/'
   }
@@ -138,7 +138,7 @@ export function validateRedirectUri(redirect: string | undefined | null): string
 /**
  * Extract user claims from token response.
  */
-export function extractUserClaims(tokenResponse: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers): {
+export function extractUserClaims (tokenResponse: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers): {
   sub: string
   username: string
   name: string
@@ -185,7 +185,7 @@ export function extractUserClaims(tokenResponse: client.TokenEndpointResponse & 
  * Only allows URIs that start with KES_PUBLIC_URL.
  * CRITICAL SECURITY: This prevents attackers from redirecting users to malicious sites after logout.
  */
-export function validatePostLogoutRedirectUri(uri: string | null | undefined): string | null {
+export function validatePostLogoutRedirectUri (uri: string | null | undefined): string | null {
   if (!uri || typeof uri !== 'string') {
     return null
   }
@@ -216,7 +216,7 @@ export function validatePostLogoutRedirectUri(uri: string | null | undefined): s
 /**
  * Build the end session URL for logout.
  */
-export async function buildEndSessionUrl(
+export async function buildEndSessionUrl (
   idToken?: string,
   postLogoutRedirectUri?: string,
 ): Promise<string | null> {
@@ -250,6 +250,6 @@ export async function buildEndSessionUrl(
 /**
  * Clear the cached OIDC configuration (useful for testing).
  */
-export function clearOidcCache(): void {
+export function clearOidcCache (): void {
   cachedConfig = null
 }

@@ -25,6 +25,7 @@ const AppContent = () => {
       const targetId = parseInt(roomIdParam, 10)
       if (!isNaN(targetId)) {
         enrollmentCheckDone.current = true
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional: show spinner before full page redirect
         setIsRedirecting(true)
 
         // Clean up roomId param BEFORE redirect to prevent loop on return
@@ -55,6 +56,7 @@ const AppContent = () => {
       // - User is NOT a guest (guests are bound to their room)
       // - Target room is different from current room
       if (userId && !isGuest && !isNaN(targetId) && targetId !== roomId) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronizing URL param to state for modal display
         setTargetRoomId(targetId)
       } else {
         // Clean up the param if we're not showing the prompt

@@ -3,7 +3,6 @@ import { uniqueNamesGenerator, colors, animals } from 'unique-names-generator'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
-import { AuthentikClient } from '../lib/AuthentikClient.js'
 
 interface RequestWithBody {
   body: Record<string, unknown>

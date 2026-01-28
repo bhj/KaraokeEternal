@@ -1,5 +1,5 @@
-interface RequestOptions extends RequestInit {
-  body?: BodyInit | Record<string, unknown> | null
+interface RequestOptions extends Omit<RequestInit, 'body'> {
+  body?: BodyInit | Record<string, unknown>
   skipAuthRedirect?: boolean // Don't auto-redirect to login on 401
 }
 
@@ -24,20 +24,23 @@ export default class HttpApi {
     url: string,
     options: RequestOptions = {},
   ): Promise<T> => {
-    const { skipAuthRedirect, ...fetchOptions } = options
-    const opts = {
+    const { skipAuthRedirect, body, ...restOptions } = options
+    const opts: RequestInit = {
       ...this.options,
-      ...fetchOptions,
+      ...restOptions,
       method,
     }
 
-    // assume we're sending JSON if not multipart form data
-    if (typeof opts.body === 'object' && !(opts.body instanceof FormData)) {
-      opts.headers = new Headers({
-        'Content-Type': 'application/json',
-      })
-
-      opts.body = JSON.stringify(opts.body)
+    // Process body - convert object to JSON string if needed
+    if (body !== undefined) {
+      if (typeof body === 'object' && !(body instanceof FormData) && !(body instanceof Blob) && !(body instanceof ArrayBuffer)) {
+        opts.headers = new Headers({
+          'Content-Type': 'application/json',
+        })
+        opts.body = JSON.stringify(body)
+      } else {
+        opts.body = body as BodyInit
+      }
     }
 
     const res = await fetch(`${document.baseURI}api/${this.prefix}${url}`, opts)

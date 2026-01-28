@@ -41,7 +41,7 @@ const JoinLandingPage = () => {
     if (!itoken && roomIdParam) {
       // Fetch public prefs to get SSO login URL
       api.get<PublicPrefs>('prefs/public')
-        .then((prefs) => {
+        .then((prefs): void => {
           if (prefs.ssoLoginUrl) {
             // Redirect to SSO with return to library (where RoomJoinPrompt will show)
             const returnUrl = `/library?roomId=${roomIdParam}`
@@ -52,6 +52,7 @@ const JoinLandingPage = () => {
             // No SSO configured - redirect to account page
             window.location.href = `/account?redirect=${encodeURIComponent(`/library?roomId=${roomIdParam}`)}`
           }
+          return undefined
         })
         .catch(() => {
           setError('Failed to load configuration')
@@ -82,7 +83,7 @@ const JoinLandingPage = () => {
     }
 
     fetchData()
-  }, [itoken])
+  }, [itoken, roomIdParam])
 
   // Auto-complete join for users who already have a session
   // (e.g., logged-in user who manually navigates to a /join link)
@@ -151,7 +152,12 @@ const JoinLandingPage = () => {
     <div className={styles.container}>
       <Logo className={styles.logo} />
 
-      <h1>Join {roomInfo.roomName}'s Party</h1>
+      <h1>
+        Join
+        {' '}
+        {roomInfo.roomName}
+        &apos;s Party
+      </h1>
 
       <div className={styles.buttons}>
         {guestName && (

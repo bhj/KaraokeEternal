@@ -43,7 +43,7 @@ const PathPrefs = () => {
     dispatch(setPathPriority(res as number[]))
   }, [dispatch, priority])
 
-  const handleAdd = useCallback((dir: string, prefs: object) => {
+  const handleAdd = useCallback((dir: string, prefs: Record<string, unknown>) => {
     api.post(`/?dir=${encodeURIComponent(dir)}`, { body: prefs })
       .then((res) => {
         dispatch(receivePrefs(res))

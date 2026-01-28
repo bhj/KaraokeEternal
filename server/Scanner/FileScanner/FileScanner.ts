@@ -18,9 +18,28 @@ const log = getLogger('FileScanner')
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
 
+interface PathEntity {
+  pathId: number
+  path: string
+  priority: number
+}
+
+interface PathsCollection {
+  result: number[]
+  entities: Record<number, PathEntity>
+}
+
+type MetaParserFn = (input: { dir: string, dirSep: string, name: string, meta: unknown }) => Record<string, unknown>
+
+// IPC child process interface for typed IPC.req calls
+interface IPCChild {
+  req: <T = unknown>(action: { type: string, payload: unknown }) => Promise<T>
+  send: (action: { type: string, payload?: unknown }) => void
+}
+
 class FileScanner extends Scanner {
-  paths: any
-  parser: any
+  paths: PathsCollection
+  parser: MetaParserFn
 
   constructor (prefs, qStats) {
     super(qStats)
@@ -138,7 +157,7 @@ class FileScanner extends Scanner {
     })
 
     // get artistId and songId
-    const match = await (IPC as any).req({ type: LIBRARY_MATCH_SONG, payload: parsed })
+    const match = await (IPC as unknown as IPCChild).req<{ artistId: number, songId: number }>({ type: LIBRARY_MATCH_SONG, payload: parsed })
 
     const media = {
       songId: match.songId,
@@ -168,7 +187,7 @@ class FileScanner extends Scanner {
       })
 
       if (Object.keys(diff).length) {
-        await (IPC as any).req({
+        await (IPC as unknown as IPCChild).req({
           type: MEDIA_UPDATE,
           payload: {
             mediaId: row.mediaId,
@@ -186,11 +205,14 @@ class FileScanner extends Scanner {
     } // end if
 
     // new media
-    ;(media as any).dateAdded = Math.round(new Date().getTime() / 1000) // seconds
+    const mediaWithDate = {
+      ...media,
+      dateAdded: Math.round(new Date().getTime() / 1000), // seconds
+    }
     log.info('  => new: %s', JSON.stringify(match))
 
     return {
-      mediaId: await (IPC as any).req({ type: MEDIA_ADD, payload: media }),
+      mediaId: await (IPC as unknown as IPCChild).req<number>({ type: MEDIA_ADD, payload: mediaWithDate }),
       isNew: true,
     }
   }
@@ -200,7 +222,7 @@ class FileScanner extends Scanner {
     const invalid = res.result.filter(mediaId => !validMediaIds.includes(mediaId))
 
     if (invalid.length) {
-      await (IPC as any).req({ type: MEDIA_REMOVE, payload: invalid })
+      await (IPC as unknown as IPCChild).req({ type: MEDIA_REMOVE, payload: invalid })
     }
 
     return invalid.length

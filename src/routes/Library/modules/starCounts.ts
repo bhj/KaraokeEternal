@@ -12,7 +12,7 @@ const starCountsPush = createAction<StarCountsState>(STAR_COUNTS_PUSH)
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface StarCountsState {
+export interface StarCountsState {
   artists: Record<number, number>
   songs: Record<number, number>
   version: number

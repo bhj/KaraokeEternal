@@ -13,6 +13,7 @@ import { QUEUE_PUSH } from '../../shared/actionTypes.js'
 import { BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, PASSWORD_MIN_LENGTH, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from './User.js'
 import { isOidcConfigured, buildEndSessionUrl } from '../Auth/oidc.js'
 import getLogger from '../lib/Log.js'
+import type { Prefs as PrefsType } from '../../shared/types.js'
 
 const log = getLogger('User')
 
@@ -20,8 +21,24 @@ interface File {
   filepath: string
 }
 
+interface UserCredentials {
+  username?: string
+  password?: string
+  roomId?: number
+  roomPassword?: string
+}
+
+interface UserCreateBody {
+  username?: string
+  newPassword?: string
+  newPasswordConfirm?: string
+  name?: string
+  roomId?: number
+  role?: 'admin' | 'standard' | 'guest'
+}
+
 interface RequestWithBody {
-  body: Record<string, any>
+  body: UserCredentials & UserCreateBody & Record<string, unknown>
   files?: Record<string, File | File[]>
 }
 
@@ -55,11 +72,11 @@ const createUserCtx = (user, roomId, ownRoomId: number | null = null) => {
 // login
 router.post('/login', async (ctx) => {
   const req = ctx.request as unknown as RequestWithBody
-  const roomId = parseInt(req.body.roomId, 10) || null
+  const roomId = req.body.roomId ? parseInt(String(req.body.roomId), 10) : null
   let user
 
   try {
-    user = await User.validate(req.body as any)
+    user = await User.validate({ username: req.body.username, password: req.body.password })
 
     if (roomId) {
       await Rooms.validate(roomId, req.body.roomPassword, {
@@ -398,7 +415,13 @@ router.post('/user', async (ctx) => {
 
   // create user
   try {
-    const userId = await User.create({ ...req.body, image } as any, req.body.role)
+    const userId = await User.create({
+      username: req.body.username,
+      newPassword: req.body.newPassword,
+      newPasswordConfirm: req.body.newPasswordConfirm,
+      name: req.body.name,
+      image,
+    }, req.body.role)
 
     // if admin creating another user, we're done
     if (ctx.user.isAdmin) {
@@ -428,7 +451,7 @@ router.post('/user', async (ctx) => {
 
 // first-time setup
 router.post('/setup', async (ctx) => {
-  const prefs: any = await Prefs.get()
+  const prefs = await Prefs.get() as PrefsType
   let image
 
   // must be first run
@@ -455,7 +478,13 @@ router.post('/setup', async (ctx) => {
   // create admin user
   try {
     const req = ctx.request as unknown as RequestWithBody
-    const userId = await User.create({ ...req.body, image } as any, 'admin')
+    const userId = await User.create({
+      username: req.body.username,
+      newPassword: req.body.newPassword,
+      newPasswordConfirm: req.body.newPasswordConfirm,
+      name: req.body.name,
+      image,
+    }, 'admin')
     const user = await User.getById(userId, true)
     const userCtx = createUserCtx(user, res.lastID)
 

@@ -63,6 +63,32 @@
   }
 }
 
+.modeButtons,
+.paletteButtons,
+.lyricsModeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+
+  button {
+    flex: 0 0 auto;
+    padding: var(--space-xs) var(--space-s);
+    font-size: var(--font-size-s);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  label {
+    font-size: var(--font-size-s);
+    color: var(--text-muted-color);
+  }
+}
+
 .presetName {
   margin: 0;
   height: 2lh;
