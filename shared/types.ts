@@ -99,11 +99,8 @@ export interface UserWithRole extends User {
 }
 
 export type VisualizerMode
-  = 'particles' // GPU particle system (Cinema4D-style)
-    | 'geometry' // Mesh deformation (blob, sphere)
-    | 'shader' // Full-screen shader effects
-    | 'spectrum' // Clean frequency bars
-    | 'reactive' // Beat-reactive colors only
+  = 'particles' // GPU particle system with bloom
+    | 'liquid' // Oobleck landscape with reflections
     | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 

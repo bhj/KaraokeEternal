@@ -30,10 +30,7 @@ interface DisplayCtrlProps {
 // Visualizer mode options
 const VISUALIZER_MODES: { value: VisualizerMode, label: string }[] = [
   { value: 'particles', label: 'Particles' },
-  { value: 'geometry', label: 'Geometry' },
-  { value: 'shader', label: 'Shader' },
-  { value: 'spectrum', label: 'Spectrum' },
-  { value: 'reactive', label: 'Reactive' },
+  { value: 'liquid', label: 'Liquid' },
   { value: 'milkdrop', label: 'Milkdrop' },
   { value: 'off', label: 'Off' },
 ]

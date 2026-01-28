@@ -9,18 +9,15 @@ import {
 /**
  * Tests for the extended playerVisualizer module.
  * TDD: These tests define the expected behavior for new visualizer features:
- * - Multiple visualizer modes (particles, geometry, shader, etc.)
+ * - Multiple visualizer modes (particles, liquid, milkdrop)
  * - Color palettes
  * - Lyrics overlay modes
  */
 
 // Define the extended state interface with new features
 export type VisualizerMode
-  = | 'particles' // GPU particle system (Cinema4D-style)
-    | 'geometry' // Mesh deformation (blob, sphere)
-    | 'shader' // Full-screen shader effects
-    | 'spectrum' // Clean frequency bars
-    | 'reactive' // Beat-reactive colors only
+  = | 'particles' // GPU particle system with bloom
+    | 'liquid' // Oobleck landscape with reflections
     | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 
@@ -118,32 +115,11 @@ describe('playerVisualizer reducer - Extended Features', () => {
   })
 
   describe('Visualizer mode changes', () => {
-    it('should change mode to "geometry"', () => {
+    it('should change mode to "liquid"', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { mode: 'geometry' },
+        visualizer: { mode: 'liquid' },
       }))
-      expect(state.mode).toBe('geometry')
-    })
-
-    it('should change mode to "shader"', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { mode: 'shader' },
-      }))
-      expect(state.mode).toBe('shader')
-    })
-
-    it('should change mode to "spectrum"', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { mode: 'spectrum' },
-      }))
-      expect(state.mode).toBe('spectrum')
-    })
-
-    it('should change mode to "reactive"', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { mode: 'reactive' },
-      }))
-      expect(state.mode).toBe('reactive')
+      expect(state.mode).toBe('liquid')
     })
 
     it('should change mode to "milkdrop" (legacy Butterchurn)', () => {
@@ -161,11 +137,11 @@ describe('playerVisualizer reducer - Extended Features', () => {
     })
 
     it('should preserve mode when not specified', () => {
-      const stateWithGeometry = { ...initialState, mode: 'geometry' as VisualizerMode }
-      const state = expectedReducer(stateWithGeometry, playerCmdOptions({
+      const stateWithLiquid = { ...initialState, mode: 'liquid' as VisualizerMode }
+      const state = expectedReducer(stateWithLiquid, playerCmdOptions({
         visualizer: { sensitivity: 0.5 },
       }))
-      expect(state.mode).toBe('geometry')
+      expect(state.mode).toBe('liquid')
     })
   })
 
@@ -201,7 +177,7 @@ describe('playerVisualizer reducer - Extended Features', () => {
     it('should preserve colorPalette when not specified', () => {
       const stateWithNeon = { ...initialState, colorPalette: 'neon' as ColorPalette }
       const state = expectedReducer(stateWithNeon, playerCmdOptions({
-        visualizer: { mode: 'shader' },
+        visualizer: { mode: 'liquid' },
       }))
       expect(state.colorPalette).toBe('neon')
     })
@@ -242,13 +218,13 @@ describe('playerVisualizer reducer - Extended Features', () => {
     it('should update multiple settings at once', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
         visualizer: {
-          mode: 'shader',
+          mode: 'liquid',
           colorPalette: 'neon',
           lyricsMode: 'msdfOverlay',
           sensitivity: 0.8,
         },
       }))
-      expect(state.mode).toBe('shader')
+      expect(state.mode).toBe('liquid')
       expect(state.colorPalette).toBe('neon')
       expect(state.lyricsMode).toBe('msdfOverlay')
       expect(state.sensitivity).toBe(0.8)
@@ -257,10 +233,10 @@ describe('playerVisualizer reducer - Extended Features', () => {
     it('should preserve existing isEnabled when updating other settings', () => {
       const stateDisabled = { ...initialState, isEnabled: false }
       const state = expectedReducer(stateDisabled, playerCmdOptions({
-        visualizer: { mode: 'geometry' },
+        visualizer: { mode: 'liquid' },
       }))
       expect(state.isEnabled).toBe(false)
-      expect(state.mode).toBe('geometry')
+      expect(state.mode).toBe('liquid')
     })
   })
 
@@ -268,13 +244,13 @@ describe('playerVisualizer reducer - Extended Features', () => {
     it('should preserve new settings when visualizer error occurs', () => {
       const stateWithSettings = {
         ...initialState,
-        mode: 'shader' as VisualizerMode,
+        mode: 'liquid' as VisualizerMode,
         colorPalette: 'neon' as ColorPalette,
         lyricsMode: 'msdfOverlay' as LyricsMode,
       }
       const state = expectedReducer(stateWithSettings, playerVisualizerError('WebGL error'))
       expect(state.isSupported).toBe(false)
-      expect(state.mode).toBe('shader')
+      expect(state.mode).toBe('liquid')
       expect(state.colorPalette).toBe('neon')
       expect(state.lyricsMode).toBe('msdfOverlay')
     })
@@ -309,9 +285,9 @@ describe('playerVisualizer actual implementation', () => {
     const state = reducer(undefined, { type: '@@INIT' })
     const newState = reducer(state, {
       type: PLAYER_CMD_OPTIONS,
-      payload: { visualizer: { mode: 'shader' } },
+      payload: { visualizer: { mode: 'liquid' } },
     })
-    expect(newState.mode).toBe('shader')
+    expect(newState.mode).toBe('liquid')
   })
 
   it('should update colorPalette via PLAYER_CMD_OPTIONS', async () => {

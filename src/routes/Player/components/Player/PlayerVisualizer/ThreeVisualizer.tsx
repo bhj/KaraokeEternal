@@ -1,16 +1,16 @@
-import React, { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
+import React, { Suspense, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { PerformanceMonitor } from '@react-three/drei'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import * as THREE from 'three'
 import type { ColorPalette, VisualizerMode } from 'shared/types'
-import { AudioDataProvider } from './contexts/AudioDataContext'
+import { AudioDataProvider, useAudioData } from './contexts/AudioDataContext'
 import styles from './ThreeVisualizer.css'
 
 // Lazy load visualization modes to reduce initial bundle size
 const ParticlesMode = React.lazy(() => import('./modes/ParticlesMode'))
-const GeometryMode = React.lazy(() => import('./modes/GeometryMode'))
-const ShaderMode = React.lazy(() => import('./modes/ShaderMode'))
-const SpectrumMode = React.lazy(() => import('./modes/SpectrumMode'))
-const ReactiveMode = React.lazy(() => import('./modes/ReactiveMode'))
+const LiquidMode = React.lazy(() => import('./modes/LiquidMode'))
 
 interface ThreeVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode
@@ -25,10 +25,58 @@ interface ThreeVisualizerProps {
 // Map mode to component
 const MODE_COMPONENTS: Record<string, React.LazyExoticComponent<React.ComponentType<{ colorPalette: ColorPalette }>>> = {
   particles: ParticlesMode,
-  geometry: GeometryMode,
-  shader: ShaderMode,
-  spectrum: SpectrumMode,
-  reactive: ReactiveMode,
+  liquid: LiquidMode,
+}
+
+/**
+ * Audio-reactive post-processing effects wrapper
+ */
+function AudioReactiveEffects () {
+  const { audioData } = useAudioData()
+  const bloomRef = useRef<typeof Bloom>(null)
+  const chromaRef = useRef<typeof ChromaticAberration>(null)
+
+  // Update effects based on audio
+  useFrame(() => {
+    const { bass, beatIntensity } = audioData.current
+
+    // Audio-reactive bloom intensity
+    if (bloomRef.current) {
+      const bloom = bloomRef.current as unknown as { intensity: number }
+      bloom.intensity = 0.5 + bass * 1.5
+    }
+
+    // Chromatic aberration pulses on beats
+    if (chromaRef.current) {
+      const chroma = chromaRef.current as unknown as { offset: THREE.Vector2 }
+      const offset = 0.001 + beatIntensity * 0.003
+      chroma.offset = new THREE.Vector2(offset, offset)
+    }
+  })
+
+  return (
+    <EffectComposer>
+      <Bloom
+        ref={bloomRef as React.RefObject<never>}
+        intensity={0.5}
+        luminanceThreshold={0.2}
+        luminanceSmoothing={0.9}
+        mipmapBlur
+      />
+      <ChromaticAberration
+        ref={chromaRef as React.RefObject<never>}
+        blendFunction={BlendFunction.NORMAL}
+        offset={new THREE.Vector2(0.001, 0.001)}
+        radialModulation={false}
+        modulationOffset={0.5}
+      />
+      <Vignette
+        darkness={0.5}
+        offset={0.3}
+        blendFunction={BlendFunction.NORMAL}
+      />
+    </EffectComposer>
+  )
 }
 
 function ThreeVisualizer ({
@@ -67,6 +115,7 @@ function ThreeVisualizer ({
             <Suspense fallback={null}>
               <ModeComponent colorPalette={colorPalette} />
             </Suspense>
+            <AudioReactiveEffects />
           </AudioDataProvider>
         </PerformanceMonitor>
       </Canvas>
