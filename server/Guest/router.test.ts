@@ -1,7 +1,21 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
 import fse from 'fs-extra'
+import type { Layer } from '@koa/router'
 
 const TEST_DB_PATH = '/tmp/karaoke-eternal-test-guest-router.sqlite'
+
+// Typed mock context to avoid `any` casts
+interface MockContext {
+  request: {
+    body: Record<string, unknown>
+    socket: { remoteAddress: string }
+  }
+  ip: string
+  cookies: { set: ReturnType<typeof vi.fn>, get: ReturnType<typeof vi.fn> }
+  body: unknown
+  throw: (status: number, message?: string) => never
+  jwtKey: string
+}
 
 // Mock AuthentikClient to avoid external calls
 vi.mock('../lib/AuthentikClient.js', () => ({
@@ -15,7 +29,6 @@ vi.mock('../lib/AuthentikClient.js', () => ({
 
 // We need to dynamically import after database is open
 let db: typeof import('../lib/Database.js').default
-let User: typeof import('../User/User.js').default
 
 describe('Guest Router - App-Managed Guest Sessions', () => {
   let testRoomId: number
@@ -29,10 +42,6 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
     const Database = await import('../lib/Database.js')
     await Database.open({ file: TEST_DB_PATH, ro: false })
     db = Database.default
-
-    // NOW import modules (after db is initialized)
-    const UserModule = await import('../User/User.js')
-    User = UserModule.default
   })
 
   afterAll(async () => {
@@ -63,12 +72,12 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       // Debug: log router structure
       console.log('Router opts:', router.opts)
       console.log('Stack length:', router.stack.length)
-      router.stack.forEach((layer: { path: string; methods: string[] }, i: number) => {
-        console.log(`Layer ${i}: path=${layer.path}, methods=${JSON.stringify(layer.methods)}`)
+      router.stack.forEach((layer: Layer, i: number) => {
+        console.log(`Layer ${i}: path=${String(layer.path)}, methods=${JSON.stringify(layer.methods)}`)
       })
 
       const joinLayer = router.stack.find(
-        (l: { path: string; methods: string[] }) => l.path === '/api/guest/join' && l.methods.includes('POST'),
+        (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
 
       expect(joinLayer).toBeDefined()
@@ -95,7 +104,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await handler(ctx, async () => {})
+      await handler(ctx as MockContext, async () => {})
 
       expect(ctx.body).toEqual({ success: true })
       expect(mockCookieSet).toHaveBeenCalledWith('keToken', expect.any(String), {
@@ -111,7 +120,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       const router = routerModule.default
 
       const joinLayer = router.stack.find(
-        (l: { path: string; methods: string[] }) => l.path === '/api/guest/join' && l.methods.includes('POST'),
+        (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
 
       expect(joinLayer).toBeDefined()
@@ -133,7 +142,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for invalid invite code format', async () => {
@@ -141,7 +150,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       const router = routerModule.default
 
       const joinLayer = router.stack.find(
-        (l: { path: string; methods: string[] }) => l.path === '/api/guest/join' && l.methods.includes('POST'),
+        (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
 
       expect(joinLayer).toBeDefined()
@@ -167,7 +176,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for wrong invite code', async () => {
@@ -175,7 +184,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       const router = routerModule.default
 
       const joinLayer = router.stack.find(
-        (l: { path: string; methods: string[] }) => l.path === '/api/guest/join' && l.methods.includes('POST'),
+        (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
 
       expect(joinLayer).toBeDefined()
@@ -201,7 +210,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for non-existent room', async () => {
@@ -209,7 +218,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       const router = routerModule.default
 
       const joinLayer = router.stack.find(
-        (l: { path: string; methods: string[] }) => l.path === '/api/guest/join' && l.methods.includes('POST'),
+        (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
 
       expect(joinLayer).toBeDefined()
@@ -235,7 +244,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for closed room', async () => {
@@ -246,7 +255,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       const router = routerModule.default
 
       const joinLayer = router.stack.find(
-        (l: { path: string; methods: string[] }) => l.path === '/api/guest/join' && l.methods.includes('POST'),
+        (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
 
       expect(joinLayer).toBeDefined()
@@ -272,7 +281,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       }
 
       const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 429 when rate limited', async () => {
@@ -280,7 +289,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       const router = routerModule.default
 
       const joinLayer = router.stack.find(
-        (l: { path: string; methods: string[] }) => l.path === '/api/guest/join' && l.methods.includes('POST'),
+        (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
 
       expect(joinLayer).toBeDefined()
@@ -313,7 +322,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         }
 
         try {
-          await handler(ctx, async () => {})
+          await handler(ctx as MockContext, async () => {})
         } catch (err) {
           if ((err as Error & { status: number }).status === 429) {
             rateLimited = true

@@ -1,4 +1,4 @@
-import { AnyAction, createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { AnyAction, createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import {
   CLEAR_ERROR_MESSAGE,
   FOOTER_HEIGHT_CHANGE,
@@ -34,26 +34,33 @@ const initialState: UIState = {
   contentWidth: Math.min(window.innerWidth, MAX_CONTENT_WIDTH),
 }
 
+// Internal action creators for extraReducers (defined before slice)
+const headerHeightChangeInternal = createAction<number>(HEADER_HEIGHT_CHANGE)
+const footerHeightChangeInternal = createAction<number>(FOOTER_HEIGHT_CHANGE)
+const showErrorInternal = createAction<string>(SHOW_ERROR_MESSAGE)
+const clearErrorInternal = createAction(CLEAR_ERROR_MESSAGE)
+const windowResizeInternal = createAction<{ innerWidth: number, innerHeight: number }>(UI_WINDOW_RESIZE)
+
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(HEADER_HEIGHT_CHANGE, (state, action: PayloadAction<number>) => {
+      .addCase(headerHeightChangeInternal, (state, action) => {
         state.headerHeight = action.payload
       })
-      .addCase(FOOTER_HEIGHT_CHANGE, (state, action: PayloadAction<number>) => {
+      .addCase(footerHeightChangeInternal, (state, action) => {
         state.footerHeight = action.payload
       })
-      .addCase(SHOW_ERROR_MESSAGE, (state, action: PayloadAction<string>) => {
+      .addCase(showErrorInternal, (state, action) => {
         state.isErrored = true
         state.errorMessage = action.payload
       })
-      .addCase(CLEAR_ERROR_MESSAGE, (state) => {
+      .addCase(clearErrorInternal, (state) => {
         state.isErrored = false
       })
-      .addCase(UI_WINDOW_RESIZE, (state, action: PayloadAction<{ innerWidth: number, innerHeight: number }>) => {
+      .addCase(windowResizeInternal, (state, action) => {
         state.innerWidth = action.payload.innerWidth
         state.innerHeight = action.payload.innerHeight
         state.contentWidth = Math.min(action.payload.innerWidth, MAX_CONTENT_WIDTH)

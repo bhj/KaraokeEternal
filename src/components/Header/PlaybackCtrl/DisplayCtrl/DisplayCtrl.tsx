@@ -6,7 +6,7 @@ import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Slider from 'components/Slider/Slider'
 import Icon from 'components/Icon/Icon'
 import styles from './DisplayCtrl.css'
-import { MediaType, PlaybackOptions } from 'shared/types'
+import type { ColorPalette, LyricsMode, MediaType, PlaybackOptions, VisualizerMode } from 'shared/types'
 
 interface DisplayCtrlProps {
   cdgAlpha: number
@@ -18,10 +18,42 @@ interface DisplayCtrlProps {
   mp4Alpha: number
   sensitivity: number
   visualizerPresetName: string
+  // New props for extended visualizer options
+  visualizerMode: VisualizerMode
+  colorPalette: ColorPalette
+  lyricsMode: LyricsMode
   // actions
   onRequestOptions(opts: PlaybackOptions): void
   onClose: ModalProps['onClose']
 }
+
+// Visualizer mode options
+const VISUALIZER_MODES: { value: VisualizerMode, label: string }[] = [
+  { value: 'particles', label: 'Particles' },
+  { value: 'geometry', label: 'Geometry' },
+  { value: 'shader', label: 'Shader' },
+  { value: 'spectrum', label: 'Spectrum' },
+  { value: 'reactive', label: 'Reactive' },
+  { value: 'milkdrop', label: 'Milkdrop' },
+  { value: 'off', label: 'Off' },
+]
+
+// Color palette options
+const COLOR_PALETTES: { value: ColorPalette, label: string }[] = [
+  { value: 'warm', label: 'Warm' },
+  { value: 'cool', label: 'Cool' },
+  { value: 'neon', label: 'Neon' },
+  { value: 'monochrome', label: 'Mono' },
+  { value: 'rainbow', label: 'Rainbow' },
+]
+
+// Lyrics mode options
+const LYRICS_MODES: { value: LyricsMode, label: string }[] = [
+  { value: 'cdgOnly', label: 'CDG Only' },
+  { value: 'msdfOverlay', label: 'MSDF Overlay' },
+  { value: 'msdfOnly', label: 'MSDF Only' },
+  { value: 'off', label: 'Off' },
+]
 
 const DisplayCtrl = ({
   cdgAlpha,
@@ -33,6 +65,9 @@ const DisplayCtrl = ({
   mp4Alpha,
   sensitivity,
   visualizerPresetName,
+  visualizerMode,
+  colorPalette,
+  lyricsMode,
   onRequestOptions,
   onClose,
 }: DisplayCtrlProps) => {
@@ -65,6 +100,21 @@ const DisplayCtrl = ({
     visualizer: { randomPreset: true },
   })
 
+  const handleModeChange = (mode: VisualizerMode) => onRequestOptions({
+    visualizer: { mode },
+  })
+
+  const handleColorPaletteChange = (palette: ColorPalette) => onRequestOptions({
+    visualizer: { colorPalette: palette },
+  })
+
+  const handleLyricsModeChange = (mode: LyricsMode) => onRequestOptions({
+    visualizer: { lyricsMode: mode },
+  })
+
+  // Show milkdrop preset controls only when in milkdrop mode
+  const showMilkdropPresets = visualizerMode === 'milkdrop'
+
   return (
     <Modal
       className={styles.modal}
@@ -86,39 +136,73 @@ const DisplayCtrl = ({
 
             {isWebGLSupported && (mediaType === 'cdg' || isVideoKeyingEnabled) && (
               <>
-                <div className={styles.presetContainer}>
-                  <div className={styles.presetButtons}>
-                    <Button
-                      onClick={handlePresetPrev}
-                      aria-label='Previous preset'
-                      aria-controls='visualizer-preset-name'
-                    >
-                      <Icon icon='CHEVRON_LEFT' />
-                    </Button>
-                    <Button
-                      onClick={handlePresetRandom}
-                      aria-label='Random preset'
-                      aria-controls='visualizer-preset-name'
-                    >
-                      <Icon icon='DICE' />
-                    </Button>
-                    <Button
-                      onClick={handlePresetNext}
-                      aria-label='Next preset'
-                      aria-controls='visualizer-preset-name'
-                    >
-                      <Icon icon='CHEVRON_RIGHT' />
-                    </Button>
+                <div className={styles.field}>
+                  <label id='label-visualizer-mode'>Mode</label>
+                  <div className={styles.modeButtons}>
+                    {VISUALIZER_MODES.map(({ value, label }) => (
+                      <Button
+                        key={value}
+                        onClick={() => handleModeChange(value)}
+                        variant={visualizerMode === value ? 'primary' : 'default'}
+                      >
+                        {label}
+                      </Button>
+                    ))}
                   </div>
-                  <p
-                    id='visualizer-preset-name'
-                    className={styles.presetName}
-                    aria-live='polite'
-                    translate='no'
-                  >
-                    {visualizerPresetName}
-                  </p>
                 </div>
+
+                {showMilkdropPresets && (
+                  <div className={styles.presetContainer}>
+                    <div className={styles.presetButtons}>
+                      <Button
+                        onClick={handlePresetPrev}
+                        aria-label='Previous preset'
+                        aria-controls='visualizer-preset-name'
+                      >
+                        <Icon icon='CHEVRON_LEFT' />
+                      </Button>
+                      <Button
+                        onClick={handlePresetRandom}
+                        aria-label='Random preset'
+                        aria-controls='visualizer-preset-name'
+                      >
+                        <Icon icon='DICE' />
+                      </Button>
+                      <Button
+                        onClick={handlePresetNext}
+                        aria-label='Next preset'
+                        aria-controls='visualizer-preset-name'
+                      >
+                        <Icon icon='CHEVRON_RIGHT' />
+                      </Button>
+                    </div>
+                    <p
+                      id='visualizer-preset-name'
+                      className={styles.presetName}
+                      aria-live='polite'
+                      translate='no'
+                    >
+                      {visualizerPresetName}
+                    </p>
+                  </div>
+                )}
+
+                {visualizerMode !== 'off' && visualizerMode !== 'milkdrop' && (
+                  <div className={styles.field}>
+                    <label id='label-color-palette'>Color Palette</label>
+                    <div className={styles.paletteButtons}>
+                      {COLOR_PALETTES.map(({ value, label }) => (
+                        <Button
+                          key={value}
+                          onClick={() => handleColorPaletteChange(value)}
+                          variant={colorPalette === value ? 'primary' : 'default'}
+                        >
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className={styles.field}>
                   <label id='label-visualizer-sensitivity'>Sensitivity</label>
@@ -148,6 +232,23 @@ const DisplayCtrl = ({
             <legend>
               <label>Lyrics</label>
             </legend>
+
+            {mediaType === 'cdg' && isWebGLSupported && (
+              <div className={styles.field}>
+                <label id='label-lyrics-mode'>Display Mode</label>
+                <div className={styles.lyricsModeButtons}>
+                  {LYRICS_MODES.map(({ value, label }) => (
+                    <Button
+                      key={value}
+                      onClick={() => handleLyricsModeChange(value)}
+                      variant={lyricsMode === value ? 'primary' : 'default'}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {mediaType === 'cdg' && (
               <div className={styles.field}>
