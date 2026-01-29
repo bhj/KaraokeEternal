@@ -54,6 +54,9 @@ const UpNow = ({ queueItem }: UpNowProps) => {
           />
           <div className={styles.user}>
             {queueItem.userDisplayName}
+            {queueItem.coSingers && queueItem.coSingers.length > 0 && (
+              <span className={styles.coSingers}> + {queueItem.coSingers.join(', ')}</span>
+            )}
           </div>
         </div>
       </div>

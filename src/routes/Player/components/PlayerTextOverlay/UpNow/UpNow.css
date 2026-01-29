@@ -46,6 +46,12 @@
   max-width: 33vw;
 }
 
+.coSingers {
+  font-size: 4vh;
+  color: var(--color-gray-6);
+  font-style: italic;
+}
+
 .userImage {
   height: 20vh;
 }
