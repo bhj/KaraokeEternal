@@ -118,6 +118,7 @@ const agentUpdateFrag = `
 // Each agent deposits pheromone at its position.
 const depositVert = `
   uniform sampler2D agents;
+  uniform float treble;
   attribute vec2 texCoord;
 
   void main() {
@@ -125,7 +126,7 @@ const depositVert = `
     // Agent x,y are in [0,1] → map to clip space [-1, 1]
     vec2 pos = agent.xy * 2.0 - 1.0;
     gl_Position = vec4(pos, 0.0, 1.0);
-    gl_PointSize = 1.0;
+    gl_PointSize = 1.0 + treble * 2.0;
   }
 `
 
@@ -149,6 +150,7 @@ const displayFrag = `
   uniform vec3 colorHigh;
   uniform float energyBoost;
   uniform float beatFlash;
+  uniform float paletteShift;
 
   varying vec2 vUv;
 
@@ -158,12 +160,15 @@ const displayFrag = `
     // Boost intensity with energy
     intensity = clamp(intensity * (1.0 + energyBoost * 0.5), 0.0, 1.0);
 
+    // Shift palette sampling position by BPM-driven rotation
+    float t = fract(intensity + paletteShift);
+
     // 3-stop gradient: low → mid → high
     vec3 color;
-    if (intensity < 0.5) {
-      color = mix(colorLow, colorMid, intensity * 2.0);
+    if (t < 0.5) {
+      color = mix(colorLow, colorMid, t * 2.0);
     } else {
-      color = mix(colorMid, colorHigh, (intensity - 0.5) * 2.0);
+      color = mix(colorMid, colorHigh, (t - 0.5) * 2.0);
     }
 
     // Beat flash
@@ -196,7 +201,7 @@ interface GPUResources {
 
 function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
   const { gl, viewport } = useThree()
-  const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.25 })
+  const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.15 })
 
   const pingRef = useRef(true)
   const needsInitRef = useRef(true)
@@ -254,7 +259,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
       uniforms: {
         trailPrev: { value: null },
         deposits: { value: null },
-        decay: { value: 0.95 },
+        decay: { value: 0.85 },
         texelSize: { value: new THREE.Vector2(trailTexelSize, trailTexelSize) },
       },
       vertexShader: fullscreenVert,
@@ -265,10 +270,10 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
       uniforms: {
         agentsPrev: { value: null },
         trail: { value: null },
-        ss: { value: 0.001 },
-        sa: { value: 0.3 },
-        ra: { value: 0.3 },
-        so: { value: 0.01 },
+        ss: { value: 0.003 },
+        sa: { value: 0.6 },
+        ra: { value: 0.45 },
+        so: { value: 0.03 },
         time: { value: 0 },
       },
       vertexShader: fullscreenVert,
@@ -279,6 +284,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
       uniforms: {
         agents: { value: null },
         depositStrength: { value: 0.5 },
+        treble: { value: 0 },
       },
       vertexShader: depositVert,
       fragmentShader: depositFrag,
@@ -296,6 +302,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
         colorHigh: { value: new THREE.Color(1, 1, 1) },
         energyBoost: { value: 0 },
         beatFlash: { value: 0 },
+        paletteShift: { value: 0 },
       },
       vertexShader: fullscreenVert,
       fragmentShader: displayFrag,
@@ -385,12 +392,12 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
     } = gpuResources
 
     // Audio → simulation params
-    const ss = 0.0005 + (audio.energySmooth + audio.bass) * 0.002 // step size
-    const sa = 0.2 + audio.spectralCentroid * 0.6 // sensor angle
-    const ra = 0.2 + audio.beatIntensity * 0.5 // rotation angle
-    const so = 0.005 + audio.mid * 0.02 // sensor offset
-    const decay = 0.97 - audio.energySmooth * 0.07 // trail decay
-    const depositStrength = 0.3 + audio.energy * 0.4 + audio.beatIntensity * 0.3
+    const ss = 0.002 + audio.energy * 0.004 // step size (energy only, no bass double-count)
+    const sa = 0.4 + audio.spectralCentroid * 0.8 // sensor angle (wider range for dramatic forking)
+    const ra = 0.3 + audio.beatIntensity * 0.6 + audio.treble * 0.2 // rotation angle (treble for hi-hat response)
+    const so = 0.02 + audio.mid * 0.04 // sensor offset (wider range for pattern scale)
+    const decay = 0.88 - audio.energy * 0.1 // trail decay (lower base = cleaner trails)
+    const depositStrength = 0.4 + audio.energy * 0.5 + audio.beatIntensity * 0.3
 
     // Source textures for this frame
     const srcAgentRT = ping ? agentRenderTargets[0] : agentRenderTargets[1]
@@ -411,6 +418,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
     // eslint-disable-next-line react-hooks/immutability -- Three.js uniform updates
     agentDepositMaterial.uniforms.agents.value = agentSource
     agentDepositMaterial.uniforms.depositStrength.value = depositStrength
+    agentDepositMaterial.uniforms.treble.value = audio.treble
 
     gl.setRenderTarget(depositRenderTarget)
     gl.clearColor()
@@ -447,6 +455,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
     displayMaterial.uniforms.colorHigh.value = getColorFromPalette(colorPalette, 1.0)
     displayMaterial.uniforms.energyBoost.value = audio.energySmooth
     displayMaterial.uniforms.beatFlash.value = audio.beatIntensity
+    displayMaterial.uniforms.paletteShift.value = (audio.beatFrequency * time) % 1.0
 
     // Scale to fill viewport
     if (meshRef.current) {

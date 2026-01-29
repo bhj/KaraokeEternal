@@ -1,6 +1,7 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { type PlayerVisualizerState } from 'routes/Player/modules/playerVisualizer'
 import {
+  PLAYER_CMD_OPTIONS,
   PLAYER_REQ_NEXT,
   PLAYER_REQ_OPTIONS,
   PLAYER_REQ_PLAY,
@@ -58,6 +59,7 @@ const initialState: StatusState = {
 // Internal action creators for extraReducers (defined before slice)
 const playerLeaveInternal = createAction(PLAYER_LEAVE)
 const playerStatusInternal = createAction<Partial<StatusState>>(PLAYER_STATUS)
+const playerCmdOptionsInternal = createAction<{ visualizer?: Partial<PlayerVisualizerState> }>(PLAYER_CMD_OPTIONS)
 
 const statusSlice = createSlice({
   name: 'status',
@@ -73,6 +75,11 @@ const statusSlice = createSlice({
         ...action.payload,
         isPlayerPresent: true,
       }))
+      .addCase(playerCmdOptionsInternal, (state, { payload }) => {
+        if (payload.visualizer && typeof payload.visualizer === 'object') {
+          state.visualizer = { ...state.visualizer, ...payload.visualizer }
+        }
+      })
   },
 })
 
