@@ -87,10 +87,10 @@ export function useSmoothedAudio (options: UseSmoothedAudioOptions = {}) {
       mid: lerp(prev.mid, raw.mid, lerpFactor),
       treble: lerp(prev.treble, raw.treble, lerpFactor),
       isBeat: raw.isBeat, // Keep boolean as-is
-      beatIntensity: lerp(prev.beatIntensity, raw.beatIntensity, lerpFactor * 2), // Faster decay for beats
+      beatIntensity: lerp(prev.beatIntensity, raw.beatIntensity, lerpFactor * 4), // Fast decay for beats
       energy: lerp(prev.energy, raw.energy, lerpFactor),
-      energySmooth: lerp(prev.energySmooth, raw.energySmooth, lerpFactor),
-      spectralCentroid: lerp(prev.spectralCentroid, raw.spectralCentroid, lerpFactor),
+      energySmooth: raw.energySmooth, // Already EMA-smoothed in analyser, no double-smoothing
+      spectralCentroid: raw.spectralCentroid, // Already smoothed in analyser, no double-smoothing
       beatFrequency: lerp(prev.beatFrequency, raw.beatFrequency, lerpFactor * 0.5), // Slower for BPM
     }
 

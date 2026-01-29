@@ -256,7 +256,7 @@ const gyroidFragmentShader = `
 function LiquidMode ({ colorPalette }: LiquidModeProps) {
   const sphereRef = useRef<THREE.Mesh>(null)
   const groupRef = useRef<THREE.Group>(null)
-  const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.08 }) // Slower lerp for liquid
+  const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.25 }) // Responsive but smooth
 
   // Accumulated phase offset (smooth accumulation from audio)
   const phaseOffsetRef = useRef<number>(0)

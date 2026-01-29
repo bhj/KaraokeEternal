@@ -38,6 +38,9 @@ function AudioReactiveEffects () {
   const chromaRef = useRef<typeof ChromaticAberration>(null)
   const vignetteRef = useRef<typeof Vignette>(null)
 
+  // Cached Vector2 to avoid per-frame allocation
+  const chromaOffsetRef = useRef(new THREE.Vector2(0.001, 0.001))
+
   // Smoothed values for gradual transitions
   const smoothedBloomRef = useRef(0.5)
   const smoothedThresholdRef = useRef(0.4)
@@ -54,20 +57,20 @@ function AudioReactiveEffects () {
 
     // Target bloom intensity: 0.3 (ballad) to 1.8 (metal)
     const targetBloom = 0.3 + energySmooth * 1.5 + bass * 0.5 + beatIntensity * 0.4
-    smoothedBloomRef.current += (targetBloom - smoothedBloomRef.current) * 0.1
+    smoothedBloomRef.current += (targetBloom - smoothedBloomRef.current) * 0.2
 
     // Target bloom threshold: 0.6 (ballad - only bright things glow) to 0.15 (metal - everything glows)
     const targetThreshold = 0.6 - energySmooth * 0.4 - spectralCentroid * 0.1
-    smoothedThresholdRef.current += (targetThreshold - smoothedThresholdRef.current) * 0.05
+    smoothedThresholdRef.current += (targetThreshold - smoothedThresholdRef.current) * 0.12
 
     // Chromatic aberration: minimal for ballad, strong for metal + beat pulses
     const baseChroma = energySmooth * 0.002 + spectralCentroid * 0.001
     const targetChroma = baseChroma + beatIntensity * 0.004
-    smoothedChromaRef.current += (targetChroma - smoothedChromaRef.current) * 0.15
+    smoothedChromaRef.current += (targetChroma - smoothedChromaRef.current) * 0.3
 
     // Vignette: soft for ballad, intense for metal
     const targetVignette = 0.4 + energySmooth * 0.3 + spectralCentroid * 0.2
-    smoothedVignetteRef.current += (targetVignette - smoothedVignetteRef.current) * 0.05
+    smoothedVignetteRef.current += (targetVignette - smoothedVignetteRef.current) * 0.12
 
     // Apply smoothed values
     if (bloomRef.current) {
@@ -78,7 +81,8 @@ function AudioReactiveEffects () {
 
     if (chromaRef.current) {
       const chroma = chromaRef.current as unknown as { offset: THREE.Vector2 }
-      chroma.offset = new THREE.Vector2(smoothedChromaRef.current, smoothedChromaRef.current)
+      chromaOffsetRef.current.set(smoothedChromaRef.current, smoothedChromaRef.current)
+      chroma.offset = chromaOffsetRef.current
     }
 
     if (vignetteRef.current) {
@@ -135,7 +139,7 @@ function ThreeVisualizer ({
         camera={{ position: [0, 0, 5], fov: 60 }}
         gl={{ antialias: true, alpha: true }}
         frameloop={isPlaying ? 'always' : 'demand'}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
       >
         <PerformanceMonitor
           onDecline={() => {

@@ -339,7 +339,7 @@ interface GPUResources {
 
 function ParticlesMode ({ colorPalette }: ParticlesModeProps) {
   const { gl } = useThree()
-  const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.12 })
+  const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.3 }) // Snappy for particle response
 
   // Ping-pong state
   const pingPongRef = useRef<boolean>(true)
