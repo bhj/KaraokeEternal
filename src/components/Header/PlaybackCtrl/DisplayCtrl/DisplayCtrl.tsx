@@ -6,7 +6,7 @@ import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Slider from 'components/Slider/Slider'
 import Icon from 'components/Icon/Icon'
 import styles from './DisplayCtrl.css'
-import type { LyricsMode, MediaType, PlaybackOptions, VisualizerMode } from 'shared/types'
+import type { MediaType, PlaybackOptions, VisualizerMode } from 'shared/types'
 
 interface DisplayCtrlProps {
   cdgAlpha: number
@@ -18,10 +18,8 @@ interface DisplayCtrlProps {
   mp4Alpha: number
   sensitivity: number
   visualizerPresetName: string
-  // New props for extended visualizer options
   visualizerMode: VisualizerMode
   colorHue: number
-  lyricsMode: LyricsMode
   // actions
   onRequestOptions(opts: PlaybackOptions): void
   onClose: ModalProps['onClose']
@@ -31,14 +29,6 @@ interface DisplayCtrlProps {
 const VISUALIZER_MODES: { value: VisualizerMode, label: string }[] = [
   { value: 'hydra', label: 'Hydra' },
   { value: 'milkdrop', label: 'Milkdrop' },
-  { value: 'off', label: 'Off' },
-]
-
-// Lyrics mode options
-const LYRICS_MODES: { value: LyricsMode, label: string }[] = [
-  { value: 'cdgOnly', label: 'CDG Only' },
-  { value: 'msdfOverlay', label: 'MSDF Overlay' },
-  { value: 'msdfOnly', label: 'MSDF Only' },
   { value: 'off', label: 'Off' },
 ]
 
@@ -54,7 +44,6 @@ const DisplayCtrl = ({
   visualizerPresetName,
   visualizerMode,
   colorHue,
-  lyricsMode,
   onRequestOptions,
   onClose,
 }: DisplayCtrlProps) => {
@@ -93,10 +82,6 @@ const DisplayCtrl = ({
 
   const handleColorHueChange = (val: number) => onRequestOptions({
     visualizer: { colorHue: val },
-  })
-
-  const handleLyricsModeChange = (mode: LyricsMode) => onRequestOptions({
-    visualizer: { lyricsMode: mode },
   })
 
   // Show milkdrop preset controls only when in milkdrop mode
@@ -217,23 +202,6 @@ const DisplayCtrl = ({
             <legend>
               <label>Lyrics</label>
             </legend>
-
-            {mediaType === 'cdg' && isWebGLSupported && (
-              <div className={styles.field}>
-                <label id='label-lyrics-mode'>Display Mode</label>
-                <div className={styles.lyricsModeButtons}>
-                  {LYRICS_MODES.map(({ value, label }) => (
-                    <Button
-                      key={value}
-                      onClick={() => handleLyricsModeChange(value)}
-                      variant={lyricsMode === value ? 'primary' : 'default'}
-                    >
-                      {label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {mediaType === 'cdg' && (
               <div className={styles.field}>

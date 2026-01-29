@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import Hydra from 'hydra-synth'
-import type { HydraSynth } from 'hydra-synth'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
 import styles from './HydraVisualizer.css'
 
@@ -18,23 +17,30 @@ osc(20, 0.1, () => bass() * 2)
   .out()
 `.trim()
 
-function executeHydraCode (code: string, synth: HydraSynth, closures: AudioClosures) {
+// Audio closure names exposed on window for Hydra code to reference
+const AUDIO_GLOBAL_NAMES = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright'] as const
+
+function setAudioGlobals (closures: AudioClosures) {
+  const w = window as Record<string, unknown>
+  w.bass = closures.bass
+  w.mid = closures.mid
+  w.treble = closures.treble
+  w.beat = closures.beat
+  w.energy = closures.energy
+  w.bpm = closures.bpm
+  w.bright = closures.bright
+}
+
+function clearAudioGlobals () {
+  const w = window as Record<string, unknown>
+  for (const name of AUDIO_GLOBAL_NAMES) {
+    delete w[name]
+  }
+}
+
+function executeHydraCode (hydra: Hydra, code: string) {
   try {
-    const fn = new Function(
-      'osc', 'noise', 'voronoi', 'shape', 'gradient', 'src',
-      'o0', 'o1', 'o2', 'o3',
-      'render',
-      'bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright',
-      code,
-    )
-    fn(
-      synth.osc.bind(synth), synth.noise.bind(synth), synth.voronoi.bind(synth),
-      synth.shape.bind(synth), synth.gradient.bind(synth), synth.src.bind(synth),
-      synth.o0, synth.o1, synth.o2, synth.o3,
-      synth.render.bind(synth),
-      closures.bass, closures.mid, closures.treble, closures.beat,
-      closures.energy, closures.bpm, closures.bright,
-    )
+    hydra.eval(code)
   } catch (err) {
     warn('Code execution error:', err)
     // Don't crash — keep last working frame
@@ -67,6 +73,12 @@ function HydraVisualizer ({
 
   const { update: updateAudio, closures } = useHydraAudio(audioSourceNode, sensitivity)
 
+  // Set audio closures on window so Hydra code can reference them
+  useEffect(() => {
+    setAudioGlobals(closures)
+    return () => clearAudioGlobals()
+  }, [closures])
+
   // Initialize Hydra
   useEffect(() => {
     const canvas = canvasRef.current
@@ -81,7 +93,7 @@ function HydraVisualizer ({
         width,
         height,
         detectAudio: false,
-        makeGlobal: false,
+        makeGlobal: true,
         autoLoop: false,
         precision: 'mediump',
       })
@@ -94,7 +106,7 @@ function HydraVisualizer ({
     errorCountRef.current = 0
 
     // Execute initial patch
-    executeHydraCode(code ?? DEFAULT_PATCH, hydra.synth, closures)
+    executeHydraCode(hydra, code ?? DEFAULT_PATCH)
 
     return () => {
       log('Destroying')
@@ -106,7 +118,7 @@ function HydraVisualizer ({
       }
       hydraRef.current = null
     }
-  // Only re-init when canvas dimensions change or audio closures change
+  // Only re-init when canvas dimensions change
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, height])
 
@@ -115,9 +127,9 @@ function HydraVisualizer ({
     const hydra = hydraRef.current
     if (!hydra) return
 
-    executeHydraCode(code ?? DEFAULT_PATCH, hydra.synth, closures)
+    executeHydraCode(hydra, code ?? DEFAULT_PATCH)
     errorCountRef.current = 0
-  }, [code, closures])
+  }, [code])
 
   // Animation loop
   const tick = useCallback((time: number) => {
@@ -140,13 +152,13 @@ function HydraVisualizer ({
       }
       if (errorCountRef.current === 10) {
         warn('Too many errors, re-applying default patch')
-        executeHydraCode(DEFAULT_PATCH, hydra.synth, closures)
+        executeHydraCode(hydra, DEFAULT_PATCH)
         errorCountRef.current = 0
       }
     }
 
     rafRef.current = requestAnimationFrame(tick)
-  }, [updateAudio, closures])
+  }, [updateAudio])
 
   // Start/stop animation based on isPlaying
   useEffect(() => {

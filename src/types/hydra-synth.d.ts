@@ -63,6 +63,7 @@ declare module 'hydra-synth' {
   class Hydra {
     constructor(opts?: HydraOptions)
     synth: HydraSynth
+    eval: (code: string) => void
     tick: (dt: number) => void
     regl: { destroy: () => void }
   }

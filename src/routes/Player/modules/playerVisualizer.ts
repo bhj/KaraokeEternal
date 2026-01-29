@@ -6,7 +6,7 @@ import {
   PLAYER_VISUALIZER_ERROR,
   VISUALIZER_HYDRA_CODE,
 } from 'shared/actionTypes'
-import type { LyricsMode, PlaybackOptions, VisualizerMode } from 'shared/types'
+import type { PlaybackOptions, VisualizerMode } from 'shared/types'
 
 const BAD_PRESETS = [
   'Flexi + Martin - astral projection',
@@ -39,10 +39,8 @@ export interface PlayerVisualizerState {
   presetKey: string
   presetName: string
   sensitivity: number
-  // New visualizer state
   mode: VisualizerMode
   colorHue: number
-  lyricsMode: LyricsMode
   hydraCode?: string
 }
 
@@ -51,10 +49,8 @@ const initialState: PlayerVisualizerState = {
   isSupported: true,
   ...getRandomPreset(),
   sensitivity: 1,
-  // New defaults
   mode: 'hydra',
   colorHue: 20,
-  lyricsMode: 'cdgOnly',
 }
 
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
@@ -84,10 +80,8 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         ...preset,
         isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
-        // New visualizer options
         mode: visualizer.mode ?? state.mode,
         colorHue: typeof visualizer.colorHue === 'number' ? visualizer.colorHue : state.colorHue,
-        lyricsMode: visualizer.lyricsMode ?? state.lyricsMode,
       }
     })
     .addCase(hydraCodeReceived, (state, { payload }) => {
