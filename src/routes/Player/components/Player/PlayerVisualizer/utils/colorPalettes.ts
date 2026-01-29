@@ -1,33 +1,34 @@
 import * as THREE from 'three'
-import type { ColorPalette } from 'shared/types'
 
-// Palette definitions as hex strings for readability
-const PALETTE_HEX: Record<ColorPalette, string[]> = {
-  warm: ['#ff6b35', '#f7c59f', '#eb5e28', '#8b0000', '#ff9a5a'],
-  cool: ['#00b4d8', '#0077b6', '#90e0ef', '#023e8a', '#48cae4'],
-  neon: ['#ff00ff', '#00ffff', '#ff6600', '#00ff00', '#ff0066'],
-  monochrome: ['#ffffff', '#cccccc', '#888888', '#444444', '#666666'],
-  rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#8b00ff'],
-}
-
-// Pre-computed THREE.Color arrays for performance
-export const COLOR_PALETTES: Record<ColorPalette, THREE.Color[]> = {
-  warm: PALETTE_HEX.warm.map(hex => new THREE.Color(hex)),
-  cool: PALETTE_HEX.cool.map(hex => new THREE.Color(hex)),
-  neon: PALETTE_HEX.neon.map(hex => new THREE.Color(hex)),
-  monochrome: PALETTE_HEX.monochrome.map(hex => new THREE.Color(hex)),
-  rainbow: PALETTE_HEX.rainbow.map(hex => new THREE.Color(hex)),
+/**
+ * Generate a 5-color palette from a single hue value (0-360).
+ *
+ *  0: vivid base       — hsl(hue, 90%, 55%)
+ *  1: light tint        — hsl(hue, 60%, 80%)
+ *  2: darker analogous  — hsl(hue+15, 95%, 40%)
+ *  3: muted shadow      — hsl(hue-15, 50%, 30%)
+ *  4: complementary     — hsl(hue+180, 70%, 50%)
+ */
+export function generatePaletteFromHue (hue: number): THREE.Color[] {
+  const h = ((hue % 360) + 360) % 360 // normalise to [0, 360)
+  return [
+    new THREE.Color().setHSL(h / 360, 0.90, 0.55),
+    new THREE.Color().setHSL(h / 360, 0.60, 0.80),
+    new THREE.Color().setHSL(((h + 15) % 360) / 360, 0.95, 0.40),
+    new THREE.Color().setHSL(((h - 15 + 360) % 360) / 360, 0.50, 0.30),
+    new THREE.Color().setHSL(((h + 180) % 360) / 360, 0.70, 0.50),
+  ]
 }
 
 /**
- * Get a color from the palette based on a normalized value (0-1)
+ * Get a color from a hue-generated palette based on a normalised value (0-1).
  */
 export function getColorFromPalette (
-  palette: ColorPalette,
+  hue: number,
   value: number,
   target?: THREE.Color,
 ): THREE.Color {
-  const colors = COLOR_PALETTES[palette]
+  const colors = generatePaletteFromHue(hue)
   const t = Math.max(0, Math.min(1, value))
   const index = t * (colors.length - 1)
   const i = Math.floor(index)
@@ -39,25 +40,15 @@ export function getColorFromPalette (
     return color.copy(colors[colors.length - 1])
   }
 
-  // Interpolate between adjacent colors
   return color.copy(colors[i]).lerp(colors[i + 1], f)
 }
 
 /**
- * Get a random color from the palette
+ * Convert hue-generated palette to a flat Float32Array for shaders.
+ * Each color is 3 floats (r, g, b).
  */
-export function getRandomColorFromPalette (palette: ColorPalette): THREE.Color {
-  const colors = COLOR_PALETTES[palette]
-  const index = Math.floor(Math.random() * colors.length)
-  return colors[index].clone()
-}
-
-/**
- * Convert palette colors to a flat Float32Array for use in shaders
- * Each color is 3 floats (r, g, b)
- */
-export function getPaletteAsUniform (palette: ColorPalette): Float32Array {
-  const colors = COLOR_PALETTES[palette]
+export function getPaletteAsUniform (hue: number): Float32Array {
+  const colors = generatePaletteFromHue(hue)
   const data = new Float32Array(colors.length * 3)
 
   colors.forEach((color, i) => {
@@ -70,8 +61,8 @@ export function getPaletteAsUniform (palette: ColorPalette): Float32Array {
 }
 
 /**
- * Get the number of colors in a palette
+ * Get the number of colors in a hue-generated palette (always 5).
  */
-export function getPaletteLength (palette: ColorPalette): number {
-  return COLOR_PALETTES[palette].length
+export function getPaletteLength (): number {
+  return 5
 }

@@ -36,7 +36,7 @@ export interface OptimisticQueueItem {
 
 export interface IRoomVisualizerPrefs {
   mode?: VisualizerMode
-  colorPalette?: ColorPalette
+  colorHue?: number
   lyricsMode?: LyricsMode
   sensitivity?: number
 }
@@ -103,8 +103,6 @@ export type VisualizerMode
     | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 
-export type ColorPalette = 'warm' | 'cool' | 'neon' | 'monochrome' | 'rainbow'
-
 export type LyricsMode = 'cdgOnly' | 'msdfOverlay' | 'msdfOnly' | 'off'
 
 export interface PlaybackOptions {
@@ -119,7 +117,7 @@ export interface PlaybackOptions {
     randomPreset?: boolean
     // New visualizer options
     mode?: VisualizerMode
-    colorPalette?: ColorPalette
+    colorHue?: number
     lyricsMode?: LyricsMode
   }
 }

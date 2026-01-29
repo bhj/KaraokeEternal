@@ -10,7 +10,7 @@ import {
  * Tests for the extended playerVisualizer module.
  * TDD: These tests define the expected behavior for new visualizer features:
  * - Multiple visualizer modes (physarum, liquid, milkdrop)
- * - Color palettes
+ * - Color hue (0-360)
  * - Lyrics overlay modes
  */
 
@@ -19,8 +19,6 @@ export type VisualizerMode
   = | 'physarum' // Slime mold pheromone simulation
     | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
-
-export type ColorPalette = 'warm' | 'cool' | 'neon' | 'monochrome' | 'rainbow'
 
 export type LyricsMode = 'cdgOnly' | 'msdfOverlay' | 'msdfOnly' | 'off'
 
@@ -32,7 +30,7 @@ interface PlayerVisualizerState {
   sensitivity: number
   // New fields
   mode: VisualizerMode
-  colorPalette: ColorPalette
+  colorHue: number
   lyricsMode: LyricsMode
 }
 
@@ -44,7 +42,7 @@ const initialState: PlayerVisualizerState = {
   sensitivity: 1,
   // New defaults
   mode: 'physarum', // Default to new modern visualizer
-  colorPalette: 'warm',
+  colorHue: 20,
   lyricsMode: 'cdgOnly',
 }
 
@@ -57,7 +55,7 @@ interface ExtendedVisualizerOptions {
   randomPreset?: boolean
   // New options
   mode?: VisualizerMode
-  colorPalette?: ColorPalette
+  colorHue?: number
   lyricsMode?: LyricsMode
 }
 
@@ -85,7 +83,7 @@ const expectedReducer = createReducer(initialState, (builder) => {
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
         // New fields
         mode: visualizer.mode ?? state.mode,
-        colorPalette: visualizer.colorPalette ?? state.colorPalette,
+        colorHue: typeof visualizer.colorHue === 'number' ? visualizer.colorHue : state.colorHue,
         lyricsMode: visualizer.lyricsMode ?? state.lyricsMode,
       }
     })
@@ -102,9 +100,9 @@ describe('playerVisualizer reducer - Extended Features', () => {
       expect(state.mode).toBe('physarum')
     })
 
-    it('should have default colorPalette of "warm"', () => {
+    it('should have default colorHue of 20', () => {
       const state = expectedReducer(undefined, { type: '@@INIT' })
-      expect(state.colorPalette).toBe('warm')
+      expect(state.colorHue).toBe(20)
     })
 
     it('should have default lyricsMode of "cdgOnly"', () => {
@@ -137,41 +135,34 @@ describe('playerVisualizer reducer - Extended Features', () => {
     })
   })
 
-  describe('Color palette changes', () => {
-    it('should change colorPalette to "cool"', () => {
+  describe('Color hue changes', () => {
+    it('should change colorHue to 200', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { colorPalette: 'cool' },
+        visualizer: { colorHue: 200 },
       }))
-      expect(state.colorPalette).toBe('cool')
+      expect(state.colorHue).toBe(200)
     })
 
-    it('should change colorPalette to "neon"', () => {
+    it('should change colorHue to 0', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { colorPalette: 'neon' },
+        visualizer: { colorHue: 0 },
       }))
-      expect(state.colorPalette).toBe('neon')
+      expect(state.colorHue).toBe(0)
     })
 
-    it('should change colorPalette to "monochrome"', () => {
+    it('should change colorHue to 360', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { colorPalette: 'monochrome' },
+        visualizer: { colorHue: 360 },
       }))
-      expect(state.colorPalette).toBe('monochrome')
+      expect(state.colorHue).toBe(360)
     })
 
-    it('should change colorPalette to "rainbow"', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { colorPalette: 'rainbow' },
-      }))
-      expect(state.colorPalette).toBe('rainbow')
-    })
-
-    it('should preserve colorPalette when not specified', () => {
-      const stateWithNeon = { ...initialState, colorPalette: 'neon' as ColorPalette }
-      const state = expectedReducer(stateWithNeon, playerCmdOptions({
+    it('should preserve colorHue when not specified', () => {
+      const stateWithHue = { ...initialState, colorHue: 120 }
+      const state = expectedReducer(stateWithHue, playerCmdOptions({
         visualizer: { mode: 'milkdrop' },
       }))
-      expect(state.colorPalette).toBe('neon')
+      expect(state.colorHue).toBe(120)
     })
   })
 
@@ -200,7 +191,7 @@ describe('playerVisualizer reducer - Extended Features', () => {
     it('should preserve lyricsMode when not specified', () => {
       const stateWithMsdf = { ...initialState, lyricsMode: 'msdfOverlay' as LyricsMode }
       const state = expectedReducer(stateWithMsdf, playerCmdOptions({
-        visualizer: { colorPalette: 'cool' },
+        visualizer: { colorHue: 180 },
       }))
       expect(state.lyricsMode).toBe('msdfOverlay')
     })
@@ -211,13 +202,13 @@ describe('playerVisualizer reducer - Extended Features', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
         visualizer: {
           mode: 'milkdrop',
-          colorPalette: 'neon',
+          colorHue: 270,
           lyricsMode: 'msdfOverlay',
           sensitivity: 0.8,
         },
       }))
       expect(state.mode).toBe('milkdrop')
-      expect(state.colorPalette).toBe('neon')
+      expect(state.colorHue).toBe(270)
       expect(state.lyricsMode).toBe('msdfOverlay')
       expect(state.sensitivity).toBe(0.8)
     })
@@ -237,13 +228,13 @@ describe('playerVisualizer reducer - Extended Features', () => {
       const stateWithSettings = {
         ...initialState,
         mode: 'milkdrop' as VisualizerMode,
-        colorPalette: 'neon' as ColorPalette,
+        colorHue: 270,
         lyricsMode: 'msdfOverlay' as LyricsMode,
       }
       const state = expectedReducer(stateWithSettings, playerVisualizerError('WebGL error'))
       expect(state.isSupported).toBe(false)
       expect(state.mode).toBe('milkdrop')
-      expect(state.colorPalette).toBe('neon')
+      expect(state.colorHue).toBe(270)
       expect(state.lyricsMode).toBe('msdfOverlay')
     })
   })
@@ -260,10 +251,10 @@ describe('playerVisualizer actual implementation', () => {
     expect(state.mode).toBe('physarum')
   })
 
-  it('should have colorPalette field in initial state', async () => {
+  it('should have colorHue field in initial state', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     const state = reducer(undefined, { type: '@@INIT' })
-    expect(state.colorPalette).toBe('warm')
+    expect(state.colorHue).toBe(20)
   })
 
   it('should have lyricsMode field in initial state', async () => {
@@ -282,14 +273,14 @@ describe('playerVisualizer actual implementation', () => {
     expect(newState.mode).toBe('milkdrop')
   })
 
-  it('should update colorPalette via PLAYER_CMD_OPTIONS', async () => {
+  it('should update colorHue via PLAYER_CMD_OPTIONS', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     const state = reducer(undefined, { type: '@@INIT' })
     const newState = reducer(state, {
       type: PLAYER_CMD_OPTIONS,
-      payload: { visualizer: { colorPalette: 'neon' } },
+      payload: { visualizer: { colorHue: 270 } },
     })
-    expect(newState.colorPalette).toBe('neon')
+    expect(newState.colorHue).toBe(270)
   })
 
   it('should update lyricsMode via PLAYER_CMD_OPTIONS', async () => {

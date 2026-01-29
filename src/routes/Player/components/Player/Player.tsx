@@ -150,7 +150,7 @@ class Player extends React.Component<PlayerProps> {
             width={this.props.width}
             height={this.props.height}
             mode={this.props.visualizer.mode}
-            colorPalette={this.props.visualizer.colorPalette}
+            colorHue={this.props.visualizer.colorHue}
           />
         )}
       </>

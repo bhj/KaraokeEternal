@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import type { ColorPalette, VisualizerMode } from 'shared/types'
+import type { VisualizerMode } from 'shared/types'
 import styles from './PlayerVisualizer.css'
 
 // Lazy load visualizers to reduce initial bundle
@@ -15,7 +15,7 @@ interface PlayerVisualizerProps {
   width: number
   height: number
   mode: VisualizerMode
-  colorPalette: ColorPalette
+  colorHue: number
 }
 
 // Modes that use the Three.js visualizer
@@ -30,7 +30,7 @@ function PlayerVisualizer ({
   width,
   height,
   mode,
-  colorPalette,
+  colorHue,
 }: PlayerVisualizerProps) {
   // Don't render if mode is 'off'
   if (mode === 'off') {
@@ -48,7 +48,7 @@ function PlayerVisualizer ({
                 audioSourceNode={audioSourceNode}
                 isPlaying={isPlaying}
                 mode={mode}
-                colorPalette={colorPalette}
+                colorHue={colorHue}
                 sensitivity={sensitivity}
                 width={width}
                 height={height}

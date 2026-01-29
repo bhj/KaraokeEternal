@@ -91,6 +91,10 @@ const QueueItem = ({
   const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
   const handleStarClick = useCallback(() => dispatch(toggleSongStarred(songId)), [dispatch, songId])
 
+  const handleContentClick = useCallback(() => {
+    setExpanded(prev => !prev && (isErrored || isInfoable || isRemovable || isSkippable))
+  }, [isErrored, isInfoable, isRemovable, isSkippable])
+
   const swipeHandlers = useSwipeable({
     onSwipedLeft: useCallback(() => {
       setExpanded(isErrored || isInfoable || isRemovable || isSkippable)
@@ -129,7 +133,7 @@ const QueueItem = ({
       )}
       style={{ '--progress': (isCurrent && pctPlayed < 2 ? 2 : pctPlayed) + '%' } as React.CSSProperties}
     >
-      <div className={styles.content}>
+      <div className={styles.content} onClick={handleContentClick}>
         <div className={clsx(styles.imageContainer, isPlayed && styles.greyed)}>
           <UserImage userId={userId} dateUpdated={userDateUpdated} />
           <div className={styles.waitContainer}>

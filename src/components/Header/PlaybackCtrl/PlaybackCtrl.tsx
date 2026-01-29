@@ -97,7 +97,7 @@ const PlaybackCtrl = () => {
           sensitivity={status.visualizer.sensitivity}
           visualizerPresetName={status.visualizer.presetName}
           visualizerMode={status.visualizer.mode}
-          colorPalette={status.visualizer.colorPalette}
+          colorHue={status.visualizer.colorHue}
           lyricsMode={status.visualizer.lyricsMode}
         />
       )}

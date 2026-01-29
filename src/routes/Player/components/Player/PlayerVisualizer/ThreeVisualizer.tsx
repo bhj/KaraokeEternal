@@ -4,7 +4,7 @@ import { PerformanceMonitor } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
-import type { ColorPalette, VisualizerMode } from 'shared/types'
+import type { VisualizerMode } from 'shared/types'
 import { AudioDataProvider, useAudioData } from './contexts/AudioDataContext'
 import styles from './ThreeVisualizer.css'
 
@@ -15,14 +15,14 @@ interface ThreeVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode
   isPlaying: boolean
   mode: VisualizerMode
-  colorPalette: ColorPalette
+  colorHue: number
   sensitivity: number
   width: number
   height: number
 }
 
 // Map mode to component
-const MODE_COMPONENTS: Record<string, React.LazyExoticComponent<React.ComponentType<{ colorPalette: ColorPalette }>>> = {
+const MODE_COMPONENTS: Record<string, React.LazyExoticComponent<React.ComponentType<{ colorHue: number }>>> = {
   physarum: PhysarumMode,
 }
 
@@ -119,7 +119,7 @@ function ThreeVisualizer ({
   audioSourceNode,
   isPlaying,
   mode,
-  colorPalette,
+  colorHue,
   sensitivity,
   width,
   height,
@@ -149,7 +149,7 @@ function ThreeVisualizer ({
             sensitivity={sensitivity}
           >
             <Suspense fallback={null}>
-              <ModeComponent colorPalette={colorPalette} />
+              <ModeComponent colorHue={colorHue} />
             </Suspense>
             <AudioReactiveEffects />
           </AudioDataProvider>

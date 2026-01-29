@@ -6,7 +6,7 @@ import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Slider from 'components/Slider/Slider'
 import Icon from 'components/Icon/Icon'
 import styles from './DisplayCtrl.css'
-import type { ColorPalette, LyricsMode, MediaType, PlaybackOptions, VisualizerMode } from 'shared/types'
+import type { LyricsMode, MediaType, PlaybackOptions, VisualizerMode } from 'shared/types'
 
 interface DisplayCtrlProps {
   cdgAlpha: number
@@ -20,7 +20,7 @@ interface DisplayCtrlProps {
   visualizerPresetName: string
   // New props for extended visualizer options
   visualizerMode: VisualizerMode
-  colorPalette: ColorPalette
+  colorHue: number
   lyricsMode: LyricsMode
   // actions
   onRequestOptions(opts: PlaybackOptions): void
@@ -32,15 +32,6 @@ const VISUALIZER_MODES: { value: VisualizerMode, label: string }[] = [
   { value: 'physarum', label: 'Physarum' },
   { value: 'milkdrop', label: 'Milkdrop' },
   { value: 'off', label: 'Off' },
-]
-
-// Color palette options
-const COLOR_PALETTES: { value: ColorPalette, label: string }[] = [
-  { value: 'warm', label: 'Warm' },
-  { value: 'cool', label: 'Cool' },
-  { value: 'neon', label: 'Neon' },
-  { value: 'monochrome', label: 'Mono' },
-  { value: 'rainbow', label: 'Rainbow' },
 ]
 
 // Lyrics mode options
@@ -62,7 +53,7 @@ const DisplayCtrl = ({
   sensitivity,
   visualizerPresetName,
   visualizerMode,
-  colorPalette,
+  colorHue,
   lyricsMode,
   onRequestOptions,
   onClose,
@@ -100,8 +91,8 @@ const DisplayCtrl = ({
     visualizer: { mode },
   })
 
-  const handleColorPaletteChange = (palette: ColorPalette) => onRequestOptions({
-    visualizer: { colorPalette: palette },
+  const handleColorHueChange = (val: number) => onRequestOptions({
+    visualizer: { colorHue: val },
   })
 
   const handleLyricsModeChange = (mode: LyricsMode) => onRequestOptions({
@@ -185,18 +176,16 @@ const DisplayCtrl = ({
 
                 {visualizerMode !== 'off' && visualizerMode !== 'milkdrop' && (
                   <div className={styles.field}>
-                    <label id='label-color-palette'>Color Palette</label>
-                    <div className={styles.paletteButtons}>
-                      {COLOR_PALETTES.map(({ value, label }) => (
-                        <Button
-                          key={value}
-                          onClick={() => handleColorPaletteChange(value)}
-                          variant={colorPalette === value ? 'primary' : 'default'}
-                        >
-                          {label}
-                        </Button>
-                      ))}
-                    </div>
+                    <label id='label-color-hue'>Color</label>
+                    <Slider
+                      min={0}
+                      max={360}
+                      step={1}
+                      value={colorHue}
+                      onChange={handleColorHueChange}
+                      className={clsx(styles.slider, styles.hueSlider)}
+                      aria-labelledby='label-color-hue'
+                    />
                   </div>
                 )}
 

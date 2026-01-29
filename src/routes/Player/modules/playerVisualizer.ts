@@ -5,7 +5,7 @@ import {
   PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
 } from 'shared/actionTypes'
-import type { ColorPalette, LyricsMode, PlaybackOptions, VisualizerMode } from 'shared/types'
+import type { LyricsMode, PlaybackOptions, VisualizerMode } from 'shared/types'
 
 const BAD_PRESETS = [
   'Flexi + Martin - astral projection',
@@ -39,7 +39,7 @@ export interface PlayerVisualizerState {
   sensitivity: number
   // New visualizer state
   mode: VisualizerMode
-  colorPalette: ColorPalette
+  colorHue: number
   lyricsMode: LyricsMode
 }
 
@@ -50,7 +50,7 @@ const initialState: PlayerVisualizerState = {
   sensitivity: 1,
   // New defaults
   mode: 'physarum',
-  colorPalette: 'warm',
+  colorHue: 20,
   lyricsMode: 'cdgOnly',
 }
 
@@ -83,7 +83,7 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
         // New visualizer options
         mode: visualizer.mode ?? state.mode,
-        colorPalette: visualizer.colorPalette ?? state.colorPalette,
+        colorHue: typeof visualizer.colorHue === 'number' ? visualizer.colorHue : state.colorHue,
         lyricsMode: visualizer.lyricsMode ?? state.lyricsMode,
       }
     })
