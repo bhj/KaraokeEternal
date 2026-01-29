@@ -65,6 +65,7 @@ declare module 'hydra-synth' {
     synth: HydraSynth
     eval: (code: string) => void
     tick: (dt: number) => void
+    setResolution: (width: number, height: number) => void
     regl: { destroy: () => void }
   }
 

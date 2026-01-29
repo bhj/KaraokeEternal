@@ -141,18 +141,20 @@ class Player extends React.Component<PlayerProps> {
           onPlay={this.handlePlay}
         />
         {isVisualizerActive && (
-          <PlayerVisualizer
-            audioSourceNode={this.state.visualizerAudioSourceNode}
-            isPlaying={this.props.isPlaying}
-            onError={this.props.onError}
-            presetKey={this.props.visualizer.presetKey}
-            sensitivity={this.props.visualizer.sensitivity}
-            width={this.props.width}
-            height={this.props.height}
-            mode={this.props.visualizer.mode}
-            colorHue={this.props.visualizer.colorHue}
-            hydraCode={this.props.visualizer.hydraCode}
-          />
+          <React.Suspense fallback={null}>
+            <PlayerVisualizer
+              audioSourceNode={this.state.visualizerAudioSourceNode}
+              isPlaying={this.props.isPlaying}
+              onError={this.props.onError}
+              presetKey={this.props.visualizer.presetKey}
+              sensitivity={this.props.visualizer.sensitivity}
+              width={this.props.width}
+              height={this.props.height}
+              mode={this.props.visualizer.mode}
+              colorHue={this.props.visualizer.colorHue}
+              hydraCode={this.props.visualizer.hydraCode}
+            />
+          </React.Suspense>
         )}
       </>
     )

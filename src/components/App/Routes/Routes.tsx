@@ -40,9 +40,9 @@ const AppRoutes = () => (
     <Route
       path='/orchestrator'
       element={(
-        <RequireAdmin redirectTo='/account'>
+        <RequireAuth path='/orchestrator' redirectTo='/account'>
           <OrchestratorView />
-        </RequireAdmin>
+        </RequireAuth>
       )}
     />
     <Route path='/join' element={<JoinLandingPage />} />
@@ -62,21 +62,6 @@ const AppRoutes = () => (
 )
 
 export default AppRoutes
-
-interface RequireAdminProps {
-  children: React.ReactNode
-  redirectTo: string
-}
-
-const RequireAdmin = ({ children, redirectTo }: RequireAdminProps) => {
-  const { isAdmin, userId } = useAppSelector(state => state.user)
-
-  if (userId === null || !isAdmin) {
-    return <Navigate to={redirectTo} replace />
-  }
-
-  return children
-}
 
 interface RequireAuthProps {
   children: React.ReactNode

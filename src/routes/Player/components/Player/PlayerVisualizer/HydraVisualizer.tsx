@@ -70,6 +70,14 @@ function HydraVisualizer ({
   const rafRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
   const errorCountRef = useRef<number>(0)
+  const widthRef = useRef(width)
+  const heightRef = useRef(height)
+  const codeRef = useRef(code)
+
+  // Keep refs in sync
+  widthRef.current = width
+  heightRef.current = height
+  codeRef.current = code
 
   const { update: updateAudio, closures } = useHydraAudio(audioSourceNode, sensitivity)
 
@@ -79,7 +87,7 @@ function HydraVisualizer ({
     return () => clearAudioGlobals()
   }, [closures])
 
-  // Initialize Hydra
+  // Initialize Hydra (mount-only)
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -90,8 +98,8 @@ function HydraVisualizer ({
     try {
       hydra = new Hydra({
         canvas,
-        width,
-        height,
+        width: widthRef.current,
+        height: heightRef.current,
         detectAudio: false,
         makeGlobal: true,
         autoLoop: false,
@@ -105,8 +113,9 @@ function HydraVisualizer ({
     hydraRef.current = hydra
     errorCountRef.current = 0
 
-    // Execute initial patch
-    executeHydraCode(hydra, code ?? DEFAULT_PATCH)
+    // Execute initial patch and render first frame immediately
+    executeHydraCode(hydra, codeRef.current ?? DEFAULT_PATCH)
+    hydra.tick(16.67)
 
     return () => {
       log('Destroying')
@@ -118,8 +127,13 @@ function HydraVisualizer ({
       }
       hydraRef.current = null
     }
-  // Only re-init when canvas dimensions change
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // mount-only — resize handled separately
+
+  // Resize without recreating WebGL context
+  useEffect(() => {
+    const hydra = hydraRef.current
+    if (!hydra) return
+    hydra.setResolution(width, height)
   }, [width, height])
 
   // Re-execute code when it changes
