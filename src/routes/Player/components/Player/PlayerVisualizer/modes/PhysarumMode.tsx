@@ -1,15 +1,14 @@
 import { useRef, useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import type { ColorPalette } from 'shared/types'
 import { useSmoothedAudio } from '../contexts/AudioDataContext'
 import { getColorFromPalette } from '../utils/colorPalettes'
 
 interface PhysarumModeProps {
-  colorPalette: ColorPalette
+  colorHue: number
 }
 
-const AGENT_TEX_SIZE = 256 // 65,536 agents
+const AGENT_TEX_SIZE = 512 // 262,144 agents
 const TRAIL_SIZE = 1024 // Trail/pheromone field resolution
 
 // ── Shared fullscreen quad vertex shader ──
@@ -62,6 +61,7 @@ const agentUpdateFrag = `
   uniform float ra; // rotation angle (radians)
   uniform float so; // sensor offset (look-ahead distance)
   uniform float time;
+  uniform float spawnChance;
 
   varying vec2 vUv;
 
@@ -106,6 +106,13 @@ const agentUpdateFrag = `
     // Wrap around [0, 1]
     x = fract(x);
     y = fract(y);
+
+    // Beat-driven re-seeding: randomly respawn agents on strong beats
+    if (spawnChance > 0.0 && hash(vUv + time * 3.7) < spawnChance) {
+      x = hash(vUv * 1.1 + time);
+      y = hash(vUv * 2.3 + time);
+      angle = hash(vUv * 4.7 + time) * 6.28318530718;
+    }
 
     // Wrap angle to prevent float32 precision loss over time
     angle = mod(angle, 6.28318530718);
@@ -199,7 +206,7 @@ interface GPUResources {
   depositScene: THREE.Scene
 }
 
-function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
+function PhysarumMode ({ colorHue }: PhysarumModeProps) {
   const { gl, viewport } = useThree()
   const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.15 })
 
@@ -275,6 +282,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
         ra: { value: 0.45 },
         so: { value: 0.03 },
         time: { value: 0 },
+        spawnChance: { value: 0 },
       },
       vertexShader: fullscreenVert,
       fragmentShader: agentUpdateFrag,
@@ -392,10 +400,11 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
     } = gpuResources
 
     // Audio → simulation params
-    const ss = 0.002 + audio.energy * 0.004 // step size (energy only, no bass double-count)
+    const ss = 0.001 + audio.energy * 0.008 // step size (wider range: crawl in quiet, race in loud)
     const sa = 0.4 + audio.spectralCentroid * 0.8 // sensor angle (wider range for dramatic forking)
     const ra = 0.3 + audio.beatIntensity * 0.6 + audio.treble * 0.2 // rotation angle (treble for hi-hat response)
-    const so = 0.02 + audio.mid * 0.04 // sensor offset (wider range for pattern scale)
+    const so = 0.01 + audio.mid * 0.08 // sensor offset (wider range for pattern scale)
+    const spawnChance = audio.beatIntensity > 0.4 ? audio.beatIntensity * 0.03 : 0.0
     const decay = 0.88 - audio.energy * 0.1 // trail decay (lower base = cleaner trails)
     const depositStrength = 0.4 + audio.energy * 0.5 + audio.beatIntensity * 0.3
 
@@ -441,6 +450,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
     agentUpdateMaterial.uniforms.ra.value = ra
     agentUpdateMaterial.uniforms.so.value = so
     agentUpdateMaterial.uniforms.time.value = time
+    agentUpdateMaterial.uniforms.spawnChance.value = spawnChance
 
     simQuad.material = agentUpdateMaterial
     gl.setRenderTarget(dstAgentRT)
@@ -450,9 +460,9 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
 
     // ── Update display material ──
     displayMaterial.uniforms.trail.value = dstTrailRT.texture
-    displayMaterial.uniforms.colorLow.value = getColorFromPalette(colorPalette, 0.0)
-    displayMaterial.uniforms.colorMid.value = getColorFromPalette(colorPalette, 0.5)
-    displayMaterial.uniforms.colorHigh.value = getColorFromPalette(colorPalette, 1.0)
+    displayMaterial.uniforms.colorLow.value = getColorFromPalette(colorHue, 0.0)
+    displayMaterial.uniforms.colorMid.value = getColorFromPalette(colorHue, 0.5)
+    displayMaterial.uniforms.colorHigh.value = getColorFromPalette(colorHue, 1.0)
     displayMaterial.uniforms.energyBoost.value = audio.energySmooth
     displayMaterial.uniforms.beatFlash.value = audio.beatIntensity
     displayMaterial.uniforms.paletteShift.value = (audio.beatFrequency * time) % 1.0
