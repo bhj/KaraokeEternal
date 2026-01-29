@@ -1,30 +1,6 @@
-import React, { useRef, useEffect, useCallback } from 'react'
-import Hydra from 'hydra-synth'
+import React, { useEffect, useRef, useState } from 'react'
+import HydraVisualizer from '../../Player/components/Player/PlayerVisualizer/HydraVisualizer'
 import styles from './HydraPreview.css'
-
-const log = (...args: unknown[]) => console.log('[HydraPreview]', ...args)
-const warn = (...args: unknown[]) => console.warn('[HydraPreview]', ...args)
-
-const DEFAULT_PATCH = 'osc(10, 0.1, 1.5).out()'
-
-function executeCode (hydra: Hydra, code: string) {
-  try {
-    hydra.eval(code)
-  } catch (err) {
-    warn('Code execution error:', err)
-  }
-}
-
-// Stub audio closures so Hydra code referencing them doesn't crash
-function setAudioStubs () {
-  const w = window as Record<string, unknown>
-  const zero = () => 0
-  for (const name of ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright']) {
-    if (typeof w[name] !== 'function') {
-      w[name] = zero
-    }
-  }
-}
 
 interface HydraPreviewProps {
   code: string
@@ -32,105 +8,75 @@ interface HydraPreviewProps {
   height: number
 }
 
-function HydraPreview ({ code, width, height }: HydraPreviewProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const hydraRef = useRef<Hydra | null>(null)
-  const rafRef = useRef<number>(0)
-  const lastTimeRef = useRef<number>(0)
-  const codeRef = useRef(code)
-  const widthRef = useRef(width)
-  const heightRef = useRef(height)
+const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
+  // Create a dummy audio source to drive the visualizer
+  const [audioSource, setAudioSource] = useState<MediaElementAudioSourceNode | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const oscRef = useRef<OscillatorNode | null>(null)
+  const gainRef = useRef<GainNode | null>(null)
 
-  codeRef.current = code
-  widthRef.current = width
-  heightRef.current = height
-
-  // Initialize Hydra on mount
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    // Setup a simulated audio beat for preview
+    const AudioCtx = window.AudioContext || window.webkitAudioContext
+    const ctx = new AudioCtx()
+    audioCtxRef.current = ctx
 
-    setAudioStubs()
-    log('Initializing preview')
+    // Create a destination that doesn't actually output to speakers (gain 0)
+    // but drives the analyser
+    const masterGain = ctx.createGain()
+    masterGain.gain.value = 0 // Mute simulated audio
+    masterGain.connect(ctx.destination)
 
-    let hydra: Hydra
-    try {
-      hydra = new Hydra({
-        canvas,
-        width: widthRef.current,
-        height: heightRef.current,
-        detectAudio: false,
-        makeGlobal: true,
-        autoLoop: false,
-        precision: 'mediump',
-      })
-    } catch (err) {
-      warn('Failed to initialize:', err)
-      return
-    }
+    // Oscillator to simulate "bass" / beat
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.value = 2 // 120 BPM-ish throb
+    
+    // VCA for the oscillator
+    const oscGain = ctx.createGain()
+    oscGain.gain.value = 1.0
 
-    hydraRef.current = hydra
-    executeCode(hydra, codeRef.current || DEFAULT_PATCH)
-    hydra.tick(16.67)
+    osc.connect(oscGain)
+    oscGain.connect(masterGain)
+    osc.start()
+
+    oscRef.current = osc
+    gainRef.current = oscGain
+
+    // We need a MediaElementSourceNode to satisfy the prop type, 
+    // BUT our visualizer hook uses `createAnalyser` from the context.
+    // The current `useAudioAnalyser` takes `MediaElementAudioSourceNode`.
+    // We might need to mock that object or cast a regular node if the hook only checks `.context`.
+    
+    // Hack: The hook uses `audioSourceNode.context`. 
+    // It calls `audioSourceNode.connect(gainNode)`.
+    // A regular GainNode works for this signature compatibility in standard WebAudio, 
+    // but the type is specific.
+    
+    // Let's rely on the fact that `useAudioAnalyser` just calls `.connect` and `.context`.
+    // We'll cast `oscGain` to `any` -> `MediaElementAudioSourceNode` 
+    // since we know the hook essentially treats it as an AudioNode.
+    setAudioSource(oscGain as unknown as MediaElementAudioSourceNode)
 
     return () => {
-      log('Destroying preview')
-      cancelAnimationFrame(rafRef.current)
-      try {
-        hydra.regl.destroy()
-      } catch {
-        // WebGL context may already be lost
-      }
-      hydraRef.current = null
+      osc.stop()
+      ctx.close()
     }
   }, [])
-
-  // Resize without recreating context
-  useEffect(() => {
-    const hydra = hydraRef.current
-    if (!hydra) return
-    hydra.setResolution(width, height)
-  }, [width, height])
-
-  // Re-execute code when it changes
-  useEffect(() => {
-    const hydra = hydraRef.current
-    if (!hydra) return
-    setAudioStubs()
-    executeCode(hydra, code || DEFAULT_PATCH)
-  }, [code])
-
-  // Animation loop
-  const tick = useCallback((time: number) => {
-    const hydra = hydraRef.current
-    if (!hydra) return
-
-    const dt = lastTimeRef.current ? time - lastTimeRef.current : 16.67
-    lastTimeRef.current = time
-
-    try {
-      hydra.tick(dt)
-    } catch {
-      // keep running
-    }
-
-    rafRef.current = requestAnimationFrame(tick)
-  }, [])
-
-  // Start loop on mount
-  useEffect(() => {
-    rafRef.current = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafRef.current)
-  }, [tick])
 
   return (
     <div className={styles.container}>
-      <canvas
-        ref={canvasRef}
-        className={styles.canvas}
-        width={width}
-        height={height}
-      />
+      <div className={styles.label}>Preview (Simulated Audio)</div>
+      {audioSource && (
+        <HydraVisualizer
+          audioSourceNode={audioSource}
+          isPlaying={true}
+          sensitivity={1}
+          width={width}
+          height={height}
+          code={code}
+        />
+      )}
     </div>
   )
 }

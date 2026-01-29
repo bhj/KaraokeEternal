@@ -15,6 +15,7 @@ import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modul
 
 const CoreLayout = () => {
   const isPlayerRoute = useMatch('/player')
+  const isOrchestratorRoute = useMatch('/orchestrator')
   const dispatch = useAppDispatch()
   const headerRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLDivElement>(null)
@@ -34,11 +35,11 @@ const CoreLayout = () => {
 
   return (
     <>
-      <Header ref={headerRef} />
+      {!isOrchestratorRoute && <Header ref={headerRef} />}
 
       <Routes />
 
-      {!isPlayerRoute && <Navigation ref={navRef} />}
+      {!isPlayerRoute && !isOrchestratorRoute && <Navigation ref={navRef} />}
 
       <SongInfo />
 

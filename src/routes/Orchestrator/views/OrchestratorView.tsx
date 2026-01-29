@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import CodeEditor from '../components/CodeEditor'
@@ -10,10 +10,8 @@ function OrchestratorView () {
   const dispatch = useAppDispatch()
   const [generatedCode, setGeneratedCode] = useState<string>('')
   const [previewCode, setPreviewCode] = useState<string>('')
-  const previewRef = useRef<HTMLDivElement>(null)
 
   const handleSendCode = useCallback((code: string) => {
-    setPreviewCode(code)
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
       payload: { code },
@@ -22,14 +20,22 @@ function OrchestratorView () {
 
   const handlePatchChange = useCallback((code: string) => {
     setGeneratedCode(code)
-    handleSendCode(code)
+    setPreviewCode(code) // Update preview immediately
+    handleSendCode(code) // Auto-broadcast (optional)
   }, [handleSendCode])
 
   return (
     <div className={styles.container}>
-      <div className={styles.editorPanel}>
-        <div className={styles.patchBayArea}>
-          <PatchBay onCodeChange={handlePatchChange} />
+      <div className={styles.patchBayArea}>
+        <PatchBay onCodeChange={handlePatchChange} />
+      </div>
+      <div className={styles.sidebar}>
+        <div className={styles.previewArea}>
+          <HydraPreview
+            code={previewCode}
+            width={380}
+            height={285}
+          />
         </div>
         <div className={styles.editorArea}>
           <CodeEditor
@@ -37,13 +43,6 @@ function OrchestratorView () {
             generatedCode={generatedCode}
           />
         </div>
-      </div>
-      <div className={styles.previewPanel} ref={previewRef}>
-        <HydraPreview
-          code={previewCode}
-          width={640}
-          height={480}
-        />
       </div>
     </div>
   )

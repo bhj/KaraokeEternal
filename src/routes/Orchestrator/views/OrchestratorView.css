@@ -1,34 +1,39 @@
 .container {
   display: flex;
-  flex-direction: row;
-  height: 100vh;
-  background: #0a0a14;
-  color: #ccc;
-}
-
-.editorPanel {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
+  background: #111;
+  color: #eee;
 }
 
 .patchBayArea {
   flex: 1;
-  display: flex;
+  height: 100%;
   overflow: hidden;
+  border-right: 1px solid #333;
+}
+
+.sidebar {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+}
+
+.previewArea {
+  height: 250px; /* Aspect ratio 4:3 ish + padding */
+  padding: 10px;
+  background: #000;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .editorArea {
-  flex-shrink: 0;
-  border-top: 1px solid #333;
-}
-
-.previewPanel {
-  width: 40%;
+  flex: 1;
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  border-left: 1px solid #333;
+  flex-direction: column;
 }
