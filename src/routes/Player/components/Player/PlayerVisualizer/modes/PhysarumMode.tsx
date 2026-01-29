@@ -398,10 +398,16 @@ function PhysarumMode ({ colorHue }: PhysarumModeProps) {
     } = gpuResources
 
     // Audio → simulation params
-    const ss = 0.001 + audio.energy * 0.008 // step size (wider range: crawl in quiet, race in loud)
-    const sa = 0.3 + audio.spectralCentroid * 1.2 // sensor angle (wide: bright sounds push near-perpendicular)
-    const ra = 0.2 + audio.beatIntensity * 1.0 + audio.treble * 0.4 // rotation angle (wide: snare+cymbal → near-90° turns)
-    const so = 0.01 + audio.mid * 0.08 // sensor offset (wider range for pattern scale)
+    const ss = 0.001 + audio.energy * 0.006 + audio.beatIntensity * 0.006 // step size: beat bursts create visible acceleration
+    const saBase = 0.4 + audio.spectralCentroid * 0.6
+    const saBeat = audio.beatIntensity * 0.5
+    const saOsc = Math.sin(time * 0.2) * 0.15 // slow morph in quiet passages
+    const sa = saBase + saBeat + saOsc // sensor angle: beats push toward branching networks
+    const ra = 0.15 + audio.beatIntensity * 0.8 + audio.treble * 0.6 // rotation angle: treble-weighted for cymbal snap
+    const soBase = 0.02 + audio.mid * 0.06
+    const soBeat = audio.beatIntensity * 0.04
+    const soOsc = Math.sin(time * 0.3) * 0.01 // slow drift prevents static baseline
+    const so = soBase + soBeat + soOsc // sensor offset: cells pulse size on beats
     const spawnChance = audio.beatIntensity > 0.4 ? audio.beatIntensity * 0.03 : 0.0
     const beatDecayDrop = audio.beatIntensity > 0.6 ? audio.beatIntensity * 0.15 : 0.0
     const decay = 0.92 - audio.energy * 0.2 - beatDecayDrop // trail decay (beat-reactive flood on strong hits)
