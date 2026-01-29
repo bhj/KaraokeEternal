@@ -37,7 +37,8 @@ const diffuseDecayFrag = `
     vec4 sum = vec4(0.0);
     for (int dx = -1; dx <= 1; dx++) {
       for (int dy = -1; dy <= 1; dy++) {
-        sum += texture2D(trailPrev, vUv + vec2(float(dx), float(dy)) * texelSize);
+        vec2 offset = vec2(float(dx), float(dy)) * texelSize;
+        sum += texture2D(trailPrev, fract(vUv + offset));
       }
     }
     vec4 blurred = sum / 9.0;
@@ -61,7 +62,6 @@ const agentUpdateFrag = `
   uniform float ra; // rotation angle (radians)
   uniform float so; // sensor offset (look-ahead distance)
   uniform float time;
-  uniform vec2 trailTexelSize; // 1.0 / TRAIL_SIZE
 
   varying vec2 vUv;
 
@@ -81,10 +81,10 @@ const agentUpdateFrag = `
     vec2 fc = vec2(x, y) + so * vec2(cos(angle),      sin(angle));
     vec2 fr = vec2(x, y) + so * vec2(cos(angle - sa), sin(angle - sa));
 
-    // Sample trail at sensor positions
-    float sL = texture2D(trail, fl).r;
-    float sC = texture2D(trail, fc).r;
-    float sR = texture2D(trail, fr).r;
+    // Sample trail at sensor positions (fract for toroidal wrap)
+    float sL = texture2D(trail, fract(fl)).r;
+    float sC = texture2D(trail, fract(fc)).r;
+    float sR = texture2D(trail, fract(fr)).r;
 
     // Steering logic (Jones 2010)
     float rnd = hash(vUv + time);
@@ -106,6 +106,9 @@ const agentUpdateFrag = `
     // Wrap around [0, 1]
     x = fract(x);
     y = fract(y);
+
+    // Wrap angle to prevent float32 precision loss over time
+    angle = mod(angle, 6.28318530718);
 
     gl_FragColor = vec4(x, y, angle, 1.0);
   }
@@ -130,7 +133,10 @@ const depositFrag = `
   uniform float depositStrength;
 
   void main() {
-    gl_FragColor = vec4(vec3(depositStrength), 1.0);
+    // Soft circular falloff (no-op at pointSize 1, correct for larger sizes)
+    float d = length(gl_PointCoord - vec2(0.5));
+    float alpha = 1.0 - smoothstep(0.4, 0.5, d);
+    gl_FragColor = vec4(vec3(depositStrength), alpha);
   }
 `
 
@@ -193,6 +199,7 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
   const { getSmoothedAudio } = useSmoothedAudio({ lerpFactor: 0.25 })
 
   const pingRef = useRef(true)
+  const needsInitRef = useRef(true)
   const meshRef = useRef<THREE.Mesh>(null)
 
   const gpuResources = useMemo<GPUResources>(() => {
@@ -263,7 +270,6 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
         ra: { value: 0.3 },
         so: { value: 0.01 },
         time: { value: 0 },
-        trailTexelSize: { value: new THREE.Vector2(trailTexelSize, trailTexelSize) },
       },
       vertexShader: fullscreenVert,
       fragmentShader: agentUpdateFrag,
@@ -276,6 +282,10 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
       },
       vertexShader: depositVert,
       fragmentShader: depositFrag,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+      transparent: true,
     })
 
     const displayMat = new THREE.ShaderMaterial({
@@ -388,10 +398,11 @@ function PhysarumMode ({ colorPalette }: PhysarumModeProps) {
     const srcTrailRT = ping ? trailRenderTargets[0] : trailRenderTargets[1]
     const dstTrailRT = ping ? trailRenderTargets[1] : trailRenderTargets[0]
 
-    // Use DataTexture on first frame, then RT texture
-    const agentSource = srcAgentRT.texture.image
-      ? srcAgentRT.texture
-      : agentDataTextures[ping ? 0 : 1]
+    // Use DataTexture on first frame to seed agents, then switch to RT
+    const agentSource = needsInitRef.current
+      ? agentDataTextures[ping ? 0 : 1]
+      : srcAgentRT.texture
+    needsInitRef.current = false
 
     // Get the sim quad mesh to swap materials
     const simQuad = simScene.children[0] as THREE.Mesh
