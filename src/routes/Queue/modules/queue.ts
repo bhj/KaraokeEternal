@@ -6,6 +6,7 @@ import {
   QUEUE_MOVE,
   QUEUE_PUSH,
   QUEUE_REMOVE,
+  QUEUE_UPDATE,
   LOGOUT,
 } from 'shared/actionTypes'
 import type { QueueItem, OptimisticQueueItem } from 'shared/types'
@@ -22,6 +23,8 @@ export const queueSong = createAction(QUEUE_ADD, (songId: number) => ({
   payload: { songId },
   meta: { isOptimistic: true },
 }))
+
+export const updateCoSingers = createAction<{ queueId: number, coSingers: string[] }>(QUEUE_UPDATE)
 
 export const removeUpcomingItems = (userId: number): AppThunk => (dispatch: AppDispatch, getState: () => RootState) => {
   const upcomingQueueIds = getUpcoming(getState(), userId)

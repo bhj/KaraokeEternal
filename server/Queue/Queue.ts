@@ -8,14 +8,18 @@ class Queue {
   /**
    * Add a songId to a room's queue
    *
-   * @param  {object}      roomId, songId, userId
+   * @param  {object}      roomId, songId, userId, coSingers (optional)
    * @return {Promise}
    */
-  static async add ({ roomId, songId, userId }) {
+  static async add ({ roomId, songId, userId, coSingers = null }) {
     const fields = new Map()
     fields.set('roomId', roomId)
     fields.set('songId', songId)
     fields.set('userId', userId)
+    // coSingers stored as JSON string (ex: '["Alice", "Bob"]')
+    if (coSingers && Array.isArray(coSingers) && coSingers.length > 0) {
+      fields.set('coSingers', JSON.stringify(coSingers))
+    }
     fields.set('prevQueueId', sql`(
       SELECT queueId
       FROM queue
@@ -51,7 +55,7 @@ class Queue {
     let curQueueId = null
 
     const query = sql`
-      SELECT queueId, songId, userId, prevQueueId,
+      SELECT queueId, songId, userId, prevQueueId, coSingers,
         media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
         users.name AS userDisplayName, users.dateUpdated AS userDateUpdated,
         paths.pathId, paths.data AS pathData,
@@ -76,6 +80,8 @@ class Queue {
       entities[row.queueId] = row
       entities[row.queueId].mediaType = this.getType(row.relPath)
       entities[row.queueId].isVideoKeyingEnabled = !!pathPrefs?.isVideoKeyingEnabled
+      // Parse coSingers JSON string to array
+      entities[row.queueId].coSingers = row.coSingers ? JSON.parse(row.coSingers) : []
 
       // don't send over the wire
       delete entities[row.queueId].relPath
@@ -94,7 +100,13 @@ class Queue {
 
     while (result.length < rows.length) {
       // get the item whose prevQueueId references the current one
-      const nextQueueId = entities[map.get(curQueueId)].queueId
+      const nextId = map.get(curQueueId)
+      if (nextId === undefined || !entities[nextId]) {
+        // Linked list is broken - stop here to avoid crash
+        // This can happen if queue data is corrupted
+        break
+      }
+      const nextQueueId = entities[nextId].queueId
       result.push(nextQueueId)
       curQueueId = nextQueueId
     }
@@ -208,6 +220,28 @@ class Queue {
     `
     const res = await db.get(String(query), query.parameters)
     return res.count === ids.length
+  }
+
+  /**
+   * Update co-singers for a queue item
+   * @param  {object}  queueId, coSingers
+   * @return {Promise}
+   */
+  static async updateCoSingers ({ queueId, coSingers }) {
+    const coSingersJson = coSingers && coSingers.length > 0
+      ? JSON.stringify(coSingers)
+      : null
+
+    const query = sql`
+      UPDATE queue
+      SET coSingers = ${coSingersJson}
+      WHERE queueId = ${queueId}
+    `
+    const res = await db.run(String(query), query.parameters)
+
+    if (!res.changes) {
+      throw new Error(`Could not update queueId: ${queueId}`)
+    }
   }
 
   /**

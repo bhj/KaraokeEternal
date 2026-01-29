@@ -10,7 +10,7 @@ import { requestPlayNext, requestReplay } from 'store/modules/status'
 import { showSongInfo } from 'store/modules/songInfo'
 import { toggleSongStarred } from 'store/modules/userStars'
 import { showErrorMessage } from 'store/modules/ui'
-import { queueSong, removeItem } from '../../modules/queue'
+import { queueSong, removeItem, updateCoSingers } from '../../modules/queue'
 import styles from './QueueItem.css'
 
 const LONG_PRESS_THRESHOLD_MS = 700
@@ -38,6 +38,7 @@ interface QueueItemProps {
   userDisplayName: string
   userId: number
   wait?: string
+  coSingers?: string[]
   // actions
   onMoveClick(queueId: number): void
   onRemoveUpcoming: (userId: number) => void
@@ -45,6 +46,7 @@ interface QueueItemProps {
 
 const QueueItem = ({
   artist,
+  coSingers,
   errorMessage,
   isCurrent,
   isErrored,
@@ -91,10 +93,25 @@ const QueueItem = ({
   const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
   const handleStarClick = useCallback(() => dispatch(toggleSongStarred(songId)), [dispatch, songId])
 
+  const handleEditCoSingersClick = useCallback(() => {
+    const currentCoSingers = coSingers?.join(', ') || ''
+    const input = prompt('Co-singers (comma-separated):', currentCoSingers)
+    if (input !== null) {
+      const newCoSingers = input
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+      dispatch(updateCoSingers({ queueId, coSingers: newCoSingers }))
+      setExpanded(false)
+    }
+  }, [coSingers, dispatch, queueId])
+
+  const canEditCoSingers = isUpcoming && isOwner
+
   const swipeHandlers = useSwipeable({
     onSwipedLeft: useCallback(() => {
-      setExpanded(isErrored || isInfoable || isRemovable || isSkippable)
-    }, [isErrored, isInfoable, isRemovable, isSkippable]),
+      setExpanded(isErrored || isInfoable || isRemovable || isSkippable || canEditCoSingers)
+    }, [isErrored, isInfoable, isRemovable, isSkippable, canEditCoSingers]),
     onSwipedRight: useCallback(() => setExpanded(false), []),
     preventScrollOnSwipe: true,
     trackMouse: true,
@@ -165,6 +182,14 @@ const QueueItem = ({
             icon='STAR_FULL'
             onClick={handleStarClick}
           />
+          {canEditCoSingers && (
+            <Button
+              className={styles.active}
+              data-hide
+              icon='ACCOUNT'
+              onClick={handleEditCoSingersClick}
+            />
+          )}
           {isInfoable && (
             <Button
               className={styles.active}

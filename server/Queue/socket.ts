@@ -1,13 +1,13 @@
 import Queue from './Queue.js'
 import Rooms from '../Rooms/Rooms.js'
-import { QUEUE_ADD, QUEUE_MOVE, QUEUE_REMOVE, QUEUE_PUSH } from '../../shared/actionTypes.js'
+import { QUEUE_ADD, QUEUE_MOVE, QUEUE_REMOVE, QUEUE_PUSH, QUEUE_UPDATE } from '../../shared/actionTypes.js'
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
   [QUEUE_ADD]: async (sock, { payload }, acknowledge) => {
-    const { songId } = payload
+    const { songId, coSingers } = payload
 
     try {
       await Rooms.validate(sock.user.roomId, null, { validatePassword: false })
@@ -22,6 +22,7 @@ const ACTION_HANDLERS = {
       roomId: sock.user.roomId,
       songId,
       userId: sock.user.userId,
+      coSingers: coSingers || null,
     })
 
     // success
@@ -84,6 +85,28 @@ const ACTION_HANDLERS = {
 
     // success
     acknowledge({ type: QUEUE_REMOVE + '_SUCCESS' })
+
+    // tell room
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: QUEUE_PUSH,
+      payload: await Queue.get(sock.user.roomId),
+    })
+  },
+  [QUEUE_UPDATE]: async (sock, { payload }, acknowledge) => {
+    const { queueId, coSingers } = payload
+
+    // Only owner or admin can update
+    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, queueId))) {
+      return acknowledge({
+        type: QUEUE_UPDATE + '_ERROR',
+        error: 'Cannot update another user\'s song',
+      })
+    }
+
+    await Queue.updateCoSingers({ queueId, coSingers })
+
+    // success
+    acknowledge({ type: QUEUE_UPDATE + '_SUCCESS' })
 
     // tell room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
