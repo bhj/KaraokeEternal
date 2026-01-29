@@ -119,6 +119,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
         />
         <br />
         <audio
+          crossOrigin='anonymous'
           preload='auto'
           onCanPlayThrough={this.updateIsPlaying}
           onEnded={this.handleEnded}

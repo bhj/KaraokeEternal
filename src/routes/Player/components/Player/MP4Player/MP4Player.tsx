@@ -46,6 +46,7 @@ class MP4Player extends React.Component<MP4PlayerProps> {
 
     return (
       <video
+        crossOrigin='anonymous'
         className={styles.video}
         preload='auto'
         width={width}
