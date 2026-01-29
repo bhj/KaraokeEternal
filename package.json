@@ -61,6 +61,7 @@
     "ctx-compose": "^3.0.0",
     "electron-log": "^5.4.3",
     "fs-extra": "^11.3.3",
+    "hydra-synth": "^1.4.0",
     "json-e": "^4.8.0",
     "json5": "^2.2.3",
     "jsonwebtoken": "^9.0.3",

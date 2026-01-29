@@ -1,0 +1,118 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #16213e;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle {
+  margin-right: 8px;
+  font-size: 10px;
+  color: #888;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ccc;
+  flex: 1;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modeToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+}
+
+.modeToggle input {
+  cursor: pointer;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  background: #0d1117;
+  color: #c9d1d9;
+  border: none;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  tab-size: 2;
+}
+
+.editor:read-only {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #16213e;
+  gap: 12px;
+}
+
+.hint {
+  font-size: 11px;
+  color: #555;
+}
+
+.audioVars {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.audioVars span {
+  font-size: 10px;
+  font-family: monospace;
+  color: #d4a017;
+  background: rgba(212, 160, 23, 0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.sendButton {
+  padding: 6px 16px;
+  background: #238636;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.sendButton:hover {
+  background: #2ea043;
+}

@@ -1,0 +1,206 @@
+.container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.palette {
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  background: #111;
+  border-right: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.categoryTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 1px solid #333;
+}
+
+.categoryTab {
+  flex: 1;
+  min-width: 50%;
+  padding: 6px 4px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #888;
+  font-size: 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+}
+
+.categoryTab:hover {
+  color: #ccc;
+}
+
+.categoryTab.active {
+  color: #fff;
+}
+
+.moduleList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.moduleButton {
+  padding: 6px 8px;
+  background: #1a1a2e;
+  border: none;
+  border-left: 3px solid #333;
+  color: #ccc;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+}
+
+.moduleButton:hover {
+  background: #2a2a4e;
+}
+
+.canvas {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 1) 0%, rgba(10, 10, 20, 1) 100%);
+  background-size: 100% 100%;
+  min-height: 500px;
+}
+
+.connectionsSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.connectionsSvg path {
+  pointer-events: stroke;
+}
+
+.node {
+  position: absolute;
+  width: 170px;
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  cursor: grab;
+  position: relative;
+  min-height: 28px;
+  touch-action: none;
+}
+
+.nodeHeader:active {
+  cursor: grabbing;
+}
+
+.nodeType {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  flex: 1;
+  text-align: center;
+}
+
+.removeNode {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.removeNode:hover {
+  color: #ff4444;
+}
+
+.jack {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #222;
+  border: 2px solid #666;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.jack:hover, .jackActive {
+  border-color: #0ff;
+  box-shadow: 0 0 6px #0ff;
+}
+
+.inputJack {
+  left: -6px;
+}
+
+.outputJack {
+  right: -6px;
+}
+
+.audioModRow {
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px 6px;
+  justify-content: center;
+}
+
+.audioModButton {
+  padding: 2px 6px;
+  font-size: 9px;
+  background: #111;
+  border: 1px solid #333;
+  color: #666;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: monospace;
+  min-width: 24px;
+}
+
+.audioModButton:hover {
+  border-color: #d4a017;
+}
+
+.audioModActive {
+  background: rgba(212, 160, 23, 0.15);
+  border-color: #d4a017;
+  color: #d4a017;
+}
+
+.connectingHint {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid #0ff;
+  color: #0ff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  z-index: 100;
+}

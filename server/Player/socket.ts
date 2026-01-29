@@ -17,6 +17,8 @@ import {
   PLAYER_EMIT_LEAVE,
   PLAYER_STATUS,
   PLAYER_LEAVE,
+  VISUALIZER_HYDRA_CODE_REQ,
+  VISUALIZER_HYDRA_CODE,
 } from '../../shared/actionTypes.js'
 
 // ------------------------------------
@@ -69,6 +71,14 @@ const ACTION_HANDLERS = {
 
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_STATUS,
+      payload,
+    })
+  },
+  [VISUALIZER_HYDRA_CODE_REQ]: async (sock, { payload }) => {
+    if (!sock.user.isAdmin) return
+
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: VISUALIZER_HYDRA_CODE,
       payload,
     })
   },

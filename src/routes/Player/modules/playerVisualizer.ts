@@ -4,6 +4,7 @@ import {
   PLAYER_CMD_OPTIONS,
   PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
+  VISUALIZER_HYDRA_CODE,
 } from 'shared/actionTypes'
 import type { LyricsMode, PlaybackOptions, VisualizerMode } from 'shared/types'
 
@@ -25,6 +26,7 @@ const getRandomPreset = () => getPreset(Math.floor(Math.random() * (_presetKeys.
 // Actions
 // ------------------------------------
 const playerCmdOptions = createAction<{ visualizer: PlaybackOptions['visualizer'] }>(PLAYER_CMD_OPTIONS)
+const hydraCodeReceived = createAction<{ code: string }>(VISUALIZER_HYDRA_CODE)
 export const playerLoad = createAction(PLAYER_LOAD)
 export const playerVisualizerError = createAction<string>(PLAYER_VISUALIZER_ERROR)
 
@@ -41,6 +43,7 @@ export interface PlayerVisualizerState {
   mode: VisualizerMode
   colorHue: number
   lyricsMode: LyricsMode
+  hydraCode?: string
 }
 
 const initialState: PlayerVisualizerState = {
@@ -49,7 +52,7 @@ const initialState: PlayerVisualizerState = {
   ...getRandomPreset(),
   sensitivity: 1,
   // New defaults
-  mode: 'physarum',
+  mode: 'hydra',
   colorHue: 20,
   lyricsMode: 'cdgOnly',
 }
@@ -86,6 +89,9 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         colorHue: typeof visualizer.colorHue === 'number' ? visualizer.colorHue : state.colorHue,
         lyricsMode: visualizer.lyricsMode ?? state.lyricsMode,
       }
+    })
+    .addCase(hydraCodeReceived, (state, { payload }) => {
+      state.hydraCode = payload.code
     })
     .addCase(playerVisualizerError, (state) => {
       state.isSupported = false

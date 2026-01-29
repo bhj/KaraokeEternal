@@ -4,19 +4,20 @@ import {
   PLAYER_CMD_OPTIONS,
   PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
+  VISUALIZER_HYDRA_CODE,
 } from 'shared/actionTypes'
 
 /**
  * Tests for the extended playerVisualizer module.
  * TDD: These tests define the expected behavior for new visualizer features:
- * - Multiple visualizer modes (physarum, liquid, milkdrop)
+ * - Multiple visualizer modes (hydra, milkdrop)
  * - Color hue (0-360)
  * - Lyrics overlay modes
  */
 
 // Define the extended state interface with new features
 export type VisualizerMode
-  = | 'physarum' // Slime mold pheromone simulation
+  = | 'hydra' // Hydra video synth
     | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 
@@ -41,7 +42,7 @@ const initialState: PlayerVisualizerState = {
   presetName: '',
   sensitivity: 1,
   // New defaults
-  mode: 'physarum', // Default to new modern visualizer
+  mode: 'hydra', // Default to new modern visualizer
   colorHue: 20,
   lyricsMode: 'cdgOnly',
 }
@@ -95,9 +96,9 @@ const expectedReducer = createReducer(initialState, (builder) => {
 
 describe('playerVisualizer reducer - Extended Features', () => {
   describe('Initial state', () => {
-    it('should have default mode of "physarum"', () => {
+    it('should have default mode of "hydra"', () => {
       const state = expectedReducer(undefined, { type: '@@INIT' })
-      expect(state.mode).toBe('physarum')
+      expect(state.mode).toBe('hydra')
     })
 
     it('should have default colorHue of 20', () => {
@@ -248,7 +249,7 @@ describe('playerVisualizer actual implementation', () => {
   it('should have mode field in initial state', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     const state = reducer(undefined, { type: '@@INIT' })
-    expect(state.mode).toBe('physarum')
+    expect(state.mode).toBe('hydra')
   })
 
   it('should have colorHue field in initial state', async () => {
@@ -291,5 +292,51 @@ describe('playerVisualizer actual implementation', () => {
       payload: { visualizer: { lyricsMode: 'msdfOverlay' } },
     })
     expect(newState.lyricsMode).toBe('msdfOverlay')
+  })
+
+  it('should have no hydraCode in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(state.hydraCode).toBeUndefined()
+  })
+
+  it('should update hydraCode via VISUALIZER_HYDRA_CODE', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const code = 'osc(10).out()'
+    const newState = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code },
+    })
+    expect(newState.hydraCode).toBe(code)
+  })
+
+  it('should replace hydraCode on subsequent VISUALIZER_HYDRA_CODE', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'osc(10).out()' },
+    })
+    state = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'noise(5).out()' },
+    })
+    expect(state.hydraCode).toBe('noise(5).out()')
+  })
+
+  it('should preserve hydraCode when other options change', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'osc(10).out()' },
+    })
+    state = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { sensitivity: 0.5 } },
+    })
+    expect(state.hydraCode).toBe('osc(10).out()')
+    expect(state.sensitivity).toBe(0.5)
   })
 })

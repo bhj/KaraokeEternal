@@ -151,6 +151,7 @@ class Player extends React.Component<PlayerProps> {
             height={this.props.height}
             mode={this.props.visualizer.mode}
             colorHue={this.props.visualizer.colorHue}
+            hydraCode={this.props.visualizer.hydraCode}
           />
         )}
       </>

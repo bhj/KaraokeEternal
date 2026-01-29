@@ -40,6 +40,10 @@ export const PLAYER_REQ_VOLUME = 'server/PLAYER_REQ_VOLUME'
 export const PLAYER_EMIT_STATUS = 'server/PLAYER_EMIT_STATUS'
 export const PLAYER_EMIT_LEAVE = 'server/PLAYER_EMIT_LEAVE'
 
+// Visualizer Hydra code (orchestrator → server → player)
+export const VISUALIZER_HYDRA_CODE_REQ = 'server/VISUALIZER_HYDRA_CODE'
+export const VISUALIZER_HYDRA_CODE = 'player/VISUALIZER_HYDRA_CODE'
+
 // Player events
 export const PLAYER_STATUS = 'status/PLAYER_STATUS'
 export const PLAYER_ERROR = 'status/PLAYER_ERROR'

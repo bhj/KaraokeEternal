@@ -8,6 +8,7 @@ import QueueView from 'routes/Queue/views/QueueView'
 import JoinLandingPage from 'routes/Join/views/JoinLandingPage'
 
 const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
+const OrchestratorView = React.lazy(() => import('routes/Orchestrator/views/OrchestratorView'))
 
 const AppRoutes = () => (
   <Routes>
@@ -36,6 +37,14 @@ const AppRoutes = () => (
         </RequireAuth>
       )}
     />
+    <Route
+      path='/orchestrator'
+      element={(
+        <RequireAdmin redirectTo='/account'>
+          <OrchestratorView />
+        </RequireAdmin>
+      )}
+    />
     <Route path='/join' element={<JoinLandingPage />} />
     <Route
       path='/'
@@ -53,6 +62,21 @@ const AppRoutes = () => (
 )
 
 export default AppRoutes
+
+interface RequireAdminProps {
+  children: React.ReactNode
+  redirectTo: string
+}
+
+const RequireAdmin = ({ children, redirectTo }: RequireAdminProps) => {
+  const { isAdmin, userId } = useAppSelector(state => state.user)
+
+  if (userId === null || !isAdmin) {
+    return <Navigate to={redirectTo} replace />
+  }
+
+  return children
+}
 
 interface RequireAuthProps {
   children: React.ReactNode

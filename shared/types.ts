@@ -99,7 +99,7 @@ export interface UserWithRole extends User {
 }
 
 export type VisualizerMode
-  = 'physarum' // Slime mold pheromone simulation
+  = 'hydra' // Hydra video synth
     | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 

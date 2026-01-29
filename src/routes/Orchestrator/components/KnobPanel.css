@@ -1,0 +1,77 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 180px;
+}
+
+.panelHeader {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.panelBody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+  justify-content: center;
+}
+
+.knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 60px;
+}
+
+.knobDial {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3a3a5a, #1a1a2e);
+  border: 2px solid #444;
+  position: relative;
+  cursor: ns-resize;
+  transform: rotate(var(--knob-angle));
+  touch-action: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.knobDial:hover {
+  border-color: var(--knob-color, #0ff);
+}
+
+.knobIndicator {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 3px;
+  height: 10px;
+  margin-left: -1.5px;
+  background: var(--knob-color, #0ff);
+  border-radius: 2px;
+  box-shadow: 0 0 4px var(--knob-color, #0ff);
+}
+
+.knobLabel {
+  font-size: 10px;
+  color: #888;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.knobValue {
+  font-size: 10px;
+  color: #aaa;
+  font-family: monospace;
+}

@@ -1,0 +1,52 @@
+import { useRef, useCallback, useMemo } from 'react'
+import { useAudioAnalyser, type AudioData } from './useAudioAnalyser'
+
+export interface AudioClosures {
+  bass: () => number
+  mid: () => number
+  treble: () => number
+  beat: () => number
+  energy: () => number
+  bpm: () => number
+  bright: () => number
+}
+
+const defaultAudioData: AudioData = {
+  frequencyData: new Float32Array(64),
+  waveformData: new Float32Array(128),
+  bass: 0,
+  mid: 0,
+  treble: 0,
+  isBeat: false,
+  beatIntensity: 0,
+  energy: 0,
+  energySmooth: 0,
+  spectralCentroid: 0.5,
+  beatFrequency: 0.5,
+}
+
+export function useHydraAudio (
+  audioSourceNode: MediaElementAudioSourceNode | null,
+  sensitivity: number,
+) {
+  const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity })
+  const audioRef = useRef<AudioData>(defaultAudioData)
+
+  // Update ref every animation frame — called from the rAF loop
+  const update = useCallback(() => {
+    audioRef.current = getAudioData()
+  }, [getAudioData])
+
+  // Stable closures that Hydra code references via arrow functions
+  const closures: AudioClosures = useMemo(() => ({
+    bass: () => audioRef.current.bass,
+    mid: () => audioRef.current.mid,
+    treble: () => audioRef.current.treble,
+    beat: () => audioRef.current.beatIntensity,
+    energy: () => audioRef.current.energy,
+    bpm: () => audioRef.current.beatFrequency,
+    bright: () => audioRef.current.spectralCentroid,
+  }), [])
+
+  return { update, closures, audioRef }
+}

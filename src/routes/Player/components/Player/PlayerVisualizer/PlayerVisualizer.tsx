@@ -4,7 +4,7 @@ import styles from './PlayerVisualizer.css'
 
 // Lazy load visualizers to reduce initial bundle
 const MilkdropVisualizer = React.lazy(() => import('./MilkdropVisualizer'))
-const ThreeVisualizer = React.lazy(() => import('./ThreeVisualizer'))
+const HydraVisualizer = React.lazy(() => import('./HydraVisualizer'))
 
 interface PlayerVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode
@@ -16,10 +16,8 @@ interface PlayerVisualizerProps {
   height: number
   mode: VisualizerMode
   colorHue: number
+  hydraCode?: string
 }
-
-// Modes that use the Three.js visualizer
-const THREE_MODES: VisualizerMode[] = ['physarum']
 
 function PlayerVisualizer ({
   audioSourceNode,
@@ -31,27 +29,24 @@ function PlayerVisualizer ({
   height,
   mode,
   colorHue,
+  hydraCode,
 }: PlayerVisualizerProps) {
-  // Don't render if mode is 'off'
   if (mode === 'off') {
     return null
   }
 
-  const isThreeMode = THREE_MODES.includes(mode)
-
   return (
     <div style={{ width, height }} className={styles.container}>
       <Suspense fallback={null}>
-        {isThreeMode
+        {mode === 'hydra'
           ? (
-              <ThreeVisualizer
+              <HydraVisualizer
                 audioSourceNode={audioSourceNode}
                 isPlaying={isPlaying}
-                mode={mode}
-                colorHue={colorHue}
                 sensitivity={sensitivity}
                 width={width}
                 height={height}
+                code={hydraCode}
               />
             )
           : (
