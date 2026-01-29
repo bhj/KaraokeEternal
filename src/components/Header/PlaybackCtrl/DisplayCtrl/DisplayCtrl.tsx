@@ -29,8 +29,7 @@ interface DisplayCtrlProps {
 
 // Visualizer mode options
 const VISUALIZER_MODES: { value: VisualizerMode, label: string }[] = [
-  { value: 'particles', label: 'Particles' },
-  { value: 'liquid', label: 'Liquid' },
+  { value: 'physarum', label: 'Physarum' },
   { value: 'milkdrop', label: 'Milkdrop' },
   { value: 'off', label: 'Off' },
 ]

@@ -49,7 +49,7 @@ const initialState: PlayerVisualizerState = {
   ...getRandomPreset(),
   sensitivity: 1,
   // New defaults
-  mode: 'particles',
+  mode: 'physarum',
   colorPalette: 'warm',
   lyricsMode: 'cdgOnly',
 }

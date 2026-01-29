@@ -19,7 +19,7 @@ interface PlayerVisualizerProps {
 }
 
 // Modes that use the Three.js visualizer
-const THREE_MODES: VisualizerMode[] = ['particles', 'liquid']
+const THREE_MODES: VisualizerMode[] = ['physarum']
 
 function PlayerVisualizer ({
   audioSourceNode,

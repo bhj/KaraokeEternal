@@ -99,8 +99,7 @@ export interface UserWithRole extends User {
 }
 
 export type VisualizerMode
-  = 'particles' // GPU particle system with bloom
-    | 'liquid' // Oobleck landscape with reflections
+  = 'physarum' // Slime mold pheromone simulation
     | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 

@@ -9,8 +9,7 @@ import { AudioDataProvider, useAudioData } from './contexts/AudioDataContext'
 import styles from './ThreeVisualizer.css'
 
 // Lazy load visualization modes to reduce initial bundle size
-const ParticlesMode = React.lazy(() => import('./modes/ParticlesMode'))
-const LiquidMode = React.lazy(() => import('./modes/LiquidMode'))
+const PhysarumMode = React.lazy(() => import('./modes/PhysarumMode'))
 
 interface ThreeVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode
@@ -24,8 +23,7 @@ interface ThreeVisualizerProps {
 
 // Map mode to component
 const MODE_COMPONENTS: Record<string, React.LazyExoticComponent<React.ComponentType<{ colorPalette: ColorPalette }>>> = {
-  particles: ParticlesMode,
-  liquid: LiquidMode,
+  physarum: PhysarumMode,
 }
 
 /**
