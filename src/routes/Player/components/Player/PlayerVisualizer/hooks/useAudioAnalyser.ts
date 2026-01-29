@@ -39,7 +39,7 @@ export function useAudioAnalyser (
   const frequencyDataRef = useRef<Float32Array | null>(null)
   const waveformDataRef = useRef<Float32Array | null>(null)
   const previousBassRef = useRef<number>(0)
-  const beatThresholdRef = useRef<number>(0.3)
+  const beatThresholdRef = useRef<number>(0.15)
 
   // Energy tracking for genre detection
   const energySmoothRef = useRef<number>(0)
@@ -127,12 +127,14 @@ export function useAudioAnalyser (
     for (let i = 0; i < frequencyData.length; i++) {
       // Convert from dB (-100 to 0) to linear (0 to 1)
       // -100dB = 0, 0dB = 1
-      normalizedFreq[i] = Math.max(0, Math.min(1, (frequencyData[i] + 100) / 100))
+      normalizedFreq[i] = Math.max(0, Math.min(1,
+        (frequencyData[i] - analyser.minDecibels) / (analyser.maxDecibels - analyser.minDecibels)
+      ))
     }
 
     // Calculate frequency bands
     const binCount = frequencyData.length
-    const bassEnd = Math.floor(binCount * 0.15) // ~0-300Hz at 44.1kHz
+    const bassEnd = Math.max(2, Math.floor(binCount * 0.03)) // ~0-500Hz
     const midEnd = Math.floor(binCount * 0.5) // ~300-2000Hz
 
     let bassSum = 0
@@ -155,14 +157,14 @@ export function useAudioAnalyser (
 
     // Simple beat detection based on bass spike
     const bassChange = bass - previousBassRef.current
-    const isBeat = bassChange > beatThresholdRef.current && bass > 0.4
+    const isBeat = bassChange > beatThresholdRef.current && bass > 0.25
     const beatIntensity = isBeat ? Math.min(1, bassChange * 2) : 0
 
     // Update previous bass for next frame
     previousBassRef.current = bass
 
     // Adaptive beat threshold
-    beatThresholdRef.current = beatThresholdRef.current * 0.95 + 0.05 * 0.3
+    beatThresholdRef.current = beatThresholdRef.current * 0.95 + 0.05 * 0.15
 
     // --- Energy Detection for Genre Response ---
 

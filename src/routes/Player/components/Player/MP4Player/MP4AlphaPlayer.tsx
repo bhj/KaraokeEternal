@@ -35,6 +35,7 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   }
 
   componentDidMount () {
+    this.video.crossOrigin = 'anonymous'
     this.props.onAudioElement(this.video)
     this.video.oncanplaythrough = this.updateIsPlaying
     this.video.onended = this.handleEnded
