@@ -40,7 +40,6 @@ export interface PlayerVisualizerState {
   presetName: string
   sensitivity: number
   mode: VisualizerMode
-  colorHue: number
   hydraCode?: string
 }
 
@@ -50,7 +49,6 @@ const initialState: PlayerVisualizerState = {
   ...getRandomPreset(),
   sensitivity: 1,
   mode: 'hydra',
-  colorHue: 20,
 }
 
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
@@ -81,7 +79,6 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
         mode: visualizer.mode ?? state.mode,
-        colorHue: typeof visualizer.colorHue === 'number' ? visualizer.colorHue : state.colorHue,
       }
     })
     .addCase(hydraCodeReceived, (state, { payload }) => {

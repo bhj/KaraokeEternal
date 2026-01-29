@@ -36,7 +36,6 @@ export interface OptimisticQueueItem {
 
 export interface IRoomVisualizerPrefs {
   mode?: VisualizerMode
-  colorHue?: number
   sensitivity?: number
 }
 
@@ -113,7 +112,6 @@ export interface PlaybackOptions {
     prevPreset?: boolean
     randomPreset?: boolean
     mode?: VisualizerMode
-    colorHue?: number
   }
 }
 

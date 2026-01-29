@@ -75,8 +75,6 @@ const ACTION_HANDLERS = {
     })
   },
   [VISUALIZER_HYDRA_CODE_REQ]: async (sock, { payload }) => {
-    if (!sock.user.isAdmin) return
-
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload,

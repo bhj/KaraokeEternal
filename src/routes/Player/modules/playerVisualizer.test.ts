@@ -11,7 +11,6 @@ import {
  * Tests for the extended playerVisualizer module.
  * TDD: These tests define the expected behavior for visualizer features:
  * - Multiple visualizer modes (hydra, milkdrop)
- * - Color hue (0-360)
  */
 
 export type VisualizerMode
@@ -26,7 +25,6 @@ interface PlayerVisualizerState {
   presetName: string
   sensitivity: number
   mode: VisualizerMode
-  colorHue: number
 }
 
 const initialState: PlayerVisualizerState = {
@@ -36,7 +34,6 @@ const initialState: PlayerVisualizerState = {
   presetName: '',
   sensitivity: 1,
   mode: 'hydra',
-  colorHue: 20,
 }
 
 interface ExtendedVisualizerOptions {
@@ -46,7 +43,6 @@ interface ExtendedVisualizerOptions {
   prevPreset?: boolean
   randomPreset?: boolean
   mode?: VisualizerMode
-  colorHue?: number
 }
 
 // Create test actions
@@ -71,7 +67,6 @@ const expectedReducer = createReducer(initialState, (builder) => {
         isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
         mode: visualizer.mode ?? state.mode,
-        colorHue: typeof visualizer.colorHue === 'number' ? visualizer.colorHue : state.colorHue,
       }
     })
     .addCase(playerVisualizerError, state => ({
@@ -87,10 +82,6 @@ describe('playerVisualizer reducer - Extended Features', () => {
       expect(state.mode).toBe('hydra')
     })
 
-    it('should have default colorHue of 20', () => {
-      const state = expectedReducer(undefined, { type: '@@INIT' })
-      expect(state.colorHue).toBe(20)
-    })
   })
 
   describe('Visualizer mode changes', () => {
@@ -117,48 +108,15 @@ describe('playerVisualizer reducer - Extended Features', () => {
     })
   })
 
-  describe('Color hue changes', () => {
-    it('should change colorHue to 200', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { colorHue: 200 },
-      }))
-      expect(state.colorHue).toBe(200)
-    })
-
-    it('should change colorHue to 0', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { colorHue: 0 },
-      }))
-      expect(state.colorHue).toBe(0)
-    })
-
-    it('should change colorHue to 360', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { colorHue: 360 },
-      }))
-      expect(state.colorHue).toBe(360)
-    })
-
-    it('should preserve colorHue when not specified', () => {
-      const stateWithHue = { ...initialState, colorHue: 120 }
-      const state = expectedReducer(stateWithHue, playerCmdOptions({
-        visualizer: { mode: 'milkdrop' },
-      }))
-      expect(state.colorHue).toBe(120)
-    })
-  })
-
   describe('Combined changes', () => {
     it('should update multiple settings at once', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
         visualizer: {
           mode: 'milkdrop',
-          colorHue: 270,
           sensitivity: 0.8,
         },
       }))
       expect(state.mode).toBe('milkdrop')
-      expect(state.colorHue).toBe(270)
       expect(state.sensitivity).toBe(0.8)
     })
 
@@ -177,12 +135,10 @@ describe('playerVisualizer reducer - Extended Features', () => {
       const stateWithSettings = {
         ...initialState,
         mode: 'milkdrop' as VisualizerMode,
-        colorHue: 270,
       }
       const state = expectedReducer(stateWithSettings, playerVisualizerError('WebGL error'))
       expect(state.isSupported).toBe(false)
       expect(state.mode).toBe('milkdrop')
-      expect(state.colorHue).toBe(270)
     })
   })
 })
@@ -197,12 +153,6 @@ describe('playerVisualizer actual implementation', () => {
     expect(state.mode).toBe('hydra')
   })
 
-  it('should have colorHue field in initial state', async () => {
-    const { default: reducer } = await import('./playerVisualizer')
-    const state = reducer(undefined, { type: '@@INIT' })
-    expect(state.colorHue).toBe(20)
-  })
-
   it('should update mode via PLAYER_CMD_OPTIONS', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     const state = reducer(undefined, { type: '@@INIT' })
@@ -211,16 +161,6 @@ describe('playerVisualizer actual implementation', () => {
       payload: { visualizer: { mode: 'milkdrop' } },
     })
     expect(newState.mode).toBe('milkdrop')
-  })
-
-  it('should update colorHue via PLAYER_CMD_OPTIONS', async () => {
-    const { default: reducer } = await import('./playerVisualizer')
-    const state = reducer(undefined, { type: '@@INIT' })
-    const newState = reducer(state, {
-      type: PLAYER_CMD_OPTIONS,
-      payload: { visualizer: { colorHue: 270 } },
-    })
-    expect(newState.colorHue).toBe(270)
   })
 
   it('should have no hydraCode in initial state', async () => {

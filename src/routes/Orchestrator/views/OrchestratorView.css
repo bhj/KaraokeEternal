@@ -1,9 +1,16 @@
 .container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100vh;
   background: #0a0a14;
   color: #ccc;
+}
+
+.editorPanel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
 }
 
 .patchBayArea {
@@ -15,4 +22,13 @@
 .editorArea {
   flex-shrink: 0;
   border-top: 1px solid #333;
+}
+
+.previewPanel {
+  width: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border-left: 1px solid #333;
 }

@@ -63,24 +63,6 @@
   }
 }
 
-.hueSlider {
-  :global(.rc-slider-rail) {
-    background: linear-gradient(to right,
-      hsl(0, 90%, 55%),
-      hsl(60, 90%, 55%),
-      hsl(120, 90%, 55%),
-      hsl(180, 90%, 55%),
-      hsl(240, 90%, 55%),
-      hsl(300, 90%, 55%),
-      hsl(360, 90%, 55%)
-    );
-  }
-
-  :global(.rc-slider-track) {
-    background: transparent;
-  }
-}
-
 .modeButtons {
   display: flex;
   flex-wrap: wrap;

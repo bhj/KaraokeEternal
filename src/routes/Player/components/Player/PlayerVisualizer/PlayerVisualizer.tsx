@@ -15,7 +15,6 @@ interface PlayerVisualizerProps {
   width: number
   height: number
   mode: VisualizerMode
-  colorHue: number
   hydraCode?: string
 }
 
@@ -28,7 +27,6 @@ function PlayerVisualizer ({
   width,
   height,
   mode,
-  colorHue,
   hydraCode,
 }: PlayerVisualizerProps) {
   if (mode === 'off') {

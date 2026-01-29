@@ -97,7 +97,6 @@ const PlaybackCtrl = () => {
           sensitivity={status.visualizer.sensitivity}
           visualizerPresetName={status.visualizer.presetName}
           visualizerMode={status.visualizer.mode}
-          colorHue={status.visualizer.colorHue}
         />
       )}
     </div>

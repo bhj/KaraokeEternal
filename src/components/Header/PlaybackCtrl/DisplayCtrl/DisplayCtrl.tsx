@@ -19,7 +19,6 @@ interface DisplayCtrlProps {
   sensitivity: number
   visualizerPresetName: string
   visualizerMode: VisualizerMode
-  colorHue: number
   // actions
   onRequestOptions(opts: PlaybackOptions): void
   onClose: ModalProps['onClose']
@@ -43,7 +42,6 @@ const DisplayCtrl = ({
   sensitivity,
   visualizerPresetName,
   visualizerMode,
-  colorHue,
   onRequestOptions,
   onClose,
 }: DisplayCtrlProps) => {
@@ -78,10 +76,6 @@ const DisplayCtrl = ({
 
   const handleModeChange = (mode: VisualizerMode) => onRequestOptions({
     visualizer: { mode },
-  })
-
-  const handleColorHueChange = (val: number) => onRequestOptions({
-    visualizer: { colorHue: val },
   })
 
   // Show milkdrop preset controls only when in milkdrop mode
@@ -156,21 +150,6 @@ const DisplayCtrl = ({
                     >
                       {visualizerPresetName}
                     </p>
-                  </div>
-                )}
-
-                {visualizerMode !== 'off' && visualizerMode !== 'milkdrop' && (
-                  <div className={styles.field}>
-                    <label id='label-color-hue'>Color</label>
-                    <Slider
-                      min={0}
-                      max={360}
-                      step={1}
-                      value={colorHue}
-                      onChange={handleColorHueChange}
-                      className={clsx(styles.slider, styles.hueSlider)}
-                      aria-labelledby='label-color-hue'
-                    />
                   </div>
                 )}
 
