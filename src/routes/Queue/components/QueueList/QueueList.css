@@ -1,0 +1,10 @@
+.container {
+  /* Container for drag-drop list */
+}
+
+.dragging {
+  opacity: 0.8;
+  background-color: hsl(var(--hue-blue), 50%, 15%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border-radius: var(--border-radius);
+}
