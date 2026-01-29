@@ -165,6 +165,9 @@ const QueueItem = ({
           </div>
           <div className={clsx(styles.user, isOwner && styles.isOwner)}>
             {userDisplayName}
+            {coSingers && coSingers.length > 0 && (
+              <span className={styles.coSingers}> + {coSingers.join(', ')}</span>
+            )}
           </div>
         </div>
 
