@@ -401,11 +401,12 @@ function PhysarumMode ({ colorHue }: PhysarumModeProps) {
 
     // Audio → simulation params
     const ss = 0.001 + audio.energy * 0.008 // step size (wider range: crawl in quiet, race in loud)
-    const sa = 0.4 + audio.spectralCentroid * 0.8 // sensor angle (wider range for dramatic forking)
-    const ra = 0.3 + audio.beatIntensity * 0.6 + audio.treble * 0.2 // rotation angle (treble for hi-hat response)
+    const sa = 0.3 + audio.spectralCentroid * 1.2 // sensor angle (wide: bright sounds push near-perpendicular)
+    const ra = 0.2 + audio.beatIntensity * 1.0 + audio.treble * 0.4 // rotation angle (wide: snare+cymbal → near-90° turns)
     const so = 0.01 + audio.mid * 0.08 // sensor offset (wider range for pattern scale)
     const spawnChance = audio.beatIntensity > 0.4 ? audio.beatIntensity * 0.03 : 0.0
-    const decay = 0.88 - audio.energy * 0.1 // trail decay (lower base = cleaner trails)
+    const beatDecayDrop = audio.beatIntensity > 0.6 ? audio.beatIntensity * 0.15 : 0.0
+    const decay = 0.88 - audio.energy * 0.1 - beatDecayDrop // trail decay (beat-reactive flood on strong hits)
     const depositStrength = 0.4 + audio.energy * 0.5 + audio.beatIntensity * 0.3
 
     // Source textures for this frame
