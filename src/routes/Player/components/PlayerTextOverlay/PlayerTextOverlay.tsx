@@ -33,7 +33,7 @@ const PlayerTextOverlay = ({
   let Component
 
   if (isQueueEmpty || (isAtQueueEnd && !nextQueueItem)) {
-    Component = <ColorCycle text='CAN HAZ MOAR SONGZ?' className={styles.backdrop} />
+    Component = <ColorCycle text='Add songs to the queue' className={styles.backdrop} />
   } else if (!queueItem || (isAtQueueEnd && nextQueueItem)) {
     Component = (
       <>

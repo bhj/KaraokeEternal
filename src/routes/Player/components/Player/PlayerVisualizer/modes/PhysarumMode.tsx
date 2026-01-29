@@ -157,7 +157,6 @@ const displayFrag = `
   uniform vec3 colorHigh;
   uniform float energyBoost;
   uniform float beatFlash;
-  uniform float paletteShift;
 
   varying vec2 vUv;
 
@@ -165,10 +164,10 @@ const displayFrag = `
     float intensity = texture2D(trail, vUv).r;
 
     // Boost intensity with energy
-    intensity = clamp(intensity * (1.0 + energyBoost * 0.5), 0.0, 1.0);
+    intensity = clamp(intensity * (1.0 + energyBoost * 2.0), 0.0, 1.0);
 
-    // Shift palette sampling position by BPM-driven rotation
-    float t = fract(intensity + paletteShift);
+    // Gamma correction to expand mid-range detail
+    float t = pow(intensity, 0.75);
 
     // 3-stop gradient: low → mid → high
     vec3 color;
@@ -179,7 +178,7 @@ const displayFrag = `
     }
 
     // Beat flash
-    color += vec3(beatFlash * 0.15);
+    color += vec3(beatFlash * 0.4);
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -310,7 +309,6 @@ function PhysarumMode ({ colorHue }: PhysarumModeProps) {
         colorHigh: { value: new THREE.Color(1, 1, 1) },
         energyBoost: { value: 0 },
         beatFlash: { value: 0 },
-        paletteShift: { value: 0 },
       },
       vertexShader: fullscreenVert,
       fragmentShader: displayFrag,
@@ -406,8 +404,8 @@ function PhysarumMode ({ colorHue }: PhysarumModeProps) {
     const so = 0.01 + audio.mid * 0.08 // sensor offset (wider range for pattern scale)
     const spawnChance = audio.beatIntensity > 0.4 ? audio.beatIntensity * 0.03 : 0.0
     const beatDecayDrop = audio.beatIntensity > 0.6 ? audio.beatIntensity * 0.15 : 0.0
-    const decay = 0.88 - audio.energy * 0.1 - beatDecayDrop // trail decay (beat-reactive flood on strong hits)
-    const depositStrength = 0.4 + audio.energy * 0.5 + audio.beatIntensity * 0.3
+    const decay = 0.92 - audio.energy * 0.2 - beatDecayDrop // trail decay (beat-reactive flood on strong hits)
+    const depositStrength = 0.6 + audio.energy * 0.8 + audio.beatIntensity * 0.5
 
     // Source textures for this frame
     const srcAgentRT = ping ? agentRenderTargets[0] : agentRenderTargets[1]
@@ -464,9 +462,8 @@ function PhysarumMode ({ colorHue }: PhysarumModeProps) {
     displayMaterial.uniforms.colorLow.value = getColorFromPalette(colorHue, 0.0)
     displayMaterial.uniforms.colorMid.value = getColorFromPalette(colorHue, 0.5)
     displayMaterial.uniforms.colorHigh.value = getColorFromPalette(colorHue, 1.0)
-    displayMaterial.uniforms.energyBoost.value = audio.energySmooth
+    displayMaterial.uniforms.energyBoost.value = audio.energy
     displayMaterial.uniforms.beatFlash.value = audio.beatIntensity
-    displayMaterial.uniforms.paletteShift.value = (audio.beatFrequency * time) % 1.0
 
     // Scale to fill viewport
     if (meshRef.current) {
