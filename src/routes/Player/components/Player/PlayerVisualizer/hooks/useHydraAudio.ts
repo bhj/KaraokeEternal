@@ -1,5 +1,6 @@
 import { useRef, useCallback, useMemo } from 'react'
 import { useAudioAnalyser, type AudioData } from './useAudioAnalyser'
+import { createHydraAudioCompat } from './hydraAudioCompat'
 
 export interface AudioClosures {
   bass: () => number
@@ -12,6 +13,7 @@ export interface AudioClosures {
 }
 
 const defaultAudioData: AudioData = {
+  rawFrequencyData: new Float32Array(64),
   frequencyData: new Float32Array(64),
   waveformData: new Float32Array(128),
   bass: 0,
@@ -31,11 +33,14 @@ export function useHydraAudio (
 ) {
   const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity })
   const audioRef = useRef<AudioData>(defaultAudioData)
+  const compat = useMemo(() => createHydraAudioCompat(), [])
 
   // Update ref every animation frame — called from the rAF loop
   const update = useCallback(() => {
     audioRef.current = getAudioData()
-  }, [getAudioData])
+    // Feed linear FFT data to window.a compat layer (rawFrequencyData, no gamma)
+    compat.update(audioRef.current)
+  }, [getAudioData, compat])
 
   // Stable closures that Hydra code references via arrow functions
   const closures: AudioClosures = useMemo(() => ({
@@ -48,5 +53,5 @@ export function useHydraAudio (
     bright: () => audioRef.current.spectralCentroid,
   }), [])
 
-  return { update, closures, audioRef }
+  return { update, closures, audioRef, compat }
 }

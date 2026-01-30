@@ -21,6 +21,7 @@ interface DisplayCtrlProps {
   visualizerMode: VisualizerMode
   // actions
   onRequestOptions(opts: PlaybackOptions): void
+  onHydraPresetChange(direction: 'next' | 'prev' | 'random'): void
   onClose: ModalProps['onClose']
 }
 
@@ -43,6 +44,7 @@ const DisplayCtrl = ({
   visualizerPresetName,
   visualizerMode,
   onRequestOptions,
+  onHydraPresetChange,
   onClose,
 }: DisplayCtrlProps) => {
   const handleAlpha = (val: number) => {
@@ -62,24 +64,36 @@ const DisplayCtrl = ({
     visualizer: { isEnabled: !isVisualizerEnabled },
   })
 
-  const handlePresetNext = () => onRequestOptions({
-    visualizer: { nextPreset: true },
-  })
+  const handlePresetNext = () => {
+    if (visualizerMode === 'hydra') {
+      onHydraPresetChange('next')
+    } else {
+      onRequestOptions({ visualizer: { nextPreset: true } })
+    }
+  }
 
-  const handlePresetPrev = () => onRequestOptions({
-    visualizer: { prevPreset: true },
-  })
+  const handlePresetPrev = () => {
+    if (visualizerMode === 'hydra') {
+      onHydraPresetChange('prev')
+    } else {
+      onRequestOptions({ visualizer: { prevPreset: true } })
+    }
+  }
 
-  const handlePresetRandom = () => onRequestOptions({
-    visualizer: { randomPreset: true },
-  })
+  const handlePresetRandom = () => {
+    if (visualizerMode === 'hydra') {
+      onHydraPresetChange('random')
+    } else {
+      onRequestOptions({ visualizer: { randomPreset: true } })
+    }
+  }
 
   const handleModeChange = (mode: VisualizerMode) => onRequestOptions({
     visualizer: { mode },
   })
 
-  // Show milkdrop preset controls only when in milkdrop mode
-  const showMilkdropPresets = visualizerMode === 'milkdrop'
+  // Show preset controls for milkdrop and hydra modes
+  const showPresets = visualizerMode === 'milkdrop' || visualizerMode === 'hydra'
 
   return (
     <Modal
@@ -117,7 +131,7 @@ const DisplayCtrl = ({
                   </div>
                 </div>
 
-                {showMilkdropPresets && (
+                {showPresets && (
                   <div className={styles.presetContainer}>
                     <div className={styles.presetButtons}>
                       <Button

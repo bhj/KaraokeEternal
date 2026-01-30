@@ -1,7 +1,8 @@
 import { useRef, useEffect, useCallback } from 'react'
 
 export interface AudioData {
-  frequencyData: Float32Array // 0-1 normalized, 128 bins
+  rawFrequencyData: Float32Array // Linear normalized 0-1, 128 bins (for window.a.fft compat)
+  frequencyData: Float32Array // Gamma-shaped 0-1, 128 bins (for band globals)
   waveformData: Float32Array // -1 to 1, 256 samples
   bass: number // Low freq average (0-1)
   mid: number // Mid freq average (0-1)
@@ -24,6 +25,12 @@ interface UseAudioAnalyserOptions {
 const DEFAULT_FFT_SIZE = 256
 const DEFAULT_SMOOTHING = 0.8
 
+/**
+ * Gamma exponent applied to frequency data for band globals (bass/mid/treble/etc).
+ * Linear data (no gamma) is preserved in rawFrequencyData for window.a.fft compat.
+ */
+const GAMMA = 0.7
+
 export function useAudioAnalyser (
   audioSourceNode: MediaElementAudioSourceNode | null,
   options: UseAudioAnalyserOptions = {},
@@ -43,6 +50,10 @@ export function useAudioAnalyser (
   const beatThresholdRef = useRef<number>(0.15)
   const diagLoggedRef = useRef(false)
   const diagFramesRef = useRef(0)
+
+  // Hz-based band boundaries (computed once per audio source)
+  const bassEndRef = useRef<number>(0)
+  const midEndRef = useRef<number>(0)
 
   // Energy tracking for genre detection
   const energySmoothRef = useRef<number>(0)
@@ -67,17 +78,18 @@ export function useAudioAnalyser (
     analyser.smoothingTimeConstant = smoothingTimeConstant
     analyserRef.current = analyser
 
-    // Connect: source -> gain -> analyser
+    // REQUIRED: source → gain → analyser → silentGain(0) → destination
+    // This chain keeps the analyser alive in all browsers (some ignore dead-end nodes)
     audioSourceNode.connect(gainNode)
     gainNode.connect(analyser)
 
-    // Keep analyser branch alive in browsers that ignore dead-ends
     const silentGain = audioCtx.createGain()
     silentGain.gain.value = 0
     silentGainRef.current = silentGain
     analyser.connect(silentGain)
     silentGain.connect(audioCtx.destination)
 
+    // REQUIRED: resume() ensures analyser receives data on autoplay-restricted browsers
     if (audioCtx.state === 'suspended') {
       const resume = (audioCtx as AudioContext).resume?.bind(audioCtx)
       if (resume) {
@@ -95,6 +107,15 @@ export function useAudioAnalyser (
     waveformDataRef.current = new Float32Array(
       new ArrayBuffer(analyser.fftSize * Float32Array.BYTES_PER_ELEMENT),
     )
+
+    // Compute Hz-based band boundaries once per audio source
+    // Known limitation: FFT 256 at 44.1kHz gives ~172Hz per bin — coarse for bass.
+    // Widened bass to 20-400Hz gives ~2-3 bins. Weighted average smooths it.
+    // Can increase FFT to 512 later for better bass resolution.
+    const sampleRate = (audioCtx as AudioContext).sampleRate ?? 44100
+    const hzPerBin = sampleRate / fftSize
+    bassEndRef.current = Math.max(2, Math.round(400 / hzPerBin)) // 20-400Hz
+    midEndRef.current = Math.max(bassEndRef.current + 1, Math.round(4000 / hzPerBin)) // 400-4kHz
 
     return () => {
       // Disconnect nodes on cleanup
@@ -129,6 +150,7 @@ export function useAudioAnalyser (
     // Return empty data if not initialized
     if (!analyser || !frequencyData || !waveformData) {
       return {
+        rawFrequencyData: new Float32Array(64),
         frequencyData: new Float32Array(64),
         waveformData: new Float32Array(128),
         bass: 0,
@@ -149,12 +171,12 @@ export function useAudioAnalyser (
     // Get waveform data (-1 to 1)
     analyser.getFloatTimeDomainData(waveformData)
 
-    // Normalize frequency data to 0-1 range
-    const normalizedFreq = new Float32Array(frequencyData.length)
+    // Normalize frequency data to 0-1 range (linear)
+    const rawNormalizedFreq = new Float32Array(frequencyData.length)
+    const gammaFreq = new Float32Array(frequencyData.length)
     for (let i = 0; i < frequencyData.length; i++) {
       // Convert from dB (-100 to 0) to linear (0 to 1)
-      // -100dB = 0, 0dB = 1
-      normalizedFreq[i] = Math.max(
+      const linear = Math.max(
         0,
         Math.min(
           1,
@@ -162,25 +184,28 @@ export function useAudioAnalyser (
           / (analyser.maxDecibels - analyser.minDecibels),
         ),
       )
+      rawNormalizedFreq[i] = linear
+      // Gamma curve for band globals — gentle boost to mid/low amplitudes
+      gammaFreq[i] = Math.pow(linear, GAMMA)
     }
 
-    // Calculate frequency bands
+    // Hz-based frequency bands (use gamma-shaped data for band globals)
     const binCount = frequencyData.length
-    const bassEnd = Math.max(2, Math.floor(binCount * 0.03)) // ~0-500Hz
-    const midEnd = Math.floor(binCount * 0.5) // ~300-2000Hz
+    const bassEnd = bassEndRef.current || Math.max(2, Math.floor(binCount * 0.03))
+    const midEnd = midEndRef.current || Math.floor(binCount * 0.5)
 
     let bassSum = 0
     let midSum = 0
     let trebleSum = 0
 
     for (let i = 0; i < bassEnd; i++) {
-      bassSum += normalizedFreq[i]
+      bassSum += gammaFreq[i]
     }
     for (let i = bassEnd; i < midEnd; i++) {
-      midSum += normalizedFreq[i]
+      midSum += gammaFreq[i]
     }
     for (let i = midEnd; i < binCount; i++) {
-      trebleSum += normalizedFreq[i]
+      trebleSum += gammaFreq[i]
     }
 
     const bass = bassSum / bassEnd
@@ -217,12 +242,12 @@ export function useAudioAnalyser (
     // Weighted average of frequencies - higher = brighter/harsher sound
     let weightedSum = 0
     let totalWeight = 0
-    for (let i = 0; i < normalizedFreq.length; i++) {
-      const weight = normalizedFreq[i]
+    for (let i = 0; i < rawNormalizedFreq.length; i++) {
+      const weight = rawNormalizedFreq[i]
       weightedSum += i * weight
       totalWeight += weight
     }
-    const rawCentroid = totalWeight > 0 ? weightedSum / totalWeight / normalizedFreq.length : 0.5
+    const rawCentroid = totalWeight > 0 ? weightedSum / totalWeight / rawNormalizedFreq.length : 0.5
     // Smooth the spectral centroid
     spectralCentroidSmoothRef.current = spectralCentroidSmoothRef.current * 0.9 + rawCentroid * 0.1
     const spectralCentroid = spectralCentroidSmoothRef.current
@@ -253,9 +278,11 @@ export function useAudioAnalyser (
       beatFrequency = Math.max(0, Math.min(1, (bpm - 60) / 120))
     }
 
+    // Dev-only startup diagnostic — fires after 60 frames for reliability
+    // Catches CORS taint and suspended audio contexts
     if (!diagLoggedRef.current) {
       diagFramesRef.current += 1
-      if (diagFramesRef.current >= 30) {
+      if (diagFramesRef.current >= 60) {
         diagLoggedRef.current = true
         const sample = frequencyData[0]
         const ctxState = analyser.context.state
@@ -276,7 +303,8 @@ export function useAudioAnalyser (
     }
 
     return {
-      frequencyData: normalizedFreq,
+      rawFrequencyData: rawNormalizedFreq,
+      frequencyData: gammaFreq,
       waveformData: new Float32Array(waveformData),
       bass,
       mid,

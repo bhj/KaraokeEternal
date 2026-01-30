@@ -7,6 +7,7 @@ import {
   VISUALIZER_HYDRA_CODE,
 } from 'shared/actionTypes'
 import type { PlaybackOptions, VisualizerMode } from 'shared/types'
+import { getDefaultPresetIndex, getPresetLabel } from 'routes/Orchestrator/components/hydraPresets'
 
 const BAD_PRESETS = [
   'Flexi + Martin - astral projection',
@@ -26,7 +27,7 @@ const getRandomPreset = () => getPreset(Math.floor(Math.random() * (_presetKeys.
 // Actions
 // ------------------------------------
 const playerCmdOptions = createAction<{ visualizer: PlaybackOptions['visualizer'] }>(PLAYER_CMD_OPTIONS)
-const hydraCodeReceived = createAction<{ code: string }>(VISUALIZER_HYDRA_CODE)
+const hydraCodeReceived = createAction<{ code: string, hydraPresetIndex?: number }>(VISUALIZER_HYDRA_CODE)
 export const playerLoad = createAction(PLAYER_LOAD)
 export const playerVisualizerError = createAction<string>(PLAYER_VISUALIZER_ERROR)
 
@@ -41,7 +42,11 @@ export interface PlayerVisualizerState {
   sensitivity: number
   mode: VisualizerMode
   hydraCode?: string
+  hydraPresetIndex: number
+  hydraPresetName: string
 }
+
+const _defaultHydraIndex = getDefaultPresetIndex()
 
 const initialState: PlayerVisualizerState = {
   isEnabled: true,
@@ -49,12 +54,15 @@ const initialState: PlayerVisualizerState = {
   ...getRandomPreset(),
   sensitivity: 1,
   mode: 'hydra',
+  hydraPresetIndex: _defaultHydraIndex,
+  hydraPresetName: getPresetLabel(_defaultHydraIndex),
 }
 
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(playerLoad, state => ({
       ...state,
+      // Randomize Milkdrop preset on load; Hydra presets only change via server broadcast
       ...getRandomPreset(),
     }))
     .addCase(playerCmdOptions, (state, { payload }) => {
@@ -83,6 +91,13 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
     })
     .addCase(hydraCodeReceived, (state, { payload }) => {
       state.hydraCode = payload.code
+      // Server-chosen index: dispatching client includes hydraPresetIndex in payload.
+      // Only update index/name when present (preset navigation).
+      // Code-only payloads (Orchestrator send) preserve existing preset index.
+      if (typeof payload.hydraPresetIndex === 'number') {
+        state.hydraPresetIndex = payload.hydraPresetIndex
+        state.hydraPresetName = getPresetLabel(payload.hydraPresetIndex)
+      }
     })
     .addCase(playerVisualizerError, (state) => {
       state.isSupported = false

@@ -207,4 +207,63 @@ describe('playerVisualizer actual implementation', () => {
     expect(state.hydraCode).toBe('osc(10).out()')
     expect(state.sensitivity).toBe(0.5)
   })
+
+  it('should have hydraPresetIndex in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(typeof state.hydraPresetIndex).toBe('number')
+    expect(state.hydraPresetIndex).toBeGreaterThanOrEqual(0)
+  })
+
+  it('should have hydraPresetName in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(typeof state.hydraPresetName).toBe('string')
+    expect(state.hydraPresetName).toContain('[')
+    expect(state.hydraPresetName).toContain(']')
+  })
+
+  /**
+   * Payload passthrough test: dispatch VISUALIZER_HYDRA_CODE with combined
+   * { code, hydraPresetIndex } payload → verify reducer sets both hydraCode
+   * AND hydraPresetIndex AND hydraPresetName. This validates the server
+   * passthrough contract (server relays full payload object unchanged).
+   */
+  it('should extract hydraPresetIndex from VISUALIZER_HYDRA_CODE payload', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const { getPresetLabel } = await import('routes/Orchestrator/components/hydraPresets')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'noise(5).out()', hydraPresetIndex: 5 },
+    })
+    expect(state.hydraCode).toBe('noise(5).out()')
+    expect(state.hydraPresetIndex).toBe(5)
+    expect(state.hydraPresetName).toBe(getPresetLabel(5))
+  })
+
+  it('should preserve hydraPresetIndex when code-only payload received', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'noise(5).out()', hydraPresetIndex: 5 },
+    })
+    state = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'osc(10).out()' },
+    })
+    expect(state.hydraCode).toBe('osc(10).out()')
+    // No preset index in payload → should keep existing (Orchestrator send, not preset nav)
+    expect(state.hydraPresetIndex).toBe(5)
+  })
+
+  it('should NOT randomize hydra preset on PLAYER_LOAD', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const initialIdx = state.hydraPresetIndex
+    const newState = reducer(state, { type: PLAYER_LOAD })
+    // Hydra preset should NOT change on player load
+    expect(newState.hydraPresetIndex).toBe(initialIdx)
+  })
 })

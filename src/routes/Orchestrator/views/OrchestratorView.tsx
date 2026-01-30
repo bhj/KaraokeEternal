@@ -18,14 +18,11 @@ function OrchestratorView () {
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
   const remoteHydraCode = playerVisualizer?.hydraCode
   const ui = useAppSelector(state => state.ui)
-  const roomId = useAppSelector(state => state.user.roomId)
-
   const [localCode, setLocalCode] = useState<string>(DEFAULT_SKETCH)
-  const [previewBuffer, setPreviewBuffer] = useState<StageBuffer>('o0')
+  const [previewBuffer, setPreviewBuffer] = useState<StageBuffer>('auto')
   const [userHasEdited, setUserHasEdited] = useState(false)
   const [pendingRemoteCode, setPendingRemoteCode] = useState<string | null>(null)
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
-  const [randomCounter, setRandomCounter] = useState(0)
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
   const prevRemoteRef = useRef<string | undefined>(undefined)
 
@@ -47,11 +44,10 @@ function OrchestratorView () {
    * other clients. This avoids spamming collaborators with rapid clicks.
    */
   const handleRandomize = useCallback(() => {
-    setRandomCounter(c => c + 1)
-    const sketch = getRandomSketch(localCode, roomId ?? undefined, randomCounter + 1)
+    const sketch = getRandomSketch()
     setLocalCode(sketch)
     setUserHasEdited(true)
-  }, [localCode, roomId, randomCounter])
+  }, [])
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {

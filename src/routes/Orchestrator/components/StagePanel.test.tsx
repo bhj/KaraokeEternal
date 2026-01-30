@@ -3,7 +3,7 @@ import React, { act } from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { createRoot } from 'react-dom/client'
 import StagePanel from './StagePanel'
-import { buildPreviewCode } from './stagePanelUtils'
+import { buildPreviewCode, detectOutputBuffer } from './stagePanelUtils'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -12,19 +12,75 @@ vi.mock('./HydraPreview', () => ({
 }))
 
 describe('StagePanel', () => {
-  it('buildPreviewCode appends render for grid mode', () => {
-    const code = 'osc(10,0,1).out(o0)'
-    const result = buildPreviewCode(code, 'grid')
-    expect(result).toBe(`${code}\nrender()`)
+  describe('detectOutputBuffer', () => {
+    it('.out() (no arg) → o0', () => {
+      expect(detectOutputBuffer('osc(10).out()')).toBe('o0')
+    })
+
+    it('.out(o2) → o2', () => {
+      expect(detectOutputBuffer('osc(10).out(o2)')).toBe('o2')
+    })
+
+    it('render(o2) overrides .out(o1)', () => {
+      expect(detectOutputBuffer('osc(10).out(o1)\nrender(o2)')).toBe('o2')
+    })
+
+    it('render() (no arg) → o0', () => {
+      expect(detectOutputBuffer('osc(10).out(o1)\nrender()')).toBe('o0')
+    })
+
+    it('multiple .out() → last one', () => {
+      expect(detectOutputBuffer('osc(10).out(o1)\nnoise(3).out(o3)')).toBe('o3')
+    })
+
+    it('no .out or render → o0', () => {
+      expect(detectOutputBuffer('osc(10).color(1,0,0)')).toBe('o0')
+    })
+
+    it('.out(o2) inside // comment is ignored', () => {
+      expect(detectOutputBuffer('// .out(o2)\nosc(10).out(o1)')).toBe('o1')
+    })
+
+    it('.out(o3) inside /* */ block comment is ignored', () => {
+      expect(detectOutputBuffer('/* .out(o3) */\nosc(10).out(o1)')).toBe('o1')
+    })
   })
 
-  it('buildPreviewCode renders selected buffer', () => {
-    const code = 'noise(3,0).out(o2)'
-    const result = buildPreviewCode(code, 'o2')
-    expect(result).toBe(`${code}\nrender(o2)`)
+  describe('buildPreviewCode', () => {
+    it('auto mode uses detectOutputBuffer to find target', () => {
+      const code = 'osc(10).out(o2)'
+      const result = buildPreviewCode(code, 'auto')
+      // Auto-detect: .out(o2) → render(o2)
+      expect(result).toContain('render(o2)')
+    })
+
+    it('auto mode with .out() → render(o0)', () => {
+      const code = 'osc(10).out()'
+      const result = buildPreviewCode(code, 'auto')
+      expect(result).toContain('render(o0)')
+    })
+
+    it('auto mode with render(o2) in code → render(o2)', () => {
+      const code = 'osc(10).out(o1)\nrender(o2)'
+      const result = buildPreviewCode(code, 'auto')
+      expect(result).toContain('render(o2)')
+    })
+
+    it('manual o1 override works', () => {
+      const code = 'osc(10).out(o2)'
+      const result = buildPreviewCode(code, 'o1')
+      expect(result).toBe(`${code}\nrender(o1)`)
+    })
+
+    it('returns empty for empty code', () => {
+      expect(buildPreviewCode('', 'auto')).toBe('')
+      expect(buildPreviewCode('  ', 'o0')).toBe('')
+    })
   })
 
-  it('renders buffer buttons', async () => {
+  // NOTE: preview appends render() which overrides any user render() call.
+  // This is intentional for preview — preview != runtime behavior.
+  it('renders buffer buttons (Auto + o0-o3)', async () => {
     const container = document.createElement('div')
     const root = createRoot(container)
 
@@ -34,17 +90,19 @@ describe('StagePanel', () => {
           code='osc(10,0,1).out(o0)'
           width={360}
           height={270}
-          buffer='o0'
+          buffer='auto'
           onBufferChange={vi.fn()}
         />,
       )
     })
 
+    expect(container.textContent).toContain('Auto')
     expect(container.textContent).toContain('o0')
     expect(container.textContent).toContain('o1')
     expect(container.textContent).toContain('o2')
     expect(container.textContent).toContain('o3')
-    expect(container.textContent).toContain('grid')
+    // No 'grid' option
+    expect(container.textContent).not.toContain('grid')
 
     await act(async () => {
       root.unmount()

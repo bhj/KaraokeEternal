@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import Hydra from 'hydra-synth'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
+import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
 import styles from './HydraVisualizer.css'
 
 const log = (...args: unknown[]) => console.log('[Hydra]', ...args)
@@ -20,7 +21,7 @@ osc(20, 0.1, () => bass() * 2)
 // Audio closure names exposed on window for Hydra code to reference
 const AUDIO_GLOBAL_NAMES = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright'] as const
 
-function setAudioGlobals (closures: AudioClosures) {
+function setAudioGlobals (closures: AudioClosures, compat: HydraAudioCompat) {
   const w = window as unknown as Record<string, unknown>
   w.bass = closures.bass
   w.mid = closures.mid
@@ -29,6 +30,8 @@ function setAudioGlobals (closures: AudioClosures) {
   w.energy = closures.energy
   w.bpm = closures.bpm
   w.bright = closures.bright
+  // Hydra-native audio API: gallery sketches use a.fft[0], a.setBins(), etc.
+  w.a = compat
 }
 
 function clearAudioGlobals () {
@@ -36,6 +39,7 @@ function clearAudioGlobals () {
   for (const name of AUDIO_GLOBAL_NAMES) {
     delete w[name]
   }
+  delete w.a
 }
 
 function executeHydraCode (hydra: Hydra, code: string) {
@@ -78,7 +82,7 @@ function HydraVisualizer ({
   const heightRef = useRef(height)
   const codeRef = useRef(code)
 
-  const { update: updateAudio, closures } = useHydraAudio(audioSourceNode, sensitivity)
+  const { update: updateAudio, closures, compat } = useHydraAudio(audioSourceNode, sensitivity)
 
   useEffect(() => {
     widthRef.current = width
@@ -86,11 +90,11 @@ function HydraVisualizer ({
     codeRef.current = code
   }, [width, height, code])
 
-  // Set audio closures on window so Hydra code can reference them
+  // Set audio closures + window.a compat on window so Hydra code can reference them
   useEffect(() => {
-    setAudioGlobals(closures)
+    setAudioGlobals(closures, compat)
     return () => clearAudioGlobals()
-  }, [closures])
+  }, [closures, compat])
 
   // Initialize Hydra (mount-only)
   useEffect(() => {

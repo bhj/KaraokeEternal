@@ -4,6 +4,8 @@ import { useLocation } from 'react-router'
 import clsx from 'clsx'
 import screenfull from 'screenfull'
 import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolume } from 'store/modules/status'
+import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
+import { getPresetByIndex, getNextPreset, getPrevPreset, getRandomPreset } from 'routes/Orchestrator/components/hydraPresets'
 import Button from 'components/Button/Button'
 import VolumeSlider from './VolumeSlider/VolumeSlider'
 import NoPlayer from './NoPlayer/NoPlayer'
@@ -37,6 +39,22 @@ const PlaybackCtrl = () => {
   const toggleDisplayCtrl = useCallback(() => {
     setDisplayCtrlVisible(!isDisplayCtrlVisible)
   }, [isDisplayCtrlVisible])
+
+  const handleHydraPresetChange = useCallback((direction: 'next' | 'prev' | 'random') => {
+    const currentIdx = status.visualizer.hydraPresetIndex ?? 0
+    let newIdx: number
+    if (direction === 'next') {
+      newIdx = getNextPreset(currentIdx)
+    } else if (direction === 'prev') {
+      newIdx = getPrevPreset(currentIdx)
+    } else {
+      newIdx = getRandomPreset(currentIdx)
+    }
+    dispatch({
+      type: VISUALIZER_HYDRA_CODE_REQ,
+      payload: { code: getPresetByIndex(newIdx), hydraPresetIndex: newIdx },
+    })
+  }, [dispatch, status.visualizer.hydraPresetIndex])
 
   if (!status.isPlayerPresent) {
     // Show launch button for non-guest users in a room (admins and standard users)
@@ -95,8 +113,11 @@ const PlaybackCtrl = () => {
           onClose={toggleDisplayCtrl}
           onRequestOptions={handleOptions}
           sensitivity={status.visualizer.sensitivity}
-          visualizerPresetName={status.visualizer.presetName}
+          visualizerPresetName={status.visualizer.mode === 'hydra'
+            ? (status.visualizer.hydraPresetName ?? '')
+            : (status.visualizer.presetName ?? '')}
           visualizerMode={status.visualizer.mode}
+          onHydraPresetChange={handleHydraPresetChange}
         />
       )}
     </div>
