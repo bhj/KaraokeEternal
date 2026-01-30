@@ -19,6 +19,21 @@ interface SsoConfig {
   ssoLoginUrl: string | null
 }
 
+export const buildSsoLoginUrl = (ssoLoginUrl: string, redirectPath: string): string => {
+  const redirect = encodeURIComponent(redirectPath)
+  return ssoLoginUrl.startsWith('/api/')
+    ? `${ssoLoginUrl}?redirect=${redirect}`
+    : `${ssoLoginUrl}?rd=${redirect}`
+}
+
+export const getSsoRedirectUrl = (config: SsoConfig | null, redirectPath: string): string | null => {
+  if (!config?.ssoMode || !config.ssoLoginUrl) {
+    return null
+  }
+
+  return buildSsoLoginUrl(config.ssoLoginUrl, redirectPath)
+}
+
 const SignedOutView = () => {
   const userSectionRef = useRef<HTMLDivElement | null>(null)
   const firstFieldRef = useRef<HTMLInputElement | null>(null)
@@ -41,12 +56,31 @@ const SignedOutView = () => {
 
   // once per mount
   useEffect(() => {
-    dispatch(fetchRooms())
+    let isMounted = true
+    const currentPath = window.location.pathname + window.location.search
 
-    // Fetch SSO config
+    // Fetch SSO config first to avoid unauthenticated room fetch in SSO-only mode
     api.get<SsoConfig>('prefs/public')
-      .then(setSsoConfig)
-      .catch(() => {})
+      .then((config) => {
+        if (!isMounted) return
+        setSsoConfig(config)
+
+        const redirectUrl = getSsoRedirectUrl(config, currentPath)
+        if (redirectUrl) {
+          window.location.href = redirectUrl
+          return
+        }
+
+        dispatch(fetchRooms())
+      })
+      .catch(() => {
+        if (!isMounted) return
+        dispatch(fetchRooms())
+      })
+
+    return () => {
+      isMounted = false
+    }
   }, [dispatch])
 
   // room selection visibility/defaults
@@ -149,11 +183,10 @@ const SignedOutView = () => {
         <Button
           variant='primary'
           onClick={() => {
-            // Pass current path as redirect to return here after login
-            const redirect = encodeURIComponent(window.location.pathname + window.location.search)
-            const loginUrl = ssoConfig.ssoLoginUrl!.startsWith('/api/')
-              ? `${ssoConfig.ssoLoginUrl}?redirect=${redirect}`
-              : `${ssoConfig.ssoLoginUrl}?rd=${redirect}` // Authentik outpost uses 'rd'
+            const loginUrl = buildSsoLoginUrl(
+              ssoConfig.ssoLoginUrl!,
+              window.location.pathname + window.location.search,
+            )
             window.location.href = loginUrl
           }}
         >
