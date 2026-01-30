@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildSsoLoginUrl, getSsoRedirectUrl } from './SignedOutView'
+import { buildSsoLoginUrl, getSsoRedirectUrl } from './sso'
 
 describe('SignedOutView SSO helpers', () => {
   it('buildSsoLoginUrl should use redirect param for app-managed OIDC', () => {

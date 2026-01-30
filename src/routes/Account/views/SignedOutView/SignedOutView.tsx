@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchRooms } from 'store/modules/rooms'
 import { createAccount, login } from 'store/modules/user'
 import HttpApi from 'lib/HttpApi'
+import { buildSsoLoginUrl, getSsoRedirectUrl, type SsoConfig } from './sso'
 import Logo from 'components/Logo/Logo'
 import Button from 'components/Button/Button'
 import SelectRoom from './SelectRoom/SelectRoom'
@@ -13,26 +14,6 @@ import SignIn from './SignIn/SignIn'
 import styles from './SignedOutView.css'
 
 const api = new HttpApi('')
-
-interface SsoConfig {
-  ssoMode: boolean
-  ssoLoginUrl: string | null
-}
-
-export const buildSsoLoginUrl = (ssoLoginUrl: string, redirectPath: string): string => {
-  const redirect = encodeURIComponent(redirectPath)
-  return ssoLoginUrl.startsWith('/api/')
-    ? `${ssoLoginUrl}?redirect=${redirect}`
-    : `${ssoLoginUrl}?rd=${redirect}`
-}
-
-export const getSsoRedirectUrl = (config: SsoConfig | null, redirectPath: string): string | null => {
-  if (!config?.ssoMode || !config.ssoLoginUrl) {
-    return null
-  }
-
-  return buildSsoLoginUrl(config.ssoLoginUrl, redirectPath)
-}
 
 const SignedOutView = () => {
   const userSectionRef = useRef<HTMLDivElement | null>(null)
