@@ -181,13 +181,17 @@ function compileToHydra (nodes: PatchNode[], connections: PatchConnection[]): st
 
     // Generate params string
     const def = MODULE_DEFS.find(d => d.type === node.type)
-    const paramStr = def ? def.params.map(p => {
-      const audioInput = node.audioMod[p.key]
-      if (audioInput) {
-        return `() => ${audioInput}() * ${node.params[p.key].toFixed(2)}`
-      }
-      return node.params[p.key].toString()
-    }).join(', ') : ''
+    const paramStr = def
+      ? def.params
+          .map((p) => {
+            const audioInput = node.audioMod[p.key]
+            if (audioInput) {
+              return `() => ${audioInput}() * ${node.params[p.key].toFixed(2)}`
+            }
+            return node.params[p.key].toString()
+          })
+          .join(', ')
+      : ''
 
     // Source: Leaf node
     if (node.category === 'source') {
@@ -212,7 +216,7 @@ function compileToHydra (nodes: PatchNode[], connections: PatchConnection[]): st
       const inputConn = connections.find(c => c.toId === nodeId && c.toPort === 'in')
       // If no input, transform implies src(o0) or invalid. Hydra transforms need a source.
       const inputCode = inputConn ? compileNode(inputConn.fromId) : 'src(o0)'
-      
+
       visited.delete(nodeId)
       return `${inputCode}.${node.type}(${paramStr})`
     }
@@ -221,7 +225,7 @@ function compileToHydra (nodes: PatchNode[], connections: PatchConnection[]): st
     if (node.category === 'combiner') {
       const inConn = connections.find(c => c.toId === nodeId && c.toPort === 'in')
       const modConn = connections.find(c => c.toId === nodeId && c.toPort !== 'in') // The 2nd input
-      
+
       const inCode = inConn ? compileNode(inConn.fromId) : 'src(o0)'
       const modCode = modConn ? compileNode(modConn.fromId) : 'noise(2)' // Default noise if unconnected
 
@@ -249,22 +253,17 @@ interface PatchBayProps {
 }
 
 function PatchBay ({ onCodeChange }: PatchBayProps) {
-  const [nodes, setNodes] = useState<PatchNode[]>([])
+  const [nodes, setNodes] = useState<PatchNode[]>(() => {
+    const outDef = MODULE_DEFS.find(d => d.type === 'out')
+    return outDef ? [createNode(outDef, 600, 300)] : []
+  })
   const [connections, setConnections] = useState<PatchConnection[]>([])
   const [selectedCategory, setSelectedCategory] = useState<ModuleCategory>('source')
-  
+
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null) // nodeId
-  
+
   const canvasRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<{ nodeId: string, offsetX: number, offsetY: number } | null>(null)
-
-  // Initialize with an Output node if none exists
-  useEffect(() => {
-    setNodes(prev => {
-      if (prev.some(n => n.type === 'out')) return prev
-      return [...prev, createNode(MODULE_DEFS.find(d => d.type === 'out')!, 600, 300)]
-    })
-  }, [])
 
   const compiledCode = useMemo(() => compileToHydra(nodes, connections), [nodes, connections])
 
@@ -287,13 +286,13 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
   }, [])
 
   const handleParamChange = useCallback((nodeId: string, key: string, value: number) => {
-    setNodes(prev => prev.map(n =>
+    setNodes(prev => prev.map(n => (
       n.id === nodeId ? { ...n, params: { ...n.params, [key]: value } } : n
-    ))
+    )))
   }, [])
 
   const handleAudioModSet = useCallback((nodeId: string, paramKey: string, audioInput: string | null) => {
-    setNodes(prev => prev.map(n => {
+    setNodes(prev => prev.map((n) => {
       if (n.id !== nodeId) return n
       return { ...n, audioMod: { ...n.audioMod, [paramKey]: audioInput } }
     }))
@@ -309,7 +308,7 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
   // End connection drag on Input jack
   const handleInputClick = useCallback((nodeId: string, portName: string) => {
     if (connectingFrom && connectingFrom !== nodeId) {
-      setConnections(prev => {
+      setConnections((prev) => {
         // Remove existing connection to this port (one input per port)
         const filtered = prev.filter(c => !(c.toId === nodeId && c.toPort === portName))
         // Prevent duplicates
@@ -338,9 +337,9 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
   const handleCanvasPointerMove = useCallback((e: React.PointerEvent) => {
     if (!dragRef.current) return
     const { nodeId, offsetX, offsetY } = dragRef.current
-    setNodes(prev => prev.map(n =>
+    setNodes(prev => prev.map(n => (
       n.id === nodeId ? { ...n, x: e.clientX - offsetX, y: e.clientY - offsetY } : n
-    ))
+    )))
   }, [])
 
   const handleCanvasPointerUp = useCallback(() => {
@@ -388,11 +387,11 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
         onClick={() => setConnectingFrom(null)}
       >
         <svg className={styles.connectionsSvg}>
-          {connections.map(c => {
+          {connections.map((c) => {
             const fromNode = nodes.find(n => n.id === c.fromId)
             const toNode = nodes.find(n => n.id === c.toId)
             if (!fromNode || !toNode) return null
-            
+
             const def = MODULE_DEFS.find(d => d.type === toNode.type)
             const portIdx = def?.inputs.indexOf(c.toPort) ?? 0
             const inputCount = def?.inputs.length ?? 1
@@ -414,23 +413,26 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
                   strokeWidth={12}
                   fill='none'
                   style={{ cursor: 'pointer' }}
-                  onContextMenu={e => { e.preventDefault(); handleRemoveConnection(c.fromId, c.toId, c.toPort) }}
+                  onContextMenu={(event) => {
+                    event.preventDefault()
+                    handleRemoveConnection(c.fromId, c.toId, c.toPort)
+                  }}
                 />
               </g>
             )
           })}
           {connectingFrom && (
-            // Draw a dangling line from the connecting node to mouse? 
+            // Draw a dangling line from the connecting node to mouse?
             // Too complex for V1 without mouse tracking state.
             // Just hint.
             null
           )}
         </svg>
 
-        {nodes.map(node => {
+        {nodes.map((node) => {
           const def = MODULE_DEFS.find(d => d.type === node.type)
           if (!def) return null
-          
+
           const paramRows: ParamRow[] = def.params.map(p => ({
             key: p.key,
             label: p.label,
@@ -447,29 +449,36 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
             <div
               key={node.id}
               className={styles.node}
-              style={{ 
-                left: node.x, 
+              style={{
+                left: node.x,
                 top: node.y,
                 width: NODE_WIDTH,
-                border: node.id === connectingFrom ? '2px solid #fff' : undefined 
+                border: node.id === connectingFrom ? '2px solid #fff' : undefined,
               }}
             >
               <div
                 className={styles.nodeHeader}
                 style={{ background: CATEGORY_COLORS[node.category] }}
-                onPointerDown={e => handleNodePointerDown(e, node.id)}
+                onPointerDown={event => handleNodePointerDown(event, node.id)}
               >
                 {/* Input Jacks */}
                 <div className={styles.inputJacks}>
-                  {def.inputs.map((portName, idx) => (
+                  {def.inputs.map(portName => (
                     <div
                       key={portName}
                       className={styles.jackRow}
-                      onPointerDown={e => e.stopPropagation()}
-                      onClick={e => { e.stopPropagation(); handleInputClick(node.id, portName) }}
+                      onPointerDown={event => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        handleInputClick(node.id, portName)
+                      }}
                     >
                       <div
-                        className={`${styles.jack} ${styles.inputJack} ${connections.some(c => c.toId === node.id && c.toPort === portName) ? styles.jackConnected : ''}`}
+                        className={`${styles.jack} ${styles.inputJack} ${
+                          connections.some(c => c.toId === node.id && c.toPort === portName)
+                            ? styles.jackConnected
+                            : ''
+                        }`}
                         title={portName}
                       />
                       <span className={styles.jackLabel}>{portName}</span>
@@ -478,30 +487,40 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
                 </div>
 
                 <span className={styles.nodeType}>{node.type}</span>
-                
+
                 {node.type !== 'out' && (
                   <button
                     className={styles.removeNode}
-                    onPointerDown={e => e.stopPropagation()}
-                    onClick={e => { e.stopPropagation(); handleRemoveNode(node.id) }}
+                    onPointerDown={event => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      handleRemoveNode(node.id)
+                    }}
                   >
                     x
                   </button>
                 )}
-                
+
                 {/* Output Jack */}
                 {node.category !== 'output' && (
                   <div
                     className={styles.jackRow}
-                    onPointerDown={e => e.stopPropagation()}
-                    onClick={e => { e.stopPropagation(); handleOutputClick(node.id) }}
+                    onPointerDown={event => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      handleOutputClick(node.id)
+                    }}
                   >
                     <span className={styles.jackLabel}>out</span>
-                    <div className={`${styles.jack} ${styles.outputJack} ${outputConnected ? styles.jackConnected : ''}`} />
+                    <div
+                      className={`${styles.jack} ${styles.outputJack} ${
+                        outputConnected ? styles.jackConnected : ''
+                      }`}
+                    />
                   </div>
                 )}
               </div>
-              
+
               {paramRows.length > 0 && (
                 <ParamPanel
                   params={paramRows}

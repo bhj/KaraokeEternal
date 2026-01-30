@@ -96,6 +96,7 @@ describe('User Router - createUserCtx', () => {
         newPassword: 'password123',
         newPasswordConfirm: 'password123',
         name: 'Local User',
+        image: undefined,
       })
       const testUser = await User.getById(userId, true)
 

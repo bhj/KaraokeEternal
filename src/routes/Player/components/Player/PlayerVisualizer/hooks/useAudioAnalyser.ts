@@ -36,10 +36,13 @@ export function useAudioAnalyser (
 
   const analyserRef = useRef<AnalyserNode | null>(null)
   const gainNodeRef = useRef<GainNode | null>(null)
-  const frequencyDataRef = useRef<Float32Array | null>(null)
-  const waveformDataRef = useRef<Float32Array | null>(null)
+  const silentGainRef = useRef<GainNode | null>(null)
+  const frequencyDataRef = useRef<Float32Array<ArrayBuffer> | null>(null)
+  const waveformDataRef = useRef<Float32Array<ArrayBuffer> | null>(null)
   const previousBassRef = useRef<number>(0)
   const beatThresholdRef = useRef<number>(0.15)
+  const diagLoggedRef = useRef(false)
+  const diagFramesRef = useRef(0)
 
   // Energy tracking for genre detection
   const energySmoothRef = useRef<number>(0)
@@ -65,20 +68,44 @@ export function useAudioAnalyser (
     analyserRef.current = analyser
 
     // Connect: source -> gain -> analyser
-    // Note: We don't connect analyser to destination - it just monitors
     audioSourceNode.connect(gainNode)
     gainNode.connect(analyser)
 
+    // Keep analyser branch alive in browsers that ignore dead-ends
+    const silentGain = audioCtx.createGain()
+    silentGain.gain.value = 0
+    silentGainRef.current = silentGain
+    analyser.connect(silentGain)
+    silentGain.connect(audioCtx.destination)
+
+    if (audioCtx.state === 'suspended') {
+      const resume = (audioCtx as AudioContext).resume?.bind(audioCtx)
+      if (resume) {
+        resume().catch(() => {
+          // Browser policy may block resume until user gesture
+        })
+      }
+    }
+
     // Initialize data arrays
     const binCount = analyser.frequencyBinCount
-    frequencyDataRef.current = new Float32Array(binCount)
-    waveformDataRef.current = new Float32Array(analyser.fftSize)
+    frequencyDataRef.current = new Float32Array(
+      new ArrayBuffer(binCount * Float32Array.BYTES_PER_ELEMENT),
+    )
+    waveformDataRef.current = new Float32Array(
+      new ArrayBuffer(analyser.fftSize * Float32Array.BYTES_PER_ELEMENT),
+    )
 
     return () => {
       // Disconnect nodes on cleanup
       try {
         audioSourceNode.disconnect(gainNode)
         gainNode.disconnect(analyser)
+        if (silentGainRef.current) {
+          analyser.disconnect(silentGainRef.current)
+          silentGainRef.current.disconnect(audioCtx.destination)
+          silentGainRef.current = null
+        }
       } catch {
         // Nodes may already be disconnected
       }
@@ -127,9 +154,14 @@ export function useAudioAnalyser (
     for (let i = 0; i < frequencyData.length; i++) {
       // Convert from dB (-100 to 0) to linear (0 to 1)
       // -100dB = 0, 0dB = 1
-      normalizedFreq[i] = Math.max(0, Math.min(1,
-        (frequencyData[i] - analyser.minDecibels) / (analyser.maxDecibels - analyser.minDecibels)
-      ))
+      normalizedFreq[i] = Math.max(
+        0,
+        Math.min(
+          1,
+          (frequencyData[i] - analyser.minDecibels)
+          / (analyser.maxDecibels - analyser.minDecibels),
+        ),
+      )
     }
 
     // Calculate frequency bands
@@ -219,6 +251,28 @@ export function useAudioAnalyser (
       const bpm = 60000 / avgInterval
       // Normalize BPM to 0-1 range: 60 BPM = 0, 120 BPM = 0.5, 180 BPM = 1
       beatFrequency = Math.max(0, Math.min(1, (bpm - 60) / 120))
+    }
+
+    if (!diagLoggedRef.current) {
+      diagFramesRef.current += 1
+      if (diagFramesRef.current >= 30) {
+        diagLoggedRef.current = true
+        const sample = frequencyData[0]
+        const ctxState = analyser.context.state
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[AudioAnalyser] diag:', {
+            sample,
+            ctxState,
+            bass,
+            mid,
+            treble,
+            energy,
+          })
+          if (sample === -Infinity) {
+            console.warn('[AudioAnalyser] -Infinity frequency data — possible CORS taint or suspended context')
+          }
+        }
+      }
     }
 
     return {

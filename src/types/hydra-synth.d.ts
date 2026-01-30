@@ -20,8 +20,14 @@ declare module 'hydra-synth' {
     src: (source: HydraOutput) => HydraSource
     render: (output?: HydraOutput) => void
     a: HydraAudio
-    o0: HydraOutput; o1: HydraOutput; o2: HydraOutput; o3: HydraOutput
-    s0: HydraExtSource; s1: HydraExtSource; s2: HydraExtSource; s3: HydraExtSource
+    o0: HydraOutput
+    o1: HydraOutput
+    o2: HydraOutput
+    o3: HydraOutput
+    s0: HydraExtSource
+    s1: HydraExtSource
+    s2: HydraExtSource
+    s3: HydraExtSource
   }
 
   interface HydraSource {
@@ -46,14 +52,18 @@ declare module 'hydra-synth' {
     modulateRotate: (source: HydraSource, amount?: number | (() => number)) => HydraSource
     modulateScale: (source: HydraSource, amount?: number | (() => number)) => HydraSource
     mult: (source: HydraSource, amount?: number | (() => number)) => HydraSource
-    [key: string]: any
+    [key: string]: unknown
   }
 
-  interface HydraOutput {}
-  interface HydraExtSource { initCam: (index?: number) => void }
+  type HydraOutput = Record<string, unknown>
+  interface HydraExtSource {
+    initCam: (index?: number) => void
+  }
   interface HydraAudio {
-    fft: number[]; vol: number
-    show: () => void; hide: () => void
+    fft: number[]
+    vol: number
+    show: () => void
+    hide: () => void
     setBins: (n: number) => void
     setSmooth: (n: number) => void
     setScale: (n: number) => void
@@ -61,7 +71,7 @@ declare module 'hydra-synth' {
   }
 
   class Hydra {
-    constructor(opts?: HydraOptions)
+    constructor (opts?: HydraOptions)
     synth: HydraSynth
     eval: (code: string) => void
     tick: (dt: number) => void

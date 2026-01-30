@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import combinedReducer from 'store/reducers'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
@@ -7,15 +7,16 @@ import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { shouldApplyRemoteCode } from '../components/orchestratorSync'
 import CodeEditor from '../components/CodeEditor'
 import PatchBay from '../components/PatchBay'
-import HydraPreview from '../components/HydraPreview'
+import StagePanel from '../components/StagePanel'
+import { type StageBuffer } from '../components/stagePanelUtils'
 import styles from './OrchestratorView.css'
 
 function OrchestratorView () {
   const dispatch = useAppDispatch()
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
   const remoteHydraCode = playerVisualizer?.hydraCode
-  const [generatedCode, setGeneratedCode] = useState<string>('')
-  const [previewCode, setPreviewCode] = useState<string>('')
+  const [localCode, setLocalCode] = useState<string>('')
+  const [previewBuffer, setPreviewBuffer] = useState<StageBuffer>('o0')
 
   const handleSendCode = useCallback((code: string) => {
     dispatch({
@@ -25,8 +26,7 @@ function OrchestratorView () {
   }, [dispatch])
 
   const handlePatchChange = useCallback((code: string) => {
-    setGeneratedCode(code)
-    setPreviewCode(code) // Update preview immediately
+    setLocalCode(code)
     handleSendCode(code) // Auto-broadcast (optional)
   }, [handleSendCode])
 
@@ -35,12 +35,12 @@ function OrchestratorView () {
     dispatch(sliceInjectNoOp())
   }
 
-  useEffect(() => {
-    if (shouldApplyRemoteCode(generatedCode, remoteHydraCode)) {
-      setGeneratedCode(remoteHydraCode ?? '')
-      setPreviewCode(remoteHydraCode ?? '')
-    }
-  }, [generatedCode, remoteHydraCode])
+  const shouldUseRemote = localCode.trim() === ''
+    && shouldApplyRemoteCode(localCode, remoteHydraCode)
+  const effectiveCode = shouldUseRemote ? (remoteHydraCode ?? '') : localCode
+
+  const previewWidth = 360
+  const previewHeight = 270
 
   return (
     <div className={styles.container}>
@@ -48,17 +48,17 @@ function OrchestratorView () {
         <PatchBay onCodeChange={handlePatchChange} />
       </div>
       <div className={styles.sidebar}>
-        <div className={styles.previewArea}>
-          <HydraPreview
-            code={previewCode}
-            width={380}
-            height={285}
-          />
-        </div>
+        <StagePanel
+          code={effectiveCode}
+          width={previewWidth}
+          height={previewHeight}
+          buffer={previewBuffer}
+          onBufferChange={setPreviewBuffer}
+        />
         <div className={styles.editorArea}>
           <CodeEditor
             onSend={handleSendCode}
-            generatedCode={generatedCode}
+            generatedCode={effectiveCode}
           />
         </div>
       </div>

@@ -17,6 +17,12 @@ interface MockContext {
   jwtKey: string
 }
 
+type Handler = (ctx: unknown, next: () => Promise<void>) => Promise<void>
+
+const runHandler = async (handler: Handler, ctx: MockContext) => {
+  await handler(ctx as unknown as Parameters<Handler>[0], async () => {})
+}
+
 // Mock AuthentikClient to avoid external calls
 vi.mock('../lib/AuthentikClient.js', () => ({
   AuthentikClient: {
@@ -69,13 +75,6 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
       const routerModule = await import('./router.js')
       const router = routerModule.default
 
-      // Debug: log router structure
-      console.log('Router opts:', router.opts)
-      console.log('Stack length:', router.stack.length)
-      router.stack.forEach((layer: Layer, i: number) => {
-        console.log(`Layer ${i}: path=${String(layer.path)}, methods=${JSON.stringify(layer.methods)}`)
-      })
-
       const joinLayer = router.stack.find(
         (l: Layer) => String(l.path) === '/api/guest/join' && l.methods.includes('POST'),
       )
@@ -103,8 +102,8 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         jwtKey: 'test-jwt-key',
       }
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await handler(ctx as MockContext, async () => {})
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1] as Handler
+      await runHandler(handler, ctx)
 
       expect(ctx.body).toEqual({ success: true })
       expect(mockCookieSet).toHaveBeenCalledWith('keToken', expect.any(String), {
@@ -141,8 +140,8 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         jwtKey: 'test-jwt-key',
       }
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1] as Handler
+      await expect(runHandler(handler, ctx)).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for invalid invite code format', async () => {
@@ -175,8 +174,8 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         jwtKey: 'test-jwt-key',
       }
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1] as Handler
+      await expect(runHandler(handler, ctx)).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for wrong invite code', async () => {
@@ -209,8 +208,8 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         jwtKey: 'test-jwt-key',
       }
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1] as Handler
+      await expect(runHandler(handler, ctx)).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for non-existent room', async () => {
@@ -243,8 +242,8 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         jwtKey: 'test-jwt-key',
       }
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1] as Handler
+      await expect(runHandler(handler, ctx)).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 400 for closed room', async () => {
@@ -280,8 +279,8 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         jwtKey: 'test-jwt-key',
       }
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
-      await expect(handler(ctx as MockContext, async () => {})).rejects.toMatchObject({ status: 400 })
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1] as Handler
+      await expect(runHandler(handler, ctx)).rejects.toMatchObject({ status: 400 })
     })
 
     it('should return 429 when rate limited', async () => {
@@ -294,7 +293,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
 
       expect(joinLayer).toBeDefined()
 
-      const handler = joinLayer!.stack[joinLayer!.stack.length - 1]
+      const handler = joinLayer!.stack[joinLayer!.stack.length - 1] as Handler
 
       // Make many requests from same IP to trigger rate limit
       const rateLimitIP = '192.168.99.99'
@@ -322,7 +321,7 @@ describe('Guest Router - App-Managed Guest Sessions', () => {
         }
 
         try {
-          await handler(ctx as MockContext, async () => {})
+          await runHandler(handler, ctx)
         } catch (err) {
           if ((err as Error & { status: number }).status === 429) {
             rateLimited = true

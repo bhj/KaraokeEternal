@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useSyncExternalStore } from 'react'
 import HydraVisualizer from '../../Player/components/Player/PlayerVisualizer/HydraVisualizer'
 import styles from './HydraPreview.css'
 
@@ -10,7 +10,33 @@ interface HydraPreviewProps {
 
 const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
   // Create a dummy audio source to drive the visualizer
-  const [audioSource, setAudioSource] = useState<MediaElementAudioSourceNode | null>(null)
+  const audioStoreRef = useRef<{
+    source: MediaElementAudioSourceNode | null
+    listeners: Set<() => void>
+  }>({
+    source: null,
+    listeners: new Set(),
+  })
+
+  const getSnapshot = useCallback(
+    () => audioStoreRef.current.source,
+    [],
+  )
+  const getServerSnapshot = useCallback(
+    () => null as MediaElementAudioSourceNode | null,
+    [],
+  )
+  const subscribe = useCallback((listener: () => void) => {
+    const store = audioStoreRef.current
+    store.listeners.add(listener)
+    return () => store.listeners.delete(listener)
+  }, [])
+
+  const audioSource = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  )
   const audioCtxRef = useRef<AudioContext | null>(null)
   const oscRef = useRef<OscillatorNode | null>(null)
   const gainRef = useRef<GainNode | null>(null)
@@ -31,7 +57,7 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
     const osc = ctx.createOscillator()
     osc.type = 'sine'
     osc.frequency.value = 2 // 120 BPM-ish throb
-    
+
     // VCA for the oscillator
     const oscGain = ctx.createGain()
     oscGain.gain.value = 1.0
@@ -43,23 +69,27 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
     oscRef.current = osc
     gainRef.current = oscGain
 
-    // We need a MediaElementSourceNode to satisfy the prop type, 
+    // We need a MediaElementSourceNode to satisfy the prop type,
     // BUT our visualizer hook uses `createAnalyser` from the context.
     // The current `useAudioAnalyser` takes `MediaElementAudioSourceNode`.
     // We might need to mock that object or cast a regular node if the hook only checks `.context`.
-    
-    // Hack: The hook uses `audioSourceNode.context`. 
+
+    // Hack: The hook uses `audioSourceNode.context`.
     // It calls `audioSourceNode.connect(gainNode)`.
-    // A regular GainNode works for this signature compatibility in standard WebAudio, 
+    // A regular GainNode works for this signature compatibility in standard WebAudio,
     // but the type is specific.
-    
+
     // Let's rely on the fact that `useAudioAnalyser` just calls `.connect` and `.context`.
-    // We'll cast `oscGain` to `any` -> `MediaElementAudioSourceNode` 
+    // We'll cast `oscGain` to `any` -> `MediaElementAudioSourceNode`
     // since we know the hook essentially treats it as an AudioNode.
-    setAudioSource(oscGain as unknown as MediaElementAudioSourceNode)
+    const store = audioStoreRef.current
+    store.source = oscGain as unknown as MediaElementAudioSourceNode
+    store.listeners.forEach(listener => listener())
 
     return () => {
       osc.stop()
+      store.source = null
+      store.listeners.forEach(listener => listener())
       ctx.close()
     }
   }, [])

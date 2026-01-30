@@ -32,7 +32,7 @@ export interface StatusState {
   nextUserId: number | null
   position: number
   queueId: number
-  visualizer: PlayerVisualizerState | Record<string, never>
+  visualizer: Partial<PlayerVisualizerState>
   volume: number
 }
 
@@ -75,11 +75,15 @@ const statusSlice = createSlice({
         ...action.payload,
         isPlayerPresent: true,
       }))
-      .addCase(playerCmdOptionsInternal, (state, { payload }) => {
-        if (payload.visualizer && typeof payload.visualizer === 'object') {
-          state.visualizer = { ...state.visualizer, ...payload.visualizer }
-        }
-      })
+      .addCase(
+        playerCmdOptionsInternal,
+        (state, action: PayloadAction<{ visualizer?: Partial<PlayerVisualizerState> }>) => {
+          const { payload } = action
+          if (payload.visualizer && typeof payload.visualizer === 'object') {
+            state.visualizer = { ...state.visualizer, ...payload.visualizer }
+          }
+        },
+      )
   },
 })
 

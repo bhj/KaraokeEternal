@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import styles from './CodeEditor.css'
 
 const DEFAULT_CODE = `osc(20, 0.1, () => bass() * 2)
@@ -16,21 +16,32 @@ interface CodeEditorProps {
 }
 
 function CodeEditor ({ onSend, generatedCode }: CodeEditorProps) {
-  const [code, setCode] = useState(generatedCode ?? DEFAULT_CODE)
+  const [manualCode, setManualCode] = useState(generatedCode ?? DEFAULT_CODE)
   const [isManualMode, setIsManualMode] = useState(!generatedCode)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  // Sync generated code from patch bay when not in manual mode
-  useEffect(() => {
-    if (!isManualMode && generatedCode) {
-      setCode(generatedCode)
-    }
-  }, [generatedCode, isManualMode])
+  const displayCode = isManualMode ? manualCode : (generatedCode ?? DEFAULT_CODE)
 
   const handleSend = useCallback(() => {
-    onSend(code)
-  }, [onSend, code])
+    onSend(displayCode)
+  }, [displayCode, onSend])
+
+  const handleToggleManual = useCallback(() => {
+    setIsManualMode((prev) => {
+      const next = !prev
+      if (next && !prev) {
+        setManualCode(generatedCode ?? DEFAULT_CODE)
+      }
+      return next
+    })
+  }, [generatedCode])
+
+  const handleEditorChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setManualCode(event.target.value)
+    if (!isManualMode) {
+      setIsManualMode(true)
+    }
+  }, [isManualMode])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -38,31 +49,31 @@ function CodeEditor ({ onSend, generatedCode }: CodeEditorProps) {
       handleSend()
     }
     // Tab inserts 2 spaces
-    if (e.key === 'Tab') {
+    if (e.key === 'Tab' && isManualMode) {
       e.preventDefault()
       const textarea = textareaRef.current
       if (!textarea) return
       const start = textarea.selectionStart
       const end = textarea.selectionEnd
-      const newCode = code.substring(0, start) + '  ' + code.substring(end)
-      setCode(newCode)
+      const newCode = manualCode.substring(0, start) + '  ' + manualCode.substring(end)
+      setManualCode(newCode)
       requestAnimationFrame(() => {
         textarea.selectionStart = textarea.selectionEnd = start + 2
       })
     }
-  }, [handleSend, code])
+  }, [handleSend, isManualMode, manualCode])
 
   return (
     <div className={styles.container}>
       <div className={styles.header} onClick={() => setIsCollapsed(!isCollapsed)}>
         <span className={styles.toggle}>{isCollapsed ? '\u25B6' : '\u25BC'}</span>
         <span className={styles.title}>Hydra Code</span>
-        <div className={styles.headerActions} onClick={e => e.stopPropagation()}>
+        <div className={styles.headerActions} onClick={event => event.stopPropagation()}>
           <label className={styles.modeToggle}>
             <input
               type='checkbox'
               checked={isManualMode}
-              onChange={() => setIsManualMode(!isManualMode)}
+              onChange={handleToggleManual}
             />
             Manual
           </label>
@@ -73,8 +84,8 @@ function CodeEditor ({ onSend, generatedCode }: CodeEditorProps) {
           <textarea
             ref={textareaRef}
             className={styles.editor}
-            value={code}
-            onChange={e => { setCode(e.target.value); setIsManualMode(true) }}
+            value={displayCode}
+            onChange={handleEditorChange}
             onKeyDown={handleKeyDown}
             spellCheck={false}
             readOnly={!isManualMode}

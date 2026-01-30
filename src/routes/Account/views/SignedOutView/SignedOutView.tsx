@@ -43,8 +43,9 @@ const SignedOutView = () => {
     const currentPath = window.location.pathname + window.location.search
 
     // Fetch SSO config first to avoid unauthenticated room fetch in SSO-only mode
-    api.get<SsoConfig>('prefs/public')
-      .then((config) => {
+    const fetchSsoConfig = async () => {
+      try {
+        const config = await api.get<SsoConfig>('prefs/public')
         if (!isMounted) return
         setSsoConfig(config)
 
@@ -56,12 +57,14 @@ const SignedOutView = () => {
 
         dispatch(fetchRooms())
         setLoading(false)
-      })
-      .catch(() => {
+      } catch {
         if (!isMounted) return
         dispatch(fetchRooms())
         setLoading(false)
-      })
+      }
+    }
+
+    void fetchSsoConfig()
 
     return () => {
       isMounted = false

@@ -21,7 +21,7 @@ osc(20, 0.1, () => bass() * 2)
 const AUDIO_GLOBAL_NAMES = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright'] as const
 
 function setAudioGlobals (closures: AudioClosures) {
-  const w = window as Record<string, unknown>
+  const w = window as unknown as Record<string, unknown>
   w.bass = closures.bass
   w.mid = closures.mid
   w.treble = closures.treble
@@ -32,7 +32,7 @@ function setAudioGlobals (closures: AudioClosures) {
 }
 
 function clearAudioGlobals () {
-  const w = window as Record<string, unknown>
+  const w = window as unknown as Record<string, unknown>
   for (const name of AUDIO_GLOBAL_NAMES) {
     delete w[name]
   }
@@ -73,16 +73,18 @@ function HydraVisualizer ({
   const rafRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
   const errorCountRef = useRef<number>(0)
+  const frameCountRef = useRef<number>(0)
   const widthRef = useRef(width)
   const heightRef = useRef(height)
   const codeRef = useRef(code)
 
-  // Keep refs in sync
-  widthRef.current = width
-  heightRef.current = height
-  codeRef.current = code
-
   const { update: updateAudio, closures } = useHydraAudio(audioSourceNode, sensitivity)
+
+  useEffect(() => {
+    widthRef.current = width
+    heightRef.current = height
+    codeRef.current = code
+  }, [width, height, code])
 
   // Set audio closures on window so Hydra code can reference them
   useEffect(() => {
@@ -148,7 +150,7 @@ function HydraVisualizer ({
     errorCountRef.current = 0
   }, [code])
 
-  // Animation loop
+  // Animation tick
   const tick = useCallback((time: number) => {
     const hydra = hydraRef.current
     if (!hydra) return
@@ -174,14 +176,24 @@ function HydraVisualizer ({
       }
     }
 
-    rafRef.current = requestAnimationFrame(tick)
+    frameCountRef.current += 1
+    if (process.env.NODE_ENV !== 'production' && frameCountRef.current % 120 === 1) {
+      const w = window as unknown as Record<string, unknown>
+      const bassFn = w.bass
+      const bassValue = typeof bassFn === 'function' ? (bassFn as () => number)() : 'unset'
+      console.log('[Hydra] audio sample:', { bass: bassValue })
+    }
   }, [updateAudio])
 
   // Start/stop animation based on isPlaying
   useEffect(() => {
     if (isPlaying && hydraRef.current) {
       lastTimeRef.current = 0
-      rafRef.current = requestAnimationFrame(tick)
+      const frame = (time: number) => {
+        tick(time)
+        rafRef.current = requestAnimationFrame(frame)
+      }
+      rafRef.current = requestAnimationFrame(frame)
     } else {
       cancelAnimationFrame(rafRef.current)
     }

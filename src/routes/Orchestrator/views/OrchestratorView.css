@@ -15,20 +15,10 @@
 }
 
 .sidebar {
-  width: 400px;
+  width: 420px;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #141823, #0c0f16);
-}
-
-.previewArea {
-  height: 250px; /* Aspect ratio 4:3 ish + padding */
-  padding: 10px;
-  background: radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.08), transparent 55%), #07080c;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .editorArea {

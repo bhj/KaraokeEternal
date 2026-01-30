@@ -81,7 +81,6 @@ describe('playerVisualizer reducer - Extended Features', () => {
       const state = expectedReducer(undefined, { type: '@@INIT' })
       expect(state.mode).toBe('hydra')
     })
-
   })
 
   describe('Visualizer mode changes', () => {

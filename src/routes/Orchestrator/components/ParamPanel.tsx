@@ -111,7 +111,7 @@ function ParamPanel ({ params, audioInputs, onChange, onAudioChange }: ParamPane
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      {params.map(param => {
+      {params.map((param) => {
         const percent = ((param.value - param.min) / (param.max - param.min)) * 100
         const isActive = activeKey === param.key
         const isPickerOpen = audioPickerKey === param.key
@@ -126,7 +126,7 @@ function ParamPanel ({ params, audioInputs, onChange, onAudioChange }: ParamPane
                 type='button'
                 className={`${styles.audioBadge} ${audioAccent}`}
                 data-audio-badge='true'
-                onPointerDown={e => e.stopPropagation()}
+                onPointerDown={event => event.stopPropagation()}
                 onClick={() => setAudioPickerKey(isPickerOpen ? null : param.key)}
               >
                 <span className={styles.audioBadgeIcon}>◆</span>
@@ -136,8 +136,10 @@ function ParamPanel ({ params, audioInputs, onChange, onAudioChange }: ParamPane
             </div>
             <div
               className={styles.sliderTrack}
-              ref={el => { trackRefs.current[param.key] = el }}
-              onPointerDown={e => handlePointerDown(param, e)}
+              ref={(element) => {
+                trackRefs.current[param.key] = element
+              }}
+              onPointerDown={event => handlePointerDown(param, event)}
             >
               <div className={styles.sliderFill} style={{ width: `${percent}%`, background: param.audioSource ? '#d4a017' : undefined }} />
               <div className={styles.sliderThumb} style={{ left: `${percent}%` }} />
@@ -147,7 +149,10 @@ function ParamPanel ({ params, audioInputs, onChange, onAudioChange }: ParamPane
                 <button
                   type='button'
                   className={`${styles.audioOption} ${param.audioSource ? '' : styles.audioOptionActive}`}
-                  onClick={() => { onAudioChange(param.key, null); closeAudioPicker() }}
+                  onClick={() => {
+                    onAudioChange(param.key, null)
+                    closeAudioPicker()
+                  }}
                 >
                   Off
                 </button>
@@ -156,7 +161,10 @@ function ParamPanel ({ params, audioInputs, onChange, onAudioChange }: ParamPane
                     key={input}
                     type='button'
                     className={`${styles.audioOption} ${param.audioSource === input ? styles.audioOptionActive : ''}`}
-                    onClick={() => { onAudioChange(param.key, input); closeAudioPicker() }}
+                    onClick={() => {
+                      onAudioChange(param.key, input)
+                      closeAudioPicker()
+                    }}
                   >
                     {input}
                   </button>

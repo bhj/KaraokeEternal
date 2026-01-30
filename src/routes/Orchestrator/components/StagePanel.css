@@ -1,0 +1,73 @@
+.stage {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: radial-gradient(circle at 15% 20%, rgba(0, 255, 255, 0.08), transparent 55%), #07080c;
+}
+
+.stageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(18, 24, 35, 0.9), rgba(7, 8, 12, 0.9));
+}
+
+.stageTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #bcd1ff;
+}
+
+.stageHint {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: rgba(188, 209, 255, 0.6);
+}
+
+.bufferControls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.bufferButton {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(8, 10, 14, 0.8);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bufferButton:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  color: #eaffff;
+}
+
+.bufferButtonActive {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: rgba(0, 255, 255, 0.85);
+  color: #eaffff;
+}
+
+.stageBody {
+  padding: 10px 12px 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stageFrame {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
