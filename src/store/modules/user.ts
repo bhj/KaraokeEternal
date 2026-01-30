@@ -108,6 +108,12 @@ export const checkSession = createAsyncThunk<void, void, { state: RootState }>(
       thunkAPI.dispatch(fetchPrefs())
       thunkAPI.dispatch(connectSocket())
       socket.open()
+
+      // Consume ?redirect param (set by RequireAuth → /account?redirect=...)
+      const redirect = new URLSearchParams(window.location.search).get('redirect')
+      if (redirect) {
+        AppRouter.navigate(basename.replace(/\/$/, '') + redirect)
+      }
     } catch {
       // No valid session, timeout, or network error - expected for unauthenticated users
     } finally {

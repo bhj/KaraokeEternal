@@ -5,6 +5,7 @@ import { fetchRooms } from 'store/modules/rooms'
 import { createAccount, login } from 'store/modules/user'
 import HttpApi from 'lib/HttpApi'
 import { buildSsoLoginUrl, getSsoRedirectUrl, type SsoConfig } from './sso'
+import Spinner from 'components/Spinner/Spinner'
 import Logo from 'components/Logo/Logo'
 import Button from 'components/Button/Button'
 import SelectRoom from './SelectRoom/SelectRoom'
@@ -34,6 +35,7 @@ const SignedOutView = () => {
   const [prevRooms, setPrevRooms] = useState<typeof rooms | null>(null)
   const [focusRequest, setFocusRequest] = useState(0)
   const [ssoConfig, setSsoConfig] = useState<SsoConfig | null>(null)
+  const [loading, setLoading] = useState(true)
 
   // once per mount
   useEffect(() => {
@@ -53,10 +55,12 @@ const SignedOutView = () => {
         }
 
         dispatch(fetchRooms())
+        setLoading(false)
       })
       .catch(() => {
         if (!isMounted) return
         dispatch(fetchRooms())
+        setLoading(false)
       })
 
     return () => {
@@ -154,6 +158,10 @@ const SignedOutView = () => {
   useEffect(() => {
     firstFieldRef.current?.focus()
   }, [focusRequest, mode])
+
+  if (loading) {
+    return <Spinner />
+  }
 
   // SSO-only mode: hide local login form, show only SSO button
   if (ssoConfig?.ssoMode && ssoConfig?.ssoLoginUrl) {
