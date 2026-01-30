@@ -101,7 +101,13 @@ class Queue {
 
     while (result.length < rows.length) {
       // get the item whose prevQueueId references the current one
-      const nextQueueId = entities[map.get(curQueueId)].queueId
+      const nextId = map.get(curQueueId)
+      if (nextId === undefined || !entities[nextId]) {
+        // Linked list is broken - stop here to avoid crash
+        // This can happen if queue data is corrupted
+        break
+      }
+      const nextQueueId = entities[nextId].queueId
       result.push(nextQueueId)
       curQueueId = nextQueueId
     }
