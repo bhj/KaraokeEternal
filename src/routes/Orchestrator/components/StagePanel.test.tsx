@@ -18,10 +18,10 @@ describe('StagePanel', () => {
     expect(result).toBe(`${code}\nrender()`)
   })
 
-  it('buildPreviewCode maps buffer output to o0', () => {
+  it('buildPreviewCode renders selected buffer', () => {
     const code = 'noise(3,0).out(o2)'
     const result = buildPreviewCode(code, 'o2')
-    expect(result).toBe(`${code}\nsrc(o2).out(o0)`)
+    expect(result).toBe(`${code}\nrender(o2)`)
   })
 
   it('renders buffer buttons', async () => {

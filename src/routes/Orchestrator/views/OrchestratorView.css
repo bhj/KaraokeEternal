@@ -1,5 +1,9 @@
 .container {
-  display: flex;
+  display: grid;
+  grid-template-areas:
+    "stage"
+    "code";
+  grid-template-rows: auto 1fr;
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -7,23 +11,83 @@
   color: #eee;
 }
 
-.patchBayArea {
-  flex: 1;
-  height: 100%;
-  overflow: hidden;
+.refPanel {
+  grid-area: ref;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d1117;
 }
 
-.sidebar {
-  width: 420px;
+.stageDock {
+  grid-area: stage;
+}
+
+.codeDock {
+  grid-area: code;
   display: flex;
   flex-direction: column;
+  min-height: 220px;
   background: linear-gradient(180deg, #141823, #0c0f16);
+  overflow: hidden;
 }
 
-.editorArea {
-  flex: 1;
-  overflow: hidden;
+.remoteBanner {
+  grid-column: 1 / -1;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: rgba(0, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  font-size: 12px;
+}
+
+.remoteBannerText {
+  flex: 1;
+  color: #aee;
+}
+
+.remoteBannerApply {
+  padding: 3px 10px;
+  background: rgba(0, 255, 255, 0.15);
+  color: #0ff;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.remoteBannerApply:hover {
+  background: rgba(0, 255, 255, 0.25);
+}
+
+.remoteBannerDismiss {
+  padding: 3px 10px;
+  background: transparent;
+  color: #888;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.remoteBannerDismiss:hover {
+  color: #aaa;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (min-width: 980px) {
+  .container {
+    grid-template-areas:
+      "ref stage"
+      "ref code";
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .refPanel {
+    display: flex;
+  }
 }

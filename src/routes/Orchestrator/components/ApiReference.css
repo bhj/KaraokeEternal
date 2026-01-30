@@ -1,0 +1,79 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 11px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.section {
+  margin-bottom: 4px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #aaa;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sectionHeader:hover {
+  color: #ddd;
+}
+
+.sectionToggle {
+  font-size: 8px;
+  color: #666;
+}
+
+.audioSection .sectionHeader {
+  color: #d4a017;
+  cursor: default;
+}
+
+.audioItem {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 12px 2px 20px;
+  gap: 1px;
+}
+
+.audioName {
+  color: #d4a017;
+  font-weight: 500;
+}
+
+.audioRange {
+  color: #666;
+  font-size: 10px;
+}
+
+.audioDesc {
+  color: #888;
+  font-size: 10px;
+}
+
+.funcItem {
+  padding: 2px 12px 2px 20px;
+  color: #c9d1d9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.funcItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.funcParams {
+  color: #666;
+}

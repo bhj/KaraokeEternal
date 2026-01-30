@@ -14,5 +14,5 @@ export function buildPreviewCode (code: string, buffer: StageBuffer): string {
   if (buffer === 'grid') {
     return `${trimmed}\nrender()`
   }
-  return `${trimmed}\nsrc(${buffer}).out(o0)`
+  return `${trimmed}\nrender(${buffer})`
 }
