@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
 import fse from 'fs-extra'
+import jsonWebToken from 'jsonwebtoken'
 
 const TEST_DB_PATH = '/tmp/karaoke-eternal-test-user-router.sqlite'
 
@@ -71,6 +72,7 @@ describe('User Router - createUserCtx', () => {
           isAdmin: false,
           isGuest: false,
         },
+        jwtKey: 'test-jwt-key',
         body: undefined as unknown,
         throw: (status: number) => {
           const err = new Error() as Error & { status: number }
@@ -88,8 +90,14 @@ describe('User Router - createUserCtx', () => {
     })
 
     it('should return ownRoomId as null when user has no own room', async () => {
-      // Create a test user
-      const testUser = await User.getOrCreateFromHeader('testuser', false, false)
+      // Create a local user (non-SSO)
+      const userId = await User.create({
+        username: 'localuser',
+        newPassword: 'password123',
+        newPasswordConfirm: 'password123',
+        name: 'Local User',
+      })
+      const testUser = await User.getById(userId, true)
 
       // Create a room that is NOT owned by the user (just a standard room)
       const now = Math.floor(Date.now() / 1000)
@@ -122,6 +130,7 @@ describe('User Router - createUserCtx', () => {
           isAdmin: false,
           isGuest: false,
         },
+        jwtKey: 'test-jwt-key',
         body: undefined as unknown,
         throw: (status: number) => {
           const err = new Error() as Error & { status: number }
@@ -136,6 +145,65 @@ describe('User Router - createUserCtx', () => {
       // The response should include ownRoomId as null
       expect(ctx.body).toBeDefined()
       expect((ctx.body as { ownRoomId?: number | null }).ownRoomId).toBeNull()
+    })
+
+    it('should create an ephemeral room for SSO users without one and refresh the token', async () => {
+      const { verify: jwtVerify } = jsonWebToken
+
+      const testUser = await User.getOrCreateFromHeader('testuser', false, false)
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      type Layer = {
+        path: string
+        methods: string[]
+        stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>>
+      }
+      const userLayer = (router as unknown as { stack: Layer[] }).stack
+        .find((l: Layer) => l.path === '/api/user' && l.methods.includes('GET'))
+
+      expect(userLayer).toBeDefined()
+
+      const cookieSetCalls: Array<{ name: string, value: string, options?: { maxAge?: number } }> = []
+      const ctx = {
+        user: {
+          userId: testUser.userId,
+          username: testUser.username,
+          roomId: null,
+          ownRoomId: null,
+          isAdmin: false,
+          isGuest: false,
+        },
+        jwtKey: 'test-jwt-key',
+        body: undefined as unknown,
+        cookies: {
+          set: (name: string, value: string, options?: { maxAge?: number }) => {
+            cookieSetCalls.push({ name, value, options })
+          },
+        },
+        throw: (status: number) => {
+          const err = new Error() as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = userLayer!.stack[userLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      const ownRoom = await Rooms.getByOwnerId(testUser.userId)
+      expect(ownRoom).toBeDefined()
+
+      expect(ctx.body).toBeDefined()
+      expect((ctx.body as { ownRoomId?: number }).ownRoomId).toBe(ownRoom!.roomId)
+      expect((ctx.body as { roomId?: number }).roomId).toBe(ownRoom!.roomId)
+
+      const keTokenCall = cookieSetCalls.find(c => c.name === 'keToken')
+      expect(keTokenCall).toBeDefined()
+      const decoded = jwtVerify(keTokenCall!.value, ctx.jwtKey) as { roomId: number, ownRoomId: number }
+      expect(decoded.roomId).toBe(ownRoom!.roomId)
+      expect(decoded.ownRoomId).toBe(ownRoom!.roomId)
     })
   })
 

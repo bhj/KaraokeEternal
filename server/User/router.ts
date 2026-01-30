@@ -7,7 +7,7 @@ import bcrypt from '../lib/bcrypt.js'
 import KoaRouter from '@koa/router'
 import Prefs from '../Prefs/Prefs.js'
 import Queue from '../Queue/Queue.js'
-import Rooms from '../Rooms/Rooms.js'
+import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import User from '../User/User.js'
 import { QUEUE_PUSH } from '../../shared/actionTypes.js'
 import { BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, PASSWORD_MIN_LENGTH, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from './User.js'
@@ -157,7 +157,48 @@ router.get('/user', async (ctx) => {
     ctx.throw(404)
   }
 
-  ctx.body = createUserCtx(user, ctx.user.roomId, ctx.user.ownRoomId ?? null)
+  const ephemeralEnabled = process.env.KES_EPHEMERAL_ROOMS !== 'false'
+  let ownRoomId = ctx.user.ownRoomId ?? null
+  let roomId = ctx.user.roomId ?? null
+
+  // Ensure SSO users always have an ephemeral room (handles room cleanup race)
+  if (!ctx.user.isGuest && ephemeralEnabled && user.authProvider === 'sso') {
+    const ownRoom = await Rooms.getByOwnerId(ctx.user.userId)
+
+    if (!ownRoom) {
+      ownRoomId = await Rooms.createEphemeral(ctx.user.userId, user.username)
+    } else {
+      ownRoomId = ownRoom.roomId
+    }
+
+    if (typeof roomId !== 'number') {
+      roomId = ownRoomId
+    } else {
+      const roomRes = await Rooms.get(roomId, { status: STATUSES })
+      if (!roomRes.entities[roomId]) {
+        roomId = ownRoomId
+      }
+    }
+  }
+
+  const userCtx = createUserCtx(user, roomId, ownRoomId)
+
+  if (roomId !== ctx.user.roomId || ownRoomId !== (ctx.user.ownRoomId ?? null)) {
+    const token = jwtSign(userCtx, ctx.jwtKey)
+    const cookieOptions: { httpOnly: boolean, sameSite: 'lax', secure: boolean, maxAge?: number } = {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isSecureCookie(),
+    }
+
+    if (user.authProvider === 'sso') {
+      cookieOptions.maxAge = 30 * 24 * 60 * 60 * 1000
+    }
+
+    ctx.cookies.set('keToken', token, cookieOptions)
+  }
+
+  ctx.body = userCtx
 })
 
 // list all users (admin only)
