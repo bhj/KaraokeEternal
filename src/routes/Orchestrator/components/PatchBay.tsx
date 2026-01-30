@@ -1,6 +1,12 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
-import KnobPanel, { type KnobParam } from './KnobPanel'
+import ParamPanel, { type ParamRow } from './ParamPanel'
 import styles from './PatchBay.css'
+import {
+  NODE_WIDTH,
+  getInputJackCenter,
+  getOutputJackCenter,
+  buildConnectionPath,
+} from './patchbayLayout'
 
 // --- Module definitions ---
 
@@ -286,14 +292,10 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
     ))
   }, [])
 
-  const handleAudioModToggle = useCallback((nodeId: string, paramKey: string) => {
+  const handleAudioModSet = useCallback((nodeId: string, paramKey: string, audioInput: string | null) => {
     setNodes(prev => prev.map(n => {
       if (n.id !== nodeId) return n
-      const currentMod = n.audioMod[paramKey]
-      const idx = currentMod ? AUDIO_INPUTS.indexOf(currentMod) : -1
-      const nextIdx = idx + 1
-      const nextMod = nextIdx < AUDIO_INPUTS.length ? AUDIO_INPUTS[nextIdx] : null
-      return { ...n, audioMod: { ...n.audioMod, [paramKey]: nextMod } }
+      return { ...n, audioMod: { ...n.audioMod, [paramKey]: audioInput } }
     }))
   }, [])
 
@@ -391,31 +393,23 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
             const toNode = nodes.find(n => n.id === c.toId)
             if (!fromNode || !toNode) return null
             
-            // Calculate jack positions
-            const x1 = fromNode.x + 180 // Right side
-            const y1 = fromNode.y + 20
-            
-            // Destination jack depends on port index?
-            // Simple visual approximation: 
-            // Main 'in' is on left, 2nd input is on Top? Or just vertically stacked on left?
             const def = MODULE_DEFS.find(d => d.type === toNode.type)
             const portIdx = def?.inputs.indexOf(c.toPort) ?? 0
-            
-            const x2 = toNode.x
-            const y2 = toNode.y + 20 + (portIdx * 20) // Stack ports vertically
-            
-            const cx = (x1 + x2) / 2
+            const inputCount = def?.inputs.length ?? 1
+            const fromPos = getOutputJackCenter(fromNode.x, fromNode.y)
+            const toPos = getInputJackCenter(toNode.x, toNode.y, portIdx, inputCount)
+            const path = buildConnectionPath(fromPos, toPos)
             return (
               <g key={`${c.fromId}-${c.toId}-${c.toPort}`}>
                 <path
-                  d={`M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`}
+                  d={path}
                   stroke='#0ff'
                   strokeWidth={2}
                   fill='none'
                   opacity={0.6}
                 />
                 <path
-                  d={`M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`}
+                  d={path}
                   stroke='transparent'
                   strokeWidth={12}
                   fill='none'
@@ -437,15 +431,17 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
           const def = MODULE_DEFS.find(d => d.type === node.type)
           if (!def) return null
           
-          const knobParams: KnobParam[] = def.params.map(p => ({
+          const paramRows: ParamRow[] = def.params.map(p => ({
             key: p.key,
             label: p.label,
             value: node.params[p.key],
             min: p.min,
             max: p.max,
             step: p.step,
-            color: node.audioMod[p.key] ? '#d4a017' : '#0ff',
+            audioSource: node.audioMod[p.key] ?? null,
           }))
+
+          const outputConnected = connections.some(c => c.fromId === node.id)
 
           return (
             <div
@@ -454,6 +450,7 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
               style={{ 
                 left: node.x, 
                 top: node.y,
+                width: NODE_WIDTH,
                 border: node.id === connectingFrom ? '2px solid #fff' : undefined 
               }}
             >
@@ -467,10 +464,16 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
                   {def.inputs.map((portName, idx) => (
                     <div
                       key={portName}
-                      className={`${styles.jack} ${styles.inputJack}`}
-                      title={portName}
+                      className={styles.jackRow}
+                      onPointerDown={e => e.stopPropagation()}
                       onClick={e => { e.stopPropagation(); handleInputClick(node.id, portName) }}
-                    />
+                    >
+                      <div
+                        className={`${styles.jack} ${styles.inputJack} ${connections.some(c => c.toId === node.id && c.toPort === portName) ? styles.jackConnected : ''}`}
+                        title={portName}
+                      />
+                      <span className={styles.jackLabel}>{portName}</span>
+                    </div>
                   ))}
                 </div>
 
@@ -479,6 +482,7 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
                 {node.type !== 'out' && (
                   <button
                     className={styles.removeNode}
+                    onPointerDown={e => e.stopPropagation()}
                     onClick={e => { e.stopPropagation(); handleRemoveNode(node.id) }}
                   >
                     x
@@ -488,33 +492,23 @@ function PatchBay ({ onCodeChange }: PatchBayProps) {
                 {/* Output Jack */}
                 {node.category !== 'output' && (
                   <div
-                    className={`${styles.jack} ${styles.outputJack}`}
+                    className={styles.jackRow}
+                    onPointerDown={e => e.stopPropagation()}
                     onClick={e => { e.stopPropagation(); handleOutputClick(node.id) }}
-                  />
+                  >
+                    <span className={styles.jackLabel}>out</span>
+                    <div className={`${styles.jack} ${styles.outputJack} ${outputConnected ? styles.jackConnected : ''}`} />
+                  </div>
                 )}
               </div>
               
-              {knobParams.length > 0 && (
-                <KnobPanel
-                  title=''
-                  params={knobParams}
+              {paramRows.length > 0 && (
+                <ParamPanel
+                  params={paramRows}
+                  audioInputs={AUDIO_INPUTS}
                   onChange={(key, value) => handleParamChange(node.id, key, value)}
+                  onAudioChange={(key, audioInput) => handleAudioModSet(node.id, key, audioInput)}
                 />
-              )}
-              
-              {def.params.length > 0 && (
-                <div className={styles.audioModRow}>
-                  {def.params.map(p => (
-                    <button
-                      key={p.key}
-                      className={`${styles.audioModButton} ${node.audioMod[p.key] ? styles.audioModActive : ''}`}
-                      onClick={() => handleAudioModToggle(node.id, p.key)}
-                      title={p.key}
-                    >
-                      {p.label[0]}
-                    </button>
-                  ))}
-                </div>
               )}
             </div>
           )

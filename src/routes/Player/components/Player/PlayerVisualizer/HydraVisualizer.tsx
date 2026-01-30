@@ -55,6 +55,8 @@ interface HydraVisualizerProps {
   height: number
   /** Hydra code to execute. If not provided, uses default patch. */
   code?: string
+  /** Override container z-index for previews or overlays. */
+  layer?: number
 }
 
 function HydraVisualizer ({
@@ -64,6 +66,7 @@ function HydraVisualizer ({
   width,
   height,
   code,
+  layer,
 }: HydraVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hydraRef = useRef<Hydra | null>(null)
@@ -186,8 +189,13 @@ function HydraVisualizer ({
     return () => cancelAnimationFrame(rafRef.current)
   }, [isPlaying, tick])
 
+  const containerStyle: React.CSSProperties = { width, height }
+  if (typeof layer === 'number') {
+    containerStyle.zIndex = layer
+  }
+
   return (
-    <div className={styles.container} style={{ width, height }}>
+    <div className={styles.container} style={containerStyle}>
       <canvas
         ref={canvasRef}
         className={styles.canvas}
@@ -204,7 +212,7 @@ interface ErrorBoundaryState {
 }
 
 class HydraErrorBoundary extends React.Component<
-  { children: React.ReactNode, width: number, height: number },
+  { children: React.ReactNode, width: number, height: number, layer?: number },
   ErrorBoundaryState
 > {
   state: ErrorBoundaryState = { hasError: false }
@@ -237,7 +245,7 @@ class HydraErrorBoundary extends React.Component<
             position: 'absolute',
             top: 0,
             left: 0,
-            zIndex: -1,
+            zIndex: typeof this.props.layer === 'number' ? this.props.layer : -1,
           }}
         />
       )
@@ -249,7 +257,7 @@ class HydraErrorBoundary extends React.Component<
 // Wrapped export with error boundary
 function HydraVisualizerWithBoundary (props: HydraVisualizerProps) {
   return (
-    <HydraErrorBoundary width={props.width} height={props.height}>
+    <HydraErrorBoundary width={props.width} height={props.height} layer={props.layer}>
       <HydraVisualizer {...props} />
     </HydraErrorBoundary>
   )

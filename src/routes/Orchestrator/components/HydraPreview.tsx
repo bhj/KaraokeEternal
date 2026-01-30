@@ -65,7 +65,7 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
   }, [])
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={{ width, height }}>
       <div className={styles.label}>Preview (Simulated Audio)</div>
       {audioSource && (
         <HydraVisualizer
@@ -75,6 +75,7 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
           width={width}
           height={height}
           code={code}
+          layer={0}
         />
       )}
     </div>

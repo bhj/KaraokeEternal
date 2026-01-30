@@ -1,15 +1,25 @@
 .container {
+  --vj-cyan: #00f5ff;
+  --vj-amber: #d4a017;
+  --vj-panel: #151820;
+  --vj-panel-dark: #0c0f15;
+  --vj-grid: rgba(255, 255, 255, 0.04);
+  --vj-border: rgba(255, 255, 255, 0.08);
+
   display: flex;
   width: 100%;
   height: 100%;
-  background: #111;
+  background: radial-gradient(circle at 20% 20%, rgba(0, 245, 255, 0.08), transparent 55%),
+    radial-gradient(circle at 80% 80%, rgba(212, 160, 23, 0.1), transparent 50%),
+    #0b0d12;
   overflow: hidden;
+  color: #e8e8f0;
 }
 
 .palette {
-  width: 140px;
-  background: #1a1a1a;
-  border-right: 1px solid #333;
+  width: 180px;
+  background: linear-gradient(180deg, #161a23, #0f1219);
+  border-right: 1px solid var(--vj-border);
   display: flex;
   flex-direction: column;
 }
@@ -17,48 +27,55 @@
 .categoryTabs {
   display: flex;
   flex-wrap: wrap;
+  border-bottom: 1px solid var(--vj-border);
 }
 
 .categoryTab {
   flex: 1 0 50%;
-  background: #222;
+  background: #191d27;
   border: none;
   border-bottom: 2px solid transparent;
-  color: #888;
-  padding: 8px 4px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 10px 6px;
   font-size: 11px;
   cursor: pointer;
   text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .categoryTab.active {
   color: #fff;
-  background: #2a2a2a;
+  background: #232836;
 }
 
 .moduleList {
-  padding: 10px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   overflow-y: auto;
 }
 
 .moduleButton {
-  background: #222;
-  color: #ccc;
+  background: #1f2431;
+  color: #d7d7e0;
   border: none;
   border-left: 4px solid #555;
-  padding: 8px;
+  padding: 10px 12px;
   text-align: left;
   cursor: pointer;
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 13px;
+  letter-spacing: 0.02em;
+  border-radius: 6px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .moduleButton:hover {
-  background: #333;
+  background: #2a3042;
   color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
 }
 
 /* Canvas */
@@ -67,10 +84,10 @@
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: 
-    linear-gradient(#1a1a1a 1px, transparent 1px),
-    linear-gradient(90deg, #1a1a1a 1px, transparent 1px);
-  background-size: 20px 20px;
+  background:
+    linear-gradient(var(--vj-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--vj-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
   cursor: grab;
 }
 
@@ -84,8 +101,9 @@
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* Let clicks pass through to nodes */
+  pointer-events: none;
   z-index: 1;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.25));
 }
 
 .connectionsSvg path {
@@ -96,111 +114,105 @@
 
 .node {
   position: absolute;
-  width: 180px;
-  background: #222;
-  border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  width: 220px;
+  background: linear-gradient(180deg, rgba(26, 30, 40, 0.98), rgba(17, 20, 28, 0.98));
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
   z-index: 2;
   user-select: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .nodeHeader {
-  height: 28px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
-  border-radius: 4px 4px 0 0;
+  padding: 0 8px;
+  border-radius: 12px 12px 0 0;
   cursor: move;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
 }
 
 .nodeType {
-  font-weight: bold;
+  font-weight: 700;
   font-size: 12px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.92);
   flex: 1;
   text-align: center;
   pointer-events: none;
+  letter-spacing: 0.18em;
+  font-family: 'Beon', ui-sans-serif, system-ui, sans-serif;
 }
 
 .removeNode {
-  background: transparent;
-  border: none;
-  color: rgba(0,0,0,0.5);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(0, 0, 0, 0.6);
   font-weight: bold;
   cursor: pointer;
   font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .removeNode:hover {
   color: #fff;
+  background: rgba(255, 0, 76, 0.5);
+  border-color: rgba(255, 0, 76, 0.7);
 }
 
 .inputJacks {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-right: 4px;
+  gap: 4px;
+}
+
+.jackRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
 }
 
 .jack {
-  width: 12px;
-  height: 12px;
-  background: #000;
-  border: 2px solid #555;
+  width: 16px;
+  height: 16px;
+  background: #0a0d12;
+  border: 2px solid rgba(255, 255, 255, 0.35);
   border-radius: 50%;
-  cursor: pointer;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
 .jack:hover {
   border-color: #fff;
 }
 
-.jackActive {
-  border-color: #0ff;
-  box-shadow: 0 0 5px #0ff;
+.jackConnected {
+  border-color: var(--vj-cyan);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
 }
 
 .inputJack {
-  border-color: #888;
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .outputJack {
   border-color: #fff;
 }
 
-/* Audio Mod Buttons */
-.audioModRow {
-  display: flex;
-  gap: 2px;
-  padding: 4px;
-  background: #181818;
-  border-radius: 0 0 4px 4px;
-}
-
-.audioModButton {
-  flex: 1;
-  background: #222;
-  border: 1px solid #333;
-  color: #555;
-  font-size: 9px;
-  padding: 2px 0;
-  cursor: pointer;
-  border-radius: 2px;
-}
-
-.audioModButton:hover {
-  color: #aaa;
-}
-
-.audioModActive {
-  background: #d4a017;
-  color: #000;
-  border-color: #d4a017;
-  font-weight: bold;
+.jackLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .connectingHint {
@@ -214,4 +226,6 @@
   color: #0ff;
   pointer-events: none;
   z-index: 100;
+  font-size: 12px;
+  letter-spacing: 0.08em;
 }

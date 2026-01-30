@@ -3,6 +3,7 @@
   background: #000;
   border: 1px solid #333;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .label {

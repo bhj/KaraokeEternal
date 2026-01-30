@@ -3,7 +3,7 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: #111;
+  background: #0b0d12;
   color: #eee;
 }
 
@@ -11,21 +11,21 @@
   flex: 1;
   height: 100%;
   overflow: hidden;
-  border-right: 1px solid #333;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar {
   width: 400px;
   display: flex;
   flex-direction: column;
-  background: #1a1a1a;
+  background: linear-gradient(180deg, #141823, #0c0f16);
 }
 
 .previewArea {
   height: 250px; /* Aspect ratio 4:3 ish + padding */
   padding: 10px;
-  background: #000;
-  border-bottom: 1px solid #333;
+  background: radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.08), transparent 55%), #07080c;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: center;
   align-items: center;
