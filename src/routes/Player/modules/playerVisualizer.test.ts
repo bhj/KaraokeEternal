@@ -269,6 +269,49 @@ describe('playerVisualizer actual implementation', () => {
   })
 })
 
+describe('playerVisualizer hasHydraUpdate lifecycle', () => {
+  it('should have hasHydraUpdate=false in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(state.hasHydraUpdate).toBe(false)
+  })
+
+  it('should set hasHydraUpdate=true on VISUALIZER_HYDRA_CODE', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, { type: VISUALIZER_HYDRA_CODE, payload: { code: 'osc().out()' } })
+    expect(state.hasHydraUpdate).toBe(true)
+  })
+
+  it('should reset hasHydraUpdate=false on PLAYER_LOAD', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, { type: VISUALIZER_HYDRA_CODE, payload: { code: 'osc().out()' } })
+    expect(state.hasHydraUpdate).toBe(true)
+    state = reducer(state, { type: PLAYER_LOAD })
+    expect(state.hasHydraUpdate).toBe(false)
+  })
+
+  it('PLAYER_LOAD should not introduce hydraCode (getRandomPreset guard)', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, { type: PLAYER_LOAD })
+    // getRandomPreset() must only return { presetKey, presetName }.
+    // If this fails, update PLAYER_LOAD handler to explicitly handle hydraCode.
+    expect(newState.hydraCode).toBeUndefined()
+  })
+
+  it('PLAYER_LOAD should preserve existing hydraCode', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, { type: VISUALIZER_HYDRA_CODE, payload: { code: 'osc(10).out()' } })
+    expect(state.hydraCode).toBe('osc(10).out()')
+    state = reducer(state, { type: PLAYER_LOAD })
+    // hydraCode should be preserved (not wiped) — getRandomPreset() doesn't return hydraCode
+    expect(state.hydraCode).toBe('osc(10).out()')
+  })
+})
+
 describe('playerVisualizer audioResponse', () => {
   it('should have audioResponse matching AUDIO_RESPONSE_DEFAULTS in initial state', async () => {
     const { default: reducer } = await import('./playerVisualizer')

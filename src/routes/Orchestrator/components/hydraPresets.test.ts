@@ -29,8 +29,8 @@ describe('hydraPresets', () => {
   })
 
   describe('gallery integrity', () => {
-    it('has exactly 58 entries', () => {
-      expect(getPresetCount()).toBe(58)
+    it(`has exactly ${HYDRA_GALLERY.length} entries`, () => {
+      expect(getPresetCount()).toBe(HYDRA_GALLERY.length)
     })
 
     it('all decoded sketches contain .out( or render(', () => {
@@ -61,26 +61,26 @@ describe('hydraPresets', () => {
   })
 
   describe('getPresetLabel', () => {
-    it('returns [1/58] sketch_id format for index 0', () => {
+    it(`returns [1/${HYDRA_GALLERY.length}] sketch_id format for index 0`, () => {
       const label = getPresetLabel(0)
-      expect(label).toBe(`[1/58] ${HYDRA_GALLERY[0].sketch_id}`)
+      expect(label).toBe(`[1/${HYDRA_GALLERY.length}] ${HYDRA_GALLERY[0].sketch_id}`)
     })
 
-    it('returns [58/58] sketch_id format for last index', () => {
+    it(`returns [${HYDRA_GALLERY.length}/${HYDRA_GALLERY.length}] sketch_id format for last index`, () => {
       const lastIdx = getPresetCount() - 1
       const label = getPresetLabel(lastIdx)
-      expect(label).toBe(`[58/58] ${HYDRA_GALLERY[lastIdx].sketch_id}`)
+      expect(label).toBe(`[${HYDRA_GALLERY.length}/${HYDRA_GALLERY.length}] ${HYDRA_GALLERY[lastIdx].sketch_id}`)
     })
   })
 
   describe('getDefaultPreset', () => {
-    it('returns mahalia_0 decoded', () => {
+    it('returns marianne_1 decoded', () => {
       const preset = getDefaultPreset()
-      expect(preset).toContain('render(o2)')
+      expect(preset).toContain('render(o0)')
     })
 
-    it('default preset index points to mahalia_0', () => {
-      expect(HYDRA_GALLERY[getDefaultPresetIndex()].sketch_id).toBe('mahalia_0')
+    it('default preset index points to marianne_1', () => {
+      expect(HYDRA_GALLERY[getDefaultPresetIndex()].sketch_id).toBe('marianne_1')
     })
   })
 

@@ -27,9 +27,9 @@ export const PRESET_LABELS: string[] = HYDRA_GALLERY.map(
   (item, i) => `[${i + 1}/${HYDRA_GALLERY.length}] ${item.sketch_id}`,
 )
 
-/** Index of mahalia_0 in the gallery (default sketch) */
+/** Index of marianne_1 in the gallery (default sketch) */
 export const DEFAULT_PRESET_INDEX: number = HYDRA_GALLERY.findIndex(
-  item => item.sketch_id === 'mahalia_0',
+  item => item.sketch_id === 'marianne_1',
 )
 
 export function getDefaultPreset (): string {

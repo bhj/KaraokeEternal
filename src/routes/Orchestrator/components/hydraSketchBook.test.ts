@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { DEFAULT_SKETCH, getRandomSketch } from './hydraSketchBook'
 import { getPresetCount } from './hydraPresets'
+import { HYDRA_GALLERY } from './hydraGallery'
 
 describe('hydraSketchBook', () => {
   describe('DEFAULT_SKETCH', () => {
@@ -8,8 +9,8 @@ describe('hydraSketchBook', () => {
       expect(DEFAULT_SKETCH.length).toBeGreaterThan(0)
     })
 
-    it('is the mahalia_0 gallery sketch (contains render(o2))', () => {
-      expect(DEFAULT_SKETCH).toContain('render(o2)')
+    it('is the marianne_1 gallery sketch (contains render(o0))', () => {
+      expect(DEFAULT_SKETCH).toContain('render(o0)')
     })
 
     it('contains .out( (valid Hydra output)', () => {
@@ -29,8 +30,8 @@ describe('hydraSketchBook', () => {
       expect(hasOutput).toBe(true)
     })
 
-    it('draws from the full gallery (58 presets)', () => {
-      expect(getPresetCount()).toBe(58)
+    it(`draws from the full gallery (${HYDRA_GALLERY.length} presets)`, () => {
+      expect(getPresetCount()).toBe(HYDRA_GALLERY.length)
     })
   })
 })

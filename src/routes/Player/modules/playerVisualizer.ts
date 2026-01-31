@@ -45,6 +45,7 @@ export interface PlayerVisualizerState {
   hydraCode?: string
   hydraPresetIndex: number
   hydraPresetName: string
+  hasHydraUpdate: boolean
   audioResponse: AudioResponseState
 }
 
@@ -58,6 +59,7 @@ const initialState: PlayerVisualizerState = {
   mode: 'hydra',
   hydraPresetIndex: _defaultHydraIndex,
   hydraPresetName: getPresetLabel(_defaultHydraIndex),
+  hasHydraUpdate: false,
   audioResponse: { ...AUDIO_RESPONSE_DEFAULTS },
 }
 
@@ -67,6 +69,7 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
       ...state,
       // Randomize Milkdrop preset on load; Hydra presets only change via server broadcast
       ...getRandomPreset(),
+      hasHydraUpdate: false,
     }))
     .addCase(playerCmdOptions, (state, { payload }) => {
       const { visualizer } = payload
@@ -97,6 +100,7 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
     })
     .addCase(hydraCodeReceived, (state, { payload }) => {
       state.hydraCode = payload.code
+      state.hasHydraUpdate = true
       // Server-chosen index: dispatching client includes hydraPresetIndex in payload.
       // Only update index/name when present (preset navigation).
       // Code-only payloads (Orchestrator send) preserve existing preset index.

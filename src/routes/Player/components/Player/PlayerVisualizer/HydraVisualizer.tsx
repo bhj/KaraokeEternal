@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import Hydra from 'hydra-synth'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
+import { audioizeHydraCode } from './hooks/audioizeHydraCode'
 import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
 import type { AudioResponseState } from 'shared/types'
 import styles from './HydraVisualizer.css'
@@ -45,7 +46,7 @@ function clearAudioGlobals () {
 
 function executeHydraCode (hydra: Hydra, code: string) {
   try {
-    hydra.eval(code)
+    hydra.eval(audioizeHydraCode(code))
   } catch (err) {
     warn('Code execution error:', err)
     // Don't crash — keep last working frame

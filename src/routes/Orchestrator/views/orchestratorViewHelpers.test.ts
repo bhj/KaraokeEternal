@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { getEffectiveCode, getPendingRemote } from './orchestratorViewHelpers'
+import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
+import { getPresetByIndex } from '../components/hydraPresets'
 
 describe('orchestratorViewHelpers', () => {
   describe('getEffectiveCode', () => {
@@ -132,6 +133,48 @@ describe('orchestratorViewHelpers', () => {
       const result = applyRemoteUpdate('remote-v4', 'new-local', true, afterApply.pendingRemoteCode, afterApply.pendingRemoteCount)
       expect(result.pendingRemoteCode).toBe('remote-v4')
       expect(result.pendingRemoteCount).toBe(1)
+    })
+  })
+
+  describe('shouldAutoApplyPreset', () => {
+    it('returns true: index changed, userHasEdited, code matches gallery', () => {
+      const code = getPresetByIndex(5)
+      expect(shouldAutoApplyPreset(0, 5, true, code)).toBe(true)
+    })
+
+    it('returns false: index unchanged (5→5)', () => {
+      const code = getPresetByIndex(5)
+      expect(shouldAutoApplyPreset(5, 5, true, code)).toBe(false)
+    })
+
+    it('returns false: userHasEdited=false', () => {
+      const code = getPresetByIndex(5)
+      expect(shouldAutoApplyPreset(0, 5, false, code)).toBe(false)
+    })
+
+    it('returns false: prevIndex undefined (initial render)', () => {
+      const code = getPresetByIndex(5)
+      expect(shouldAutoApplyPreset(undefined, 5, true, code)).toBe(false)
+    })
+
+    it('returns false: code does not match gallery (spoofed)', () => {
+      expect(shouldAutoApplyPreset(0, 5, true, 'malicious code')).toBe(false)
+    })
+
+    it('returns false: index out of bounds', () => {
+      expect(shouldAutoApplyPreset(0, 9999, true, 'osc().out()')).toBe(false)
+    })
+
+    it('returns false: currentIndex undefined', () => {
+      expect(shouldAutoApplyPreset(0, undefined, true, 'osc().out()')).toBe(false)
+    })
+
+    it('returns false: remoteCode is null', () => {
+      expect(shouldAutoApplyPreset(0, 5, true, null)).toBe(false)
+    })
+
+    it('returns false: remoteCode is undefined', () => {
+      expect(shouldAutoApplyPreset(0, 5, true, undefined)).toBe(false)
     })
   })
 })

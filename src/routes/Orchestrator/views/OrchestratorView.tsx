@@ -5,7 +5,7 @@ import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
-import { getEffectiveCode, getPendingRemote } from './orchestratorViewHelpers'
+import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
 import CodeEditor from '../components/CodeEditor'
 import StagePanel from '../components/StagePanel'
@@ -16,7 +16,19 @@ import styles from './OrchestratorView.css'
 function OrchestratorView () {
   const dispatch = useAppDispatch()
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
-  const remoteHydraCode = playerVisualizer?.hydraCode
+  const status = useAppSelector(state => state.status)
+
+  // playerVisualizer starts with hasHydraUpdate=false.
+  // Once a VISUALIZER_HYDRA_CODE action arrives, flag is set to true.
+  // Until then, fall back to status.visualizer (hydrated by PLAYER_STATUS).
+  const hasUpdate = playerVisualizer?.hasHydraUpdate === true
+  const remoteHydraCode = hasUpdate
+    ? playerVisualizer.hydraCode
+    : status.visualizer?.hydraCode
+  const remotePresetIndex = hasUpdate
+    ? playerVisualizer.hydraPresetIndex
+    : status.visualizer?.hydraPresetIndex
+
   const ui = useAppSelector(state => state.ui)
   const [localCode, setLocalCode] = useState<string>(DEFAULT_SKETCH)
   const [previewBuffer, setPreviewBuffer] = useState<StageBuffer>('auto')
@@ -25,6 +37,7 @@ function OrchestratorView () {
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
   const prevRemoteRef = useRef<string | undefined>(undefined)
+  const prevPresetIndexRef = useRef<number | undefined>(undefined)
 
   const handleSendCode = useCallback((code: string) => {
     dispatch({
@@ -84,6 +97,22 @@ function OrchestratorView () {
     })
     return () => cancelAnimationFrame(id)
   }, [remoteHydraCode, localCode, userHasEdited])
+
+  // Auto-apply when player navigates presets (index changes)
+  useEffect(() => {
+    const prevIdx = prevPresetIndexRef.current
+    prevPresetIndexRef.current = remotePresetIndex
+
+    if (!shouldAutoApplyPreset(prevIdx, remotePresetIndex, userHasEdited, remoteHydraCode)) return
+
+    const id = requestAnimationFrame(() => {
+      setLocalCode(remoteHydraCode!)
+      setUserHasEdited(false)
+      setPendingRemoteCode(null)
+      setPendingRemoteCount(0)
+    })
+    return () => cancelAnimationFrame(id)
+  }, [remotePresetIndex, remoteHydraCode, userHasEdited])
 
   // Debounce preview at 150ms
   useEffect(() => {
