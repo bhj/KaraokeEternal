@@ -6,6 +6,7 @@ import {
   PLAYER_VISUALIZER_ERROR,
   VISUALIZER_HYDRA_CODE,
 } from 'shared/actionTypes'
+import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 
 /**
  * Tests for the extended playerVisualizer module.
@@ -265,5 +266,118 @@ describe('playerVisualizer actual implementation', () => {
     const newState = reducer(state, { type: PLAYER_LOAD })
     // Hydra preset should NOT change on player load
     expect(newState.hydraPresetIndex).toBe(initialIdx)
+  })
+})
+
+describe('playerVisualizer audioResponse', () => {
+  it('should have audioResponse matching AUDIO_RESPONSE_DEFAULTS in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(state.audioResponse).toEqual(AUDIO_RESPONSE_DEFAULTS)
+  })
+
+  it('should update all audioResponse fields via PLAYER_CMD_OPTIONS', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: {
+        visualizer: {
+          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
+        },
+      },
+    })
+    expect(newState.audioResponse).toEqual({
+      globalGain: 2.0,
+      bassWeight: 2.5,
+      midWeight: 1.5,
+      trebleWeight: 2.0,
+    })
+  })
+
+  it('should merge partial audioResponse with defaults', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: {
+        visualizer: {
+          audioResponse: { bassWeight: 2.0 },
+        },
+      },
+    })
+    expect(newState.audioResponse).toEqual({
+      globalGain: 1.0,
+      bassWeight: 2.0,
+      midWeight: 1.0,
+      trebleWeight: 1.0,
+    })
+  })
+
+  it('should preserve audioResponse across PLAYER_CMD_OPTIONS with only sensitivity change', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: {
+        visualizer: {
+          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
+        },
+      },
+    })
+    const newState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { sensitivity: 0.5 } },
+    })
+    expect(newState.audioResponse).toEqual({
+      globalGain: 2.0,
+      bassWeight: 2.5,
+      midWeight: 1.5,
+      trebleWeight: 2.0,
+    })
+    expect(newState.sensitivity).toBe(0.5)
+  })
+
+  it('should preserve audioResponse across PLAYER_LOAD', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: {
+        visualizer: {
+          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
+        },
+      },
+    })
+    const newState = reducer(state, { type: PLAYER_LOAD })
+    expect(newState.audioResponse).toEqual({
+      globalGain: 2.0,
+      bassWeight: 2.5,
+      midWeight: 1.5,
+      trebleWeight: 2.0,
+    })
+  })
+
+  it('should preserve audioResponse across VISUALIZER_HYDRA_CODE', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: {
+        visualizer: {
+          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
+        },
+      },
+    })
+    const newState = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'osc(10).out()' },
+    })
+    expect(newState.audioResponse).toEqual({
+      globalGain: 2.0,
+      bassWeight: 2.5,
+      midWeight: 1.5,
+      trebleWeight: 2.0,
+    })
   })
 })

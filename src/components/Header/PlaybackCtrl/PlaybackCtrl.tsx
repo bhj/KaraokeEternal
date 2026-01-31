@@ -11,7 +11,7 @@ import VolumeSlider from './VolumeSlider/VolumeSlider'
 import NoPlayer from './NoPlayer/NoPlayer'
 import DisplayCtrl from './DisplayCtrl/DisplayCtrl'
 import styles from './PlaybackCtrl.css'
-import { PlaybackOptions } from 'shared/types'
+import { PlaybackOptions, AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 
 const handleFullscreen = () => {
   if (screenfull.isEnabled) {
@@ -117,6 +117,7 @@ const PlaybackCtrl = () => {
             ? (status.visualizer.hydraPresetName ?? '')
             : (status.visualizer.presetName ?? '')}
           visualizerMode={status.visualizer.mode}
+          audioResponse={{ ...AUDIO_RESPONSE_DEFAULTS, ...status.visualizer.audioResponse }}
           onHydraPresetChange={handleHydraPresetChange}
         />
       )}

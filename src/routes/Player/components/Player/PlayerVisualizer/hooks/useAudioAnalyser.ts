@@ -1,4 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react'
+import type { AudioResponseState } from 'shared/types'
+import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 
 export interface AudioData {
   rawFrequencyData: Float32Array // Linear normalized 0-1, 128 bins (for window.a.fft compat)
@@ -20,6 +22,26 @@ interface UseAudioAnalyserOptions {
   fftSize?: number
   smoothingTimeConstant?: number
   sensitivity?: number
+  audioResponse?: AudioResponseState
+}
+
+export function applyAudioResponseWeights (
+  rawFreq: Float32Array,
+  gammaFreq: Float32Array,
+  bassEnd: number,
+  midEnd: number,
+  response: AudioResponseState,
+): void {
+  const g = Number.isFinite(response.globalGain) ? Math.max(0, response.globalGain) : 1
+  const bw = Number.isFinite(response.bassWeight) ? Math.max(0, response.bassWeight) : 1
+  const mw = Number.isFinite(response.midWeight) ? Math.max(0, response.midWeight) : 1
+  const tw = Number.isFinite(response.trebleWeight) ? Math.max(0, response.trebleWeight) : 1
+  for (let i = 0; i < rawFreq.length; i++) {
+    const w = i < bassEnd ? bw : i < midEnd ? mw : tw
+    const scale = g * w
+    rawFreq[i] = Math.min(1, Math.max(0, rawFreq[i] * scale))
+    gammaFreq[i] = Math.min(1, Math.max(0, gammaFreq[i] * scale))
+  }
 }
 
 const DEFAULT_FFT_SIZE = 256
@@ -39,6 +61,7 @@ export function useAudioAnalyser (
     fftSize = DEFAULT_FFT_SIZE,
     smoothingTimeConstant = DEFAULT_SMOOTHING,
     sensitivity = 1,
+    audioResponse,
   } = options
 
   const analyserRef = useRef<AnalyserNode | null>(null)
@@ -54,6 +77,12 @@ export function useAudioAnalyser (
   // Hz-based band boundaries (computed once per audio source)
   const bassEndRef = useRef<number>(0)
   const midEndRef = useRef<number>(0)
+
+  // Audio response weights (updated on prop change, read in getAudioData)
+  const audioResponseRef = useRef<AudioResponseState>(audioResponse ?? AUDIO_RESPONSE_DEFAULTS)
+  useEffect(() => {
+    audioResponseRef.current = audioResponse ?? AUDIO_RESPONSE_DEFAULTS
+  }, [audioResponse])
 
   // Energy tracking for genre detection
   const energySmoothRef = useRef<number>(0)
@@ -189,15 +218,76 @@ export function useAudioAnalyser (
       gammaFreq[i] = Math.pow(linear, GAMMA)
     }
 
-    // Hz-based frequency bands (use gamma-shaped data for band globals)
+    // Hz-based frequency bands
     const binCount = frequencyData.length
     const bassEnd = bassEndRef.current || Math.max(2, Math.floor(binCount * 0.03))
     const midEnd = midEndRef.current || Math.floor(binCount * 0.5)
 
+    // --- UNWEIGHTED pass: bass for beat detection, spectral centroid ---
+    let bassUnweightedSum = 0
+    for (let i = 0; i < bassEnd; i++) {
+      bassUnweightedSum += gammaFreq[i]
+    }
+    const bassUnweighted = bassUnweightedSum / bassEnd
+
+    // Beat detection (unweighted bass)
+    const bassChange = bassUnweighted - previousBassRef.current
+    const isBeat = bassChange > beatThresholdRef.current && bassUnweighted > 0.25
+    const beatIntensity = isBeat ? Math.min(1, bassChange * 2) : 0
+    previousBassRef.current = bassUnweighted
+    beatThresholdRef.current = beatThresholdRef.current * 0.95 + 0.05 * 0.15
+
+    // Spectral centroid (unweighted — brightness indicator)
+    let weightedSum = 0
+    let totalWeight = 0
+    for (let i = 0; i < rawNormalizedFreq.length; i++) {
+      const weight = rawNormalizedFreq[i]
+      weightedSum += i * weight
+      totalWeight += weight
+    }
+    const rawCentroid = totalWeight > 0 ? weightedSum / totalWeight / rawNormalizedFreq.length : 0.5
+    spectralCentroidSmoothRef.current = spectralCentroidSmoothRef.current * 0.9 + rawCentroid * 0.1
+    const spectralCentroid = spectralCentroidSmoothRef.current
+
+    // Energy (unweighted — waveform RMS, not affected by audio response)
+    let sumSquares = 0
+    for (let i = 0; i < waveformData.length; i++) {
+      sumSquares += waveformData[i] * waveformData[i]
+    }
+    const energy = Math.sqrt(sumSquares / waveformData.length)
+
+    const energySmoothAlpha = 0.008
+    energySmoothRef.current = energySmoothRef.current * (1 - energySmoothAlpha) + energy * energySmoothAlpha
+    const energySmooth = energySmoothRef.current
+
+    // Beat frequency estimation (BPM tracking)
+    const now = performance.now()
+    if (isBeat && now - lastBeatTimeRef.current > 200) {
+      beatTimestampsRef.current.push(now)
+      lastBeatTimeRef.current = now
+      if (beatTimestampsRef.current.length > 16) {
+        beatTimestampsRef.current.shift()
+      }
+    }
+
+    let beatFrequency = 0.5
+    const timestamps = beatTimestampsRef.current
+    if (timestamps.length >= 4) {
+      let totalInterval = 0
+      for (let i = 1; i < timestamps.length; i++) {
+        totalInterval += timestamps[i] - timestamps[i - 1]
+      }
+      const avgInterval = totalInterval / (timestamps.length - 1)
+      const bpm = 60000 / avgInterval
+      beatFrequency = Math.max(0, Math.min(1, (bpm - 60) / 120))
+    }
+
+    // --- WEIGHTED pass: apply audio response, then compute band averages for closures ---
+    applyAudioResponseWeights(rawNormalizedFreq, gammaFreq, bassEnd, midEnd, audioResponseRef.current)
+
     let bassSum = 0
     let midSum = 0
     let trebleSum = 0
-
     for (let i = 0; i < bassEnd; i++) {
       bassSum += gammaFreq[i]
     }
@@ -211,72 +301,6 @@ export function useAudioAnalyser (
     const bass = bassSum / bassEnd
     const mid = midSum / (midEnd - bassEnd)
     const treble = trebleSum / (binCount - midEnd)
-
-    // Simple beat detection based on bass spike
-    const bassChange = bass - previousBassRef.current
-    const isBeat = bassChange > beatThresholdRef.current && bass > 0.25
-    const beatIntensity = isBeat ? Math.min(1, bassChange * 2) : 0
-
-    // Update previous bass for next frame
-    previousBassRef.current = bass
-
-    // Adaptive beat threshold
-    beatThresholdRef.current = beatThresholdRef.current * 0.95 + 0.05 * 0.15
-
-    // --- Energy Detection for Genre Response ---
-
-    // Calculate RMS energy from waveform (instant loudness)
-    let sumSquares = 0
-    for (let i = 0; i < waveformData.length; i++) {
-      sumSquares += waveformData[i] * waveformData[i]
-    }
-    const energy = Math.sqrt(sumSquares / waveformData.length)
-
-    // Exponential moving average for energy smoothing (~2 second window at 60fps)
-    // Alpha ~= 1 - e^(-1/(fps*seconds)) ≈ 0.008 for 2s at 60fps
-    const energySmoothAlpha = 0.008
-    energySmoothRef.current = energySmoothRef.current * (1 - energySmoothAlpha) + energy * energySmoothAlpha
-    const energySmooth = energySmoothRef.current
-
-    // Calculate spectral centroid (brightness indicator)
-    // Weighted average of frequencies - higher = brighter/harsher sound
-    let weightedSum = 0
-    let totalWeight = 0
-    for (let i = 0; i < rawNormalizedFreq.length; i++) {
-      const weight = rawNormalizedFreq[i]
-      weightedSum += i * weight
-      totalWeight += weight
-    }
-    const rawCentroid = totalWeight > 0 ? weightedSum / totalWeight / rawNormalizedFreq.length : 0.5
-    // Smooth the spectral centroid
-    spectralCentroidSmoothRef.current = spectralCentroidSmoothRef.current * 0.9 + rawCentroid * 0.1
-    const spectralCentroid = spectralCentroidSmoothRef.current
-
-    // Beat frequency estimation (BPM tracking)
-    const now = performance.now()
-    if (isBeat && now - lastBeatTimeRef.current > 200) { // Minimum 200ms between beats (300 BPM max)
-      beatTimestampsRef.current.push(now)
-      lastBeatTimeRef.current = now
-
-      // Keep only last 16 beats for BPM calculation
-      if (beatTimestampsRef.current.length > 16) {
-        beatTimestampsRef.current.shift()
-      }
-    }
-
-    // Calculate BPM from beat intervals
-    let beatFrequency = 0.5 // Default to mid-range
-    const timestamps = beatTimestampsRef.current
-    if (timestamps.length >= 4) {
-      let totalInterval = 0
-      for (let i = 1; i < timestamps.length; i++) {
-        totalInterval += timestamps[i] - timestamps[i - 1]
-      }
-      const avgInterval = totalInterval / (timestamps.length - 1)
-      const bpm = 60000 / avgInterval
-      // Normalize BPM to 0-1 range: 60 BPM = 0, 120 BPM = 0.5, 180 BPM = 1
-      beatFrequency = Math.max(0, Math.min(1, (bpm - 60) / 120))
-    }
 
     // Dev-only startup diagnostic — fires after 60 frames for reliability
     // Catches CORS taint and suspended audio contexts

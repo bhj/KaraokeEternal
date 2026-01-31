@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react'
 import Hydra from 'hydra-synth'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
 import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
+import type { AudioResponseState } from 'shared/types'
 import styles from './HydraVisualizer.css'
 
 const log = (...args: unknown[]) => console.log('[Hydra]', ...args)
@@ -61,6 +62,7 @@ interface HydraVisualizerProps {
   code?: string
   /** Override container z-index for previews or overlays. */
   layer?: number
+  audioResponse?: AudioResponseState
 }
 
 function HydraVisualizer ({
@@ -71,6 +73,7 @@ function HydraVisualizer ({
   height,
   code,
   layer,
+  audioResponse,
 }: HydraVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hydraRef = useRef<Hydra | null>(null)
@@ -82,7 +85,7 @@ function HydraVisualizer ({
   const heightRef = useRef(height)
   const codeRef = useRef(code)
 
-  const { update: updateAudio, closures, compat } = useHydraAudio(audioSourceNode, sensitivity)
+  const { update: updateAudio, closures, compat } = useHydraAudio(audioSourceNode, sensitivity, audioResponse)
 
   useEffect(() => {
     widthRef.current = width

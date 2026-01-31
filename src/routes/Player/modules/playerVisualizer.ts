@@ -6,7 +6,8 @@ import {
   PLAYER_VISUALIZER_ERROR,
   VISUALIZER_HYDRA_CODE,
 } from 'shared/actionTypes'
-import type { PlaybackOptions, VisualizerMode } from 'shared/types'
+import type { AudioResponseState, PlaybackOptions, VisualizerMode } from 'shared/types'
+import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 import { getDefaultPresetIndex, getPresetLabel } from 'routes/Orchestrator/components/hydraPresets'
 
 const BAD_PRESETS = [
@@ -44,6 +45,7 @@ export interface PlayerVisualizerState {
   hydraCode?: string
   hydraPresetIndex: number
   hydraPresetName: string
+  audioResponse: AudioResponseState
 }
 
 const _defaultHydraIndex = getDefaultPresetIndex()
@@ -56,6 +58,7 @@ const initialState: PlayerVisualizerState = {
   mode: 'hydra',
   hydraPresetIndex: _defaultHydraIndex,
   hydraPresetName: getPresetLabel(_defaultHydraIndex),
+  audioResponse: { ...AUDIO_RESPONSE_DEFAULTS },
 }
 
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
@@ -87,6 +90,9 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
         mode: visualizer.mode ?? state.mode,
+        audioResponse: visualizer.audioResponse
+          ? { ...AUDIO_RESPONSE_DEFAULTS, ...visualizer.audioResponse }
+          : state.audioResponse,
       }
     })
     .addCase(hydraCodeReceived, (state, { payload }) => {

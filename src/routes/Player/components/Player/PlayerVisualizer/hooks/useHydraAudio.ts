@@ -1,6 +1,7 @@
 import { useRef, useCallback, useMemo } from 'react'
 import { useAudioAnalyser, type AudioData } from './useAudioAnalyser'
 import { createHydraAudioCompat } from './hydraAudioCompat'
+import type { AudioResponseState } from 'shared/types'
 
 export interface AudioClosures {
   bass: () => number
@@ -30,8 +31,9 @@ const defaultAudioData: AudioData = {
 export function useHydraAudio (
   audioSourceNode: MediaElementAudioSourceNode | null,
   sensitivity: number,
+  audioResponse?: AudioResponseState,
 ) {
-  const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity })
+  const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity, audioResponse })
   const audioRef = useRef<AudioData>(defaultAudioData)
   const compat = useMemo(() => createHydraAudioCompat(), [])
 

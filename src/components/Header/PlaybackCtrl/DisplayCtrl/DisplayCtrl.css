@@ -107,3 +107,34 @@
 .slider {
   margin: 0 1.25rem;
 }
+
+.audioResponse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  border-top: 1px solid var(--btn-bg-color);
+  padding-top: var(--space-m);
+}
+
+.audioResponseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  label {
+    font-size: var(--font-size-s);
+    color: var(--text-muted-color);
+  }
+
+  button {
+    font-size: var(--font-size-xs);
+    padding: var(--space-xxs) var(--space-xs);
+  }
+}
+
+.hintText {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted-color);
+  opacity: 0.7;
+}
