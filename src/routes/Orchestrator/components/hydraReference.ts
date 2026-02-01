@@ -103,4 +103,17 @@ export const HYDRA_REFERENCE: HydraRefCategory[] = [
       { name: '.modulateScrollY', params: [{ name: 'tex', default: 'osc()' }, { name: 'amount', default: 0.5 }, { name: 'speed', default: 0 }] },
     ],
   },
+  {
+    label: 'Camera / External Sources',
+    color: '#78909c',
+    functions: [
+      { name: 's0.initCam', params: [{ name: 'index', default: 0 }] },
+      { name: 's1.initCam', params: [{ name: 'index', default: 0 }] },
+      { name: 's2.initCam', params: [{ name: 'index', default: 0 }] },
+      { name: 's3.initCam', params: [{ name: 'index', default: 0 }] },
+      { name: 's0.initImage', params: [{ name: 'url', default: '\'\'' }] },
+      { name: 's0.initVideo', params: [{ name: 'url', default: '\'\'' }] },
+      { name: 's0.initScreen', params: [] },
+    ],
+  },
 ]

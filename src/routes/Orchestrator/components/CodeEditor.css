@@ -20,7 +20,9 @@
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  background: #16213e;
+  background: var(--aqua-glass-bg, #16213e);
+  backdrop-filter: var(--aqua-blur, none);
+  border-top: var(--aqua-border, 1px solid rgba(255, 255, 255, 0.08));
   gap: 12px;
 }
 
@@ -48,9 +50,10 @@
 .randomButton {
   padding: 6px 12px;
   background: rgba(212, 160, 23, 0.15);
+  background-image: var(--aqua-gloss, none);
   color: #d4a017;
   border: 1px solid rgba(212, 160, 23, 0.3);
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
   font-weight: 500;
@@ -64,9 +67,10 @@
 .autoAudioButton {
   padding: 6px 12px;
   background: rgba(56, 189, 248, 0.15);
+  background-image: var(--aqua-gloss, none);
   color: #38bdf8;
   border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
   font-weight: 500;
@@ -94,9 +98,10 @@
 .sendButton {
   padding: 6px 16px;
   background: #238636;
+  background-image: var(--aqua-gloss, none);
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
   font-weight: 500;
@@ -104,4 +109,61 @@
 
 .sendButton:hover {
   background: #2ea043;
+}
+
+.cameraBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: rgba(78, 144, 156, 0.15);
+  border-bottom: 1px solid rgba(78, 144, 156, 0.3);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cameraBannerEnable {
+  padding: 3px 10px;
+  background: rgba(78, 205, 196, 0.2);
+  color: #4ecdc4;
+  border: 1px solid rgba(78, 205, 196, 0.4);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.cameraBannerEnable:hover {
+  background: rgba(78, 205, 196, 0.3);
+}
+
+.cameraBannerDismiss {
+  padding: 3px 10px;
+  background: transparent;
+  color: #888;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.cameraBannerDismiss:hover {
+  color: #aaa;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.stripAudioButton {
+  padding: 6px 12px;
+  background: rgba(229, 115, 115, 0.15);
+  background-image: var(--aqua-gloss, none);
+  color: #e57373;
+  border: 1px solid rgba(229, 115, 115, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.stripAudioButton:hover {
+  background: rgba(229, 115, 115, 0.25);
+  border-color: rgba(229, 115, 115, 0.5);
 }

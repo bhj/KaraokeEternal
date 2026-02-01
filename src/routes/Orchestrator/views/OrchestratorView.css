@@ -1,4 +1,13 @@
 .container {
+  /* Aqua-inspired CSS variables — scoped to Orchestrator, not :root */
+  --aqua-glass-bg: rgba(20, 30, 40, 0.65);
+  --aqua-blur: blur(12px);
+  --aqua-radius: 10px;
+  --aqua-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --aqua-gloss: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  --aqua-border: 1px solid rgba(255, 255, 255, 0.08);
+  --aqua-accent: #4ecdc4;
+
   display: grid;
   grid-template-areas:
     "stage"
@@ -15,9 +24,44 @@
   grid-area: ref;
   display: none;
   flex-direction: column;
+  overflow: hidden;
+  border-right: var(--aqua-border);
+  background: var(--aqua-glass-bg);
+  backdrop-filter: var(--aqua-blur);
+}
+
+.tabBar {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tabActive {
+  color: var(--aqua-accent);
+  border-bottom-color: var(--aqua-accent);
+}
+
+.tabContent {
+  flex: 1;
   overflow-y: auto;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0d1117;
+  padding: 8px;
 }
 
 .stageDock {
@@ -52,9 +96,10 @@
 .remoteBannerApply {
   padding: 3px 10px;
   background: rgba(0, 255, 255, 0.15);
+  background-image: var(--aqua-gloss);
   color: #0ff;
   border: 1px solid rgba(0, 255, 255, 0.3);
-  border-radius: 3px;
+  border-radius: 6px;
   font-size: 11px;
   cursor: pointer;
 }
@@ -68,7 +113,7 @@
   background: transparent;
   color: #888;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  border-radius: 6px;
   font-size: 11px;
   cursor: pointer;
 }

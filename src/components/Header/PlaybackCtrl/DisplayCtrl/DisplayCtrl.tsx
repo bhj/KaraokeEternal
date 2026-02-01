@@ -21,6 +21,8 @@ interface DisplayCtrlProps {
   visualizerPresetName: string
   visualizerMode: VisualizerMode
   audioResponse: AudioResponseState
+  allowCamera: boolean
+  cameraHint?: string
   // actions
   onRequestOptions(opts: PlaybackOptions): void
   onHydraPresetChange(direction: 'next' | 'prev' | 'random'): void
@@ -45,6 +47,8 @@ const DisplayCtrl = ({
   visualizerPresetName,
   visualizerMode,
   audioResponse,
+  allowCamera,
+  cameraHint,
   onRequestOptions,
   onHydraPresetChange,
   onClose,
@@ -72,6 +76,10 @@ const DisplayCtrl = ({
 
   const handleModeChange = (mode: VisualizerMode) => onRequestOptions({
     visualizer: { mode },
+  })
+
+  const handleToggleCamera = () => onRequestOptions({
+    visualizer: { allowCamera: !allowCamera },
   })
 
   const handleAudioResponseField = (field: keyof AudioResponseState, val: number) =>
@@ -168,6 +176,19 @@ const DisplayCtrl = ({
                     aria-labelledby='label-visualizer-sensitivity'
                   />
                 </div>
+
+                {showPresets && (
+                  <div className={styles.field}>
+                    <InputCheckbox
+                      label='Allow Camera'
+                      checked={allowCamera}
+                      onChange={handleToggleCamera}
+                    />
+                    {cameraHint && (
+                      <p className={styles.hintText}>{cameraHint}</p>
+                    )}
+                  </div>
+                )}
 
                 {showAudioResponse && (
                   <div className={styles.audioResponse}>

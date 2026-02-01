@@ -30,6 +30,7 @@ export interface PlayerVisualizerState {
   hydraPresetName: string
   hasHydraUpdate: boolean
   audioResponse: AudioResponseState
+  allowCamera: boolean
 }
 
 const _defaultHydraIndex = getDefaultPresetIndex()
@@ -44,6 +45,7 @@ const initialState: PlayerVisualizerState = {
   hydraPresetName: getPresetLabel(_defaultHydraIndex),
   hasHydraUpdate: false,
   audioResponse: { ...AUDIO_RESPONSE_DEFAULTS },
+  allowCamera: false,
 }
 
 /** Guard: only allow valid modes */
@@ -70,6 +72,7 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         audioResponse: visualizer.audioResponse
           ? { ...AUDIO_RESPONSE_DEFAULTS, ...visualizer.audioResponse }
           : state.audioResponse,
+        allowCamera: typeof visualizer.allowCamera === 'boolean' ? visualizer.allowCamera : state.allowCamera,
       }
     })
     .addCase(hydraCodeReceived, (state, { payload }) => {

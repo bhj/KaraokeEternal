@@ -116,6 +116,7 @@ const PlaybackCtrl = () => {
           visualizerPresetName={status.visualizer.hydraPresetName ?? ''}
           visualizerMode={status.visualizer.mode}
           audioResponse={{ ...AUDIO_RESPONSE_DEFAULTS, ...status.visualizer.audioResponse }}
+          allowCamera={status.visualizer.allowCamera ?? false}
           onHydraPresetChange={handleHydraPresetChange}
         />
       )}

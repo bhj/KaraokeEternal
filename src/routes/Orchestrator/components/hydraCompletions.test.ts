@@ -69,3 +69,39 @@ describe('buildHydraCompletions', () => {
     }
   })
 })
+
+describe('buildHydraCompletions - camera / external sources', () => {
+  const { topLevel, sourceDot } = buildHydraCompletions()
+
+  it('sourceDot has initCam, initImage, initVideo, initScreen', () => {
+    const labels = sourceDot.map(c => c.label)
+    expect(labels).toContain('initCam')
+    expect(labels).toContain('initImage')
+    expect(labels).toContain('initVideo')
+    expect(labels).toContain('initScreen')
+  })
+
+  it('sourceDot entries have no sN. prefix (CM6 keeps typed prefix)', () => {
+    for (const c of sourceDot) {
+      expect(c.label).not.toMatch(/^s\d\./)
+    }
+  })
+
+  it('topLevel does NOT include s0.initCam (no duplication with sourceDot)', () => {
+    expect(topLevel.some(c => c.label === 's0.initCam')).toBe(false)
+    expect(topLevel.some(c => c.label === 's1.initCam')).toBe(false)
+    expect(topLevel.some(c => c.label === 'initCam')).toBe(false)
+  })
+
+  it('sourceDot entries have detail and section', () => {
+    for (const c of sourceDot) {
+      expect(typeof c.detail, `${c.label} missing detail`).toBe('string')
+      expect(typeof c.section, `${c.label} missing section`).toBe('string')
+    }
+  })
+
+  it('no duplicates in sourceDot', () => {
+    const labels = sourceDot.map(c => c.label)
+    expect(new Set(labels).size).toBe(labels.length)
+  })
+})

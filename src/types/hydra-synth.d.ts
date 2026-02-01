@@ -58,6 +58,9 @@ declare module 'hydra-synth' {
   type HydraOutput = Record<string, unknown>
   interface HydraExtSource {
     initCam: (index?: number) => void
+    initImage: (url?: string) => void
+    initVideo: (url?: string) => void
+    initScreen: () => void
   }
   interface HydraAudio {
     fft: number[]

@@ -312,6 +312,52 @@ describe('playerVisualizer hasHydraUpdate lifecycle', () => {
   })
 })
 
+describe('playerVisualizer allowCamera', () => {
+  it('should have allowCamera=false in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(state.allowCamera).toBe(false)
+  })
+
+  it('should set allowCamera=true via PLAYER_CMD_OPTIONS', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { allowCamera: true } },
+    })
+    expect(newState.allowCamera).toBe(true)
+  })
+
+  it('should preserve allowCamera when not specified in PLAYER_CMD_OPTIONS', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { allowCamera: true } },
+    })
+    const newState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { sensitivity: 0.5 } },
+    })
+    expect(newState.allowCamera).toBe(true)
+  })
+
+  it('should set allowCamera=false via PLAYER_CMD_OPTIONS', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { allowCamera: true } },
+    })
+    const newState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { allowCamera: false } },
+    })
+    expect(newState.allowCamera).toBe(false)
+  })
+})
+
 describe('playerVisualizer audioResponse', () => {
   it('should have audioResponse matching AUDIO_RESPONSE_DEFAULTS in initial state', async () => {
     const { default: reducer } = await import('./playerVisualizer')

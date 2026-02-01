@@ -8,6 +8,7 @@ import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisuali
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
 import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
+import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
 import StagePanel from '../components/StagePanel'
 import { type StageBuffer } from '../components/stagePanelUtils'
@@ -37,6 +38,7 @@ function OrchestratorView () {
   const [pendingRemoteCode, setPendingRemoteCode] = useState<string | null>(null)
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
   const [autoAudioOnSend, setAutoAudioOnSend] = useState(false)
+  const [activeTab, setActiveTab] = useState<'presets' | 'api'>('presets')
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
@@ -76,6 +78,21 @@ function OrchestratorView () {
   const handleToggleAutoAudio = useCallback(() => {
     setAutoAudioOnSend(prev => !prev)
   }, [])
+
+  const handleLoadPreset = useCallback((code: string) => {
+    setLocalCode(code)
+    setUserHasEdited(true)
+  }, [])
+
+  const handleSendPreset = useCallback((code: string) => {
+    setLocalCode(code)
+    setUserHasEdited(true)
+    const finalCode = autoAudioOnSend ? audioizeHydraCode(code) : code
+    dispatch({
+      type: VISUALIZER_HYDRA_CODE_REQ,
+      payload: { code: finalCode },
+    })
+  }, [dispatch, autoAudioOnSend])
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
@@ -163,7 +180,27 @@ function OrchestratorView () {
   return (
     <div className={styles.container}>
       <div className={styles.refPanel}>
-        <ApiReference />
+        <div className={styles.tabBar}>
+          <button
+            type='button'
+            className={`${styles.tab} ${activeTab === 'presets' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('presets')}
+          >
+            Presets
+          </button>
+          <button
+            type='button'
+            className={`${styles.tab} ${activeTab === 'api' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('api')}
+          >
+            API
+          </button>
+        </div>
+        <div className={styles.tabContent}>
+          {activeTab === 'presets'
+            ? <PresetBrowser onLoad={handleLoadPreset} onSend={handleSendPreset} />
+            : <ApiReference />}
+        </div>
       </div>
       {pendingRemoteCode && (
         <div className={styles.remoteBanner}>

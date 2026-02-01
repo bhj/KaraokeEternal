@@ -109,6 +109,7 @@ export interface PlaybackOptions {
     isEnabled?: boolean
     mode?: VisualizerMode
     audioResponse?: AudioResponseState
+    allowCamera?: boolean
   }
 }
 

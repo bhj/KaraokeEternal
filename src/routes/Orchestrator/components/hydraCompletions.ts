@@ -6,20 +6,30 @@ export interface HydraCompletion {
   section: string
 }
 
-export function buildHydraCompletions (): { topLevel: HydraCompletion[], dotChain: HydraCompletion[], nativeAudioDot: HydraCompletion[] } {
+export function buildHydraCompletions (): { topLevel: HydraCompletion[], dotChain: HydraCompletion[], nativeAudioDot: HydraCompletion[], sourceDot: HydraCompletion[] } {
   const topLevel: HydraCompletion[] = []
   const dotChain: HydraCompletion[] = []
+  const sourceDotSet = new Map<string, HydraCompletion>()
 
   for (const cat of HYDRA_REFERENCE) {
     for (const fn of cat.functions) {
       const sig = `(${fn.params.map(p => `${p.name}=${p.default}`).join(', ')})`
       if (fn.name.startsWith('.')) {
         dotChain.push({ label: fn.name, detail: sig, section: cat.label })
+      } else if (/^s[0-3]\./.test(fn.name)) {
+        // Camera/external source methods — extract method name without sN. prefix
+        const method = fn.name.replace(/^s[0-3]\./, '')
+        if (!sourceDotSet.has(method)) {
+          sourceDotSet.set(method, { label: method, detail: sig, section: cat.label })
+        }
+        // Do NOT add to topLevel — only available via sN. dot completion
       } else {
         topLevel.push({ label: fn.name, detail: sig, section: cat.label })
       }
     }
   }
+
+  const sourceDot = Array.from(sourceDotSet.values())
 
   // .out() is not in HYDRA_REFERENCE — add it
   dotChain.push({ label: '.out', detail: '(output=o0)', section: 'Output' })
@@ -52,5 +62,5 @@ export function buildHydraCompletions (): { topLevel: HydraCompletion[], dotChai
     { label: 'setScale', detail: '(v) → set scale', section: 'Audio' },
   ]
 
-  return { topLevel, dotChain, nativeAudioDot }
+  return { topLevel, dotChain, nativeAudioDot, sourceDot }
 }

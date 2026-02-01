@@ -1,4 +1,6 @@
 import { getSkipRegions, type SkipRegion } from 'lib/skipRegions'
+import { stripInjectedLines } from 'lib/injectedLines'
+import { DEFAULT_PROFILE, type AudioInjectProfile } from './audioInjectProfiles'
 
 const AUDIO_PATTERNS = [
   /bass\s*\(/, /mid\s*\(/, /treble\s*\(/, /beat\s*\(/,
@@ -45,7 +47,14 @@ function findRenderTarget (code: string, regions: readonly SkipRegion[]): string
   return target
 }
 
-export function audioizeHydraCode (code: string): string {
+export function audioizeHydraCode (code: string, profile?: AudioInjectProfile): string {
+  const p = profile ?? DEFAULT_PROFILE
+
+  // If a different profile is requested, strip existing injection first
+  if (profile) {
+    code = stripInjectedLines(code)
+  }
+
   // Single getSkipRegions call — reused by detection and injection
   const { regions, hasUnterminated } = getSkipRegions(code)
 
@@ -86,10 +95,11 @@ export function audioizeHydraCode (code: string): string {
   }
 
   const audioChain
-    = '\n  .modulate(osc(3, 0.05), () => a.fft[0] * 0.25)'
-      + '\n  .rotate(() => a.fft[1] * 0.08)'
-      + '\n  .scale(() => 0.95 + a.fft[2] * 0.08)'
-      + '\n  .color(1, 1 - a.fft[3] * 0.06, 1 + a.fft[3] * 0.06)'
+    = `\n  .modulate(osc(3, 0.05), () => a.fft[0] * ${p.modulate})`
+      + `\n  .rotate(() => a.fft[1] * ${p.rotate})`
+      + `\n  .scale(() => 0.95 + a.fft[2] * ${p.scale})`
+      + `\n  .color(1, 1 - a.fft[3] * ${p.colorShift}, 1 + a.fft[3] * ${p.colorShift})`
+      + '\n  '
 
   return code.slice(0, insertMatch.index) + audioChain + code.slice(insertMatch.index)
 }

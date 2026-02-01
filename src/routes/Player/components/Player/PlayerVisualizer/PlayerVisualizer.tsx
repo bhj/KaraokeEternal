@@ -14,6 +14,7 @@ interface PlayerVisualizerProps {
   mode: VisualizerMode
   hydraCode?: string
   audioResponse?: AudioResponseState
+  allowCamera?: boolean
 }
 
 function PlayerVisualizer ({
@@ -25,6 +26,7 @@ function PlayerVisualizer ({
   mode,
   hydraCode,
   audioResponse,
+  allowCamera,
 }: PlayerVisualizerProps) {
   if (mode !== 'hydra') {
     return null
@@ -41,6 +43,7 @@ function PlayerVisualizer ({
           height={height}
           code={hydraCode}
           audioResponse={audioResponse}
+          allowCamera={allowCamera}
         />
       </Suspense>
     </div>

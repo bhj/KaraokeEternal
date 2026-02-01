@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react'
 import Hydra from 'hydra-synth'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
 import { audioizeHydraCode } from './hooks/audioizeHydraCode'
+import { detectCameraUsage } from 'lib/detectCameraUsage'
 import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
 import type { AudioResponseState } from 'shared/types'
 import styles from './HydraVisualizer.css'
@@ -64,6 +65,8 @@ interface HydraVisualizerProps {
   /** Override container z-index for previews or overlays. */
   layer?: number
   audioResponse?: AudioResponseState
+  /** When true, auto-init camera for detected source usage */
+  allowCamera?: boolean
 }
 
 function HydraVisualizer ({
@@ -75,6 +78,7 @@ function HydraVisualizer ({
   code,
   layer,
   audioResponse,
+  allowCamera,
 }: HydraVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hydraRef = useRef<Hydra | null>(null)
@@ -85,6 +89,7 @@ function HydraVisualizer ({
   const widthRef = useRef(width)
   const heightRef = useRef(height)
   const codeRef = useRef(code)
+  const cameraInitRef = useRef<Set<string>>(new Set())
 
   const { update: updateAudio, closures, compat } = useHydraAudio(audioSourceNode, sensitivity, audioResponse)
 
@@ -149,14 +154,57 @@ function HydraVisualizer ({
     hydra.setResolution(width, height)
   }, [width, height])
 
+  // Camera auto-init: when allowCamera flips true, init camera for detected sources
+  useEffect(() => {
+    if (!allowCamera) {
+      cameraInitRef.current.clear()
+      return
+    }
+
+    const currentCode = codeRef.current ?? DEFAULT_PATCH
+    const { sources } = detectCameraUsage(currentCode)
+    const w = window as unknown as Record<string, unknown>
+
+    for (const src of sources) {
+      if (cameraInitRef.current.has(src)) continue
+      const extSrc = w[src] as { initCam?: (index?: number) => void } | undefined
+      if (extSrc?.initCam) {
+        try {
+          extSrc.initCam()
+          cameraInitRef.current.add(src)
+        } catch (err) {
+          warn('Camera init failed for', src, err)
+        }
+      }
+    }
+  }, [allowCamera])
+
   // Re-execute code when it changes
   useEffect(() => {
     const hydra = hydraRef.current
     if (!hydra) return
 
+    // Re-check camera init when code changes with camera enabled
+    if (allowCamera) {
+      const { sources } = detectCameraUsage(code ?? DEFAULT_PATCH)
+      const w = window as unknown as Record<string, unknown>
+      for (const src of sources) {
+        if (cameraInitRef.current.has(src)) continue
+        const extSrc = w[src] as { initCam?: (index?: number) => void } | undefined
+        if (extSrc?.initCam) {
+          try {
+            extSrc.initCam()
+            cameraInitRef.current.add(src)
+          } catch (err) {
+            warn('Camera init failed for', src, err)
+          }
+        }
+      }
+    }
+
     executeHydraCode(hydra, code ?? DEFAULT_PATCH)
     errorCountRef.current = 0
-  }, [code])
+  }, [code, allowCamera])
 
   // Animation tick
   const tick = useCallback((time: number) => {
