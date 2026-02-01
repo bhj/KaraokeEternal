@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isValidFftPayload, type FftPayload } from './fftPayload'
+import { isValidFftPayload, type FftPayload } from './fftPayload.js'
 
 describe('isValidFftPayload', () => {
   it('validates a correct payload', () => {
@@ -22,7 +22,7 @@ describe('isValidFftPayload', () => {
 
   it('rejects missing fields', () => {
     const invalid = {
-      fft: [],
+      fft: [] as number[],
       bass: 0.5,
       // missing others
     }

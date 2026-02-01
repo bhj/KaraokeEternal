@@ -43,7 +43,7 @@ export function filterPresets (
   activeTags: string[],
 ): PresetBrowserItem[] {
   const q = query.toLowerCase()
-  return items.filter(item => {
+  return items.filter((item) => {
     if (q && !item.sketchId.toLowerCase().includes(q)) return false
     if (activeTags.length > 0 && !activeTags.every(tag => item.tags.includes(tag))) return false
     return true

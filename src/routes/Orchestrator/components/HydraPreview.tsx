@@ -11,7 +11,7 @@ interface HydraPreviewProps {
 }
 
 // Convert FftPayload to AudioData format expected by HydraVisualizer
-function mapFftToAudioData(fft: { fft: number[]; bass: number; mid: number; treble: number; beat: number; energy: number; bpm: number; bright: number }): AudioData {
+function mapFftToAudioData (fft: { fft: number[], bass: number, mid: number, treble: number, beat: number, energy: number, bpm: number, bright: number }): AudioData {
   return {
     // Reconstruct full float arrays if needed, but for now just pass what we have.
     // HydraAudioCompat uses rawFrequencyData for fft[], and other props directly.

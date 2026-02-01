@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { HighlightStyle } from '@codemirror/language'
-import { hydraHighlightStyle, hydraHighlight } from './hydraHighlightStyle'
+import { hydraHighlightStyle, hydraExtensions } from './hydraHighlightStyle'
 
 describe('hydraHighlightStyle', () => {
   it('is a HighlightStyle instance', () => {
@@ -19,7 +19,8 @@ describe('hydraHighlightStyle', () => {
     expect(rules.length).toBeGreaterThan(0)
   })
 
-  it('exports hydraHighlight extension', () => {
-    expect(hydraHighlight).toBeDefined()
+  it('exports hydraExtensions array', () => {
+    expect(Array.isArray(hydraExtensions)).toBe(true)
+    expect(hydraExtensions.length).toBeGreaterThan(0)
   })
 })

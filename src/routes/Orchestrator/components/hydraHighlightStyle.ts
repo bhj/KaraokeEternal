@@ -49,11 +49,13 @@ export const hydraHighlighter = [
       constructor (view: EditorView) {
         this.decorations = this.build(view)
       }
+
       update (update: ViewUpdate) {
         if (update.docChanged || update.viewportChanged) {
           this.decorations = this.build(update.view)
         }
       }
+
       build (view: EditorView) {
         let deco = Decoration.none
         deco = hydraSourceMatcher.createDeco(view)

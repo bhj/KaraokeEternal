@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { HYDRA_SNIPPETS, type HydraSnippetCategory } from './hydraSnippets'
+import { HYDRA_SNIPPETS } from './hydraSnippets'
 
 describe('HYDRA_SNIPPETS', () => {
   it('has exactly 3 categories: Audio, Camera, Templates', () => {

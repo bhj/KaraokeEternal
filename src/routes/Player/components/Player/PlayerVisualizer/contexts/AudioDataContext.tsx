@@ -13,6 +13,7 @@ interface AudioDataContextValue {
 }
 
 const defaultAudioData: AudioData = {
+  rawFrequencyData: new Float32Array(64),
   frequencyData: new Float32Array(64),
   waveformData: new Float32Array(128),
   bass: 0,

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import Hydra from 'hydra-synth'
 import throttle from 'lodash/throttle'
 import { useDispatch } from 'react-redux'
@@ -110,7 +110,7 @@ function HydraVisualizer ({
   )
 
   // Throttle FFT emission to ~20Hz (50ms)
-  const emitFftData = useCallback(throttle((data: AudioData) => {
+  const emitFftData = useMemo(() => throttle((data: AudioData) => {
     // Send a condensed payload to save bandwidth
     const payload = {
       fft: Array.from(compat.fft), // Use the downsampled/smoothed FFT from compat
@@ -122,13 +122,19 @@ function HydraVisualizer ({
       bpm: data.beatFrequency,
       bright: data.spectralCentroid,
     }
-    
+
     dispatch({
       type: PLAYER_EMIT_FFT,
       payload,
       meta: { throttle: { wait: 50, leading: false } },
     })
   }, 50, { leading: false, trailing: true }), [dispatch, compat])
+
+  useEffect(() => {
+    return () => {
+      emitFftData.cancel()
+    }
+  }, [emitFftData])
 
   useEffect(() => {
     widthRef.current = width

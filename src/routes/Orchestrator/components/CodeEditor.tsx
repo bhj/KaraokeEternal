@@ -356,7 +356,11 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
     <div className={styles.container}>
       {showCameraBanner && (
         <div className={styles.cameraBanner}>
-          <span>This sketch uses camera source ({cameraUsage.sources.join(', ')})</span>
+          <span>
+            This sketch uses camera source (
+            {cameraUsage.sources.join(', ')}
+            )
+          </span>
           <button type='button' className={styles.cameraBannerEnable} onClick={handleEnableCamera}>
             Enable Camera
           </button>

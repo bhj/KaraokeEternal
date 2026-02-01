@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import combinedReducer from 'store/reducers'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
@@ -12,7 +12,7 @@ import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
 import StagePanel from '../components/StagePanel'
 import { type StageBuffer } from '../components/stagePanelUtils'
-import { getPreviewSize, shouldShowRefPanelToggle } from './orchestratorLayout'
+import { getPreviewSize } from './orchestratorLayout'
 import styles from './OrchestratorView.css'
 
 function OrchestratorView () {
