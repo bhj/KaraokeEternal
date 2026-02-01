@@ -35,32 +35,34 @@ describe('audioizeHydraCode', () => {
   })
 
   describe('render-aware injection', () => {
-    it('injects before .out() (no args, treated as o0)', () => {
+    it('injects 4-line audio chain before .out() (no args, treated as o0)', () => {
       const code = 'osc(10)\n  .out()'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
-      expect(result).toContain('.rotate(() => a.fft[1]')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
+      expect(result).toContain('.rotate(() => a.fft[1] * 0.08)')
+      expect(result).toContain('.scale(() => 0.95 + a.fft[2] * 0.08)')
+      expect(result).toContain('.color(1, 1 - a.fft[3] * 0.06, 1 + a.fft[3] * 0.06)')
       expect(result.indexOf('.modulate')).toBeLessThan(result.indexOf('.out()'))
     })
 
     it('injects before .out(o0)', () => {
       const code = 'osc(10)\n  .out(o0)'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       expect(result.indexOf('.modulate')).toBeLessThan(result.indexOf('.out(o0)'))
     })
 
     it('injects when no render() and single .out()', () => {
       const code = 'osc(10).color(1, 0.5, 0.3)\n  .out()'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
     })
 
     it('injects before last .out(o0) when no render() and multiple .out()', () => {
       const code = 'osc(10).out(o0)\nnoise(5).out(o1)'
       const result = audioizeHydraCode(code)
       // Should inject before .out(o0) — last match for default target o0
-      const modIdx = result.indexOf('.modulate(osc(3, 0.05)')
+      const modIdx = result.indexOf('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       const outO0Idx = result.indexOf('.out(o0)')
       expect(modIdx).toBeGreaterThan(-1)
       expect(modIdx).toBeLessThan(outO0Idx)
@@ -69,7 +71,7 @@ describe('audioizeHydraCode', () => {
     it('injects before .out(o0) when render(o0)', () => {
       const code = 'osc(10).out(o0)\nnoise(5).out(o1)\nrender(o0)'
       const result = audioizeHydraCode(code)
-      const modIdx = result.indexOf('.modulate(osc(3, 0.05)')
+      const modIdx = result.indexOf('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       const outO0Idx = result.indexOf('.out(o0)')
       expect(modIdx).toBeGreaterThan(-1)
       expect(modIdx).toBeLessThan(outO0Idx)
@@ -78,7 +80,7 @@ describe('audioizeHydraCode', () => {
     it('injects before .out(o1) when render(o1)', () => {
       const code = 'osc(10).out(o0)\nnoise(5).out(o1)\nrender(o1)'
       const result = audioizeHydraCode(code)
-      const modIdx = result.indexOf('.modulate(osc(3, 0.05)')
+      const modIdx = result.indexOf('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       const outO1Idx = result.indexOf('.out(o1)')
       expect(modIdx).toBeGreaterThan(-1)
       expect(modIdx).toBeLessThan(outO1Idx)
@@ -88,7 +90,7 @@ describe('audioizeHydraCode', () => {
       const code = 'osc(10).out(o0)\nnoise(5).out(o1)\nrender(o0)\nrender(o1)'
       const result = audioizeHydraCode(code)
       // Last render is o1, so inject before .out(o1)
-      const modIdx = result.indexOf('.modulate(osc(3, 0.05)')
+      const modIdx = result.indexOf('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       const outO1Idx = result.indexOf('.out(o1)')
       expect(modIdx).toBeGreaterThan(-1)
       expect(modIdx).toBeLessThan(outO1Idx)
@@ -130,7 +132,7 @@ describe('audioizeHydraCode', () => {
       const code = '// .out()\nosc(10).out()'
       const result = audioizeHydraCode(code)
       // Should inject before the real .out(), not the comment one
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       // The comment should be preserved
       expect(result).toContain('// .out()')
     })
@@ -138,39 +140,39 @@ describe('audioizeHydraCode', () => {
     it('.out() in /* block */ comment is ignored', () => {
       const code = '/* .out() */\nosc(10).out()'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       expect(result).toContain('/* .out() */')
     })
 
     it('.out() in single-quoted string is ignored', () => {
       const code = 'var x = \'.out()\'\nosc(10).out()'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
     })
 
     it('.out() in double-quoted string is ignored', () => {
       const code = 'var x = ".out()"\nosc(10).out()'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
     })
 
     it('.out() in template literal is ignored', () => {
       const code = 'var x = `.out()`\nosc(10).out()'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
     })
 
     it('.out() in string with escaped quotes is ignored', () => {
       const code = 'var x = "foo \\" .out() \\""\nosc(10).out()'
       const result = audioizeHydraCode(code)
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
     })
 
     it('render() in string literal is ignored', () => {
       const code = 'var x = "render(o2)"\nosc(10).out(o0)\nnoise(5).out(o1)'
       const result = audioizeHydraCode(code)
       // render(o2) is in string → target should be o0 (default)
-      const modIdx = result.indexOf('.modulate(osc(3, 0.05)')
+      const modIdx = result.indexOf('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
       const outO0Idx = result.indexOf('.out(o0)')
       expect(modIdx).toBeGreaterThan(-1)
       expect(modIdx).toBeLessThan(outO0Idx)
@@ -229,7 +231,7 @@ describe('audioizeHydraCode', () => {
       const code = 'var x = `result: ${osc(10).out()}`\nosc(5).out()'
       const result = audioizeHydraCode(code)
       // The real .out() outside the template should still be found
-      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
     })
   })
 

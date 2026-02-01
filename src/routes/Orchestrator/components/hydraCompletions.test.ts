@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { buildHydraCompletions } from './hydraCompletions'
 
 describe('buildHydraCompletions', () => {
-  const { topLevel, dotChain } = buildHydraCompletions()
+  const { topLevel, dotChain, nativeAudioDot } = buildHydraCompletions()
 
   it('topLevel includes 8 source functions', () => {
     const sources = ['osc', 'noise', 'voronoi', 'shape', 'gradient', 'solid', 'src', 'prev']
@@ -52,5 +52,20 @@ describe('buildHydraCompletions', () => {
   it('no duplicates in dotChain', () => {
     const labels = dotChain.map(c => c.label)
     expect(new Set(labels).size).toBe(labels.length)
+  })
+
+  it('nativeAudioDot has 4 entries for a. completions', () => {
+    expect(nativeAudioDot).toHaveLength(4)
+    const labels = nativeAudioDot.map(c => c.label)
+    expect(labels).toContain('fft')
+    expect(labels).toContain('setBins')
+    expect(labels).toContain('setSmooth')
+    expect(labels).toContain('setScale')
+  })
+
+  it('nativeAudioDot entries have no a. prefix (CM6 keeps typed prefix)', () => {
+    for (const c of nativeAudioDot) {
+      expect(c.label.startsWith('a.')).toBe(false)
+    }
   })
 })

@@ -88,6 +88,8 @@ export function audioizeHydraCode (code: string): string {
   const audioChain
     = '\n  .modulate(osc(3, 0.05), () => a.fft[0] * 0.25)'
       + '\n  .rotate(() => a.fft[1] * 0.08)'
+      + '\n  .scale(() => 0.95 + a.fft[2] * 0.08)'
+      + '\n  .color(1, 1 - a.fft[3] * 0.06, 1 + a.fft[3] * 0.06)'
 
   return code.slice(0, insertMatch.index) + audioChain + code.slice(insertMatch.index)
 }

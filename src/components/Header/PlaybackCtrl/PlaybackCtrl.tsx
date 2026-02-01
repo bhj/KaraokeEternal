@@ -113,9 +113,7 @@ const PlaybackCtrl = () => {
           onClose={toggleDisplayCtrl}
           onRequestOptions={handleOptions}
           sensitivity={status.visualizer.sensitivity}
-          visualizerPresetName={status.visualizer.mode === 'hydra'
-            ? (status.visualizer.hydraPresetName ?? '')
-            : (status.visualizer.presetName ?? '')}
+          visualizerPresetName={status.visualizer.hydraPresetName ?? ''}
           visualizerMode={status.visualizer.mode}
           audioResponse={{ ...AUDIO_RESPONSE_DEFAULTS, ...status.visualizer.audioResponse }}
           onHydraPresetChange={handleHydraPresetChange}

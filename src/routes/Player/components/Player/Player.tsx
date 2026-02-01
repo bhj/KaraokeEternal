@@ -145,8 +145,6 @@ class Player extends React.Component<PlayerProps> {
             <PlayerVisualizer
               audioSourceNode={this.state.visualizerAudioSourceNode}
               isPlaying={this.props.isPlaying}
-              onError={this.props.onError}
-              presetKey={this.props.visualizer.presetKey}
               sensitivity={this.props.visualizer.sensitivity}
               width={this.props.width}
               height={this.props.height}

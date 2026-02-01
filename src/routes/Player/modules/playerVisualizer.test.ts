@@ -9,21 +9,18 @@ import {
 import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 
 /**
- * Tests for the extended playerVisualizer module.
+ * Tests for the playerVisualizer module.
  * TDD: These tests define the expected behavior for visualizer features:
- * - Multiple visualizer modes (hydra, milkdrop)
+ * - Visualizer modes (hydra, off) — milkdrop removed
  */
 
 export type VisualizerMode
   = | 'hydra' // Hydra video synth
-    | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 
 interface PlayerVisualizerState {
   isEnabled: boolean
   isSupported: boolean
-  presetKey: string
-  presetName: string
   sensitivity: number
   mode: VisualizerMode
 }
@@ -31,8 +28,6 @@ interface PlayerVisualizerState {
 const initialState: PlayerVisualizerState = {
   isEnabled: true,
   isSupported: true,
-  presetKey: '',
-  presetName: '',
   sensitivity: 1,
   mode: 'hydra',
 }
@@ -40,9 +35,6 @@ const initialState: PlayerVisualizerState = {
 interface ExtendedVisualizerOptions {
   sensitivity?: number
   isEnabled?: boolean
-  nextPreset?: boolean
-  prevPreset?: boolean
-  randomPreset?: boolean
   mode?: VisualizerMode
 }
 
@@ -56,8 +48,6 @@ const expectedReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(playerLoad, state => ({
       ...state,
-      presetKey: 'randomPreset',
-      presetName: '[1/100] randomPreset',
     }))
     .addCase(playerCmdOptions, (state, { payload }) => {
       const { visualizer } = payload
@@ -85,13 +75,6 @@ describe('playerVisualizer reducer - Extended Features', () => {
   })
 
   describe('Visualizer mode changes', () => {
-    it('should change mode to "milkdrop" (legacy Butterchurn)', () => {
-      const state = expectedReducer(initialState, playerCmdOptions({
-        visualizer: { mode: 'milkdrop' },
-      }))
-      expect(state.mode).toBe('milkdrop')
-    })
-
     it('should change mode to "off"', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
         visualizer: { mode: 'off' },
@@ -100,11 +83,11 @@ describe('playerVisualizer reducer - Extended Features', () => {
     })
 
     it('should preserve mode when not specified', () => {
-      const stateWithMilkdrop = { ...initialState, mode: 'milkdrop' as VisualizerMode }
-      const state = expectedReducer(stateWithMilkdrop, playerCmdOptions({
+      const stateWithOff = { ...initialState, mode: 'off' as VisualizerMode }
+      const state = expectedReducer(stateWithOff, playerCmdOptions({
         visualizer: { sensitivity: 0.5 },
       }))
-      expect(state.mode).toBe('milkdrop')
+      expect(state.mode).toBe('off')
     })
   })
 
@@ -112,21 +95,21 @@ describe('playerVisualizer reducer - Extended Features', () => {
     it('should update multiple settings at once', () => {
       const state = expectedReducer(initialState, playerCmdOptions({
         visualizer: {
-          mode: 'milkdrop',
+          mode: 'off',
           sensitivity: 0.8,
         },
       }))
-      expect(state.mode).toBe('milkdrop')
+      expect(state.mode).toBe('off')
       expect(state.sensitivity).toBe(0.8)
     })
 
     it('should preserve existing isEnabled when updating other settings', () => {
       const stateDisabled = { ...initialState, isEnabled: false }
       const state = expectedReducer(stateDisabled, playerCmdOptions({
-        visualizer: { mode: 'milkdrop' },
+        visualizer: { mode: 'off' },
       }))
       expect(state.isEnabled).toBe(false)
-      expect(state.mode).toBe('milkdrop')
+      expect(state.mode).toBe('off')
     })
   })
 
@@ -134,11 +117,11 @@ describe('playerVisualizer reducer - Extended Features', () => {
     it('should preserve new settings when visualizer error occurs', () => {
       const stateWithSettings = {
         ...initialState,
-        mode: 'milkdrop' as VisualizerMode,
+        mode: 'off' as VisualizerMode,
       }
       const state = expectedReducer(stateWithSettings, playerVisualizerError('WebGL error'))
       expect(state.isSupported).toBe(false)
-      expect(state.mode).toBe('milkdrop')
+      expect(state.mode).toBe('off')
     })
   })
 })
@@ -158,9 +141,19 @@ describe('playerVisualizer actual implementation', () => {
     const state = reducer(undefined, { type: '@@INIT' })
     const newState = reducer(state, {
       type: PLAYER_CMD_OPTIONS,
-      payload: { visualizer: { mode: 'milkdrop' } },
+      payload: { visualizer: { mode: 'off' } },
     })
-    expect(newState.mode).toBe('milkdrop')
+    expect(newState.mode).toBe('off')
+  })
+
+  it('should guard unknown modes to hydra', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { mode: 'milkdrop' as never } },
+    })
+    expect(newState.mode).toBe('hydra')
   })
 
   it('should have hydraCode equal to getDefaultPreset() in initial state', async () => {
@@ -268,6 +261,13 @@ describe('playerVisualizer actual implementation', () => {
     // Hydra preset should NOT change on player load
     expect(newState.hydraPresetIndex).toBe(initialIdx)
   })
+
+  it('should not have presetKey or presetName in state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect('presetKey' in state).toBe(false)
+    expect('presetName' in state).toBe(false)
+  })
 })
 
 describe('playerVisualizer hasHydraUpdate lifecycle', () => {
@@ -298,8 +298,6 @@ describe('playerVisualizer hasHydraUpdate lifecycle', () => {
     const { getDefaultPreset } = await import('routes/Orchestrator/components/hydraPresets')
     const state = reducer(undefined, { type: '@@INIT' })
     const newState = reducer(state, { type: PLAYER_LOAD })
-    // getRandomPreset() must only return { presetKey, presetName }.
-    // hydraCode should be preserved (default preset code).
     expect(newState.hydraCode).toBe(getDefaultPreset())
   })
 
@@ -309,7 +307,7 @@ describe('playerVisualizer hasHydraUpdate lifecycle', () => {
     state = reducer(state, { type: VISUALIZER_HYDRA_CODE, payload: { code: 'osc(10).out()' } })
     expect(state.hydraCode).toBe('osc(10).out()')
     state = reducer(state, { type: PLAYER_LOAD })
-    // hydraCode should be preserved (not wiped) — getRandomPreset() doesn't return hydraCode
+    // hydraCode should be preserved (not wiped)
     expect(state.hydraCode).toBe('osc(10).out()')
   })
 })

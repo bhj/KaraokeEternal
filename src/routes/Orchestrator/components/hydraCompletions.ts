@@ -6,7 +6,7 @@ export interface HydraCompletion {
   section: string
 }
 
-export function buildHydraCompletions (): { topLevel: HydraCompletion[], dotChain: HydraCompletion[] } {
+export function buildHydraCompletions (): { topLevel: HydraCompletion[], dotChain: HydraCompletion[], nativeAudioDot: HydraCompletion[] } {
   const topLevel: HydraCompletion[] = []
   const dotChain: HydraCompletion[] = []
 
@@ -44,5 +44,13 @@ export function buildHydraCompletions (): { topLevel: HydraCompletion[], dotChai
     topLevel.push({ label: entry.label, detail: entry.detail, section: 'Audio' })
   }
 
-  return { topLevel, dotChain }
+  // Completions for `a.` prefix — labels without `a.` since CM6 keeps typed prefix
+  const nativeAudioDot: HydraCompletion[] = [
+    { label: 'fft', detail: '[n] → 0–1 frequency bin', section: 'Audio' },
+    { label: 'setBins', detail: '(n) → set bin count', section: 'Audio' },
+    { label: 'setSmooth', detail: '(v) → set smoothing', section: 'Audio' },
+    { label: 'setScale', detail: '(v) → set scale', section: 'Audio' },
+  ]
+
+  return { topLevel, dotChain, nativeAudioDot }
 }

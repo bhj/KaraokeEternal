@@ -128,8 +128,6 @@
     "@typescript-eslint/parser": "^8.18.2",
     "babel-loader": "^10.0.0",
     "blueimp-load-image": "^5.16.0",
-    "butterchurn": "^3.0.0-beta.4",
-    "butterchurn-presets": "^3.0.0-beta.4",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "cdgraphics": "^7.0.0",
     "clsx": "^2.1.1",

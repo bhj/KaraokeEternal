@@ -30,7 +30,6 @@ interface DisplayCtrlProps {
 // Visualizer mode options
 const VISUALIZER_MODES: { value: VisualizerMode, label: string }[] = [
   { value: 'hydra', label: 'Hydra' },
-  { value: 'milkdrop', label: 'Milkdrop' },
   { value: 'off', label: 'Off' },
 ]
 
@@ -67,29 +66,9 @@ const DisplayCtrl = ({
     visualizer: { isEnabled: !isVisualizerEnabled },
   })
 
-  const handlePresetNext = () => {
-    if (visualizerMode === 'hydra') {
-      onHydraPresetChange('next')
-    } else {
-      onRequestOptions({ visualizer: { nextPreset: true } })
-    }
-  }
-
-  const handlePresetPrev = () => {
-    if (visualizerMode === 'hydra') {
-      onHydraPresetChange('prev')
-    } else {
-      onRequestOptions({ visualizer: { prevPreset: true } })
-    }
-  }
-
-  const handlePresetRandom = () => {
-    if (visualizerMode === 'hydra') {
-      onHydraPresetChange('random')
-    } else {
-      onRequestOptions({ visualizer: { randomPreset: true } })
-    }
-  }
+  const handlePresetNext = () => onHydraPresetChange('next')
+  const handlePresetPrev = () => onHydraPresetChange('prev')
+  const handlePresetRandom = () => onHydraPresetChange('random')
 
   const handleModeChange = (mode: VisualizerMode) => onRequestOptions({
     visualizer: { mode },
@@ -101,8 +80,8 @@ const DisplayCtrl = ({
   const handleResetAudioResponse = () =>
     onRequestOptions({ visualizer: { audioResponse: AUDIO_RESPONSE_DEFAULTS } })
 
-  // Show preset controls for milkdrop and hydra modes
-  const showPresets = visualizerMode === 'milkdrop' || visualizerMode === 'hydra'
+  // Show preset controls for hydra mode
+  const showPresets = visualizerMode === 'hydra'
   const showAudioResponse = visualizerMode === 'hydra'
 
   return (

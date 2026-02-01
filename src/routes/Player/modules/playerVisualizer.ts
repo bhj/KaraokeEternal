@@ -1,5 +1,4 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import presets from 'butterchurn-presets/all'
 import {
   PLAYER_CMD_OPTIONS,
   PLAYER_LOAD,
@@ -9,20 +8,6 @@ import {
 import type { AudioResponseState, PlaybackOptions, VisualizerMode } from 'shared/types'
 import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 import { getDefaultPreset, getDefaultPresetIndex, getPresetLabel } from 'routes/Orchestrator/components/hydraPresets'
-
-const BAD_PRESETS = [
-  'Flexi + Martin - astral projection',
-  'Rovastar & Loadus + Zylot - FractalDrop (Spark Machine v2.0)',
-]
-
-const _presetKeys = Object.keys(presets).filter(key => !BAD_PRESETS.includes(key))
-
-const getPreset = (i: number) => ({
-  presetKey: _presetKeys[i],
-  presetName: `[${i + 1}/${_presetKeys.length}] ` + _presetKeys[i],
-})
-
-const getRandomPreset = () => getPreset(Math.floor(Math.random() * (_presetKeys.length - 1)))
 
 // ------------------------------------
 // Actions
@@ -38,8 +23,6 @@ export const playerVisualizerError = createAction<string>(PLAYER_VISUALIZER_ERRO
 export interface PlayerVisualizerState {
   isEnabled: boolean
   isSupported: boolean
-  presetKey: string
-  presetName: string
   sensitivity: number
   mode: VisualizerMode
   hydraCode?: string
@@ -54,7 +37,6 @@ const _defaultHydraIndex = getDefaultPresetIndex()
 const initialState: PlayerVisualizerState = {
   isEnabled: true,
   isSupported: true,
-  ...getRandomPreset(),
   sensitivity: 1,
   mode: 'hydra',
   hydraCode: getDefaultPreset(),
@@ -64,36 +46,27 @@ const initialState: PlayerVisualizerState = {
   audioResponse: { ...AUDIO_RESPONSE_DEFAULTS },
 }
 
+/** Guard: only allow valid modes */
+function validMode (mode: VisualizerMode | undefined, fallback: VisualizerMode): VisualizerMode {
+  if (mode === 'hydra' || mode === 'off') return mode
+  return fallback
+}
+
 const playerVisualizerReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(playerLoad, state => ({
       ...state,
-      // Randomize Milkdrop preset on load; Hydra presets only change via server broadcast
-      ...getRandomPreset(),
       hasHydraUpdate: false,
     }))
     .addCase(playerCmdOptions, (state, { payload }) => {
       const { visualizer } = payload
       if (typeof visualizer !== 'object') return state
 
-      let preset = {}
-
-      if (visualizer.nextPreset || visualizer.prevPreset) {
-        const curIdx = _presetKeys.indexOf(state.presetKey)
-        const nextIdx = curIdx === _presetKeys.length - 1 ? 0 : curIdx + 1 // wrap around
-        const prevIdx = curIdx === 0 ? _presetKeys.length - 1 : curIdx - 1 // wrap around
-
-        preset = getPreset(visualizer.nextPreset ? nextIdx : visualizer.prevPreset ? prevIdx : curIdx)
-      } else if (visualizer.randomPreset) {
-        preset = getRandomPreset()
-      }
-
       return {
         ...state,
-        ...preset,
         isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
-        mode: visualizer.mode ?? state.mode,
+        mode: validMode(visualizer.mode, state.mode),
         audioResponse: visualizer.audioResponse
           ? { ...AUDIO_RESPONSE_DEFAULTS, ...visualizer.audioResponse }
           : state.audioResponse,

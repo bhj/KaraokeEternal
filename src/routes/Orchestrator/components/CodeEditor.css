@@ -61,6 +61,36 @@
   border-color: rgba(212, 160, 23, 0.5);
 }
 
+.autoAudioButton {
+  padding: 6px 12px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.autoAudioButton:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+.autoOnSend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.autoOnSend input {
+  cursor: pointer;
+}
+
 .sendButton {
   padding: 6px 16px;
   background: #238636;

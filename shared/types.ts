@@ -98,7 +98,6 @@ export interface UserWithRole extends User {
 
 export type VisualizerMode
   = 'hydra' // Hydra video synth
-    | 'milkdrop' // Legacy Butterchurn (fallback)
     | 'off'
 
 export interface PlaybackOptions {
@@ -108,9 +107,6 @@ export interface PlaybackOptions {
   visualizer?: {
     sensitivity?: number
     isEnabled?: boolean
-    nextPreset?: boolean
-    prevPreset?: boolean
-    randomPreset?: boolean
     mode?: VisualizerMode
     audioResponse?: AudioResponseState
   }

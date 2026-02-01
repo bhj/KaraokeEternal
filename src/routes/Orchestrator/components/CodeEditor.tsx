@@ -10,7 +10,7 @@ import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
 import styles from './CodeEditor.css'
 
-const { topLevel, dotChain } = buildHydraCompletions()
+const { topLevel, dotChain, nativeAudioDot } = buildHydraCompletions()
 
 const hydraTheme = EditorView.theme({
   '&': {
@@ -60,6 +60,19 @@ const hydraTheme = EditorView.theme({
 })
 
 function hydraAutocomplete (context: CompletionContext): CompletionResult | null {
+  // Special case: `a.` native audio API — must come before generic dot-chain
+  const audioDotMatch = context.matchBefore(/\ba\.\w*/)
+  if (audioDotMatch) {
+    return {
+      from: audioDotMatch.from + 2,
+      options: nativeAudioDot.map(c => ({
+        label: c.label,
+        detail: c.detail,
+        section: c.section,
+      })),
+    }
+  }
+
   // Dot-chain: triggered after a dot
   const dotMatch = context.matchBefore(/\.\w*/)
   if (dotMatch) {
@@ -104,9 +117,12 @@ interface CodeEditorProps {
   onCodeChange: (code: string) => void
   onSend: (code: string) => void
   onRandomize: () => void
+  onAutoAudio: () => void
+  autoAudioOnSend: boolean
+  onToggleAutoAudio: () => void
 }
 
-function CodeEditor ({ code, onCodeChange, onSend, onRandomize }: CodeEditorProps) {
+function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, autoAudioOnSend, onToggleAutoAudio }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onCodeChangeRef = useRef(onCodeChange)
@@ -192,6 +208,13 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize }: CodeEditorProp
         <button type='button' className={styles.randomButton} onClick={onRandomize}>
           Random
         </button>
+        <button type='button' className={styles.autoAudioButton} onClick={onAutoAudio}>
+          Auto Audio
+        </button>
+        <label className={styles.autoOnSend} title='Auto-inject audio reactivity before sending'>
+          <input type='checkbox' checked={autoAudioOnSend} onChange={onToggleAutoAudio} />
+          Auto on Send
+        </label>
         <button type='button' className={styles.sendButton} onClick={handleSend}>
           Send
         </button>

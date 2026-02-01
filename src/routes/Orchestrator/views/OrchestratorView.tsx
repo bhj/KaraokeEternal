@@ -36,16 +36,18 @@ function OrchestratorView () {
   const [userHasEdited, setUserHasEdited] = useState(false)
   const [pendingRemoteCode, setPendingRemoteCode] = useState<string | null>(null)
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
+  const [autoAudioOnSend, setAutoAudioOnSend] = useState(false)
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
 
   const handleSendCode = useCallback((code: string) => {
+    const finalCode = autoAudioOnSend ? audioizeHydraCode(code) : code
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code },
+      payload: { code: finalCode },
     })
-  }, [dispatch])
+  }, [dispatch, autoAudioOnSend])
 
   const handleCodeChange = useCallback((code: string) => {
     setUserHasEdited(true)
@@ -61,6 +63,18 @@ function OrchestratorView () {
     const sketch = getRandomSketch()
     setLocalCode(sketch)
     setUserHasEdited(true)
+  }, [])
+
+  const handleAutoAudio = useCallback(() => {
+    const audioized = audioizeHydraCode(localCode)
+    if (audioized !== localCode) {
+      setLocalCode(audioized)
+      setUserHasEdited(true)
+    }
+  }, [localCode])
+
+  const handleToggleAutoAudio = useCallback(() => {
+    setAutoAudioOnSend(prev => !prev)
   }, [])
 
   const handleApplyRemote = useCallback(() => {
@@ -100,9 +114,10 @@ function OrchestratorView () {
 
     if (!userHasEdited) return
 
-    // Audioize remote code before comparison so injection-only diffs don't trigger banner
+    // Audioize both sides before comparison so injection-only diffs don't trigger banner
     const normalizedRemote = remoteHydraCode ? audioizeHydraCode(remoteHydraCode) : null
-    const pending = getPendingRemote(normalizedRemote, localCode, userHasEdited)
+    const normalizedLocal = audioizeHydraCode(localCode)
+    const pending = getPendingRemote(normalizedRemote, normalizedLocal, userHasEdited)
     if (pending === null) return
 
     // Schedule state update asynchronously (external system sync pattern)
@@ -178,6 +193,9 @@ function OrchestratorView () {
           onCodeChange={handleCodeChange}
           onSend={handleSendCode}
           onRandomize={handleRandomize}
+          onAutoAudio={handleAutoAudio}
+          autoAudioOnSend={autoAudioOnSend}
+          onToggleAutoAudio={handleToggleAutoAudio}
         />
       </div>
     </div>
