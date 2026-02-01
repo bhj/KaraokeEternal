@@ -163,10 +163,11 @@ describe('playerVisualizer actual implementation', () => {
     expect(newState.mode).toBe('milkdrop')
   })
 
-  it('should have no hydraCode in initial state', async () => {
+  it('should have hydraCode equal to getDefaultPreset() in initial state', async () => {
     const { default: reducer } = await import('./playerVisualizer')
+    const { getDefaultPreset } = await import('routes/Orchestrator/components/hydraPresets')
     const state = reducer(undefined, { type: '@@INIT' })
-    expect(state.hydraCode).toBeUndefined()
+    expect(state.hydraCode).toBe(getDefaultPreset())
   })
 
   it('should update hydraCode via VISUALIZER_HYDRA_CODE', async () => {
@@ -292,13 +293,14 @@ describe('playerVisualizer hasHydraUpdate lifecycle', () => {
     expect(state.hasHydraUpdate).toBe(false)
   })
 
-  it('PLAYER_LOAD should not introduce hydraCode (getRandomPreset guard)', async () => {
+  it('PLAYER_LOAD should preserve initial hydraCode (getRandomPreset guard)', async () => {
     const { default: reducer } = await import('./playerVisualizer')
+    const { getDefaultPreset } = await import('routes/Orchestrator/components/hydraPresets')
     const state = reducer(undefined, { type: '@@INIT' })
     const newState = reducer(state, { type: PLAYER_LOAD })
     // getRandomPreset() must only return { presetKey, presetName }.
-    // If this fails, update PLAYER_LOAD handler to explicitly handle hydraCode.
-    expect(newState.hydraCode).toBeUndefined()
+    // hydraCode should be preserved (default preset code).
+    expect(newState.hydraCode).toBe(getDefaultPreset())
   })
 
   it('PLAYER_LOAD should preserve existing hydraCode', async () => {

@@ -8,7 +8,7 @@ import {
 } from 'shared/actionTypes'
 import type { AudioResponseState, PlaybackOptions, VisualizerMode } from 'shared/types'
 import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
-import { getDefaultPresetIndex, getPresetLabel } from 'routes/Orchestrator/components/hydraPresets'
+import { getDefaultPreset, getDefaultPresetIndex, getPresetLabel } from 'routes/Orchestrator/components/hydraPresets'
 
 const BAD_PRESETS = [
   'Flexi + Martin - astral projection',
@@ -57,6 +57,7 @@ const initialState: PlayerVisualizerState = {
   ...getRandomPreset(),
   sensitivity: 1,
   mode: 'hydra',
+  hydraCode: getDefaultPreset(),
   hydraPresetIndex: _defaultHydraIndex,
   hydraPresetName: getPresetLabel(_defaultHydraIndex),
   hasHydraUpdate: false,

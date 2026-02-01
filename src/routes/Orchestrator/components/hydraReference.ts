@@ -23,6 +23,10 @@ export const AUDIO_REFERENCE: AudioRef[] = [
   { name: 'energy()', range: '0–1 RMS', description: 'Overall loudness' },
   { name: 'bpm()', range: '0–1 tempo', description: 'Tempo estimate (0.5 ≈ 120)' },
   { name: 'bright()', range: '0–1', description: 'Spectral brightness' },
+  { name: 'a.fft[n]', range: '0–1', description: 'Native frequency bin (0=bass)' },
+  { name: 'a.setBins(n)', range: '1–128', description: 'Set FFT bin count' },
+  { name: 'a.setSmooth(v)', range: '0–1', description: 'Set temporal smoothing' },
+  { name: 'a.setScale(v)', range: '0–10', description: 'Set amplitude scale' },
 ]
 
 export const HYDRA_REFERENCE: HydraRefCategory[] = [

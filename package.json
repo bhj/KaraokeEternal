@@ -55,6 +55,13 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/commands": "^6.10.1",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/lint": "^6.9.3",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.12",
     "@jcoreio/async-throttle": "^1.7.0",
     "@koa/router": "^13.1.1",
     "bcrypt": "^5.1.1",

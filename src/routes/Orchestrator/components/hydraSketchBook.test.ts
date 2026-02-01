@@ -16,6 +16,10 @@ describe('hydraSketchBook', () => {
     it('contains .out( (valid Hydra output)', () => {
       expect(DEFAULT_SKETCH).toContain('.out(')
     })
+
+    it('contains a.fft (audio injection visible)', () => {
+      expect(DEFAULT_SKETCH).toContain('a.fft')
+    })
   })
 
   describe('getRandomSketch', () => {

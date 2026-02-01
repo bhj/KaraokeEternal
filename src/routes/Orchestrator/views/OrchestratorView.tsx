@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
+import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioizeHydraCode'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
 import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
@@ -64,7 +65,7 @@ function OrchestratorView () {
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
-      setLocalCode(pendingRemoteCode)
+      setLocalCode(audioizeHydraCode(pendingRemoteCode))
     }
     setPendingRemoteCode(null)
     setPendingRemoteCount(0)
@@ -80,6 +81,18 @@ function OrchestratorView () {
     dispatch(sliceInjectNoOp())
   }
 
+  // Sync remote code to local (audioized) before user edits — runs once per remote change
+  useEffect(() => {
+    if (userHasEdited) return
+    if (!remoteHydraCode || remoteHydraCode.trim() === '') return
+    const audioized = audioizeHydraCode(remoteHydraCode)
+    if (audioized === localCode) return
+    const id = requestAnimationFrame(() => {
+      setLocalCode(audioized)
+    })
+    return () => cancelAnimationFrame(id)
+  }, [remoteHydraCode, userHasEdited, localCode])
+
   // Track remote code changes — uses async callback to satisfy lint
   useEffect(() => {
     if (remoteHydraCode === prevRemoteRef.current) return
@@ -87,7 +100,9 @@ function OrchestratorView () {
 
     if (!userHasEdited) return
 
-    const pending = getPendingRemote(remoteHydraCode, localCode, userHasEdited)
+    // Audioize remote code before comparison so injection-only diffs don't trigger banner
+    const normalizedRemote = remoteHydraCode ? audioizeHydraCode(remoteHydraCode) : null
+    const pending = getPendingRemote(normalizedRemote, localCode, userHasEdited)
     if (pending === null) return
 
     // Schedule state update asynchronously (external system sync pattern)
@@ -106,7 +121,7 @@ function OrchestratorView () {
     if (!shouldAutoApplyPreset(prevIdx, remotePresetIndex, userHasEdited, remoteHydraCode)) return
 
     const id = requestAnimationFrame(() => {
-      setLocalCode(remoteHydraCode!)
+      setLocalCode(audioizeHydraCode(remoteHydraCode!))
       setUserHasEdited(false)
       setPendingRemoteCode(null)
       setPendingRemoteCount(0)

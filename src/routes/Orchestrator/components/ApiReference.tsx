@@ -28,6 +28,16 @@ function ApiReference () {
             <span className={styles.audioDesc}>{ref.description}</span>
           </div>
         ))}
+        <div className={styles.autoAudioNote}>
+          {'Non-audio sketches get .modulate + .rotate lines injected with a.fft values. '
+            + 'The injected code is shown in the editor. Sending from the Orchestrator '
+            + 'broadcasts the editor contents (including injected lines) to all connected '
+            + 'players. Deleting the injected lines disables auto-audio for the current '
+            + 'session, but incoming remote updates or preset changes will re-inject. '
+            + 'To permanently disable, add an explicit audio call (e.g. a.fft[0]) '
+            + 'anywhere in the sketch. The preview uses simulated audio, so injected '
+            + 'lines produce visible movement even without music.'}
+        </div>
       </div>
 
       {HYDRA_REFERENCE.map(cat => (

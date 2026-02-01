@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { audioizeHydraCode, getSkipRegions, hasAudioUsage } from './audioizeHydraCode'
+import { getSkipRegions } from 'lib/skipRegions'
+import { audioizeHydraCode, hasAudioUsage } from './audioizeHydraCode'
 import { HYDRA_GALLERY } from 'routes/Orchestrator/components/hydraGallery'
 import { decodeSketch, getPresetByIndex, getPresetCount } from 'routes/Orchestrator/components/hydraPresets'
 
@@ -38,7 +39,7 @@ describe('audioizeHydraCode', () => {
       const code = 'osc(10)\n  .out()'
       const result = audioizeHydraCode(code)
       expect(result).toContain('.modulate(osc(3, 0.05)')
-      expect(result).toContain('.rotate(() => mid()')
+      expect(result).toContain('.rotate(() => a.fft[1]')
       expect(result.indexOf('.modulate')).toBeLessThan(result.indexOf('.out()'))
     })
 
@@ -112,8 +113,15 @@ describe('audioizeHydraCode', () => {
     })
 
     it('does not double-inject (already-audioized code)', () => {
-      const code = 'osc(10)\n  .modulate(osc(3, 0.05), () => bass() * 0.15)\n  .out()'
+      const code = 'osc(10)\n  .modulate(osc(3, 0.05), () => a.fft[0] * 0.25)\n  .out()'
       expect(audioizeHydraCode(code)).toBe(code)
+    })
+
+    it('is idempotent (audioize(audioize(code)) === audioize(code))', () => {
+      const code = 'osc(10)\n  .out()'
+      const once = audioizeHydraCode(code)
+      const twice = audioizeHydraCode(once)
+      expect(twice).toBe(once)
     })
   })
 
