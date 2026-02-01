@@ -272,7 +272,7 @@ function OrchestratorView () {
             onClick={() => setActiveMobileTab('ref')}
           >
             <span className={styles.mobileTabIcon}>{'\u2630'}</span>
-            <span>Library</span>
+            <span>Presets</span>
           </button>
         </div>
       )}

@@ -44,6 +44,7 @@ function PlayerVisualizer ({
           code={hydraCode}
           audioResponse={audioResponse}
           allowCamera={allowCamera}
+          emitFft={true}
         />
       </Suspense>
     </div>

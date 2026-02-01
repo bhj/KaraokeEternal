@@ -1,5 +1,6 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { type PlayerVisualizerState } from 'routes/Player/modules/playerVisualizer'
+import { type FftPayload } from 'shared/fftPayload'
 import {
   PLAYER_CMD_OPTIONS,
   PLAYER_REQ_NEXT,
@@ -9,6 +10,7 @@ import {
   PLAYER_REQ_REPLAY,
   PLAYER_REQ_VOLUME,
   PLAYER_STATUS,
+  PLAYER_FFT,
   PLAYER_LEAVE,
 } from 'shared/actionTypes'
 import { MediaType, PlaybackOptions } from 'shared/types'
@@ -20,6 +22,7 @@ export interface StatusState {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
+  fftData: FftPayload | null
   historyJSON: string // queueIds in JSON array
   isAtQueueEnd: boolean
   isErrored: boolean
@@ -40,6 +43,7 @@ const initialState: StatusState = {
   cdgAlpha: 0,
   cdgSize: 0.8,
   errorMessage: '',
+  fftData: null,
   historyJSON: '[]',
   isAtQueueEnd: false,
   isErrored: false,
@@ -59,6 +63,7 @@ const initialState: StatusState = {
 // Internal action creators for extraReducers (defined before slice)
 const playerLeaveInternal = createAction(PLAYER_LEAVE)
 const playerStatusInternal = createAction<Partial<StatusState>>(PLAYER_STATUS)
+const playerFftInternal = createAction<FftPayload>(PLAYER_FFT)
 const playerCmdOptionsInternal = createAction<{ visualizer?: Partial<PlayerVisualizerState> }>(PLAYER_CMD_OPTIONS)
 
 const statusSlice = createSlice({
@@ -69,14 +74,19 @@ const statusSlice = createSlice({
     builder
       .addCase(playerLeaveInternal, (state) => {
         state.isPlayerPresent = false
+        state.fftData = null
       })
       .addCase(playerStatusInternal, (state, action: PayloadAction<Partial<StatusState>>) => ({
         ...state,
         ...action.payload,
         isPlayerPresent: true,
       }))
+      .addCase(playerFftInternal, (state, action: PayloadAction<FftPayload>) => {
+        state.fftData = action.payload
+      })
       .addCase(
         playerCmdOptionsInternal,
+
         (state, action: PayloadAction<{ visualizer?: Partial<PlayerVisualizerState> }>) => {
           const { payload } = action
           if (payload.visualizer && typeof payload.visualizer === 'object') {

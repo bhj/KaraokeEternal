@@ -6,7 +6,7 @@ import { autocompletion, type CompletionContext, type CompletionResult } from '@
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { indentUnit } from '@codemirror/language'
-import { hydraHighlight } from './hydraHighlightStyle'
+import { hydraExtensions } from './hydraHighlightStyle'
 import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
 import { isInjectedLine, isPartialInjectedLine, stripInjectedLines } from 'lib/injectedLines'
@@ -273,7 +273,7 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
         keymap.of([...defaultKeymap, ...historyKeymap]),
         indentUnit.of('  '),
         javascript(),
-        hydraHighlight,
+        hydraExtensions,
         autocompletion({ override: [hydraAutocomplete, slashCommandComplete] }),
         linter(hydraLinter),
         injectedLinePlugin,

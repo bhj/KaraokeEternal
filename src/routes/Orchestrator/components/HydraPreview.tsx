@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useRef, useSyncExternalStore } from 'react'
+import { useAppSelector } from 'store/hooks'
+import { type AudioData } from 'routes/Player/components/Player/PlayerVisualizer/hooks/useAudioAnalyser'
 import HydraVisualizer from '../../Player/components/Player/PlayerVisualizer/HydraVisualizer'
 import styles from './HydraPreview.css'
 
@@ -8,7 +10,32 @@ interface HydraPreviewProps {
   height: number
 }
 
+// Convert FftPayload to AudioData format expected by HydraVisualizer
+function mapFftToAudioData(fft: { fft: number[]; bass: number; mid: number; treble: number; beat: number; energy: number; bpm: number; bright: number }): AudioData {
+  return {
+    // Reconstruct full float arrays if needed, but for now just pass what we have.
+    // HydraAudioCompat uses rawFrequencyData for fft[], and other props directly.
+    // We'll map the payload fft array to rawFrequencyData.
+    rawFrequencyData: new Float32Array(fft.fft),
+    frequencyData: new Float32Array(fft.fft), // shim
+    waveformData: new Float32Array(128), // shim (no waveform in payload yet)
+    bass: fft.bass,
+    mid: fft.mid,
+    treble: fft.treble,
+    isBeat: fft.beat > 0.8, // approximate
+    beatIntensity: fft.beat,
+    energy: fft.energy,
+    energySmooth: fft.energy,
+    spectralCentroid: fft.bright,
+    beatFrequency: fft.bpm,
+  }
+}
+
 const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
+  const status = useAppSelector(state => state.status)
+  const isLive = status.isPlayerPresent && status.fftData !== null
+  const overrideData = isLive && status.fftData ? mapFftToAudioData(status.fftData) : null
+
   // Create a dummy audio source to drive the visualizer
   const audioStoreRef = useRef<{
     source: MediaElementAudioSourceNode | null
@@ -96,16 +123,19 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
 
   return (
     <div className={styles.container} style={{ width, height }}>
-      <div className={styles.label}>Preview (Simulated Audio)</div>
-      {audioSource && (
+      <div className={styles.label}>
+        {isLive ? 'Preview (Live Audio)' : 'Preview (Simulated Audio)'}
+      </div>
+      {(audioSource || isLive) && (
         <HydraVisualizer
-          audioSourceNode={audioSource}
+          audioSourceNode={isLive ? null : audioSource}
           isPlaying={true}
           sensitivity={1}
           width={width}
           height={height}
           code={code}
           layer={0}
+          overrideData={overrideData}
         />
       )}
     </div>

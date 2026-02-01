@@ -10,7 +10,14 @@ export interface FftPayload {
 }
 
 export function isValidFftPayload (obj: unknown): obj is FftPayload {
-  if (obj == null || typeof obj !== 'object') return false
-  const p = obj as Record<string, unknown>
-  return Array.isArray(p.fft) && typeof p.bass === 'number'
+  if (typeof obj !== 'object' || obj === null) return false
+  const r = obj as Record<string, unknown>
+  return Array.isArray(r.fft)
+    && typeof r.bass === 'number'
+    && typeof r.mid === 'number'
+    && typeof r.treble === 'number'
+    && typeof r.beat === 'number'
+    && typeof r.energy === 'number'
+    && typeof r.bpm === 'number'
+    && typeof r.bright === 'number'
 }

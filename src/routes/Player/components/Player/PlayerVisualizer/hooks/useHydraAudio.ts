@@ -32,6 +32,7 @@ export function useHydraAudio (
   audioSourceNode: MediaElementAudioSourceNode | null,
   sensitivity: number,
   audioResponse?: AudioResponseState,
+  overrideData?: AudioData | null,
 ) {
   const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity, audioResponse })
   const audioRef = useRef<AudioData>(defaultAudioData)
@@ -39,10 +40,14 @@ export function useHydraAudio (
 
   // Update ref every animation frame — called from the rAF loop
   const update = useCallback(() => {
-    audioRef.current = getAudioData()
+    if (overrideData) {
+      audioRef.current = overrideData
+    } else {
+      audioRef.current = getAudioData()
+    }
     // Feed linear FFT data to window.a compat layer (rawFrequencyData, no gamma)
     compat.update(audioRef.current)
-  }, [getAudioData, compat])
+  }, [getAudioData, compat, overrideData])
 
   // Stable closures that Hydra code references via arrow functions
   const closures: AudioClosures = useMemo(() => ({

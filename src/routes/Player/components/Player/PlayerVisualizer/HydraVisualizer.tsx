@@ -1,5 +1,9 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import Hydra from 'hydra-synth'
+import throttle from 'lodash/throttle'
+import { useDispatch } from 'react-redux'
+import { PLAYER_EMIT_FFT } from 'shared/actionTypes'
+import { type AudioData } from './hooks/useAudioAnalyser'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
 import { audioizeHydraCode } from './hooks/audioizeHydraCode'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
@@ -55,7 +59,7 @@ function executeHydraCode (hydra: Hydra, code: string) {
 }
 
 interface HydraVisualizerProps {
-  audioSourceNode: MediaElementAudioSourceNode
+  audioSourceNode: MediaElementAudioSourceNode | null
   isPlaying: boolean
   sensitivity: number
   width: number
@@ -67,6 +71,10 @@ interface HydraVisualizerProps {
   audioResponse?: AudioResponseState
   /** When true, auto-init camera for detected source usage */
   allowCamera?: boolean
+  /** When true, emit FFT data to server for remote preview */
+  emitFft?: boolean
+  /** Remote audio data to drive visualizer (replaces audioSourceNode) */
+  overrideData?: AudioData | null
 }
 
 function HydraVisualizer ({
@@ -79,7 +87,10 @@ function HydraVisualizer ({
   layer,
   audioResponse,
   allowCamera,
+  emitFft,
+  overrideData,
 }: HydraVisualizerProps) {
+  const dispatch = useDispatch()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hydraRef = useRef<Hydra | null>(null)
   const rafRef = useRef<number>(0)
@@ -91,7 +102,33 @@ function HydraVisualizer ({
   const codeRef = useRef(code)
   const cameraInitRef = useRef<Set<string>>(new Set())
 
-  const { update: updateAudio, closures, compat } = useHydraAudio(audioSourceNode, sensitivity, audioResponse)
+  const { update: updateAudio, closures, compat, audioRef } = useHydraAudio(
+    audioSourceNode,
+    sensitivity,
+    audioResponse,
+    overrideData,
+  )
+
+  // Throttle FFT emission to ~20Hz (50ms)
+  const emitFftData = useCallback(throttle((data: AudioData) => {
+    // Send a condensed payload to save bandwidth
+    const payload = {
+      fft: Array.from(compat.fft), // Use the downsampled/smoothed FFT from compat
+      bass: data.bass,
+      mid: data.mid,
+      treble: data.treble,
+      beat: data.beatIntensity,
+      energy: data.energy,
+      bpm: data.beatFrequency,
+      bright: data.spectralCentroid,
+    }
+    
+    dispatch({
+      type: PLAYER_EMIT_FFT,
+      payload,
+      meta: { throttle: { wait: 50, leading: false } },
+    })
+  }, 50, { leading: false, trailing: true }), [dispatch, compat])
 
   useEffect(() => {
     widthRef.current = width
@@ -214,6 +251,11 @@ function HydraVisualizer ({
     // Update audio data from analyser
     updateAudio()
 
+    // Emit FFT if enabled
+    if (emitFft && isPlaying) {
+      emitFftData(audioRef.current)
+    }
+
     // Calculate delta time in milliseconds
     const dt = lastTimeRef.current ? time - lastTimeRef.current : 16.67
     lastTimeRef.current = time
@@ -239,7 +281,7 @@ function HydraVisualizer ({
       const bassValue = typeof bassFn === 'function' ? (bassFn as () => number)() : 'unset'
       console.log('[Hydra] audio sample:', { bass: bassValue })
     }
-  }, [updateAudio])
+  }, [updateAudio, emitFft, isPlaying, emitFftData, audioRef])
 
   // Start/stop animation based on isPlaying
   useEffect(() => {
