@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getPreviewSize } from './orchestratorLayout'
+import { getPreviewSize, shouldShowRefPanelToggle } from './orchestratorLayout'
 
 describe('orchestratorLayout', () => {
   it('uses compact preview sizing on narrow screens', () => {
@@ -18,5 +18,19 @@ describe('orchestratorLayout', () => {
     const size = getPreviewSize(1200)
     expect(size.width).toBe(360)
     expect(size.height).toBe(270)
+  })
+
+  describe('shouldShowRefPanelToggle', () => {
+    it('returns true for narrow screens', () => {
+      expect(shouldShowRefPanelToggle(800)).toBe(true)
+    })
+
+    it('returns false at breakpoint', () => {
+      expect(shouldShowRefPanelToggle(980)).toBe(false)
+    })
+
+    it('returns false for wide screens', () => {
+      expect(shouldShowRefPanelToggle(1200)).toBe(false)
+    })
   })
 })

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import combinedReducer from 'store/reducers'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
@@ -12,7 +12,7 @@ import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
 import StagePanel from '../components/StagePanel'
 import { type StageBuffer } from '../components/stagePanelUtils'
-import { getPreviewSize } from './orchestratorLayout'
+import { getPreviewSize, shouldShowRefPanelToggle } from './orchestratorLayout'
 import styles from './OrchestratorView.css'
 
 function OrchestratorView () {
@@ -39,6 +39,7 @@ function OrchestratorView () {
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
   const [autoAudioOnSend, setAutoAudioOnSend] = useState(false)
   const [activeTab, setActiveTab] = useState<'presets' | 'api'>('presets')
+  const [activeMobileTab, setActiveMobileTab] = useState<'stage' | 'code' | 'ref'>('stage')
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
@@ -82,7 +83,10 @@ function OrchestratorView () {
   const handleLoadPreset = useCallback((code: string) => {
     setLocalCode(code)
     setUserHasEdited(true)
-  }, [])
+    if (ui.innerWidth < 980) {
+      setActiveMobileTab('stage')
+    }
+  }, [ui.innerWidth])
 
   const handleSendPreset = useCallback((code: string) => {
     setLocalCode(code)
@@ -92,7 +96,10 @@ function OrchestratorView () {
       type: VISUALIZER_HYDRA_CODE_REQ,
       payload: { code: finalCode },
     })
-  }, [dispatch, autoAudioOnSend])
+    if (ui.innerWidth < 980) {
+      setActiveMobileTab('stage')
+    }
+  }, [dispatch, autoAudioOnSend, ui.innerWidth])
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
@@ -176,10 +183,11 @@ function OrchestratorView () {
   )
 
   const previewSize = getPreviewSize(ui.innerWidth)
+  const isMobile = ui.innerWidth < 980
 
   return (
     <div className={styles.container}>
-      <div className={styles.refPanel}>
+      <div className={`${styles.refPanel} ${(isMobile && activeMobileTab === 'ref') ? styles.refPanelOpen : ''}`}>
         <div className={styles.tabBar}>
           <button
             type='button'
@@ -215,26 +223,59 @@ function OrchestratorView () {
           </button>
         </div>
       )}
-      <div className={styles.stageDock}>
-        <StagePanel
-          code={effectiveCode}
-          width={previewSize.width}
-          height={previewSize.height}
-          buffer={previewBuffer}
-          onBufferChange={setPreviewBuffer}
-        />
-      </div>
-      <div className={styles.codeDock}>
-        <CodeEditor
-          code={userHasEdited ? localCode : effectiveCode}
-          onCodeChange={handleCodeChange}
-          onSend={handleSendCode}
-          onRandomize={handleRandomize}
-          onAutoAudio={handleAutoAudio}
-          autoAudioOnSend={autoAudioOnSend}
-          onToggleAutoAudio={handleToggleAutoAudio}
-        />
-      </div>
+      {(!isMobile || activeMobileTab === 'stage') && (
+        <div className={styles.stageDock}>
+          <StagePanel
+            code={effectiveCode}
+            width={previewSize.width}
+            height={previewSize.height}
+            buffer={previewBuffer}
+            onBufferChange={setPreviewBuffer}
+          />
+        </div>
+      )}
+      {(!isMobile || activeMobileTab === 'code') && (
+        <div className={styles.codeDock}>
+          <CodeEditor
+            code={userHasEdited ? localCode : effectiveCode}
+            onCodeChange={handleCodeChange}
+            onSend={handleSendCode}
+            onRandomize={handleRandomize}
+            onAutoAudio={handleAutoAudio}
+            autoAudioOnSend={autoAudioOnSend}
+            onToggleAutoAudio={handleToggleAutoAudio}
+          />
+        </div>
+      )}
+
+      {isMobile && (
+        <div className={styles.mobileToolbar}>
+          <button
+            type='button'
+            className={`${styles.mobileTab} ${activeMobileTab === 'stage' ? styles.mobileTabActive : ''}`}
+            onClick={() => setActiveMobileTab('stage')}
+          >
+            <span className={styles.mobileTabIcon}>{'\u25b6'}</span>
+            <span>Stage</span>
+          </button>
+          <button
+            type='button'
+            className={`${styles.mobileTab} ${activeMobileTab === 'code' ? styles.mobileTabActive : ''}`}
+            onClick={() => setActiveMobileTab('code')}
+          >
+            <span className={styles.mobileTabIcon}>{'\u003c\u002f\u003e'}</span>
+            <span>Code</span>
+          </button>
+          <button
+            type='button'
+            className={`${styles.mobileTab} ${activeMobileTab === 'ref' ? styles.mobileTabActive : ''}`}
+            onClick={() => setActiveMobileTab('ref')}
+          >
+            <span className={styles.mobileTabIcon}>{'\u2630'}</span>
+            <span>Library</span>
+          </button>
+        </div>
+      )}
     </div>
   )
 }

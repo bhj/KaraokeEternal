@@ -14,8 +14,10 @@ import {
   PLAYER_REQ_REPLAY,
   PLAYER_REQ_VOLUME,
   PLAYER_EMIT_STATUS,
+  PLAYER_EMIT_FFT,
   PLAYER_EMIT_LEAVE,
   PLAYER_STATUS,
+  PLAYER_FFT,
   PLAYER_LEAVE,
   VISUALIZER_HYDRA_CODE_REQ,
   VISUALIZER_HYDRA_CODE,
@@ -61,6 +63,12 @@ const ACTION_HANDLERS = {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_VOLUME,
+      payload,
+    })
+  },
+  [PLAYER_EMIT_FFT]: async (sock, { payload }) => {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: PLAYER_FFT,
       payload,
     })
   },

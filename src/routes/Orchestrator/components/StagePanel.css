@@ -1,19 +1,22 @@
 .stage {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: radial-gradient(circle at 15% 20%, rgba(0, 255, 255, 0.08), transparent 55%), #07080c;
 }
 
 .stageHeader {
+  grid-row: 1;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(180deg, rgba(18, 24, 35, 0.9), rgba(7, 8, 12, 0.9));
+  min-height: 42px;
 }
 
 .stageTitle {
@@ -24,19 +27,27 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #bcd1ff;
+  white-space: nowrap;
 }
 
 .stageHint {
   font-size: 9px;
   letter-spacing: 0.08em;
   color: rgba(188, 209, 255, 0.6);
+  display: none;
 }
 
 .bufferControls {
   display: flex;
   gap: 6px;
   align-items: center;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.bufferControls::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .bufferButton {
@@ -44,10 +55,12 @@
   background: rgba(8, 10, 14, 0.8);
   color: rgba(255, 255, 255, 0.75);
   font-size: 10px;
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .bufferButton:hover {
@@ -62,14 +75,18 @@
 }
 
 .stageBody {
+  grid-row: 2;
   padding: 10px 12px 14px;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
+  overflow: hidden;
 }
 
 .stageFrame {
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -77,7 +94,10 @@
 
 @media (min-width: 980px) {
   .stageHeader {
-    flex-direction: row;
-    align-items: center;
+    padding: 10px 12px;
+  }
+  
+  .stageHint {
+    display: block;
   }
 }

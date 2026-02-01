@@ -1,13 +1,14 @@
 .container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
   flex: 1;
   position: relative;
   overflow: hidden;
 }
 
 .editor {
-  flex: 1;
+  grid-row: 1;
   min-height: 200px;
   overflow: hidden;
 }
@@ -17,6 +18,7 @@
 }
 
 .footer {
+  grid-row: 2;
   display: flex;
   align-items: center;
   padding: 8px 12px;

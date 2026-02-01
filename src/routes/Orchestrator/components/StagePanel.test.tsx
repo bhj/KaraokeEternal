@@ -60,10 +60,28 @@ describe('StagePanel', () => {
       expect(result).toContain('render(o0)')
     })
 
-    it('auto mode with render(o2) in code → render(o2)', () => {
+    it('auto mode with render(o2) in code → no extra render appended', () => {
       const code = 'osc(10).out(o1)\nrender(o2)'
       const result = buildPreviewCode(code, 'auto')
-      expect(result).toContain('render(o2)')
+      expect(result).toBe(code)
+    })
+
+    it('auto mode with render() in code → no extra render appended', () => {
+      const code = 'osc(10).out()\nrender()'
+      const result = buildPreviewCode(code, 'auto')
+      expect(result).toBe(code)
+    })
+
+    it('auto mode with commented-out render → appends render', () => {
+      const code = '// render(o2)\nosc(10).out(o1)'
+      const result = buildPreviewCode(code, 'auto')
+      expect(result).toBe(`${code}\nrender(o1)`)
+    })
+
+    it('explicit buffer override always appends even with existing render', () => {
+      const code = 'osc(10).out(o1)\nrender(o2)'
+      const result = buildPreviewCode(code, 'o1')
+      expect(result).toBe(`${code}\nrender(o1)`)
     })
 
     it('manual o1 override works', () => {
@@ -78,8 +96,8 @@ describe('StagePanel', () => {
     })
   })
 
-  // NOTE: preview appends render() which overrides any user render() call.
-  // This is intentional for preview — preview != runtime behavior.
+  // NOTE: In auto mode, preview respects user's existing render() call.
+  // In explicit buffer mode, preview always appends render(oN).
   it('renders buffer buttons (Auto + o0-o3)', async () => {
     const container = document.createElement('div')
     const root = createRoot(container)

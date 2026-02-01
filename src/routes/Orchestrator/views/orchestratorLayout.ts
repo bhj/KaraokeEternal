@@ -9,6 +9,10 @@ const PREVIEW_MIN = 240
 const PREVIEW_PADDING = 32
 const PREVIEW_RATIO = 0.75
 
+export function shouldShowRefPanelToggle (innerWidth: number): boolean {
+  return innerWidth < NARROW_BREAKPOINT
+}
+
 export function getPreviewSize (innerWidth: number): PreviewSize {
   if (innerWidth < NARROW_BREAKPOINT) {
     const width = Math.max(PREVIEW_MIN, Math.min(PREVIEW_MAX, innerWidth - PREVIEW_PADDING))

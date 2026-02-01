@@ -49,16 +49,28 @@ export function detectOutputBuffer (code: string): string {
 }
 
 /**
+ * Check if code contains a render() call outside of comments.
+ */
+function hasRenderCall (code: string): boolean {
+  const stripped = code
+    .replace(/\/\/[^\n]*/g, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+  return /render\s*\(/.test(stripped)
+}
+
+/**
  * Build preview code by appending a render() call.
  *
- * NOTE: This overrides any user render() call in the code.
- * Preview != runtime — this is intentional for the preview panel.
+ * In auto mode, if the user's code already contains a render() call,
+ * the code is returned unchanged (no duplicate render appended).
+ * Explicit buffer overrides (o0-o3) always append.
  */
 export function buildPreviewCode (code: string, buffer: StageBuffer): string {
   const trimmed = code.trim()
   if (!trimmed) return ''
 
   if (buffer === 'auto') {
+    if (hasRenderCall(trimmed)) return trimmed
     const target = detectOutputBuffer(trimmed)
     return `${trimmed}\nrender(${target})`
   }
