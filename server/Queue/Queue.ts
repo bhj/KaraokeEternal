@@ -129,7 +129,7 @@ class Queue {
       UPDATE queue
       SET prevQueueId = CASE
         WHEN queueId = newChild THEN ${queueId}
-        WHEN queueId = curChild THEN curParent
+        WHEN queueId = curChild AND curParent IS NOT NULL AND newChild IS NOT NULL THEN curParent
         WHEN queueId = ${queueId} THEN ${prevQueueId}
         ELSE queue.prevQueueId
       END
