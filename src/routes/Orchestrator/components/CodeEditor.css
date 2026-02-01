@@ -31,6 +31,7 @@
 .hint {
   font-size: 11px;
   color: #555;
+  white-space: nowrap;
 }
 
 .audioVars {
@@ -47,6 +48,7 @@
   background: rgba(212, 160, 23, 0.1);
   padding: 2px 6px;
   border-radius: 3px;
+  white-space: nowrap;
 }
 
 .randomButton {
@@ -59,6 +61,7 @@
   font-size: 12px;
   cursor: pointer;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .randomButton:hover {
@@ -76,6 +79,7 @@
   font-size: 12px;
   cursor: pointer;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .autoAudioButton:hover {
@@ -111,6 +115,24 @@
 
 .sendButton:hover {
   background: #2ea043;
+}
+
+.stripAudioButton {
+  padding: 6px 12px;
+  background: rgba(229, 115, 115, 0.15);
+  background-image: var(--aqua-gloss, none);
+  color: #e57373;
+  border: 1px solid rgba(229, 115, 115, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stripAudioButton:hover {
+  background: rgba(229, 115, 115, 0.25);
+  border-color: rgba(229, 115, 115, 0.5);
 }
 
 .cameraBanner {
@@ -153,19 +175,89 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.stripAudioButton {
-  padding: 6px 12px;
-  background: rgba(229, 115, 115, 0.15);
-  background-image: var(--aqua-gloss, none);
-  color: #e57373;
-  border: 1px solid rgba(229, 115, 115, 0.3);
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  font-weight: 500;
-}
+@media (max-width: 979px) {
+  .footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "vars vars"
+      "actions secondary"
+      "send send";
+    gap: 8px;
+    padding: 10px;
+    height: auto;
+  }
 
-.stripAudioButton:hover {
-  background: rgba(229, 115, 115, 0.25);
-  border-color: rgba(229, 115, 115, 0.5);
+  .hint {
+    display: none;
+  }
+
+  .audioVars {
+    grid-area: vars;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+  }
+
+  /* Wrap action buttons in a sub-flex container if structure permits,
+     but since they are direct children, we need to target them by class
+     or use nth-child which is brittle.
+     Instead, let's treat the footer as a flex-wrap container for now
+     as the HTML structure is flat.
+  */
+  
+  /* Resetting grid strategy above because flat HTML makes grid areas hard without wrapper divs.
+     Going with Flex Wrap strategy for Mobile.
+  */
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .audioVars {
+    flex: 1 1 100%;
+    order: 1;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .randomButton {
+    order: 2;
+    flex: 1;
+    text-align: center;
+  }
+
+  .autoAudioButton {
+    order: 3;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .stripAudioButton {
+    order: 4;
+    flex: 1;
+    text-align: center;
+  }
+
+  .autoOnSend {
+    order: 5;
+    width: auto;
+    margin-right: auto;
+  }
+
+  .sendButton {
+    order: 6;
+    flex: 1 1 100%;
+    padding: 10px;
+    font-size: 14px;
+    margin-top: 4px;
+  }
 }
