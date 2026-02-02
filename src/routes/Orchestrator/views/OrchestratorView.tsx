@@ -245,8 +245,6 @@ function OrchestratorView () {
             height={previewSize.height}
             buffer={previewBuffer}
             onBufferChange={setPreviewBuffer}
-            onPresetLoad={handleLoadPreset}
-            onPresetSend={handleSendPreset}
           />
         </div>
       )}

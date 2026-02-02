@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import HydraPreview from './HydraPreview'
-import PresetPicker from './PresetPicker'
 import styles from './StagePanel.css'
 import { BUFFER_OPTIONS, buildPreviewCode, type StageBuffer } from './stagePanelUtils'
 
@@ -10,8 +9,6 @@ interface StagePanelProps {
   height: number
   buffer: StageBuffer
   onBufferChange: (buffer: StageBuffer) => void
-  onPresetLoad?: (code: string) => void
-  onPresetSend?: (code: string) => void
 }
 
 function StagePanel ({
@@ -20,8 +17,6 @@ function StagePanel ({
   height,
   buffer,
   onBufferChange,
-  onPresetLoad,
-  onPresetSend,
 }: StagePanelProps) {
   const previewCode = useMemo(() => buildPreviewCode(code, buffer), [code, buffer])
 
@@ -32,9 +27,6 @@ function StagePanel ({
           Stage
           <span className={styles.stageHint}>Preview</span>
         </div>
-        {onPresetLoad && onPresetSend && (
-          <PresetPicker onLoad={onPresetLoad} onSend={onPresetSend} />
-        )}
         <div className={styles.bufferControls}>
           {BUFFER_OPTIONS.map(option => (
             <button
