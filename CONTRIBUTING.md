@@ -1,4 +1,4 @@
-# Contributing to Karaoke Eternal Automated
+# Contributing to Karaoke Hydra
 
 Thank you for your interest in contributing!
 

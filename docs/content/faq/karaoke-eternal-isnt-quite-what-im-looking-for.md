@@ -1,5 +1,5 @@
 ---
-title: Karaoke Eternal isn't quite what I'm looking for. What else is out there?
+title: Karaoke Hydra isn't quite what I'm looking for. What else is out there?
 category: General
 weight: 3
 ---

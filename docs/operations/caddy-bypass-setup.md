@@ -1,4 +1,4 @@
-# Caddy Configuration for Karaoke Eternal
+# Caddy Configuration for Karaoke Hydra
 
 With app-managed OIDC, Caddy configuration is simple: just reverse proxy all traffic to the app. The app handles authentication internally.
 

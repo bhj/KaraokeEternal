@@ -8,7 +8,7 @@
 
 ## Upstream: Butterchurn (MilkDrop)
 
-Upstream Karaoke Eternal (`bhj/KaraokeEternal`) uses **Butterchurn** (`butterchurn@3.0.0-beta.4`), a WebGL port of Winamp's MilkDrop visualizer.
+Upstream Karaoke Hydra (`bhj/KaraokeEternal`) uses **Butterchurn** (`butterchurn@3.0.0-beta.4`), a WebGL port of Winamp's MilkDrop visualizer.
 
 - **Class component** wrapping a `<canvas>` element
 - **Audio handling**: Passes a `GainNode` (for sensitivity) directly to `butterchurn.connectAudio()` — Butterchurn handles all FFT analysis internally

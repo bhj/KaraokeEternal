@@ -1,4 +1,4 @@
 ---
 title: Documentation
-description: Documentation for Karaoke Eternal (the app) and Karaoke Eternal Server
+description: Documentation for Karaoke Hydra (the app) and Karaoke Hydra Server
 ---

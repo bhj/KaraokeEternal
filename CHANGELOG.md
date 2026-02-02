@@ -1,3 +1,27 @@
+## 2026.02.02
+
+### Karaoke Hydra
+
+The project has been renamed from Karaoke Eternal to **Karaoke Hydra** to reflect the integration of the Hydra live-coding visual synthesizer.
+
+### Hydra Visualizer & Orchestrator
+
+- Live audio-reactive visuals powered by [Hydra](https://hydra.ojack.xyz/)
+- Orchestrator UI with real-time code editor, syntax highlighting, and Aqua theme
+- Preset gallery with 58 curated sketches, search, and tag filtering
+- Injection strength control (Low/Med/High) to scale audio-reactive intensity
+- Auto Audio injection with per-preset profile scaling
+- Mobile-optimized tabbed layout (Stage / Code / Presets) with CSS subgrid
+- Mobile refPanel overlay with click-to-close backdrop
+
+### Audio Controls Simplified
+
+- Removed redundant Sensitivity slider from Display Controls
+- Relabeled "Gain (post-FFT)" to "Audio Sensitivity"
+- Hardcoded gain node to 1.0 (existing saved preferences are harmlessly ignored)
+
+---
+
 ## v2.0.1 (2026-01-10)
 
 - Obligatory bug fixes and performance improvements

@@ -1,6 +1,6 @@
 {
-  "name": "karaoke-eternal",
-  "version": "0.0.0-dev.0",
+  "name": "karaoke-hydra",
+  "version": "2026.02.02",
   "description": "Open karaoke party system",
   "keywords": [
     "karaoke",
@@ -13,7 +13,7 @@
     "mp4",
     "webgl"
   ],
-  "homepage": "https://www.karaoke-eternal.com",
+  "homepage": "https://github.com/Zardoz8901/KaraokeEternalAutomated",
   "type": "module",
   "main": "./build/server/main.js",
   "engines": {
@@ -40,13 +40,13 @@
     "build/shared/**"
   ],
   "bin": {
-    "karaoke-eternal-server": "build/server/main.js"
+    "karaoke-hydra-server": "build/server/main.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bhj/KaraokeEternal.git"
+    "url": "git+https://github.com/Zardoz8901/KaraokeEternalAutomated.git"
   },
-  "productName": "Karaoke Eternal Server",
+  "productName": "Karaoke Hydra Server",
   "author": "RadRoot LLC",
   "license": "ISC",
   "overrides": {

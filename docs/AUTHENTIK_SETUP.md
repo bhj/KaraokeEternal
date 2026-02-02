@@ -1,6 +1,6 @@
 # Authentik Setup
 
-This guide covers configuring Authentik as the identity provider for Karaoke Eternal.
+This guide covers configuring Authentik as the identity provider for Karaoke Hydra.
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ In Authentik Admin → Applications → Create:
 
 | Setting | Value |
 |---------|-------|
-| **Name** | `Karaoke Eternal` |
+| **Name** | `Karaoke Hydra` |
 | **Slug** | `karaoke-eternal` |
 | **Provider** | Select `karaoke-eternal` (created above) |
 | **Launch URL** | `https://karaoke.example.com/` |

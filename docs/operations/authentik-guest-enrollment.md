@@ -1,6 +1,6 @@
 # Authentik Guest Enrollment Flow
 
-This document describes guest enrollment options for Karaoke Eternal.
+This document describes guest enrollment options for Karaoke Hydra.
 
 ## Overview
 

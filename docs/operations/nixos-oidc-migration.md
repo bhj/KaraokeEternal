@@ -16,7 +16,7 @@ In Authentik Admin → Applications → Providers → Create:
 8. **Subject mode**: `Based on User's username`
 
 Then create an Application:
-- **Name**: `Karaoke Eternal`
+- **Name**: `Karaoke Hydra`
 - **Slug**: `karaoke-eternal`
 - **Provider**: `karaoke-eternal-oidc`
 
@@ -67,7 +67,7 @@ let
     '';
 
     meta = with lib; {
-      description = "Karaoke Eternal with app-managed OIDC";
+      description = "Karaoke Hydra with app-managed OIDC";
       homepage = "https://github.com/Zardoz8901/KaraokeEternalAutomated";
       license = licenses.isc;
     };
@@ -83,7 +83,7 @@ in
 
   # --- SERVICE ---
   systemd.services.karaoke-eternal = {
-    description = "Karaoke Eternal Server";
+    description = "Karaoke Hydra Server";
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
 

@@ -1,10 +1,10 @@
 ---
-title: Karaoke Eternal Server with NGINX (reverse proxy + custom path)
+title: Karaoke Hydra Server with NGINX (reverse proxy + custom path)
 category: Networking
 weight: 4
 ---
 
-If you want to host the app at `/karaoke` for example, run Karaoke Eternal Server with the `--urlPath /karaoke` option, then use an NGINX config similar to the following, replacing `<your_server_ip>` and `<your_server_port>`:
+If you want to host the app at `/karaoke` for example, run Karaoke Hydra Server with the `--urlPath /karaoke` option, then use an NGINX config similar to the following, replacing `<your_server_ip>` and `<your_server_port>`:
 
 ```
   location /karaoke {

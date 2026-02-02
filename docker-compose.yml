@@ -1,4 +1,4 @@
-# Karaoke Eternal with Authentik Header Auth
+# Karaoke Hydra with Authentik Header Auth
 #
 # This setup assumes Authentik is already running and configured.
 # The karaoke service should be behind Authentik's forward auth proxy
@@ -13,8 +13,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: karaoke-eternal-automated:latest
-    container_name: karaoke-eternal
+    image: karaoke-hydra:latest
+    container_name: karaoke-hydra
     restart: unless-stopped
     ports:
       - "3000:3000"

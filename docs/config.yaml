@@ -1,6 +1,6 @@
-baseURL: https://www.karaoke-eternal.com/
+baseURL: https://github.com/Zardoz8901/KaraokeEternalAutomated
 languageCode: en-us
-title: Karaoke Eternal
+title: Karaoke Hydra
 permalinks:
   page: "/:slug/"
 markup:

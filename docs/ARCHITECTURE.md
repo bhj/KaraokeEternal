@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the system architecture for Karaoke Eternal Automated Edition.
+This document describes the system architecture for Karaoke Hydra.
 
 ## System Overview
 

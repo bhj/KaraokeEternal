@@ -1,14 +1,12 @@
 <div align="center">
 
-# Karaoke Eternal
-
-### Automated Edition
+# Karaoke Hydra
 
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-20%2B-brightgreen)](https://nodejs.org/)
 [![Authentik](https://img.shields.io/badge/SSO-Authentik-fd4b2d)](https://goauthentik.io/)
 
-**Multi-tenant karaoke with SSO. Guests scan a QR code and sing.**
+**Multi-tenant karaoke with live audio-reactive visuals, SSO, and QR guest enrollment.**
 
 </div>
 
@@ -16,6 +14,8 @@
 
 ## Features
 
+- **Hydra Visualizer** — Live audio-reactive visuals powered by Hydra
+- **Orchestrator** — Real-time visual code editor with preset gallery, injection strength control, and mobile-optimized UI
 - **SSO Login** — Authenticate via Authentik
 - **Per-User Rooms** — Each user gets their own party space
 - **QR Guest Enrollment** — One scan, one click, singing
@@ -82,7 +82,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Built With
 
-[Koa](https://koajs.com/) | [Socket.io](https://socket.io/) | [SQLite](https://sqlite.org/) | [React](https://react.dev/) | [Authentik](https://goauthentik.io/)
+[Koa](https://koajs.com/) | [Socket.io](https://socket.io/) | [SQLite](https://sqlite.org/) | [React](https://react.dev/) | [Hydra](https://hydra.ojack.xyz/) | [Authentik](https://goauthentik.io/)
 
 ---
 

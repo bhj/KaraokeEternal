@@ -1,6 +1,6 @@
 # Security
 
-This document describes the security model and hardening measures for Karaoke Eternal Automated Edition.
+This document describes the security model and hardening measures for Karaoke Hydra.
 
 ## Threat Model
 

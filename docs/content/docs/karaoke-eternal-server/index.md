@@ -1,20 +1,20 @@
 ---
-title: Karaoke Eternal Server
-description: Documentation for Karaoke Eternal Server
+title: Karaoke Hydra Server
+description: Documentation for Karaoke Hydra Server
 ---
 
 The server hosts the web app and your media files, and can run on pretty much anything including a Raspberry Pi, NAS or Windows/Mac/Linux desktop. Since the [player]({{< ref "docs/karaoke-eternal-app#player" >}}) is fully browser-based, it doesn't need to run on the same system as the server, but it can.
 
 ## Installation
 
-Karaoke Eternal Server is available as both a Docker image and an `npm` package. Both options are multi-platform and multi-architecture (64-bit required).
+Karaoke Hydra Server is available as both a Docker image and an `npm` package. Both options are multi-platform and multi-architecture (64-bit required).
 
 - [Docker]({{< ref "docs/karaoke-eternal-server#docker" >}})
 - [NPM]({{< ref "docs/karaoke-eternal-server#npm" >}})
 
 ### Docker
 
-Docker is the preferred way to run Karaoke Eternal Server if you're using a dedicated server or NAS. The [Karaoke Eternal docker image](https://hub.docker.com/r/radrootllc/karaoke-eternal) is modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers) images and supports both `amd64` and `arm64`.
+Docker is the preferred way to run Karaoke Hydra Server if you're using a dedicated server or NAS. The [Karaoke Hydra docker image](https://hub.docker.com/r/radrootllc/karaoke-eternal) is modeled after [LinuxServer's](https://docs.linuxserver.io/general/running-our-containers) images and supports both `amd64` and `arm64`.
 
 The easiest way to use the Docker image is via a [Compose](https://docs.docker.com/compose/) file, which is a simple YAML format for configuring your container.
 
@@ -26,7 +26,7 @@ services:
     container_name: karaoke-eternal
     image: radrootllc/karaoke-eternal
     volumes:
-      # Folder where the Karaoke Eternal Server database will be created
+      # Folder where the Karaoke Hydra Server database will be created
       - <path_to_database>:/config
       # Folder(s) containing your media 
       # (inside the app, you'll add /mnt/karaoke to Media Folders)
@@ -43,11 +43,11 @@ services:
 
 At a minimum, replace `<path_to_database>`, `<path_to_media>` and `<host_port>` with the desired values. See the [CLI & ENV]({{< ref "docs/karaoke-eternal-server#cli--env" >}}) section for additional environment settings.
 
-Once the container is running, see [Getting Started]({{< ref "docs/getting-started" >}}) if you're new to Karaoke Eternal.
+Once the container is running, see [Getting Started]({{< ref "docs/getting-started" >}}) if you're new to Karaoke Hydra.
 
 ### NPM
 
-Karaoke Eternal Server is also available as an `npm` package:
+Karaoke Hydra Server is also available as an `npm` package:
 
 1. Install [Node.js](https://nodejs.org){{% icon-external %}} v24 or later if it's not already installed.
 
@@ -75,7 +75,7 @@ karaoke-eternal-server
 
 4. Look for "Web server running at..." and browse to that **server URL**.
 
-See [Getting Started]({{< ref "docs/getting-started" >}}) if you're new to Karaoke Eternal.
+See [Getting Started]({{< ref "docs/getting-started" >}}) if you're new to Karaoke Hydra.
 
 ## Media Files
 
@@ -84,7 +84,7 @@ The following file types are supported:
 - [MP3+G](https://en.wikipedia.org/wiki/MP3%2BG){{% icon-external %}} (including zipped; also supports .m4a instead of .mp3)
 - MP4 video (codec support can vary depending on the browser running the [player]({{< ref "docs/karaoke-eternal-app#player" >}}))
 
-Karaoke Eternal Server expects your media files to be named in **"Artist - Title"** format by default (you can [configure this](#metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
+Karaoke Hydra Server expects your media files to be named in **"Artist - Title"** format by default (you can [configure this](#metadata-parser)). Media with filenames that couldn't be parsed won't appear in the library, so check the [scanner log](#file-locations) or console output for these.
 
 ## Metadata Parser
 
@@ -124,7 +124,7 @@ If changing the parser's default configuration doesn't yield the desired results
 - `title` (string) song's title as it will be shown in the library
 - `titleNorm` (string) normalized version of the song's title; used for matching and sorting (`title` if not set)
 
-For each media file encountered, Karaoke Eternal makes a "context" available to your field template(s). This context includes the fields above (that is, the results from the built-in parser) in addition to:
+For each media file encountered, Karaoke Hydra makes a "context" available to your field template(s). This context includes the fields above (that is, the results from the built-in parser) in addition to:
 
 - `name` (string) media filename (without extension)
 - `meta` (object) media file's [metadata fields](https://github.com/Borewit/music-metadata/blob/master/doc/common_metadata.md){{% icon-external %}}
@@ -175,7 +175,7 @@ Field templates are defined using [JSON-e syntax](https://json-e.js.org){{% icon
 
 ## CLI & ENV
 
-Karaoke Eternal Server supports the following CLI options and environment variables. The numeric values used for log/console levels are: **0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug
+Karaoke Hydra Server supports the following CLI options and environment variables. The numeric values used for log/console levels are: **0**=off, **1**=error, **2**=warn, **3**=info, **4**=verbose, **5**=debug
 
 | Option | ENV | Description | Default |
 | --- | --- | --- | --- |
@@ -242,15 +242,15 @@ If using the `npm` installation method, the default locations for the database (
 
 ### Windows
 
-- Database: `%USERPROFILE%\AppData\Roaming\Karaoke Eternal Server`
-- Logs: `%USERPROFILE%\AppData\Roaming\Karaoke Eternal Server\logs`
+- Database: `%USERPROFILE%\AppData\Roaming\Karaoke Hydra Server`
+- Logs: `%USERPROFILE%\AppData\Roaming\Karaoke Hydra Server\logs`
 
 ### macOS
 
- - Database: `~/Library/Application Support/Karaoke Eternal Server`
- - Logs: `~/Library/Logs/Karaoke Eternal Server`
+ - Database: `~/Library/Application Support/Karaoke Hydra Server`
+ - Logs: `~/Library/Logs/Karaoke Hydra Server`
 
 ### Linux
 
-- Database: `~/.config/Karaoke Eternal Server`
-- Logs: `~/.config/Karaoke Eternal Server/logs`
+- Database: `~/.config/Karaoke Hydra Server`
+- Logs: `~/.config/Karaoke Hydra Server/logs`
