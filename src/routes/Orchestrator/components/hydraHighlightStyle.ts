@@ -1,6 +1,6 @@
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
-import { MatchDecorator, ViewPlugin, Decoration, type DecorationSet, type ViewUpdate, EditorView } from '@codemirror/view'
+import { MatchDecorator, ViewPlugin, Decoration, EditorView } from '@codemirror/view'
 
 // Extended highlight style with higher contrast and distinct colors
 export const hydraHighlightStyle = HighlightStyle.define([
@@ -41,37 +41,6 @@ const hydraAudioMatcher = new MatchDecorator({
   decoration: hydraAudioDeco,
 })
 
-export const hydraHighlighter = [
-  syntaxHighlighting(hydraHighlightStyle),
-  ViewPlugin.fromClass(
-    class {
-      decorations: DecorationSet
-      constructor (view: EditorView) {
-        this.decorations = this.build(view)
-      }
-
-      update (update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged) {
-          this.decorations = this.build(update.view)
-        }
-      }
-
-      build (view: EditorView) {
-        let deco = Decoration.none
-        deco = hydraSourceMatcher.createDeco(view)
-        deco = hydraOutputMatcher.updateDeco(update => update.view === view ? deco : deco, deco) // simplified for brevity, actually usually composed
-        // Clean way to compose multiple match decorators is merging their ranges, but ViewPlugin logic gets complex.
-        // Easiest path: separate extensions or compositing manually.
-        // Let's verify if MatchDecorator supports composition easily. It creates a DecorationSet.
-        // We can just export them as an array of ViewPlugins.
-        return deco
-      }
-    },
-    { decorations: v => v.decorations },
-  ),
-]
-
-// Better approach: separate plugins for each matcher to avoid composition headaches
 export const hydraSourcePlugin = ViewPlugin.define(view => ({
   decorations: hydraSourceMatcher.createDeco(view),
   update (u) { this.decorations = hydraSourceMatcher.updateDeco(u, this.decorations) },

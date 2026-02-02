@@ -138,7 +138,7 @@ describe('orchestratorViewHelpers', () => {
 
     it('apply clears pending (simulated by resetting state)', () => {
       // After user clicks Apply, component resets pending state
-      const afterApply = { pendingRemoteCode: null, pendingRemoteCount: 0 }
+      const afterApply: { pendingRemoteCode: string | null, pendingRemoteCount: number } = { pendingRemoteCode: null, pendingRemoteCount: 0 }
       // Then a new remote arrives
       const result = applyRemoteUpdate('remote-v4', 'new-local', true, afterApply.pendingRemoteCode, afterApply.pendingRemoteCount)
       expect(result.pendingRemoteCode).toBe('remote-v4')

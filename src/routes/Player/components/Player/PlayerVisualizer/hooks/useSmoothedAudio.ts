@@ -81,6 +81,7 @@ export function useSmoothedAudio (options: UseSmoothedAudioOptions = {}) {
 
     // Update smoothed values
     smoothedRef.current = {
+      rawFrequencyData: raw.rawFrequencyData,
       frequencyData: smoothedFreq,
       waveformData: smoothedWave,
       bass: lerp(prev.bass, raw.bass, lerpFactor),
