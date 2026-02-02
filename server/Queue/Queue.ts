@@ -63,9 +63,9 @@ class Queue {
       ORDER BY queueId, paths.priority ASC
     `
     const rows = db.all<{
-      queueId: number, songId: number, userId: number, prevQueueId: number,
-      mediaId: number, relPath: string, rgTrackGain: number, rgTrackPeak: number,
-      userDisplayName: string, userDateUpdated: number,
+      queueId: number, songId: number, userId: number, prevQueueId: number
+      mediaId: number, relPath: string, rgTrackGain: number, rgTrackPeak: number
+      userDisplayName: string, userDateUpdated: number
       pathId: number, pathData: string, isPreferred: number
     }>(String(query), query.parameters)
 
@@ -152,45 +152,36 @@ class Queue {
   /**
    * Delete a queue item
    *
-   * We could DELETE first and get the deleted item's prevQueueId using
-   * RETURNING, but the DELETE and UPDATE need to be wrapped in a transaction
-   * (so the prevQueueId foreign key check is deferred). Also, v0.9 betas didn't
-   * have prevQueueId DEFERRABLE, and so will still error at DELETE (do we care?)
-   *
    * @param  {object}      queueId, userId
    * @return {Promise}     undefined
    */
   static async remove (queueId) {
-    // close the soon-to-be gap first
-    const updateQuery = sql`
-      UPDATE queue
-      SET prevQueueId = curParent
-      FROM (
-        SELECT
-          (
-            SELECT prevQueueId
-            FROM queue
-            WHERE queueId = ${queueId}
-          ) AS curParent,
-          (
-            SELECT queueId
-            FROM queue
-            WHERE prevQueueId = ${queueId}
-          ) AS curChild
-      )
-      WHERE queueId = curChild
-    `
-    db.run(String(updateQuery), updateQuery.parameters)
+    db.exec('BEGIN IMMEDIATE')
+    db.exec('PRAGMA defer_foreign_keys = ON') // v0.9 betas didn't have prevQueueId DEFERRABLE
 
-    // delete item
-    const deleteQuery = sql`
-      DELETE FROM queue
-      WHERE queueId = ${queueId}
-    `
-    const deleteRes = db.run(String(deleteQuery), deleteQuery.parameters)
+    try {
+      const deleteQuery = sql`
+        DELETE FROM queue
+        WHERE queueId = ${queueId}
+        RETURNING prevQueueId
+      `
+      const deletedRow = db.get<{ prevQueueId: number | null }>(String(deleteQuery), deleteQuery.parameters)
 
-    if (!deleteRes.changes) {
-      throw new Error(`Could not remove queueId: ${queueId}`)
+      if (deletedRow === undefined) {
+        throw new Error(`Could not remove queueId: ${queueId}`)
+      }
+
+      // close the gap
+      const updateQuery = sql`
+        UPDATE queue
+        SET prevQueueId = ${deletedRow.prevQueueId}
+        WHERE prevQueueId = ${queueId}
+      `
+      db.run(String(updateQuery), updateQuery.parameters)
+      db.exec('COMMIT')
+    } catch (err) {
+      db.exec('ROLLBACK')
+      throw err
     }
   }
 
