@@ -58,10 +58,6 @@ const DisplayCtrl = ({
     onRequestOptions({ [mediaType + 'Alpha']: val })
   }
 
-  const handleSensitivity = (val: number) => onRequestOptions({
-    visualizer: { sensitivity: val },
-  })
-
   const handleSize = (val: number) => {
     onRequestOptions({ cdgSize: val })
   }
@@ -164,19 +160,6 @@ const DisplayCtrl = ({
                   </div>
                 )}
 
-                <div className={styles.field}>
-                  <label id='label-visualizer-sensitivity'>Sensitivity</label>
-                  <Slider
-                    min={0}
-                    max={2}
-                    step={0.01}
-                    value={sensitivity}
-                    onChange={handleSensitivity}
-                    className={styles.slider}
-                    aria-labelledby='label-visualizer-sensitivity'
-                  />
-                </div>
-
                 {showPresets && (
                   <div className={styles.field}>
                     <InputCheckbox
@@ -198,7 +181,7 @@ const DisplayCtrl = ({
                     </div>
 
                     <div className={styles.field}>
-                      <label id='label-audio-gain'>Gain (post-FFT)</label>
+                      <label id='label-audio-gain'>Audio Sensitivity</label>
                       <Slider
                         min={0.2}
                         max={3}
@@ -208,7 +191,6 @@ const DisplayCtrl = ({
                         className={styles.slider}
                         aria-labelledby='label-audio-gain'
                       />
-                      <p className={styles.hintText}>Scales frequency data after analysis</p>
                     </div>
 
                     <div className={styles.field}>

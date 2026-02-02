@@ -96,11 +96,22 @@
   align-items: center;
 }
 
+@media (max-width: 979px) {
+  .bufferButton {
+    min-height: 36px;
+    padding: 0.375rem 0.625rem;
+  }
+
+  .stageHeader {
+    gap: 8px;
+  }
+}
+
 @media (min-width: 980px) {
   .stageHeader {
     padding: 0.625rem 0.75rem;
   }
-  
+
   .stageHint {
     display: block;
   }

@@ -13,6 +13,7 @@ import { isInjectedLine, isPartialInjectedLine, stripInjectedLines } from 'lib/i
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
 import { getSkipRegions } from 'lib/skipRegions'
+import type { InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import styles from './CodeEditor.css'
 
 const { topLevel, dotChain, nativeAudioDot, sourceDot } = buildHydraCompletions()
@@ -232,6 +233,9 @@ function findCameraInsertLine (code: string): number {
   return i
 }
 
+const INJECTION_LEVELS: InjectionLevel[] = ['low', 'med', 'high']
+const INJECTION_LABELS: Record<InjectionLevel, string> = { low: 'Low', med: 'Med', high: 'High' }
+
 interface CodeEditorProps {
   code: string
   onCodeChange: (code: string) => void
@@ -240,9 +244,11 @@ interface CodeEditorProps {
   onAutoAudio: () => void
   autoAudioOnSend: boolean
   onToggleAutoAudio: () => void
+  injectionLevel: InjectionLevel
+  onInjectionLevelChange: (level: InjectionLevel) => void
 }
 
-function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, autoAudioOnSend, onToggleAutoAudio }: CodeEditorProps) {
+function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, autoAudioOnSend, onToggleAutoAudio, injectionLevel, onInjectionLevelChange }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onCodeChangeRef = useRef(onCodeChange)
@@ -388,6 +394,18 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
         <button type='button' className={styles.autoAudioButton} onClick={onAutoAudio}>
           Auto Audio
         </button>
+        <div className={styles.injectionControl}>
+          {INJECTION_LEVELS.map(level => (
+            <button
+              key={level}
+              type='button'
+              className={`${styles.injectionPill} ${injectionLevel === level ? styles.injectionPillActive : ''}`}
+              onClick={() => onInjectionLevelChange(level)}
+            >
+              {INJECTION_LABELS[level]}
+            </button>
+          ))}
+        </div>
         {hasInjectedLines && (
           <button
             type='button'

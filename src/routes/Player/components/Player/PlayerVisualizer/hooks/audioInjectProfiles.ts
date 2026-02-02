@@ -54,6 +54,23 @@ const PROFILE_MAP: Record<string, ProfileEntry> = {
   // },
 }
 
+export type InjectionLevel = 'low' | 'med' | 'high'
+
+export const INJECTION_FACTORS: Record<InjectionLevel, number> = {
+  low: 0.4,
+  med: 1.0,
+  high: 2.0,
+}
+
+export function scaleProfile (base: AudioInjectProfile, factor: number): AudioInjectProfile {
+  return {
+    modulate: base.modulate * factor,
+    rotate: base.rotate * factor,
+    scale: base.scale * factor,
+    colorShift: base.colorShift * factor,
+  }
+}
+
 export function getProfileForSketch (sketchId: string, code: string): AudioInjectProfile {
   const entry = PROFILE_MAP[sketchId]
   if (!entry) return DEFAULT_PROFILE

@@ -4,7 +4,10 @@ import {
   djb2Hash,
   normalizeForHash,
   getProfileForSketch,
+  scaleProfile,
+  INJECTION_FACTORS,
   type AudioInjectProfile,
+  type InjectionLevel,
 } from './audioInjectProfiles'
 
 describe('DEFAULT_PROFILE', () => {
@@ -70,6 +73,55 @@ describe('getProfileForSketch', () => {
     // Even if the sketch_id matches a known profile, changed code → default
     const profile = getProfileForSketch('example_0', 'completely different code')
     expect(profile).toEqual(DEFAULT_PROFILE)
+  })
+})
+
+describe('scaleProfile', () => {
+  it('scales all values by factor 0.5', () => {
+    const result = scaleProfile(DEFAULT_PROFILE, 0.5)
+    expect(result.modulate).toBeCloseTo(DEFAULT_PROFILE.modulate * 0.5)
+    expect(result.rotate).toBeCloseTo(DEFAULT_PROFILE.rotate * 0.5)
+    expect(result.scale).toBeCloseTo(DEFAULT_PROFILE.scale * 0.5)
+    expect(result.colorShift).toBeCloseTo(DEFAULT_PROFILE.colorShift * 0.5)
+  })
+
+  it('scales all values by factor 2.0', () => {
+    const result = scaleProfile(DEFAULT_PROFILE, 2.0)
+    expect(result.modulate).toBeCloseTo(DEFAULT_PROFILE.modulate * 2.0)
+    expect(result.rotate).toBeCloseTo(DEFAULT_PROFILE.rotate * 2.0)
+    expect(result.scale).toBeCloseTo(DEFAULT_PROFILE.scale * 2.0)
+    expect(result.colorShift).toBeCloseTo(DEFAULT_PROFILE.colorShift * 2.0)
+  })
+
+  it('scales all values to zero with factor 0', () => {
+    const result = scaleProfile(DEFAULT_PROFILE, 0)
+    expect(result.modulate).toBe(0)
+    expect(result.rotate).toBe(0)
+    expect(result.scale).toBe(0)
+    expect(result.colorShift).toBe(0)
+  })
+
+  it('does not mutate the input profile', () => {
+    const original = { ...DEFAULT_PROFILE }
+    scaleProfile(DEFAULT_PROFILE, 3.0)
+    expect(DEFAULT_PROFILE).toEqual(original)
+  })
+})
+
+describe('INJECTION_FACTORS', () => {
+  it('has low, med, high levels', () => {
+    expect(INJECTION_FACTORS).toHaveProperty('low')
+    expect(INJECTION_FACTORS).toHaveProperty('med')
+    expect(INJECTION_FACTORS).toHaveProperty('high')
+  })
+
+  it('med is 1.0 (unscaled default)', () => {
+    expect(INJECTION_FACTORS.med).toBe(1.0)
+  })
+
+  it('low < med < high', () => {
+    expect(INJECTION_FACTORS.low).toBeLessThan(INJECTION_FACTORS.med)
+    expect(INJECTION_FACTORS.med).toBeLessThan(INJECTION_FACTORS.high)
   })
 })
 

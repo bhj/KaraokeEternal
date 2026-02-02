@@ -96,9 +96,9 @@ export function useAudioAnalyser (
 
     const audioCtx = audioSourceNode.context
 
-    // Create gain node for sensitivity control
+    // Gain node kept in audio graph for topology stability — sensitivity hardcoded to 1.0
     const gainNode = audioCtx.createGain()
-    gainNode.gain.setValueAtTime(sensitivity, audioCtx.currentTime)
+    gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime)
     gainNodeRef.current = gainNode
 
     // Create analyser node
@@ -162,13 +162,8 @@ export function useAudioAnalyser (
     }
   }, [audioSourceNode, fftSize, smoothingTimeConstant, sensitivity])
 
-  // Update sensitivity when it changes
-  useEffect(() => {
-    if (gainNodeRef.current) {
-      const audioCtx = gainNodeRef.current.context
-      gainNodeRef.current.gain.setValueAtTime(sensitivity, audioCtx.currentTime)
-    }
-  }, [sensitivity])
+  // sensitivity prop ignored — hardcoded to 1.0 (see Phase 4 cleanup)
+  // Gain node stays in audio graph for topology stability
 
   // Function to get current audio data - call this in animation loop
   const getAudioData = useCallback((): AudioData => {

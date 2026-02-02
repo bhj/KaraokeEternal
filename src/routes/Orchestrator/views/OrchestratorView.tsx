@@ -5,6 +5,7 @@ import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioizeHydraCode'
+import { scaleProfile, INJECTION_FACTORS, DEFAULT_PROFILE, getProfileForSketch, type InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
 import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
@@ -38,19 +39,25 @@ function OrchestratorView () {
   const [pendingRemoteCode, setPendingRemoteCode] = useState<string | null>(null)
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
   const [autoAudioOnSend, setAutoAudioOnSend] = useState(false)
+  const [injectionLevel, setInjectionLevel] = useState<InjectionLevel>('med')
   const [activeTab, setActiveTab] = useState<'presets' | 'api'>('presets')
   const [activeMobileTab, setActiveMobileTab] = useState<'stage' | 'code' | 'ref'>('stage')
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
 
+  const getScaledProfile = useCallback((code: string) => {
+    const factor = INJECTION_FACTORS[injectionLevel]
+    return scaleProfile(DEFAULT_PROFILE, factor)
+  }, [injectionLevel])
+
   const handleSendCode = useCallback((code: string) => {
-    const finalCode = autoAudioOnSend ? audioizeHydraCode(code) : code
+    const finalCode = autoAudioOnSend ? audioizeHydraCode(code, getScaledProfile(code)) : code
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
       payload: { code: finalCode },
     })
-  }, [dispatch, autoAudioOnSend])
+  }, [dispatch, autoAudioOnSend, getScaledProfile])
 
   const handleCodeChange = useCallback((code: string) => {
     setUserHasEdited(true)
@@ -69,12 +76,12 @@ function OrchestratorView () {
   }, [])
 
   const handleAutoAudio = useCallback(() => {
-    const audioized = audioizeHydraCode(localCode)
+    const audioized = audioizeHydraCode(localCode, getScaledProfile(localCode))
     if (audioized !== localCode) {
       setLocalCode(audioized)
       setUserHasEdited(true)
     }
-  }, [localCode])
+  }, [localCode, getScaledProfile])
 
   const handleToggleAutoAudio = useCallback(() => {
     setAutoAudioOnSend(prev => !prev)
@@ -91,7 +98,7 @@ function OrchestratorView () {
   const handleSendPreset = useCallback((code: string) => {
     setLocalCode(code)
     setUserHasEdited(true)
-    const finalCode = autoAudioOnSend ? audioizeHydraCode(code) : code
+    const finalCode = autoAudioOnSend ? audioizeHydraCode(code, getScaledProfile(code)) : code
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
       payload: { code: finalCode },
@@ -99,7 +106,7 @@ function OrchestratorView () {
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
-  }, [dispatch, autoAudioOnSend, ui.innerWidth])
+  }, [dispatch, autoAudioOnSend, ui.innerWidth, getScaledProfile])
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
@@ -210,6 +217,13 @@ function OrchestratorView () {
             : <ApiReference />}
         </div>
       </div>
+      {isMobile && activeMobileTab === 'ref' && (
+        <div
+          className={styles.refPanelOverlay}
+          onClick={() => setActiveMobileTab('stage')}
+          role='presentation'
+        />
+      )}
       {pendingRemoteCode && (
         <div className={styles.remoteBanner}>
           <span className={styles.remoteBannerText}>
@@ -231,6 +245,8 @@ function OrchestratorView () {
             height={previewSize.height}
             buffer={previewBuffer}
             onBufferChange={setPreviewBuffer}
+            onPresetLoad={handleLoadPreset}
+            onPresetSend={handleSendPreset}
           />
         </div>
       )}
@@ -244,6 +260,8 @@ function OrchestratorView () {
             onAutoAudio={handleAutoAudio}
             autoAudioOnSend={autoAudioOnSend}
             onToggleAutoAudio={handleToggleAutoAudio}
+            injectionLevel={injectionLevel}
+            onInjectionLevelChange={setInjectionLevel}
           />
         </div>
       )}

@@ -85,8 +85,8 @@
   grid-column: 1;
   display: grid;
   grid-template-rows: subgrid;
-  overflow: hidden;
-  min-height: 200px;
+  overflow: auto;
+  min-height: 0;
 }
 
 .codeDock {
@@ -95,8 +95,8 @@
   display: grid;
   grid-template-rows: subgrid;
   background: linear-gradient(180deg, #141823, #0c0f16);
-  overflow: hidden;
-  min-height: 200px;
+  overflow: auto;
+  min-height: 0;
 }
 
 .mobileToolbar {
@@ -185,7 +185,40 @@
 @media (max-width: 979px) {
   .container {
     /* Leave space for mobile toolbar */
-    padding-bottom: 50px;
+    padding-bottom: calc(50px + env(safe-area-inset-bottom));
+  }
+
+  .refPanelOpen {
+    display: grid;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: calc(50px + env(safe-area-inset-bottom));
+    z-index: 95;
+    grid-template-rows: auto 1fr;
+    background: rgba(20, 30, 40, 0.95);
+    backdrop-filter: var(--aqua-blur);
+    transform: translateY(0);
+    transition: transform 0.2s ease;
+  }
+
+  .refPanelOverlay {
+    position: fixed;
+    inset: 0;
+    bottom: calc(50px + env(safe-area-inset-bottom));
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 94;
+  }
+
+  .remoteBannerApply,
+  .remoteBannerDismiss {
+    min-height: 36px;
+    padding: 0.375rem 0.75rem;
+  }
+
+  .tabContent {
+    padding: 8px;
   }
 }
 

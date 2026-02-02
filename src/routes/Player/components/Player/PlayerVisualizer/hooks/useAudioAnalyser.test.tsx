@@ -104,6 +104,28 @@ function TestComponent ({ source }: { source: MediaElementAudioSourceNode | null
 }
 
 describe('useAudioAnalyser setup', () => {
+  it('hardcodes gain node value to 1.0 regardless of sensitivity option', async () => {
+    const { gainNodes, source } = createMockAudioGraph()
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    function TestWithSensitivity (): null {
+      useAudioAnalyser(source, { sensitivity: 2.5 })
+      return null
+    }
+
+    await act(async () => {
+      root.render(<TestWithSensitivity />)
+    })
+
+    // First gain node is the sensitivity gain — should be hardcoded to 1.0
+    expect(gainNodes[0].gain.setValueAtTime).toHaveBeenCalledWith(1.0, expect.any(Number))
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
   it('resumes suspended audio context and keeps analyser branch alive', async () => {
     const { ctx, gainNodes, source, getAnalyser } = createMockAudioGraph()
     const container = document.createElement('div')
