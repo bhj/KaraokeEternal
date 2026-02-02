@@ -184,8 +184,19 @@
 
 @media (max-width: 979px) {
   .container {
-    /* Leave space for mobile toolbar */
+    /* On mobile, only one dock is visible at a time — use simple 1fr to fill */
+    grid-template-rows: 1fr;
     padding-bottom: calc(50px + env(safe-area-inset-bottom));
+  }
+
+  .stageDock {
+    grid-row: 1;
+    grid-template-rows: auto 1fr;
+  }
+
+  .codeDock {
+    grid-row: 1;
+    grid-template-rows: 1fr auto;
   }
 
   .refPanelOpen {
