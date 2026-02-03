@@ -65,6 +65,40 @@
   box-shadow: 0 0 8px rgba(96, 125, 139, 0.3);
 }
 
+.tagFeedback {
+  background: rgba(156, 39, 176, 0.15);
+  color: #ce93d8;
+  border-color: rgba(156, 39, 176, 0.3);
+}
+
+.tagFeedback:hover {
+  background: rgba(156, 39, 176, 0.25);
+}
+
+.tagFeedback.tagActive {
+  background: rgba(156, 39, 176, 0.4);
+  border-color: #e1bee7;
+  color: #f3e5f5;
+  box-shadow: 0 0 8px rgba(156, 39, 176, 0.3);
+}
+
+.tagKaleid {
+  background: rgba(0, 188, 212, 0.15);
+  color: #80deea;
+  border-color: rgba(0, 188, 212, 0.3);
+}
+
+.tagKaleid:hover {
+  background: rgba(0, 188, 212, 0.25);
+}
+
+.tagKaleid.tagActive {
+  background: rgba(0, 188, 212, 0.4);
+  border-color: #b2ebf2;
+  color: #e0f7fa;
+  box-shadow: 0 0 8px rgba(0, 188, 212, 0.3);
+}
+
 .tagTuned {
   background: rgba(255, 183, 77, 0.15);
   color: #ffcc80;
@@ -148,6 +182,18 @@
   background: rgba(96, 125, 139, 0.2);
   color: #b0bec5;
   border: 1px solid rgba(96, 125, 139, 0.3);
+}
+
+.badgeFeedback {
+  background: rgba(156, 39, 176, 0.15);
+  color: #ce93d8;
+  border: 1px solid rgba(156, 39, 176, 0.3);
+}
+
+.badgeKaleid {
+  background: rgba(0, 188, 212, 0.15);
+  color: #80deea;
+  border: 1px solid rgba(0, 188, 212, 0.3);
 }
 
 .badgeTuned {

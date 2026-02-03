@@ -9,6 +9,9 @@ export interface AudioInjectProfile {
   rotate: number
   scale: number
   colorShift: number
+  saturate: number
+  contrast: number
+  brightness: number
 }
 
 export const DEFAULT_PROFILE: AudioInjectProfile = {
@@ -16,6 +19,9 @@ export const DEFAULT_PROFILE: AudioInjectProfile = {
   rotate: 0.08,
   scale: 0.08,
   colorShift: 0.06,
+  saturate: 0.3,
+  contrast: 0.2,
+  brightness: 0.15,
 }
 
 /**
@@ -68,6 +74,9 @@ export function scaleProfile (base: AudioInjectProfile, factor: number): AudioIn
     rotate: base.rotate * factor,
     scale: base.scale * factor,
     colorShift: base.colorShift * factor,
+    saturate: base.saturate * factor,
+    contrast: base.contrast * factor,
+    brightness: base.brightness * factor,
   }
 }
 

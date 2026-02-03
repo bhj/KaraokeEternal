@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import combinedReducer from 'store/reducers'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
+import { VISUALIZER_HYDRA_CODE_REQ, VISUALIZER_STATE_SYNC_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioizeHydraCode'
@@ -13,11 +13,13 @@ import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
 import StagePanel from '../components/StagePanel'
 import { type StageBuffer } from '../components/stagePanelUtils'
+import { useCameraSender } from 'lib/webrtc/useCameraSender'
 import { getPreviewSize } from './orchestratorLayout'
 import styles from './OrchestratorView.css'
 
 function OrchestratorView () {
   const dispatch = useAppDispatch()
+  const camera = useCameraSender()
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
   const status = useAppSelector(state => state.status)
 
@@ -86,6 +88,14 @@ function OrchestratorView () {
   const handleToggleAutoAudio = useCallback(() => {
     setAutoAudioOnSend(prev => !prev)
   }, [])
+
+  const handleCameraToggle = useCallback(async () => {
+    if (camera.status === 'idle' || camera.status === 'error') {
+      await camera.start()
+    } else {
+      camera.stop()
+    }
+  }, [camera])
 
   const handleLoadPreset = useCallback((code: string) => {
     setLocalCode(code)
@@ -175,6 +185,14 @@ function OrchestratorView () {
     return () => cancelAnimationFrame(id)
   }, [remotePresetIndex, remoteHydraCode, userHasEdited])
 
+  // Sync injection level to all clients in the room
+  useEffect(() => {
+    dispatch({
+      type: VISUALIZER_STATE_SYNC_REQ,
+      payload: { injectionLevel },
+    })
+  }, [dispatch, injectionLevel])
+
   // Debounce preview at 150ms
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -260,6 +278,8 @@ function OrchestratorView () {
             onToggleAutoAudio={handleToggleAutoAudio}
             injectionLevel={injectionLevel}
             onInjectionLevelChange={setInjectionLevel}
+            cameraStatus={camera.status}
+            onCameraToggle={handleCameraToggle}
           />
         </div>
       )}

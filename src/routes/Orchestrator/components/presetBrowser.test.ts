@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { buildPresetItems, filterPresets, type PresetBrowserItem } from './presetBrowser'
 import { HYDRA_GALLERY } from './hydraGallery'
+import type { PresetCategory } from 'routes/Player/components/Player/PlayerVisualizer/hooks/presetClassifier'
 
 describe('buildPresetItems', () => {
   const items = buildPresetItems(HYDRA_GALLERY)
@@ -31,13 +32,36 @@ describe('buildPresetItems', () => {
       expect(items[i].sketchId).toBe(HYDRA_GALLERY[i].sketch_id)
     }
   })
+
+  it('every item has a valid category', () => {
+    const validCategories: PresetCategory[] = ['camera', 'feedback', 'kaleid', 'default']
+    for (const item of items) {
+      expect(validCategories).toContain(item.category)
+    }
+  })
+
+  it('items with usesCamera have category=camera', () => {
+    for (const item of items) {
+      if (item.usesCamera) {
+        expect(item.category).toBe('camera')
+      }
+    }
+  })
+
+  it('category tags appear in item.tags', () => {
+    for (const item of items) {
+      if (item.category !== 'default') {
+        expect(item.tags).toContain(item.category)
+      }
+    }
+  })
 })
 
 describe('filterPresets', () => {
   const items: PresetBrowserItem[] = [
-    { index: 0, sketchId: 'example_0', tags: ['audio'], hasAudioProfile: true, usesCamera: false },
-    { index: 1, sketchId: 'rangga_1', tags: ['camera'], hasAudioProfile: false, usesCamera: true },
-    { index: 2, sketchId: 'flor_2', tags: [], hasAudioProfile: false, usesCamera: false },
+    { index: 0, sketchId: 'example_0', tags: ['audio'], hasAudioProfile: true, usesCamera: false, category: 'default' },
+    { index: 1, sketchId: 'rangga_1', tags: ['camera'], hasAudioProfile: false, usesCamera: true, category: 'camera' },
+    { index: 2, sketchId: 'flor_2', tags: [], hasAudioProfile: false, usesCamera: false, category: 'default' },
   ]
 
   it('returns all on empty query and no tags', () => {

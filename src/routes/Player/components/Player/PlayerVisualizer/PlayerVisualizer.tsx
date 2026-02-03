@@ -15,6 +15,7 @@ interface PlayerVisualizerProps {
   hydraCode?: string
   audioResponse?: AudioResponseState
   allowCamera?: boolean
+  remoteVideoElement?: HTMLVideoElement | null
 }
 
 function PlayerVisualizer ({
@@ -27,6 +28,7 @@ function PlayerVisualizer ({
   hydraCode,
   audioResponse,
   allowCamera,
+  remoteVideoElement,
 }: PlayerVisualizerProps) {
   if (mode !== 'hydra') {
     return null
@@ -44,6 +46,7 @@ function PlayerVisualizer ({
           code={hydraCode}
           audioResponse={audioResponse}
           allowCamera={allowCamera}
+          remoteVideoElement={remoteVideoElement}
           emitFft={true}
         />
       </Suspense>

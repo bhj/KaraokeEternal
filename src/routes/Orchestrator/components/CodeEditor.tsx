@@ -246,9 +246,11 @@ interface CodeEditorProps {
   onToggleAutoAudio: () => void
   injectionLevel: InjectionLevel
   onInjectionLevelChange: (level: InjectionLevel) => void
+  cameraStatus?: 'idle' | 'connecting' | 'active' | 'error'
+  onCameraToggle?: () => void
 }
 
-function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, autoAudioOnSend, onToggleAutoAudio, injectionLevel, onInjectionLevelChange }: CodeEditorProps) {
+function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, autoAudioOnSend, onToggleAutoAudio, injectionLevel, onInjectionLevelChange, cameraStatus, onCameraToggle }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onCodeChangeRef = useRef(onCodeChange)
@@ -420,6 +422,16 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
           <input type='checkbox' checked={autoAudioOnSend} onChange={onToggleAutoAudio} />
           Auto on Send
         </label>
+        {onCameraToggle && (
+          <button
+            type='button'
+            className={`${styles.randomButton} ${cameraStatus === 'active' ? styles.sendButton : ''}`}
+            onClick={onCameraToggle}
+            title={cameraStatus === 'idle' ? 'Share camera' : cameraStatus === 'connecting' ? 'Connecting...' : cameraStatus === 'active' ? 'Stop camera' : 'Camera error'}
+          >
+            {cameraStatus === 'idle' ? 'Cam' : cameraStatus === 'connecting' ? 'Cam...' : cameraStatus === 'active' ? 'Cam On' : 'Cam Err'}
+          </button>
+        )}
         <button type='button' className={styles.sendButton} onClick={handleSend}>
           Send
         </button>

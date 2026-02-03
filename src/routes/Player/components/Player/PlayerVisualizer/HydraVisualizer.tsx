@@ -75,6 +75,8 @@ interface HydraVisualizerProps {
   emitFft?: boolean
   /** Remote audio data to drive visualizer (replaces audioSourceNode) */
   overrideData?: AudioData | null
+  /** Remote camera video element from WebRTC (replaces local initCam) */
+  remoteVideoElement?: HTMLVideoElement | null
 }
 
 function HydraVisualizer ({
@@ -89,6 +91,7 @@ function HydraVisualizer ({
   allowCamera,
   emitFft,
   overrideData,
+  remoteVideoElement,
 }: HydraVisualizerProps) {
   const dispatch = useDispatch()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -198,6 +201,7 @@ function HydraVisualizer ({
   }, [width, height])
 
   // Camera auto-init: when allowCamera flips true, init camera for detected sources
+  // Uses remote WebRTC video when available, falls back to local initCam()
   useEffect(() => {
     if (!allowCamera) {
       cameraInitRef.current.clear()
@@ -210,17 +214,21 @@ function HydraVisualizer ({
 
     for (const src of sources) {
       if (cameraInitRef.current.has(src)) continue
-      const extSrc = w[src] as { initCam?: (index?: number) => void } | undefined
-      if (extSrc?.initCam) {
-        try {
+      const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
+      if (!extSrc) continue
+      try {
+        if (remoteVideoElement && extSrc.init) {
+          extSrc.init({ src: remoteVideoElement })
+          cameraInitRef.current.add(src)
+        } else if (extSrc.initCam) {
           extSrc.initCam()
           cameraInitRef.current.add(src)
-        } catch (err) {
-          warn('Camera init failed for', src, err)
         }
+      } catch (err) {
+        warn('Camera init failed for', src, err)
       }
     }
-  }, [allowCamera])
+  }, [allowCamera, remoteVideoElement])
 
   // Re-execute code when it changes
   useEffect(() => {
@@ -233,21 +241,25 @@ function HydraVisualizer ({
       const w = window as unknown as Record<string, unknown>
       for (const src of sources) {
         if (cameraInitRef.current.has(src)) continue
-        const extSrc = w[src] as { initCam?: (index?: number) => void } | undefined
-        if (extSrc?.initCam) {
-          try {
+        const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
+        if (!extSrc) continue
+        try {
+          if (remoteVideoElement && extSrc.init) {
+            extSrc.init({ src: remoteVideoElement })
+            cameraInitRef.current.add(src)
+          } else if (extSrc.initCam) {
             extSrc.initCam()
             cameraInitRef.current.add(src)
-          } catch (err) {
-            warn('Camera init failed for', src, err)
           }
+        } catch (err) {
+          warn('Camera init failed for', src, err)
         }
       }
     }
 
     executeHydraCode(hydra, code ?? DEFAULT_PATCH)
     errorCountRef.current = 0
-  }, [code, allowCamera])
+  }, [code, allowCamera, remoteVideoElement])
 
   // Animation tick
   const tick = useCallback((time: number) => {

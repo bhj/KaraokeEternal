@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
+import { useCameraReceiver } from 'lib/webrtc/useCameraReceiver'
 import Player from '../Player/Player'
+import InjectionLevelIndicator from '../InjectionLevelIndicator/InjectionLevelIndicator'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
@@ -24,6 +26,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
+  const { videoElement: remoteVideoElement } = useCameraReceiver()
   const dispatch = useAppDispatch()
   const handleStatus = useCallback<(status?: Partial<PlayerState>) => void>(status => dispatch(playerStatus(status)), [dispatch])
   const handleLoad = useCallback(() => dispatch(playerLoad()), [dispatch])
@@ -170,6 +173,7 @@ const PlayerController = (props: PlayerControllerProps) => {
         rgTrackGain={queueItem ? queueItem.rgTrackGain : null}
         rgTrackPeak={queueItem ? queueItem.rgTrackPeak : null}
         visualizer={playerVisualizer}
+        remoteVideoElement={remoteVideoElement}
         volume={player.volume}
         width={props.width}
         height={props.height}
@@ -183,6 +187,9 @@ const PlayerController = (props: PlayerControllerProps) => {
         width={props.width}
         height={props.height}
       />
+      {playerVisualizer && (
+        <InjectionLevelIndicator level={playerVisualizer.injectionLevel} />
+      )}
       {roomPrefs?.qr?.isEnabled && (
         <PlayerQR
           height={props.height}

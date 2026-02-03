@@ -6,6 +6,7 @@ import { type HydraGalleryItem } from './hydraGallery'
 import { decodeSketch } from './hydraPresets'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { getProfileForSketch, DEFAULT_PROFILE } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
+import { classifyPreset, type PresetCategory } from 'routes/Player/components/Player/PlayerVisualizer/hooks/presetClassifier'
 
 export interface PresetBrowserItem {
   index: number
@@ -13,6 +14,7 @@ export interface PresetBrowserItem {
   tags: string[]
   hasAudioProfile: boolean
   usesCamera: boolean
+  category: PresetCategory
 }
 
 export function buildPresetItems (gallery: HydraGalleryItem[]): PresetBrowserItem[] {
@@ -23,8 +25,10 @@ export function buildPresetItems (gallery: HydraGalleryItem[]): PresetBrowserIte
     const profile = getProfileForSketch(item.sketch_id, code)
     const hasAudioProfile = profile !== DEFAULT_PROFILE
 
+    const category = classifyPreset(code)
+
     const tags: string[] = []
-    if (usesCamera) tags.push('camera')
+    if (category !== 'default') tags.push(category)
     if (hasAudioProfile) tags.push('tuned')
 
     return {
@@ -33,6 +37,7 @@ export function buildPresetItems (gallery: HydraGalleryItem[]): PresetBrowserIte
       tags,
       hasAudioProfile,
       usesCamera,
+      category,
     }
   })
 }

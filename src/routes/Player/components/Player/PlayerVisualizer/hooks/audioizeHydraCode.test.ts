@@ -235,6 +235,80 @@ describe('audioizeHydraCode', () => {
     })
   })
 
+  describe('category-aware injection', () => {
+    it('camera preset gets saturate+contrast chain (not modulate)', () => {
+      const code = 's0.initCam()\nsrc(s0).out(o0)'
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.saturate(')
+      expect(result).toContain('.contrast(')
+      expect(result).not.toContain('.modulate(osc(')
+      expect(result).not.toContain('.rotate(')
+    })
+
+    it('feedback preset gets brightness+contrast chain', () => {
+      const code = 'src(o0).modulate(o0, 0.01).out(o0)'
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.brightness(')
+      expect(result).toContain('.contrast(')
+      expect(result).not.toContain('.modulate(osc(')
+    })
+
+    it('kaleid preset gets brightness+color chain', () => {
+      const code = 'osc(10).kaleid(4).out()'
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.brightness(')
+      expect(result).toContain('.color(')
+      expect(result).not.toContain('.modulate(osc(')
+      expect(result).not.toContain('.rotate(')
+    })
+
+    it('default preset gets full 4-line chain', () => {
+      const code = 'osc(10).out()'
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.rotate(')
+      expect(result).toContain('.scale(')
+      expect(result).toContain('.color(')
+    })
+
+    it('category-aware injection is idempotent', () => {
+      const codes = [
+        's0.initCam()\nsrc(s0).out(o0)',
+        'src(o0).modulate(o0, 0.01).out(o0)',
+        'osc(10).kaleid(4).out()',
+        'osc(10).out()',
+      ]
+      for (const code of codes) {
+        const once = audioizeHydraCode(code)
+        const twice = audioizeHydraCode(once)
+        expect(twice).toBe(once)
+      }
+    })
+  })
+
+  describe('nested .out() handling', () => {
+    it('does NOT inject before .out(o0) nested inside .layer()', () => {
+      // flor_1 pattern: .out(o0) is inside .layer() at depth > 0
+      const code = 's0.initCam()\nsrc(s0).saturate(2).contrast(1.3).layer(src(o0).mask(shape(4,2)).modulate(o0,0.001).out(o0))'
+      const result = audioizeHydraCode(code)
+      // Nested .out(o0) inside .layer() must be preserved intact
+      expect(result).toContain('.layer(src(o0).mask(shape(4,2)).modulate(o0,0.001).out(o0))')
+      // Instead, injection is appended with a new top-level .out()
+      expect(result).toContain('.saturate(')
+      expect(result.endsWith('.out(o0)\n')).toBe(true)
+    })
+
+    it('flor_1 gets camera chain (saturate+contrast)', () => {
+      const florIdx = HYDRA_GALLERY.findIndex(g => g.sketch_id === 'flor_1')
+      expect(florIdx).toBeGreaterThan(-1)
+      const code = getPresetByIndex(florIdx)
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.saturate(')
+      expect(result).toContain('.contrast(')
+      expect(result).not.toContain('.modulate(osc(3, 0.05)')
+    })
+  })
+
   describe('gallery contract', () => {
     it('all presets: audioized code contains .out(', () => {
       for (let i = 0; i < getPresetCount(); i++) {

@@ -21,6 +21,16 @@ import {
   PLAYER_LEAVE,
   VISUALIZER_HYDRA_CODE_REQ,
   VISUALIZER_HYDRA_CODE,
+  VISUALIZER_STATE_SYNC_REQ,
+  VISUALIZER_STATE_SYNC,
+  CAMERA_OFFER_REQ,
+  CAMERA_OFFER,
+  CAMERA_ANSWER_REQ,
+  CAMERA_ANSWER,
+  CAMERA_ICE_REQ,
+  CAMERA_ICE,
+  CAMERA_STOP_REQ,
+  CAMERA_STOP,
 } from '../../shared/actionTypes.js'
 
 // ------------------------------------
@@ -85,6 +95,36 @@ const ACTION_HANDLERS = {
   [VISUALIZER_HYDRA_CODE_REQ]: async (sock, { payload }) => {
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: VISUALIZER_HYDRA_CODE,
+      payload,
+    })
+  },
+  [VISUALIZER_STATE_SYNC_REQ]: async (sock, { payload }) => {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: VISUALIZER_STATE_SYNC,
+      payload,
+    })
+  },
+  [CAMERA_OFFER_REQ]: async (sock, { payload }) => {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: CAMERA_OFFER,
+      payload,
+    })
+  },
+  [CAMERA_ANSWER_REQ]: async (sock, { payload }) => {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: CAMERA_ANSWER,
+      payload,
+    })
+  },
+  [CAMERA_ICE_REQ]: async (sock, { payload }) => {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: CAMERA_ICE,
+      payload,
+    })
+  },
+  [CAMERA_STOP_REQ]: async (sock, { payload }) => {
+    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
+      type: CAMERA_STOP,
       payload,
     })
   },

@@ -5,7 +5,7 @@ import { buildPresetItems, filterPresets, type PresetBrowserItem } from './prese
 import styles from './PresetBrowser.css'
 
 const allItems = buildPresetItems(HYDRA_GALLERY)
-const ALL_TAGS = ['camera', 'tuned'] as const
+const ALL_TAGS = ['camera', 'feedback', 'kaleid', 'tuned'] as const
 
 interface PresetBrowserProps {
   onLoad: (code: string) => void
@@ -47,16 +47,20 @@ function PresetBrowser ({ onLoad, onSend }: PresetBrowserProps) {
         onChange={e => setQuery(e.target.value)}
       />
       <div className={styles.tags}>
-        {ALL_TAGS.map(tag => (
-          <button
-            key={tag}
-            type='button'
-            className={`${styles.tag} ${tag === 'camera' ? styles.tagCamera : styles.tagTuned} ${activeTags.includes(tag) ? styles.tagActive : ''}`}
-            onClick={() => toggleTag(tag)}
-          >
-            {tag === 'camera' ? 'Cam' : 'Tuned'}
-          </button>
-        ))}
+        {ALL_TAGS.map(tag => {
+          const tagLabel = tag === 'camera' ? 'Cam' : tag === 'feedback' ? 'Feedback' : tag === 'kaleid' ? 'Kaleid' : 'Tuned'
+          const tagStyle = tag === 'camera' ? styles.tagCamera : tag === 'feedback' ? styles.tagFeedback : tag === 'kaleid' ? styles.tagKaleid : styles.tagTuned
+          return (
+            <button
+              key={tag}
+              type='button'
+              className={`${styles.tag} ${tagStyle} ${activeTags.includes(tag) ? styles.tagActive : ''}`}
+              onClick={() => toggleTag(tag)}
+            >
+              {tagLabel}
+            </button>
+          )
+        })}
       </div>
       <div className={styles.list}>
         {filtered.length === 0 && (
@@ -65,9 +69,11 @@ function PresetBrowser ({ onLoad, onSend }: PresetBrowserProps) {
         {filtered.map(item => (
           <div key={item.index} className={styles.card}>
             <div className={styles.cardName}>{item.sketchId}</div>
-            {(item.usesCamera || item.hasAudioProfile) && (
+            {(item.category !== 'default' || item.hasAudioProfile) && (
               <div className={styles.cardBadges}>
-                {item.usesCamera && <span className={`${styles.badge} ${styles.badgeCamera}`}>Cam</span>}
+                {item.category === 'camera' && <span className={`${styles.badge} ${styles.badgeCamera}`}>Cam</span>}
+                {item.category === 'feedback' && <span className={`${styles.badge} ${styles.badgeFeedback}`}>Feedback</span>}
+                {item.category === 'kaleid' && <span className={`${styles.badge} ${styles.badgeKaleid}`}>Kaleid</span>}
                 {item.hasAudioProfile && <span className={`${styles.badge} ${styles.badgeTuned}`}>Tuned</span>}
               </div>
             )}
