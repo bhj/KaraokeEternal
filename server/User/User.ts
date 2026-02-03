@@ -5,6 +5,13 @@ import Queue from '../Queue/Queue.js'
 import { randomChars } from '../lib/util.js'
 import { User as UserType } from '../../shared/types.js'
 
+export type ServerUser = UserType & {
+  role: string
+  password?: string // only populated if requesting creds
+  image?: string
+  rooms?: number[] // populated in router
+}
+
 export const IMG_MAX_LENGTH = 51200 // 50KB
 export const USERNAME_MIN_LENGTH = 3
 export const USERNAME_MAX_LENGTH = 128
@@ -16,11 +23,9 @@ class User {
   /**
    * Get user by userId
    *
-   * @param  {Number}  userId
-   * @param  {Bool}  creds  Whether to include username and password in result
-   * @return {Promise}
+   * @param creds Whether to include username and password in result
    */
-  static async getById (userId, creds = false) {
+  static getById (userId: number, creds: boolean = false): ServerUser | false {
     if (typeof userId !== 'number') {
       throw new Error('userId must be a number')
     }
@@ -31,11 +36,9 @@ class User {
   /**
    * Get user by username
    *
-   * @param  {String}  username
-   * @param  {Bool}  creds  Whether to include username and password in result
-   * @return {Promise}
+   * @param creds Whether to include username and password in result
    */
-  static async getByUsername (username, creds = false) {
+  static getByUsername (username: string, creds: boolean = false): ServerUser | false {
     if (typeof username !== 'string') {
       throw new Error('username must be a string')
     }
@@ -46,9 +49,9 @@ class User {
   /**
    * Gets all users
    *
-   * @return {Promise}      normalized list of users
+   * @returns normalized list of users
    */
-  static async get () {
+  static get (): { result: number[], entities: Record<number, ServerUser> } {
     const result = []
     const entities = {}
 
@@ -105,7 +108,7 @@ class User {
         throw new Error('New passwords do not match')
       }
 
-      if (await User.getByUsername(username)) {
+      if (User.getByUsername(username)) {
         throw new Error('Username or email is not available')
       }
 
@@ -168,7 +171,7 @@ class User {
       throw new Error('Username/email and password are required')
     }
 
-    const user = await User.getByUsername(username, true)
+    const user = User.getByUsername(username, true) as ServerUser
 
     if (!user || !(await crypto.compare(password, user.password))) {
       throw new Error('Incorrect username/email or password')
@@ -179,11 +182,8 @@ class User {
 
   /**
    * Remove a user
-   *
-   * @param  {Number}  userId
-   * @return {Promise}
    */
-  static async remove (userId) {
+  static remove (userId: number): void {
     if (typeof userId !== 'number') {
       throw new Error('userId must be a number')
     }
@@ -197,7 +197,7 @@ class User {
     const queueRows = db.all<{ queueId: number }>(String(queueQuery), queueQuery.parameters)
 
     for (const row of queueRows) {
-      await Queue.remove(row.queueId)
+      Queue.remove(row.queueId)
     }
 
     // remove user's song stars
@@ -228,11 +228,11 @@ class User {
 
   /**
    * (private) runs the query
-   * @param  {Object}  id   with fields 'username' or 'userId'
-   * @param  {Bool}  creds  whether to include username and password in result
-   * @return {Promise}      user object
+   * @param id with fields 'username' or 'userId'
+   * @param creds whether to include username and password in result
+   * @returns user object
    */
-  static async _get ({ userId, username }, creds = false) {
+  static _get ({ userId, username }: { userId?: number, username?: string }, creds: boolean = false): ServerUser | false {
     const query = sql`
       SELECT users.*, roles.name AS role
       FROM users
@@ -240,7 +240,7 @@ class User {
       WHERE ${typeof userId === 'number' ? sql`userId = ${userId}` : sql`LOWER(username) = ${username.toLowerCase()}`}
     `
 
-    const user = db.get<UserType & { role: string, password?: string, image?: string }>(String(query), query.parameters)
+    const user = db.get<ServerUser>(String(query), query.parameters)
     if (!user) return false
 
     if (!creds) {

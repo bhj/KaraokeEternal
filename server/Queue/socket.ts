@@ -18,7 +18,7 @@ const ACTION_HANDLERS = {
       })
     }
 
-    await Queue.add({
+    Queue.add({
       roomId: sock.user.roomId,
       songId,
       userId: sock.user.userId,
@@ -30,7 +30,7 @@ const ACTION_HANDLERS = {
     // to all in room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(sock.user.roomId),
+      payload: Queue.get(sock.user.roomId),
     })
   },
   [QUEUE_MOVE]: async (sock, { payload }, acknowledge) => {
@@ -45,14 +45,14 @@ const ACTION_HANDLERS = {
       })
     }
 
-    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, queueId))) {
+    if (!sock.user.isAdmin && !(Queue.isOwner(sock.user.userId, queueId))) {
       return acknowledge({
         type: QUEUE_MOVE + '_ERROR',
         error: 'Cannot move another user\'s song',
       })
     }
 
-    await Queue.move({
+    Queue.move({
       prevQueueId,
       queueId,
       roomId: sock.user.roomId,
@@ -64,14 +64,14 @@ const ACTION_HANDLERS = {
     // tell room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(sock.user.roomId),
+      payload: Queue.get(sock.user.roomId),
     })
   },
-  [QUEUE_REMOVE]: async (sock, { payload }, acknowledge) => {
+  [QUEUE_REMOVE]: (sock, { payload }, acknowledge) => {
     const { queueId } = payload
     const ids = Array.isArray(queueId) ? queueId : [queueId]
 
-    if (!sock.user.isAdmin && !(await Queue.isOwner(sock.user.userId, ids))) {
+    if (!sock.user.isAdmin && !(Queue.isOwner(sock.user.userId, ids))) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         error: 'Cannot remove another user\'s song',
@@ -79,7 +79,7 @@ const ACTION_HANDLERS = {
     }
 
     for (const id of ids) {
-      await Queue.remove(id)
+      Queue.remove(id)
     }
 
     // success
@@ -88,7 +88,7 @@ const ACTION_HANDLERS = {
     // tell room
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(sock.user.roomId),
+      payload: Queue.get(sock.user.roomId),
     })
   },
 }

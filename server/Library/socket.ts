@@ -2,8 +2,8 @@ import Library from './Library.js'
 import { STAR_SONG, SONG_STARRED, UNSTAR_SONG, SONG_UNSTARRED, _SUCCESS } from '../../shared/actionTypes.js'
 
 const ACTION_HANDLERS = {
-  [STAR_SONG]: async (sock, { payload }, acknowledge) => {
-    const changes = await Library.starSong(payload.songId, sock.user.userId)
+  [STAR_SONG]: (sock, { payload }, acknowledge) => {
+    const changes = Library.starSong(payload.songId, sock.user.userId)
 
     // success
     acknowledge({ type: STAR_SONG + _SUCCESS })
@@ -19,8 +19,8 @@ const ACTION_HANDLERS = {
       })
     }
   },
-  [UNSTAR_SONG]: async (sock, { payload }, acknowledge) => {
-    const changes = await Library.unstarSong(payload.songId, sock.user.userId)
+  [UNSTAR_SONG]: (sock, { payload }, acknowledge) => {
+    const changes = Library.unstarSong(payload.songId, sock.user.userId)
 
     // success
     acknowledge({ type: UNSTAR_SONG + _SUCCESS })

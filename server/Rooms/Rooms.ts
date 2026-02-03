@@ -15,11 +15,11 @@ const roomUsers: Map<number, Set<number>> = new Map()
 class Rooms {
   /**
    * Get all rooms
-   *
-   * @param  {Object}
-   * @return {Promise}
    */
-  static async get (roomId, { status = ['open'], includePassword = false } = {}) {
+  static get (
+    roomId: number | null | undefined = undefined,
+    { status = ['open'], includePassword = false }: { status?: string[], includePassword?: boolean } = {},
+  ): { result: number[], entities: Record<number, any> } {
     const result = []
     const entities = {}
     const whereConditions = []
@@ -123,13 +123,10 @@ class Rooms {
 
   /**
    * Validate a room against optional criteria
-   *
-   * @param  {Number}    roomId
-   * @param  {[String]}  password      Room password
-   * @param  {[Object]}  opts          (bool) isOpen, (bool) validatePassword
-   * @return {Promise}                 True if validated, otherwise throws an error
    */
-  static async validate (roomId, password,
+  static async validate (
+    roomId: number,
+    password: string | undefined,
     {
       isOpen = true,
       validatePassword = true,
@@ -139,8 +136,8 @@ class Rooms {
       validatePassword?: boolean
       role?: any
     } = {},
-  ) {
-    const res = await Rooms.get(roomId, { includePassword: true })
+  ): Promise<boolean> {
+    const res = Rooms.get(roomId, { includePassword: true })
     const room = res.entities[roomId]
 
     if (!room) {
@@ -194,11 +191,8 @@ class Rooms {
 
   /**
    * Utility method to list active rooms on a socket.io instance
-   *
-   * @param  {Object}  io  The socket.io instance
-   * @return {Array}       Array of objects as { room, roomId }
    */
-  static getActive (io) {
+  static getActive (io: any): { room: string, roomId: number }[] {
     const rooms = []
 
     for (const room of io.sockets.adapter.rooms.keys()) {
@@ -214,12 +208,8 @@ class Rooms {
 
   /**
    * Utility method to determine if a player is in a room
-   *
-   * @param  {Object}  io  The socket.io instance
-   * @param  {Object}  roomId  Room to check
-   * @return {Boolean}
    */
-  static isPlayerPresent (io, roomId) {
+  static isPlayerPresent (io: any, roomId: number): boolean {
     for (const sock of io.of('/').sockets.values()) {
       if (sock.user && sock.user.roomId === roomId && sock._lastPlayerStatus) {
         return true
@@ -231,9 +221,6 @@ class Rooms {
 
   /**
    * Remember that a user has been in a room
-   *
-   * @param  {Number}  roomId
-   * @param  {Number}  userId
    */
   static trackUser (roomId: number, userId: number) {
     if (!roomUsers.has(roomId)) {
@@ -245,10 +232,6 @@ class Rooms {
 
   /**
    * Check if a user has been in a room (since server start)
-   *
-   * @param  {Number}  roomId
-   * @param  {Number}  userId
-   * @return {Boolean}
    */
   static hasUserBeenInRoom (roomId: number, userId: number): boolean {
     return roomUsers.get(roomId)?.has(userId) ?? false

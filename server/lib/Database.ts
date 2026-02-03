@@ -68,7 +68,7 @@ export class DatabaseWrapper {
     this.db.exec(sql)
   }
 
-  async migrate ({ migrationsPath, force = false, table = 'migrations' }: { migrationsPath: string, force?: boolean, table?: string }) {
+  migrate ({ migrationsPath, force = false, table = 'migrations' }: { migrationsPath: string, force?: boolean, table?: string }) {
     this.db.exec(`CREATE TABLE IF NOT EXISTS "${table}" (
       id INTEGER PRIMARY KEY,
       name TEXT,
@@ -76,14 +76,14 @@ export class DatabaseWrapper {
       down TEXT
     )`)
 
-    const files = await fs.promises.readdir(migrationsPath)
+    const files = fs.readdirSync(migrationsPath)
     const migrations = []
 
     for (const file of files) {
       const match = file.match(/^(\d+)-(.*)\.sql$/)
 
       if (match) {
-        const content = await fs.promises.readFile(path.join(migrationsPath, file), 'utf8')
+        const content = fs.readFileSync(path.join(migrationsPath, file), 'utf8')
         const parts = content.split(/^--\s*Down/mi)
         const upSql = parts[0].replace(/^--\s*Up/mi, '').trim()
         const downSql = (parts[1] || '').trim()
@@ -153,14 +153,15 @@ export class DatabaseWrapper {
 class Database {
   static refs: { db?: DatabaseWrapper } = {}
 
-  static async close () {
+  static close () {
     if (Database.refs.db) {
       log.info('Closing database file %s', Database.refs.db.config.filename)
       Database.refs.db.close()
+      delete Database.refs.db
     }
   }
 
-  static async open ({ file, ro = true }: { file: string, ro?: boolean } = { file: '', ro: true }) {
+  static open ({ file, ro = true }: { file: string, ro?: boolean } = { file: '', ro: true }) {
     if (Database.refs.db) throw new Error('Database already open')
     log.info('Opening database file %s %s', ro ? '(read-only)' : '(writeable)', file)
 
@@ -170,7 +171,7 @@ class Database {
     const instance = new DatabaseWrapper(file)
 
     if (!ro) {
-      await instance.migrate({
+      instance.migrate({
         migrationsPath: path.join(import.meta.dirname, 'schemas'),
       })
 

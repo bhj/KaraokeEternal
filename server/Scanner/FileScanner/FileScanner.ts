@@ -43,7 +43,7 @@ class FileScanner extends Scanner {
     this.emitStatus(`Searching: ${dir}`, 0)
 
     try {
-      files = await getFiles(dir, file => searchExts.includes(getExt(file)))
+      files = getFiles(dir, file => searchExts.includes(getExt(file)))
 
       log.info('  => found %s files with valid extensions %s',
         files.length.toLocaleString(),
@@ -111,7 +111,7 @@ class FileScanner extends Scanner {
       buffer = Buffer.from(await entries[audioName].arrayBuffer())
       mimeType = fileTypes[getExt(audioName)].mimeType
     } else {
-      if (fileTypes[getExt(file)].requiresCDG && !(await getCdgName(file))) throw new Error('no .cdg sidecar found')
+      if (fileTypes[getExt(file)].requiresCDG && !(getCdgName(file))) throw new Error('no .cdg sidecar found')
     }
 
     const data = await parseBuffer(buffer, mimeType, {
@@ -151,7 +151,7 @@ class FileScanner extends Scanner {
     }
 
     // file already in database?
-    const res = await Media.search({
+    const res = Media.search({
       pathId,
       relPath: media.relPath,
     })
@@ -196,7 +196,7 @@ class FileScanner extends Scanner {
   }
 
   async removeInvalid (pathId, validMediaIds = []) {
-    const res = await Media.search({ pathId })
+    const res = Media.search({ pathId })
     const invalid = res.result.filter(mediaId => !validMediaIds.includes(mediaId))
 
     if (invalid.length) {

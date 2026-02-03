@@ -8,11 +8,8 @@ const log = getLogger('Media')
 class Media {
   /**
    * Get media matching all search criteria
-   *
-   * @param  {Object}  filter Search criteria
-   * @return {Promise}        Object with media results
    */
-  static async search (filter) {
+  static search (filter: object): { result: number[], entities: Record<string, any> } {
     const media = {
       result: [],
       entities: {},
@@ -47,11 +44,8 @@ class Media {
 
   /**
    * Add media file to the library
-   *
-   * @param  {Object}  media Media object
-   * @return {Number}        New media's mediaId
    */
-  static async add (media) {
+  static add (media: any): number {
     if (!Number.isInteger(media.songId)
       || !Number.isInteger(media.duration)
       || !Number.isInteger(media.pathId)
@@ -74,11 +68,8 @@ class Media {
 
   /**
    * Update media item
-   *
-   * @param  {Object}  media Media object
-   * @return {Promise}
    */
-  static async update (media) {
+  static update (media: any): void {
     const { mediaId } = media
 
     if (!Number.isInteger(mediaId)) {
@@ -98,11 +89,8 @@ class Media {
 
   /**
    * Removes media from the db in sqlite-friendly batches
-   *
-   * @param  {Array}  mediaIds
-   * @return {Promise}
    */
-  static async remove (mediaIds) {
+  static remove (mediaIds: number[]): void {
     const batchSize = 999
 
     while (mediaIds.length) {
@@ -118,10 +106,8 @@ class Media {
 
   /**
    * Remove unlinked items and VACUUM
-   *
-   * @return {Promise}
    */
-  static async cleanup () {
+  static cleanup (): void {
     let res
 
     // remove media in nonexistent paths
@@ -154,7 +140,7 @@ class Media {
     `)
 
     for (const row of rows) {
-      await Queue.remove(row.queueId)
+      Queue.remove(row.queueId)
     }
 
     log.info(`cleanup: ${rows.length} queue items for nonexistent songs`)
@@ -165,17 +151,14 @@ class Media {
 
   /**
    * Set isPreferred flag for a given media item
-   * @param  {Number}  mediaId
-   * @param  {Boolean} isPreferred
-   * @return {Promise} songId of the (un)preferred media item
    */
-  static async setPreferred (mediaId, isPreferred) {
+  static setPreferred (mediaId: number, isPreferred: boolean): number {
     if (!Number.isInteger(mediaId) || typeof isPreferred !== 'boolean') {
       throw new Error('invalid mediaId or value')
     }
 
     // get songId
-    const res = await Media.search({ mediaId })
+    const res = Media.search({ mediaId })
 
     if (!res.result.length) {
       throw new Error(`mediaId not found: ${mediaId}`)
@@ -192,7 +175,7 @@ class Media {
     db.run(String(query), query.parameters)
 
     if (isPreferred) {
-      await Media.update({ mediaId, isPreferred: 1 })
+      Media.update({ mediaId, isPreferred: 1 })
     }
 
     return songId

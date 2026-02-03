@@ -16,8 +16,8 @@ class ScannerQueue {
     this.onDone = onDone
   }
 
-  async queue (pathIds) {
-    const prefs = await Prefs.get()
+  queue (pathIds) {
+    const prefs = Prefs.get()
 
     if (pathIds === true) {
       pathIds = prefs.paths.result // queueing all paths
@@ -52,7 +52,7 @@ class ScannerQueue {
     log.info('Starting media scan')
 
     while (this.#q.length && !this.#isCanceling) {
-      const prefs = await Prefs.get()
+      const prefs = Prefs.get()
       this.#instance = new FileScanner(prefs, { length: this.#q.length })
 
       const stats = await this.#instance.scan(this.#q.shift())

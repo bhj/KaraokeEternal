@@ -35,7 +35,7 @@ const handlers = {
 const { verify: jwtVerify } = jsonWebToken
 
 export default function (io, jwtKey) {
-  io.on('connection', async (sock) => {
+  io.on('connection', (sock) => {
     const { keToken } = parseCookie(sock.handshake.headers.cookie)
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
     const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
@@ -112,7 +112,7 @@ export default function (io, jwtKey) {
       log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
       io.to(sock.id).emit('action', {
         type: PREFS_PUSH,
-        payload: await Prefs.get(),
+        payload: Prefs.get(),
       })
     }
 
@@ -123,14 +123,14 @@ export default function (io, jwtKey) {
 
       io.to(sock.id).emit('action', {
         type: LIBRARY_PUSH,
-        payload: await Library.get(),
+        payload: Library.get(),
       })
     }
 
     // push user's stars
     io.to(sock.id).emit('action', {
       type: STARS_PUSH,
-      payload: await Library.getUserStars(sock.user.userId),
+      payload: Library.getUserStars(sock.user.userId),
     })
 
     // push star counts (only if client's is outdated)
@@ -140,7 +140,7 @@ export default function (io, jwtKey) {
 
       io.to(sock.id).emit('action', {
         type: STAR_COUNTS_PUSH,
-        payload: await Library.getStarCounts(),
+        payload: Library.getStarCounts(),
       })
     }
 
@@ -173,7 +173,7 @@ export default function (io, jwtKey) {
     // send room's queue
     io.to(sock.id).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(sock.user.roomId),
+      payload: Queue.get(sock.user.roomId),
     })
   })
 }

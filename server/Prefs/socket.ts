@@ -5,7 +5,7 @@ import { LIBRARY_PUSH, PREFS_PATH_SET_PRIORITY, PREFS_PUSH, PREFS_SET, _ERROR } 
 const log = getLogger(`server[${process.pid}]`)
 
 const ACTION_HANDLERS = {
-  [PREFS_SET]: async (sock, { payload }, acknowledge) => {
+  [PREFS_SET]: (sock, { payload }, acknowledge) => {
     if (!sock.user.isAdmin) {
       acknowledge({
         type: PREFS_SET + _ERROR,
@@ -13,12 +13,12 @@ const ACTION_HANDLERS = {
       })
     }
 
-    await Prefs.set(payload.key, payload.data)
+    Prefs.set(payload.key, payload.data)
     log.info('%s (%s) set pref %s = %s', sock.user.name, sock.id, payload.key, payload.data)
 
-    await pushPrefs(sock)
+    pushPrefs(sock)
   },
-  [PREFS_PATH_SET_PRIORITY]: async (sock, { payload }, acknowledge) => {
+  [PREFS_PATH_SET_PRIORITY]: (sock, { payload }, acknowledge) => {
     if (!sock.user.isAdmin) {
       acknowledge({
         type: PREFS_PATH_SET_PRIORITY + _ERROR,
@@ -26,23 +26,23 @@ const ACTION_HANDLERS = {
       })
     }
 
-    await Prefs.setPathPriority(payload)
+    Prefs.setPathPriority(payload)
     log.info('%s re-prioritized media folders; pushing library to all', sock.user.name)
 
-    await pushPrefs(sock)
+    pushPrefs(sock)
 
     // invalidate cache
     Library.cache.version = null
 
     sock.server.emit('action', {
       type: LIBRARY_PUSH,
-      payload: await Library.get(),
+      payload: Library.get(),
     })
   },
 }
 
 // helper to push prefs to admins
-const pushPrefs = async (sock) => {
+const pushPrefs = (sock) => {
   const admins = []
 
   for (const s of sock.server.sockets.sockets.values()) {
@@ -55,7 +55,7 @@ const pushPrefs = async (sock) => {
   if (admins.length) {
     sock.server.emit('action', {
       type: PREFS_PUSH,
-      payload: await Prefs.get(),
+      payload: Prefs.get(),
     })
   }
 }

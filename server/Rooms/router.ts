@@ -15,10 +15,10 @@ const router = new KoaRouter({ prefix: '/api/rooms' })
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
 
 // list rooms
-router.get(['/', '/:roomId'], async (ctx) => {
+router.get(['/', '/:roomId'], (ctx) => {
   const roomId = ctx.params.roomId ? parseInt(ctx.params.roomId, 10) : undefined
   const status = ctx.user.isAdmin ? STATUSES : undefined
-  const res = await Rooms.get(roomId, { status })
+  const res = Rooms.get(roomId, { status })
 
   res.result.forEach((roomId) => {
     if (ctx.user.isAdmin) {
@@ -48,7 +48,7 @@ router.post('/', async (ctx) => {
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(null, { status: STATUSES })
+  ctx.body = Rooms.get(null, { status: STATUSES })
 })
 
 // update room
@@ -74,17 +74,17 @@ router.put('/:roomId', async (ctx) => {
     if (s?.user.isAdmin) {
       ctx.io.to(s.id).emit('action', {
         type: ROOM_PREFS_PUSH,
-        payload: await Rooms.get(roomId),
+        payload: Rooms.get(roomId),
       })
     }
   }
 
   // send updated room list
-  ctx.body = await Rooms.get(null, { status: STATUSES })
+  ctx.body = Rooms.get(null, { status: STATUSES })
 })
 
 // remove room
-router.delete('/:roomId', async (ctx) => {
+router.delete('/:roomId', (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -112,7 +112,7 @@ router.delete('/:roomId', async (ctx) => {
   log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
 
   // send updated room list
-  ctx.body = await Rooms.get(null, { status: STATUSES })
+  ctx.body = Rooms.get(null, { status: STATUSES })
 })
 
 export default router

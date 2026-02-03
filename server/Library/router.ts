@@ -15,7 +15,7 @@ router.get('/song/:songId', async (ctx) => {
     ctx.throw(401, 'Invalid songId')
   }
 
-  const res = await Media.search({ songId })
+  const res = Media.search({ songId })
 
   if (!res.result.length) {
     ctx.throw(404)

@@ -23,46 +23,46 @@ import {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [PLAYER_REQ_OPTIONS]: async (sock, { payload }) => {
+  [PLAYER_REQ_OPTIONS]: (sock, { payload }) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_OPTIONS,
       payload,
     })
   },
-  [PLAYER_REQ_NEXT]: async (sock) => {
+  [PLAYER_REQ_NEXT]: (sock) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_NEXT,
     })
   },
-  [PLAYER_REQ_PAUSE]: async (sock) => {
+  [PLAYER_REQ_PAUSE]: (sock) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_PAUSE,
     })
   },
-  [PLAYER_REQ_PLAY]: async (sock) => {
+  [PLAYER_REQ_PLAY]: (sock) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_PLAY,
     })
   },
-  [PLAYER_REQ_REPLAY]: async (sock, { payload }) => {
+  [PLAYER_REQ_REPLAY]: (sock, { payload }) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_REPLAY,
       payload,
     })
   },
-  [PLAYER_REQ_VOLUME]: async (sock, { payload }) => {
+  [PLAYER_REQ_VOLUME]: (sock, { payload }) => {
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_VOLUME,
       payload,
     })
   },
-  [PLAYER_EMIT_STATUS]: async (sock, { payload }) => {
+  [PLAYER_EMIT_STATUS]: (sock, { payload }) => {
     // so we can tell the room when players leave and
     // relay last known player status on client join
     sock._lastPlayerStatus = payload
@@ -72,7 +72,7 @@ const ACTION_HANDLERS = {
       payload,
     })
   },
-  [PLAYER_EMIT_LEAVE]: async (sock) => {
+  [PLAYER_EMIT_LEAVE]: (sock) => {
     sock._lastPlayerStatus = null
 
     // any players left in room?

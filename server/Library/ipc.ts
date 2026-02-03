@@ -9,7 +9,7 @@ export default function (io) {
   const emit = throttle(action => io.emit('action', action), 1000)
 
   return {
-    [LIBRARY_MATCH_SONG]: async ({ payload }) => Library.matchSong(payload),
+    [LIBRARY_MATCH_SONG]: ({ payload }) => Library.matchSong(payload),
     [SCANNER_WORKER_STATUS]: action => emit(action),
   }
 }

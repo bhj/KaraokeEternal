@@ -1,15 +1,13 @@
 import path from 'path'
 import { db } from '../lib/Database.js'
 import sql from 'sqlate'
+import { QueueItem } from '../../shared/types.js'
 
 class Queue {
   /**
    * Add a songId to a room's queue
-   *
-   * @param  {object}      roomId, songId, userId
-   * @return {Promise}
    */
-  static async add ({ roomId, songId, userId }) {
+  static add ({ roomId, songId, userId }: { roomId: number, songId: number, userId: number }): void {
     const fields = new Map()
     fields.set('roomId', roomId)
     fields.set('songId', songId)
@@ -37,13 +35,10 @@ class Queue {
 
   /**
    * Get queued items for a given room
-   *
-   * @param  {Number}  roomId
-   * @return {Promise}
    */
-  static async get (roomId) {
-    const result = []
-    const entities = {}
+  static get (roomId: number): { result: number[], entities: Record<number, QueueItem> } {
+    const result: number[] = []
+    const entities: Record<number, any> = {}
     const map = new Map()
     const pathData = new Map()
     let curQueueId = null
@@ -63,10 +58,19 @@ class Queue {
       ORDER BY queueId, paths.priority ASC
     `
     const rows = db.all<{
-      queueId: number, songId: number, userId: number, prevQueueId: number
-      mediaId: number, relPath: string, rgTrackGain: number, rgTrackPeak: number
-      userDisplayName: string, userDateUpdated: number
-      pathId: number, pathData: string, isPreferred: number
+      queueId: number
+      songId: number
+      userId: number
+      prevQueueId: number
+      mediaId: number
+      relPath: string
+      rgTrackGain: number
+      rgTrackPeak: number
+      userDisplayName: string
+      userDateUpdated: number
+      pathId: number
+      pathData: string
+      isPreferred: number
     }>(String(query), query.parameters)
 
     for (const row of rows) {
@@ -107,10 +111,8 @@ class Queue {
 
   /**
    * Move a queue item
-   * @param  {object}      prevQueueId, queueId, roomId
-   * @return {Promise}     undefined
    */
-  static async move ({ prevQueueId, queueId, roomId }) {
+  static move ({ prevQueueId, queueId, roomId }: { prevQueueId: number | null, queueId: number, roomId: number }): void {
     if (queueId === prevQueueId) {
       throw new Error('Invalid prevQueueId')
     }
@@ -151,11 +153,8 @@ class Queue {
 
   /**
    * Delete a queue item
-   *
-   * @param  {object}      queueId, userId
-   * @return {Promise}     undefined
    */
-  static async remove (queueId) {
+  static remove (queueId: number): void {
     db.exec('BEGIN IMMEDIATE')
     db.exec('PRAGMA defer_foreign_keys = ON') // v0.9 betas didn't have prevQueueId DEFERRABLE
 
@@ -187,11 +186,8 @@ class Queue {
 
   /**
    * Check if user owns queue item(s)
-   * @param  {number} userId
-   * @param  {number|number[]} queueId
-   * @return {boolean}
    */
-  static async isOwner (userId, queueId) {
+  static isOwner (userId: number, queueId: number | number[]): boolean {
     const ids = Array.isArray(queueId) ? queueId : [queueId]
     if (ids.length === 0) return false
 
@@ -206,10 +202,8 @@ class Queue {
 
   /**
    * Get media type from file extension
-   * @param  {string} file filename
-   * @return {string}      player component
    */
-  static getType (file) {
+  static getType (file: string): string {
     return /\.mp4/i.test(path.extname(file)) ? 'mp4' : 'cdg'
   }
 }

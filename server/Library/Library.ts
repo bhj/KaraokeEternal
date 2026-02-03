@@ -8,16 +8,23 @@ import Media from '../Media/Media.js'
 const log = getLogger('Library')
 
 class Library {
-  static cache: { version: any, artists?: any, songs?: any } = { version: null }
-  static starCountsCache: { version: any, artists?: any, songs?: any } = { version: null }
+  static cache: {
+    version: number | null
+    artists?: { result: number[], entities: Record<number, Artist> }
+    songs?: { result: number[], entities: Record<number, Song> }
+  } = { version: null }
+
+  static starCountsCache: {
+    version: number | null
+    artists?: Record<number, number>
+    songs?: Record<number, number>
+  } = { version: null }
 
   /**
   * Get artists and songs in a format suitable for sending to clients.
   * Should not include songs or artists for which there are no media.
-  *
-  * @return {Promise} Object with artists and songs normalized
   */
-  static async get () {
+  static get (): typeof Library.cache {
     // already cached?
     if (this.cache.version) return this.cache
 
@@ -92,12 +99,9 @@ class Library {
 
   /**
   * Get single song in format similar to get()
-  *
-  * @param  {number}  songId
-  * @return {Promise} normalized media entries
   */
-  static async getSong (songId) {
-    const { result, entities } = await Media.search({ songId })
+  static getSong (songId: number): Record<number, Song> {
+    const { result, entities } = Media.search({ songId })
     if (!result.length) return {}
 
     // should be in order of path priority...
@@ -121,12 +125,16 @@ class Library {
 
   /**
   * Matches or creates artist and song
-  *
-  * @param  {object}  parsed  The object returned from MetaParser
-  * @return {object}          { artistId, songId }
   */
-  static async matchSong (parsed) {
-    const match: { artistId?: any, artist?: string, artistNorm?: string, songId?: any, title?: string, titleNorm?: string } = {}
+  static matchSong (parsed: { artist: string, artistNorm: string, title: string, titleNorm: string }): {
+    artistId?: number
+    artist?: string
+    artistNorm?: string
+    songId?: number
+    title?: string
+    titleNorm?: string
+  } {
+    const match: { artistId?: number, artist?: string, artistNorm?: string, songId?: number, title?: string, titleNorm?: string } = {}
 
     // match artist
     {
@@ -208,11 +216,8 @@ class Library {
 
   /**
   * Gets a user's starred artists and songs
-  *
-  * @param  {Number}  userId
-  * @return {Object}
   */
-  static async getUserStars (userId) {
+  static getUserStars (userId: number): { starredArtists: number[], starredSongs: number[] } {
     let starredArtists, starredSongs
 
     // get starred artists
@@ -244,12 +249,8 @@ class Library {
 
   /**
   * Add a user's star to a song
-  *
-  * @param  {Number}  songId
-  * @param  {Number}  userId
-  * @return {Promise} Number of rows affected
   */
-  static async starSong (songId, userId) {
+  static starSong (songId: number, userId: number): number {
     const fields = new Map()
     fields.set('songId', songId)
     fields.set('userId', userId)
@@ -270,12 +271,8 @@ class Library {
 
   /**
   * Remove a user's star from a song
-  *
-  * @param  {Number}  songId
-  * @param  {Number}  userId
-  * @return {Promise} Number of rows affected
   */
-  static async unstarSong (songId, userId) {
+  static unstarSong (songId: number, userId: number): number {
     const query = sql`
       DELETE FROM songStars
       WHERE userId = ${userId} AND songId = ${songId}
@@ -292,10 +289,8 @@ class Library {
 
   /**
   * Gets artist and song star counts
-  *
-  * @return {Object}
   */
-  static async getStarCounts () {
+  static getStarCounts (): typeof Library.starCountsCache {
     // already cached?
     if (this.starCountsCache.version) return this.starCountsCache
 

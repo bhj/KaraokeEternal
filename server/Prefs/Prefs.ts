@@ -9,9 +9,8 @@ const log = getLogger('Prefs')
 class Prefs {
   /**
    * Get all global preferences (includes media paths; excludes JWT secret key)
-   * @return {Promise<object>}
    */
-  static async get () {
+  static get () {
     const prefs = {
       paths: { result: [], entities: {} },
       roles: { result: [], entities: {} },
@@ -65,11 +64,11 @@ class Prefs {
 
   /**
    * Set a global preference
-   * @param {string} key - the preference key
-   * @param {any} data - the value to be JSON-encoded
-   * @return {Promise<boolean>} Success/fail boolean
+   * @param key - the preference key
+   * @param data - the value to be JSON-encoded
+   * @return Success/fail boolean
    */
-  static async set (key, data) {
+  static set (key: string, data: any): boolean {
     const query = sql`
       REPLACE INTO prefs (key, data)
       VALUES (${key}, ${JSON.stringify(data)})
@@ -80,12 +79,12 @@ class Prefs {
 
   /**
    * Add media path
-   * @param {string} dir - an absolute path
-   * @param {object?} data - the object to be JSON-encoded
-   * @return {Promise<number>} the newly-added path's pathId
+   * @param dir - an absolute path
+   * @param data - the object to be JSON-encoded
+   * @return the newly-added path's pathId
    */
-  static async addPath (dir, data) {
-    const prefs = await Prefs.get()
+  static addPath (dir: string, data?: object): number {
+    const prefs = Prefs.get()
     const { result, entities } = prefs.paths
 
     // is it a subfolder of an already-added folder?
@@ -114,9 +113,8 @@ class Prefs {
 
   /**
    * Remove a media path
-   * @param {number} pathId
    */
-  static async removePath (pathId) {
+  static removePath (pathId: number): void {
     const query = sql`
       DELETE FROM paths
       WHERE pathId = ${pathId}
@@ -126,9 +124,8 @@ class Prefs {
 
   /**
    * Set media path priorities
-   * @param {number[]} pathIds
    */
-  static async setPathPriority (pathIds) {
+  static setPathPriority (pathIds: number[]): void {
     if (!Array.isArray(pathIds)) {
       throw new Error('pathIds must be an array')
     }
@@ -145,12 +142,11 @@ class Prefs {
 
   /**
    * Set a path's JSON data
-   * @param {number} pathId
-   * @param {string} keyPrefix - key prefix; e.g. `prefs.`
-   * @param {object} data - key:value pair to set
+   * @param keyPrefix - key prefix; e.g. `prefs.`
+   * @param data - key:value pair to set
    * @todo Currently only supports one key:value pair at a time
    */
-  static async setPathData (pathId, keyPrefix = '', data) {
+  static setPathData (pathId: number, keyPrefix: string = '', data: object): void {
     const keys = Object.keys(data).map(key => `$.${keyPrefix}${key}`)
     const values = Object.values(data)
 
@@ -164,9 +160,9 @@ class Prefs {
 
   /**
    * Get JWT secret key from db
-   * @return {Promise<string>} the current or newly-generated key
+   * @return the current or newly-generated key
    */
-  static async getJwtKey (forceRotate = false) {
+  static getJwtKey (forceRotate: boolean = false): string {
     if (forceRotate) return this.rotateJwtKey()
 
     const query = sql`
@@ -186,7 +182,7 @@ class Prefs {
   /**
    * Create or rotate JWT secret key
    */
-  static async rotateJwtKey () {
+  static rotateJwtKey (): string {
     const jwtKey = crypto.randomBytes(48).toString('base64') // 64 char
     log.info('Rotating JWT secret key (length=%s)', jwtKey.length)
 

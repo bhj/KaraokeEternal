@@ -3,14 +3,14 @@ import Queue from '../Queue/Queue.js'
 import Rooms from '../Rooms/Rooms.js'
 import { LIBRARY_PUSH, QUEUE_PUSH } from '../../shared/actionTypes.js'
 
-async function pushQueuesAndLibrary (io) {
+function pushQueuesAndLibrary (io): void {
   // emit (potentially) updated queues to each room
   // it's important that this happens before the library is pushed,
   // otherwise queue items might reference newly non-existent songs
   for (const { room, roomId } of Rooms.getActive(io)) {
     io.to(room).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(roomId),
+      payload: Queue.get(roomId),
     })
   }
 
@@ -19,7 +19,7 @@ async function pushQueuesAndLibrary (io) {
 
   io.emit('action', {
     type: LIBRARY_PUSH,
-    payload: await Library.get(),
+    payload: Library.get(),
   })
 }
 

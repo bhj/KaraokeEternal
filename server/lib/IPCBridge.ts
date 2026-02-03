@@ -4,7 +4,6 @@ import { _ERROR, _SUCCESS } from '../../shared/actionTypes.js'
 const log = getLogger('IPCBridge')
 const PROCESS_NAME = process.env.KES_CHILD_PROCESS || 'main'
 const isParent = typeof process.env.KES_CHILD_PROCESS === 'undefined' // @todo
-const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
 
 class IPCParent {
   static children = new Map()
@@ -37,29 +36,39 @@ class IPCParent {
     }
 
     // synchronous handler: just fire and forget
-    if (!(IPCParent.handlers[type] instanceof AsyncFunction)) {
-      IPCParent.handlers[type](action)
+    const res = IPCParent.handlers[type](action)
+
+    if (res instanceof Promise) {
+      res.then((payload) => {
+        if (meta?.reqId) {
+          IPCParent.send({
+            ...action,
+            type: type + _SUCCESS,
+            payload,
+          }, meta?.pid)
+        }
+        return null
+      }).catch((err) => {
+        if (meta?.reqId) {
+          IPCParent.send({
+            ...action,
+            type: type + _ERROR,
+            error: err,
+          }, meta?.pid)
+        }
+
+        log.error(`${PROCESS_NAME}: error in ipc action ${type}: ${err.message}`)
+      })
       return
     }
 
-    // async handler: emit the result back to child
-    IPCParent.handlers[type](action).then((res) => {
+    if (meta?.reqId) {
       IPCParent.send({
         ...action,
         type: type + _SUCCESS,
         payload: res,
       }, meta?.pid)
-
-      return
-    }).catch((err) => {
-      IPCParent.send({
-        ...action,
-        type: type + _ERROR,
-        error: err,
-      }, meta?.pid)
-
-      log.error(`${PROCESS_NAME}: error in ipc action ${type}: ${err.message}`)
-    })
+    }
   }
 
   static addChild (subprocess) {
@@ -117,7 +126,39 @@ class IPCChild {
       return
     }
 
-    IPCChild.handlers[type](action)
+    const res = IPCChild.handlers[type](action)
+
+    if (res instanceof Promise) {
+      res.then((payload) => {
+        if (meta?.reqId) {
+          IPCChild.send({
+            ...action,
+            type: type + _SUCCESS,
+            payload,
+          })
+        }
+        return null
+      }).catch((err) => {
+        if (meta?.reqId) {
+          IPCChild.send({
+            ...action,
+            type: type + _ERROR,
+            error: err,
+          })
+        }
+
+        log.error(`${PROCESS_NAME}: error in ipc action ${type}: ${err.message}`)
+      })
+      return
+    }
+
+    if (meta?.reqId) {
+      IPCChild.send({
+        ...action,
+        type: type + _SUCCESS,
+        payload: res,
+      })
+    }
   }
 
   // used by child processes only

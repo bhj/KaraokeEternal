@@ -35,7 +35,7 @@ const { verify: jwtVerify } = jsonWebToken
 async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers }) {
   const indexFile = path.join(env.KES_PATH_WEBROOT, 'index.html')
   const urlPath = env.KES_URL_PATH.replace(/\/?$/, '/') // force trailing slash
-  const jwtKey = await Prefs.getJwtKey(env.KES_ROTATE_KEY)
+  const jwtKey = Prefs.getJwtKey(env.KES_ROTATE_KEY)
   const app = new Koa()
   let server, io
 
@@ -82,11 +82,11 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     })
 
     // when scanner exits cleanly
-    process.on(SCANNER_WORKER_EXITED, async ({ code }) => {
+    process.on(SCANNER_WORKER_EXITED, ({ code }) => {
       if (code !== 0) return
 
-      await Media.cleanup()
-      await pushQueuesAndLibrary(io)
+      Media.cleanup()
+      pushQueuesAndLibrary(io)
     })
 
     // handle shutdown gracefully

@@ -96,7 +96,7 @@ router.post('/login', async (ctx) => {
 })
 
 // logout
-router.get('/logout', async (ctx) => {
+router.get('/logout', (ctx) => {
   // @todo force socket room leave
   ctx.cookies.set('keToken', '')
   ctx.status = 200
@@ -104,13 +104,13 @@ router.get('/logout', async (ctx) => {
 })
 
 // get own account (helps sync account changes across devices)
-router.get('/user', async (ctx) => {
+router.get('/user', (ctx) => {
   if (typeof ctx.user.userId !== 'number') {
     ctx.throw(401)
   }
 
   // include credentials since their username may have changed
-  const user = await User.getById(ctx.user.userId, true)
+  const user = User.getById(ctx.user.userId, true)
 
   if (!user) {
     ctx.throw(404)
@@ -139,7 +139,7 @@ router.get('/users', async (ctx) => {
   }
 
   // get all users
-  const users = await User.get()
+  const users = User.get()
 
   users.result.forEach((userId) => {
     users.entities[userId].rooms = userRooms[userId] || []
@@ -156,7 +156,7 @@ router.delete('/user/:userId', async (ctx) => {
     ctx.throw(403)
   }
 
-  await User.remove(targetId)
+  User.remove(targetId)
 
   // disconnect their socket session(s)
   const sockets = await ctx.io.fetchSockets()
@@ -171,7 +171,7 @@ router.delete('/user/:userId', async (ctx) => {
   for (const { room, roomId } of Rooms.getActive(ctx.io)) {
     ctx.io.to(room).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(roomId),
+      payload: Queue.get(roomId),
     })
   }
 
@@ -183,7 +183,7 @@ router.delete('/user/:userId', async (ctx) => {
 // update a user account
 router.put('/user/:userId', async (ctx) => {
   const targetId = parseInt(ctx.params.userId, 10)
-  const user = await User.getById(ctx.user.userId, true)
+  const user = User.getById(ctx.user.userId, true)
 
   // must be admin if updating another user
   if (!user) {
@@ -223,7 +223,7 @@ router.put('/user/:userId', async (ctx) => {
     }
 
     // check for duplicate
-    if (await User.getByUsername(username)) {
+    if (User.getByUsername(username)) {
       ctx.throw(409, 'Username or email is not available')
     }
 
@@ -298,7 +298,7 @@ router.put('/user/:userId', async (ctx) => {
   for (const { room, roomId } of Rooms.getActive(ctx.io)) {
     ctx.io.to(room).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(roomId),
+      payload: Queue.get(roomId),
     })
   }
 
@@ -394,7 +394,7 @@ router.post('/user', async (ctx) => {
       return
     }
 
-    const user = await User.getById(userId, true)
+    const user = User.getById(userId, true)
 
     if (!user) {
       throw new Error('User not found')
@@ -419,7 +419,7 @@ router.post('/user', async (ctx) => {
 
 // first-time setup
 router.post('/setup', async (ctx) => {
-  const prefs: any = await Prefs.get()
+  const prefs: any = Prefs.get()
   let image
 
   // must be first run
@@ -447,7 +447,7 @@ router.post('/setup', async (ctx) => {
   try {
     const req = ctx.request as unknown as RequestWithBody
     const userId = await User.create({ ...req.body, image } as any, 'admin')
-    const user = await User.getById(userId, true)
+    const user = User.getById(userId, true)
     const userCtx = createUserCtx(user, res.lastID)
 
     // create JWT
@@ -479,7 +479,7 @@ router.post('/setup', async (ctx) => {
 })
 
 // get a user's image
-router.get('/user/:userId/image', async (ctx) => {
+router.get('/user/:userId/image', (ctx) => {
   const targetId = parseInt(ctx.params.userId, 10)
 
   if (ctx.user.userId !== targetId && !ctx.user.isAdmin) {
@@ -489,7 +489,7 @@ router.get('/user/:userId/image', async (ctx) => {
     }
   }
 
-  const user = await User.getById(targetId)
+  const user = User.getById(targetId)
 
   if (!user || !user.image) {
     ctx.throw(404)

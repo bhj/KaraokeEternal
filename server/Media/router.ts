@@ -34,7 +34,7 @@ router.get('/:mediaId', async (ctx) => {
   }
 
   // get media info
-  const res = await Media.search({ mediaId })
+  const res = Media.search({ mediaId })
 
   if (!res.result.length) {
     ctx.throw(404, 'mediaId not found')
@@ -43,7 +43,7 @@ router.get('/:mediaId', async (ctx) => {
   const { pathId, relPath } = res.entities[mediaId]
 
   // get base path
-  const { paths } = await Prefs.get()
+  const { paths } = Prefs.get()
   const basePath = paths.entities[pathId].path
 
   let file = path.join(basePath, relPath)
@@ -66,7 +66,7 @@ router.get('/:mediaId', async (ctx) => {
     buffer = Buffer.from(await entries[entry].arrayBuffer())
   } else {
     if (type === 'cdg') {
-      file = await getCdgName(file)
+      file = getCdgName(file)
       if (!file) ctx.throw(404, 'The .cdg file could not be found')
     }
 
@@ -82,7 +82,7 @@ router.get('/:mediaId', async (ctx) => {
 })
 
 // set isPreferred flag
-router.all('/:mediaId/prefer', async (ctx) => {
+router.all('/:mediaId/prefer', (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -93,21 +93,21 @@ router.all('/:mediaId/prefer', async (ctx) => {
     ctx.throw(422)
   }
 
-  const songId = await Media.setPreferred(mediaId, ctx.request.method === 'PUT')
+  const songId = Media.setPreferred(mediaId, ctx.request.method === 'PUT')
   ctx.status = 200
 
   // emit (potentially) updated queues to each room
   for (const { room, roomId } of Rooms.getActive(ctx.io)) {
     ctx.io.to(room).emit('action', {
       type: QUEUE_PUSH,
-      payload: await Queue.get(roomId),
+      payload: Queue.get(roomId),
     })
   }
 
   // emit (potentially) new duration
   ctx.io.emit('action', {
     type: LIBRARY_PUSH_SONG,
-    payload: await Library.getSong(songId),
+    payload: Library.getSong(songId),
   })
 })
 

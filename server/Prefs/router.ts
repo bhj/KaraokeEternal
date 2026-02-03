@@ -19,8 +19,8 @@ const log = getLogger('Prefs')
 const router = new KoaRouter({ prefix: '/api/prefs' })
 
 // get all prefs (including media paths)
-router.get('/', async (ctx) => {
-  const prefs = await Prefs.get() as unknown as PrefsType
+router.get('/', (ctx) => {
+  const prefs = Prefs.get() as unknown as PrefsType
 
   // must be admin or firstrun
   if (prefs.isFirstRun || ctx.user.isAdmin) {
@@ -33,7 +33,7 @@ router.get('/', async (ctx) => {
 })
 
 // add a media path
-router.post('/path', async (ctx) => {
+router.post('/path', (ctx) => {
   const dir = decodeURIComponent(ctx.query.dir as string)
 
   if (!ctx.user.isAdmin) {
@@ -45,12 +45,12 @@ router.post('/path', async (ctx) => {
     ctx.throw(422, 'Invalid path')
   }
 
-  const pathId = await Prefs.addPath(dir, {
+  const pathId = Prefs.addPath(dir, {
     prefs: (ctx.request as unknown as RequestWithBody).body,
   })
 
   // respond with updated prefs
-  const prefs = await Prefs.get() as unknown as PrefsType
+  const prefs = Prefs.get() as unknown as PrefsType
   ctx.body = prefs
 
   // (re)start watcher
@@ -60,7 +60,7 @@ router.post('/path', async (ctx) => {
 })
 
 // set media path preferences
-router.put('/path/:pathId', async (ctx) => {
+router.put('/path/:pathId', (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -71,10 +71,10 @@ router.put('/path/:pathId', async (ctx) => {
     ctx.throw(422, 'Invalid pathId')
   }
 
-  await Prefs.setPathData(pathId, 'prefs.', (ctx.request as unknown as RequestWithBody).body)
+  Prefs.setPathData(pathId, 'prefs.', (ctx.request as unknown as RequestWithBody).body)
 
   // respond with updated prefs
-  const prefs = await Prefs.get() as unknown as PrefsType
+  const prefs = Prefs.get() as unknown as PrefsType
   ctx.body = prefs
 
   // (re)start watcher?
@@ -87,14 +87,14 @@ router.put('/path/:pathId', async (ctx) => {
     for (const { room, roomId } of Rooms.getActive(ctx.io)) {
       ctx.io.to(room).emit('action', {
         type: QUEUE_PUSH,
-        payload: await Queue.get(roomId),
+        payload: Queue.get(roomId),
       })
     }
   }
 })
 
 // remove a media path
-router.delete('/path/:pathId', async (ctx) => {
+router.delete('/path/:pathId', (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -107,18 +107,17 @@ router.delete('/path/:pathId', async (ctx) => {
 
   ctx.stopScanner()
 
-  await Prefs.removePath(pathId)
+  Prefs.removePath(pathId)
 
   // respond with updated prefs
-  const prefs = await Prefs.get() as unknown as PrefsType
+  const prefs = Prefs.get() as unknown as PrefsType
   ctx.body = prefs
 
   // (re)start watcher
   process.emit(PREFS_PATHS_CHANGED, prefs.paths)
 
-  await Media.cleanup()
+  Media.cleanup()
 
-  // no need to await
   pushQueuesAndLibrary(ctx.io)
 })
 

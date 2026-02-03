@@ -24,7 +24,7 @@ let IPC
   // init database
   const { open } = await import('./lib/Database.js')
 
-  await open({
+  open({
     file: path.join(env.KES_PATH_DATA, 'database.sqlite3'),
     ro: true,
   })

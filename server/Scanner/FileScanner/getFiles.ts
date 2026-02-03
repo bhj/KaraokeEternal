@@ -4,34 +4,15 @@ import getLogger from '../../lib/Log.js'
 const log = getLogger('FileScanner:getFiles')
 
 /**
- * Silly promise wrapper for synchronous walker
- *
- * We want a synchronous walker for performance, but FileScanner runs
- * the walker in a loop, which will block the (async) socket.io status
- * emissions unless we use setTimeout here. @todo is there a better way?
- *
- * @param  {string} dir      path to recursively list
- * @param  {function} filterFn filter function applied to each file
- * @return {array}          array of objects with path and stat properties
- */
-function getFiles (dir, filterFn) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        resolve(walkSync(dir, filterFn))
-      } catch (err) {
-        reject(err)
-      }
-    }, 0)
-  })
-}
-
-/**
  * Directory walker that only throws if parent directory
  * can't be read. Errors stat-ing children are only logged.
+ *
+ * @param dir path to recursively list
+ * @param filterFn filter function applied to each file
+ * @return array of objects with path and stat properties
  */
-function walkSync (dir, filterFn) {
-  let results = []
+function getFiles (dir: string, filterFn?: (file: string) => boolean): { file: string, stats: fs.Stats }[] {
+  let results: { file: string, stats: fs.Stats }[] = []
   const list = fs.readdirSync(dir)
 
   list.forEach((file) => {
@@ -47,7 +28,7 @@ function walkSync (dir, filterFn) {
 
     if (stats && stats.isDirectory()) {
       try {
-        results = results.concat(walkSync(file, filterFn))
+        results = results.concat(getFiles(file, filterFn))
       } catch (err) {
         log.warn(err.message)
       }
