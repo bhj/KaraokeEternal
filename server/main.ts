@@ -61,9 +61,9 @@ process.on('unhandledRejection', (reason) => {
 ;(async function () {
   // init database
   const { open, close } = await import('./lib/Database.js')
-  shutdownHandlers.push(close)
+  shutdownHandlers.push(async () => close())
 
-  await open({
+  open({
     file: path.join(env.KES_PATH_DATA, 'database.sqlite3'),
     ro: false,
   })
@@ -88,7 +88,7 @@ process.on('unhandledRejection', (reason) => {
 
   // any paths with watching enabled?
   const { default: Prefs } = await import('./Prefs/Prefs.js')
-  const { paths } = await Prefs.get()
+  const { paths } = Prefs.get()
 
   if (paths.result.find(pathId => paths.entities[pathId].prefs?.isWatchingEnabled)) {
     startWatcher(paths)
