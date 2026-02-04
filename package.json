@@ -60,6 +60,7 @@
     "bcryptjs": "^3.0.3",
     "ctx-compose": "^3.0.0",
     "electron-log": "^5.4.3",
+    "fractional-indexing": "^3.2.0",
     "json-e": "^4.8.1",
     "json5": "^2.2.3",
     "jsonwebtoken": "^9.0.3",

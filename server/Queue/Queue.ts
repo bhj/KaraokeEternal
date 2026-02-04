@@ -1,4 +1,5 @@
 import path from 'path'
+import { generateKeyBetween } from 'fractional-indexing'
 import { db } from '../lib/Database.js'
 import sql from 'sqlate'
 import { QueueItem } from '../../shared/types.js'
@@ -8,19 +9,25 @@ class Queue {
    * Add a songId to a room's queue
    */
   static add ({ roomId, songId, userId }: { roomId: number, songId: number, userId: number }): void {
+    // Get the last position in the queue for this room
+    const lastQuery = sql`
+      SELECT position
+      FROM queue
+      WHERE roomId = ${roomId}
+      ORDER BY position DESC
+      LIMIT 1
+    `
+    const lastRow = db.get<{ position: string }>(String(lastQuery), lastQuery.parameters)
+    const lastPosition = lastRow?.position ?? null
+
+    // Generate a new position after the last item
+    const newPosition = generateKeyBetween(lastPosition, null)
+
     const fields = new Map()
     fields.set('roomId', roomId)
     fields.set('songId', songId)
     fields.set('userId', userId)
-    fields.set('prevQueueId', sql`(
-      SELECT queueId
-      FROM queue
-      WHERE roomId = ${roomId} AND queueId NOT IN (
-        SELECT prevQueueId
-        FROM queue
-        WHERE prevQueueId IS NOT NULL
-      )
-    )`)
+    fields.set('position', newPosition)
 
     const query = sql`
       INSERT INTO queue ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
@@ -39,12 +46,10 @@ class Queue {
   static get (roomId: number): { result: number[], entities: Record<number, QueueItem> } {
     const result: number[] = []
     const entities: Record<number, any> = {}
-    const map = new Map()
     const pathData = new Map()
-    let curQueueId = null
 
     const query = sql`
-      SELECT queueId, songId, userId, prevQueueId,
+      SELECT queueId, songId, userId, position,
         media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
         users.name AS userDisplayName, users.dateUpdated AS userDateUpdated,
         paths.pathId, paths.data AS pathData,
@@ -55,13 +60,13 @@ class Queue {
         INNER JOIN paths USING(pathId)
       WHERE roomId = ${roomId}
       GROUP BY queueId
-      ORDER BY queueId, paths.priority ASC
+      ORDER BY position ASC
     `
     const rows = db.all<{
       queueId: number
       songId: number
       userId: number
-      prevQueueId: number
+      position: string
       mediaId: number
       relPath: string
       rgTrackGain: number
@@ -88,105 +93,85 @@ class Queue {
       delete entities[row.queueId].relPath
       delete entities[row.queueId].isPreferred
       delete entities[row.queueId].pathData
+      delete entities[row.queueId].position
 
-      if (row.prevQueueId === null) {
-        // found the first item
-        result.push(row.queueId)
-        curQueueId = row.queueId
-      } else {
-        // map indexed by prevQueueId
-        map.set(row.prevQueueId, row.queueId)
-      }
-    }
-
-    while (result.length < rows.length) {
-      // get the item whose prevQueueId references the current one
-      const nextId = map.get(curQueueId)
-      if (nextId === undefined || !entities[nextId]) {
-        // Linked list is broken - stop here to avoid crash
-        // This can happen if queue data is corrupted
-        break
-      }
-      const nextQueueId = entities[nextId].queueId
-      result.push(nextQueueId)
-      curQueueId = nextQueueId
+      result.push(row.queueId)
     }
 
     return { result, entities }
   }
 
   /**
-   * Move a queue item
+   * Move a queue item to a new position
+   * prevQueueId: -1 means move to beginning, otherwise the queueId after which to insert
    */
   static move ({ prevQueueId, queueId, roomId }: { prevQueueId: number | null, queueId: number, roomId: number }): void {
     if (queueId === prevQueueId) {
       throw new Error('Invalid prevQueueId')
     }
 
-    if (prevQueueId === -1) prevQueueId = null
-
-    const query = sql`
-      UPDATE queue
-      SET prevQueueId = CASE
-        WHEN queueId = newChild THEN ${queueId}
-        WHEN queueId = curChild AND curParent IS NOT NULL AND newChild IS NOT NULL THEN curParent
-        WHEN queueId = ${queueId} THEN ${prevQueueId}
-        ELSE queue.prevQueueId
-      END
-      FROM (SELECT
-        (
-          SELECT prevQueueId
-          FROM queue
-          WHERE queueId = ${queueId}
-        ) AS curParent,
-        (
-          SELECT queueId
-          FROM queue
-          WHERE prevQueueId = ${queueId}
-        ) AS curChild,
-        (
-          SELECT queueId
-          FROM queue
-          WHERE queueId != ${queueId}
-            AND prevQueueId ${prevQueueId === null ? sql`IS NULL` : sql`= ${prevQueueId}`}
-            AND roomId = ${roomId}
-        ) AS newChild
-      )
+    // Get all positions in the room ordered
+    const positionsQuery = sql`
+      SELECT queueId, position
+      FROM queue
       WHERE roomId = ${roomId}
+      ORDER BY position ASC
     `
-    db.run(String(query), query.parameters)
+    const rows = db.all<{ queueId: number, position: string }>(String(positionsQuery), positionsQuery.parameters)
+
+    // Find the positions we need
+    let beforePosition: string | null = null
+    let afterPosition: string | null = null
+
+    if (prevQueueId === -1 || prevQueueId === null) {
+      // Move to beginning
+      afterPosition = rows.length > 0 ? rows[0].position : null
+      // Skip the item being moved if it's already first
+      if (rows.length > 0 && rows[0].queueId === queueId && rows.length > 1) {
+        afterPosition = rows[1].position
+      }
+    } else {
+      // Find the position after prevQueueId
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].queueId === prevQueueId) {
+          beforePosition = rows[i].position
+          // Find the next item that isn't the one being moved
+          for (let j = i + 1; j < rows.length; j++) {
+            if (rows[j].queueId !== queueId) {
+              afterPosition = rows[j].position
+              break
+            }
+          }
+          break
+        }
+      }
+    }
+
+    // Generate new position between before and after
+    const newPosition = generateKeyBetween(beforePosition, afterPosition)
+
+    // Update the position
+    const updateQuery = sql`
+      UPDATE queue
+      SET position = ${newPosition}
+      WHERE queueId = ${queueId} AND roomId = ${roomId}
+    `
+    db.run(String(updateQuery), updateQuery.parameters)
   }
 
   /**
    * Delete a queue item
+   * With fractional indexing, we simply delete the item - no need to update other positions
    */
   static remove (queueId: number): void {
-    db.exec('BEGIN IMMEDIATE')
-    db.exec('PRAGMA defer_foreign_keys = ON') // v0.9 betas didn't have prevQueueId DEFERRABLE
+    const deleteQuery = sql`
+      DELETE FROM queue
+      WHERE queueId = ${queueId}
+    `
+    const res = db.run(String(deleteQuery), deleteQuery.parameters)
 
-    try {
-      const deleteQuery = sql`
-        DELETE FROM queue
-        WHERE queueId = ${queueId}
-        RETURNING prevQueueId
-      `
-      const deletedRow = db.get<{ prevQueueId: number | null }>(String(deleteQuery), deleteQuery.parameters)
-
-      if (deletedRow === undefined) {
-        throw new Error(`Could not remove queueId: ${queueId}`)
-      }
-
-      // close the gap
-      const updateQuery = sql`
-        UPDATE queue
-        SET prevQueueId = ${deletedRow.prevQueueId}
-        WHERE prevQueueId = ${queueId}
-      `
-      db.run(String(updateQuery), updateQuery.parameters)
-      db.exec('COMMIT')
-    } catch (err) {
-      db.exec('ROLLBACK')
-      throw err
+    if (!res.changes) {
+      throw new Error(`Could not remove queueId: ${queueId}`)
     }
   }
 
@@ -203,7 +188,7 @@ class Queue {
       WHERE userId = ${userId} AND queueId IN ${sql.tuple(ids)}
     `
     const res = db.get<{ count: number }>(String(query), query.parameters)
-    return res.count === ids.length
+    return res!.count === ids.length
   }
 
   /**
