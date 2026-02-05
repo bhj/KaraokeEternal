@@ -72,25 +72,6 @@
   border-color: rgba(212, 160, 23, 0.5);
 }
 
-.autoAudioButton {
-  padding: 0.375rem 0.75rem;
-  background: rgba(56, 189, 248, 0.15);
-  background-image: var(--aqua-gloss, none);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 6px;
-  font-size: var(--text-sm);
-  cursor: pointer;
-  font-weight: 500;
-  white-space: nowrap;
-  min-height: 36px;
-}
-
-.autoAudioButton:hover {
-  background: rgba(56, 189, 248, 0.25);
-  border-color: rgba(56, 189, 248, 0.5);
-}
-
 
 .sendButton {
   padding: 0.375rem 1rem;
@@ -154,51 +135,6 @@
   font-size: var(--text-xs);
   cursor: pointer;
   min-height: 32px;
-}
-
-.stripAudioButton {
-  padding: 0.375rem 0.75rem;
-  background: rgba(229, 115, 115, 0.15);
-  background-image: var(--aqua-gloss, none);
-  color: #e57373;
-  border: 1px solid rgba(229, 115, 115, 0.3);
-  border-radius: 6px;
-  font-size: var(--text-sm);
-  cursor: pointer;
-  font-weight: 500;
-  white-space: nowrap;
-  min-height: 36px;
-}
-
-.stripAudioButton:hover {
-  background: rgba(229, 115, 115, 0.25);
-  border-color: rgba(229, 115, 115, 0.5);
-}
-
-.injectionLevel {
-  display: inline-flex;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-}
-
-.injectionButton {
-  padding: 0.3rem 0.65rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  border: none;
-  font-size: var(--text-xs);
-  cursor: pointer;
-  min-height: 32px;
-}
-
-.injectionButton + .injectionButton {
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.injectionButtonActive {
-  background: rgba(78, 205, 196, 0.25);
-  color: #eafffb;
 }
 
 .cameraBanner {
@@ -281,29 +217,12 @@
     min-height: 40px;
   }
 
-  .autoAudioButton {
-    display: none;
-  }
-
   .sendButton {
     order: 4;
     flex: 1;
     padding: 0.625rem;
     font-size: var(--text-md);
     min-height: 44px;
-  }
-
-  .stripAudioButton {
-    display: none;
-  }
-
-  .injectionLevel {
-    display: none;
-  }
-
-  .injectionButton {
-    flex: 1;
-    min-height: 40px;
   }
 
   .sendGroup {

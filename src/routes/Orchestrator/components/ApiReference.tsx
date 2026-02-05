@@ -29,9 +29,8 @@ function ApiReference () {
           </div>
         ))}
         <div className={styles.autoAudioNote}>
-          {'Audio reactivity is opt-in. Use "Auto Audio" to insert a.fft-based lines into the current sketch. '
-            + 'Nothing is injected automatically — the editor content is exactly what gets sent to the Player. '
-            + 'You can remove injected lines any time or write your own audio logic.'}
+          {'Audio reactivity is fully manual. Use a.fft[n], bass(), mid(), treble(), beat(), energy(), bpm(), or bright() '
+            + 'directly in your sketch. The editor content is exactly what gets sent to the Player.'}
         </div>
       </div>
 

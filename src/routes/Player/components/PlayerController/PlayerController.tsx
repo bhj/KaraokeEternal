@@ -2,7 +2,6 @@ import React, { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { useCameraReceiver } from 'lib/webrtc/useCameraReceiver'
 import Player from '../Player/Player'
-import InjectionLevelIndicator from '../InjectionLevelIndicator/InjectionLevelIndicator'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
@@ -187,9 +186,6 @@ const PlayerController = (props: PlayerControllerProps) => {
         width={props.width}
         height={props.height}
       />
-      {playerVisualizer && (
-        <InjectionLevelIndicator level={playerVisualizer.injectionLevel} />
-      )}
       {roomPrefs?.qr?.isEnabled && (
         <PlayerQR
           height={props.height}

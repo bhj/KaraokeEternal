@@ -52,28 +52,37 @@ class HydraFolders {
   }
 
   static async update (folderId: number, { name, sortOrder }: { name?: string, sortOrder?: number }): Promise<void> {
-    const fields: string[] = []
-    const params: Array<string | number> = []
-
     if (typeof name === 'string') {
-      fields.push('name = ?')
-      params.push(name)
+      const nameQuery = sql`
+        UPDATE hydraFolders
+        SET name = ${name}
+        WHERE folderId = ${folderId}
+      `
+      await db.run(String(nameQuery), nameQuery.parameters)
     }
 
     if (typeof sortOrder === 'number') {
-      fields.push('sortOrder = ?')
-      params.push(sortOrder)
+      const sortOrderQuery = sql`
+        UPDATE hydraFolders
+        SET sortOrder = ${sortOrder}
+        WHERE folderId = ${folderId}
+      `
+      await db.run(String(sortOrderQuery), sortOrderQuery.parameters)
     }
-
-    if (fields.length === 0) return
-
-    params.push(folderId)
-
-    await db.run(`UPDATE hydraFolders SET ${fields.join(', ')} WHERE folderId = ?`, params)
   }
 
   static async remove (folderId: number): Promise<void> {
-    await db.run('DELETE FROM hydraFolders WHERE folderId = ?', [folderId])
+    const deletePresetsQuery = sql`
+      DELETE FROM hydraPresets
+      WHERE folderId = ${folderId}
+    `
+    await db.run(String(deletePresetsQuery), deletePresetsQuery.parameters)
+
+    const deleteFolderQuery = sql`
+      DELETE FROM hydraFolders
+      WHERE folderId = ${folderId}
+    `
+    await db.run(String(deleteFolderQuery), deleteFolderQuery.parameters)
   }
 }
 

@@ -16,4 +16,19 @@ describe('buildPresetDraft', () => {
     expect(draft.name).toBe('flor_1 copy')
     expect(draft.code).toBe('src(s0).out()')
   })
+
+  it('increments trailing copy suffix when cloning an already-cloned preset', () => {
+    const firstClone = buildPresetDraft({
+      currentCode: 'ignored',
+      preset: { name: 'flor_1 copy', code: 'src(s0).out()' },
+    })
+
+    const numberedClone = buildPresetDraft({
+      currentCode: 'ignored',
+      preset: { name: 'flor_1 copy 2', code: 'src(s0).out()' },
+    })
+
+    expect(firstClone.name).toBe('flor_1 copy 2')
+    expect(numberedClone.name).toBe('flor_1 copy 3')
+  })
 })

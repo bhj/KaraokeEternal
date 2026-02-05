@@ -1,24 +1,11 @@
 import React from 'react'
-import type { InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
-import styles from './InjectionLevelIndicator.css'
 
 interface InjectionLevelIndicatorProps {
-  level: InjectionLevel
+  level?: string
+  visible?: boolean
 }
 
-const LABELS: Record<InjectionLevel, string> = {
-  low: 'Low',
-  med: 'Med',
-  high: 'High',
-}
-
-function InjectionLevelIndicator ({ level }: InjectionLevelIndicatorProps) {
-  return (
-    <div key={level} className={styles.indicator}>
-      <span>Audio:</span>
-      <span>{LABELS[level]}</span>
-    </div>
-  )
-}
+// Legacy no-op component kept to preserve API compatibility.
+const InjectionLevelIndicator: React.FC<InjectionLevelIndicatorProps> = () => null
 
 export default InjectionLevelIndicator

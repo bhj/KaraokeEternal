@@ -110,6 +110,11 @@ describe('StagePanel', () => {
           height={270}
           buffer='auto'
           onBufferChange={vi.fn()}
+          visualizerMode='hydra'
+          visualizerEnabled={true}
+          visualizerSensitivity={1}
+          visualizerAllowCamera={false}
+          visualizerAudioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
         />,
       )
     })

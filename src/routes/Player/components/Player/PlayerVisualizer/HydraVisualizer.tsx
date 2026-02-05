@@ -8,6 +8,7 @@ import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
 import { getHydraEvalCode, DEFAULT_PATCH } from './hydraEvalCode'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { applyRemoteCameraOverride, restoreRemoteCameraOverride } from 'lib/remoteCameraOverride'
+import { shouldEmitFft } from './hooks/emitFftPolicy'
 import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
 import type { AudioResponseState } from 'shared/types'
 import styles from './HydraVisualizer.css'
@@ -272,9 +273,8 @@ function HydraVisualizer ({
     // Update audio data from analyser
     updateAudio()
 
-    // Emit FFT if enabled (even if isPlaying is false but energy is present)
-    const hasEnergy = audioRef.current.energy > 0.01
-    if (emitFft && (isPlaying || hasEnergy)) {
+    // Emit FFT if enabled (always emit while Hydra is running)
+    if (emitFft && shouldEmitFft(isPlaying)) {
       emitFftData(audioRef.current)
     }
 

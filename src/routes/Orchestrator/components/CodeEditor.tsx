@@ -10,7 +10,7 @@ import { hydraExtensions } from './hydraHighlightStyle'
 import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
 import { getLintErrorSummary } from './codeEditorUtils'
-import { isInjectedLine, isPartialInjectedLine, stripInjectedLines } from 'lib/injectedLines'
+import { isInjectedLine, isPartialInjectedLine } from 'lib/injectedLines'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
 import { getSkipRegions } from 'lib/skipRegions'
@@ -170,7 +170,7 @@ function hydraLinter (view: EditorView): Diagnostic[] {
         from: line.from,
         to: line.to,
         severity: 'info',
-        message: 'Modified audio injection — use Auto Audio to regenerate',
+        message: 'Modified audio injection — remove or reapply manually',
       })
     }
   }
@@ -240,9 +240,6 @@ interface CodeEditorProps {
   sendStatus?: 'idle' | 'sending' | 'synced' | 'error'
   onResend?: () => void
   onRandomize: () => void
-  onAutoAudio: () => void
-  injectionLevel: 'low' | 'med' | 'high'
-  onInjectionLevelChange: (level: 'low' | 'med' | 'high') => void
   cameraStatus?: 'idle' | 'connecting' | 'active' | 'error'
   onCameraToggle?: () => void
 }
@@ -254,9 +251,6 @@ function CodeEditor ({
   sendStatus = 'idle',
   onResend,
   onRandomize,
-  onAutoAudio,
-  injectionLevel,
-  onInjectionLevelChange,
   cameraStatus,
   onCameraToggle,
 }: CodeEditorProps) {
@@ -344,15 +338,6 @@ function CodeEditor ({
     sendAttemptRef.current()
   }, [])
 
-  const hasInjectedLines = useMemo(
-    () => code.split('\n').some(isInjectedLine),
-    [code],
-  )
-
-  const handleStripAudio = useCallback(() => {
-    onCodeChange(stripInjectedLines(code))
-  }, [code, onCodeChange])
-
   // Camera banner: show when code uses src(sN) without init
   const cameraUsage = useMemo(() => detectCameraUsage(code), [code])
   const [cameraBannerDismissed, setCameraBannerDismissed] = useState(false)
@@ -419,42 +404,6 @@ function CodeEditor ({
         <button type='button' className={styles.randomButton} onClick={onRandomize}>
           Random
         </button>
-        <button type='button' className={styles.autoAudioButton} onClick={onAutoAudio}>
-          Auto Audio
-        </button>
-        <div className={styles.injectionLevel}>
-          <button
-            type='button'
-            className={`${styles.injectionButton} ${injectionLevel === 'low' ? styles.injectionButtonActive : ''}`}
-            onClick={() => onInjectionLevelChange('low')}
-          >
-            Low
-          </button>
-          <button
-            type='button'
-            className={`${styles.injectionButton} ${injectionLevel === 'med' ? styles.injectionButtonActive : ''}`}
-            onClick={() => onInjectionLevelChange('med')}
-          >
-            Med
-          </button>
-          <button
-            type='button'
-            className={`${styles.injectionButton} ${injectionLevel === 'high' ? styles.injectionButtonActive : ''}`}
-            onClick={() => onInjectionLevelChange('high')}
-          >
-            High
-          </button>
-        </div>
-        {hasInjectedLines && (
-          <button
-            type='button'
-            className={styles.stripAudioButton}
-            onClick={handleStripAudio}
-            title='Remove auto-injected audio-reactive lines'
-          >
-            Strip Audio
-          </button>
-        )}
         {onCameraToggle && (
           <button
             type='button'

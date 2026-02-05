@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
+import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, shouldAutoApplyPreset, resolvePreviewHydraState } from './orchestratorViewHelpers'
 import { getPresetByIndex } from '../components/hydraPresets'
 
 describe('orchestratorViewHelpers', () => {
@@ -59,6 +59,26 @@ describe('orchestratorViewHelpers', () => {
     it('returns null when remote is undefined', () => {
       const result = getPendingRemote(undefined, 'local', true)
       expect(result).toBeNull()
+    })
+  })
+
+  describe('normalizeCodeForAck', () => {
+    it('returns null for null or undefined', () => {
+      expect(normalizeCodeForAck(null)).toBeNull()
+      expect(normalizeCodeForAck(undefined)).toBeNull()
+    })
+
+    it('strips injected lines and normalizes line endings', () => {
+      const code = [
+        'osc(10)',
+        '  .modulate(osc(3, 0.05), () => a.fft[0] * 0.25)',
+        '  .rotate(() => a.fft[1] * 0.08)',
+        '  .scale(() => 0.95 + a.fft[2] * 0.08)',
+        '  .color(1, 1 - a.fft[3] * 0.06, 1 + a.fft[3] * 0.06)',
+        '  .out()',
+      ].join('\r\n')
+
+      expect(normalizeCodeForAck(code)).toBe('osc(10)\n  .out()')
     })
   })
 
@@ -176,5 +196,65 @@ describe('orchestratorViewHelpers', () => {
     it('returns false: remoteCode is undefined', () => {
       expect(shouldAutoApplyPreset(0, 5, true, undefined)).toBe(false)
     })
+  })
+})
+
+describe('resolvePreviewHydraState', () => {
+  it('prefers player visualizer values when hasHydraUpdate=true', () => {
+    const state = resolvePreviewHydraState(
+      true,
+      {
+        mode: 'off',
+        isEnabled: false,
+        sensitivity: 0.75,
+        allowCamera: true,
+        audioResponse: { globalGain: 1.5, bassWeight: 2, midWeight: 0.9, trebleWeight: 0.8 },
+      },
+      {
+        mode: 'hydra',
+        isEnabled: true,
+        sensitivity: 1.25,
+        allowCamera: false,
+      },
+    )
+
+    expect(state.mode).toBe('off')
+    expect(state.isEnabled).toBe(false)
+    expect(state.sensitivity).toBe(0.75)
+    expect(state.allowCamera).toBe(true)
+    expect(state.audioResponse.globalGain).toBe(1.5)
+  })
+
+  it('uses status visualizer values when hasHydraUpdate=false', () => {
+    const state = resolvePreviewHydraState(
+      false,
+      {
+        mode: 'off',
+        isEnabled: false,
+        sensitivity: 0.5,
+        allowCamera: false,
+      },
+      {
+        mode: 'hydra',
+        isEnabled: true,
+        sensitivity: 1.2,
+        allowCamera: true,
+      },
+    )
+
+    expect(state.mode).toBe('hydra')
+    expect(state.isEnabled).toBe(true)
+    expect(state.sensitivity).toBe(1.2)
+    expect(state.allowCamera).toBe(true)
+  })
+
+  it('falls back to sane defaults when values are missing', () => {
+    const state = resolvePreviewHydraState(false, {}, {})
+
+    expect(state.mode).toBe('hydra')
+    expect(state.isEnabled).toBe(true)
+    expect(state.sensitivity).toBe(1)
+    expect(state.allowCamera).toBe(false)
+    expect(state.audioResponse.globalGain).toBe(1)
   })
 })

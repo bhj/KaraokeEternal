@@ -4,15 +4,8 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
-import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioizeHydraCode'
-import {
-  DEFAULT_PROFILE,
-  INJECTION_FACTORS,
-  scaleProfile,
-  type InjectionLevel,
-} from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
-import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
+import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, resolvePreviewHydraState, shouldAutoApplyPreset } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
 import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
@@ -38,6 +31,7 @@ function OrchestratorView () {
   const remotePresetIndex = hasUpdate
     ? playerVisualizer.hydraPresetIndex
     : status.visualizer?.hydraPresetIndex
+  const previewHydraState = resolvePreviewHydraState(hasUpdate, playerVisualizer, status.visualizer)
 
   const ui = useAppSelector(state => state.ui)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -49,13 +43,12 @@ function OrchestratorView () {
   const [activeTab, setActiveTab] = useState<'presets' | 'api'>('presets')
   const [activeMobileTab, setActiveMobileTab] = useState<'stage' | 'code' | 'ref'>('stage')
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
-  const [injectionLevel, setInjectionLevel] = useState<InjectionLevel>('med')
   const [refPanelWidth, setRefPanelWidth] = useState<number>(() => {
     if (typeof window === 'undefined') return 280
     const stored = window.localStorage.getItem('orchestratorRefPanelWidth')
     const width = stored ? Number(stored) : NaN
     if (!Number.isFinite(width)) return 280
-    return Math.min(480, Math.max(220, width))
+    return Math.min(520, Math.max(240, width))
   })
   const [isResizingPanel, setIsResizingPanel] = useState(false)
   const [sendStatus, setSendStatus] = useState<'idle' | 'sending' | 'synced' | 'error'>('idle')
@@ -64,7 +57,7 @@ function OrchestratorView () {
   const lastSentRef = useRef<string | null>(null)
 
   const handleSendCode = useCallback((code: string) => {
-    lastSentRef.current = code
+    lastSentRef.current = normalizeCodeForAck(code)
     setSendStatus('sending')
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
@@ -91,15 +84,6 @@ function OrchestratorView () {
     setLocalCode(sketch)
     setUserHasEdited(true)
   }, [])
-
-  const handleAutoAudio = useCallback(() => {
-    const profile = scaleProfile(DEFAULT_PROFILE, INJECTION_FACTORS[injectionLevel])
-    const audioized = audioizeHydraCode(localCode, profile)
-    if (audioized !== localCode) {
-      setLocalCode(audioized)
-      setUserHasEdited(true)
-    }
-  }, [injectionLevel, localCode])
 
   const handleCameraToggle = useCallback(async () => {
     if (camera.status === 'idle' || camera.status === 'error') {
@@ -160,7 +144,7 @@ function OrchestratorView () {
     const handleMove = (event: PointerEvent) => {
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return
-      const next = Math.min(480, Math.max(220, event.clientX - rect.left))
+      const next = Math.min(520, Math.max(240, event.clientX - rect.left))
       setRefPanelWidth(next)
     }
     const handleUp = () => {
@@ -192,8 +176,8 @@ function OrchestratorView () {
   // Mark send status as synced when remote matches last sent code
   useEffect(() => {
     if (!lastSentRef.current || !remoteHydraCode) return
-    const normalize = (s: string) => s.trim().replace(/\r\n/g, '\n')
-    if (normalize(remoteHydraCode) !== normalize(lastSentRef.current)) return
+    const normalizedRemote = normalizeCodeForAck(remoteHydraCode)
+    if (!normalizedRemote || normalizedRemote !== lastSentRef.current) return
     let timeoutId: number | null = null
     const rafId = requestAnimationFrame(() => {
       setSendStatus('synced')
@@ -349,9 +333,15 @@ function OrchestratorView () {
             height={previewSize.height}
             buffer={previewBuffer}
             onBufferChange={setPreviewBuffer}
+            localCameraStream={camera.stream}
             onPresetLoad={handleLoadPreset}
             onPresetSend={handleSendPreset}
             onRandomize={handleRandomize}
+            visualizerMode={previewHydraState.mode}
+            visualizerEnabled={previewHydraState.isEnabled}
+            visualizerSensitivity={previewHydraState.sensitivity}
+            visualizerAllowCamera={previewHydraState.allowCamera}
+            visualizerAudioResponse={previewHydraState.audioResponse}
           />
         </div>
       )}
@@ -364,9 +354,6 @@ function OrchestratorView () {
             sendStatus={sendStatus}
             onResend={handleResend}
             onRandomize={handleRandomize}
-            onAutoAudio={handleAutoAudio}
-            injectionLevel={injectionLevel}
-            onInjectionLevelChange={setInjectionLevel}
             cameraStatus={camera.status}
             onCameraToggle={handleCameraToggle}
           />

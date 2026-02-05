@@ -7,9 +7,11 @@ interface RequestWithBody {
 }
 
 const router = new KoaRouter({ prefix: '/api/hydra-presets' })
+const MAX_PRESET_CODE_LENGTH = 50_000
 
-function requireUser (ctx) {
+function requireUser (ctx, { nonGuest = false }: { nonGuest?: boolean } = {}) {
   if (!ctx.user?.userId) ctx.throw(401)
+  if (nonGuest && ctx.user.isGuest) ctx.throw(403, 'Guests cannot manage presets')
 }
 
 function parseId (value: string, ctx, label: string): number {
@@ -24,7 +26,7 @@ router.get('/folders', async (ctx) => {
 })
 
 router.post('/folders', async (ctx) => {
-  requireUser(ctx)
+  requireUser(ctx, { nonGuest: true })
 
   const body = (ctx.request as unknown as RequestWithBody).body as { name?: unknown }
   const name = typeof body.name === 'string' ? body.name.trim() : ''
@@ -40,7 +42,7 @@ router.post('/folders', async (ctx) => {
 })
 
 router.put('/folders/:folderId', async (ctx) => {
-  requireUser(ctx)
+  requireUser(ctx, { nonGuest: true })
   const folderId = parseId(ctx.params.folderId, ctx, 'folderId')
 
   const folder = await HydraFolders.getById(folderId)
@@ -63,7 +65,7 @@ router.put('/folders/:folderId', async (ctx) => {
 })
 
 router.delete('/folders/:folderId', async (ctx) => {
-  requireUser(ctx)
+  requireUser(ctx, { nonGuest: true })
   const folderId = parseId(ctx.params.folderId, ctx, 'folderId')
 
   const folder = await HydraFolders.getById(folderId)
@@ -88,7 +90,7 @@ router.get('/folder/:folderId', async (ctx) => {
 })
 
 router.post('/', async (ctx) => {
-  requireUser(ctx)
+  requireUser(ctx, { nonGuest: true })
 
   const body = (ctx.request as unknown as RequestWithBody).body as {
     folderId?: unknown
@@ -101,6 +103,13 @@ router.post('/', async (ctx) => {
   if (folderId === null) ctx.throw(400, 'Invalid folderId')
   if (!name) ctx.throw(400, 'Invalid name')
   if (!code.trim()) ctx.throw(400, 'Invalid code')
+  if (code.length > MAX_PRESET_CODE_LENGTH) ctx.throw(400, 'Code too large')
+
+  const targetFolder = await HydraFolders.getById(folderId)
+  if (!targetFolder) ctx.throw(404, 'Folder not found')
+  if (!ctx.user.isAdmin && targetFolder.authorUserId !== ctx.user.userId) {
+    ctx.throw(403)
+  }
 
   const preset = await HydraPresets.create({
     folderId,
@@ -114,7 +123,7 @@ router.post('/', async (ctx) => {
 })
 
 router.put('/:presetId', async (ctx) => {
-  requireUser(ctx)
+  requireUser(ctx, { nonGuest: true })
   const presetId = parseId(ctx.params.presetId, ctx, 'presetId')
 
   const preset = await HydraPresets.getById(presetId)
@@ -130,18 +139,33 @@ router.put('/:presetId', async (ctx) => {
     sortOrder?: unknown
     folderId?: unknown
   }
+
+  const folderId = typeof body.folderId === 'number' ? body.folderId : undefined
+  const code = typeof body.code === 'string' ? body.code : undefined
+
+  if (typeof code === 'string' && !code.trim()) ctx.throw(400, 'Invalid code')
+  if (typeof code === 'string' && code.length > MAX_PRESET_CODE_LENGTH) ctx.throw(400, 'Code too large')
+
+  if (typeof folderId === 'number') {
+    const targetFolder = await HydraFolders.getById(folderId)
+    if (!targetFolder) ctx.throw(404, 'Folder not found')
+    if (!ctx.user.isAdmin && targetFolder.authorUserId !== ctx.user.userId) {
+      ctx.throw(403)
+    }
+  }
+
   await HydraPresets.update(presetId, {
     name: typeof body.name === 'string' ? body.name.trim() : undefined,
-    code: typeof body.code === 'string' ? body.code : undefined,
+    code,
     sortOrder: typeof body.sortOrder === 'number' ? body.sortOrder : undefined,
-    folderId: typeof body.folderId === 'number' ? body.folderId : undefined,
+    folderId,
   })
 
   ctx.body = await HydraPresets.getById(presetId)
 })
 
 router.delete('/:presetId', async (ctx) => {
-  requireUser(ctx)
+  requireUser(ctx, { nonGuest: true })
   const presetId = parseId(ctx.params.presetId, ctx, 'presetId')
 
   const preset = await HydraPresets.getById(presetId)

@@ -14,15 +14,16 @@
 .toolbarButton,
 .toolbarButtonPrimary {
   flex: 1;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.85);
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s;
+  min-height: 40px;
 }
 
 .toolbarButton:hover {
@@ -38,6 +39,10 @@
 
 .toolbarButtonPrimary:hover {
   background: rgba(78, 205, 196, 0.3);
+}
+
+.searchWrap {
+  position: relative;
 }
 
 .searchInput {
@@ -62,10 +67,24 @@
   color: rgba(255, 255, 255, 0.35);
 }
 
+.searchClear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
 .loading,
 .error,
 .empty {
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: rgba(255, 255, 255, 0.6);
   padding: 6px 2px;
 }
@@ -74,25 +93,102 @@
   color: #ffb4b4;
 }
 
+.loadingLabel {
+  margin-bottom: 8px;
+}
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeletonGroup {
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.skeletonFolder,
+.skeletonItem,
+.skeletonItemShort {
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+  background-size: 240px 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+.skeletonFolder {
+  height: 20px;
+  margin-bottom: 8px;
+}
+
+.skeletonItem,
+.skeletonItemShort {
+  height: 14px;
+  margin-bottom: 6px;
+}
+
+.skeletonItemShort {
+  width: 65%;
+  margin-bottom: 0;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -240px 0;
+  }
+
+  to {
+    background-position: 240px 0;
+  }
+}
+
 .modalLabel {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 12px;
 }
 
 .modalInput,
-.modalSelect {
-  padding: 8px 10px;
+.modalSelect,
+.modalCodePreview {
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 15, 20, 0.6);
   color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 
 .modalSelect {
   cursor: pointer;
+}
+
+.modalCodePreview {
+  resize: vertical;
+  min-height: 160px;
+  max-height: 280px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.confirmText {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 980px) {
+  .toolbar {
+    flex-direction: column;
+  }
+
+  .toolbarButton,
+  .toolbarButtonPrimary {
+    width: 100%;
+  }
 }

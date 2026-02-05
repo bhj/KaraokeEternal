@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useSyncExternalStore } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { type AudioData } from 'routes/Player/components/Player/PlayerVisualizer/hooks/useAudioAnalyser'
+import { useCameraReceiver } from 'lib/webrtc/useCameraReceiver'
+import type { AudioResponseState, VisualizerMode } from 'shared/types'
 import HydraVisualizer from '../../Player/components/Player/PlayerVisualizer/HydraVisualizer'
 import styles from './HydraPreview.css'
 
@@ -8,21 +10,23 @@ interface HydraPreviewProps {
   code: string
   width: number
   height: number
+  localCameraStream?: MediaStream | null
+  mode: VisualizerMode
+  isEnabled: boolean
+  sensitivity: number
+  allowCamera: boolean
+  audioResponse: AudioResponseState
 }
 
-// Convert FftPayload to AudioData format expected by HydraVisualizer
 function mapFftToAudioData (fft: { fft: number[], bass: number, mid: number, treble: number, beat: number, energy: number, bpm: number, bright: number }): AudioData {
   return {
-    // Reconstruct full float arrays if needed, but for now just pass what we have.
-    // HydraAudioCompat uses rawFrequencyData for fft[], and other props directly.
-    // We'll map the payload fft array to rawFrequencyData.
     rawFrequencyData: new Float32Array(fft.fft),
-    frequencyData: new Float32Array(fft.fft), // shim
-    waveformData: new Float32Array(128), // shim (no waveform in payload yet)
+    frequencyData: new Float32Array(fft.fft),
+    waveformData: new Float32Array(128),
     bass: fft.bass,
     mid: fft.mid,
     treble: fft.treble,
-    isBeat: fft.beat > 0.8, // approximate
+    isBeat: fft.beat > 0.8,
     beatIntensity: fft.beat,
     energy: fft.energy,
     energySmooth: fft.energy,
@@ -31,12 +35,24 @@ function mapFftToAudioData (fft: { fft: number[], bass: number, mid: number, tre
   }
 }
 
-const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
+const HydraPreview = ({
+  code,
+  width,
+  height,
+  mode,
+  isEnabled,
+  sensitivity,
+  allowCamera,
+  audioResponse,
+}: HydraPreviewProps) => {
   const status = useAppSelector(state => state.status)
-  const isLive = status.fftData !== null
-  const overrideData = status.fftData ? mapFftToAudioData(status.fftData) : null
+  const { videoElement: remoteVideoElement } = useCameraReceiver()
+  const isHydraActive = isEnabled && mode === 'hydra'
 
-  // Create a dummy audio source to drive the visualizer
+  const isLive = status.isPlayerPresent && status.fftData !== null
+  const overrideData = isLive && status.fftData ? mapFftToAudioData(status.fftData) : null
+  const previewVideoElement = allowCamera ? remoteVideoElement : null
+
   const audioStoreRef = useRef<{
     source: MediaElementAudioSourceNode | null
     listeners: Set<() => void>
@@ -64,28 +80,27 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
     getSnapshot,
     getServerSnapshot,
   )
-  const audioCtxRef = useRef<AudioContext | null>(null)
-  const oscRef = useRef<OscillatorNode | null>(null)
-  const gainRef = useRef<GainNode | null>(null)
 
   useEffect(() => {
-    // Setup a simulated audio beat for preview
+    const store = audioStoreRef.current
+
+    if (!isHydraActive) {
+      store.source = null
+      store.listeners.forEach(listener => listener())
+      return
+    }
+
     const AudioCtx = window.AudioContext || window.webkitAudioContext
     const ctx = new AudioCtx()
-    audioCtxRef.current = ctx
 
-    // Create a destination that doesn't actually output to speakers (gain 0)
-    // but drives the analyser
     const masterGain = ctx.createGain()
-    masterGain.gain.value = 0 // Mute simulated audio
+    masterGain.gain.value = 0
     masterGain.connect(ctx.destination)
 
-    // Oscillator to simulate "bass" / beat
     const osc = ctx.createOscillator()
     osc.type = 'sine'
-    osc.frequency.value = 2 // 120 BPM-ish throb
+    osc.frequency.value = 2
 
-    // VCA for the oscillator
     const oscGain = ctx.createGain()
     oscGain.gain.value = 1.0
 
@@ -93,23 +108,6 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
     oscGain.connect(masterGain)
     osc.start()
 
-    oscRef.current = osc
-    gainRef.current = oscGain
-
-    // We need a MediaElementSourceNode to satisfy the prop type,
-    // BUT our visualizer hook uses `createAnalyser` from the context.
-    // The current `useAudioAnalyser` takes `MediaElementAudioSourceNode`.
-    // We might need to mock that object or cast a regular node if the hook only checks `.context`.
-
-    // Hack: The hook uses `audioSourceNode.context`.
-    // It calls `audioSourceNode.connect(gainNode)`.
-    // A regular GainNode works for this signature compatibility in standard WebAudio,
-    // but the type is specific.
-
-    // Let's rely on the fact that `useAudioAnalyser` just calls `.connect` and `.context`.
-    // We'll cast `oscGain` to `any` -> `MediaElementAudioSourceNode`
-    // since we know the hook essentially treats it as an AudioNode.
-    const store = audioStoreRef.current
     store.source = oscGain as unknown as MediaElementAudioSourceNode
     store.listeners.forEach(listener => listener())
 
@@ -119,23 +117,30 @@ const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
       store.listeners.forEach(listener => listener())
       ctx.close()
     }
-  }, [])
+  }, [isHydraActive])
+
+  const label = !isHydraActive
+    ? 'Preview (Visualizer Off)'
+    : isLive
+      ? 'Preview (Live Audio)'
+      : 'Preview (Simulated Audio)'
 
   return (
     <div className={styles.container} style={{ width, height }}>
-      <div className={styles.label}>
-        {isLive ? 'Preview (Live Audio)' : 'Preview (Simulated Audio)'}
-      </div>
-      {(audioSource || isLive) && (
+      <div className={styles.label}>{label}</div>
+      {isHydraActive && (audioSource || isLive) && (
         <HydraVisualizer
           audioSourceNode={isLive ? null : audioSource}
           isPlaying={true}
-          sensitivity={1}
+          sensitivity={sensitivity}
           width={width}
           height={height}
           code={code}
           layer={0}
+          audioResponse={audioResponse}
+          allowCamera={allowCamera}
           overrideData={overrideData}
+          remoteVideoElement={previewVideoElement}
         />
       )}
     </div>

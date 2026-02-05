@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import type { AudioResponseState, VisualizerMode } from 'shared/types'
 import HydraPreview from './HydraPreview'
 import styles from './StagePanel.css'
 import { BUFFER_OPTIONS, buildPreviewCode, type StageBuffer } from './stagePanelUtils'
@@ -10,9 +11,15 @@ interface StagePanelProps {
   height: number
   buffer: StageBuffer
   onBufferChange: (buffer: StageBuffer) => void
+  localCameraStream?: MediaStream | null
   onPresetLoad?: (code: string) => void
   onPresetSend?: (code: string) => void
   onRandomize?: () => void
+  visualizerMode: VisualizerMode
+  visualizerEnabled: boolean
+  visualizerSensitivity: number
+  visualizerAllowCamera: boolean
+  visualizerAudioResponse: AudioResponseState
 }
 
 function StagePanel ({
@@ -21,9 +28,15 @@ function StagePanel ({
   height,
   buffer,
   onBufferChange,
+  localCameraStream,
   onPresetLoad,
   onPresetSend,
   onRandomize,
+  visualizerMode,
+  visualizerEnabled,
+  visualizerSensitivity,
+  visualizerAllowCamera,
+  visualizerAudioResponse,
 }: StagePanelProps) {
   const previewCode = useMemo(() => buildPreviewCode(code, buffer), [code, buffer])
 
@@ -62,6 +75,12 @@ function StagePanel ({
             code={previewCode}
             width={width}
             height={height}
+            localCameraStream={localCameraStream}
+            mode={visualizerMode}
+            isEnabled={visualizerEnabled}
+            sensitivity={visualizerSensitivity}
+            allowCamera={visualizerAllowCamera}
+            audioResponse={visualizerAudioResponse}
           />
         </div>
       </div>

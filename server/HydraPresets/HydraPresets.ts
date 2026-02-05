@@ -65,40 +65,65 @@ class HydraPresets {
   }
 
   static async update (presetId: number, { name, code, sortOrder, folderId }: { name?: string, code?: string, sortOrder?: number, folderId?: number }): Promise<void> {
-    const fields: string[] = []
-    const params: Array<string | number> = []
+    const now = Math.floor(Date.now() / 1000)
+    let didUpdateField = false
 
     if (typeof name === 'string') {
-      fields.push('name = ?')
-      params.push(name)
+      const nameQuery = sql`
+        UPDATE hydraPresets
+        SET name = ${name}, dateUpdated = ${now}
+        WHERE presetId = ${presetId}
+      `
+      await db.run(String(nameQuery), nameQuery.parameters)
+      didUpdateField = true
     }
 
     if (typeof code === 'string') {
-      fields.push('code = ?')
-      params.push(code)
+      const codeQuery = sql`
+        UPDATE hydraPresets
+        SET code = ${code}, dateUpdated = ${now}
+        WHERE presetId = ${presetId}
+      `
+      await db.run(String(codeQuery), codeQuery.parameters)
+      didUpdateField = true
     }
 
     if (typeof sortOrder === 'number') {
-      fields.push('sortOrder = ?')
-      params.push(sortOrder)
+      const sortOrderQuery = sql`
+        UPDATE hydraPresets
+        SET sortOrder = ${sortOrder}, dateUpdated = ${now}
+        WHERE presetId = ${presetId}
+      `
+      await db.run(String(sortOrderQuery), sortOrderQuery.parameters)
+      didUpdateField = true
     }
 
     if (typeof folderId === 'number') {
-      fields.push('folderId = ?')
-      params.push(folderId)
+      const folderIdQuery = sql`
+        UPDATE hydraPresets
+        SET folderId = ${folderId}, dateUpdated = ${now}
+        WHERE presetId = ${presetId}
+      `
+      await db.run(String(folderIdQuery), folderIdQuery.parameters)
+      didUpdateField = true
     }
 
-    const now = Math.floor(Date.now() / 1000)
-    fields.push('dateUpdated = ?')
-    params.push(now)
-
-    params.push(presetId)
-
-    await db.run(`UPDATE hydraPresets SET ${fields.join(', ')} WHERE presetId = ?`, params)
+    if (!didUpdateField) {
+      const touchQuery = sql`
+        UPDATE hydraPresets
+        SET dateUpdated = ${now}
+        WHERE presetId = ${presetId}
+      `
+      await db.run(String(touchQuery), touchQuery.parameters)
+    }
   }
 
   static async remove (presetId: number): Promise<void> {
-    await db.run('DELETE FROM hydraPresets WHERE presetId = ?', [presetId])
+    const query = sql`
+      DELETE FROM hydraPresets
+      WHERE presetId = ${presetId}
+    `
+    await db.run(String(query), query.parameters)
   }
 }
 

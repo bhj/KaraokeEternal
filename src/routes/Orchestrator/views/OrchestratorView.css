@@ -15,7 +15,7 @@
   --text-lg: clamp(16px, 3.2vw, 18px);
 
   display: grid;
-  grid-template-columns: var(--ref-panel-width, 280px) minmax(0, 1fr);
+  grid-template-columns: minmax(240px, var(--ref-panel-width, 320px)) minmax(0, 1fr);
   /* 4-row structure: Header, StageBody, CodeEditor, CodeFooter */
   grid-template-rows: auto auto 1fr auto;
   height: 100dvh;
@@ -38,6 +38,7 @@
   z-index: 10;
   min-height: 0;
   position: relative;
+  min-width: 240px;
 }
 
 .tabBar {
@@ -77,6 +78,7 @@
   overflow-y: auto;
   padding: 0.5rem;
   min-height: 0;
+  font-size: var(--text-sm);
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
@@ -283,7 +285,7 @@
 
 @media (min-width: 980px) {
   .container {
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: minmax(240px, var(--ref-panel-width, 320px)) minmax(0, 1fr);
   }
 
   .refPanel {
