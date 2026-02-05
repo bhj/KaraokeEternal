@@ -7,7 +7,6 @@ import {
   scaleProfile,
   INJECTION_FACTORS,
   type AudioInjectProfile,
-  type InjectionLevel,
 } from './audioInjectProfiles'
 
 describe('DEFAULT_PROFILE', () => {

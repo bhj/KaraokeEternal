@@ -66,7 +66,7 @@ export function useCameraSender () {
     if (pubRef.current) {
       pubRef.current.stop()
     }
-    pubRef.current = createCameraPublisher((a) => dispatch(a as { type: string }))
+    pubRef.current = createCameraPublisher(a => dispatch(a as { type: string }))
     await pubRef.current.start()
     syncState()
   }, [dispatch, syncState])

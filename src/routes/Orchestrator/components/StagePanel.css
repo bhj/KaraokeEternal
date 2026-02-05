@@ -20,6 +20,13 @@
   min-height: 44px;
 }
 
+.stageHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
 .stageTitle {
   display: flex;
   flex-direction: column;
@@ -98,8 +105,8 @@
 
 @media (max-width: 979px) {
   .bufferButton {
-    min-height: 36px;
-    padding: 0.375rem 0.625rem;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
   }
 
   .stageHeader {

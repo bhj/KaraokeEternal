@@ -7,7 +7,7 @@ import {
   CAMERA_ICE,
   CAMERA_STOP,
 } from 'shared/actionTypes'
-import { isCameraOffer, isCameraAnswer, isCameraIce, isCameraStop } from './CameraSignaling'
+import { isCameraOffer, isCameraIce } from './CameraSignaling'
 import { createCameraSubscriber, type CameraSubscriber, type SubscriberStatus } from './useCameraSubscriber'
 
 /**
@@ -42,7 +42,7 @@ export function useCameraReceiver () {
           if (subRef.current) {
             subRef.current.stop()
           }
-          subRef.current = createCameraSubscriber((a) => dispatch(a as { type: string }))
+          subRef.current = createCameraSubscriber(a => dispatch(a as { type: string }))
           await subRef.current.handleOffer(action.payload)
           syncState()
           break

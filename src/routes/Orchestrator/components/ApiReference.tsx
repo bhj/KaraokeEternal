@@ -29,14 +29,9 @@ function ApiReference () {
           </div>
         ))}
         <div className={styles.autoAudioNote}>
-          {'Non-audio sketches get .modulate + .rotate lines injected with a.fft values. '
-            + 'The injected code is shown in the editor. Sending from the Orchestrator '
-            + 'broadcasts the editor contents (including injected lines) to all connected '
-            + 'players. Deleting the injected lines disables auto-audio for the current '
-            + 'session, but incoming remote updates or preset changes will re-inject. '
-            + 'To permanently disable, add an explicit audio call (e.g. a.fft[0]) '
-            + 'anywhere in the sketch. The preview uses simulated audio, so injected '
-            + 'lines produce visible movement even without music.'}
+          {'Audio reactivity is opt-in. Use "Auto Audio" to insert a.fft-based lines into the current sketch. '
+            + 'Nothing is injected automatically — the editor content is exactly what gets sent to the Player. '
+            + 'You can remove injected lines any time or write your own audio logic.'}
         </div>
       </div>
 

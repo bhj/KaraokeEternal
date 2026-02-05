@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { classifyPreset, getInjectionChain, type PresetCategory } from './presetClassifier'
-import { DEFAULT_PROFILE, type AudioInjectProfile } from './audioInjectProfiles'
+import { DEFAULT_PROFILE } from './audioInjectProfiles'
 import { stripInjectedLines } from 'lib/injectedLines'
 import { HYDRA_GALLERY } from 'routes/Orchestrator/components/hydraGallery'
 import { getPresetByIndex, getPresetCount } from 'routes/Orchestrator/components/hydraPresets'

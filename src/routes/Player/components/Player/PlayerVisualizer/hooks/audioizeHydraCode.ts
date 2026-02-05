@@ -1,7 +1,7 @@
 import { getSkipRegions, type SkipRegion } from 'lib/skipRegions'
 import { stripInjectedLines } from 'lib/injectedLines'
 import { DEFAULT_PROFILE, type AudioInjectProfile } from './audioInjectProfiles'
-import { classifyPreset, getInjectionChain } from './presetClassifier'
+import { getInjectionChain } from './presetClassifier'
 
 const AUDIO_PATTERNS = [
   /bass\s*\(/, /mid\s*\(/, /treble\s*\(/, /beat\s*\(/,
@@ -98,9 +98,8 @@ export function audioizeHydraCode (code: string, profile?: AudioInjectProfile): 
     }
   }
 
-  // Classify preset and get category-appropriate injection chain
-  const category = classifyPreset(code)
-  const audioChain = getInjectionChain(category, p)
+  // Use a single default injection chain for all presets
+  const audioChain = getInjectionChain('default', p)
 
   // If only nested .out() found (no top-level), append a top-level .out() with injection.
   // This handles presets like flor_1 where the only .out() is nested inside .layer().

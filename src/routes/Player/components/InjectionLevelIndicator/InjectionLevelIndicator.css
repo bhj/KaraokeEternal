@@ -2,6 +2,9 @@
   position: fixed;
   top: 16px;
   right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 16px;
   background: rgba(0, 0, 0, 0.7);
   color: rgba(255, 255, 255, 0.9);

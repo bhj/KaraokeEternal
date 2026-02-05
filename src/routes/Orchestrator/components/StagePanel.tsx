@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import HydraPreview from './HydraPreview'
 import styles from './StagePanel.css'
 import { BUFFER_OPTIONS, buildPreviewCode, type StageBuffer } from './stagePanelUtils'
+import PresetPicker from './PresetPicker'
 
 interface StagePanelProps {
   code: string
@@ -9,6 +10,9 @@ interface StagePanelProps {
   height: number
   buffer: StageBuffer
   onBufferChange: (buffer: StageBuffer) => void
+  onPresetLoad?: (code: string) => void
+  onPresetSend?: (code: string) => void
+  onRandomize?: () => void
 }
 
 function StagePanel ({
@@ -17,15 +21,27 @@ function StagePanel ({
   height,
   buffer,
   onBufferChange,
+  onPresetLoad,
+  onPresetSend,
+  onRandomize,
 }: StagePanelProps) {
   const previewCode = useMemo(() => buildPreviewCode(code, buffer), [code, buffer])
 
   return (
     <div className={styles.stage}>
       <div className={styles.stageHeader}>
-        <div className={styles.stageTitle}>
-          Stage
-          <span className={styles.stageHint}>Preview</span>
+        <div className={styles.stageHeaderLeft}>
+          <div className={styles.stageTitle}>
+            Stage
+            <span className={styles.stageHint}>Preview</span>
+          </div>
+          {(onPresetLoad || onPresetSend || onRandomize) && (
+            <PresetPicker
+              onLoad={onPresetLoad}
+              onSend={onPresetSend}
+              onRandomize={onRandomize}
+            />
+          )}
         </div>
         <div className={styles.bufferControls}>
           {BUFFER_OPTIONS.map(option => (

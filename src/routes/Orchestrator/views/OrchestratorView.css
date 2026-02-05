@@ -211,7 +211,7 @@
     background: rgba(20, 30, 40, 0.95);
     backdrop-filter: var(--aqua-blur);
     transform: translateY(0);
-    transition: transform 0.2s ease;
+    animation: refPanelSlideUp 0.18s ease-out;
   }
 
   .refPanelOverlay {
@@ -230,6 +230,22 @@
 
   .tabContent {
     padding: 8px;
+  }
+
+  .mobileTab {
+    font-size: var(--text-sm);
+    letter-spacing: 0.03em;
+  }
+}
+
+@keyframes refPanelSlideUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 

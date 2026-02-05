@@ -60,16 +60,6 @@ describe('orchestratorViewHelpers', () => {
       const result = getPendingRemote(undefined, 'local', true)
       expect(result).toBeNull()
     })
-
-    it('caller normalizes inputs; helper returns null when normalized inputs are identical', () => {
-      // Contract: getPendingRemote does NO normalization itself.
-      // The caller (OrchestratorView) must normalize both remote and local
-      // (e.g. via audioizeHydraCode) before calling this helper.
-      // When both sides are identical after normalization, no banner appears.
-      const normalized = 'osc(10)\n  .modulate(osc(3, 0.05), () => a.fft[0] * 0.25)\n  .out()'
-      const result = getPendingRemote(normalized, normalized, true)
-      expect(result).toBeNull()
-    })
   })
 
   /**

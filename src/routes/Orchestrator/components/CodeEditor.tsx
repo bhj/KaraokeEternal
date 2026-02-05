@@ -13,7 +13,6 @@ import { isInjectedLine, isPartialInjectedLine, stripInjectedLines } from 'lib/i
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
 import { getSkipRegions } from 'lib/skipRegions'
-import type { InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import styles from './CodeEditor.css'
 
 const { topLevel, dotChain, nativeAudioDot, sourceDot } = buildHydraCompletions()
@@ -233,24 +232,29 @@ function findCameraInsertLine (code: string): number {
   return i
 }
 
-const INJECTION_LEVELS: InjectionLevel[] = ['low', 'med', 'high']
-const INJECTION_LABELS: Record<InjectionLevel, string> = { low: 'Low', med: 'Med', high: 'High' }
-
 interface CodeEditorProps {
   code: string
   onCodeChange: (code: string) => void
   onSend: (code: string) => void
   onRandomize: () => void
   onAutoAudio: () => void
-  autoAudioOnSend: boolean
-  onToggleAutoAudio: () => void
-  injectionLevel: InjectionLevel
-  onInjectionLevelChange: (level: InjectionLevel) => void
+  injectionLevel: 'low' | 'med' | 'high'
+  onInjectionLevelChange: (level: 'low' | 'med' | 'high') => void
   cameraStatus?: 'idle' | 'connecting' | 'active' | 'error'
   onCameraToggle?: () => void
 }
 
-function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, autoAudioOnSend, onToggleAutoAudio, injectionLevel, onInjectionLevelChange, cameraStatus, onCameraToggle }: CodeEditorProps) {
+function CodeEditor ({
+  code,
+  onCodeChange,
+  onSend,
+  onRandomize,
+  onAutoAudio,
+  injectionLevel,
+  onInjectionLevelChange,
+  cameraStatus,
+  onCameraToggle,
+}: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onCodeChangeRef = useRef(onCodeChange)
@@ -396,17 +400,28 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
         <button type='button' className={styles.autoAudioButton} onClick={onAutoAudio}>
           Auto Audio
         </button>
-        <div className={styles.injectionControl}>
-          {INJECTION_LEVELS.map(level => (
-            <button
-              key={level}
-              type='button'
-              className={`${styles.injectionPill} ${injectionLevel === level ? styles.injectionPillActive : ''}`}
-              onClick={() => onInjectionLevelChange(level)}
-            >
-              {INJECTION_LABELS[level]}
-            </button>
-          ))}
+        <div className={styles.injectionLevel}>
+          <button
+            type='button'
+            className={`${styles.injectionButton} ${injectionLevel === 'low' ? styles.injectionButtonActive : ''}`}
+            onClick={() => onInjectionLevelChange('low')}
+          >
+            Low
+          </button>
+          <button
+            type='button'
+            className={`${styles.injectionButton} ${injectionLevel === 'med' ? styles.injectionButtonActive : ''}`}
+            onClick={() => onInjectionLevelChange('med')}
+          >
+            Med
+          </button>
+          <button
+            type='button'
+            className={`${styles.injectionButton} ${injectionLevel === 'high' ? styles.injectionButtonActive : ''}`}
+            onClick={() => onInjectionLevelChange('high')}
+          >
+            High
+          </button>
         </div>
         {hasInjectedLines && (
           <button
@@ -418,10 +433,6 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
             Strip Audio
           </button>
         )}
-        <label className={styles.autoOnSend} title='Auto-inject audio reactivity before sending'>
-          <input type='checkbox' checked={autoAudioOnSend} onChange={onToggleAutoAudio} />
-          Auto on Send
-        </label>
         {onCameraToggle && (
           <button
             type='button'

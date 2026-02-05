@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   CAMERA_OFFER_REQ,
   CAMERA_ICE_REQ,
@@ -116,38 +116,36 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
 export function useCameraPublisher (dispatch: (action: unknown) => void) {
   const [status, setStatus] = useState<PublisherStatus>('idle')
   const [stream, setStream] = useState<MediaStream | null>(null)
-  const pubRef = useRef<CameraPublisher | null>(null)
 
-  if (!pubRef.current) {
-    pubRef.current = createCameraPublisher((action) => {
+  const publisher = useMemo(() => {
+    const pub = createCameraPublisher((action) => {
       dispatch(action)
-      // Sync React state from core state
-      const s = pubRef.current!.getStatus()
-      setStatus(s)
-      setStream(pubRef.current!.getStream())
+      setStatus(pub.getStatus())
+      setStream(pub.getStream())
     })
-  }
+    return pub
+  }, [dispatch])
 
   const start = useCallback(async () => {
-    await pubRef.current!.start()
-    setStatus(pubRef.current!.getStatus())
-    setStream(pubRef.current!.getStream())
-  }, [])
+    await publisher.start()
+    setStatus(publisher.getStatus())
+    setStream(publisher.getStream())
+  }, [publisher])
 
   const stop = useCallback(() => {
-    pubRef.current!.stop()
-    setStatus(pubRef.current!.getStatus())
-    setStream(pubRef.current!.getStream())
-  }, [])
+    publisher.stop()
+    setStatus(publisher.getStatus())
+    setStream(publisher.getStream())
+  }, [publisher])
 
   const handleAnswer = useCallback(async (answer: CameraAnswerPayload) => {
-    await pubRef.current!.handleAnswer(answer)
-    setStatus(pubRef.current!.getStatus())
-  }, [])
+    await publisher.handleAnswer(answer)
+    setStatus(publisher.getStatus())
+  }, [publisher])
 
   const handleIce = useCallback(async (ice: CameraIcePayload) => {
-    await pubRef.current!.handleIce(ice)
-  }, [])
+    await publisher.handleIce(ice)
+  }, [publisher])
 
   return { status, stream, start, stop, handleAnswer, handleIce }
 }

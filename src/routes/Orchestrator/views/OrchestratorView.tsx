@@ -1,11 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import combinedReducer from 'store/reducers'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { VISUALIZER_HYDRA_CODE_REQ, VISUALIZER_STATE_SYNC_REQ } from 'shared/actionTypes'
+import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioizeHydraCode'
-import { scaleProfile, INJECTION_FACTORS, DEFAULT_PROFILE, getProfileForSketch, type InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
+import {
+  DEFAULT_PROFILE,
+  INJECTION_FACTORS,
+  scaleProfile,
+  type InjectionLevel,
+} from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
 import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
@@ -40,26 +45,19 @@ function OrchestratorView () {
   const [userHasEdited, setUserHasEdited] = useState(false)
   const [pendingRemoteCode, setPendingRemoteCode] = useState<string | null>(null)
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
-  const [autoAudioOnSend, setAutoAudioOnSend] = useState(false)
-  const [injectionLevel, setInjectionLevel] = useState<InjectionLevel>('med')
   const [activeTab, setActiveTab] = useState<'presets' | 'api'>('presets')
   const [activeMobileTab, setActiveMobileTab] = useState<'stage' | 'code' | 'ref'>('stage')
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
+  const [injectionLevel, setInjectionLevel] = useState<InjectionLevel>('med')
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
 
-  const getScaledProfile = useCallback((code: string) => {
-    const factor = INJECTION_FACTORS[injectionLevel]
-    return scaleProfile(DEFAULT_PROFILE, factor)
-  }, [injectionLevel])
-
   const handleSendCode = useCallback((code: string) => {
-    const finalCode = autoAudioOnSend ? audioizeHydraCode(code, getScaledProfile(code)) : code
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code: finalCode },
+      payload: { code },
     })
-  }, [dispatch, autoAudioOnSend, getScaledProfile])
+  }, [dispatch])
 
   const handleCodeChange = useCallback((code: string) => {
     setUserHasEdited(true)
@@ -78,16 +76,13 @@ function OrchestratorView () {
   }, [])
 
   const handleAutoAudio = useCallback(() => {
-    const audioized = audioizeHydraCode(localCode, getScaledProfile(localCode))
+    const profile = scaleProfile(DEFAULT_PROFILE, INJECTION_FACTORS[injectionLevel])
+    const audioized = audioizeHydraCode(localCode, profile)
     if (audioized !== localCode) {
       setLocalCode(audioized)
       setUserHasEdited(true)
     }
-  }, [localCode, getScaledProfile])
-
-  const handleToggleAutoAudio = useCallback(() => {
-    setAutoAudioOnSend(prev => !prev)
-  }, [])
+  }, [injectionLevel, localCode])
 
   const handleCameraToggle = useCallback(async () => {
     if (camera.status === 'idle' || camera.status === 'error') {
@@ -108,19 +103,18 @@ function OrchestratorView () {
   const handleSendPreset = useCallback((code: string) => {
     setLocalCode(code)
     setUserHasEdited(true)
-    const finalCode = autoAudioOnSend ? audioizeHydraCode(code, getScaledProfile(code)) : code
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code: finalCode },
+      payload: { code },
     })
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
-  }, [dispatch, autoAudioOnSend, ui.innerWidth, getScaledProfile])
+  }, [dispatch, ui.innerWidth])
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
-      setLocalCode(audioizeHydraCode(pendingRemoteCode))
+      setLocalCode(pendingRemoteCode)
     }
     setPendingRemoteCode(null)
     setPendingRemoteCount(0)
@@ -140,10 +134,9 @@ function OrchestratorView () {
   useEffect(() => {
     if (userHasEdited) return
     if (!remoteHydraCode || remoteHydraCode.trim() === '') return
-    const audioized = audioizeHydraCode(remoteHydraCode)
-    if (audioized === localCode) return
+    if (remoteHydraCode === localCode) return
     const id = requestAnimationFrame(() => {
-      setLocalCode(audioized)
+      setLocalCode(remoteHydraCode)
     })
     return () => cancelAnimationFrame(id)
   }, [remoteHydraCode, userHasEdited, localCode])
@@ -155,10 +148,7 @@ function OrchestratorView () {
 
     if (!userHasEdited) return
 
-    // Audioize both sides before comparison so injection-only diffs don't trigger banner
-    const normalizedRemote = remoteHydraCode ? audioizeHydraCode(remoteHydraCode) : null
-    const normalizedLocal = audioizeHydraCode(localCode)
-    const pending = getPendingRemote(normalizedRemote, normalizedLocal, userHasEdited)
+    const pending = getPendingRemote(remoteHydraCode ?? null, localCode, userHasEdited)
     if (pending === null) return
 
     // Schedule state update asynchronously (external system sync pattern)
@@ -177,21 +167,13 @@ function OrchestratorView () {
     if (!shouldAutoApplyPreset(prevIdx, remotePresetIndex, userHasEdited, remoteHydraCode)) return
 
     const id = requestAnimationFrame(() => {
-      setLocalCode(audioizeHydraCode(remoteHydraCode!))
+      setLocalCode(remoteHydraCode!)
       setUserHasEdited(false)
       setPendingRemoteCode(null)
       setPendingRemoteCount(0)
     })
     return () => cancelAnimationFrame(id)
   }, [remotePresetIndex, remoteHydraCode, userHasEdited])
-
-  // Sync injection level to all clients in the room
-  useEffect(() => {
-    dispatch({
-      type: VISUALIZER_STATE_SYNC_REQ,
-      payload: { injectionLevel },
-    })
-  }, [dispatch, injectionLevel])
 
   // Debounce preview at 150ms
   useEffect(() => {
@@ -209,10 +191,26 @@ function OrchestratorView () {
 
   const previewSize = getPreviewSize(ui.innerWidth)
   const isMobile = ui.innerWidth < 980
+  const isRefOpen = isMobile && activeMobileTab === 'ref'
+  const refPanelClass = isRefOpen
+    ? `${styles.refPanel} ${styles.refPanelOpen}`
+    : styles.refPanel
+  let tabContent: React.ReactNode
+  if (activeTab === 'presets') {
+    tabContent = (
+      <PresetBrowser
+        currentCode={localCode}
+        onLoad={handleLoadPreset}
+        onSend={handleSendPreset}
+      />
+    )
+  } else {
+    tabContent = <ApiReference />
+  }
 
   return (
     <div className={styles.container}>
-      <div className={`${styles.refPanel} ${(isMobile && activeMobileTab === 'ref') ? styles.refPanelOpen : ''}`}>
+      <div className={refPanelClass}>
         <div className={styles.tabBar}>
           <button
             type='button'
@@ -230,9 +228,7 @@ function OrchestratorView () {
           </button>
         </div>
         <div className={styles.tabContent}>
-          {activeTab === 'presets'
-            ? <PresetBrowser onLoad={handleLoadPreset} onSend={handleSendPreset} />
-            : <ApiReference />}
+          {tabContent}
         </div>
       </div>
       {isMobile && activeMobileTab === 'ref' && (
@@ -263,6 +259,9 @@ function OrchestratorView () {
             height={previewSize.height}
             buffer={previewBuffer}
             onBufferChange={setPreviewBuffer}
+            onPresetLoad={handleLoadPreset}
+            onPresetSend={handleSendPreset}
+            onRandomize={handleRandomize}
           />
         </div>
       )}
@@ -274,8 +273,6 @@ function OrchestratorView () {
             onSend={handleSendCode}
             onRandomize={handleRandomize}
             onAutoAudio={handleAutoAudio}
-            autoAudioOnSend={autoAudioOnSend}
-            onToggleAutoAudio={handleToggleAutoAudio}
             injectionLevel={injectionLevel}
             onInjectionLevelChange={setInjectionLevel}
             cameraStatus={camera.status}

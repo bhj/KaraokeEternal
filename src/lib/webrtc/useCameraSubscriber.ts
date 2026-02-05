@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   CAMERA_ANSWER_REQ,
   CAMERA_ICE_REQ,
@@ -94,31 +94,31 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
 export function useCameraSubscriber (dispatch: (action: unknown) => void) {
   const [status, setStatus] = useState<SubscriberStatus>('idle')
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null)
-  const subRef = useRef<CameraSubscriber | null>(null)
 
-  if (!subRef.current) {
-    subRef.current = createCameraSubscriber((action) => {
+  const subscriber = useMemo(() => {
+    const sub = createCameraSubscriber((action) => {
       dispatch(action)
-      setStatus(subRef.current!.getStatus())
-      setVideoElement(subRef.current!.getVideoElement())
+      setStatus(sub.getStatus())
+      setVideoElement(sub.getVideoElement())
     })
-  }
+    return sub
+  }, [dispatch])
 
   const handleOffer = useCallback(async (offer: CameraOfferPayload) => {
-    await subRef.current!.handleOffer(offer)
-    setStatus(subRef.current!.getStatus())
-    setVideoElement(subRef.current!.getVideoElement())
-  }, [])
+    await subscriber.handleOffer(offer)
+    setStatus(subscriber.getStatus())
+    setVideoElement(subscriber.getVideoElement())
+  }, [subscriber])
 
   const handleIce = useCallback(async (ice: CameraIcePayload) => {
-    await subRef.current!.handleIce(ice)
-  }, [])
+    await subscriber.handleIce(ice)
+  }, [subscriber])
 
   const stop = useCallback(() => {
-    subRef.current!.stop()
-    setStatus(subRef.current!.getStatus())
-    setVideoElement(subRef.current!.getVideoElement())
-  }, [])
+    subscriber.stop()
+    setStatus(subscriber.getStatus())
+    setVideoElement(subscriber.getVideoElement())
+  }, [subscriber])
 
   return { status, videoElement, handleOffer, handleIce, stop }
 }

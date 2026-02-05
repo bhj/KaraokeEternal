@@ -5,25 +5,15 @@ import { useDispatch } from 'react-redux'
 import { PLAYER_EMIT_FFT } from 'shared/actionTypes'
 import { type AudioData } from './hooks/useAudioAnalyser'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
-import { audioizeHydraCode } from './hooks/audioizeHydraCode'
+import { getHydraEvalCode, DEFAULT_PATCH } from './hydraEvalCode'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
+import { applyRemoteCameraOverride, restoreRemoteCameraOverride } from 'lib/remoteCameraOverride'
 import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
 import type { AudioResponseState } from 'shared/types'
 import styles from './HydraVisualizer.css'
 
 const log = (...args: unknown[]) => console.log('[Hydra]', ...args)
 const warn = (...args: unknown[]) => console.warn('[Hydra]', ...args)
-
-const DEFAULT_PATCH = `
-osc(20, 0.1, () => bass() * 2)
-  .color(1, 0.5, () => treble())
-  .modulate(noise(3), () => beat() * 0.4)
-  .modulate(voronoi(5, () => energy() * 2), () => beat() * 0.2)
-  .rotate(() => mid() * 0.5)
-  .kaleid(() => 2 + beat() * 4)
-  .saturate(() => 0.6 + energy() * 0.4)
-  .out()
-`.trim()
 
 // Audio closure names exposed on window for Hydra code to reference
 const AUDIO_GLOBAL_NAMES = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright'] as const
@@ -51,7 +41,7 @@ function clearAudioGlobals () {
 
 function executeHydraCode (hydra: Hydra, code: string) {
   try {
-    hydra.eval(audioizeHydraCode(code))
+    hydra.eval(getHydraEvalCode(code))
   } catch (err) {
     warn('Code execution error:', err)
     // Don't crash — keep last working frame
@@ -104,6 +94,7 @@ function HydraVisualizer ({
   const heightRef = useRef(height)
   const codeRef = useRef(code)
   const cameraInitRef = useRef<Set<string>>(new Set())
+  const cameraOverrideRef = useRef<Map<string, unknown>>(new Map())
 
   const { update: updateAudio, closures, compat, audioRef } = useHydraAudio(
     audioSourceNode,
@@ -145,6 +136,18 @@ function HydraVisualizer ({
     codeRef.current = code
   }, [width, height, code])
 
+  // Override initCam() to use remote video when present
+  useEffect(() => {
+    const w = window as unknown as Record<string, unknown>
+    const sources = ['s0', 's1', 's2', 's3']
+
+    if (remoteVideoElement) {
+      applyRemoteCameraOverride(sources, remoteVideoElement, w, cameraOverrideRef.current)
+    } else {
+      restoreRemoteCameraOverride(w, cameraOverrideRef.current)
+    }
+  }, [remoteVideoElement])
+
   // Set audio closures + window.a compat on window so Hydra code can reference them
   useEffect(() => {
     setAudioGlobals(closures, compat)
@@ -178,7 +181,7 @@ function HydraVisualizer ({
     errorCountRef.current = 0
 
     // Execute initial patch and render first frame immediately
-    executeHydraCode(hydra, codeRef.current ?? DEFAULT_PATCH)
+    executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
     hydra.tick(16.67)
 
     return () => {
@@ -203,12 +206,12 @@ function HydraVisualizer ({
   // Camera auto-init: when allowCamera flips true, init camera for detected sources
   // Uses remote WebRTC video when available, falls back to local initCam()
   useEffect(() => {
-    if (!allowCamera) {
+    if (!allowCamera && !remoteVideoElement) {
       cameraInitRef.current.clear()
       return
     }
 
-    const currentCode = codeRef.current ?? DEFAULT_PATCH
+    const currentCode = getHydraEvalCode(codeRef.current)
     const { sources } = detectCameraUsage(currentCode)
     const w = window as unknown as Record<string, unknown>
 
@@ -220,7 +223,7 @@ function HydraVisualizer ({
         if (remoteVideoElement && extSrc.init) {
           extSrc.init({ src: remoteVideoElement })
           cameraInitRef.current.add(src)
-        } else if (extSrc.initCam) {
+        } else if (allowCamera && extSrc.initCam) {
           extSrc.initCam()
           cameraInitRef.current.add(src)
         }
@@ -236,8 +239,8 @@ function HydraVisualizer ({
     if (!hydra) return
 
     // Re-check camera init when code changes with camera enabled
-    if (allowCamera) {
-      const { sources } = detectCameraUsage(code ?? DEFAULT_PATCH)
+    if (allowCamera || remoteVideoElement) {
+      const { sources } = detectCameraUsage(getHydraEvalCode(code))
       const w = window as unknown as Record<string, unknown>
       for (const src of sources) {
         if (cameraInitRef.current.has(src)) continue
@@ -247,7 +250,7 @@ function HydraVisualizer ({
           if (remoteVideoElement && extSrc.init) {
             extSrc.init({ src: remoteVideoElement })
             cameraInitRef.current.add(src)
-          } else if (extSrc.initCam) {
+          } else if (allowCamera && extSrc.initCam) {
             extSrc.initCam()
             cameraInitRef.current.add(src)
           }
@@ -257,7 +260,7 @@ function HydraVisualizer ({
       }
     }
 
-    executeHydraCode(hydra, code ?? DEFAULT_PATCH)
+    executeHydraCode(hydra, getHydraEvalCode(code))
     errorCountRef.current = 0
   }, [code, allowCamera, remoteVideoElement])
 

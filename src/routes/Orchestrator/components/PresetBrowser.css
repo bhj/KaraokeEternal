@@ -2,8 +2,42 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
   min-height: 0;
+  gap: 10px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbarButton,
+.toolbarButtonPrimary {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.toolbarButton:hover {
+  border-color: rgba(78, 205, 196, 0.35);
+  background: rgba(78, 205, 196, 0.12);
+}
+
+.toolbarButtonPrimary {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: rgba(78, 205, 196, 0.45);
+  color: #eafffb;
+}
+
+.toolbarButtonPrimary:hover {
+  background: rgba(78, 205, 196, 0.3);
 }
 
 .searchInput {
@@ -15,7 +49,6 @@
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
   outline: none;
-  margin-bottom: 12px;
   box-sizing: border-box;
   transition: border-color 0.2s, background-color 0.2s;
 }
@@ -26,225 +59,40 @@
 }
 
 .searchInput::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.35);
 }
 
-.tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-  padding: 0 2px;
+.loading,
+.error,
+.empty {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 6px 2px;
 }
 
-.tag {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+.error {
+  color: #ffb4b4;
 }
 
-.tagCamera {
-  background: rgba(96, 125, 139, 0.15);
-  color: #b0bec5;
-  border-color: rgba(96, 125, 139, 0.3);
-}
-
-.tagCamera:hover {
-  background: rgba(96, 125, 139, 0.25);
-}
-
-.tagCamera.tagActive {
-  background: rgba(96, 125, 139, 0.4);
-  border-color: #cfd8dc;
-  color: #eceff1;
-  box-shadow: 0 0 8px rgba(96, 125, 139, 0.3);
-}
-
-.tagFeedback {
-  background: rgba(156, 39, 176, 0.15);
-  color: #ce93d8;
-  border-color: rgba(156, 39, 176, 0.3);
-}
-
-.tagFeedback:hover {
-  background: rgba(156, 39, 176, 0.25);
-}
-
-.tagFeedback.tagActive {
-  background: rgba(156, 39, 176, 0.4);
-  border-color: #e1bee7;
-  color: #f3e5f5;
-  box-shadow: 0 0 8px rgba(156, 39, 176, 0.3);
-}
-
-.tagKaleid {
-  background: rgba(0, 188, 212, 0.15);
-  color: #80deea;
-  border-color: rgba(0, 188, 212, 0.3);
-}
-
-.tagKaleid:hover {
-  background: rgba(0, 188, 212, 0.25);
-}
-
-.tagKaleid.tagActive {
-  background: rgba(0, 188, 212, 0.4);
-  border-color: #b2ebf2;
-  color: #e0f7fa;
-  box-shadow: 0 0 8px rgba(0, 188, 212, 0.3);
-}
-
-.tagTuned {
-  background: rgba(255, 183, 77, 0.15);
-  color: #ffcc80;
-  border-color: rgba(255, 183, 77, 0.3);
-}
-
-.tagTuned:hover {
-  background: rgba(255, 183, 77, 0.25);
-}
-
-.tagTuned.tagActive {
-  background: rgba(255, 183, 77, 0.4);
-  border-color: #ffe0b2;
-  color: #fff3e0;
-  box-shadow: 0 0 8px rgba(255, 183, 77, 0.3);
-}
-
-.list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 4px 10px 2px;
-  min-height: 0;
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-}
-
-.list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.list::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-}
-
-.card {
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  background: linear-gradient(180deg, rgba(30, 40, 50, 0.7), rgba(20, 30, 40, 0.8));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  cursor: default;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+.modalLabel {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.card:hover {
-  border-color: rgba(78, 205, 196, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transform: translateY(-1px);
-}
-
-.cardName {
-  font-size: 13px;
-  color: #e6edf3;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cardBadges {
-  display: flex;
   gap: 6px;
-}
-
-.badge {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.badgeCamera {
-  background: rgba(96, 125, 139, 0.2);
-  color: #b0bec5;
-  border: 1px solid rgba(96, 125, 139, 0.3);
-}
-
-.badgeFeedback {
-  background: rgba(156, 39, 176, 0.15);
-  color: #ce93d8;
-  border: 1px solid rgba(156, 39, 176, 0.3);
-}
-
-.badgeKaleid {
-  background: rgba(0, 188, 212, 0.15);
-  color: #80deea;
-  border: 1px solid rgba(0, 188, 212, 0.3);
-}
-
-.badgeTuned {
-  background: rgba(255, 183, 77, 0.15);
-  color: #ffcc80;
-  border: 1px solid rgba(255, 183, 77, 0.3);
-}
-
-.cardButtons {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.cardBtn {
-  flex: 1;
-  padding: 6px 0;
-  border-radius: 6px;
   font-size: 12px;
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
   color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
-  transition: all 0.15s;
-  text-align: center;
+  margin-bottom: 12px;
 }
 
-.cardBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.25);
+.modalInput,
+.modalSelect {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 15, 20, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
 }
 
-.cardBtnSend {
-  background: rgba(35, 134, 54, 0.15);
-  color: #4ade80;
-  border-color: rgba(35, 134, 54, 0.3);
-}
-
-.cardBtnSend:hover {
-  background: rgba(35, 134, 54, 0.3);
-  border-color: rgba(35, 134, 54, 0.5);
-  color: #86efac;
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.1);
-}
-
-.empty {
-  padding: 40px 20px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 13px;
-  font-style: italic;
+.modalSelect {
+  cursor: pointer;
 }

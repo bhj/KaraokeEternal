@@ -43,7 +43,6 @@ const DisplayCtrl = ({
   isWebGLSupported,
   mediaType = '',
   mp4Alpha,
-  sensitivity,
   visualizerPresetName,
   visualizerMode,
   audioResponse,

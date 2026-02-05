@@ -50,9 +50,15 @@ const mockStream = {
 function setupGlobals () {
   const mockPc = new MockRTCPeerConnection()
   // Use a proper constructor function (vi.fn arrow functions can't be constructors)
-  vi.stubGlobal('RTCPeerConnection', function RTCPeerConnection () { return mockPc })
-  vi.stubGlobal('RTCSessionDescription', function RTCSessionDescription (desc: unknown) { return desc })
-  vi.stubGlobal('RTCIceCandidate', function RTCIceCandidate (desc: unknown) { return desc })
+  vi.stubGlobal('RTCPeerConnection', function RTCPeerConnection () {
+    return mockPc
+  })
+  vi.stubGlobal('RTCSessionDescription', function RTCSessionDescription (desc: unknown) {
+    return desc
+  })
+  vi.stubGlobal('RTCIceCandidate', function RTCIceCandidate (desc: unknown) {
+    return desc
+  })
 
   const getUserMedia = vi.fn().mockResolvedValue(mockStream)
   Object.defineProperty(navigator, 'mediaDevices', {
@@ -185,7 +191,7 @@ describe('createCameraPublisher', () => {
     mocks.mockPc.onicecandidate?.({ candidate: null as unknown as RTCIceCandidate })
 
     const iceDispatches = dispatch.mock.calls.filter(
-      ([a]: [{ type: string }]) => a.type === 'server/CAMERA_ICE'
+      ([a]: [{ type: string }]) => a.type === 'server/CAMERA_ICE',
     )
     expect(iceDispatches).toHaveLength(0)
   })

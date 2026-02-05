@@ -41,9 +41,15 @@ const mockVideoEl = {
 
 function setupGlobals () {
   const mockPc = new MockRTCPeerConnection()
-  vi.stubGlobal('RTCPeerConnection', function RTCPeerConnection () { return mockPc })
-  vi.stubGlobal('RTCSessionDescription', function RTCSessionDescription (desc: unknown) { return desc })
-  vi.stubGlobal('RTCIceCandidate', function RTCIceCandidate (desc: unknown) { return desc })
+  vi.stubGlobal('RTCPeerConnection', function RTCPeerConnection () {
+    return mockPc
+  })
+  vi.stubGlobal('RTCSessionDescription', function RTCSessionDescription (desc: unknown) {
+    return desc
+  })
+  vi.stubGlobal('RTCIceCandidate', function RTCIceCandidate (desc: unknown) {
+    return desc
+  })
 
   // Mock document.createElement for the hidden video element
   const origCreateElement = globalThis.document?.createElement
