@@ -9,6 +9,7 @@ import { indentUnit } from '@codemirror/language'
 import { hydraExtensions } from './hydraHighlightStyle'
 import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
+import { getLintErrorSummary } from './codeEditorUtils'
 import { isInjectedLine, isPartialInjectedLine, stripInjectedLines } from 'lib/injectedLines'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
@@ -236,6 +237,8 @@ interface CodeEditorProps {
   code: string
   onCodeChange: (code: string) => void
   onSend: (code: string) => void
+  sendStatus?: 'idle' | 'sending' | 'synced' | 'error'
+  onResend?: () => void
   onRandomize: () => void
   onAutoAudio: () => void
   injectionLevel: 'low' | 'med' | 'high'
@@ -248,6 +251,8 @@ function CodeEditor ({
   code,
   onCodeChange,
   onSend,
+  sendStatus = 'idle',
+  onResend,
   onRandomize,
   onAutoAudio,
   injectionLevel,
@@ -260,6 +265,8 @@ function CodeEditor ({
   const onCodeChangeRef = useRef(onCodeChange)
   const onSendRef = useRef(onSend)
   const codeRef = useRef(code)
+  const sendAttemptRef = useRef<() => void>(() => {})
+  const [sendLintError, setSendLintError] = useState<{ count: number, firstLine: number } | null>(null)
 
   onCodeChangeRef.current = onCodeChange
   onSendRef.current = onSend
@@ -272,7 +279,7 @@ function CodeEditor ({
       key: 'Ctrl-Enter',
       mac: 'Cmd-Enter',
       run: () => {
-        onSendRef.current(viewRef.current?.state.doc.toString() ?? '')
+        sendAttemptRef.current()
         return true
       },
     }])
@@ -293,6 +300,7 @@ function CodeEditor ({
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onCodeChangeRef.current(update.state.doc.toString())
+            setSendLintError(null)
           }
         }),
         EditorView.lineWrapping,
@@ -320,9 +328,21 @@ function CodeEditor ({
     })
   }, [code])
 
+  sendAttemptRef.current = () => {
+    const currentCode = viewRef.current?.state.doc.toString() ?? codeRef.current
+    const summary = getLintErrorSummary(currentCode)
+    if (summary) {
+      setSendLintError(summary)
+      viewRef.current?.focus()
+      return
+    }
+    setSendLintError(null)
+    onSendRef.current(currentCode)
+  }
+
   const handleSend = useCallback(() => {
-    onSend(viewRef.current?.state.doc.toString() ?? code)
-  }, [code, onSend])
+    sendAttemptRef.current()
+  }, [])
 
   const hasInjectedLines = useMemo(
     () => code.split('\n').some(isInjectedLine),
@@ -363,6 +383,8 @@ function CodeEditor ({
   const handleDismissCamera = useCallback(() => {
     setCameraBannerDismissed(true)
   }, [])
+
+  const showSendStatus = sendStatus !== 'idle'
 
   return (
     <div className={styles.container}>
@@ -443,9 +465,28 @@ function CodeEditor ({
             {cameraStatus === 'idle' ? 'Cam' : cameraStatus === 'connecting' ? 'Cam...' : cameraStatus === 'active' ? 'Cam On' : 'Cam Err'}
           </button>
         )}
-        <button type='button' className={styles.sendButton} onClick={handleSend}>
-          Send
-        </button>
+        <div className={styles.sendGroup}>
+          <button type='button' className={styles.sendButton} onClick={handleSend}>
+            {sendStatus === 'sending' ? 'Sending…' : 'Send'}
+          </button>
+          {showSendStatus && sendStatus !== 'sending' && (
+            <span
+              className={`${styles.sendStatus} ${sendStatus === 'error' ? styles.sendStatusError : styles.sendStatusOk}`}
+            >
+              {sendStatus === 'synced' ? 'Synced' : 'Send failed'}
+            </span>
+          )}
+          {sendLintError && (
+            <span className={styles.sendLintError}>
+              {`Fix ${sendLintError.count} error${sendLintError.count > 1 ? 's' : ''} (line ${sendLintError.firstLine})`}
+            </span>
+          )}
+          {sendStatus === 'error' && onResend && (
+            <button type='button' className={styles.resendButton} onClick={onResend}>
+              Resend
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

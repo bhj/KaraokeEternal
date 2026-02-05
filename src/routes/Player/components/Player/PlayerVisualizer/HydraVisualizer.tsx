@@ -272,8 +272,9 @@ function HydraVisualizer ({
     // Update audio data from analyser
     updateAudio()
 
-    // Emit FFT if enabled
-    if (emitFft && isPlaying) {
+    // Emit FFT if enabled (even if isPlaying is false but energy is present)
+    const hasEnergy = audioRef.current.energy > 0.01
+    if (emitFft && (isPlaying || hasEnergy)) {
       emitFftData(audioRef.current)
     }
 

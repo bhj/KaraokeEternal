@@ -40,6 +40,7 @@ function OrchestratorView () {
     : status.visualizer?.hydraPresetIndex
 
   const ui = useAppSelector(state => state.ui)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [localCode, setLocalCode] = useState<string>(DEFAULT_SKETCH)
   const [previewBuffer, setPreviewBuffer] = useState<StageBuffer>('auto')
   const [userHasEdited, setUserHasEdited] = useState(false)
@@ -49,10 +50,22 @@ function OrchestratorView () {
   const [activeMobileTab, setActiveMobileTab] = useState<'stage' | 'code' | 'ref'>('stage')
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
   const [injectionLevel, setInjectionLevel] = useState<InjectionLevel>('med')
+  const [refPanelWidth, setRefPanelWidth] = useState<number>(() => {
+    if (typeof window === 'undefined') return 280
+    const stored = window.localStorage.getItem('orchestratorRefPanelWidth')
+    const width = stored ? Number(stored) : NaN
+    if (!Number.isFinite(width)) return 280
+    return Math.min(480, Math.max(220, width))
+  })
+  const [isResizingPanel, setIsResizingPanel] = useState(false)
+  const [sendStatus, setSendStatus] = useState<'idle' | 'sending' | 'synced' | 'error'>('idle')
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
+  const lastSentRef = useRef<string | null>(null)
 
   const handleSendCode = useCallback((code: string) => {
+    lastSentRef.current = code
+    setSendStatus('sending')
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
       payload: { code },
@@ -62,7 +75,11 @@ function OrchestratorView () {
   const handleCodeChange = useCallback((code: string) => {
     setUserHasEdited(true)
     setLocalCode(code)
-  }, [])
+    if (sendStatus === 'synced' || sendStatus === 'error') {
+      setSendStatus('idle')
+      lastSentRef.current = null
+    }
+  }, [sendStatus])
 
   /**
    * Random is LOCAL-ONLY: changes the editor code but does NOT dispatch to
@@ -103,14 +120,15 @@ function OrchestratorView () {
   const handleSendPreset = useCallback((code: string) => {
     setLocalCode(code)
     setUserHasEdited(true)
-    dispatch({
-      type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code },
-    })
+    handleSendCode(code)
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
-  }, [dispatch, ui.innerWidth])
+  }, [handleSendCode, ui.innerWidth])
+
+  const handleResend = useCallback(() => {
+    handleSendCode(localCode)
+  }, [handleSendCode, localCode])
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
@@ -130,6 +148,36 @@ function OrchestratorView () {
     dispatch(sliceInjectNoOp())
   }
 
+  // Persist ref panel width
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('orchestratorRefPanelWidth', String(refPanelWidth))
+  }, [refPanelWidth])
+
+  // Handle ref panel resize drag
+  useEffect(() => {
+    if (!isResizingPanel) return
+    const handleMove = (event: PointerEvent) => {
+      const rect = containerRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const next = Math.min(480, Math.max(220, event.clientX - rect.left))
+      setRefPanelWidth(next)
+    }
+    const handleUp = () => {
+      setIsResizingPanel(false)
+    }
+    window.addEventListener('pointermove', handleMove)
+    window.addEventListener('pointerup', handleUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    return () => {
+      window.removeEventListener('pointermove', handleMove)
+      window.removeEventListener('pointerup', handleUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isResizingPanel])
+
   // Sync remote code to local (audioized) before user edits — runs once per remote change
   useEffect(() => {
     if (userHasEdited) return
@@ -140,6 +188,32 @@ function OrchestratorView () {
     })
     return () => cancelAnimationFrame(id)
   }, [remoteHydraCode, userHasEdited, localCode])
+
+  // Mark send status as synced when remote matches last sent code
+  useEffect(() => {
+    if (!lastSentRef.current || !remoteHydraCode) return
+    const normalize = (s: string) => s.trim().replace(/\r\n/g, '\n')
+    if (normalize(remoteHydraCode) !== normalize(lastSentRef.current)) return
+    let timeoutId: number | null = null
+    const rafId = requestAnimationFrame(() => {
+      setSendStatus('synced')
+      lastSentRef.current = null
+      timeoutId = window.setTimeout(() => setSendStatus('idle'), 1500)
+    })
+    return () => {
+      cancelAnimationFrame(rafId)
+      if (timeoutId) window.clearTimeout(timeoutId)
+    }
+  }, [remoteHydraCode])
+
+  // If no ack arrives, show error
+  useEffect(() => {
+    if (sendStatus !== 'sending') return
+    const id = window.setTimeout(() => {
+      if (sendStatus === 'sending') setSendStatus('error')
+    }, 4000)
+    return () => window.clearTimeout(id)
+  }, [sendStatus])
 
   // Track remote code changes — uses async callback to satisfy lint
   useEffect(() => {
@@ -208,8 +282,14 @@ function OrchestratorView () {
     tabContent = <ApiReference />
   }
 
+  const containerStyle = { ['--ref-panel-width' as string]: `${refPanelWidth}px` } as React.CSSProperties
+
   return (
-    <div className={styles.container}>
+    <div
+      className={`${styles.container} ${isResizingPanel ? styles.containerResizing : ''}`}
+      ref={containerRef}
+      style={containerStyle}
+    >
       <div className={refPanelClass}>
         <div className={styles.tabBar}>
           <button
@@ -230,6 +310,16 @@ function OrchestratorView () {
         <div className={styles.tabContent}>
           {tabContent}
         </div>
+        {!isMobile && (
+          <div
+            className={styles.refPanelResize}
+            onPointerDown={() => setIsResizingPanel(true)}
+            role='separator'
+            aria-orientation='vertical'
+            aria-label='Resize presets panel'
+            tabIndex={-1}
+          />
+        )}
       </div>
       {isMobile && activeMobileTab === 'ref' && (
         <div
@@ -271,6 +361,8 @@ function OrchestratorView () {
             code={userHasEdited ? localCode : effectiveCode}
             onCodeChange={handleCodeChange}
             onSend={handleSendCode}
+            sendStatus={sendStatus}
+            onResend={handleResend}
             onRandomize={handleRandomize}
             onAutoAudio={handleAutoAudio}
             injectionLevel={injectionLevel}

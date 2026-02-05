@@ -33,8 +33,8 @@ function mapFftToAudioData (fft: { fft: number[], bass: number, mid: number, tre
 
 const HydraPreview = ({ code, width, height }: HydraPreviewProps) => {
   const status = useAppSelector(state => state.status)
-  const isLive = status.isPlayerPresent && status.fftData !== null
-  const overrideData = isLive && status.fftData ? mapFftToAudioData(status.fftData) : null
+  const isLive = status.fftData !== null
+  const overrideData = status.fftData ? mapFftToAudioData(status.fftData) : null
 
   // Create a dummy audio source to drive the visualizer
   const audioStoreRef = useRef<{
