@@ -1,5 +1,8 @@
+import getLogger from './Log.js'
 import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
+
+const log = getLogger('crypto')
 
 const ARGON2_CONFIG = {
   parallelism: 1,
@@ -11,14 +14,20 @@ const ARGON2_CONFIG = {
 function hash (password: string): Promise<string> {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(16, (err, nonce) => {
-      if (err) return reject(err)
+      if (err) {
+        log.error(err)
+        return reject(err)
+      }
 
       crypto.argon2('argon2id', {
         message: password,
         nonce,
         ...ARGON2_CONFIG,
       }, (err, derivedKey) => {
-        if (err) return reject(err)
+        if (err) {
+          log.error(err)
+          return reject(err)
+        }
 
         const saltB64 = nonce.toString('base64').replace(/=/g, '')
         const hashB64 = derivedKey.toString('base64').replace(/=/g, '')
@@ -37,7 +46,10 @@ function compare (password: string, hashStr: string): Promise<boolean> {
   if (hashStr.startsWith('$2')) {
     return new Promise((resolve, reject) => {
       bcrypt.compare(password, hashStr, function (err, matched) {
-        if (err) return reject(err)
+        if (err) {
+          log.error(err)
+          return reject(err)
+        }
         return resolve(matched)
       })
     })
@@ -71,7 +83,10 @@ function compare (password: string, hashStr: string): Promise<boolean> {
         memory: m,
         passes: t,
       }, (err, derivedKey) => {
-        if (err) return reject(err)
+        if (err) {
+          log.error(err)
+          return reject(err)
+        }
 
         try {
           if (derivedKey.length !== expectedHash.length) {
@@ -81,10 +96,12 @@ function compare (password: string, hashStr: string): Promise<boolean> {
           const match = crypto.timingSafeEqual(derivedKey, expectedHash)
           resolve(match)
         } catch (e) {
+          log.error(e)
           resolve(false)
         }
       })
     } catch (e) {
+      log.error(e)
       resolve(false)
     }
   })
