@@ -7,7 +7,7 @@ import {
   CAMERA_STOP,
 } from 'shared/actionTypes'
 import { isCameraAnswer, isCameraIce, isCameraStop } from './CameraSignaling'
-import { createCameraPublisher, type CameraPublisher, type PublisherStatus } from './useCameraPublisher'
+import { createCameraPublisher, type CameraPublisher, type CameraStartOptions, type PublisherStatus } from './useCameraPublisher'
 
 /**
  * Manages the camera publisher lifecycle by listening for signaling
@@ -62,12 +62,12 @@ export function useCameraSender () {
     }
   }, [syncState])
 
-  const start = useCallback(async () => {
+  const start = useCallback(async (options?: CameraStartOptions) => {
     if (pubRef.current) {
       pubRef.current.stop()
     }
     pubRef.current = createCameraPublisher(a => dispatch(a as { type: string }))
-    await pubRef.current.start()
+    await pubRef.current.start(options)
     syncState()
   }, [dispatch, syncState])
 

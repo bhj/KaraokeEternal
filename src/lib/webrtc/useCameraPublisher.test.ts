@@ -195,4 +195,13 @@ describe('createCameraPublisher', () => {
     )
     expect(iceDispatches).toHaveLength(0)
   })
+
+  it('should request environment facing mode when specified', async () => {
+    await publisher.start({ facingMode: 'environment' })
+
+    expect(mocks.getUserMedia).toHaveBeenCalledWith({
+      video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false,
+    })
+  })
 })

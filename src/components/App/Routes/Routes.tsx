@@ -9,6 +9,7 @@ import JoinLandingPage from 'routes/Join/views/JoinLandingPage'
 
 const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
 const OrchestratorView = React.lazy(() => import('routes/Orchestrator/views/OrchestratorView'))
+const CameraRelayView = React.lazy(() => import('routes/Camera/views/CameraRelayView'))
 
 const AppRoutes = () => (
   <Routes>
@@ -42,6 +43,14 @@ const AppRoutes = () => (
       element={(
         <RequireAuth path='/orchestrator' redirectTo='/account'>
           <OrchestratorView />
+        </RequireAuth>
+      )}
+    />
+    <Route
+      path='/camera'
+      element={(
+        <RequireAuth path='/camera' redirectTo='/account'>
+          <CameraRelayView />
         </RequireAuth>
       )}
     />

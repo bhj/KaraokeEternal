@@ -57,29 +57,31 @@ pat = () =>
           .mult(osc((time / 8) * 1, (time / 1006) * 0.2).rotate(1.57))
           .modulate(shape(106, 1, 0.05))
           .mult(shape(106, 1, 0.05))
-          .modulateScale(osc(4, 0.125), -0.125),
+          .modulateScale(osc(4, 0.125), -0.125)
+          .color(1.2, 0.3, 0.85),
       ),
     )
 
 pat()
+  .color(0.95, 0.55, 1.2)
   .shift(0.04, 0.04, 0)
-  .add(src(o0).modulate(o0, 0.04), 0.6, 0.9)
-  .add(src(o0).modulate(o0, 0.04), 0.6, 0.9)
-  .add(src(o0).modulate(o0, 0.04), 0.6, 0.9)
-  .add(src(o0).modulate(o0, 0.04), 0.6, 0.9)
-  .add(src(o0).modulate(o0, 0.04), 0.6, 0.9)
-  .out()`,
+  .add(src(o0).saturate(1.2).contrast(1.05).modulate(o0, 0.03), 0.45)
+  .add(gradient(1.5).color(0.3, 0.08, 0.7), 0.12)
+  .out(o0)`,
   eerie_ear_2: `//ee_5 . FUGITIVE GEOMETRY VHS . audioreactive shapes and gradients
 // e_e // @eerie_ear
 //
 s = () =>
-  shape(4)
+  shape(4, 0.35, 0.01)
     .scrollX([-0.5, -0.2, 0.3, -0.1, -0.1].smooth(0.1).fast(0.3))
     .scrollY([0.25, -0.2, 0.3, -0.1, 0.2].smooth(0.9).fast(0.15))
+    .color(1.2, 0.25, 0.55)
 
-solid()
-  .add(s(), 0.9)
-  .add(gradient(3, 0.05), 0.35)
+solid(0, 0, 0)
+  .add(gradient(3, 0.05).color(0.08, 0.05, 0.25), 0.35)
+  .add(s(), 0.78)
+  .modulateScale(osc(2, 0.04).kaleid(2), 0.08)
+  .add(src(o0).scale(0.995).contrast(1.02), 0.22)
   .out()`,
 }
 

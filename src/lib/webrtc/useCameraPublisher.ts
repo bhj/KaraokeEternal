@@ -7,11 +7,16 @@ import {
 import { STUN_SERVERS, type CameraAnswerPayload, type CameraIcePayload } from './CameraSignaling'
 
 export type PublisherStatus = 'idle' | 'connecting' | 'active' | 'error'
+export type CameraFacingMode = 'user' | 'environment'
+
+export interface CameraStartOptions {
+  facingMode?: CameraFacingMode
+}
 
 // ---- Testable core (no React dependency) ----
 
 export interface CameraPublisher {
-  start: () => Promise<void>
+  start: (options?: CameraStartOptions) => Promise<void>
   stop: () => void
   handleAnswer: (answer: CameraAnswerPayload) => Promise<void>
   handleIce: (ice: CameraIcePayload) => Promise<void>
@@ -24,10 +29,12 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
   let stream: MediaStream | null = null
   let pc: RTCPeerConnection | null = null
 
-  const start = async () => {
+  const start = async (options?: CameraStartOptions) => {
+    const facingMode = options?.facingMode ?? 'user'
+
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
         audio: false,
       })
 
@@ -126,8 +133,8 @@ export function useCameraPublisher (dispatch: (action: unknown) => void) {
     return pub
   }, [dispatch])
 
-  const start = useCallback(async () => {
-    await publisher.start()
+  const start = useCallback(async (options?: CameraStartOptions) => {
+    await publisher.start(options)
     setStatus(publisher.getStatus())
     setStream(publisher.getStream())
   }, [publisher])
