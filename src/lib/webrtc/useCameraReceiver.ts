@@ -7,7 +7,7 @@ import {
   CAMERA_ICE,
   CAMERA_STOP,
 } from 'shared/actionTypes'
-import { isCameraOffer, isCameraIce } from './CameraSignaling'
+import { isCameraOffer, isCameraIce, type CameraIcePayload } from './CameraSignaling'
 import { createCameraSubscriber, type CameraSubscriber, type SubscriberStatus } from './useCameraSubscriber'
 
 /**
@@ -23,6 +23,7 @@ export function useCameraReceiver () {
   const [status, setStatus] = useState<SubscriberStatus>('idle')
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null)
   const subRef = useRef<CameraSubscriber | null>(null)
+  const pendingIceRef = useRef<CameraIcePayload[]>([])
 
   const syncState = useCallback(() => {
     if (subRef.current) {
@@ -44,20 +45,37 @@ export function useCameraReceiver () {
           }
           subRef.current = createCameraSubscriber(a => dispatch(a as { type: string }))
           await subRef.current.handleOffer(action.payload)
+
+          // Apply any ICE that arrived before the offer action.
+          if (pendingIceRef.current.length > 0) {
+            const pending = pendingIceRef.current
+            pendingIceRef.current = []
+            for (const ice of pending) {
+              await subRef.current.handleIce(ice)
+            }
+          }
+
           syncState()
           break
         }
         case CAMERA_ANSWER: {
-          // Player (subscriber) shouldn't receive answers — those go to the publisher
+          // Player (subscriber) shouldn't receive answers - those go to the publisher
           break
         }
         case CAMERA_ICE: {
-          if (!isCameraIce(action.payload) || !subRef.current) return
+          if (!isCameraIce(action.payload)) return
+
+          if (!subRef.current) {
+            pendingIceRef.current.push(action.payload)
+            return
+          }
+
           await subRef.current.handleIce(action.payload)
           syncState()
           break
         }
         case CAMERA_STOP: {
+          pendingIceRef.current = []
           if (!subRef.current) return
           subRef.current.stop()
           subRef.current = null
@@ -71,6 +89,7 @@ export function useCameraReceiver () {
     socket.on('action', handleAction)
     return () => {
       socket.off('action', handleAction)
+      pendingIceRef.current = []
       if (subRef.current) {
         subRef.current.stop()
         subRef.current = null

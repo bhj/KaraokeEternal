@@ -21,8 +21,38 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
   let status: SubscriberStatus = 'idle'
   let pc: RTCPeerConnection | null = null
   let videoEl: HTMLVideoElement | null = null
+  let hasRemoteDescription = false
+  let pendingIce: CameraIcePayload[] = []
+
+  const addIceCandidate = async (ice: CameraIcePayload) => {
+    if (!pc || !ice.candidate) return
+
+    await pc.addIceCandidate(new RTCIceCandidate({
+      candidate: ice.candidate,
+      sdpMid: ice.sdpMid,
+      sdpMLineIndex: ice.sdpMLineIndex,
+    }))
+  }
+
+  const flushPendingIce = async () => {
+    if (!hasRemoteDescription || !pendingIce.length) return
+    const queued = pendingIce
+    pendingIce = []
+
+    for (const ice of queued) {
+      await addIceCandidate(ice)
+    }
+  }
 
   const handleOffer = async (offer: CameraOfferPayload) => {
+    if (pc) {
+      pc.close()
+    }
+
+    status = 'connecting'
+    hasRemoteDescription = false
+    pendingIce = []
+
     pc = new RTCPeerConnection({ iceServers: STUN_SERVERS })
 
     pc.onicecandidate = (ev) => {
@@ -39,16 +69,29 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
     }
 
     pc.ontrack = (ev) => {
-      const el = document.createElement('video')
-      el.autoplay = true
-      el.playsInline = true
-      el.muted = true
-      el.srcObject = ev.streams[0] ?? new MediaStream([ev.track])
-      videoEl = el
+      if (!videoEl) {
+        videoEl = document.createElement('video')
+        videoEl.autoplay = true
+        videoEl.playsInline = true
+        videoEl.muted = true
+      }
+
+      videoEl.srcObject = ev.streams[0] ?? new MediaStream([ev.track])
+
+      const playResult = videoEl.play?.()
+      if (playResult && typeof playResult.catch === 'function') {
+        playResult.catch((err: unknown): void => {
+          console.debug('[CameraSubscriber] remote video play() failed', err)
+        })
+      }
+
       status = 'active'
     }
 
     await pc.setRemoteDescription(new RTCSessionDescription(offer))
+    hasRemoteDescription = true
+    await flushPendingIce()
+
     const answer = await pc.createAnswer()
     await pc.setLocalDescription(answer)
 
@@ -56,19 +99,17 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
       type: CAMERA_ANSWER_REQ,
       payload: { sdp: answer.sdp, type: 'answer' },
     })
-
-    status = 'connecting'
   }
 
   const handleIce = async (ice: CameraIcePayload) => {
-    if (!pc) return
-    if (ice.candidate) {
-      await pc.addIceCandidate(new RTCIceCandidate({
-        candidate: ice.candidate,
-        sdpMid: ice.sdpMid,
-        sdpMLineIndex: ice.sdpMLineIndex,
-      }))
+    if (!pc || !ice.candidate) return
+
+    if (!hasRemoteDescription) {
+      pendingIce.push(ice)
+      return
     }
+
+    await addIceCandidate(ice)
   }
 
   const stop = () => {
@@ -76,6 +117,8 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
       pc.close()
       pc = null
     }
+    pendingIce = []
+    hasRemoteDescription = false
     videoEl = null
     status = 'idle'
   }

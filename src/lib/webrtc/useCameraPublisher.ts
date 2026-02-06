@@ -133,10 +133,34 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
   let stream: MediaStream | null = null
   let pc: RTCPeerConnection | null = null
   let error: string | null = null
+  let hasRemoteDescription = false
+  let pendingIce: CameraIcePayload[] = []
+
+  const addIceCandidate = async (ice: CameraIcePayload) => {
+    if (!pc || !ice.candidate) return
+
+    await pc.addIceCandidate(new RTCIceCandidate({
+      candidate: ice.candidate,
+      sdpMid: ice.sdpMid,
+      sdpMLineIndex: ice.sdpMLineIndex,
+    }))
+  }
+
+  const flushPendingIce = async () => {
+    if (!hasRemoteDescription || !pendingIce.length) return
+    const queued = pendingIce
+    pendingIce = []
+
+    for (const ice of queued) {
+      await addIceCandidate(ice)
+    }
+  }
 
   const start = async (options?: CameraStartOptions) => {
     const facingMode = options?.facingMode ?? 'user'
     error = null
+    hasRemoteDescription = false
+    pendingIce = []
 
     try {
       const mediaStream = await requestCameraStream(facingMode)
@@ -180,19 +204,22 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
 
   const handleAnswer = async (answer: CameraAnswerPayload) => {
     if (!pc) return
+
     await pc.setRemoteDescription(new RTCSessionDescription(answer))
+    hasRemoteDescription = true
+    await flushPendingIce()
     status = 'active'
   }
 
   const handleIce = async (ice: CameraIcePayload) => {
-    if (!pc) return
-    if (ice.candidate) {
-      await pc.addIceCandidate(new RTCIceCandidate({
-        candidate: ice.candidate,
-        sdpMid: ice.sdpMid,
-        sdpMLineIndex: ice.sdpMLineIndex,
-      }))
+    if (!pc || !ice.candidate) return
+
+    if (!hasRemoteDescription) {
+      pendingIce.push(ice)
+      return
     }
+
+    await addIceCandidate(ice)
   }
 
   const stop = () => {
@@ -207,6 +234,9 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
       pc.close()
       pc = null
     }
+
+    pendingIce = []
+    hasRemoteDescription = false
 
     dispatch({ type: CAMERA_STOP_REQ, payload: {} })
     status = 'idle'

@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useRef, useSyncExternalStore } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { type AudioData } from 'routes/Player/components/Player/PlayerVisualizer/hooks/useAudioAnalyser'
-import { useCameraReceiver } from 'lib/webrtc/useCameraReceiver'
 import type { AudioResponseState, VisualizerMode } from 'shared/types'
 import HydraVisualizer from '../../Player/components/Player/PlayerVisualizer/HydraVisualizer'
 import styles from './HydraPreview.css'
@@ -39,6 +38,7 @@ const HydraPreview = ({
   code,
   width,
   height,
+  localCameraStream,
   mode,
   isEnabled,
   sensitivity,
@@ -46,12 +46,43 @@ const HydraPreview = ({
   audioResponse,
 }: HydraPreviewProps) => {
   const status = useAppSelector(state => state.status)
-  const { videoElement: remoteVideoElement } = useCameraReceiver()
   const isHydraActive = isEnabled && mode === 'hydra'
 
   const isLive = status.isPlayerPresent && status.fftData !== null
   const overrideData = isLive && status.fftData ? mapFftToAudioData(status.fftData) : null
-  const previewVideoElement = allowCamera ? remoteVideoElement : null
+
+  const previewVideoElement = useMemo(() => {
+    if (!allowCamera || !localCameraStream) {
+      return null
+    }
+
+    const el = document.createElement('video')
+    el.autoplay = true
+    el.playsInline = true
+    el.muted = true
+    el.srcObject = localCameraStream
+
+    return el
+  }, [allowCamera, localCameraStream])
+
+  // Use only local camera stream in orchestrator preview.
+  // Player owns remote camera subscription to avoid WebRTC answer races.
+  useEffect(() => {
+    if (!previewVideoElement) {
+      return
+    }
+
+    const playPromise = previewVideoElement.play()
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch((err: unknown): void => {
+        console.debug('[HydraPreview] camera preview play() failed', err)
+      })
+    }
+
+    return () => {
+      previewVideoElement.srcObject = null
+    }
+  }, [previewVideoElement])
 
   const audioStoreRef = useRef<{
     source: MediaElementAudioSourceNode | null
