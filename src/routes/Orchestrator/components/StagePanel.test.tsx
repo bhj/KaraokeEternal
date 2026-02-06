@@ -124,73 +124,7 @@ describe('StagePanel', () => {
     expect(container.textContent).toContain('o1')
     expect(container.textContent).toContain('o2')
     expect(container.textContent).toContain('o3')
-    // No 'grid' option
-    expect(container.textContent).not.toContain('grid')
-
-    await act(async () => {
-      root.unmount()
-    })
-  })
-})
-
-describe('StagePanel player mirror', () => {
-  it('shows waiting mirror state when player is present but no frame has arrived', async () => {
-    const container = document.createElement('div')
-    const root = createRoot(container)
-
-    await act(async () => {
-      root.render(
-        <StagePanel
-          code='osc(10).out()'
-          width={360}
-          height={270}
-          buffer='auto'
-          onBufferChange={vi.fn()}
-          visualizerMode='hydra'
-          visualizerEnabled={true}
-          visualizerSensitivity={1}
-          visualizerAllowCamera={false}
-          visualizerAudioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
-          isPlayerPresent={true}
-        />,
-      )
-    })
-
-    expect(container.textContent).toContain('Waiting for player mirror frames...')
-
-    await act(async () => {
-      root.unmount()
-    })
-  })
-
-  it('renders player mirror image when frame data is available', async () => {
-    const container = document.createElement('div')
-    const root = createRoot(container)
-    const frameDataUrl = 'data:image/jpeg;base64,abc'
-
-    await act(async () => {
-      root.render(
-        <StagePanel
-          code='osc(10).out()'
-          width={360}
-          height={270}
-          buffer='auto'
-          onBufferChange={vi.fn()}
-          visualizerMode='hydra'
-          visualizerEnabled={true}
-          visualizerSensitivity={1}
-          visualizerAllowCamera={false}
-          visualizerAudioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
-          playerFrameDataUrl={frameDataUrl}
-          playerFrameTimestamp={123}
-          isPlayerPresent={true}
-        />,
-      )
-    })
-
-    const image = container.querySelector('img[alt="Live player reference frame"]')
-    expect(image).not.toBeNull()
-    expect(image?.getAttribute('src')).toBe(frameDataUrl)
+    expect(container.textContent).not.toContain('Player Feed')
 
     await act(async () => {
       root.unmount()
