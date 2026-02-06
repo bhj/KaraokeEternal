@@ -15,11 +15,9 @@ import {
   PLAYER_REQ_VOLUME,
   PLAYER_EMIT_STATUS,
   PLAYER_EMIT_FFT,
-  PLAYER_EMIT_FRAME,
   PLAYER_EMIT_LEAVE,
   PLAYER_STATUS,
   PLAYER_FFT,
-  PLAYER_FRAME,
   PLAYER_LEAVE,
   VISUALIZER_HYDRA_CODE_REQ,
   VISUALIZER_HYDRA_CODE,
@@ -34,8 +32,6 @@ import {
   CAMERA_STOP_REQ,
   CAMERA_STOP,
 } from '../../shared/actionTypes.js'
-
-const MAX_MIRROR_DATA_URL_LENGTH = 400_000
 
 // ------------------------------------
 // Action Handlers
@@ -84,24 +80,6 @@ const ACTION_HANDLERS = {
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_FFT,
       payload,
-    })
-  },
-  [PLAYER_EMIT_FRAME]: async (sock, { payload }) => {
-    if (!payload || typeof payload !== 'object') return
-
-    const frame = payload as { dataUrl?: unknown, timestamp?: unknown }
-    if (typeof frame.dataUrl !== 'string' || frame.dataUrl.length > MAX_MIRROR_DATA_URL_LENGTH) {
-      return
-    }
-
-    const normalizedPayload = {
-      dataUrl: frame.dataUrl,
-      timestamp: typeof frame.timestamp === 'number' ? frame.timestamp : Date.now(),
-    }
-
-    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
-      type: PLAYER_FRAME,
-      payload: normalizedPayload,
     })
   },
   [PLAYER_EMIT_STATUS]: async (sock, { payload }) => {

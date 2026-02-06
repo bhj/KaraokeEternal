@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import Hydra from 'hydra-synth'
 import throttle from 'lodash/throttle'
 import { useDispatch } from 'react-redux'
-import { PLAYER_EMIT_FFT, PLAYER_EMIT_FRAME } from 'shared/actionTypes'
+import { PLAYER_EMIT_FFT } from 'shared/actionTypes'
 import { type AudioData } from './hooks/useAudioAnalyser'
 import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
 import { getHydraEvalCode, DEFAULT_PATCH } from './hydraEvalCode'
@@ -124,42 +124,6 @@ function HydraVisualizer ({
       meta: { throttle: { wait: 50, leading: false } },
     })
   }, 50, { leading: false, trailing: true }), [dispatch, compat])
-
-  // Throttle player mirror frame emission to ~4Hz (250ms)
-  const emitFrameDataRef = useRef<((timestamp: number) => void) | null>(null)
-
-  useEffect(() => {
-    const emitFrameData = throttle((timestamp: number) => {
-      const sourceCanvas = canvasRef.current
-      if (!sourceCanvas) return
-
-      const mirrorCanvas = document.createElement('canvas')
-      mirrorCanvas.width = 320
-      mirrorCanvas.height = 180
-
-      const ctx = mirrorCanvas.getContext('2d')
-      if (!ctx) return
-
-      ctx.drawImage(sourceCanvas, 0, 0, mirrorCanvas.width, mirrorCanvas.height)
-
-      try {
-        const dataUrl = mirrorCanvas.toDataURL('image/jpeg', 0.55)
-        dispatch({
-          type: PLAYER_EMIT_FRAME,
-          payload: { dataUrl, timestamp },
-        })
-      } catch (err) {
-        warn('Mirror frame capture failed:', err)
-      }
-    }, 250, { leading: false, trailing: true })
-
-    emitFrameDataRef.current = emitFrameData
-
-    return () => {
-      emitFrameData.cancel()
-      emitFrameDataRef.current = null
-    }
-  }, [dispatch])
 
   useEffect(() => {
     return () => {
@@ -312,7 +276,6 @@ function HydraVisualizer ({
     // Emit FFT if enabled (always emit while Hydra is running)
     if (emitFft && shouldEmitFft(isPlaying)) {
       emitFftData(audioRef.current)
-      emitFrameDataRef.current?.(time)
     }
 
     // Calculate delta time in milliseconds

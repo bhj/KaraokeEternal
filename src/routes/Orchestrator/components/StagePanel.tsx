@@ -20,9 +20,6 @@ interface StagePanelProps {
   visualizerSensitivity: number
   visualizerAllowCamera: boolean
   visualizerAudioResponse: AudioResponseState
-  playerFrameDataUrl?: string | null
-  playerFrameTimestamp?: number | null
-  isPlayerPresent?: boolean
 }
 
 function StagePanel ({
@@ -40,9 +37,6 @@ function StagePanel ({
   visualizerSensitivity,
   visualizerAllowCamera,
   visualizerAudioResponse,
-  playerFrameDataUrl,
-  playerFrameTimestamp,
-  isPlayerPresent,
 }: StagePanelProps) {
   const previewCode = useMemo(() => buildPreviewCode(code, buffer), [code, buffer])
 
@@ -89,31 +83,6 @@ function StagePanel ({
             audioResponse={visualizerAudioResponse}
           />
         </div>
-        <aside className={styles.playerMirror}>
-          <div className={styles.playerMirrorHeader}>
-            <span>Player Feed</span>
-            {playerFrameTimestamp && (
-              <span className={styles.playerMirrorMeta}>
-                {new Date(playerFrameTimestamp).toLocaleTimeString()}
-              </span>
-            )}
-          </div>
-          {playerFrameDataUrl
-            ? (
-                <img
-                  src={playerFrameDataUrl}
-                  alt='Live player reference frame'
-                  className={styles.playerMirrorImage}
-                />
-              )
-            : (
-                <div className={styles.playerMirrorPlaceholder}>
-                  {isPlayerPresent
-                    ? 'Waiting for player mirror frames...'
-                    : 'No active player feed'}
-                </div>
-              )}
-        </aside>
       </div>
     </div>
   )
