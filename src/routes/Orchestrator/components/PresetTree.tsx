@@ -147,55 +147,71 @@ function PresetTree ({
                       className={clsx(styles.presetRow, isSelected && styles.presetRowSelected)}
                       role='button'
                       tabIndex={0}
+                      aria-pressed={isSelected}
+                      aria-label={`Preset ${preset.name}`}
                       data-tree-focusable='true'
                       onClick={() => onLoad(preset)}
                       onKeyDown={e => handlePresetKeyDown(e, preset)}
                     >
-                      <span className={styles.presetName}>{preset.name}</span>
-                      {preset.usesCamera && <span className={clsx(styles.badge, styles.badgeCam)}>Cam</span>}
-                      <div className={styles.actions}>
+                      <div className={styles.presetMain}>
+                        <span className={styles.presetName}>{preset.name}</span>
+                        <div className={styles.presetMeta}>
+                          {isSelected && <span className={clsx(styles.badge, styles.badgeSelected)}>Selected</span>}
+                          {preset.usesCamera && <span className={clsx(styles.badge, styles.badgeCam)}>Cam</span>}
+                        </div>
+                      </div>
+
+                      <div className={styles.actions} role='group' aria-label={`${preset.name} actions`}>
                         <button
                           type='button'
                           className={styles.actionButton}
+                          aria-label='Load preset'
+                          title='Load preset'
                           onClick={(e) => {
                             e.stopPropagation()
                             onLoad(preset)
                           }}
                         >
-                          Load
+                          <span aria-hidden>↓</span>
                         </button>
                         <button
                           type='button'
                           className={clsx(styles.actionButton, styles.actionPrimary)}
+                          aria-label='Send preset'
+                          title='Send preset'
                           onClick={(e) => {
                             e.stopPropagation()
                             onSend(preset)
                           }}
                         >
-                          Send
+                          <span aria-hidden>↑</span>
                         </button>
                         {preset.isGallery && onClone && (
                           <button
                             type='button'
                             className={styles.actionButton}
+                            aria-label='Save preset copy'
+                            title='Save preset copy'
                             onClick={(e) => {
                               e.stopPropagation()
                               onClone(preset)
                             }}
                           >
-                            Save as...
+                            <span aria-hidden>⧉</span>
                           </button>
                         )}
                         {!preset.isGallery && onDeletePreset && (canDeletePreset?.(preset) ?? true) && (
                           <button
                             type='button'
                             className={clsx(styles.actionButton, styles.actionDanger)}
+                            aria-label='Delete preset'
+                            title='Delete preset'
                             onClick={(e) => {
                               e.stopPropagation()
                               onDeletePreset(preset)
                             }}
                           >
-                            Delete
+                            <span aria-hidden>×</span>
                           </button>
                         )}
                       </div>

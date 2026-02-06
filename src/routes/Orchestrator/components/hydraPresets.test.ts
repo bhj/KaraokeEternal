@@ -27,6 +27,16 @@ function countChar (code: string, ch: string): number {
   return count
 }
 
+function canParseAsJavaScript (code: string): boolean {
+  try {
+    // Syntax-only parse check (does not execute sketch code)
+    new Function(code)
+    return true
+  } catch {
+    return false
+  }
+}
+
 describe('hydraPresets', () => {
   describe('decodeSketch', () => {
     it('decodes a gallery item from base64+URI encoding', () => {
@@ -58,6 +68,17 @@ describe('hydraPresets', () => {
     it('all PRESETS entries are non-empty strings', () => {
       for (let i = 0; i < PRESETS.length; i++) {
         expect(PRESETS[i].length, `PRESETS[${i}] is empty`).toBeGreaterThan(0)
+      }
+    })
+
+    it('all decoded sketches are syntactically valid JavaScript', () => {
+      for (let i = 0; i < PRESETS.length; i++) {
+        const sketchId = HYDRA_GALLERY[i].sketch_id
+        const code = PRESETS[i]
+        expect(
+          canParseAsJavaScript(code),
+          `Sketch ${i} (${sketchId}) has invalid JavaScript syntax`,
+        ).toBe(true)
       }
     })
 
