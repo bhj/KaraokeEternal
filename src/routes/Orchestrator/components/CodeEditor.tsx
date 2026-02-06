@@ -4,12 +4,12 @@ import { Decoration, EditorView, keymap, ViewPlugin, type DecorationSet, type Vi
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion, type CompletionContext, type CompletionResult } from '@codemirror/autocomplete'
 import { linter, type Diagnostic } from '@codemirror/lint'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands'
 import { indentUnit } from '@codemirror/language'
 import { hydraExtensions } from './hydraHighlightStyle'
 import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
-import { getLintErrorSummary } from './codeEditorUtils'
+import { formatHydraCode, getLintErrorSummary, type LintErrorSummary } from './codeEditorUtils'
 import { isInjectedLine, isPartialInjectedLine } from 'lib/injectedLines'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
@@ -79,6 +79,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -92,6 +93,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -105,6 +107,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -118,6 +121,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -260,7 +264,7 @@ function CodeEditor ({
   const onSendRef = useRef(onSend)
   const codeRef = useRef(code)
   const sendAttemptRef = useRef<() => void>(() => {})
-  const [sendLintError, setSendLintError] = useState<{ count: number, firstLine: number } | null>(null)
+  const [sendLintError, setSendLintError] = useState<LintErrorSummary | null>(null)
 
   onCodeChangeRef.current = onCodeChange
   onSendRef.current = onSend
@@ -338,6 +342,30 @@ function CodeEditor ({
     sendAttemptRef.current()
   }, [])
 
+  const handleUndo = useCallback(() => {
+    if (!viewRef.current) return
+    undo(viewRef.current)
+    viewRef.current.focus()
+  }, [])
+
+  const handleRedo = useCallback(() => {
+    if (!viewRef.current) return
+    redo(viewRef.current)
+    viewRef.current.focus()
+  }, [])
+
+  const handleFormat = useCallback(() => {
+    const view = viewRef.current
+    if (!view) return
+    const currentCode = view.state.doc.toString()
+    const formatted = formatHydraCode(currentCode)
+    if (formatted === currentCode) return
+    view.dispatch({
+      changes: { from: 0, to: currentCode.length, insert: formatted },
+    })
+    view.focus()
+  }, [])
+
   // Camera banner: show when code uses src(sN) without init
   const cameraUsage = useMemo(() => detectCameraUsage(code), [code])
   const [cameraBannerDismissed, setCameraBannerDismissed] = useState(false)
@@ -391,15 +419,16 @@ function CodeEditor ({
       <div ref={containerRef} className={styles.editor} />
       <div className={styles.footer}>
         <span className={styles.hint}>Ctrl+Enter to send</span>
+        <div className={styles.editActions}>
+          <button type='button' className={styles.editButton} onClick={handleUndo}>Undo</button>
+          <button type='button' className={styles.editButton} onClick={handleRedo}>Redo</button>
+          <button type='button' className={styles.editButton} onClick={handleFormat}>Format</button>
+        </div>
         <div className={styles.audioVars}>
-          <span>bass()</span>
-          <span>mid()</span>
-          <span>treble()</span>
-          <span>beat()</span>
-          <span>energy()</span>
-          <span>bpm()</span>
-          <span>bright()</span>
           <span>a.fft[n]</span>
+          <span>a.setBins(n)</span>
+          <span>a.setSmooth(v)</span>
+          <span>a.setScale(v)</span>
         </div>
         <button type='button' className={styles.randomButton} onClick={onRandomize}>
           Random
@@ -426,9 +455,12 @@ function CodeEditor ({
             </span>
           )}
           {sendLintError && (
-            <span className={styles.sendLintError}>
-              {`Fix ${sendLintError.count} error${sendLintError.count > 1 ? 's' : ''} (line ${sendLintError.firstLine})`}
-            </span>
+            <>
+              <span className={styles.sendLintError}>
+                {`Fix ${sendLintError.count} error${sendLintError.count > 1 ? 's' : ''} (line ${sendLintError.firstLine})`}
+              </span>
+              <span className={styles.sendLintDebug}>{sendLintError.debugHint}</span>
+            </>
           )}
           {sendStatus === 'error' && onResend && (
             <button type='button' className={styles.resendButton} onClick={onResend}>

@@ -15,8 +15,8 @@ export const HYDRA_SNIPPETS: HydraSnippetCategory[] = [
       { label: 'fft bass', code: '() => a.fft[0]' },
       { label: 'fft mid', code: '() => a.fft[1]' },
       { label: 'fft treble', code: '() => a.fft[2]' },
-      { label: 'bass reactive', code: '() => bass() * 0.5' },
-      { label: 'beat gate', code: '() => beat() > 0.5 ? 1 : 0' },
+      { label: 'fft pulse', code: '() => a.fft[0] * 0.5' },
+      { label: 'fft gate', code: '() => a.fft[0] > 0.5 ? 1 : 0' },
     ],
   },
   {

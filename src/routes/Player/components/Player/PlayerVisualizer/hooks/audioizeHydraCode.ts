@@ -4,8 +4,6 @@ import { DEFAULT_PROFILE, type AudioInjectProfile } from './audioInjectProfiles'
 import { getInjectionChain } from './presetClassifier'
 
 const AUDIO_PATTERNS = [
-  /bass\s*\(/, /mid\s*\(/, /treble\s*\(/, /beat\s*\(/,
-  /bpm\s*\(/, /energy\s*\(/, /bright\s*\(/,
   /a\.fft/, /a\.setBins/, /a\.setSmooth/, /a\.setScale/,
 ]
 

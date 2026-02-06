@@ -4,7 +4,7 @@ import throttle from 'lodash/throttle'
 import { useDispatch } from 'react-redux'
 import { PLAYER_EMIT_FFT } from 'shared/actionTypes'
 import { type AudioData } from './hooks/useAudioAnalyser'
-import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
+import { useHydraAudio } from './hooks/useHydraAudio'
 import { getHydraEvalCode, DEFAULT_PATCH } from './hydraEvalCode'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { applyRemoteCameraOverride, restoreRemoteCameraOverride } from 'lib/remoteCameraOverride'
@@ -16,27 +16,22 @@ import styles from './HydraVisualizer.css'
 const log = (...args: unknown[]) => console.log('[Hydra]', ...args)
 const warn = (...args: unknown[]) => console.warn('[Hydra]', ...args)
 
-// Audio closure names exposed on window for Hydra code to reference
-const AUDIO_GLOBAL_NAMES = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright'] as const
-
-function setAudioGlobals (closures: AudioClosures, compat: HydraAudioCompat) {
+// Audio globals exposed on window for Hydra code to reference
+function setAudioGlobals (compat: HydraAudioCompat) {
   const w = window as unknown as Record<string, unknown>
-  w.bass = closures.bass
-  w.mid = closures.mid
-  w.treble = closures.treble
-  w.beat = closures.beat
-  w.energy = closures.energy
-  w.bpm = closures.bpm
-  w.bright = closures.bright
-  // Hydra-native audio API: gallery sketches use a.fft[0], a.setBins(), etc.
   w.a = compat
 }
 
 function clearAudioGlobals () {
   const w = window as unknown as Record<string, unknown>
-  for (const name of AUDIO_GLOBAL_NAMES) {
-    delete w[name]
-  }
+  // Defensive cleanup for sessions that previously exposed legacy helpers.
+  delete w.bass
+  delete w.mid
+  delete w.treble
+  delete w.beat
+  delete w.energy
+  delete w.bpm
+  delete w.bright
   delete w.a
 }
 
@@ -97,7 +92,7 @@ function HydraVisualizer ({
   const cameraInitRef = useRef<Set<string>>(new Set())
   const cameraOverrideRef = useRef<Map<string, unknown>>(new Map())
 
-  const { update: updateAudio, closures, compat, audioRef } = useHydraAudio(
+  const { update: updateAudio, compat, audioRef } = useHydraAudio(
     audioSourceNode,
     sensitivity,
     audioResponse,
@@ -149,11 +144,11 @@ function HydraVisualizer ({
     }
   }, [remoteVideoElement])
 
-  // Set audio closures + window.a compat on window so Hydra code can reference them
+  // Set window.a compat on window so Hydra code can reference a.fft and controls
   useEffect(() => {
-    setAudioGlobals(closures, compat)
+    setAudioGlobals(compat)
     return () => clearAudioGlobals()
-  }, [closures, compat])
+  }, [compat])
 
   // Initialize Hydra (mount-only)
   useEffect(() => {

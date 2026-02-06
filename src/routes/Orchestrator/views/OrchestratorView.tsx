@@ -125,6 +125,32 @@ function OrchestratorView () {
     }
   }, [cancelPendingRemoteSync, handleSendCode, ui.innerWidth])
 
+  const handleInsertApiExample = useCallback((snippet: string) => {
+    const trimmed = snippet.trim()
+    if (trimmed.length === 0) return
+    const base = (userHasEdited ? localCode : (remoteHydraCode ?? localCode)).trimEnd()
+    const nextCode = base.length > 0 ? `${base}\n\n${trimmed}` : trimmed
+    cancelPendingRemoteSync()
+    setLocalCode(nextCode)
+    setDebouncedCode(nextCode)
+    setUserHasEdited(true)
+    if (ui.innerWidth < 980) {
+      setActiveMobileTab('code')
+    }
+  }, [cancelPendingRemoteSync, localCode, remoteHydraCode, ui.innerWidth, userHasEdited])
+
+  const handleReplaceApiExample = useCallback((snippet: string) => {
+    const nextCode = snippet.trim()
+    if (nextCode.length === 0) return
+    cancelPendingRemoteSync()
+    setLocalCode(nextCode)
+    setDebouncedCode(nextCode)
+    setUserHasEdited(true)
+    if (ui.innerWidth < 980) {
+      setActiveMobileTab('code')
+    }
+  }, [cancelPendingRemoteSync, ui.innerWidth])
+
   const handleResend = useCallback(() => {
     handleSendCode(localCode)
   }, [handleSendCode, localCode])
@@ -288,7 +314,12 @@ function OrchestratorView () {
       />
     )
   } else {
-    tabContent = <ApiReference />
+    tabContent = (
+      <ApiReference
+        onInsertExample={handleInsertApiExample}
+        onReplaceWithExample={handleReplaceApiExample}
+      />
+    )
   }
 
   const containerStyle = { ['--ref-panel-width' as string]: `${refPanelWidth}px` } as React.CSSProperties

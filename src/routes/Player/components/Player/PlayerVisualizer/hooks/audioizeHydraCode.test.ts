@@ -12,25 +12,20 @@ describe('audioizeHydraCode', () => {
     }
 
     it.each([
-      ['bass(', 'osc().modulate(noise(3), () => bass() * 0.15).out()'],
-      ['mid(', 'osc().rotate(() => mid() * 0.03).out()'],
-      ['treble(', 'osc().color(1, 0.5, () => treble()).out()'],
-      ['beat(', 'osc().kaleid(() => 2 + beat() * 4).out()'],
-      ['bpm(', 'osc().scale(() => bpm() * 0.1).out()'],
-      ['energy(', 'osc().saturate(() => energy()).out()'],
-      ['bright(', 'osc().brightness(() => bright()).out()'],
       ['a.fft', 'osc().modulate(noise(3), () => a.fft[0]).out()'],
       ['a.setBins', 'a.setBins(4)\nosc().out()'],
+      ['a.setSmooth', 'a.setSmooth(0.4)\nosc().out()'],
+      ['a.setScale', 'a.setScale(1.25)\nosc().out()'],
     ])('detects %s as audio usage', (_label, code) => {
       expect(check(code)).toBe(true)
     })
 
     it('does NOT detect audio in // line comments', () => {
-      expect(check('// bass()\nosc().out()')).toBe(false)
+      expect(check('// a.fft[0]\nosc().out()')).toBe(false)
     })
 
     it('does NOT detect audio in /* block */ comments', () => {
-      expect(check('/* bass() */\nosc().out()')).toBe(false)
+      expect(check('/* a.setBins(4) */\nosc().out()')).toBe(false)
     })
   })
 

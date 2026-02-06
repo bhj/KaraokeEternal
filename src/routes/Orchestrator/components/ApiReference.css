@@ -1,93 +1,350 @@
-.panel {
+.workspace {
   display: flex;
   flex-direction: column;
-  padding: 8px 0;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-  font-size: 11px;
-  overflow-y: auto;
+  gap: 0.9rem;
   height: 100%;
+  min-height: 0;
+  padding: 0.9rem;
+  color: #d5dae1;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  background: linear-gradient(180deg, rgba(18, 22, 29, 0.9) 0%, rgba(13, 17, 23, 0.95) 100%);
 }
 
-.section {
-  margin-bottom: 4px;
-}
-
-.sectionHeader {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #aaa;
-  cursor: pointer;
-  user-select: none;
-}
-
-.sectionHeader:hover {
-  color: #ddd;
-}
-
-.sectionToggle {
-  font-size: 8px;
-  color: #666;
-}
-
-.audioSection .sectionHeader {
-  color: #d4a017;
-  cursor: default;
-}
-
-.audioItem {
+.header {
   display: flex;
   flex-direction: column;
-  padding: 2px 12px 2px 20px;
-  gap: 1px;
+  gap: 0.45rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  color: #f0f5ff;
+}
+
+.subtitle {
+  margin: 0;
+  color: #9da7b5;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.searchField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.searchLabel {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7f8ea1;
+}
+
+.searchInput {
+  width: 100%;
+  border: 1px solid #2f3b49;
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.6rem;
+  background: #101722;
+  color: #edf2f8;
+  font-size: 0.77rem;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #56a8ff;
+  box-shadow: 0 0 0 0.12rem rgba(86, 168, 255, 0.25);
+}
+
+.audioStrip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.audioCard {
+  border: 1px solid #2f3b49;
+  border-radius: 0.55rem;
+  background: #111a26;
+  padding: 0.45rem 0.55rem;
+  min-height: 4.1rem;
 }
 
 .audioName {
-  color: #d4a017;
-  font-weight: 500;
+  color: #f4ca63;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .audioRange {
-  color: #666;
-  font-size: 10px;
+  color: #b7c0cc;
+  font-size: 0.67rem;
+  margin-top: 0.16rem;
 }
 
-.audioDesc {
-  color: #888;
-  font-size: 10px;
+.audioDescription {
+  color: #8c97a8;
+  font-size: 0.65rem;
+  line-height: 1.45;
+  margin-top: 0.2rem;
 }
 
-.funcItem {
-  padding: 2px 12px 2px 20px;
-  color: #c9d1d9;
+.workspaceBody {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.95fr) minmax(14rem, 1.15fr);
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.functionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.5rem;
+  border: 1px solid #2f3b49;
+  border-radius: 0.65rem;
+  background: #0f1621;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.functionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid #2f3b49;
+  border-radius: 0.48rem;
+  background: #121c2a;
+  color: #d5dae1;
+  text-align: left;
+  cursor: pointer;
+}
+
+.functionItem:hover {
+  border-color: #4e6f96;
+  background: #162437;
+}
+
+.functionItem:focus-visible {
+  outline: 0.12rem solid #56a8ff;
+  outline-offset: 0.08rem;
+}
+
+.functionItemActive {
+  border-color: #61a8f1;
+  box-shadow: inset 0 0 0 0.06rem rgba(97, 168, 241, 0.2);
+  background: #18324a;
+}
+
+.functionTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.functionName {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #f0f5ff;
+}
+
+.functionCategory {
+  border: 1px solid #445b75;
+  border-radius: 999px;
+  padding: 0.1rem 0.38rem;
+  color: #9eaec4;
+  font-size: 0.58rem;
+  line-height: 1.3;
   white-space: nowrap;
+}
+
+.functionSignature {
+  color: #95a2b4;
+  font-size: 0.62rem;
+  line-height: 1.45;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.funcItem:hover {
-  background: rgba(255, 255, 255, 0.04);
+.emptyState {
+  border: 1px dashed #2f3b49;
+  border-radius: 0.48rem;
+  padding: 0.65rem;
+  color: #8f9daf;
+  font-size: 0.7rem;
 }
 
-.funcParams {
-  color: #666;
+.detailPane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.65rem;
+  border: 1px solid #2f3b49;
+  border-radius: 0.65rem;
+  background: #0f1621;
+  overflow-y: auto;
+  min-height: 0;
 }
 
-.autoAudioNote {
-  padding: 8px 12px;
-  margin: 4px 0;
-  font-size: 10px;
+.detailHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detailName {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #f0f5ff;
+}
+
+.detailSummary {
+  margin: 0;
+  color: #9ca8ba;
+  font-size: 0.71rem;
   line-height: 1.5;
-  color: #888;
-  border-left: 2px solid #d4a017;
 }
 
-.autoAudioNote code {
-  color: #d4a017;
-  font-size: 10px;
+.detailSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.detailLabel {
+  font-size: 0.65rem;
+  color: #8594a8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.detailText {
+  margin: 0;
+  color: #a9b6c8;
+  font-size: 0.69rem;
+  line-height: 1.5;
+}
+
+.relatedRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+}
+
+.relatedChip {
+  border: 1px solid #2f475f;
+  border-radius: 999px;
+  padding: 0.1rem 0.4rem;
+  color: #b8cadf;
+  font-size: 0.62rem;
+  background: #102030;
+}
+
+.paramList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.paramItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+  border: 1px solid #27384e;
+  border-radius: 0.42rem;
+  padding: 0.35rem 0.42rem;
+  background: #111d2c;
+}
+
+.paramName {
+  font-size: 0.67rem;
+  color: #f2f7ff;
+  font-weight: 700;
+}
+
+.paramMeta {
+  font-size: 0.64rem;
+  color: #9cabbe;
+}
+
+.noParams {
+  margin: 0;
+  font-size: 0.68rem;
+  color: #9cabbe;
+}
+
+.exampleBlock {
+  margin: 0;
+  padding: 0.55rem;
+  border-radius: 0.5rem;
+  border: 1px solid #27384e;
+  background: #0b121b;
+  color: #9ad0ff;
+  font-size: 0.67rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: auto;
+}
+
+.actionButton,
+.actionButtonSecondary {
+  border: 1px solid #39526f;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.62rem;
+  background: #18324a;
+  color: #e7f2ff;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.actionButton:hover,
+.actionButtonSecondary:hover {
+  background: #22496f;
+}
+
+.actionButtonSecondary {
+  background: #132334;
+  border-color: #2f475f;
+}
+
+@media (max-width: 1080px) {
+  .workspaceBody {
+    grid-template-columns: 1fr;
+  }
+
+  .detailPane {
+    min-height: 14rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .workspace {
+    padding: 0.75rem;
+  }
+
+  .audioStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
 }
