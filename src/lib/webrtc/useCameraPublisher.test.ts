@@ -152,10 +152,34 @@ describe('createCameraPublisher', () => {
   it('should handle remote ICE candidate', async () => {
     await publisher.start()
 
+    await publisher.handleAnswer({
+      sdp: 'mock-answer-sdp',
+      type: 'answer',
+    })
+
     await publisher.handleIce({
       candidate: 'candidate:1 1 udp ...',
       sdpMid: '0',
       sdpMLineIndex: 0,
+    })
+
+    expect(mocks.mockPc.addIceCandidate).toHaveBeenCalled()
+  })
+
+  it('queues remote ICE until answer is applied', async () => {
+    await publisher.start()
+
+    await publisher.handleIce({
+      candidate: 'candidate:1 1 udp ...',
+      sdpMid: '0',
+      sdpMLineIndex: 0,
+    })
+
+    expect(mocks.mockPc.addIceCandidate).not.toHaveBeenCalled()
+
+    await publisher.handleAnswer({
+      sdp: 'mock-answer-sdp',
+      type: 'answer',
     })
 
     expect(mocks.mockPc.addIceCandidate).toHaveBeenCalled()

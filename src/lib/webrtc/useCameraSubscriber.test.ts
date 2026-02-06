@@ -37,6 +37,7 @@ const mockVideoEl = {
   playsInline: false,
   muted: false,
   srcObject: null as MediaStream | null,
+  play: vi.fn().mockResolvedValue(undefined),
 } as unknown as HTMLVideoElement
 
 function setupGlobals () {
@@ -71,6 +72,7 @@ describe('createCameraSubscriber', () => {
     dispatch = vi.fn()
     subscriber = createCameraSubscriber(dispatch)
     mockVideoEl.srcObject = null
+    ;(mockVideoEl.play as ReturnType<typeof vi.fn>).mockClear()
   })
 
   afterEach(() => {
@@ -149,7 +151,36 @@ describe('createCameraSubscriber', () => {
 
     expect(subscriber.getVideoElement()).toBe(mockVideoEl)
     expect(mockVideoEl.srcObject).toBe(mockRemoteStream)
+    expect(mockVideoEl.play).toHaveBeenCalled()
     expect(subscriber.getStatus()).toBe('active')
+  })
+
+  it('should queue remote ICE until remote description is ready', async () => {
+    let resolveRemoteDescription: (() => void) | null = null
+    mocks.mockPc.setRemoteDescription.mockImplementationOnce(async (desc) => {
+      mocks.mockPc.remoteDescription = desc as RTCSessionDescription
+      await new Promise<void>((resolve) => {
+        resolveRemoteDescription = resolve
+      })
+    })
+
+    const offerPromise = subscriber.handleOffer({
+      sdp: 'mock-offer-sdp',
+      type: 'offer',
+    })
+
+    await subscriber.handleIce({
+      candidate: 'candidate:1 1 udp ...',
+      sdpMid: '0',
+      sdpMLineIndex: 0,
+    })
+
+    expect(mocks.mockPc.addIceCandidate).not.toHaveBeenCalled()
+
+    resolveRemoteDescription?.()
+    await offerPromise
+
+    expect(mocks.mockPc.addIceCandidate).toHaveBeenCalled()
   })
 
   it('should handle remote ICE candidate', async () => {

@@ -342,6 +342,9 @@ function OrchestratorView () {
             visualizerSensitivity={previewHydraState.sensitivity}
             visualizerAllowCamera={previewHydraState.allowCamera}
             visualizerAudioResponse={previewHydraState.audioResponse}
+            playerFrameDataUrl={status.frameDataUrl}
+            playerFrameTimestamp={status.frameTimestamp}
+            isPlayerPresent={status.isPlayerPresent}
           />
         </div>
       )}

@@ -11,19 +11,19 @@ import {
   PLAYER_REQ_VOLUME,
   PLAYER_STATUS,
   PLAYER_FFT,
+  PLAYER_FRAME,
   PLAYER_LEAVE,
 } from 'shared/actionTypes'
 import { MediaType, PlaybackOptions } from 'shared/types'
 
-// ------------------------------------
-// State & Slice
-// ------------------------------------
 export interface StatusState {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
   fftData: FftPayload | null
-  historyJSON: string // queueIds in JSON array
+  frameDataUrl: string | null
+  frameTimestamp: number | null
+  historyJSON: string
   isAtQueueEnd: boolean
   isErrored: boolean
   isPlayerPresent: boolean
@@ -44,6 +44,8 @@ const initialState: StatusState = {
   cdgSize: 0.8,
   errorMessage: '',
   fftData: null,
+  frameDataUrl: null,
+  frameTimestamp: null,
   historyJSON: '[]',
   isAtQueueEnd: false,
   isErrored: false,
@@ -60,10 +62,10 @@ const initialState: StatusState = {
   volume: 1,
 }
 
-// Internal action creators for extraReducers (defined before slice)
 const playerLeaveInternal = createAction(PLAYER_LEAVE)
 const playerStatusInternal = createAction<Partial<StatusState>>(PLAYER_STATUS)
 const playerFftInternal = createAction<FftPayload>(PLAYER_FFT)
+const playerFrameInternal = createAction<{ dataUrl: string, timestamp: number }>(PLAYER_FRAME)
 const playerCmdOptionsInternal = createAction<{ visualizer?: Partial<PlayerVisualizerState> }>(PLAYER_CMD_OPTIONS)
 
 const statusSlice = createSlice({
@@ -75,6 +77,8 @@ const statusSlice = createSlice({
       .addCase(playerLeaveInternal, (state) => {
         state.isPlayerPresent = false
         state.fftData = null
+        state.frameDataUrl = null
+        state.frameTimestamp = null
       })
       .addCase(playerStatusInternal, (state, action: PayloadAction<Partial<StatusState>>) => ({
         ...state,
@@ -84,9 +88,12 @@ const statusSlice = createSlice({
       .addCase(playerFftInternal, (state, action: PayloadAction<FftPayload>) => {
         state.fftData = action.payload
       })
+      .addCase(playerFrameInternal, (state, action: PayloadAction<{ dataUrl: string, timestamp: number }>) => {
+        state.frameDataUrl = action.payload.dataUrl
+        state.frameTimestamp = action.payload.timestamp
+      })
       .addCase(
         playerCmdOptionsInternal,
-
         (state, action: PayloadAction<{ visualizer?: Partial<PlayerVisualizerState> }>) => {
           const { payload } = action
           if (payload.visualizer && typeof payload.visualizer === 'object') {
@@ -97,7 +104,6 @@ const statusSlice = createSlice({
   },
 })
 
-// Actions with specific action types for socket middleware
 export const requestPlay = createAction(PLAYER_REQ_PLAY)
 export const requestPause = createAction(PLAYER_REQ_PAUSE)
 export const requestPlayNext = createAction(PLAYER_REQ_NEXT)
