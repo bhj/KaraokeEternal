@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import QueueItem from '../QueueItem/QueueItem'
@@ -22,7 +22,7 @@ const QueueList = () => {
 
   // actions
   const dispatch = useAppDispatch()
-  const handleMoveClick = useCallback((qId: number) => {
+  const handleMoveClick = (qId: number) => {
     // reference user's last-played item as the new prevQueueId
     const userId = queue.entities[qId].userId
     let lastPlayed = queueId // default in case user has no played items
@@ -35,11 +35,11 @@ const QueueList = () => {
     }
 
     dispatch(moveItem({ queueId: qId, prevQueueId: lastPlayed }))
-  }, [dispatch, queueId, queue.entities, queue.result])
+  }
 
-  const handleRemoveUpcoming = useCallback((userId: number) => {
+  const handleRemoveUpcoming = (userId: number) => {
     dispatch(removeUpcomingItems(userId))
-  }, [dispatch])
+  }
 
   // build children array
   const items = queue.result.map((qId) => {

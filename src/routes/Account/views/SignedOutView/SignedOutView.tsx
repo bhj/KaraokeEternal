@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchRooms } from 'store/modules/rooms'
@@ -66,7 +66,7 @@ const SignedOutView = () => {
     }
   }
 
-  const handleRoomSelect = useCallback((id: number) => {
+  const handleRoomSelect = (id: number) => {
     setRoomId(id)
     setMode('returning')
 
@@ -74,13 +74,13 @@ const SignedOutView = () => {
       setFocusRequest(r => r + 1)
       userSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
-  }, [rooms.entities, showRoomSection])
+  }
 
-  const handleFirstFieldRef = useCallback((el: HTMLInputElement | null) => {
+  const handleFirstFieldRef = (el: HTMLInputElement | null) => {
     if (el) firstFieldRef.current = el
-  }, [])
+  }
 
-  const handleLogin = useCallback((e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
 
     dispatch(login({
@@ -89,9 +89,9 @@ const SignedOutView = () => {
       roomId,
       roomPassword,
     }))
-  }, [dispatch, password, roomId, roomPassword, username])
+  }
 
-  const handleCreate = useCallback(({ name, image, passwordConfirm }: { name: string, image: Blob | undefined, passwordConfirm: string }) => {
+  const handleCreate = ({ name, image, passwordConfirm }: { name: string, image: Blob | undefined, passwordConfirm: string }) => {
     const data = new FormData()
 
     data.append('username', username.trim())
@@ -110,12 +110,12 @@ const SignedOutView = () => {
     }
 
     dispatch(createAccount(data))
-  }, [dispatch, mode, password, roomId, roomPassword, username])
+  }
 
-  const getAllowed = useCallback((roleName: string) => {
+  const getAllowed = (roleName: string) => {
     const roleId = prefs.roles.result.find(id => prefs.roles.entities[id].name === roleName)
     return !!rooms.entities[roomId]?.prefs?.roles?.[roleId]?.allowNew
-  }, [prefs.roles, rooms.entities, roomId])
+  }
 
   const allowNewGuest = getAllowed('guest')
   const allowNewStandard = getAllowed('standard')

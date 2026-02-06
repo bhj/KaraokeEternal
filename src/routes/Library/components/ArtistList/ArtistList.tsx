@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { ensureState } from 'redux-optimistic-ui'
 import { RootState } from 'store/store'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
@@ -73,7 +73,7 @@ const ArtistList = ({
     }
   }, [dispatch])
 
-  const rowHeight = useCallback((index: number) => {
+  const rowHeight = (index: number) => {
     const artistId = artists.result[index]
     let height = ROW_HEIGHT_ARTIST
 
@@ -82,22 +82,22 @@ const ArtistList = ({
     }
 
     return height
-  }, [artists, expandedArtists])
+  }
 
-  const handleRowsRendered = useCallback(({ startIndex }: { startIndex: number }) => {
+  const handleRowsRendered = ({ startIndex }: { startIndex: number }) => {
     // console.log('rendered rows: ', { startIndex })
     lastScrollRow.current = startIndex
-  }, [])
+  }
 
-  const handleAlphaPick = useCallback((char: string) => {
+  const handleAlphaPick = (char: string) => {
     const row = alphaPickerMap[char]
 
     if (typeof row !== 'undefined' && list.current) {
       list.current.scrollToRow({ index: row > 0 ? row - 1 : row, align: 'start' })
     }
-  }, [alphaPickerMap])
+  }
 
-  const handleRef = useCallback((ref: ListImperativeAPI | null) => {
+  const handleRef = (ref: ListImperativeAPI | null) => {
     if (ref) {
       list.current = ref
 
@@ -106,7 +106,7 @@ const ArtistList = ({
         list.current.scrollToRow({ index: lastScrollRow.current, align: 'start', behavior: 'instant' })
       }
     }
-  }, [])
+  }
 
   if (artists.result.length === 0) return null
 

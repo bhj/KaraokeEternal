@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useMatch } from 'react-router'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import useResizeObserver from 'use-resize-observer'
@@ -30,7 +30,7 @@ const CoreLayout = () => {
   })
 
   const ui = useAppSelector(state => state.ui)
-  const closeError = useCallback(() => dispatch(clearErrorMessage()), [dispatch])
+  const closeError = () => dispatch(clearErrorMessage())
 
   return (
     <>

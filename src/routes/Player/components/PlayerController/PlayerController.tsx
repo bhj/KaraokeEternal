@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
@@ -23,13 +23,13 @@ const PlayerController = (props: PlayerControllerProps) => {
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
   const dispatch = useAppDispatch()
-  const handleStatus = useCallback<(status?: Partial<PlayerState>) => void>(status => dispatch(playerStatus(status)), [dispatch])
-  const handleLoad = useCallback(() => dispatch(playerLoad()), [dispatch])
-  const handlePlay = useCallback(() => dispatch(playerPlay()), [dispatch])
-  const handleError = useCallback((msg: string) => {
+  const handleStatus = useCallback((status?: Partial<PlayerState>) => dispatch(playerStatus(status)), [dispatch])
+  const handleLoad = () => dispatch(playerLoad())
+  const handlePlay = () => dispatch(playerPlay())
+  const handleError = (msg: string) => {
     dispatch(playerError(msg))
     handleStatus()
-  }, [dispatch, handleStatus])
+  }
 
   const handleReplay = useCallback((queueId: number) => {
     const nextItem = queue.entities[queueId]
@@ -54,7 +54,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       nextUserId: null,
       _isReplayingQueueId: null,
     })
-  }, [handleStatus, player.queueId, player.historyJSON, queue.entities])
+  }, [handleStatus, player.historyJSON, player.queueId, queue.entities])
 
   const handleLoadNext = useCallback(() => {
     const history = JSON.parse(player.historyJSON)

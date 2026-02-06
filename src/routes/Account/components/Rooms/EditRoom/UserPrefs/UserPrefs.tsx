@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useAppSelector } from 'store/hooks'
 import Accordion from 'components/Accordion/Accordion'
 import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
@@ -14,11 +14,11 @@ interface UserPrefsProps {
 const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
   const roles = useAppSelector(state => state.prefs.roles)
 
-  const getRoleId = useCallback((roleName: string) => {
+  const getRoleId = (roleName: string) => {
     return roles.result.find(roleId => roles.entities[roleId].name === roleName)
-  }, [roles.entities, roles.result])
+  }
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target
     const roleId = getRoleId(name)
     if (!roleId) return
@@ -33,7 +33,7 @@ const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
         },
       },
     })
-  }, [getRoleId, onChange, prefs])
+  }
 
   const allowNewGuest = prefs.roles?.[getRoleId('guest')]?.allowNew ?? false
   const allowNewStandard = prefs.roles?.[getRoleId('standard')]?.allowNew ?? false

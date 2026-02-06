@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import clsx from 'clsx'
 import Icon from 'components/Icon/Icon'
 import styles from './UserImage.css'
@@ -13,12 +13,12 @@ const UserImageContent = ({ dateUpdated, userId }: { dateUpdated: number, userId
   const [isLoading, setIsLoading] = useState(true)
   const [isErrored, setIsErrored] = useState(false)
 
-  const handleLoaded = useCallback(() => setIsLoading(false), [])
+  const handleLoaded = () => setIsLoading(false)
 
-  const handleError = useCallback(() => {
+  const handleError = () => {
     setIsLoading(false)
     setIsErrored(true)
-  }, [])
+  }
 
   return (
     <>

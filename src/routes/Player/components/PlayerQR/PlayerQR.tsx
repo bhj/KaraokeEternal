@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import clsx from 'clsx'
 import { useAppSelector } from 'store/hooks'
 import { CSSTransition } from 'react-transition-group'
@@ -52,7 +52,7 @@ const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
     return () => {
       if (maxTimerID.current) clearTimeout(maxTimerID.current)
     }
-  }, [isPlaying, scheduleNextToggle])
+  }, [scheduleNextToggle])
 
   useEffect(() => {
     const now = Date.now()
@@ -64,7 +64,7 @@ const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
     }
   }, [queueItem?.queueId])
 
-  const handleTransitionEnd = useCallback(() => {
+  const handleTransitionEnd = () => {
     if (!show) {
       setAlternate(prev => !prev)
       setShow(true) // trigger enter transition
@@ -72,19 +72,15 @@ const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
 
       scheduleNextToggle()
     }
-  }, [show, scheduleNextToggle])
+  }
 
-  const url = useMemo(() => {
-    const url = new URL(window.location.href)
-    url.pathname = url.pathname.replace(/\/player$/, '')
-    url.searchParams.append('roomId', String(roomId))
+  const url = new URL(window.location.href)
+  url.pathname = url.pathname.replace(/\/player$/, '')
+  url.searchParams.append('roomId', String(roomId))
 
-    if (prefs.password) {
-      url.searchParams.append('password', btoa(prefs.password))
-    }
-
-    return url
-  }, [roomId, prefs.password])
+  if (prefs.password) {
+    url.searchParams.append('password', btoa(prefs.password))
+  }
 
   const size = Math.round(height * (0.05 + (prefs.size ?? 0.5) / 5)) // min: 5vh, max: 25vh
   const quietZoneSize = 5 + (10 * (prefs.size ?? 0.5)) // min: 5px, max: 15px

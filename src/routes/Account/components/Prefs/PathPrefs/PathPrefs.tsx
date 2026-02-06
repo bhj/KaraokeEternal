@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd'
 import HttpApi from 'lib/HttpApi'
@@ -20,9 +20,9 @@ const PathPrefs = () => {
   const [editingPath, setEditingPath] = useState<Path | null>(null)
   const [priority, setPriority] = useState(paths.result)
 
-  const handleCloseChooser = useCallback(() => setChoosing(false), [])
-  const handleOpenChooser = useCallback(() => setChoosing(true), [])
-  const handleCloseInfo = useCallback(() => setEditingPath(null), [])
+  const handleCloseChooser = () => setChoosing(false)
+  const handleOpenChooser = () => setChoosing(true)
+  const handleCloseInfo = () => setEditingPath(null)
 
   const dispatch = useAppDispatch()
 
@@ -31,7 +31,7 @@ const PathPrefs = () => {
     setPriority(paths.result)
   }, [paths])
 
-  const handleDragEnd = useCallback((dnd: DropResult) => {
+  const handleDragEnd = (dnd: DropResult) => {
     // dropped outside the list?
     if (!dnd.destination) return
 
@@ -41,9 +41,9 @@ const PathPrefs = () => {
 
     setPriority(res)
     dispatch(setPathPriority(res as number[]))
-  }, [dispatch, priority])
+  }
 
-  const handleAdd = useCallback((dir: string, prefs: object) => {
+  const handleAdd = (dir: string, prefs: object) => {
     api.post(`/?dir=${encodeURIComponent(dir)}`, { body: prefs })
       .then((res) => {
         dispatch(receivePrefs(res))
@@ -52,9 +52,9 @@ const PathPrefs = () => {
       }).catch((err) => {
         alert(err)
       })
-  }, [dispatch])
+  }
 
-  const handleRemove = useCallback((pathId: number) => {
+  const handleRemove = (pathId: number) => {
     if (!confirm(`Remove folder from library?\n\n${paths.entities[pathId].path}`)) {
       return
     }
@@ -70,15 +70,15 @@ const PathPrefs = () => {
       }).catch((err) => {
         alert(err)
       })
-  }, [dispatch, paths, priority])
+  }
 
-  const handleUpdate = useCallback((pathId: number, data: FormData) => {
+  const handleUpdate = (pathId: number, data: FormData) => {
     dispatch(setPathPrefs({ pathId, data }))
-  }, [dispatch])
+  }
 
-  const handleInfo = useCallback((pathId: number) => setEditingPath(paths.entities[pathId]), [paths])
-  const handleRefresh = useCallback((pathId: number) => dispatch(requestScan(pathId)), [dispatch])
-  const handleRefreshAll = useCallback(() => dispatch(requestScanAll()), [dispatch])
+  const handleInfo = (pathId: number) => setEditingPath(paths.entities[pathId])
+  const handleRefresh = (pathId: number) => dispatch(requestScan(pathId))
+  const handleRefreshAll = () => dispatch(requestScanAll())
 
   return (
     <Accordion headingComponent={(

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react'
+import React, { useEffect, useRef } from 'react'
 import clsx from 'clsx'
 import Button from 'components/Button/Button'
 import styles from './Modal.css'
@@ -23,21 +23,21 @@ const Modal = ({ buttons, className, children, visible = true, onClose, scrollab
     }
   }, [visible])
 
-  const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDialogElement>) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDialogElement>) => {
     isOutsideClick.current = event.target === dialogRef.current
-  }, [])
+  }
 
-  const handleMouseUp = useCallback((event: React.MouseEvent<HTMLDialogElement>) => {
+  const handleMouseUp = (event: React.MouseEvent<HTMLDialogElement>) => {
     if (isOutsideClick.current && event.target === dialogRef.current) {
       onClose()
     }
     isOutsideClick.current = false
-  }, [onClose])
+  }
 
-  const handleCancel = useCallback((e: React.SyntheticEvent) => {
+  const handleCancel = (e: React.SyntheticEvent) => {
     e.preventDefault()
     onClose()
-  }, [onClose])
+  }
 
   if (!visible) return null
 

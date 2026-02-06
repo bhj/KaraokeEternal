@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { useLocation } from 'react-router'
 import clsx from 'clsx'
@@ -28,15 +28,15 @@ const PlaybackCtrl = () => {
   const status = useAppSelector(state => state.status)
 
   const dispatch = useAppDispatch()
-  const handleOptions = useCallback((opts: PlaybackOptions) => dispatch(requestOptions(opts)), [dispatch])
-  const handlePause = useCallback(() => dispatch(requestPause()), [dispatch])
-  const handlePlay = useCallback(() => dispatch(requestPlay()), [dispatch])
-  const handlePlayNext = useCallback(() => dispatch(requestPlayNext()), [dispatch])
-  const handleVolume = useCallback((val: number) => dispatch(requestVolume(val)), [dispatch])
+  const handleOptions = (opts: PlaybackOptions) => dispatch(requestOptions(opts))
+  const handlePause = () => dispatch(requestPause())
+  const handlePlay = () => dispatch(requestPlay())
+  const handlePlayNext = () => dispatch(requestPlayNext())
+  const handleVolume = (val: number) => dispatch(requestVolume(val))
 
-  const toggleDisplayCtrl = useCallback(() => {
+  const toggleDisplayCtrl = () => {
     setDisplayCtrlVisible(!isDisplayCtrlVisible)
-  }, [isDisplayCtrlVisible])
+  }
 
   if (!status.isPlayerPresent) {
     return (isAdmin && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null

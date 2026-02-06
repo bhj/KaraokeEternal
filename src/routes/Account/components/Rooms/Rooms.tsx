@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { formatDateTime } from 'lib/dateTime'
 import Panel from 'components/Panel/Panel'
@@ -16,16 +16,16 @@ const Rooms = () => {
   const rooms = useAppSelector(getRoomList)
 
   const dispatch = useAppDispatch()
-  const handleClose = useCallback(() => dispatch(closeRoomEditor()), [dispatch])
-  const handleFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleClose = () => dispatch(closeRoomEditor())
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.currentTarget.value === 'all') dispatch(filterByStatus(false))
     else dispatch(filterByStatus(e.currentTarget.value))
-  }, [dispatch])
-  const handleFilterUsers = useCallback((e: React.MouseEvent<HTMLElement>) => dispatch(filterByRoom(parseInt(e.currentTarget.dataset.roomId))), [dispatch])
-  const handleOpen = useCallback((e: React.MouseEvent<HTMLElement>) => {
+  }
+  const handleFilterUsers = (e: React.MouseEvent<HTMLElement>) => dispatch(filterByRoom(parseInt(e.currentTarget.dataset.roomId)))
+  const handleOpen = (e: React.MouseEvent<HTMLElement>) => {
     setEditorRoom(rooms.entities[parseInt(e.currentTarget.dataset.roomId || '0')])
     dispatch(openRoomEditor())
-  }, [dispatch, rooms])
+  }
 
   // once per mount
   useEffect(() => {

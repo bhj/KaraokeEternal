@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import clsx from 'clsx'
 import Panel from 'components/Panel/Panel'
 import Icon from 'components/Icon/Icon'
@@ -13,7 +13,7 @@ const curYear = new Date().getFullYear()
 
 const About = () => {
   const [isChangelogOpen, setChangelogOpen] = useState(false)
-  const toggleChangelog = useCallback(() => setChangelogOpen(prevState => !prevState), [])
+  const toggleChangelog = () => setChangelogOpen(prevState => !prevState)
 
   return (
     <Panel title='About' contentClassName={styles.content}>

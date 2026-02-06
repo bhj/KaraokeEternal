@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createRoom, removeRoom, updateRoom, requestPrefsPush } from 'store/modules/rooms'
 import { getFormData } from 'lib/util'
@@ -27,7 +27,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
     if (room?.prefs) setPrefs(room.prefs)
   }
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     const data = getFormData(new FormData(formRef.current)) as Record<string, string | IRoomPrefs>
@@ -40,33 +40,33 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
       if (!data.password) delete data.password
       dispatch(createRoom(data))
     }
-  }, [dispatch, prefs, room, isPasswordDirty])
+  }
 
-  const handleRemoveClick = useCallback(() => {
+  const handleRemoveClick = () => {
     if (room && confirm(`Remove room "${room.name}" and its queue?`)) {
       dispatch(removeRoom(room.roomId))
     }
-  }, [dispatch, room])
+  }
 
-  const handlePrefsChange = useCallback((newPrefs: IRoomPrefs) => {
+  const handlePrefsChange = (newPrefs: IRoomPrefs) => {
     setPrefs(newPrefs)
     if (room) {
       dispatch(requestPrefsPush(room.roomId, newPrefs))
     }
-  }, [dispatch, room])
+  }
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     // emit initial prefs
     if (room) {
       dispatch(requestPrefsPush(room.roomId, room.prefs))
     }
     onClose()
-  }, [dispatch, onClose, room])
+  }
 
-  const handlePasswordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPasswordDirty(true)
     setRoomPassword(e.target.value)
-  }, [])
+  }
 
   return (
     <Modal

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { createUser, removeUser, updateUser } from '../../../modules/users'
 import Button from 'components/Button/Button'
@@ -14,16 +14,16 @@ interface EditUserProps {
 
 const EditUser = ({ user, onClose }: EditUserProps) => {
   const dispatch = useAppDispatch()
-  const handleSubmit = useCallback((data: FormData) => {
+  const handleSubmit = (data: FormData) => {
     if (user) dispatch(updateUser({ userId: user.userId, data }))
     else dispatch(createUser(data))
-  }, [dispatch, user])
+  }
 
-  const handleRemoveClick = useCallback(() => {
+  const handleRemoveClick = () => {
     if (confirm(`Remove user "${user.username}"?\n\nTheir queued songs will also be removed.`)) {
       dispatch(removeUser(user.userId))
     }
-  }, [dispatch, user])
+  }
 
   return (
     <Modal

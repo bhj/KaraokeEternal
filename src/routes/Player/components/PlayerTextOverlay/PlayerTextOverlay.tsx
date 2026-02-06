@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { useAppDispatch } from 'store/hooks'
 import { requestPlay } from 'store/modules/status'
 import ColorCycle from './ColorCycle/ColorCycle'
@@ -27,7 +27,7 @@ const PlayerTextOverlay = ({
   height,
 }: PlayerTextOverlayProps) => {
   const dispatch = useAppDispatch()
-  const handlePlay = useCallback(() => dispatch(requestPlay()), [dispatch])
+  const handlePlay = () => dispatch(requestPlay())
   const [errorOffset] = useState(() => Math.random() * -300)
 
   let Component
@@ -68,4 +68,4 @@ const PlayerTextOverlay = ({
   )
 }
 
-export default React.memo(PlayerTextOverlay)
+export default PlayerTextOverlay

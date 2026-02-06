@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import clsx from 'clsx'
 import { lockScrolling } from 'store/modules/ui'
 import RCSlider, { SliderProps as RCSliderProps } from 'rc-slider'
@@ -39,37 +39,31 @@ const Slider = ({
   const [tempVal, setTempVal] = useState<number | null>(null)
   const timerId = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleChange = useCallback(
-    (val: number) => {
-      if (timerId.current) {
-        clearTimeout(timerId.current)
-        timerId.current = null
-      }
+  const handleChange = (val: number) => {
+    if (timerId.current) {
+      clearTimeout(timerId.current)
+      timerId.current = null
+    }
 
-      lockScrolling(true)
-      setTempVal(val)
-      onChange(val)
-    },
-    [onChange],
-  )
+    lockScrolling(true)
+    setTempVal(val)
+    onChange(val)
+  }
 
-  const handleChangeComplete = useCallback(
-    (val: number) => {
-      lockScrolling(false)
+  const handleChangeComplete = (val: number) => {
+    lockScrolling(false)
 
-      if (val === value) {
+    if (val === value) {
+      setTempVal(null)
+    } else {
+      timerId.current = setTimeout(() => {
         setTempVal(null)
-      } else {
-        timerId.current = setTimeout(() => {
-          setTempVal(null)
-        }, 2000)
-      }
-    },
-    [value],
-  )
+      }, 2000)
+    }
+  }
 
   // slider handle/grabber
-  const defaultHandle = useCallback((node: React.ReactElement): React.ReactElement => {
+  const defaultHandle = (node: React.ReactElement): React.ReactElement => {
   // rc-slider passes a node (div) to which we add style and children
     return React.cloneElement(node as React.ReactElement<HandleProps>, {
       'aria-label': ariaLabel,
@@ -82,7 +76,7 @@ const Slider = ({
     }, (
       <Icon icon='CIRCLE' />
     ))
-  }, [ariaLabel, ariaLabelledby])
+  }
 
   return (
     <RCSlider

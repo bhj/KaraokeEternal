@@ -25,7 +25,7 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
     if (isQRPasswordEnabled && roomPasswordDirty && prefs?.qr?.password !== roomPassword) {
       handleSetPref({ qr: { ...prefs.qr, password: roomPassword } })
     }
-  }, [isQRPasswordEnabled, handleSetPref, prefs, roomPassword, roomPasswordDirty])
+  }, [handleSetPref, isQRPasswordEnabled, prefs, roomPassword, roomPasswordDirty])
 
   return (
     <Accordion

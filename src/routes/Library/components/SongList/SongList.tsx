@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import SongItem from '../SongItem/SongItem'
@@ -22,9 +22,9 @@ const SongList = (props: SongListProps) => {
   const isAdmin = useAppSelector(state => state.user.isAdmin)
   const { played, upcoming, current } = useAppSelector(getSongsStatus)
 
-  const handleSongQueue = useCallback((songId: number) => dispatch(queueSong(songId)), [dispatch])
-  const handleSongInfo = useCallback((songId: number) => dispatch(showSongInfo(songId)), [dispatch])
-  const handleSongStar = useCallback((songId: number) => dispatch(toggleSongStarred(songId)), [dispatch])
+  const handleSongQueue = (songId: number) => dispatch(queueSong(songId))
+  const handleSongInfo = (songId: number) => dispatch(showSongInfo(songId))
+  const handleSongStar = (songId: number) => dispatch(toggleSongStarred(songId))
 
   return props.songIds.map(songId => (
     <SongItem

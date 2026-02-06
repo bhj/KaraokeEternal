@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import Button from 'components/Button/Button'
 import Icon from 'components/Icon/Icon'
@@ -13,8 +13,8 @@ interface PathItemProps {
 }
 
 const PathItem = ({ index, onInfo, onRefresh, path }: PathItemProps) => {
-  const handleInfo = useCallback((e: React.SyntheticEvent<HTMLElement>) => onInfo(parseInt(e.currentTarget.dataset.pathId)), [onInfo])
-  const handleRefresh = useCallback((e: React.SyntheticEvent<HTMLElement>) => onRefresh(parseInt(e.currentTarget.dataset.pathId)), [onRefresh])
+  const handleInfo = (e: React.SyntheticEvent<HTMLElement>) => onInfo(parseInt(e.currentTarget.dataset.pathId))
+  const handleRefresh = (e: React.SyntheticEvent<HTMLElement>) => onRefresh(parseInt(e.currentTarget.dataset.pathId))
 
   return (
     <Draggable draggableId={`path-${path.pathId}`} index={index}>

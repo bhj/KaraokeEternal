@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { requestLogout, updateAccount } from 'store/modules/user'
 import { removeItem } from 'routes/Queue/modules/queue'
@@ -16,7 +16,7 @@ const Account = () => {
   const curPassword = useRef(null)
   const [isDirty, setDirty] = useState(false)
 
-  const handleSignOut = useCallback(() => {
+  const handleSignOut = () => {
     if (!user.isAdmin) {
       const hasUpcomingSongs = upcomingQueueIds.length > 0
       let message = ''
@@ -37,9 +37,9 @@ const Account = () => {
     }
 
     dispatch(requestLogout())
-  }, [dispatch, upcomingQueueIds, user.isAdmin, user.isGuest])
+  }
 
-  const handleSubmit = useCallback((data: FormData) => {
+  const handleSubmit = (data: FormData) => {
     if (!user.isGuest) {
       if (!curPassword.current.value.trim()) {
         alert('Please enter your current password to make changes.')
@@ -51,7 +51,7 @@ const Account = () => {
     }
 
     dispatch(updateAccount(data))
-  }, [dispatch, user.isGuest])
+  }
 
   return (
     <Panel title='My Account' contentClassName={styles.content}>

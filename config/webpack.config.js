@@ -85,7 +85,7 @@ config.module.rules.push({
     loader: 'babel-loader',
     options: {
       cacheDirectory: __DEV__,
-      configFile: path.join(baseDir, 'config', 'babel.config.json'),
+      configFile: path.join(baseDir, 'config', 'babel.config.js'),
       plugins: [
         __DEV__ && import.meta.resolve('react-refresh/babel'),
       ].filter(Boolean),

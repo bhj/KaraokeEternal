@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor, type UserWithRoomsAndRole } from '../../modules/users'
 import { formatDateTime } from 'lib/dateTime'
@@ -17,17 +17,17 @@ const Users = () => {
   const users = useAppSelector(getUsers)
 
   const dispatch = useAppDispatch()
-  const handleClose = useCallback(() => dispatch(closeUserEditor()), [dispatch])
-  const handleFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleClose = () => dispatch(closeUserEditor())
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === 'all') dispatch(filterByOnline(false))
     else if (e.target.value === 'online') dispatch(filterByOnline(true))
     else dispatch(filterByRoom(parseInt(e.target.value, 10)))
-  }, [dispatch])
+  }
 
-  const handleOpen = useCallback((e: React.MouseEvent<HTMLElement>) => {
+  const handleOpen = (e: React.MouseEvent<HTMLElement>) => {
     setEditorUser(users.entities[parseInt(e.currentTarget.dataset.userId)])
     dispatch(openUserEditor())
-  }, [dispatch, users])
+  }
 
   // once per mount
   useEffect(() => {

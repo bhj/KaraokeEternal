@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Button from 'components/Button/Button'
 import PathItem from './PathItem/PathItem'
 import Modal from 'components/Modal/Modal'
@@ -31,18 +31,18 @@ const PathChooser = ({ onCancel, onChoose }: PathChooserProps) => {
     children: [],
   })
 
-  const handleChoose = useCallback(() => {
+  const handleChoose = () => {
     onChoose(pathInfo.current, {})
-  }, [onChoose, pathInfo])
+  }
 
-  const ls = useCallback(async (dir: string) => {
+  const ls = async (dir: string) => {
     try {
       const result = await api.get<PathInfoType>(`/ls?dir=${encodeURIComponent(dir)}`)
       setPathInfo(result)
     } catch (err) {
       alert(err)
     }
-  }, [])
+  }
 
   // get initial list on first mount
   useEffect(() => {

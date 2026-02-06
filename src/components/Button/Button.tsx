@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import clsx from 'clsx'
 import Icon from '../Icon/Icon'
 import styles from './Button.css'
@@ -48,22 +48,19 @@ const Button = <E extends ButtonElementType = 'button'>({
     }
   }
 
-  const handleAnimationEnd = useCallback(() => {
+  const handleAnimationEnd = () => {
     setAnimating(false)
-  }, [])
+  }
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      if (animateClassName) {
-        setAnimating(true)
-      }
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (animateClassName) {
+      setAnimating(true)
+    }
 
-      if (onClick) {
-        (onClick as React.MouseEventHandler<HTMLElement>)(e)
-      }
-    },
-    [animateClassName, onClick],
-  )
+    if (onClick) {
+      (onClick as React.MouseEventHandler<HTMLElement>)(e)
+    }
+  }
 
   const buttonType = ElementType === 'button'
     ? (rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type || 'button'
@@ -108,4 +105,4 @@ const Button = <E extends ButtonElementType = 'button'>({
   )
 }
 
-export default React.memo(Button)
+export default Button

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { createAccount } from 'store/modules/user'
 import Button from 'components/Button/Button'
@@ -10,9 +10,9 @@ const FirstRun = () => {
   const ui = useAppSelector(state => state.ui)
 
   const dispatch = useAppDispatch()
-  const handleCreate = useCallback((data: FormData) => {
+  const handleCreate = (data: FormData) => {
     dispatch(createAccount(data))
-  }, [dispatch])
+  }
 
   return (
     <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>

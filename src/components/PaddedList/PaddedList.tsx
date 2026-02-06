@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { List, type RowComponentProps, type ListImperativeAPI } from 'react-window'
 import styles from './PaddedList.css'
 
@@ -35,11 +35,11 @@ const PaddedList = ({
   width,
   height,
 }: PaddedListProps) => {
-  const handleListRef = useCallback((ref: ListImperativeAPI | null) => {
+  const handleListRef = (ref: ListImperativeAPI | null) => {
     if (onRef) onRef(ref)
-  }, [onRef])
+  }
 
-  const PaddedRowComponent = useCallback(({ index, style, ariaAttributes, ...rest }: RowComponentProps) => {
+  const PaddedRowComponent = ({ index, style, ariaAttributes, ...rest }: RowComponentProps) => {
     // top & bottom spacer
     if (index === 0 || index === numRows + 1) {
       return (
@@ -48,7 +48,7 @@ const PaddedList = ({
     }
 
     return <RowComponent index={--index} style={{ ...style, paddingRight }} ariaAttributes={ariaAttributes} {...rest} />
-  }, [numRows, RowComponent, paddingRight])
+  }
 
   const getRowHeight = (index: number) => {
     // top & bottom spacer

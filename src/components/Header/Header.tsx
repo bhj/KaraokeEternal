@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { RootState } from 'store/store'
@@ -60,7 +60,7 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const dispatch = useAppDispatch()
-  const cancelScan = useCallback(() => dispatch(requestScanStop()), [dispatch])
+  const cancelScan = () => dispatch(requestScanStop())
 
   return (
     <div className={clsx(styles.container, 'bg-blur')} ref={ref}>

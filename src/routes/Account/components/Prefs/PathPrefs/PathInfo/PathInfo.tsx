@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import Modal from 'components/Modal/Modal'
 import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Button from 'components/Button/Button'
@@ -13,11 +13,11 @@ interface PathInfoProps {
 }
 
 const PathInfo = ({ onClose, onRemove, onUpdate, path }: PathInfoProps) => {
-  const handleChange = useCallback((data: Record<string, boolean>) => {
+  const handleChange = (data: Record<string, boolean>) => {
     onUpdate(path.pathId, data)
-  }, [onUpdate, path.pathId])
+  }
 
-  const handleRemove = useCallback(() => onRemove(path.pathId), [onRemove, path.pathId])
+  const handleRemove = () => onRemove(path.pathId)
 
   return (
     <Modal

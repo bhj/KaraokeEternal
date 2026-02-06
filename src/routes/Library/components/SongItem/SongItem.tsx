@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import clsx from 'clsx'
 import Highlighter from 'react-highlight-words'
 import { useSwipeable } from 'react-swipeable'
@@ -46,22 +46,22 @@ const SongItem = ({
 }: SongItemProps) => {
   const [isExpanded, setExpanded] = useState(false)
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     if (ignoreMouseup) ignoreMouseup = false
     else if (!isUpcoming) onSongQueue(songId)
-  }, [isUpcoming, onSongQueue, songId])
-  const handleInfoClick = useCallback(() => onSongInfo(songId), [onSongInfo, songId])
-  const handleStarClick = useCallback(() => onSongStarClick(songId), [onSongStarClick, songId])
+  }
+  const handleInfoClick = () => onSongInfo(songId)
+  const handleStarClick = () => onSongStarClick(songId)
 
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: useCallback(({ event }) => {
+    onSwipedLeft: ({ event }) => {
       ignoreMouseup = event.type === 'mouseup'
       setExpanded(isAdmin)
-    }, [isAdmin]),
-    onSwipedRight: useCallback(({ event }) => {
+    },
+    onSwipedRight: ({ event }) => {
       ignoreMouseup = event.type === 'mouseup'
       setExpanded(false)
-    }, []),
+    },
     preventScrollOnSwipe: true,
     trackMouse: true,
   })

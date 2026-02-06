@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import clsx from 'clsx'
 import { useSwipeable } from 'react-swipeable'
 import { useLongPress } from 'use-long-press'
@@ -73,29 +73,29 @@ const QueueItem = ({
   const longPressActiveRef = useRef(false)
 
   const dispatch = useAppDispatch()
-  const handleErrorInfoClick = useCallback(() => dispatch(showErrorMessage(errorMessage)), [dispatch, errorMessage])
-  const handleInfoClick = useCallback(() => dispatch(showSongInfo(songId)), [dispatch, songId])
-  const handleMoveClick = useCallback(() => {
+  const handleErrorInfoClick = () => dispatch(showErrorMessage(errorMessage))
+  const handleInfoClick = () => dispatch(showSongInfo(songId))
+  const handleMoveClick = () => {
     onMoveClick(queueId)
     setExpanded(false)
-  }, [onMoveClick, queueId])
-  const handleReplayClick = useCallback(() => {
+  }
+  const handleReplayClick = () => {
     dispatch(requestReplay(queueId))
     setExpanded(false)
-  }, [dispatch, queueId])
-  const handleRequeueClick = useCallback(() => {
+  }
+  const handleRequeueClick = () => {
     dispatch(queueSong(songId))
     setExpanded(false)
-  }, [dispatch, songId])
-  const handleRemoveClick = useCallback(() => dispatch(removeItem({ queueId })), [dispatch, queueId])
-  const handleSkipClick = useCallback(() => dispatch(requestPlayNext()), [dispatch])
-  const handleStarClick = useCallback(() => dispatch(toggleSongStarred(songId)), [dispatch, songId])
+  }
+  const handleRemoveClick = () => dispatch(removeItem({ queueId }))
+  const handleSkipClick = () => dispatch(requestPlayNext())
+  const handleStarClick = () => dispatch(toggleSongStarred(songId))
 
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: useCallback(() => {
+    onSwipedLeft: () => {
       setExpanded(isErrored || isInfoable || isRemovable || isSkippable)
-    }, [isErrored, isInfoable, isRemovable, isSkippable]),
-    onSwipedRight: useCallback(() => setExpanded(false), []),
+    },
+    onSwipedRight: () => setExpanded(false),
     preventScrollOnSwipe: true,
     trackMouse: true,
   })
@@ -249,4 +249,4 @@ const QueueItem = ({
   )
 }
 
-export default React.memo(QueueItem)
+export default QueueItem

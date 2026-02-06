@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useRef } from 'react'
 import { ensureState } from 'redux-optimistic-ui'
 import { RootState } from 'store/store'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
@@ -115,9 +115,9 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
   const { artistsResult, songsResult } = useAppSelector(getSearchResults)
 
   const listRef = useRef<ListImperativeAPI | null>(null)
-  const filterKeywords = useMemo(() => filterStr.trim() ? filterStr.trim().toLowerCase().split(' ') : [], [filterStr])
+  const filterKeywords = filterStr.trim() ? filterStr.trim().toLowerCase().split(' ') : []
 
-  const rowHeight = useCallback((index: number) => {
+  const rowHeight = (index: number) => {
     // artists heading
     if (index === 0) return ROW_HEIGHT_RESULT_HEADING
 
@@ -138,14 +138,14 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
 
     // song results
     return songsResult.length * ROW_HEIGHT_SONG_WITH_ARTIST
-  }, [artistsResult, expandedArtistResults, artists.entities, songsResult.length])
+  }
 
-  const handleRef = useCallback((ref: ListImperativeAPI) => {
+  const handleRef = (ref: ListImperativeAPI) => {
     if (ref) {
       listRef.current = ref
       // listRef.current.scrollToRow({ index: props.scrollRow, align: 'start' })
     }
-  }, [])
+  }
 
   return (
     <PaddedList

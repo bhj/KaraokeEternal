@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Accordion from 'components/Accordion/Accordion'
 import Icon from 'components/Icon/Icon'
@@ -9,9 +9,9 @@ const PlayerPrefs = () => {
   const isReplayGainEnabled = useAppSelector(state => state.prefs.isReplayGainEnabled)
   const dispatch = useAppDispatch()
 
-  const toggleCheckbox = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const toggleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setPref({ key: e.currentTarget.name, data: e.currentTarget.checked }))
-  }, [dispatch])
+  }
 
   return (
     <Accordion
