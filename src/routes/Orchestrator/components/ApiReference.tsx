@@ -84,6 +84,22 @@ function getFunctionExample (entry: HydraEntry): string {
   return `${func.name}(${args}).out(o0)`
 }
 
+function getFunctionSlug (name: string): string {
+  return name
+    .replace(/^\./, '')
+    .replace(/^s[0-3]\./, '')
+}
+
+function getApiReferenceLink (name: string): string {
+  const slug = getFunctionSlug(name)
+  return `https://hydra.ojack.xyz/api/#functions/${slug}/0`
+}
+
+function getDocsSearchLink (name: string): string {
+  const query = encodeURIComponent(getFunctionSlug(name))
+  return `https://github.com/hydra-synth/hydra-docs-v2/search?q=${query}&type=code`
+}
+
 function ApiReference ({ onInsertExample, onReplaceWithExample }: ApiReferenceProps) {
   const [query, setQuery] = useState('')
 
@@ -120,6 +136,8 @@ function ApiReference ({ onInsertExample, onReplaceWithExample }: ApiReferencePr
   const activeId = selectedEntry?.id ?? ''
   const selectedSignature = selectedEntry ? getSignature(selectedEntry.func) : ''
   const selectedExample = selectedEntry ? getFunctionExample(selectedEntry) : ''
+  const selectedApiLink = selectedEntry ? getApiReferenceLink(selectedEntry.func.name) : '#'
+  const selectedDocsLink = selectedEntry ? getDocsSearchLink(selectedEntry.func.name) : '#'
 
   const handleInsertExample = useCallback(() => {
     if (!selectedExample || !onInsertExample) return
@@ -216,6 +234,18 @@ function ApiReference ({ onInsertExample, onReplaceWithExample }: ApiReferencePr
                   </div>
                 </div>
               )}
+
+              <div className={styles.detailSection}>
+                <div className={styles.detailLabel}>References</div>
+                <div className={styles.referenceLinks}>
+                  <a className={styles.referenceLink} href={selectedApiLink} target='_blank' rel='noreferrer'>
+                    Open API Reference
+                  </a>
+                  <a className={styles.referenceLink} href={selectedDocsLink} target='_blank' rel='noreferrer'>
+                    Search Docs V2
+                  </a>
+                </div>
+              </div>
 
               <div className={styles.detailSection}>
                 <div className={styles.detailLabel}>Parameters</div>

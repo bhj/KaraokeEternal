@@ -32,6 +32,11 @@ function getButtonByText (container: HTMLElement, text: string): HTMLButtonEleme
   return buttons.find(button => (button.textContent ?? '').trim() === text) ?? null
 }
 
+function getLinkByText (container: HTMLElement, text: string): HTMLAnchorElement | null {
+  const links = Array.from(container.querySelectorAll('a')) as HTMLAnchorElement[]
+  return links.find(link => (link.textContent ?? '').trim() === text) ?? null
+}
+
 describe('ApiReference', () => {
   it('renders a learning-oriented API workspace with search and detail sections', async () => {
     const container = document.createElement('div')
@@ -127,6 +132,28 @@ describe('ApiReference', () => {
     expect(onReplaceWithExample).toHaveBeenCalledTimes(1)
     expect(typeof onInsertExample.mock.calls[0]?.[0]).toBe('string')
     expect(typeof onReplaceWithExample.mock.calls[0]?.[0]).toBe('string')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
+  it('includes official API and docs-v2 links for selected function', async () => {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(<ApiReference />)
+    })
+
+    const apiLink = getLinkByText(container, 'Open API Reference')
+    const docsLink = getLinkByText(container, 'Search Docs V2')
+
+    expect(apiLink).not.toBeNull()
+    expect(apiLink?.getAttribute('href')).toBe('https://hydra.ojack.xyz/api/#functions/osc/0')
+
+    expect(docsLink).not.toBeNull()
+    expect(docsLink?.getAttribute('href')).toBe('https://github.com/hydra-synth/hydra-docs-v2/search?q=osc&type=code')
 
     await act(async () => {
       root.unmount()

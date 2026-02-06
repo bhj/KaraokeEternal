@@ -81,6 +81,58 @@ describe('CodeEditor', () => {
     })
   })
 
+  it('keeps passive hints collapsed by default', async () => {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <CodeEditor
+          code='osc(10).out()'
+          onCodeChange={() => {}}
+          onSend={() => {}}
+          onRandomize={() => {}}
+        />,
+      )
+    })
+
+    expect(findButtonByText(container, 'Hints')).not.toBeNull()
+    expect(container.textContent ?? '').not.toContain('Tab accepts autocomplete suggestions.')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
+  it('shows passive hints when toggled', async () => {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <CodeEditor
+          code='osc(10).out()'
+          onCodeChange={() => {}}
+          onSend={() => {}}
+          onRandomize={() => {}}
+        />,
+      )
+    })
+
+    const hintsButton = findButtonByText(container, 'Hints')
+    expect(hintsButton).not.toBeNull()
+
+    await act(async () => {
+      hintsButton?.click()
+    })
+
+    expect(container.textContent ?? '').toContain('Tab accepts autocomplete suggestions.')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
   it('formats current code when format is clicked', async () => {
     const container = document.createElement('div')
     const root = createRoot(container)

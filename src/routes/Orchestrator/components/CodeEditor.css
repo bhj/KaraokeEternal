@@ -36,6 +36,45 @@
   white-space: nowrap;
 }
 
+.hintToggle {
+  padding: 0.3125rem 0.625rem;
+  background: rgba(118, 134, 156, 0.18);
+  color: #c3cfdf;
+  border: 1px solid rgba(118, 134, 156, 0.35);
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+.hintToggle:hover {
+  background: rgba(118, 134, 156, 0.28);
+  border-color: rgba(118, 134, 156, 0.55);
+}
+
+.passiveHints {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid rgba(118, 134, 156, 0.3);
+  border-radius: 6px;
+  background: rgba(14, 22, 32, 0.45);
+}
+
+.passiveHintItem {
+  font-size: var(--text-xs);
+  color: #b6c4d8;
+  background: rgba(96, 122, 157, 0.16);
+  border: 1px solid rgba(96, 122, 157, 0.28);
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
+  line-height: 1.4;
+}
+
 .editActions {
   display: inline-flex;
   align-items: center;
@@ -264,8 +303,12 @@
     font-size: var(--text-sm);
   }
 
-  .editActions {
+  .hintToggle {
     order: 2;
+  }
+
+  .editActions {
+    order: 3;
     flex: 1 1 100%;
     justify-content: space-between;
   }
@@ -273,6 +316,10 @@
   .editButton {
     flex: 1;
     min-height: 40px;
+  }
+
+  .passiveHints {
+    order: 4;
   }
 
   .randomButton {

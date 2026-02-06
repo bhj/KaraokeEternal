@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EditorState, type Range } from '@codemirror/state'
 import { Decoration, EditorView, keymap, ViewPlugin, type DecorationSet, type ViewUpdate } from '@codemirror/view'
 import { javascript } from '@codemirror/lang-javascript'
-import { autocompletion, type CompletionContext, type CompletionResult } from '@codemirror/autocomplete'
+import { autocompletion, acceptCompletion, type CompletionContext, type CompletionResult } from '@codemirror/autocomplete'
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands'
 import { indentUnit } from '@codemirror/language'
@@ -10,6 +10,7 @@ import { hydraExtensions } from './hydraHighlightStyle'
 import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
 import { formatHydraCode, getLintErrorSummary, type LintErrorSummary } from './codeEditorUtils'
+import { AUTOCOMPLETE_PASSIVE_HINTS, getAutocompleteOptions, getCompletionAcceptKeyBindings } from './codeEditorAssist'
 import { isInjectedLine, isPartialInjectedLine } from 'lib/injectedLines'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
@@ -265,6 +266,7 @@ function CodeEditor ({
   const codeRef = useRef(code)
   const sendAttemptRef = useRef<() => void>(() => {})
   const [sendLintError, setSendLintError] = useState<LintErrorSummary | null>(null)
+  const [showPassiveHints, setShowPassiveHints] = useState(false)
 
   onCodeChangeRef.current = onCodeChange
   onSendRef.current = onSend
@@ -282,16 +284,22 @@ function CodeEditor ({
       },
     }])
 
+    const completionAcceptKeymap = keymap.of(getCompletionAcceptKeyBindings(acceptCompletion))
+
     const state = EditorState.create({
       doc: code,
       extensions: [
         sendKeymap,
         history(),
         keymap.of([...defaultKeymap, ...historyKeymap]),
+        completionAcceptKeymap,
         indentUnit.of('  '),
         javascript(),
         hydraExtensions,
-        autocompletion({ override: [hydraAutocomplete, slashCommandComplete] }),
+        autocompletion({
+          override: [hydraAutocomplete, slashCommandComplete],
+          ...getAutocompleteOptions(),
+        }),
         linter(hydraLinter),
         injectedLinePlugin,
         hydraTheme,
@@ -397,6 +405,10 @@ function CodeEditor ({
     setCameraBannerDismissed(true)
   }, [])
 
+  const handleTogglePassiveHints = useCallback(() => {
+    setShowPassiveHints(prev => !prev)
+  }, [])
+
   const showSendStatus = sendStatus !== 'idle'
 
   return (
@@ -424,12 +436,22 @@ function CodeEditor ({
           <button type='button' className={styles.editButton} onClick={handleRedo}>Redo</button>
           <button type='button' className={styles.editButton} onClick={handleFormat}>Format</button>
         </div>
+        <button type='button' className={styles.hintToggle} onClick={handleTogglePassiveHints}>
+          {showPassiveHints ? 'Hide Hints' : 'Hints'}
+        </button>
         <div className={styles.audioVars}>
           <span>a.fft[n]</span>
           <span>a.setBins(n)</span>
           <span>a.setSmooth(v)</span>
           <span>a.setScale(v)</span>
         </div>
+        {showPassiveHints && (
+          <div className={styles.passiveHints} role='note' aria-label='Editor hints'>
+            {AUTOCOMPLETE_PASSIVE_HINTS.map(hint => (
+              <span key={hint} className={styles.passiveHintItem}>{hint}</span>
+            ))}
+          </div>
+        )}
         <button type='button' className={styles.randomButton} onClick={onRandomize}>
           Random
         </button>

@@ -235,6 +235,28 @@
   line-height: 1.5;
 }
 
+.referenceLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.referenceLink {
+  border: 1px solid #2f475f;
+  border-radius: 999px;
+  padding: 0.16rem 0.55rem;
+  color: #b8cadf;
+  font-size: 0.63rem;
+  line-height: 1.4;
+  text-decoration: none;
+  background: #102030;
+}
+
+.referenceLink:hover {
+  border-color: #56a8ff;
+  color: #e8f3ff;
+}
+
 .relatedRow {
   display: flex;
   flex-wrap: wrap;
