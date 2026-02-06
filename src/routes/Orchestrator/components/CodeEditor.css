@@ -36,6 +36,47 @@
   white-space: nowrap;
 }
 
+.editActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.editButton {
+  padding: 0.375rem 0.625rem;
+  background: rgba(11, 18, 28, 0.78);
+  color: rgba(206, 241, 255, 0.88);
+  border: 1px solid rgba(78, 205, 196, 0.28);
+  border-radius: 6px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  min-height: 36px;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.05s ease;
+}
+
+.editButton:hover {
+  background: rgba(29, 52, 76, 0.9);
+  border-color: rgba(78, 205, 196, 0.6);
+  color: #e9fbff;
+}
+
+.editButton:focus-visible {
+  outline: 2px solid rgba(78, 205, 196, 0.55);
+  outline-offset: 1px;
+}
+
+.editButton:active {
+  transform: translateY(1px);
+}
+
+.editButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .audioVars {
   display: flex;
   gap: 0.5rem;
@@ -126,6 +167,19 @@
   white-space: nowrap;
 }
 
+.sendLintDebug {
+  font-size: var(--text-xs);
+  color: #9ec8ff;
+  background: rgba(88, 166, 255, 0.12);
+  border: 1px solid rgba(88, 166, 255, 0.35);
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: min(40vw, 26rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .resendButton {
   padding: 0.25rem 0.6rem;
   background: rgba(255, 123, 114, 0.15);
@@ -210,8 +264,19 @@
     font-size: var(--text-sm);
   }
 
-  .randomButton {
+  .editActions {
     order: 2;
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  .editButton {
+    flex: 1;
+    min-height: 40px;
+  }
+
+  .randomButton {
+    order: 3;
     flex: 1;
     text-align: center;
     min-height: 40px;
@@ -235,7 +300,8 @@
     min-height: 36px;
   }
 
-  .sendLintError {
+  .sendLintError,
+  .sendLintDebug {
     display: none;
   }
 }
