@@ -9,6 +9,10 @@
     font-size: var(--font-size-l);
     color: hsl(var(--hue-blue), 10%, 60%);
   }
+
+  button {
+    margin-top: var(--space-s);
+  }
 }
 
 .logo {
