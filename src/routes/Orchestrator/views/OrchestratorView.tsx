@@ -55,6 +55,7 @@ function OrchestratorView () {
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
   const lastSentRef = useRef<string | null>(null)
+  const remoteSyncRafRef = useRef<number | null>(null)
 
   const handleSendCode = useCallback((code: string) => {
     lastSentRef.current = normalizeCodeForAck(code)
@@ -65,14 +66,22 @@ function OrchestratorView () {
     })
   }, [dispatch])
 
+  const cancelPendingRemoteSync = useCallback(() => {
+    if (remoteSyncRafRef.current !== null) {
+      cancelAnimationFrame(remoteSyncRafRef.current)
+      remoteSyncRafRef.current = null
+    }
+  }, [])
+
   const handleCodeChange = useCallback((code: string) => {
+    cancelPendingRemoteSync()
     setUserHasEdited(true)
     setLocalCode(code)
     if (sendStatus === 'synced' || sendStatus === 'error') {
       setSendStatus('idle')
       lastSentRef.current = null
     }
-  }, [sendStatus])
+  }, [cancelPendingRemoteSync, sendStatus])
 
   /**
    * Random is LOCAL-ONLY: changes the editor code but does NOT dispatch to
@@ -81,9 +90,11 @@ function OrchestratorView () {
    */
   const handleRandomize = useCallback(() => {
     const sketch = getRandomSketch()
+    cancelPendingRemoteSync()
     setLocalCode(sketch)
+    setDebouncedCode(sketch)
     setUserHasEdited(true)
-  }, [])
+  }, [cancelPendingRemoteSync])
 
   const handleCameraToggle = useCallback(async () => {
     if (camera.status === 'idle' || camera.status === 'error') {
@@ -94,21 +105,25 @@ function OrchestratorView () {
   }, [camera])
 
   const handleLoadPreset = useCallback((code: string) => {
+    cancelPendingRemoteSync()
     setLocalCode(code)
+    setDebouncedCode(code)
     setUserHasEdited(true)
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
-  }, [ui.innerWidth])
+  }, [cancelPendingRemoteSync, ui.innerWidth])
 
   const handleSendPreset = useCallback((code: string) => {
+    cancelPendingRemoteSync()
     setLocalCode(code)
+    setDebouncedCode(code)
     setUserHasEdited(true)
     handleSendCode(code)
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
-  }, [handleSendCode, ui.innerWidth])
+  }, [cancelPendingRemoteSync, handleSendCode, ui.innerWidth])
 
   const handleResend = useCallback(() => {
     handleSendCode(localCode)
@@ -117,6 +132,7 @@ function OrchestratorView () {
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
       setLocalCode(pendingRemoteCode)
+      setDebouncedCode(pendingRemoteCode)
     }
     setPendingRemoteCode(null)
     setPendingRemoteCount(0)
@@ -167,10 +183,19 @@ function OrchestratorView () {
     if (userHasEdited) return
     if (!remoteHydraCode || remoteHydraCode.trim() === '') return
     if (remoteHydraCode === localCode) return
-    const id = requestAnimationFrame(() => {
+
+    remoteSyncRafRef.current = requestAnimationFrame(() => {
       setLocalCode(remoteHydraCode)
+      setDebouncedCode(remoteHydraCode)
+      remoteSyncRafRef.current = null
     })
-    return () => cancelAnimationFrame(id)
+
+    return () => {
+      if (remoteSyncRafRef.current !== null) {
+        cancelAnimationFrame(remoteSyncRafRef.current)
+        remoteSyncRafRef.current = null
+      }
+    }
   }, [remoteHydraCode, userHasEdited, localCode])
 
   // Mark send status as synced when remote matches last sent code
