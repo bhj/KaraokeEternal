@@ -18,12 +18,14 @@ export function useCameraSender () {
   const dispatch = useAppDispatch()
   const [status, setStatus] = useState<PublisherStatus>('idle')
   const [stream, setStream] = useState<MediaStream | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const pubRef = useRef<CameraPublisher | null>(null)
 
   const syncState = useCallback(() => {
     if (pubRef.current) {
       setStatus(pubRef.current.getStatus())
       setStream(pubRef.current.getStream())
+      setError(pubRef.current.getError())
     }
   }, [])
 
@@ -51,6 +53,7 @@ export function useCameraSender () {
           pubRef.current = null
           setStatus('idle')
           setStream(null)
+          setError(null)
           break
         }
       }
@@ -78,6 +81,7 @@ export function useCameraSender () {
     }
     setStatus('idle')
     setStream(null)
+    setError(null)
   }, [])
 
   // Cleanup on unmount
@@ -90,5 +94,5 @@ export function useCameraSender () {
     }
   }, [])
 
-  return { status, stream, start, stop }
+  return { status, stream, error, start, stop }
 }

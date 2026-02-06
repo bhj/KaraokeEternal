@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { requestLogout, updateAccount } from 'store/modules/user'
+import { leaveRoom } from 'store/modules/rooms'
 import { removeItem } from 'routes/Queue/modules/queue'
 import getUpcoming from 'routes/Queue/selectors/getUpcoming'
 import Panel from 'components/Panel/Panel'
@@ -15,6 +16,9 @@ const Account = () => {
 
   const curPassword = useRef(null)
   const [isDirty, setDirty] = useState(false)
+  const isVisitingAnotherRoom = user.roomId !== null
+    && user.ownRoomId !== null
+    && user.roomId !== user.ownRoomId
 
   const handleSignOut = useCallback(() => {
     if (!user.isAdmin) {
@@ -38,6 +42,18 @@ const Account = () => {
 
     dispatch(requestLogout())
   }, [dispatch, upcomingQueueIds, user.isAdmin, user.isGuest])
+
+  const handleReturnToOwnRoom = useCallback(() => {
+    if (!isVisitingAnotherRoom) return
+
+    const confirmed = confirm(
+      'Are you sure you want to leave the current party and return to your own room?\n\nYou will exit this room and start your own room session.',
+    )
+
+    if (!confirmed) return
+
+    dispatch(leaveRoom())
+  }, [dispatch, isVisitingAnotherRoom])
 
   const handleSubmit = useCallback((data: FormData) => {
     // SSO users don't need to provide current password (they can only change display name/image)
@@ -88,6 +104,11 @@ const Account = () => {
             <Button onClick={handleSignOut} variant='default'>
               Sign Out
             </Button>
+            {isVisitingAnotherRoom && (
+              <Button onClick={handleReturnToOwnRoom} variant='default'>
+                Back to My Room
+              </Button>
+            )}
           </div>
         </AccountForm>
       </>

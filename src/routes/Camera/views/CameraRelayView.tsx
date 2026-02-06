@@ -9,12 +9,23 @@ function CameraRelayView () {
   const previewRef = useRef<HTMLVideoElement>(null)
 
   const isSharing = camera.status === 'connecting' || camera.status === 'active'
+  const isSecureContext = typeof window === 'undefined' ? true : window.isSecureContext
 
   useEffect(() => {
     const el = previewRef.current
     if (!el) return
 
     el.srcObject = camera.stream
+
+    if (camera.stream) {
+      // iOS Safari sometimes needs an explicit play() after srcObject is set.
+      const playPromise = el.play()
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch((err: unknown): void => {
+          console.debug('[CameraRelayView] preview play() failed', err)
+        })
+      }
+    }
   }, [camera.stream])
 
   const handleStartStop = useCallback(async () => {
@@ -37,6 +48,16 @@ function CameraRelayView () {
         <div className={styles.subheading}>
           Open this page on a phone in the same room to relay camera into player visuals.
         </div>
+
+        {!isSecureContext && (
+          <div className={styles.warning}>
+            Camera permissions on iPhone Safari require HTTPS. Open the secure room URL, then tap Start.
+          </div>
+        )}
+
+        {camera.error && (
+          <div className={styles.error}>{camera.error}</div>
+        )}
 
         <div className={styles.controls}>
           <button

@@ -11,12 +11,3 @@
     display: none;
   }
 }
-
-.visitingBanner {
-  width: 100%;
-  background-color: var(--btn-bg-primary);
-  border-radius: 0;
-  padding: var(--spacing-sm) var(--spacing-md);
-  justify-content: center;
-  font-weight: 600;
-}

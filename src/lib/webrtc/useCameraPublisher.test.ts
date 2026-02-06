@@ -95,7 +95,7 @@ describe('createCameraPublisher', () => {
     await publisher.start()
 
     expect(mocks.getUserMedia).toHaveBeenCalledWith({
-      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+      video: { facingMode: { ideal: 'user' }, width: { ideal: 640 }, height: { ideal: 480 } },
       audio: false,
     })
     expect(mocks.mockPc.addTrack).toHaveBeenCalledWith(mockVideoTrack, mockStream)
@@ -200,8 +200,56 @@ describe('createCameraPublisher', () => {
     await publisher.start({ facingMode: 'environment' })
 
     expect(mocks.getUserMedia).toHaveBeenCalledWith({
-      video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
       audio: false,
     })
+  })
+
+  it('falls back to camera constraints without facing mode when unsupported', async () => {
+    mocks.getUserMedia
+      .mockRejectedValueOnce(new DOMException('Unsupported constraint', 'OverconstrainedError'))
+      .mockResolvedValueOnce(mockStream)
+
+    await publisher.start({ facingMode: 'environment' })
+
+    expect(mocks.getUserMedia).toHaveBeenCalledTimes(2)
+    expect(mocks.getUserMedia).toHaveBeenNthCalledWith(1, {
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false,
+    })
+    expect(mocks.getUserMedia).toHaveBeenNthCalledWith(2, {
+      video: { width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false,
+    })
+    expect(publisher.getStatus()).toBe('connecting')
+  })
+
+  it('uses webkitGetUserMedia when mediaDevices API is unavailable', async () => {
+    const mockLegacyGetUserMedia = vi.fn((constraints, successCb) => {
+      successCb(mockStream)
+    })
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    })
+    Object.defineProperty(navigator, 'webkitGetUserMedia', {
+      value: mockLegacyGetUserMedia,
+      writable: true,
+      configurable: true,
+    })
+
+    await publisher.start({ facingMode: 'user' })
+
+    expect(mockLegacyGetUserMedia).toHaveBeenCalledWith(
+      {
+        video: { facingMode: { ideal: 'user' }, width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      },
+      expect.any(Function),
+      expect.any(Function),
+    )
+    expect(publisher.getStatus()).toBe('connecting')
   })
 })

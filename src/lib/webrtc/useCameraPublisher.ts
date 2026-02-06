@@ -13,6 +13,109 @@ export interface CameraStartOptions {
   facingMode?: CameraFacingMode
 }
 
+interface LegacyNavigator extends Navigator {
+  getUserMedia?: (
+    constraints: MediaStreamConstraints,
+    success: (stream: MediaStream) => void,
+    failure: (err: unknown) => void,
+  ) => void
+  webkitGetUserMedia?: (
+    constraints: MediaStreamConstraints,
+    success: (stream: MediaStream) => void,
+    failure: (err: unknown) => void,
+  ) => void
+  mozGetUserMedia?: (
+    constraints: MediaStreamConstraints,
+    success: (stream: MediaStream) => void,
+    failure: (err: unknown) => void,
+  ) => void
+  msGetUserMedia?: (
+    constraints: MediaStreamConstraints,
+    success: (stream: MediaStream) => void,
+    failure: (err: unknown) => void,
+  ) => void
+}
+
+const BASE_VIDEO_CONSTRAINTS = {
+  width: { ideal: 640 },
+  height: { ideal: 480 },
+}
+
+function buildCameraConstraints (facingMode: CameraFacingMode, includeFacingMode: boolean): MediaStreamConstraints {
+  return {
+    video: includeFacingMode
+      ? { ...BASE_VIDEO_CONSTRAINTS, facingMode: { ideal: facingMode } }
+      : { ...BASE_VIDEO_CONSTRAINTS },
+    audio: false,
+  }
+}
+
+function isFacingModeConstraintError (err: unknown): boolean {
+  return err instanceof DOMException
+    && (err.name === 'OverconstrainedError'
+      || err.name === 'ConstraintNotSatisfiedError'
+      || err.name === 'NotFoundError')
+}
+
+function getLegacyGetUserMedia (nav: LegacyNavigator) {
+  return nav.getUserMedia
+    ?? nav.webkitGetUserMedia
+    ?? nav.mozGetUserMedia
+    ?? nav.msGetUserMedia
+}
+
+async function requestCameraStream (facingMode: CameraFacingMode): Promise<MediaStream> {
+  const constrainedRequest = buildCameraConstraints(facingMode, true)
+  const fallbackRequest = buildCameraConstraints(facingMode, false)
+
+  if (navigator.mediaDevices?.getUserMedia) {
+    try {
+      return await navigator.mediaDevices.getUserMedia(constrainedRequest)
+    } catch (err) {
+      if (!isFacingModeConstraintError(err)) {
+        throw err
+      }
+      return await navigator.mediaDevices.getUserMedia(fallbackRequest)
+    }
+  }
+
+  const legacyNavigator = navigator as LegacyNavigator
+  const legacyGetUserMedia = getLegacyGetUserMedia(legacyNavigator)
+
+  if (!legacyGetUserMedia) {
+    throw new Error('Camera API unavailable in this browser. Open this page over HTTPS on a modern browser.')
+  }
+
+  return await new Promise<MediaStream>((resolve, reject) => {
+    legacyGetUserMedia.call(legacyNavigator, constrainedRequest, resolve, reject)
+  })
+}
+
+function describeCameraError (err: unknown): string {
+  if (err instanceof DOMException) {
+    if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+      return 'Camera permission was denied. Allow camera access in Safari settings and try again.'
+    }
+    if (err.name === 'NotFoundError') {
+      return 'No camera was found on this device.'
+    }
+    if (err.name === 'NotReadableError') {
+      return 'Camera is busy in another app. Close other camera apps and try again.'
+    }
+    if (err.name === 'OverconstrainedError' || err.name === 'ConstraintNotSatisfiedError') {
+      return 'This camera mode is unavailable on your device. Try switching front/rear camera.'
+    }
+
+    return err.message || 'Unable to start camera relay.'
+  }
+
+  if (err instanceof Error) {
+    return err.message
+  }
+
+  return 'Unable to start camera relay.'
+}
+
 // ---- Testable core (no React dependency) ----
 
 export interface CameraPublisher {
@@ -22,21 +125,21 @@ export interface CameraPublisher {
   handleIce: (ice: CameraIcePayload) => Promise<void>
   getStatus: () => PublisherStatus
   getStream: () => MediaStream | null
+  getError: () => string | null
 }
 
 export function createCameraPublisher (dispatch: (action: unknown) => void): CameraPublisher {
   let status: PublisherStatus = 'idle'
   let stream: MediaStream | null = null
   let pc: RTCPeerConnection | null = null
+  let error: string | null = null
 
   const start = async (options?: CameraStartOptions) => {
     const facingMode = options?.facingMode ?? 'user'
+    error = null
 
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
-        audio: false,
-      })
+      const mediaStream = await requestCameraStream(facingMode)
 
       stream = mediaStream
 
@@ -71,6 +174,7 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
     } catch (err) {
       console.warn('[CameraPublisher] start failed:', err)
       status = 'error'
+      error = describeCameraError(err)
     }
   }
 
@@ -106,6 +210,7 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
 
     dispatch({ type: CAMERA_STOP_REQ, payload: {} })
     status = 'idle'
+    error = null
   }
 
   return {
@@ -115,6 +220,7 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
     handleIce,
     getStatus: () => status,
     getStream: () => stream,
+    getError: () => error,
   }
 }
 
@@ -123,12 +229,14 @@ export function createCameraPublisher (dispatch: (action: unknown) => void): Cam
 export function useCameraPublisher (dispatch: (action: unknown) => void) {
   const [status, setStatus] = useState<PublisherStatus>('idle')
   const [stream, setStream] = useState<MediaStream | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const publisher = useMemo(() => {
     const pub = createCameraPublisher((action) => {
       dispatch(action)
       setStatus(pub.getStatus())
       setStream(pub.getStream())
+      setError(pub.getError())
     })
     return pub
   }, [dispatch])
@@ -137,22 +245,25 @@ export function useCameraPublisher (dispatch: (action: unknown) => void) {
     await publisher.start(options)
     setStatus(publisher.getStatus())
     setStream(publisher.getStream())
+    setError(publisher.getError())
   }, [publisher])
 
   const stop = useCallback(() => {
     publisher.stop()
     setStatus(publisher.getStatus())
     setStream(publisher.getStream())
+    setError(publisher.getError())
   }, [publisher])
 
   const handleAnswer = useCallback(async (answer: CameraAnswerPayload) => {
     await publisher.handleAnswer(answer)
     setStatus(publisher.getStatus())
+    setError(publisher.getError())
   }, [publisher])
 
   const handleIce = useCallback(async (ice: CameraIcePayload) => {
     await publisher.handleIce(ice)
   }, [publisher])
 
-  return { status, stream, start, stop, handleAnswer, handleIce }
+  return { status, stream, error, start, stop, handleAnswer, handleIce }
 }

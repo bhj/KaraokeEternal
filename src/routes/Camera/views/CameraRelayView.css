@@ -28,6 +28,27 @@
   line-height: 1.45;
 }
 
+.warning,
+.error {
+  border-radius: 10px;
+  border: 1px solid;
+  padding: 10px 12px;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+.warning {
+  color: #ffe8bf;
+  border-color: rgba(245, 176, 65, 0.42);
+  background: rgba(245, 176, 65, 0.15);
+}
+
+.error {
+  color: #ffd1d1;
+  border-color: rgba(229, 115, 115, 0.44);
+  background: rgba(229, 115, 115, 0.16);
+}
+
 .controls {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
