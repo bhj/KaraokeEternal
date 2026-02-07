@@ -53,7 +53,7 @@ describe('ApiReference', () => {
     expect(text).toContain('Parameters')
     expect(text).toContain('Example')
     expect(text).toContain('When to use')
-    expect(text).toContain('Pitfall')
+    expect(text).not.toContain('Pitfall')
 
     await act(async () => {
       root.unmount()
@@ -70,7 +70,7 @@ describe('ApiReference', () => {
 
     const text = container.textContent ?? ''
     expect(text).toContain('Core oscillator source for rhythmic stripes and phase motion.')
-    expect(text).toContain('High freq plus high sync can alias hard on low-end devices.')
+    expect(text).toContain('Start most sketches from osc() when you need clean periodic movement.')
 
     await act(async () => {
       root.unmount()

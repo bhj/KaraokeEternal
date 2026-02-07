@@ -22,4 +22,22 @@ describe('HYDRA_REFERENCE metadata coverage', () => {
       }
     }
   })
+
+  it('avoids generic boilerplate guidance text', () => {
+    const forbiddenSnippets = [
+      'Hydra visual signal flow.',
+      'when shaping',
+      'can become unstable with extreme values; tune incrementally while monitoring preview output.',
+      'chain operator for the current texture.',
+    ]
+
+    for (const category of HYDRA_REFERENCE) {
+      for (const fn of category.functions) {
+        const combined = `${fn.description}\n${fn.whenToUse}\n${fn.pitfall}`
+        for (const snippet of forbiddenSnippets) {
+          expect(combined.includes(snippet), `${category.label}.${fn.name} contains boilerplate snippet: ${snippet}`).toBe(false)
+        }
+      }
+    }
+  })
 })

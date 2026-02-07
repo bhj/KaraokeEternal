@@ -63,6 +63,8 @@ interface HydraVisualizerProps {
   overrideData?: AudioData | null
   /** Remote camera video element from WebRTC (replaces local initCam) */
   remoteVideoElement?: HTMLVideoElement | null
+  /** Emits currently bound camera sources (s0-s3) after init/rebind passes */
+  onCameraSourcesBoundChange?: (sources: string[]) => void
 }
 
 function HydraVisualizer ({
@@ -78,6 +80,7 @@ function HydraVisualizer ({
   emitFft,
   overrideData,
   remoteVideoElement,
+  onCameraSourcesBoundChange,
 }: HydraVisualizerProps) {
   const dispatch = useDispatch()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -91,6 +94,13 @@ function HydraVisualizer ({
   const codeRef = useRef(code)
   const cameraInitRef = useRef<Set<string>>(new Set())
   const cameraOverrideRef = useRef<Map<string, unknown>>(new Map())
+  const prevRemoteVideoRef = useRef<HTMLVideoElement | null>(null)
+
+  const reportCameraSourcesBound = useCallback(() => {
+    if (!onCameraSourcesBoundChange) return
+    const bound = Array.from(cameraInitRef.current).sort()
+    onCameraSourcesBoundChange(bound)
+  }, [onCameraSourcesBoundChange])
 
   const { update: updateAudio, compat, audioRef } = useHydraAudio(
     audioSourceNode,
@@ -136,13 +146,22 @@ function HydraVisualizer ({
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>
     const sources = ['s0', 's1', 's2', 's3']
+    const previousRemote = prevRemoteVideoRef.current
+    const nextRemote = remoteVideoElement ?? null
 
-    if (remoteVideoElement) {
-      applyRemoteCameraOverride(sources, remoteVideoElement, w, cameraOverrideRef.current)
+    if (previousRemote !== nextRemote) {
+      cameraInitRef.current.clear()
+      reportCameraSourcesBound()
+    }
+
+    if (nextRemote) {
+      applyRemoteCameraOverride(sources, nextRemote, w, cameraOverrideRef.current)
     } else {
       restoreRemoteCameraOverride(w, cameraOverrideRef.current)
     }
-  }, [remoteVideoElement])
+
+    prevRemoteVideoRef.current = nextRemote
+  }, [remoteVideoElement, reportCameraSourcesBound])
 
   // Set window.a compat on window so Hydra code can reference a.fft and controls
   useEffect(() => {
@@ -204,6 +223,7 @@ function HydraVisualizer ({
   useEffect(() => {
     if (!allowCamera && !remoteVideoElement) {
       cameraInitRef.current.clear()
+      reportCameraSourcesBound()
       return
     }
 
@@ -227,7 +247,9 @@ function HydraVisualizer ({
         warn('Camera init failed for', src, err)
       }
     }
-  }, [allowCamera, remoteVideoElement])
+
+    reportCameraSourcesBound()
+  }, [allowCamera, remoteVideoElement, reportCameraSourcesBound])
 
   // Re-execute code when it changes
   useEffect(() => {
@@ -256,9 +278,11 @@ function HydraVisualizer ({
       }
     }
 
+    reportCameraSourcesBound()
+
     executeHydraCode(hydra, getHydraEvalCode(code))
     errorCountRef.current = 0
-  }, [code, allowCamera, remoteVideoElement])
+  }, [code, allowCamera, remoteVideoElement, reportCameraSourcesBound])
 
   // Animation tick
   const tick = useCallback((time: number) => {

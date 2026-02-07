@@ -83,13 +83,8 @@ const RequireAuth = ({
   path,
   redirectTo,
 }: RequireAuthProps) => {
-  const { isGuest, userId } = useAppSelector(state => state.user)
+  const { isGuest, isAdmin, roomId, ownRoomId, userId } = useAppSelector(state => state.user)
   const location = useLocation()
-
-  // Player route requires non-guest user (admins and standard users can launch player)
-  if (path === '/player' && isGuest) {
-    return <Navigate to='/' replace />
-  }
 
   if (userId === null) {
     // set their originally-desired location in query parameter
@@ -97,6 +92,21 @@ const RequireAuth = ({
     params.set('redirect', path)
 
     return <Navigate to={redirectTo + '?' + params.toString()} replace />
+  }
+
+  const isRoomOwner = typeof roomId === 'number'
+    && typeof ownRoomId === 'number'
+    && roomId === ownRoomId
+
+  // Player route requires room owner or admin.
+  // Guests and visiting standard users are redirected out.
+  if (path === '/player' && (!isAdmin && !isRoomOwner)) {
+    return <Navigate to='/' replace />
+  }
+
+  // Guests can never open /player.
+  if (path === '/player' && isGuest) {
+    return <Navigate to='/' replace />
   }
 
   return children

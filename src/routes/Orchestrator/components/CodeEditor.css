@@ -116,23 +116,6 @@
   cursor: not-allowed;
 }
 
-.audioVars {
-  display: flex;
-  gap: 0.5rem;
-  flex: 1;
-  flex-wrap: wrap;
-}
-
-.audioVars span {
-  font-size: var(--text-xs);
-  font-family: 'JetBrains Mono', monospace;
-  color: #d4a017;
-  background: rgba(212, 160, 23, 0.1);
-  padding: 0.125rem 0.375rem;
-  border-radius: 3px;
-  white-space: nowrap;
-}
-
 .randomButton {
   padding: 0.375rem 0.75rem;
   background: rgba(212, 160, 23, 0.15);
@@ -151,7 +134,6 @@
   background: rgba(212, 160, 23, 0.25);
   border-color: rgba(212, 160, 23, 0.5);
 }
-
 
 .sendButton {
   padding: 0.375rem 1rem;
@@ -284,23 +266,6 @@
     overflow-y: auto;
     max-height: 40vh;
     -webkit-overflow-scrolling: touch;
-  }
-
-  .audioVars {
-    flex: 1 1 100%;
-    order: 1;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 0.25rem;
-    margin-bottom: 0.25rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    scrollbar-width: thin;
-    scrollbar-gutter: stable;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .audioVars span {
-    font-size: var(--text-sm);
   }
 
   .hintToggle {

@@ -15,6 +15,7 @@ interface HydraPreviewProps {
   sensitivity: number
   allowCamera: boolean
   audioResponse: AudioResponseState
+  onCameraBoundSourcesChange?: (sources: string[]) => void
 }
 
 function mapFftToAudioData (fft: { fft: number[], bass: number, mid: number, treble: number, beat: number, energy: number, bpm: number, bright: number }): AudioData {
@@ -44,6 +45,7 @@ const HydraPreview = ({
   sensitivity,
   allowCamera,
   audioResponse,
+  onCameraBoundSourcesChange,
 }: HydraPreviewProps) => {
   const status = useAppSelector(state => state.status)
   const isHydraActive = isEnabled && mode === 'hydra'
@@ -172,6 +174,7 @@ const HydraPreview = ({
           allowCamera={allowCamera}
           overrideData={overrideData}
           remoteVideoElement={previewVideoElement}
+          onCameraSourcesBoundChange={onCameraBoundSourcesChange}
         />
       )}
     </div>

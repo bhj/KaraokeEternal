@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest'
-import { FFT_STALE_MS, isPreviewLive, selectPreviewVideoElement } from './hydraPreviewUtils'
+import { FFT_STALE_MS, isPreviewLive, selectPreviewVideoElement, getCameraPipelineState } from './hydraPreviewUtils'
 import type { FftPayload } from 'shared/fftPayload'
 
 describe('hydraPreviewUtils', () => {
@@ -33,5 +33,41 @@ describe('hydraPreviewUtils', () => {
     expect(selectPreviewVideoElement(local, remote)).toBe(local)
     expect(selectPreviewVideoElement(null, remote)).toBe(remote)
     expect(selectPreviewVideoElement(null, null)).toBeNull()
+  })
+
+  it('returns live pipeline state only when relay is active and hydra has bound camera sources', () => {
+    expect(getCameraPipelineState({
+      cameraStatus: 'active',
+      usesCameraSource: true,
+      boundSourceCount: 1,
+    })).toEqual({
+      level: 'live',
+      label: 'Live',
+      missing: [],
+    })
+  })
+
+  it('returns partial pipeline state when relay is not active and hydra source is not bound', () => {
+    expect(getCameraPipelineState({
+      cameraStatus: 'connecting',
+      usesCameraSource: true,
+      boundSourceCount: 0,
+    })).toEqual({
+      level: 'partial',
+      label: 'Partial',
+      missing: ['publish/subscribe', 'hydra source bind'],
+    })
+  })
+
+  it('returns off pipeline state when camera is idle and code does not use camera', () => {
+    expect(getCameraPipelineState({
+      cameraStatus: 'idle',
+      usesCameraSource: false,
+      boundSourceCount: 0,
+    })).toEqual({
+      level: 'off',
+      label: 'Off',
+      missing: [],
+    })
   })
 })

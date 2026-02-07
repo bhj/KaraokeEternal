@@ -41,25 +41,6 @@ function getCategorySummary (category: string): string {
   }
 }
 
-function getCategoryPitfall (category: string): string {
-  switch (category) {
-    case 'Sources':
-      return 'Layering too many sources without contrast control can wash out detail.'
-    case 'Transforms':
-      return 'Large transform deltas can create flicker and break rhythm with the music.'
-    case 'Color':
-      return 'Extreme color math often clips values and kills gradient detail.'
-    case 'Combine':
-      return 'Aggressive combine chains can overexpose quickly.'
-    case 'Modulate':
-      return 'High modulation depth can introduce instability on slower devices.'
-    case 'Camera / External Sources':
-      return 'External sources require initialization and user media permissions.'
-    default:
-      return 'Keep values incremental while testing changes in preview.'
-  }
-}
-
 function getFunctionExample (entry: HydraEntry): string {
   const { func } = entry
   if (typeof func.example === 'string' && func.example.trim().length > 0) {
@@ -218,12 +199,6 @@ function ApiReference ({ onInsertExample, onReplaceWithExample }: ApiReferencePr
                 <div className={styles.detailLabel}>When to use</div>
                 <p className={styles.detailText}>{selectedEntry.func.whenToUse ?? getCategorySummary(selectedEntry.category)}</p>
               </div>
-
-              <div className={styles.detailSection}>
-                <div className={styles.detailLabel}>Pitfall</div>
-                <p className={styles.detailText}>{selectedEntry.func.pitfall ?? getCategoryPitfall(selectedEntry.category)}</p>
-              </div>
-
               {selectedEntry.func.related && selectedEntry.func.related.length > 0 && (
                 <div className={styles.detailSection}>
                   <div className={styles.detailLabel}>Related</div>

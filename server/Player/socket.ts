@@ -33,11 +33,37 @@ import {
   CAMERA_STOP,
 } from '../../shared/actionTypes.js'
 
+interface RoomControlSocket {
+  user?: {
+    userId?: number
+    roomId?: number
+    isAdmin?: boolean
+  }
+}
+
+export async function canManageRoom (sock: RoomControlSocket): Promise<boolean> {
+  if (sock.user?.isAdmin) return true
+
+  const roomId = sock.user?.roomId
+  const userId = sock.user?.userId
+  if (typeof roomId !== 'number' || typeof userId !== 'number') {
+    return false
+  }
+
+  const res = await Rooms.get(roomId, { status: ['open', 'closed'] })
+  const room = res?.entities?.[roomId]
+  if (!room) return false
+
+  return room.ownerId === userId
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
   [PLAYER_REQ_OPTIONS]: async (sock, { payload }) => {
+    if (!(await canManageRoom(sock))) return
+
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_OPTIONS,
@@ -45,24 +71,32 @@ const ACTION_HANDLERS = {
     })
   },
   [PLAYER_REQ_NEXT]: async (sock) => {
+    if (!(await canManageRoom(sock))) return
+
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_NEXT,
     })
   },
   [PLAYER_REQ_PAUSE]: async (sock) => {
+    if (!(await canManageRoom(sock))) return
+
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_PAUSE,
     })
   },
   [PLAYER_REQ_PLAY]: async (sock) => {
+    if (!(await canManageRoom(sock))) return
+
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_PLAY,
     })
   },
   [PLAYER_REQ_REPLAY]: async (sock, { payload }) => {
+    if (!(await canManageRoom(sock))) return
+
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_REPLAY,
@@ -70,6 +104,8 @@ const ACTION_HANDLERS = {
     })
   },
   [PLAYER_REQ_VOLUME]: async (sock, { payload }) => {
+    if (!(await canManageRoom(sock))) return
+
     // @todo: emit to players only
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: PLAYER_CMD_VOLUME,
@@ -93,12 +129,16 @@ const ACTION_HANDLERS = {
     })
   },
   [VISUALIZER_HYDRA_CODE_REQ]: async (sock, { payload }) => {
+    if (!(await canManageRoom(sock))) return
+
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload,
     })
   },
   [VISUALIZER_STATE_SYNC_REQ]: async (sock, { payload }) => {
+    if (!(await canManageRoom(sock))) return
+
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: VISUALIZER_STATE_SYNC,
       payload,

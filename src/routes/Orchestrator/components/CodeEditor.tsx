@@ -439,12 +439,6 @@ function CodeEditor ({
         <button type='button' className={styles.hintToggle} onClick={handleTogglePassiveHints}>
           {showPassiveHints ? 'Hide Hints' : 'Hints'}
         </button>
-        <div className={styles.audioVars}>
-          <span>a.fft[n]</span>
-          <span>a.setBins(n)</span>
-          <span>a.setSmooth(v)</span>
-          <span>a.setScale(v)</span>
-        </div>
         {showPassiveHints && (
           <div className={styles.passiveHints} role='note' aria-label='Editor hints'>
             {AUTOCOMPLETE_PASSIVE_HINTS.map(hint => (

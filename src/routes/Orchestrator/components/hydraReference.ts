@@ -78,20 +78,20 @@ function buildDefaultExample (fn: HydraFuncSeed): string {
 
 function buildDefaultDescription (categoryLabel: string, fn: HydraFuncSeed): string {
   if (fn.name.startsWith('.')) {
-    return `${fn.name} is a ${categoryLabel.toLowerCase()} chain operator for the current texture.`
+    return `${fn.name} is a ${categoryLabel.toLowerCase()} operation in the current render chain.`
   }
   if (/^s[0-3]\./.test(fn.name)) {
     return `${fn.name} configures an external source buffer for camera, image, video, or screen input.`
   }
-  return `${fn.name} is a ${categoryLabel.toLowerCase()} function for building Hydra visual signal flow.`
+  return `${fn.name} is a ${categoryLabel.toLowerCase()} signal node for combine and output chains.`
 }
 
 function buildDefaultWhenToUse (categoryLabel: string, fn: HydraFuncSeed): string {
-  return `Use ${fn.name} when shaping ${categoryLabel.toLowerCase()} behavior in your sketch.`
+  return `Use ${fn.name} to tune ${categoryLabel.toLowerCase()} behavior in your sketch.`
 }
 
 function buildDefaultPitfall (fn: HydraFuncSeed): string {
-  return `${fn.name} can become unstable with extreme values; tune incrementally while monitoring preview output.`
+  return `${fn.name} can clip or smear at extreme values; adjust in small increments while previewing.`
 }
 
 function buildRelated (categoryLabel: string, fn: HydraFuncSeed): string[] {

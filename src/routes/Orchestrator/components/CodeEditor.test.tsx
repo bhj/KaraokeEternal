@@ -127,6 +127,33 @@ describe('CodeEditor', () => {
     })
 
     expect(container.textContent ?? '').toContain('Tab accepts autocomplete suggestions.')
+    expect(container.textContent ?? '').not.toContain('a.fft[n]')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
+  it('does not show legacy audio hint chips in footer', async () => {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <CodeEditor
+          code='osc(10).out()'
+          onCodeChange={() => {}}
+          onSend={() => {}}
+          onRandomize={() => {}}
+        />,
+      )
+    })
+
+    const text = container.textContent ?? ''
+    expect(text).not.toContain('a.fft[n]')
+    expect(text).not.toContain('a.setBins(n)')
+    expect(text).not.toContain('a.setSmooth(v)')
+    expect(text).not.toContain('a.setScale(v)')
 
     await act(async () => {
       root.unmount()
