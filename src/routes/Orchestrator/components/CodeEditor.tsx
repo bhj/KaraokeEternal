@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EditorState, type Range } from '@codemirror/state'
 import { Decoration, EditorView, keymap, ViewPlugin, type DecorationSet, type ViewUpdate } from '@codemirror/view'
 import { javascript } from '@codemirror/lang-javascript'
-import { autocompletion, acceptCompletion, type CompletionContext, type CompletionResult } from '@codemirror/autocomplete'
+import {
+  autocompletion,
+  acceptCompletion,
+  closeCompletion,
+  moveCompletionSelection,
+  startCompletion,
+  type CompletionContext,
+  type CompletionResult,
+} from '@codemirror/autocomplete'
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands'
 import { indentUnit } from '@codemirror/language'
@@ -10,7 +18,12 @@ import { hydraExtensions } from './hydraHighlightStyle'
 import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
 import { formatHydraCode, getLintErrorSummary, type LintErrorSummary } from './codeEditorUtils'
-import { AUTOCOMPLETE_PASSIVE_HINTS, getAutocompleteOptions, getCompletionAcceptKeyBindings } from './codeEditorAssist'
+import {
+  AUTOCOMPLETE_PASSIVE_HINTS,
+  getAutocompleteOptions,
+  getCompletionAcceptKeyBindings,
+  getCompletionNavigationKeyBindings,
+} from './codeEditorAssist'
 import { isInjectedLine, isPartialInjectedLine } from 'lib/injectedLines'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
@@ -285,14 +298,23 @@ function CodeEditor ({
     }])
 
     const completionAcceptKeymap = keymap.of(getCompletionAcceptKeyBindings(acceptCompletion))
+    const completionNavigationKeymap = keymap.of(getCompletionNavigationKeyBindings({
+      startRun: startCompletion,
+      closeRun: closeCompletion,
+      moveDownRun: moveCompletionSelection(true),
+      moveUpRun: moveCompletionSelection(false),
+      pageDownRun: moveCompletionSelection(true, 'page'),
+      pageUpRun: moveCompletionSelection(false, 'page'),
+    }))
 
     const state = EditorState.create({
       doc: code,
       extensions: [
         sendKeymap,
         history(),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
+        completionNavigationKeymap,
         completionAcceptKeymap,
+        keymap.of([...defaultKeymap, ...historyKeymap]),
         indentUnit.of('  '),
         javascript(),
         hydraExtensions,
