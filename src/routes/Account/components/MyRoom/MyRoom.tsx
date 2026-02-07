@@ -4,6 +4,8 @@ import Panel from 'components/Panel/Panel'
 import Button from 'components/Button/Button'
 import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import HttpApi from 'lib/HttpApi'
+import { useAppDispatch } from 'store/hooks'
+import { fetchCurrentRoom } from 'store/modules/rooms'
 import { resolveRoomAccessPrefs } from 'shared/roomAccess'
 import type { IRoomPrefs } from 'shared/types'
 import { fetchFolders } from 'routes/Orchestrator/api/hydraPresetsApi'
@@ -21,6 +23,7 @@ interface MyRoomData {
 }
 
 const MyRoom = () => {
+  const dispatch = useAppDispatch()
   const [data, setData] = useState<MyRoomData | null>(null)
   const [copied, setCopied] = useState(false)
   const [presetFolders, setPresetFolders] = useState<PresetFolder[]>([])
@@ -105,12 +108,13 @@ const MyRoom = () => {
         body: { prefs },
       })
       setData(response)
+      dispatch(fetchCurrentRoom())
     } catch {
       setPrefsError('Failed to save room policy')
     } finally {
       setIsSavingPrefs(false)
     }
-  }, [data])
+  }, [data, dispatch])
 
   if (!data) {
     return null // Loading

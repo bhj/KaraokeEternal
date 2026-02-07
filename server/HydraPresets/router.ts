@@ -89,6 +89,13 @@ router.get('/folder/:folderId', async (ctx) => {
   ctx.body = await HydraPresets.getByFolder(folderId)
 })
 
+router.get('/:presetId', async (ctx) => {
+  const presetId = parseId(ctx.params.presetId, ctx, 'presetId')
+  const preset = await HydraPresets.getById(presetId)
+  if (!preset) ctx.throw(404, 'Preset not found')
+  ctx.body = preset
+})
+
 router.post('/', async (ctx) => {
   requireUser(ctx, { nonGuest: true })
 

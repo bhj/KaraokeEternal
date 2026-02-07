@@ -1,20 +1,25 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import Modal from 'components/Modal/Modal'
 import Button from 'components/Button/Button'
-import { useAppSelector } from 'store/hooks'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
+import { fetchCurrentRoom } from 'store/modules/rooms'
 import { HYDRA_GALLERY } from './hydraGallery'
 import PresetTree from './PresetTree'
 import { buildPresetTree, type PresetLeaf, type PresetTreeNode, type PresetFolder, type PresetItem } from './presetTree'
 import { scopePresetTreeForRoom } from './presetScope'
 import { buildPresetDraft } from './presetDraft'
+import { getDefaultSaveFolderId, reorderByDirection, toSortOrderUpdates, type MoveDirection } from './presetManagement'
 import {
   fetchAllPresets,
   fetchFolders,
   createFolder,
   createPreset,
+  updateFolder,
+  updatePreset,
   deleteFolder,
   deletePreset,
 } from '../api/hydraPresetsApi'
+import { updateMyRoomPrefs } from '../api/roomPrefsApi'
 import styles from './PresetBrowser.css'
 
 interface PresetBrowserProps {
@@ -25,12 +30,15 @@ interface PresetBrowserProps {
 
 type PendingDelete = { type: 'preset', preset: PresetLeaf } | { type: 'folder', folder: PresetTreeNode } | null
 
+type PendingRename = { type: 'preset', preset: PresetLeaf } | { type: 'folder', folder: PresetTreeNode } | null
+
 function toErrorMessage (err: unknown, fallback: string): string {
   if (err instanceof Error && err.message) return err.message
   return fallback
 }
 
 function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
+  const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
   const currentRoomPrefs = useAppSelector((state) => {
     if (typeof state.user.roomId !== 'number') return undefined
@@ -40,6 +48,11 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     && typeof user.ownRoomId === 'number'
     && user.roomId === user.ownRoomId
   const isPrivilegedPresetUser = user.isAdmin || isRoomOwner
+  const canManageRoomPolicy = isRoomOwner
+  const startingPresetId = typeof currentRoomPrefs?.startingPresetId === 'number'
+    ? currentRoomPrefs.startingPresetId
+    : null
+
   const [folders, setFolders] = useState<PresetFolder[]>([])
   const [presets, setPresets] = useState<PresetItem[]>([])
   const [query, setQuery] = useState('')
@@ -59,6 +72,12 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
   const [savingPreset, setSavingPreset] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<PendingDelete>(null)
   const [deleting, setDeleting] = useState(false)
+
+  const [pendingRename, setPendingRename] = useState<PendingRename>(null)
+  const [renameValue, setRenameValue] = useState('')
+  const [renaming, setRenaming] = useState(false)
+
+  const [updatingStartPreset, setUpdatingStartPreset] = useState(false)
 
   const refresh = useCallback(async () => {
     try {
@@ -141,6 +160,14 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     return node.authorUserId === user.userId
   }, [user])
 
+  const canManagePreset = canDeletePreset
+  const canManageFolder = canDeleteFolder
+
+  const canSetStartingPreset = useCallback((preset: PresetLeaf) => {
+    if (!canManageRoomPolicy) return false
+    return preset.isGallery === false && typeof preset.presetId === 'number'
+  }, [canManageRoomPolicy])
+
   const requestDeletePreset = useCallback((preset: PresetLeaf) => {
     if (!preset.presetId) return
     setPendingDelete({ type: 'preset', preset })
@@ -175,19 +202,104 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     }
   }, [pendingDelete, deleting, refresh])
 
+  const requestRenamePreset = useCallback((preset: PresetLeaf) => {
+    if (!preset.presetId) return
+    setPendingRename({ type: 'preset', preset })
+    setRenameValue(preset.name)
+  }, [])
+
+  const requestRenameFolder = useCallback((folder: PresetTreeNode) => {
+    if (!folder.folderId || folder.isGallery) return
+    setPendingRename({ type: 'folder', folder })
+    setRenameValue(folder.name)
+  }, [])
+
+  const confirmRename = useCallback(async () => {
+    const name = renameValue.trim()
+    if (!pendingRename || !name || renaming) return
+
+    try {
+      setRenaming(true)
+      setError(null)
+
+      if (pendingRename.type === 'preset') {
+        if (!pendingRename.preset.presetId) return
+        await updatePreset(pendingRename.preset.presetId, { name })
+      } else {
+        if (!pendingRename.folder.folderId) return
+        await updateFolder(pendingRename.folder.folderId, { name })
+      }
+
+      setPendingRename(null)
+      setRenameValue('')
+      await refresh()
+    } catch (err) {
+      setError(toErrorMessage(err, 'Failed to rename item'))
+    } finally {
+      setRenaming(false)
+    }
+  }, [pendingRename, renameValue, renaming, refresh])
+
+  const handleMoveFolder = useCallback(async (folder: PresetTreeNode, direction: MoveDirection) => {
+    if (!folder.folderId) return
+
+    const orderedFolderIds = folders
+      .slice()
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.folderId - b.folderId)
+      .map(item => item.folderId)
+
+    const reordered = reorderByDirection(orderedFolderIds, folder.folderId, direction)
+    if (!reordered) return
+
+    try {
+      setError(null)
+      const updates = toSortOrderUpdates(reordered)
+      await Promise.all(
+        updates.map(update => updateFolder(update.id, { sortOrder: update.sortOrder })),
+      )
+      await refresh()
+    } catch (err) {
+      setError(toErrorMessage(err, 'Failed to reorder folders'))
+    }
+  }, [folders, refresh])
+
+  const handleMovePreset = useCallback(async (preset: PresetLeaf, direction: MoveDirection) => {
+    if (!preset.presetId || !preset.folderId) return
+
+    const orderedPresetIds = presets
+      .filter(item => item.folderId === preset.folderId)
+      .slice()
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.presetId - b.presetId)
+      .map(item => item.presetId)
+
+    const reordered = reorderByDirection(orderedPresetIds, preset.presetId, direction)
+    if (!reordered) return
+
+    try {
+      setError(null)
+      const updates = toSortOrderUpdates(reordered)
+      await Promise.all(
+        updates.map(update => updatePreset(update.id, { sortOrder: update.sortOrder })),
+      )
+      await refresh()
+    } catch (err) {
+      setError(toErrorMessage(err, 'Failed to reorder presets'))
+    }
+  }, [presets, refresh])
+
   const openSavePreset = useCallback((preset?: PresetLeaf) => {
     const draft = buildPresetDraft({ currentCode, preset })
 
     if (preset?.folderId && folders.some(folder => folder.folderId === preset.folderId)) {
       setPresetFolderId(preset.folderId)
-    } else if (folders.length > 0) {
-      setPresetFolderId(folders[0].folderId)
+    } else {
+      setPresetFolderId(getDefaultSaveFolderId(folders, currentRoomPrefs))
     }
 
     setPresetName(draft.name)
     setDraftCode(draft.code)
     setShowSavePreset(true)
-  }, [currentCode, folders])
+  }, [currentCode, folders, currentRoomPrefs])
 
   const handleClonePreset = useCallback((preset: PresetLeaf) => {
     openSavePreset(preset)
@@ -238,6 +350,23 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
       setSavingPreset(false)
     }
   }, [presetName, presetFolderId, draftCode, refresh, savingPreset])
+
+  const handleSetStartingPreset = useCallback(async (preset: PresetLeaf) => {
+    if (!canManageRoomPolicy || preset.isGallery || !preset.presetId) return
+
+    const nextStartingPresetId = startingPresetId === preset.presetId ? null : preset.presetId
+
+    try {
+      setUpdatingStartPreset(true)
+      setError(null)
+      await updateMyRoomPrefs({ startingPresetId: nextStartingPresetId })
+      await dispatch(fetchCurrentRoom())
+    } catch (err) {
+      setError(toErrorMessage(err, 'Failed to update starting visual'))
+    } finally {
+      setUpdatingStartPreset(false)
+    }
+  }, [canManageRoomPolicy, startingPresetId, dispatch])
 
   let savePresetBody: React.ReactNode
   if (folders.length === 0) {
@@ -290,6 +419,9 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
       ? `Delete preset "${pendingDelete.preset.name}"?`
       : ''
 
+  const renameModalTitle = pendingRename?.type === 'folder' ? 'Rename Folder' : 'Rename Preset'
+  const renameModalLabel = pendingRename?.type === 'folder' ? 'Folder name' : 'Preset name'
+
   return (
     <div className={styles.panel}>
       <div className={styles.toolbar}>
@@ -299,6 +431,7 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
         <button type='button' className={styles.toolbarButtonPrimary} onClick={() => openSavePreset()}>
           Save Preset
         </button>
+        {updatingStartPreset && <span className={styles.toolbarHint}>Updating start...</span>}
       </div>
 
       <div className={styles.searchWrap}>
@@ -347,14 +480,23 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
           nodes={filteredTree}
           expanded={expanded}
           selectedPresetId={selectedPresetId}
+          startingPresetId={startingPresetId}
           onToggleFolder={toggleFolder}
           onLoad={handleLoad}
           onSend={handleSend}
           onClone={handleClonePreset}
           onDeletePreset={requestDeletePreset}
           onDeleteFolder={requestDeleteFolder}
+          onRenamePreset={requestRenamePreset}
+          onRenameFolder={requestRenameFolder}
+          onMovePreset={handleMovePreset}
+          onMoveFolder={handleMoveFolder}
+          onSetStartingPreset={handleSetStartingPreset}
           canDeletePreset={canDeletePreset}
           canDeleteFolder={canDeleteFolder}
+          canManagePreset={canManagePreset}
+          canManageFolder={canManageFolder}
+          canSetStartingPreset={canSetStartingPreset}
         />
       )}
 
@@ -401,6 +543,43 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
         )}
       >
         {savePresetBody}
+      </Modal>
+
+      <Modal
+        title={renameModalTitle}
+        visible={pendingRename !== null}
+        onClose={() => {
+          setPendingRename(null)
+          setRenameValue('')
+        }}
+        buttons={(
+          <>
+            <Button
+              variant='default'
+              onClick={() => {
+                setPendingRename(null)
+                setRenameValue('')
+              }}
+              disabled={renaming}
+            >
+              Cancel
+            </Button>
+            <Button variant='primary' onClick={confirmRename} disabled={renaming || !renameValue.trim()}>
+              {renaming ? 'Saving...' : 'Save'}
+            </Button>
+          </>
+        )}
+      >
+        <label className={styles.modalLabel}>
+          {renameModalLabel}
+          <input
+            className={styles.modalInput}
+            type='text'
+            value={renameValue}
+            onChange={e => setRenameValue(e.target.value)}
+            autoFocus
+          />
+        </label>
       </Modal>
 
       <Modal

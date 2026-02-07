@@ -4,6 +4,7 @@ import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
 import HydraFolders from '../HydraPresets/HydraFolders.js'
+import HydraPresets from '../HydraPresets/HydraPresets.js'
 
 interface RequestWithBody {
   body: Record<string, unknown>
@@ -25,6 +26,7 @@ const sanitizeRoomPrefsForClient = (roomPrefs: Record<string, unknown> = {}) => 
     ...accessPrefs,
     partyPresetFolderId: typeof roomPrefs.partyPresetFolderId === 'number' ? roomPrefs.partyPresetFolderId : null,
     restrictCollaboratorsToPartyPresetFolder: roomPrefs.restrictCollaboratorsToPartyPresetFolder === true,
+    startingPresetId: typeof roomPrefs.startingPresetId === 'number' ? roomPrefs.startingPresetId : null,
   }
 }
 
@@ -166,6 +168,22 @@ router.put('/my/prefs', async (ctx) => {
       nextPrefs.partyPresetFolderId = rawFolderId
     } else {
       ctx.throw(422, 'Invalid party preset folder')
+    }
+  }
+
+  if ('startingPresetId' in requestedPrefsObj) {
+    const rawPresetId = requestedPrefsObj.startingPresetId
+
+    if (rawPresetId === null || rawPresetId === '') {
+      nextPrefs.startingPresetId = null
+    } else if (typeof rawPresetId === 'number' && Number.isInteger(rawPresetId) && rawPresetId > 0) {
+      const preset = await HydraPresets.getById(rawPresetId)
+      if (!preset) {
+        ctx.throw(422, 'Starting preset not found')
+      }
+      nextPrefs.startingPresetId = rawPresetId
+    } else {
+      ctx.throw(422, 'Invalid starting preset')
     }
   }
 

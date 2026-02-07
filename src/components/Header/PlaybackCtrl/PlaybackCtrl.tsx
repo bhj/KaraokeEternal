@@ -117,6 +117,7 @@ const PlaybackCtrl = () => {
           visualizerMode={status.visualizer.mode}
           audioResponse={{ ...AUDIO_RESPONSE_DEFAULTS, ...status.visualizer.audioResponse }}
           allowCamera={status.visualizer.allowCamera ?? false}
+          cycleOnSongTransition={status.visualizer.cycleOnSongTransition ?? false}
           onHydraPresetChange={handleHydraPresetChange}
         />
       )}

@@ -19,6 +19,8 @@ export const fetchAllPresets = () => api.get<PresetItem[]>('')
 
 export const fetchPresetsByFolder = (folderId: number) => api.get<PresetItem[]>(`folder/${folderId}`)
 
+export const fetchPresetById = (presetId: number) => api.get<PresetItem>(`${presetId}`)
+
 export const createPreset = (data: { folderId: number, name: string, code: string }) => api.post<PresetItem>('', {
   body: data,
 })

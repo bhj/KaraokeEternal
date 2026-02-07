@@ -70,26 +70,52 @@
   border-color: rgba(120, 144, 156, 0.35);
 }
 
-.folderDelete {
+.badgeStart {
+  background: rgba(255, 214, 102, 0.18);
+  border-color: rgba(255, 214, 102, 0.42);
+  color: #ffe9a8;
+}
+
+.folderActions {
   margin-left: auto;
-  background: rgba(229, 115, 115, 0.15);
-  color: #ffb4b4;
-  border: 1px solid rgba(229, 115, 115, 0.4);
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: var(--text-xs);
-  cursor: pointer;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 26px;
+  gap: 6px;
   opacity: 0;
   transform: translateX(4px);
   pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-.folderHeader:hover .folderDelete,
-.folderHeader:focus-within .folderDelete {
+.folderHeader:hover .folderActions,
+.folderHeader:focus-within .folderActions {
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
+}
+
+.folderActionButton {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.folderActionButton:hover,
+.folderActionButton:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.34);
+  outline: none;
 }
 
 .childrenWrap {
@@ -212,6 +238,13 @@
   outline: none;
 }
 
+.actionButton:disabled,
+.folderActionButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .actionPrimary {
   background: rgba(78, 205, 196, 0.2);
   border-color: rgba(78, 205, 196, 0.5);
@@ -221,6 +254,12 @@
 .actionPrimary:hover,
 .actionPrimary:focus-visible {
   background: rgba(78, 205, 196, 0.3);
+}
+
+.actionActive {
+  background: rgba(255, 214, 102, 0.25);
+  border-color: rgba(255, 214, 102, 0.55);
+  color: #ffe9a8;
 }
 
 .actionDanger {
@@ -264,7 +303,7 @@
     height: 26px;
   }
 
-  .folderDelete {
+  .folderActions {
     opacity: 1;
     transform: none;
     pointer-events: auto;

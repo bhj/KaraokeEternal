@@ -46,6 +46,7 @@ export interface PlayerVisualizerState {
   hasHydraUpdate: boolean
   audioResponse: AudioResponseState
   allowCamera: boolean
+  cycleOnSongTransition: boolean
   injectionLevel: InjectionLevel
   presetCategory: PresetCategory
 }
@@ -63,6 +64,7 @@ const initialState: PlayerVisualizerState = {
   hasHydraUpdate: false,
   audioResponse: { ...AUDIO_RESPONSE_DEFAULTS },
   allowCamera: false,
+  cycleOnSongTransition: false,
   injectionLevel: 'med',
   presetCategory: 'default',
 }
@@ -92,6 +94,9 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
           ? { ...AUDIO_RESPONSE_DEFAULTS, ...visualizer.audioResponse }
           : state.audioResponse,
         allowCamera: typeof visualizer.allowCamera === 'boolean' ? visualizer.allowCamera : state.allowCamera,
+        cycleOnSongTransition: typeof visualizer.cycleOnSongTransition === 'boolean'
+          ? visualizer.cycleOnSongTransition
+          : state.cycleOnSongTransition,
       }
     })
     .addCase(hydraCodeReceived, (state, { payload }) => {

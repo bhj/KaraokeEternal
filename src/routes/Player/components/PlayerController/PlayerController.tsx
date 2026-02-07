@@ -1,6 +1,9 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { useCameraReceiver } from 'lib/webrtc/useCameraReceiver'
+import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
+import { getNextPreset, getPresetByIndex } from 'routes/Orchestrator/components/hydraPresets'
+import { fetchPresetById } from 'routes/Orchestrator/api/hydraPresetsApi'
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
@@ -8,6 +11,7 @@ import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
+import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition } from './transitionPolicy'
 
 interface PlayerControllerProps {
   width: number
@@ -25,6 +29,9 @@ const PlayerController = (props: PlayerControllerProps) => {
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
+  const startingPresetAppliedRef = useRef(false)
+  const lastTransitionKeyRef = useRef<string | null>(null)
+
   const { videoElement: remoteVideoElement } = useCameraReceiver()
   const dispatch = useAppDispatch()
   const handleStatus = useCallback<(status?: Partial<PlayerState>) => void>(status => dispatch(playerStatus(status)), [dispatch])
@@ -34,6 +41,31 @@ const PlayerController = (props: PlayerControllerProps) => {
     dispatch(playerError(msg))
     handleStatus()
   }, [dispatch, handleStatus])
+
+  const emitHydraPresetByIndex = useCallback((index: number) => {
+    dispatch({
+      type: VISUALIZER_HYDRA_CODE_REQ,
+      payload: {
+        code: getPresetByIndex(index),
+        hydraPresetIndex: index,
+      },
+    })
+  }, [dispatch])
+
+  const emitStartingPresetById = useCallback(async (presetId: number) => {
+    try {
+      const preset = await fetchPresetById(presetId)
+      if (!preset?.code || !preset.code.trim()) return
+      dispatch({
+        type: VISUALIZER_HYDRA_CODE_REQ,
+        payload: {
+          code: preset.code,
+        },
+      })
+    } catch {
+      // Preset may have been removed after room prefs were saved.
+    }
+  }, [dispatch])
 
   const handleReplay = useCallback((queueId: number) => {
     const nextItem = queue.entities[queueId]
@@ -80,6 +112,32 @@ const PlayerController = (props: PlayerControllerProps) => {
       return
     }
 
+    if (shouldApplyStartingPresetAtSessionStart({
+      startingPresetId: roomPrefs?.startingPresetId,
+      currentQueueId: player.queueId,
+      historyJSON: player.historyJSON,
+      nextQueueId: nextQueueItem.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+    })) {
+      startingPresetAppliedRef.current = true
+      void emitStartingPresetById(roomPrefs.startingPresetId as number)
+    }
+
+    if (shouldCyclePresetOnSongTransition({
+      cycleOnSongTransition: playerVisualizer.cycleOnSongTransition,
+      isVisualizerEnabled: playerVisualizer.isEnabled,
+      visualizerMode: playerVisualizer.mode,
+      currentQueueId: queueItem?.queueId,
+      nextQueueId: nextQueueItem.queueId,
+    })) {
+      const transitionKey = `${queueItem?.queueId}->${nextQueueItem.queueId}`
+      if (lastTransitionKeyRef.current !== transitionKey) {
+        lastTransitionKeyRef.current = transitionKey
+        const nextPresetIndex = getNextPreset(playerVisualizer.hydraPresetIndex)
+        emitHydraPresetByIndex(nextPresetIndex)
+      }
+    }
+
     // play next
     handleStatus({
       historyJSON: JSON.stringify(history),
@@ -92,7 +150,25 @@ const PlayerController = (props: PlayerControllerProps) => {
       nextUserId: null,
       _isPlayingNext: false,
     })
-  }, [handleStatus, nextQueueItem, player.historyJSON, queueItem])
+  }, [
+    emitHydraPresetByIndex,
+    emitStartingPresetById,
+    handleStatus,
+    nextQueueItem,
+    player.historyJSON,
+    player.queueId,
+    playerVisualizer,
+    queueItem,
+    roomPrefs,
+  ])
+
+  // Reset one-shot guards when a fresh session starts.
+  useEffect(() => {
+    if (player.queueId === -1 && player.historyJSON === '[]') {
+      startingPresetAppliedRef.current = false
+      lastTransitionKeyRef.current = null
+    }
+  }, [player.queueId, player.historyJSON])
 
   // "lock in" the next user that isn't the currently up user, if possible
   useEffect(() => {

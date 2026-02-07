@@ -123,6 +123,49 @@ describe('HydraPresets router', () => {
     await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
   })
 
+  it('GET /api/hydra-presets/:presetId returns a preset by id', async () => {
+    const folder = await HydraFolders.create({
+      name: 'Lookup Folder',
+      authorUserId: authorUser.userId,
+      authorName: authorUser.name,
+    })
+    const preset = await HydraPresets.create({
+      folderId: folder.folderId,
+      name: 'Lookup Preset',
+      code: 'osc(20).out()',
+      authorUserId: authorUser.userId,
+      authorName: authorUser.name,
+    })
+
+    const layer = getLayer('/api/hydra-presets/:presetId', 'GET')
+    const handler = layer.stack[layer.stack.length - 1]
+
+    const ctx = {
+      params: { presetId: String(preset.presetId) },
+      body: undefined as unknown,
+      throw: throwWithStatus,
+    }
+
+    await handler(ctx, async () => {})
+    expect(ctx.body).toMatchObject({
+      presetId: preset.presetId,
+      name: 'Lookup Preset',
+    })
+  })
+
+  it('GET /api/hydra-presets/:presetId returns 404 for missing preset', async () => {
+    const layer = getLayer('/api/hydra-presets/:presetId', 'GET')
+    const handler = layer.stack[layer.stack.length - 1]
+
+    const ctx = {
+      params: { presetId: '999999' },
+      body: undefined as unknown,
+      throw: throwWithStatus,
+    }
+
+    await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 404 })
+  })
+
   it('PUT /api/hydra-presets/:presetId rejects oversized code payloads', async () => {
     const folder = await HydraFolders.create({
       name: 'Code Size',

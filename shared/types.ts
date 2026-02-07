@@ -58,6 +58,7 @@ export interface IRoomPrefs {
   allowRoomCollaboratorsToSendVisualizer?: boolean
   partyPresetFolderId?: number | null
   restrictCollaboratorsToPartyPresetFolder?: boolean
+  startingPresetId?: number | null
   visualizer?: IRoomVisualizerPrefs
 }
 
@@ -115,6 +116,7 @@ export interface PlaybackOptions {
     mode?: VisualizerMode
     audioResponse?: AudioResponseState
     allowCamera?: boolean
+    cycleOnSongTransition?: boolean
   }
 }
 

@@ -356,6 +356,91 @@ describe('Rooms Router - Room Joining', () => {
     })
   })
 
+  it('should allow setting starting preset', async () => {
+    const now = Math.floor(Date.now() / 1000)
+    const folderRes = await db.db?.run(
+      'INSERT INTO hydraFolders (name, authorUserId, authorName, sortOrder, dateCreated) VALUES (?, ?, ?, ?, ?)',
+      ['Starts', testUser.userId, 'testuser', 0, now],
+    )
+    const folderId = folderRes?.lastID
+    await db.db?.run(
+      'INSERT INTO hydraPresets (folderId, name, code, authorUserId, authorName, sortOrder, dateCreated, dateUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [folderId, 'Intro', 'osc(10).out()', testUser.userId, 'testuser', 0, now, now],
+    )
+    const preset = await db.db?.get('SELECT presetId FROM hydraPresets WHERE folderId = ? LIMIT 1', [folderId])
+
+    await db.db?.run(
+      'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
+      ['Owner Room', 'open', testUser.userId, now, now, JSON.stringify({ prefs: {} })],
+    )
+
+    const routerModule = await import('./router.js')
+    const router = routerModule.default
+    const prefsLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      .find(l => l.path === '/api/rooms/my/prefs' && l.methods.includes('PUT'))
+    expect(prefsLayer).toBeDefined()
+
+    const ctx = {
+      user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
+      request: {
+        body: {
+          prefs: {
+            startingPresetId: preset?.presetId,
+          },
+        },
+      },
+      io: { in: () => ({ fetchSockets: async () => [] }) },
+      body: undefined as unknown,
+      throw: (status: number, message?: string) => {
+        const err = new Error(message) as Error & { status: number }
+        err.status = status
+        throw err
+      },
+    }
+
+    const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
+    await handler(ctx, async () => {})
+
+    const row = await db.db?.get('SELECT data FROM rooms WHERE ownerId = ?', [testUser.userId])
+    const roomData = JSON.parse(row?.data ?? '{}')
+    expect(roomData?.prefs?.startingPresetId).toBe(preset?.presetId)
+  })
+
+  it('should reject unknown starting preset IDs', async () => {
+    const now = Math.floor(Date.now() / 1000)
+    await db.db?.run(
+      'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
+      ['Owner Room', 'open', testUser.userId, now, now, JSON.stringify({ prefs: {} })],
+    )
+
+    const routerModule = await import('./router.js')
+    const router = routerModule.default
+    const prefsLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      .find(l => l.path === '/api/rooms/my/prefs' && l.methods.includes('PUT'))
+    expect(prefsLayer).toBeDefined()
+
+    const ctx = {
+      user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
+      request: {
+        body: {
+          prefs: {
+            startingPresetId: 999999,
+          },
+        },
+      },
+      io: { in: () => ({ fetchSockets: async () => [] }) },
+      body: undefined as unknown,
+      throw: (status: number, message?: string) => {
+        const err = new Error(message) as Error & { status: number }
+        err.status = status
+        throw err
+      },
+    }
+
+    const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
+    await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 422 })
+  })
+
   describe('POST /api/rooms/leave', () => {
     it('should clear keVisitedRoom cookie', async () => {
       const routerModule = await import('./router.js')

@@ -22,6 +22,7 @@ interface DisplayCtrlProps {
   visualizerMode: VisualizerMode
   audioResponse: AudioResponseState
   allowCamera: boolean
+  cycleOnSongTransition: boolean
   cameraHint?: string
   // actions
   onRequestOptions(opts: PlaybackOptions): void
@@ -47,6 +48,7 @@ const DisplayCtrl = ({
   visualizerMode,
   audioResponse,
   allowCamera,
+  cycleOnSongTransition,
   cameraHint,
   onRequestOptions,
   onHydraPresetChange,
@@ -75,6 +77,10 @@ const DisplayCtrl = ({
 
   const handleToggleCamera = () => onRequestOptions({
     visualizer: { allowCamera: !allowCamera },
+  })
+
+  const handleToggleCycleOnSongTransition = () => onRequestOptions({
+    visualizer: { cycleOnSongTransition: !cycleOnSongTransition },
   })
 
   const handleAudioResponseField = (field: keyof AudioResponseState, val: number) =>
@@ -169,6 +175,16 @@ const DisplayCtrl = ({
                     {cameraHint && (
                       <p className={styles.hintText}>{cameraHint}</p>
                     )}
+                  </div>
+                )}
+
+                {showPresets && (
+                  <div className={styles.field}>
+                    <InputCheckbox
+                      label='Cycle Preset On Song Change'
+                      checked={cycleOnSongTransition}
+                      onChange={handleToggleCycleOnSongTransition}
+                    />
                   </div>
                 )}
 

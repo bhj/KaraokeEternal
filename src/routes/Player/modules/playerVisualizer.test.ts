@@ -359,6 +359,38 @@ describe('playerVisualizer allowCamera', () => {
   })
 })
 
+describe('playerVisualizer cycleOnSongTransition', () => {
+  it('should have cycleOnSongTransition=false in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(state.cycleOnSongTransition).toBe(false)
+  })
+
+  it('should set cycleOnSongTransition=true via PLAYER_CMD_OPTIONS', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const nextState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { cycleOnSongTransition: true } },
+    })
+    expect(nextState.cycleOnSongTransition).toBe(true)
+  })
+
+  it('should preserve cycleOnSongTransition when omitted', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    let state = reducer(undefined, { type: '@@INIT' })
+    state = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { cycleOnSongTransition: true } },
+    })
+    const nextState = reducer(state, {
+      type: PLAYER_CMD_OPTIONS,
+      payload: { visualizer: { sensitivity: 0.5 } },
+    })
+    expect(nextState.cycleOnSongTransition).toBe(true)
+  })
+})
+
 describe('playerVisualizer audioResponse', () => {
   it('should have audioResponse matching AUDIO_RESPONSE_DEFAULTS in initial state', async () => {
     const { default: reducer } = await import('./playerVisualizer')

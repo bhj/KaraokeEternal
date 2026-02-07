@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import clsx from 'clsx'
+import type { MoveDirection } from './presetManagement'
 import type { PresetLeaf, PresetTreeNode } from './presetTree'
 import styles from './PresetTree.css'
 
@@ -7,28 +8,46 @@ interface PresetTreeProps {
   nodes: PresetTreeNode[]
   expanded: Set<string>
   selectedPresetId?: number | null
+  startingPresetId?: number | null
   onToggleFolder: (id: string) => void
   onLoad: (preset: PresetLeaf) => void
   onSend: (preset: PresetLeaf) => void
   onClone?: (preset: PresetLeaf) => void
   onDeletePreset?: (preset: PresetLeaf) => void
   onDeleteFolder?: (node: PresetTreeNode) => void
+  onRenamePreset?: (preset: PresetLeaf) => void
+  onRenameFolder?: (node: PresetTreeNode) => void
+  onMovePreset?: (preset: PresetLeaf, direction: MoveDirection) => void
+  onMoveFolder?: (node: PresetTreeNode, direction: MoveDirection) => void
+  onSetStartingPreset?: (preset: PresetLeaf) => void
   canDeletePreset?: (preset: PresetLeaf) => boolean
   canDeleteFolder?: (node: PresetTreeNode) => boolean
+  canManagePreset?: (preset: PresetLeaf) => boolean
+  canManageFolder?: (node: PresetTreeNode) => boolean
+  canSetStartingPreset?: (preset: PresetLeaf) => boolean
 }
 
 function PresetTree ({
   nodes,
   expanded,
   selectedPresetId,
+  startingPresetId,
   onToggleFolder,
   onLoad,
   onSend,
   onClone,
   onDeletePreset,
   onDeleteFolder,
+  onRenamePreset,
+  onRenameFolder,
+  onMovePreset,
+  onMoveFolder,
+  onSetStartingPreset,
   canDeletePreset,
   canDeleteFolder,
+  canManagePreset,
+  canManageFolder,
+  canSetStartingPreset,
 }: PresetTreeProps) {
   const focusByOffset = useCallback((target: HTMLElement, offset: number) => {
     const treeRoot = target.closest('[data-tree-root="true"]') as HTMLElement | null
@@ -100,8 +119,12 @@ function PresetTree ({
 
   return (
     <div className={styles.tree} data-tree-root='true'>
-      {nodes.map((node) => {
+      {nodes.map((node, folderIndex) => {
         const isOpen = expanded.has(node.id)
+        const isLastFolder = folderIndex === nodes.length - 1
+        const isFirstMovableFolder = folderIndex === 0 || (folderIndex === 1 && nodes[0]?.isGallery === true)
+        const folderManageAllowed = !node.isGallery && (canManageFolder?.(node) ?? true)
+
         return (
           <div key={node.id} className={styles.folder}>
             <div
@@ -120,17 +143,68 @@ function PresetTree ({
               </span>
               <span className={styles.folderName}>{node.name}</span>
               {node.isGallery && <span className={styles.badge}>Gallery</span>}
-              {!node.isGallery && onDeleteFolder && (canDeleteFolder?.(node) ?? true) && (
-                <button
-                  type='button'
-                  className={styles.folderDelete}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onDeleteFolder(node)
-                  }}
-                >
-                  Delete
-                </button>
+
+              {!node.isGallery && (
+                <div className={styles.folderActions}>
+                  {onMoveFolder && folderManageAllowed && (
+                    <>
+                      <button
+                        type='button'
+                        className={styles.folderActionButton}
+                        aria-label='Move folder up'
+                        title='Move folder up'
+                        disabled={isFirstMovableFolder}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onMoveFolder(node, 'up')
+                        }}
+                      >
+                        <span aria-hidden>↑</span>
+                      </button>
+                      <button
+                        type='button'
+                        className={styles.folderActionButton}
+                        aria-label='Move folder down'
+                        title='Move folder down'
+                        disabled={isLastFolder}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onMoveFolder(node, 'down')
+                        }}
+                      >
+                        <span aria-hidden>↓</span>
+                      </button>
+                    </>
+                  )}
+                  {onRenameFolder && folderManageAllowed && (
+                    <button
+                      type='button'
+                      className={styles.folderActionButton}
+                      aria-label='Rename folder'
+                      title='Rename folder'
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onRenameFolder(node)
+                      }}
+                    >
+                      <span aria-hidden>✎</span>
+                    </button>
+                  )}
+                  {onDeleteFolder && (canDeleteFolder?.(node) ?? true) && (
+                    <button
+                      type='button'
+                      className={clsx(styles.folderActionButton, styles.actionDanger)}
+                      aria-label='Delete folder'
+                      title='Delete folder'
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onDeleteFolder(node)
+                      }}
+                    >
+                      <span aria-hidden>×</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -139,8 +213,13 @@ function PresetTree ({
                 {node.children.length === 0 && (
                   <div className={styles.empty}>No presets</div>
                 )}
-                {node.children.map((preset) => {
+                {node.children.map((preset, presetIndex) => {
                   const isSelected = typeof preset.presetId === 'number' && preset.presetId === selectedPresetId
+                  const isStarting = typeof preset.presetId === 'number' && preset.presetId === startingPresetId
+                  const isFirstPreset = presetIndex === 0
+                  const isLastPreset = presetIndex === node.children.length - 1
+                  const presetManageAllowed = !preset.isGallery && (canManagePreset?.(preset) ?? true)
+
                   return (
                     <div
                       key={preset.id}
@@ -157,6 +236,7 @@ function PresetTree ({
                         <span className={styles.presetName}>{preset.name}</span>
                         <div className={styles.presetMeta}>
                           {isSelected && <span className={clsx(styles.badge, styles.badgeSelected)}>Selected</span>}
+                          {isStarting && <span className={clsx(styles.badge, styles.badgeStart)}>Start</span>}
                           {preset.usesCamera && <span className={clsx(styles.badge, styles.badgeCam)}>Cam</span>}
                         </div>
                       </div>
@@ -186,6 +266,64 @@ function PresetTree ({
                         >
                           <span aria-hidden>↑</span>
                         </button>
+                        {!preset.isGallery && onSetStartingPreset && (canSetStartingPreset?.(preset) ?? true) && (
+                          <button
+                            type='button'
+                            className={clsx(styles.actionButton, isStarting && styles.actionActive)}
+                            aria-label={isStarting ? 'Clear starting visual' : 'Set as starting visual'}
+                            title={isStarting ? 'Clear starting visual' : 'Set as starting visual'}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onSetStartingPreset(preset)
+                            }}
+                          >
+                            <span aria-hidden>{isStarting ? '★' : '☆'}</span>
+                          </button>
+                        )}
+                        {!preset.isGallery && onMovePreset && presetManageAllowed && (
+                          <>
+                            <button
+                              type='button'
+                              className={styles.actionButton}
+                              aria-label='Move preset up'
+                              title='Move preset up'
+                              disabled={isFirstPreset}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onMovePreset(preset, 'up')
+                              }}
+                            >
+                              <span aria-hidden>↟</span>
+                            </button>
+                            <button
+                              type='button'
+                              className={styles.actionButton}
+                              aria-label='Move preset down'
+                              title='Move preset down'
+                              disabled={isLastPreset}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onMovePreset(preset, 'down')
+                              }}
+                            >
+                              <span aria-hidden>↡</span>
+                            </button>
+                          </>
+                        )}
+                        {!preset.isGallery && onRenamePreset && presetManageAllowed && (
+                          <button
+                            type='button'
+                            className={styles.actionButton}
+                            aria-label='Rename preset'
+                            title='Rename preset'
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onRenamePreset(preset)
+                            }}
+                          >
+                            <span aria-hidden>✎</span>
+                          </button>
+                        )}
                         {preset.isGallery && onClone && (
                           <button
                             type='button'
