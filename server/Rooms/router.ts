@@ -164,6 +164,8 @@ router.get('/:roomId?', async (ctx) => {
       res.entities[roomId].prefs = {
         roles: roomPrefs.roles ?? {},
         ...accessPrefs,
+        partyPresetFolderId: typeof roomPrefs.partyPresetFolderId === 'number' ? roomPrefs.partyPresetFolderId : null,
+        restrictCollaboratorsToPartyPresetFolder: roomPrefs.restrictCollaboratorsToPartyPresetFolder === true,
       }
     }
   })

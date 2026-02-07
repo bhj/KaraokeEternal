@@ -1,10 +1,12 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useAppSelector } from 'store/hooks'
 import Accordion from 'components/Accordion/Accordion'
 import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Icon from 'components/Icon/Icon'
 import type { IRoomPrefs } from 'shared/types'
 import { resolveRoomAccessPrefs } from 'shared/roomAccess'
+import { fetchFolders } from 'routes/Orchestrator/api/hydraPresetsApi'
+import type { PresetFolder } from 'routes/Orchestrator/components/presetTree'
 import styles from './UserPrefs.css'
 
 interface UserPrefsProps {
@@ -14,6 +16,29 @@ interface UserPrefsProps {
 
 const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
   const roles = useAppSelector(state => state.prefs.roles)
+  const [presetFolders, setPresetFolders] = useState<PresetFolder[]>([])
+
+  useEffect(() => {
+    let cancelled = false
+
+    void fetchFolders()
+      .then((folders): null => {
+        if (!cancelled) {
+          setPresetFolders(folders)
+        }
+        return null
+      })
+      .catch((): null => {
+        if (!cancelled) {
+          setPresetFolders([])
+        }
+        return null
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const getRoleId = useCallback((roleName: string) => {
     return roles.result.find(roleId => roles.entities[roleId].name === roleName)
@@ -53,9 +78,26 @@ const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
     onChange(nextPrefs)
   }, [onChange, prefs])
 
+  const handlePartyRestrictionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange({
+      ...prefs,
+      restrictCollaboratorsToPartyPresetFolder: e.target.checked,
+    })
+  }, [onChange, prefs])
+
+  const handlePartyFolderChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const raw = e.target.value
+    onChange({
+      ...prefs,
+      partyPresetFolderId: raw === '' ? null : Number(raw),
+    })
+  }, [onChange, prefs])
+
   const allowNewGuest = prefs.roles?.[getRoleId('guest')]?.allowNew ?? false
   const allowNewStandard = prefs.roles?.[getRoleId('standard')]?.allowNew ?? false
   const accessPrefs = resolveRoomAccessPrefs(prefs)
+  const partyPresetFolderId = typeof prefs.partyPresetFolderId === 'number' ? prefs.partyPresetFolderId : ''
+  const restrictToPartyFolder = prefs.restrictCollaboratorsToPartyPresetFolder === true
 
   return (
     <Accordion
@@ -106,6 +148,36 @@ const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
             checked={accessPrefs.allowRoomCollaboratorsToSendVisualizer}
             onChange={handleAccessToggle}
           />
+        </div>
+        <div className={styles.field}>
+          <InputCheckbox
+            label='Restrict collaborators to party preset folder'
+            name='restrictCollaboratorsToPartyPresetFolder'
+            checked={restrictToPartyFolder}
+            onChange={handlePartyRestrictionChange}
+          />
+          <div className={styles.helperText}>
+            When enabled, guests and non-owner collaborators can only load presets from the selected folder.
+          </div>
+        </div>
+        <div className={styles.field}>
+          <label htmlFor='partyPresetFolderId'>Party preset folder</label>
+          <select
+            id='partyPresetFolderId'
+            className={styles.select}
+            value={partyPresetFolderId}
+            onChange={handlePartyFolderChange}
+          >
+            <option value=''>None selected</option>
+            {presetFolders.map(folder => (
+              <option key={folder.folderId} value={folder.folderId}>
+                {folder.name}
+              </option>
+            ))}
+          </select>
+          <div className={styles.helperText}>
+            Pick your curated party folder here.
+          </div>
         </div>
       </div>
     </Accordion>

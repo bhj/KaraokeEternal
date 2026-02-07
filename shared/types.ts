@@ -56,6 +56,8 @@ export interface IRoomPrefs {
   allowGuestOrchestrator?: boolean
   allowGuestCameraRelay?: boolean
   allowRoomCollaboratorsToSendVisualizer?: boolean
+  partyPresetFolderId?: number | null
+  restrictCollaboratorsToPartyPresetFolder?: boolean
   visualizer?: IRoomVisualizerPrefs
 }
 

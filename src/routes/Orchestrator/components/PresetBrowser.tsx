@@ -5,6 +5,7 @@ import { useAppSelector } from 'store/hooks'
 import { HYDRA_GALLERY } from './hydraGallery'
 import PresetTree from './PresetTree'
 import { buildPresetTree, type PresetLeaf, type PresetTreeNode, type PresetFolder, type PresetItem } from './presetTree'
+import { scopePresetTreeForRoom } from './presetScope'
 import { buildPresetDraft } from './presetDraft'
 import {
   fetchAllPresets,
@@ -31,6 +32,14 @@ function toErrorMessage (err: unknown, fallback: string): string {
 
 function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
   const user = useAppSelector(state => state.user)
+  const currentRoomPrefs = useAppSelector((state) => {
+    if (typeof state.user.roomId !== 'number') return undefined
+    return state.rooms.entities[state.user.roomId]?.prefs
+  })
+  const isRoomOwner = typeof user.roomId === 'number'
+    && typeof user.ownRoomId === 'number'
+    && user.roomId === user.ownRoomId
+  const isPrivilegedPresetUser = user.isAdmin || isRoomOwner
   const [folders, setFolders] = useState<PresetFolder[]>([])
   const [presets, setPresets] = useState<PresetItem[]>([])
   const [query, setQuery] = useState('')
@@ -80,8 +89,14 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
   }, [presets, selectedPresetId])
 
   const tree = useMemo(
-    () => buildPresetTree(folders, presets, HYDRA_GALLERY),
-    [folders, presets],
+    () => {
+      const rawTree = buildPresetTree(folders, presets, HYDRA_GALLERY)
+      return scopePresetTreeForRoom(rawTree, {
+        isPrivileged: isPrivilegedPresetUser,
+        roomPrefs: currentRoomPrefs,
+      })
+    },
+    [folders, presets, isPrivilegedPresetUser, currentRoomPrefs],
   )
 
   const filteredTree = useMemo(() => {
@@ -323,7 +338,11 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
 
       {error && <div className={styles.error}>{error}</div>}
 
-      {!loading && !error && (
+      {!loading && !error && filteredTree.length === 0 && (
+        <div className={styles.empty}>No presets available for this room policy.</div>
+      )}
+
+      {!loading && !error && filteredTree.length > 0 && (
         <PresetTree
           nodes={filteredTree}
           expanded={expanded}

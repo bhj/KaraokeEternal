@@ -12,6 +12,7 @@ import CodeEditor from '../components/CodeEditor'
 import StagePanel from '../components/StagePanel'
 import { type StageBuffer } from '../components/stagePanelUtils'
 import { useCameraSender } from 'lib/webrtc/useCameraSender'
+import { fetchCurrentRoom } from 'store/modules/rooms'
 import { getPreviewSize } from './orchestratorLayout'
 import styles from './OrchestratorView.css'
 
@@ -173,6 +174,10 @@ function OrchestratorView () {
     combinedReducer.inject({ reducerPath: 'playerVisualizer', reducer: playerVisualizerReducer })
     dispatch(sliceInjectNoOp())
   }
+
+  useEffect(() => {
+    dispatch(fetchCurrentRoom())
+  }, [dispatch])
 
   // Persist ref panel width
   useEffect(() => {
