@@ -268,6 +268,9 @@ class Rooms {
           size: 0.5,
         },
         roles: {},
+        allowGuestOrchestrator: true,
+        allowGuestCameraRelay: true,
+        allowRoomCollaboratorsToSendVisualizer: true,
       },
     }
 

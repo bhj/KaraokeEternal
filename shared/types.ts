@@ -53,6 +53,9 @@ export interface IRoomPrefs {
   roles?: Record<number, {
     allowNew: boolean
   }>
+  allowGuestOrchestrator?: boolean
+  allowGuestCameraRelay?: boolean
+  allowRoomCollaboratorsToSendVisualizer?: boolean
   visualizer?: IRoomVisualizerPrefs
 }
 

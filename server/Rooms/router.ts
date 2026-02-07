@@ -15,6 +15,7 @@ const router = new KoaRouter({ prefix: '/api/rooms' })
 const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.env.KES_REQUIRE_PROXY === 'true'
 
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
+import { resolveRoomAccessPrefs } from '../../shared/roomAccess.js'
 
 // NOTE: Enrollment endpoint removed - guests now use app-managed sessions via /api/guest/join
 // Standard users use SSO login via Authentik, not enrollment
@@ -158,8 +159,12 @@ router.get('/:roomId?', async (ctx) => {
       const room = ctx.io.sockets.adapter.rooms.get(Rooms.prefix(roomId))
       res.entities[roomId].numUsers = room ? room.size : 0
     } else {
-      // only pass the 'roles' prefs key
-      res.entities[roomId].prefs = res.entities[roomId].prefs?.roles ? { roles: res.entities[roomId].prefs.roles } : {}
+      const roomPrefs = res.entities[roomId].prefs ?? {}
+      const accessPrefs = resolveRoomAccessPrefs(roomPrefs)
+      res.entities[roomId].prefs = {
+        roles: roomPrefs.roles ?? {},
+        ...accessPrefs,
+      }
     }
   })
 

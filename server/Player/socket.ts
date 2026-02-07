@@ -1,4 +1,5 @@
 import Rooms from '../Rooms/Rooms.js'
+import { resolveRoomAccessPrefs } from '../../shared/roomAccess.js'
 
 import {
   PLAYER_CMD_NEXT,
@@ -41,20 +42,69 @@ interface RoomControlSocket {
   }
 }
 
-export async function canManageRoom (sock: RoomControlSocket): Promise<boolean> {
-  if (sock.user?.isAdmin) return true
+interface RoomControlAccess {
+  hasRoom: boolean
+  canManage: boolean
+  accessPrefs: ReturnType<typeof resolveRoomAccessPrefs>
+}
 
+async function getRoomControlAccess (sock: RoomControlSocket): Promise<RoomControlAccess> {
   const roomId = sock.user?.roomId
+  if (typeof roomId !== 'number') {
+    return {
+      hasRoom: false,
+      canManage: false,
+      accessPrefs: resolveRoomAccessPrefs(undefined),
+    }
+  }
+
+  if (sock.user?.isAdmin) {
+    return {
+      hasRoom: true,
+      canManage: true,
+      accessPrefs: resolveRoomAccessPrefs(undefined),
+    }
+  }
+
   const userId = sock.user?.userId
-  if (typeof roomId !== 'number' || typeof userId !== 'number') {
-    return false
+  if (typeof userId !== 'number') {
+    return {
+      hasRoom: false,
+      canManage: false,
+      accessPrefs: resolveRoomAccessPrefs(undefined),
+    }
   }
 
   const res = await Rooms.get(roomId, { status: ['open', 'closed'] })
   const room = res?.entities?.[roomId]
-  if (!room) return false
+  if (!room) {
+    return {
+      hasRoom: false,
+      canManage: false,
+      accessPrefs: resolveRoomAccessPrefs(undefined),
+    }
+  }
 
-  return room.ownerId === userId
+  return {
+    hasRoom: true,
+    canManage: room.ownerId === userId,
+    accessPrefs: resolveRoomAccessPrefs(room.prefs),
+  }
+}
+
+export async function canManageRoom (sock: RoomControlSocket): Promise<boolean> {
+  const access = await getRoomControlAccess(sock)
+  return access.hasRoom && access.canManage
+}
+
+async function canSendVisualizer (sock: RoomControlSocket): Promise<boolean> {
+  const access = await getRoomControlAccess(sock)
+  return access.hasRoom && (access.canManage || access.accessPrefs.allowRoomCollaboratorsToSendVisualizer)
+}
+
+async function canRelayCamera (sock: RoomControlSocket): Promise<boolean> {
+  const access = await getRoomControlAccess(sock)
+  return access.hasRoom && (access.canManage || access.accessPrefs.allowGuestCameraRelay)
 }
 
 // ------------------------------------
@@ -129,7 +179,7 @@ const ACTION_HANDLERS = {
     })
   },
   [VISUALIZER_HYDRA_CODE_REQ]: async (sock, { payload }) => {
-    if (!(await canManageRoom(sock))) return
+    if (!(await canSendVisualizer(sock))) return
 
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: VISUALIZER_HYDRA_CODE,
@@ -137,7 +187,7 @@ const ACTION_HANDLERS = {
     })
   },
   [VISUALIZER_STATE_SYNC_REQ]: async (sock, { payload }) => {
-    if (!(await canManageRoom(sock))) return
+    if (!(await canSendVisualizer(sock))) return
 
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: VISUALIZER_STATE_SYNC,
@@ -145,24 +195,32 @@ const ACTION_HANDLERS = {
     })
   },
   [CAMERA_OFFER_REQ]: async (sock, { payload }) => {
+    if (!(await canRelayCamera(sock))) return
+
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: CAMERA_OFFER,
       payload,
     })
   },
   [CAMERA_ANSWER_REQ]: async (sock, { payload }) => {
+    if (!(await canRelayCamera(sock))) return
+
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: CAMERA_ANSWER,
       payload,
     })
   },
   [CAMERA_ICE_REQ]: async (sock, { payload }) => {
+    if (!(await canRelayCamera(sock))) return
+
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: CAMERA_ICE,
       payload,
     })
   },
   [CAMERA_STOP_REQ]: async (sock, { payload }) => {
+    if (!(await canRelayCamera(sock))) return
+
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: CAMERA_STOP,
       payload,

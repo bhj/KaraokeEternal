@@ -73,6 +73,9 @@ describe('Rooms.createEphemeral', () => {
     expect(room.prefs).toBeDefined()
     expect(room.prefs.qr).toBeDefined()
     expect(room.prefs.qr.isEnabled).toBe(true)
+    expect(room.prefs.allowGuestOrchestrator).toBe(true)
+    expect(room.prefs.allowGuestCameraRelay).toBe(true)
+    expect(room.prefs.allowRoomCollaboratorsToSendVisualizer).toBe(true)
   })
 
   it('should allow guest accounts by default', async () => {

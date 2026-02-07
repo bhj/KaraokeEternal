@@ -6,6 +6,7 @@ import AccountView from 'routes/Account/views/AccountView'
 import LibraryView from 'routes/Library/views/LibraryView'
 import QueueView from 'routes/Queue/views/QueueView'
 import JoinLandingPage from 'routes/Join/views/JoinLandingPage'
+import { getRouteAccessDecision } from './routeAccess'
 
 const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
 const OrchestratorView = React.lazy(() => import('routes/Orchestrator/views/OrchestratorView'))
@@ -83,7 +84,11 @@ const RequireAuth = ({
   path,
   redirectTo,
 }: RequireAuthProps) => {
-  const { isGuest, isAdmin, roomId, ownRoomId, userId } = useAppSelector(state => state.user)
+  const { isAdmin, roomId, ownRoomId, userId } = useAppSelector(state => state.user)
+  const currentRoomPrefs = useAppSelector((state) => {
+    if (typeof state.user.roomId !== 'number') return undefined
+    return state.rooms.entities[state.user.roomId]?.prefs
+  })
   const location = useLocation()
 
   if (userId === null) {
@@ -98,15 +103,15 @@ const RequireAuth = ({
     && typeof ownRoomId === 'number'
     && roomId === ownRoomId
 
-  // Player route requires room owner or admin.
-  // Guests and visiting standard users are redirected out.
-  if (path === '/player' && (!isAdmin && !isRoomOwner)) {
-    return <Navigate to='/' replace />
-  }
+  const access = getRouteAccessDecision({
+    path,
+    isAdmin,
+    isRoomOwner,
+    prefs: currentRoomPrefs,
+  })
 
-  // Guests can never open /player.
-  if (path === '/player' && isGuest) {
-    return <Navigate to='/' replace />
+  if (!access.allowed) {
+    return <Navigate to={access.redirectTo ?? '/library'} replace />
   }
 
   return children

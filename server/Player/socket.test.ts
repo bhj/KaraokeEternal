@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  CAMERA_OFFER,
+  CAMERA_OFFER_REQ,
   PLAYER_CMD_NEXT,
   PLAYER_REQ_NEXT,
   VISUALIZER_HYDRA_CODE,
@@ -55,11 +57,16 @@ describe('Player socket permissions', () => {
     expect(Rooms.get).not.toHaveBeenCalled()
   })
 
-  it('blocks hydra code broadcast when user does not own the room', async () => {
+  it('blocks hydra code broadcast when collaborator send is disabled', async () => {
     vi.mocked(Rooms.get).mockResolvedValue({
       result: [55],
       entities: {
-        55: { ownerId: 999 },
+        55: {
+          ownerId: 999,
+          prefs: {
+            allowRoomCollaboratorsToSendVisualizer: false,
+          },
+        },
       },
     })
 
@@ -68,6 +75,29 @@ describe('Player socket permissions', () => {
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()' } })
 
     expect(emit).not.toHaveBeenCalled()
+  })
+
+  it('allows hydra code broadcast when collaborator send is enabled', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [55],
+      entities: {
+        55: {
+          ownerId: 999,
+          prefs: {
+            allowRoomCollaboratorsToSendVisualizer: true,
+          },
+        },
+      },
+    })
+
+    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+
+    await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()' } })
+
+    expect(emit).toHaveBeenCalledWith('action', {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'osc(10).out()' },
+    })
   })
 
   it('allows player next command for room owner', async () => {
@@ -102,6 +132,49 @@ describe('Player socket permissions', () => {
     expect(emit).toHaveBeenCalledWith('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload: { code: 'noise(4).out()' },
+    })
+  })
+
+  it('blocks camera offer when collaborator relay is disabled', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [88],
+      entities: {
+        88: {
+          ownerId: 300,
+          prefs: {
+            allowGuestCameraRelay: false,
+          },
+        },
+      },
+    })
+
+    const { sock, emit } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
+
+    await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
+
+    expect(emit).not.toHaveBeenCalled()
+  })
+
+  it('allows camera offer when collaborator relay is enabled', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [88],
+      entities: {
+        88: {
+          ownerId: 300,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const { sock, emit } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
+
+    await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
+
+    expect(emit).toHaveBeenCalledWith('action', {
+      type: CAMERA_OFFER,
+      payload: { sdp: 'offer' },
     })
   })
 })
