@@ -19,6 +19,10 @@ const playerCmdOptions = createAction<{ visualizer: PlaybackOptions['visualizer'
 const hydraCodeReceived = createAction<{
   code: string
   hydraPresetIndex?: number
+  hydraPresetName?: string
+  hydraPresetId?: number | null
+  hydraPresetFolderId?: number | null
+  hydraPresetSource?: 'gallery' | 'folder'
   injectionLevel?: InjectionLevel
 }>(VISUALIZER_HYDRA_CODE)
 export const playerLoad = createAction(PLAYER_LOAD)
@@ -43,6 +47,9 @@ export interface PlayerVisualizerState {
   hydraCode?: string
   hydraPresetIndex: number
   hydraPresetName: string
+  hydraPresetId?: number | null
+  hydraPresetFolderId?: number | null
+  hydraPresetSource?: 'gallery' | 'folder'
   hasHydraUpdate: boolean
   audioResponse: AudioResponseState
   allowCamera: boolean
@@ -61,6 +68,9 @@ const initialState: PlayerVisualizerState = {
   hydraCode: getDefaultPreset(),
   hydraPresetIndex: _defaultHydraIndex,
   hydraPresetName: getPresetLabel(_defaultHydraIndex),
+  hydraPresetId: null,
+  hydraPresetFolderId: null,
+  hydraPresetSource: 'gallery',
   hasHydraUpdate: false,
   audioResponse: { ...AUDIO_RESPONSE_DEFAULTS },
   allowCamera: false,
@@ -105,6 +115,18 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
       if (typeof payload.hydraPresetIndex === 'number') {
         state.hydraPresetIndex = payload.hydraPresetIndex
         state.hydraPresetName = getPresetLabel(payload.hydraPresetIndex)
+      }
+      if (typeof payload.hydraPresetName === 'string' && payload.hydraPresetName.trim()) {
+        state.hydraPresetName = payload.hydraPresetName
+      }
+      if ('hydraPresetId' in payload) {
+        state.hydraPresetId = typeof payload.hydraPresetId === 'number' ? payload.hydraPresetId : null
+      }
+      if ('hydraPresetFolderId' in payload) {
+        state.hydraPresetFolderId = typeof payload.hydraPresetFolderId === 'number' ? payload.hydraPresetFolderId : null
+      }
+      if (payload.hydraPresetSource === 'gallery' || payload.hydraPresetSource === 'folder') {
+        state.hydraPresetSource = payload.hydraPresetSource
       }
       if (payload.injectionLevel) {
         state.injectionLevel = payload.injectionLevel

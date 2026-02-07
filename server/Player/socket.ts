@@ -102,6 +102,34 @@ async function canSendVisualizer (sock: RoomControlSocket): Promise<boolean> {
   return access.hasRoom && (access.canManage || access.accessPrefs.allowRoomCollaboratorsToSendVisualizer)
 }
 
+function canCollaboratorSendHydraCodeForRoomPolicy (
+  access: RoomControlAccess,
+  payload: Record<string, unknown> | undefined,
+): boolean {
+  if (access.canManage) return true
+
+  if (access.accessPrefs.restrictCollaboratorsToPartyPresetFolder !== true) {
+    return true
+  }
+
+  const allowedFolderId = access.accessPrefs.partyPresetFolderId
+  if (typeof allowedFolderId !== 'number' || allowedFolderId <= 0) {
+    return false
+  }
+
+  const payloadFolderId = payload?.hydraPresetFolderId
+  return typeof payloadFolderId === 'number'
+    && Number.isInteger(payloadFolderId)
+    && payloadFolderId === allowedFolderId
+}
+
+async function canSendHydraCode (sock: RoomControlSocket, payload: Record<string, unknown> | undefined): Promise<boolean> {
+  const access = await getRoomControlAccess(sock)
+  if (!access.hasRoom) return false
+  if (!access.canManage && !access.accessPrefs.allowRoomCollaboratorsToSendVisualizer) return false
+  return canCollaboratorSendHydraCodeForRoomPolicy(access, payload)
+}
+
 async function canRelayCamera (sock: RoomControlSocket): Promise<boolean> {
   const access = await getRoomControlAccess(sock)
   return access.hasRoom && (access.canManage || access.accessPrefs.allowGuestCameraRelay)
@@ -179,7 +207,8 @@ const ACTION_HANDLERS = {
     })
   },
   [VISUALIZER_HYDRA_CODE_REQ]: async (sock, { payload }) => {
-    if (!(await canSendVisualizer(sock))) return
+    const payloadObject = payload && typeof payload === 'object' ? payload as Record<string, unknown> : undefined
+    if (!(await canSendHydraCode(sock, payloadObject))) return
 
     sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
       type: VISUALIZER_HYDRA_CODE,

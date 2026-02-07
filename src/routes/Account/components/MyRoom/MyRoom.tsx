@@ -132,6 +132,7 @@ const MyRoom = () => {
   const roomPrefs = room.prefs ?? {}
   const accessPrefs = resolveRoomAccessPrefs(roomPrefs)
   const partyPresetFolderId = typeof roomPrefs.partyPresetFolderId === 'number' ? String(roomPrefs.partyPresetFolderId) : ''
+  const playerPresetFolderId = typeof roomPrefs.playerPresetFolderId === 'number' ? String(roomPrefs.playerPresetFolderId) : ''
   const restrictToPartyFolder = roomPrefs.restrictCollaboratorsToPartyPresetFolder === true
 
   return (
@@ -219,6 +220,21 @@ const MyRoom = () => {
           checked={restrictToPartyFolder}
           onChange={e => updatePrefs({ restrictCollaboratorsToPartyPresetFolder: e.target.checked })}
         />
+
+        <label htmlFor='playerPresetFolderId'>Player preset folder</label>
+        <select
+          id='playerPresetFolderId'
+          className={styles.policySelect}
+          value={playerPresetFolderId}
+          onChange={e => updatePrefs({ playerPresetFolderId: e.target.value === '' ? null : Number(e.target.value) })}
+        >
+          <option value=''>Use gallery</option>
+          {presetFolders.map(folder => (
+            <option key={folder.folderId} value={folder.folderId}>
+              {folder.name}
+            </option>
+          ))}
+        </select>
 
         <label htmlFor='partyPresetFolderId'>Party preset folder</label>
         <select

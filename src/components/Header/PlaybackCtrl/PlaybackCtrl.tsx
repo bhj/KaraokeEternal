@@ -5,13 +5,20 @@ import clsx from 'clsx'
 import screenfull from 'screenfull'
 import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolume } from 'store/modules/status'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
-import { getPresetByIndex, getNextPreset, getPrevPreset, getRandomPreset } from 'routes/Orchestrator/components/hydraPresets'
 import Button from 'components/Button/Button'
 import VolumeSlider from './VolumeSlider/VolumeSlider'
 import NoPlayer from './NoPlayer/NoPlayer'
 import DisplayCtrl from './DisplayCtrl/DisplayCtrl'
 import styles from './PlaybackCtrl.css'
 import { PlaybackOptions, AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
+import { useRuntimeHydraPresets } from 'routes/Player/components/useRuntimeHydraPresets'
+import {
+  getNextPresetIndex,
+  getPrevPresetIndex,
+  getRandomPresetIndex,
+  normalizePresetIndex,
+  toVisualizerPresetLabel,
+} from 'routes/Player/components/runtimePresets'
 
 const handleFullscreen = () => {
   if (screenfull.isEnabled) {
@@ -28,6 +35,7 @@ const PlaybackCtrl = () => {
   const isGuest = useAppSelector(state => state.user.isGuest)
   const isInRoom = useAppSelector(state => state.user.roomId !== null)
   const status = useAppSelector(state => state.status)
+  const runtimePresetPool = useRuntimeHydraPresets()
 
   const dispatch = useAppDispatch()
   const handleOptions = useCallback((opts: PlaybackOptions) => dispatch(requestOptions(opts)), [dispatch])
@@ -41,20 +49,34 @@ const PlaybackCtrl = () => {
   }, [isDisplayCtrlVisible])
 
   const handleHydraPresetChange = useCallback((direction: 'next' | 'prev' | 'random') => {
-    const currentIdx = status.visualizer.hydraPresetIndex ?? 0
+    const presets = runtimePresetPool.presets
+    if (presets.length === 0) return
+
+    const currentIdx = normalizePresetIndex(status.visualizer.hydraPresetIndex, presets.length)
     let newIdx: number
     if (direction === 'next') {
-      newIdx = getNextPreset(currentIdx)
+      newIdx = getNextPresetIndex(currentIdx, presets.length)
     } else if (direction === 'prev') {
-      newIdx = getPrevPreset(currentIdx)
+      newIdx = getPrevPresetIndex(currentIdx, presets.length)
     } else {
-      newIdx = getRandomPreset(currentIdx)
+      newIdx = getRandomPresetIndex(currentIdx, presets.length)
     }
+
+    const preset = presets[newIdx]
+    if (!preset) return
+
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code: getPresetByIndex(newIdx), hydraPresetIndex: newIdx },
+      payload: {
+        code: preset.code,
+        hydraPresetIndex: newIdx,
+        hydraPresetName: toVisualizerPresetLabel(preset, runtimePresetPool.folderName),
+        hydraPresetId: preset.presetId,
+        hydraPresetFolderId: preset.folderId,
+        hydraPresetSource: preset.source,
+      },
     })
-  }, [dispatch, status.visualizer.hydraPresetIndex])
+  }, [dispatch, runtimePresetPool, status.visualizer.hydraPresetIndex])
 
   if (!status.isPlayerPresent) {
     // Show launch button for non-guest users in a room (admins and standard users)

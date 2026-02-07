@@ -9,6 +9,7 @@ interface PresetTreeProps {
   expanded: Set<string>
   selectedPresetId?: number | null
   startingPresetId?: number | null
+  playerPresetFolderId?: number | null
   onToggleFolder: (id: string) => void
   onLoad: (preset: PresetLeaf) => void
   onSend: (preset: PresetLeaf) => void
@@ -20,11 +21,13 @@ interface PresetTreeProps {
   onMovePreset?: (preset: PresetLeaf, direction: MoveDirection) => void
   onMoveFolder?: (node: PresetTreeNode, direction: MoveDirection) => void
   onSetStartingPreset?: (preset: PresetLeaf) => void
+  onSetPlayerPresetFolder?: (folder: PresetTreeNode) => void
   canDeletePreset?: (preset: PresetLeaf) => boolean
   canDeleteFolder?: (node: PresetTreeNode) => boolean
   canManagePreset?: (preset: PresetLeaf) => boolean
   canManageFolder?: (node: PresetTreeNode) => boolean
   canSetStartingPreset?: (preset: PresetLeaf) => boolean
+  canSetPlayerPresetFolder?: (folder: PresetTreeNode) => boolean
 }
 
 function PresetTree ({
@@ -32,6 +35,7 @@ function PresetTree ({
   expanded,
   selectedPresetId,
   startingPresetId,
+  playerPresetFolderId,
   onToggleFolder,
   onLoad,
   onSend,
@@ -43,11 +47,13 @@ function PresetTree ({
   onMovePreset,
   onMoveFolder,
   onSetStartingPreset,
+  onSetPlayerPresetFolder,
   canDeletePreset,
   canDeleteFolder,
   canManagePreset,
   canManageFolder,
   canSetStartingPreset,
+  canSetPlayerPresetFolder,
 }: PresetTreeProps) {
   const focusByOffset = useCallback((target: HTMLElement, offset: number) => {
     const treeRoot = target.closest('[data-tree-root="true"]') as HTMLElement | null
@@ -124,6 +130,7 @@ function PresetTree ({
         const isLastFolder = folderIndex === nodes.length - 1
         const isFirstMovableFolder = folderIndex === 0 || (folderIndex === 1 && nodes[0]?.isGallery === true)
         const folderManageAllowed = !node.isGallery && (canManageFolder?.(node) ?? true)
+        const isPlayerPresetFolder = typeof node.folderId === 'number' && node.folderId === playerPresetFolderId
 
         return (
           <div key={node.id} className={styles.folder}>
@@ -146,6 +153,20 @@ function PresetTree ({
 
               {!node.isGallery && (
                 <div className={styles.folderActions}>
+                  {onSetPlayerPresetFolder && !node.isGallery && (canSetPlayerPresetFolder?.(node) ?? true) && (
+                    <button
+                      type='button'
+                      className={clsx(styles.folderActionButton, isPlayerPresetFolder && styles.actionActive)}
+                      aria-label={isPlayerPresetFolder ? 'Clear player preset folder' : 'Set as player preset folder'}
+                      title={isPlayerPresetFolder ? 'Clear player preset folder' : 'Set as player preset folder'}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onSetPlayerPresetFolder(node)
+                      }}
+                    >
+                      <span aria-hidden>{isPlayerPresetFolder ? '★' : '☆'}</span>
+                    </button>
+                  )}
                   {onMoveFolder && folderManageAllowed && (
                     <>
                       <button

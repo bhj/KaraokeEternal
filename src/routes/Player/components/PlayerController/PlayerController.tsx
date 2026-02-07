@@ -2,8 +2,13 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { useCameraReceiver } from 'lib/webrtc/useCameraReceiver'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
-import { getNextPreset, getPresetByIndex } from 'routes/Orchestrator/components/hydraPresets'
 import { fetchPresetById } from 'routes/Orchestrator/api/hydraPresetsApi'
+import { useRuntimeHydraPresets } from '../useRuntimeHydraPresets'
+import {
+  getNextPresetIndex,
+  normalizePresetIndex,
+  toVisualizerPresetLabel,
+} from '../runtimePresets'
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
@@ -26,6 +31,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   const roomPrefs = useAppSelector(getRoomPrefs)
   const roomId = useAppSelector(state => state.user.roomId)
   const room = useAppSelector(state => roomId ? state.rooms.entities[roomId] : null)
+  const runtimePresetPool = useRuntimeHydraPresets()
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
@@ -43,29 +49,49 @@ const PlayerController = (props: PlayerControllerProps) => {
   }, [dispatch, handleStatus])
 
   const emitHydraPresetByIndex = useCallback((index: number) => {
+    const presets = runtimePresetPool.presets
+    if (presets.length === 0) return
+
+    const normalizedIndex = normalizePresetIndex(index, presets.length)
+    const preset = presets[normalizedIndex]
+    if (!preset) return
+
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
       payload: {
-        code: getPresetByIndex(index),
-        hydraPresetIndex: index,
+        code: preset.code,
+        hydraPresetIndex: normalizedIndex,
+        hydraPresetName: toVisualizerPresetLabel(preset, runtimePresetPool.folderName),
+        hydraPresetId: preset.presetId,
+        hydraPresetFolderId: preset.folderId,
+        hydraPresetSource: preset.source,
       },
     })
-  }, [dispatch])
+  }, [dispatch, runtimePresetPool])
 
   const emitStartingPresetById = useCallback(async (presetId: number) => {
     try {
       const preset = await fetchPresetById(presetId)
       if (!preset?.code || !preset.code.trim()) return
+
+      const folderName = runtimePresetPool.folderId === preset.folderId
+        ? runtimePresetPool.folderName
+        : null
+
       dispatch({
         type: VISUALIZER_HYDRA_CODE_REQ,
         payload: {
           code: preset.code,
+          hydraPresetName: folderName ? `${folderName} / ${preset.name}` : preset.name,
+          hydraPresetId: preset.presetId,
+          hydraPresetFolderId: preset.folderId,
+          hydraPresetSource: 'folder',
         },
       })
     } catch {
       // Preset may have been removed after room prefs were saved.
     }
-  }, [dispatch])
+  }, [dispatch, runtimePresetPool.folderId, runtimePresetPool.folderName])
 
   const handleReplay = useCallback((queueId: number) => {
     const nextItem = queue.entities[queueId]
@@ -133,7 +159,10 @@ const PlayerController = (props: PlayerControllerProps) => {
       const transitionKey = `${queueItem?.queueId}->${nextQueueItem.queueId}`
       if (lastTransitionKeyRef.current !== transitionKey) {
         lastTransitionKeyRef.current = transitionKey
-        const nextPresetIndex = getNextPreset(playerVisualizer.hydraPresetIndex)
+        const nextPresetIndex = getNextPresetIndex(
+          normalizePresetIndex(playerVisualizer.hydraPresetIndex, runtimePresetPool.presets.length),
+          runtimePresetPool.presets.length,
+        )
         emitHydraPresetByIndex(nextPresetIndex)
       }
     }
@@ -160,6 +189,7 @@ const PlayerController = (props: PlayerControllerProps) => {
     playerVisualizer,
     queueItem,
     roomPrefs,
+    runtimePresetPool.presets.length,
   ])
 
   // Reset one-shot guards when a fresh session starts.

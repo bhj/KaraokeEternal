@@ -263,6 +263,7 @@ describe('Rooms Router - Room Joining', () => {
           body: {
             prefs: {
               partyPresetFolderId: folder?.folderId,
+              playerPresetFolderId: folder?.folderId,
               restrictCollaboratorsToPartyPresetFolder: true,
               allowGuestOrchestrator: true,
             },
@@ -288,6 +289,7 @@ describe('Rooms Router - Room Joining', () => {
       const roomData = JSON.parse(row?.data ?? '{}')
 
       expect(roomData?.prefs?.partyPresetFolderId).toBe(folder?.folderId)
+      expect(roomData?.prefs?.playerPresetFolderId).toBe(folder?.folderId)
       expect(roomData?.prefs?.restrictCollaboratorsToPartyPresetFolder).toBe(true)
       expect(roomData?.prefs?.allowGuestOrchestrator).toBe(true)
     })
@@ -315,6 +317,43 @@ describe('Rooms Router - Room Joining', () => {
 
       const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
       await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 401 })
+    })
+
+    it('should reject unknown player preset folder IDs', async () => {
+      const now = Math.floor(Date.now() / 1000)
+      await db.db?.run(
+        'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
+        ['Owner Room', 'open', testUser.userId, now, now, JSON.stringify({ prefs: {} })],
+      )
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const prefsLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/my/prefs' && l.methods.includes('PUT'))
+
+      expect(prefsLayer).toBeDefined()
+
+      const ctx = {
+        user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
+        request: {
+          body: {
+            prefs: {
+              playerPresetFolderId: 999999,
+            },
+          },
+        },
+        io: { in: () => ({ fetchSockets: async () => [] }) },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 422 })
     })
 
     it('should reject unknown folder IDs', async () => {

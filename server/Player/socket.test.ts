@@ -100,6 +100,63 @@ describe('Player socket permissions', () => {
     })
   })
 
+  it('blocks collaborator hydra send when room is restricted to a different party folder', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [55],
+      entities: {
+        55: {
+          ownerId: 999,
+          prefs: {
+            allowRoomCollaboratorsToSendVisualizer: true,
+            restrictCollaboratorsToPartyPresetFolder: true,
+            partyPresetFolderId: 1,
+          },
+        },
+      },
+    })
+
+    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+
+    await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()', hydraPresetFolderId: 2 } })
+
+    expect(emit).not.toHaveBeenCalled()
+  })
+
+  it('allows collaborator hydra send when room is restricted and payload folder matches', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [55],
+      entities: {
+        55: {
+          ownerId: 999,
+          prefs: {
+            allowRoomCollaboratorsToSendVisualizer: true,
+            restrictCollaboratorsToPartyPresetFolder: true,
+            partyPresetFolderId: 2,
+          },
+        },
+      },
+    })
+
+    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+
+    await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, {
+      payload: {
+        code: 'osc(10).out()',
+        hydraPresetFolderId: 2,
+        hydraPresetName: 'Working Standards / ws_a',
+      },
+    })
+
+    expect(emit).toHaveBeenCalledWith('action', {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: {
+        code: 'osc(10).out()',
+        hydraPresetFolderId: 2,
+        hydraPresetName: 'Working Standards / ws_a',
+      },
+    })
+  })
+
   it('allows player next command for room owner', async () => {
     vi.mocked(Rooms.get).mockResolvedValue({
       result: [11],

@@ -25,6 +25,7 @@ const sanitizeRoomPrefsForClient = (roomPrefs: Record<string, unknown> = {}) => 
   return {
     ...accessPrefs,
     partyPresetFolderId: typeof roomPrefs.partyPresetFolderId === 'number' ? roomPrefs.partyPresetFolderId : null,
+    playerPresetFolderId: typeof roomPrefs.playerPresetFolderId === 'number' ? roomPrefs.playerPresetFolderId : null,
     restrictCollaboratorsToPartyPresetFolder: roomPrefs.restrictCollaboratorsToPartyPresetFolder === true,
     startingPresetId: typeof roomPrefs.startingPresetId === 'number' ? roomPrefs.startingPresetId : null,
   }
@@ -153,6 +154,22 @@ router.put('/my/prefs', async (ctx) => {
 
   if ('restrictCollaboratorsToPartyPresetFolder' in requestedPrefsObj) {
     nextPrefs.restrictCollaboratorsToPartyPresetFolder = requestedPrefsObj.restrictCollaboratorsToPartyPresetFolder === true
+  }
+
+  if ('playerPresetFolderId' in requestedPrefsObj) {
+    const rawFolderId = requestedPrefsObj.playerPresetFolderId
+
+    if (rawFolderId === null || rawFolderId === '') {
+      nextPrefs.playerPresetFolderId = null
+    } else if (typeof rawFolderId === 'number' && Number.isInteger(rawFolderId) && rawFolderId > 0) {
+      const folder = await HydraFolders.getById(rawFolderId)
+      if (!folder) {
+        ctx.throw(422, 'Player preset folder not found')
+      }
+      nextPrefs.playerPresetFolderId = rawFolderId
+    } else {
+      ctx.throw(422, 'Invalid player preset folder')
+    }
   }
 
   if ('partyPresetFolderId' in requestedPrefsObj) {

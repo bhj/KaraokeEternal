@@ -293,6 +293,7 @@ class Rooms {
         allowGuestCameraRelay: true,
         allowRoomCollaboratorsToSendVisualizer: true,
         partyPresetFolderId: defaultPartyPresetFolderId,
+        playerPresetFolderId: defaultPartyPresetFolderId,
         restrictCollaboratorsToPartyPresetFolder: defaultRestrictCollaboratorsToPartyPresetFolder,
       },
     }

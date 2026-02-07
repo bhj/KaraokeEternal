@@ -238,6 +238,17 @@ describe('playerVisualizer actual implementation', () => {
     expect(state.hydraPresetName).toBe(getPresetLabel(5))
   })
 
+  it('should set hydraPresetName from VISUALIZER_HYDRA_CODE payload metadata', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'src(s0).out()', hydraPresetName: 'Working Standards / ws_a', hydraPresetId: 10 },
+    })
+    expect(newState.hydraPresetName).toBe('Working Standards / ws_a')
+    expect(newState.hydraPresetId).toBe(10)
+  })
+
   it('should preserve hydraPresetIndex when code-only payload received', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     let state = reducer(undefined, { type: '@@INIT' })

@@ -25,7 +25,7 @@ import styles from './PresetBrowser.css'
 interface PresetBrowserProps {
   currentCode: string
   onLoad: (code: string) => void
-  onSend: (code: string) => void
+  onSend: (preset: PresetLeaf) => void
 }
 
 type PendingDelete = { type: 'preset', preset: PresetLeaf } | { type: 'folder', folder: PresetTreeNode } | null
@@ -52,6 +52,9 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
   const startingPresetId = typeof currentRoomPrefs?.startingPresetId === 'number'
     ? currentRoomPrefs.startingPresetId
     : null
+  const playerPresetFolderId = typeof currentRoomPrefs?.playerPresetFolderId === 'number'
+    ? currentRoomPrefs.playerPresetFolderId
+    : null
 
   const [folders, setFolders] = useState<PresetFolder[]>([])
   const [presets, setPresets] = useState<PresetItem[]>([])
@@ -77,7 +80,7 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
   const [renameValue, setRenameValue] = useState('')
   const [renaming, setRenaming] = useState(false)
 
-  const [updatingStartPreset, setUpdatingStartPreset] = useState(false)
+  const [updatingRoomPresetPolicy, setUpdatingRoomPresetPolicy] = useState(false)
 
   const refresh = useCallback(async () => {
     try {
@@ -145,7 +148,7 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
 
   const handleSend = useCallback((preset: PresetLeaf) => {
     setSelectedPresetId(preset.presetId ?? null)
-    onSend(preset.code)
+    onSend(preset)
   }, [onSend])
 
   const canDeletePreset = useCallback((preset: PresetLeaf) => {
@@ -166,6 +169,11 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
   const canSetStartingPreset = useCallback((preset: PresetLeaf) => {
     if (!canManageRoomPolicy) return false
     return preset.isGallery === false && typeof preset.presetId === 'number'
+  }, [canManageRoomPolicy])
+
+  const canSetPlayerPresetFolder = useCallback((folder: PresetTreeNode) => {
+    if (!canManageRoomPolicy) return false
+    return folder.isGallery === false && typeof folder.folderId === 'number'
   }, [canManageRoomPolicy])
 
   const requestDeletePreset = useCallback((preset: PresetLeaf) => {
@@ -357,16 +365,33 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     const nextStartingPresetId = startingPresetId === preset.presetId ? null : preset.presetId
 
     try {
-      setUpdatingStartPreset(true)
+      setUpdatingRoomPresetPolicy(true)
       setError(null)
       await updateMyRoomPrefs({ startingPresetId: nextStartingPresetId })
       await dispatch(fetchCurrentRoom())
     } catch (err) {
       setError(toErrorMessage(err, 'Failed to update starting visual'))
     } finally {
-      setUpdatingStartPreset(false)
+      setUpdatingRoomPresetPolicy(false)
     }
   }, [canManageRoomPolicy, startingPresetId, dispatch])
+
+  const handleSetPlayerPresetFolder = useCallback(async (folder: PresetTreeNode) => {
+    if (!canManageRoomPolicy || folder.isGallery || !folder.folderId) return
+
+    const nextPlayerPresetFolderId = playerPresetFolderId === folder.folderId ? null : folder.folderId
+
+    try {
+      setUpdatingRoomPresetPolicy(true)
+      setError(null)
+      await updateMyRoomPrefs({ playerPresetFolderId: nextPlayerPresetFolderId })
+      await dispatch(fetchCurrentRoom())
+    } catch (err) {
+      setError(toErrorMessage(err, 'Failed to update player preset folder'))
+    } finally {
+      setUpdatingRoomPresetPolicy(false)
+    }
+  }, [canManageRoomPolicy, playerPresetFolderId, dispatch])
 
   let savePresetBody: React.ReactNode
   if (folders.length === 0) {
@@ -431,7 +456,7 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
         <button type='button' className={styles.toolbarButtonPrimary} onClick={() => openSavePreset()}>
           Save Preset
         </button>
-        {updatingStartPreset && <span className={styles.toolbarHint}>Updating start...</span>}
+        {updatingRoomPresetPolicy && <span className={styles.toolbarHint}>Updating room presets...</span>}
       </div>
 
       <div className={styles.searchWrap}>
@@ -481,6 +506,7 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
           expanded={expanded}
           selectedPresetId={selectedPresetId}
           startingPresetId={startingPresetId}
+          playerPresetFolderId={playerPresetFolderId}
           onToggleFolder={toggleFolder}
           onLoad={handleLoad}
           onSend={handleSend}
@@ -492,11 +518,13 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
           onMovePreset={handleMovePreset}
           onMoveFolder={handleMoveFolder}
           onSetStartingPreset={handleSetStartingPreset}
+          onSetPlayerPresetFolder={handleSetPlayerPresetFolder}
           canDeletePreset={canDeletePreset}
           canDeleteFolder={canDeleteFolder}
           canManagePreset={canManagePreset}
           canManageFolder={canManageFolder}
           canSetStartingPreset={canSetStartingPreset}
+          canSetPlayerPresetFolder={canSetPlayerPresetFolder}
         />
       )}
 

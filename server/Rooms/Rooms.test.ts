@@ -79,6 +79,7 @@ describe('Rooms.createEphemeral', () => {
     expect(room.prefs.allowGuestCameraRelay).toBe(true)
     expect(room.prefs.allowRoomCollaboratorsToSendVisualizer).toBe(true)
     expect(room.prefs.partyPresetFolderId).toBe(null)
+    expect(room.prefs.playerPresetFolderId).toBe(null)
     expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(false)
   })
 
@@ -133,6 +134,7 @@ describe('Rooms.createEphemeral', () => {
       const room = result.entities[roomId]
 
       expect(room.prefs.partyPresetFolderId).toBe(123)
+      expect(room.prefs.playerPresetFolderId).toBe(123)
       expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(true)
     } finally {
       if (prevFolderId === undefined) delete process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
@@ -166,6 +168,7 @@ describe('Rooms.createEphemeral', () => {
       const room = result.entities[roomId]
 
       expect(room.prefs.partyPresetFolderId).toBe(folder?.folderId)
+      expect(room.prefs.playerPresetFolderId).toBe(folder?.folderId)
       expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(true)
     } finally {
       if (prevFolderId === undefined) delete process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
@@ -191,6 +194,7 @@ describe('Rooms.createEphemeral', () => {
       const room = result.entities[roomId]
 
       expect(room.prefs.partyPresetFolderId).toBe(null)
+      expect(room.prefs.playerPresetFolderId).toBe(null)
       expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(false)
     } finally {
       if (prevFolderId === undefined) delete process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID

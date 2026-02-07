@@ -93,10 +93,19 @@ const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
     })
   }, [onChange, prefs])
 
+  const handlePlayerFolderChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const raw = e.target.value
+    onChange({
+      ...prefs,
+      playerPresetFolderId: raw === '' ? null : Number(raw),
+    })
+  }, [onChange, prefs])
+
   const allowNewGuest = prefs.roles?.[getRoleId('guest')]?.allowNew ?? false
   const allowNewStandard = prefs.roles?.[getRoleId('standard')]?.allowNew ?? false
   const accessPrefs = resolveRoomAccessPrefs(prefs)
   const partyPresetFolderId = typeof prefs.partyPresetFolderId === 'number' ? prefs.partyPresetFolderId : ''
+  const playerPresetFolderId = typeof prefs.playerPresetFolderId === 'number' ? prefs.playerPresetFolderId : ''
   const restrictToPartyFolder = prefs.restrictCollaboratorsToPartyPresetFolder === true
 
   return (
@@ -158,6 +167,25 @@ const UserPrefs = ({ onChange, prefs = {} }: UserPrefsProps) => {
           />
           <div className={styles.helperText}>
             When enabled, guests and non-owner collaborators can only load presets from the selected folder.
+          </div>
+        </div>
+        <div className={styles.field}>
+          <label htmlFor='playerPresetFolderId'>Player preset folder</label>
+          <select
+            id='playerPresetFolderId'
+            className={styles.select}
+            value={playerPresetFolderId}
+            onChange={handlePlayerFolderChange}
+          >
+            <option value=''>Use gallery</option>
+            {presetFolders.map(folder => (
+              <option key={folder.folderId} value={folder.folderId}>
+                {folder.name}
+              </option>
+            ))}
+          </select>
+          <div className={styles.helperText}>
+            Player next/prev/random and song-transition cycling use this folder when set.
           </div>
         </div>
         <div className={styles.field}>

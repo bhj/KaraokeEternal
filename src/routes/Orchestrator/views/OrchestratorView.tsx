@@ -5,6 +5,7 @@ import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
+import type { PresetLeaf } from '../components/presetTree'
 import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, resolvePreviewHydraState, shouldAutoApplyPreset } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
 import PresetBrowser from '../components/PresetBrowser'
@@ -15,6 +16,14 @@ import { useCameraSender } from 'lib/webrtc/useCameraSender'
 import { fetchCurrentRoom } from 'store/modules/rooms'
 import { getPreviewSize } from './orchestratorLayout'
 import styles from './OrchestratorView.css'
+
+type SendHydraPayload = {
+  code: string
+  hydraPresetName?: string
+  hydraPresetId?: number | null
+  hydraPresetFolderId?: number | null
+  hydraPresetSource?: 'gallery' | 'folder'
+}
 
 function OrchestratorView () {
   const dispatch = useAppDispatch()
@@ -58,12 +67,13 @@ function OrchestratorView () {
   const lastSentRef = useRef<string | null>(null)
   const remoteSyncRafRef = useRef<number | null>(null)
 
-  const handleSendCode = useCallback((code: string) => {
-    lastSentRef.current = normalizeCodeForAck(code)
+  const handleSendCode = useCallback((input: string | SendHydraPayload) => {
+    const payload = typeof input === 'string' ? { code: input } : input
+    lastSentRef.current = normalizeCodeForAck(payload.code)
     setSendStatus('sending')
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code },
+      payload,
     })
   }, [dispatch])
 
@@ -115,12 +125,22 @@ function OrchestratorView () {
     }
   }, [cancelPendingRemoteSync, ui.innerWidth])
 
-  const handleSendPreset = useCallback((code: string) => {
+  const handleSendPreset = useCallback((input: PresetLeaf | string) => {
+    const payload: SendHydraPayload = typeof input === 'string'
+      ? { code: input }
+      : {
+          code: input.code,
+          hydraPresetName: input.name,
+          hydraPresetId: input.presetId ?? null,
+          hydraPresetFolderId: input.folderId ?? null,
+          hydraPresetSource: input.isGallery ? 'gallery' : 'folder',
+        }
+
     cancelPendingRemoteSync()
-    setLocalCode(code)
-    setDebouncedCode(code)
+    setLocalCode(payload.code)
+    setDebouncedCode(payload.code)
     setUserHasEdited(true)
-    handleSendCode(code)
+    handleSendCode(payload)
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
