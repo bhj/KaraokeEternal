@@ -42,6 +42,8 @@ describe('Rooms Router - Room Joining', () => {
 
   beforeEach(async () => {
     // Clean up between tests
+    await db.db?.run('DELETE FROM hydraPresets')
+    await db.db?.run('DELETE FROM hydraFolders')
     await db.db?.run('DELETE FROM rooms')
     await db.db?.run('DELETE FROM queue')
     await db.db?.run('DELETE FROM users')
@@ -230,6 +232,127 @@ describe('Rooms Router - Room Joining', () => {
       } else {
         delete process.env.KES_AUTHENTIK_PUBLIC_URL
       }
+    })
+  })
+
+  describe('PUT /api/rooms/my/prefs', () => {
+    it('should allow room owner to update party preset folder prefs', async () => {
+      const now = Math.floor(Date.now() / 1000)
+      await db.db?.run(
+        'INSERT INTO hydraFolders (name, authorUserId, authorName, sortOrder, dateCreated) VALUES (?, ?, ?, ?, ?)',
+        ['Working Standards', testUser.userId, 'testuser', 0, now],
+      )
+      const folder = await db.db?.get('SELECT folderId FROM hydraFolders WHERE name = ?', ['Working Standards'])
+
+      await db.db?.run(
+        'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
+        ['Owner Room', 'open', testUser.userId, now, now, JSON.stringify({ prefs: {} })],
+      )
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const prefsLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/my/prefs' && l.methods.includes('PUT'))
+
+      expect(prefsLayer).toBeDefined()
+
+      const ctx = {
+        user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
+        request: {
+          body: {
+            prefs: {
+              partyPresetFolderId: folder?.folderId,
+              restrictCollaboratorsToPartyPresetFolder: true,
+              allowGuestOrchestrator: true,
+            },
+          },
+        },
+        io: {
+          in: () => ({
+            fetchSockets: async () => [],
+          }),
+        },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
+      await handler(ctx, async () => {})
+
+      const row = await db.db?.get('SELECT data FROM rooms WHERE ownerId = ?', [testUser.userId])
+      const roomData = JSON.parse(row?.data ?? '{}')
+
+      expect(roomData?.prefs?.partyPresetFolderId).toBe(folder?.folderId)
+      expect(roomData?.prefs?.restrictCollaboratorsToPartyPresetFolder).toBe(true)
+      expect(roomData?.prefs?.allowGuestOrchestrator).toBe(true)
+    })
+
+    it('should reject guests', async () => {
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const prefsLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/my/prefs' && l.methods.includes('PUT'))
+
+      expect(prefsLayer).toBeDefined()
+
+      const ctx = {
+        user: { userId: guestUser.userId, isGuest: true, isAdmin: false, name: 'guestuser' },
+        request: { body: { prefs: {} } },
+        io: { in: () => ({ fetchSockets: async () => [] }) },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 401 })
+    })
+
+    it('should reject unknown folder IDs', async () => {
+      const now = Math.floor(Date.now() / 1000)
+      await db.db?.run(
+        'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
+        ['Owner Room', 'open', testUser.userId, now, now, JSON.stringify({ prefs: {} })],
+      )
+
+      const routerModule = await import('./router.js')
+      const router = routerModule.default
+
+      const prefsLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+        .find(l => l.path === '/api/rooms/my/prefs' && l.methods.includes('PUT'))
+
+      expect(prefsLayer).toBeDefined()
+
+      const ctx = {
+        user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
+        request: {
+          body: {
+            prefs: {
+              partyPresetFolderId: 999999,
+              restrictCollaboratorsToPartyPresetFolder: true,
+            },
+          },
+        },
+        io: { in: () => ({ fetchSockets: async () => [] }) },
+        body: undefined as unknown,
+        throw: (status: number, message?: string) => {
+          const err = new Error(message) as Error & { status: number }
+          err.status = status
+          throw err
+        },
+      }
+
+      const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 422 })
     })
   })
 

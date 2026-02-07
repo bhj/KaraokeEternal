@@ -3,6 +3,7 @@ import { uniqueNamesGenerator, colors, animals } from 'unique-names-generator'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
 import { ValidationError } from '../lib/Errors.js'
+import HydraFolders from '../HydraPresets/HydraFolders.js'
 
 interface RequestWithBody {
   body: Record<string, unknown>
@@ -17,6 +18,34 @@ const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.en
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
 import { resolveRoomAccessPrefs } from '../../shared/roomAccess.js'
 
+const sanitizeRoomPrefsForClient = (roomPrefs: Record<string, unknown> = {}) => {
+  const accessPrefs = resolveRoomAccessPrefs(roomPrefs)
+
+  return {
+    ...accessPrefs,
+    partyPresetFolderId: typeof roomPrefs.partyPresetFolderId === 'number' ? roomPrefs.partyPresetFolderId : null,
+    restrictCollaboratorsToPartyPresetFolder: roomPrefs.restrictCollaboratorsToPartyPresetFolder === true,
+  }
+}
+
+const buildEnrollmentUrl = (invitationToken?: string | null): string | null => {
+  const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
+  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
+
+  if (!authentikUrl || !invitationToken) {
+    return null
+  }
+
+  const authUrl = new URL(authentikUrl)
+  authUrl.pathname = '/if/flow/' + enrollmentFlow + '/'
+  authUrl.searchParams.set('itoken', invitationToken)
+
+  // Use relative URL - Authentik rejects absolute URLs in ?next (open redirect protection)
+  // Guest returns to / which goes through forward_auth to establish SSO session
+  authUrl.searchParams.set('next', '/')
+
+  return authUrl.toString()
+}
 // NOTE: Enrollment endpoint removed - guests now use app-managed sessions via /api/guest/join
 // Standard users use SSO login via Authentik, not enrollment
 
@@ -61,25 +90,11 @@ router.get('/my', async (ctx) => {
     return
   }
 
-  // Get room data (includes invitationToken)
+  // Get room data (includes invitationToken + prefs)
   const roomData = await Rooms.getRoomData(room.roomId)
-
-  // Build enrollment URL if Authentik is configured
-  let enrollmentUrl = null
-  const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
-  const enrollmentFlow = process.env.KES_AUTHENTIK_ENROLLMENT_FLOW || 'karaoke-guest-enrollment'
-
-  if (authentikUrl && roomData?.invitationToken) {
-    const authUrl = new URL(authentikUrl)
-    authUrl.pathname = `/if/flow/${enrollmentFlow}/`
-    authUrl.searchParams.set('itoken', roomData.invitationToken)
-
-    // Use relative URL - Authentik rejects absolute URLs in ?next (open redirect protection)
-    // Guest returns to / which goes through forward_auth to establish SSO session
-    authUrl.searchParams.set('next', '/')
-
-    enrollmentUrl = authUrl.toString()
-  }
+  const roomPrefs = roomData?.prefs && typeof roomData.prefs === 'object'
+    ? roomData.prefs as Record<string, unknown>
+    : {}
 
   ctx.body = {
     room: {
@@ -87,7 +102,112 @@ router.get('/my', async (ctx) => {
       name: room.name,
       status: room.status,
       invitationToken: roomData?.invitationToken ?? null,
-      enrollmentUrl,
+      enrollmentUrl: buildEnrollmentUrl(roomData?.invitationToken ?? null),
+      prefs: sanitizeRoomPrefsForClient(roomPrefs),
+    },
+  }
+})
+
+// PUT /api/rooms/my/prefs - Update own room access/preset policy (owner only)
+router.put('/my/prefs', async (ctx) => {
+  if (!ctx.user.userId || ctx.user.isGuest) {
+    ctx.throw(401)
+  }
+
+  const room = await Rooms.getByOwnerId(ctx.user.userId)
+  if (!room) {
+    ctx.throw(404, 'Room not found')
+  }
+
+  const body = (ctx.request as unknown as RequestWithBody).body ?? {}
+  const requestedPrefs = body.prefs
+
+  if (!requestedPrefs || typeof requestedPrefs !== 'object' || Array.isArray(requestedPrefs)) {
+    ctx.throw(422, 'Invalid room prefs payload')
+  }
+
+  const requestedPrefsObj = requestedPrefs as Record<string, unknown>
+
+  const roomData = await Rooms.getRoomData(room.roomId)
+  const currentPrefs = roomData?.prefs && typeof roomData.prefs === 'object'
+    ? roomData.prefs as Record<string, unknown>
+    : {}
+
+  const nextPrefs: Record<string, unknown> = {
+    ...currentPrefs,
+  }
+
+  if ('allowGuestOrchestrator' in requestedPrefsObj) {
+    nextPrefs.allowGuestOrchestrator = requestedPrefsObj.allowGuestOrchestrator === true
+  }
+
+  if ('allowGuestCameraRelay' in requestedPrefsObj) {
+    nextPrefs.allowGuestCameraRelay = requestedPrefsObj.allowGuestCameraRelay === true
+  }
+
+  if ('allowRoomCollaboratorsToSendVisualizer' in requestedPrefsObj) {
+    nextPrefs.allowRoomCollaboratorsToSendVisualizer = requestedPrefsObj.allowRoomCollaboratorsToSendVisualizer === true
+  }
+
+  if ('restrictCollaboratorsToPartyPresetFolder' in requestedPrefsObj) {
+    nextPrefs.restrictCollaboratorsToPartyPresetFolder = requestedPrefsObj.restrictCollaboratorsToPartyPresetFolder === true
+  }
+
+  if ('partyPresetFolderId' in requestedPrefsObj) {
+    const rawFolderId = requestedPrefsObj.partyPresetFolderId
+
+    if (rawFolderId === null || rawFolderId === '') {
+      nextPrefs.partyPresetFolderId = null
+    } else if (typeof rawFolderId === 'number' && Number.isInteger(rawFolderId) && rawFolderId > 0) {
+      const folder = await HydraFolders.getById(rawFolderId)
+      if (!folder) {
+        ctx.throw(422, 'Party preset folder not found')
+      }
+      nextPrefs.partyPresetFolderId = rawFolderId
+    } else {
+      ctx.throw(422, 'Invalid party preset folder')
+    }
+  }
+
+  if (nextPrefs.restrictCollaboratorsToPartyPresetFolder === true && typeof nextPrefs.partyPresetFolderId !== 'number') {
+    ctx.throw(422, 'Party preset folder is required when restriction is enabled')
+  }
+
+  if (nextPrefs.restrictCollaboratorsToPartyPresetFolder !== true) {
+    nextPrefs.restrictCollaboratorsToPartyPresetFolder = false
+  }
+
+  await Rooms.set(room.roomId, {
+    name: room.name,
+    status: room.status,
+    prefs: nextPrefs,
+  })
+
+  const sockets = await ctx.io.in(Rooms.prefix(room.roomId)).fetchSockets()
+  for (const s of sockets) {
+    if (s?.user.isAdmin) {
+      ctx.io.to(s.id).emit('action', {
+        type: ROOM_PREFS_PUSH,
+        payload: {
+          roomId: room.roomId,
+          prefs: nextPrefs,
+        },
+      })
+    }
+  }
+
+  log.verbose('%s updated own room prefs (roomId: %s)', ctx.user.name, room.roomId)
+
+  const updatedRoomData = await Rooms.getRoomData(room.roomId)
+
+  ctx.body = {
+    room: {
+      roomId: room.roomId,
+      name: room.name,
+      status: room.status,
+      invitationToken: updatedRoomData?.invitationToken ?? null,
+      enrollmentUrl: buildEnrollmentUrl(updatedRoomData?.invitationToken ?? null),
+      prefs: sanitizeRoomPrefsForClient(nextPrefs),
     },
   }
 })
@@ -160,12 +280,9 @@ router.get('/:roomId?', async (ctx) => {
       res.entities[roomId].numUsers = room ? room.size : 0
     } else {
       const roomPrefs = res.entities[roomId].prefs ?? {}
-      const accessPrefs = resolveRoomAccessPrefs(roomPrefs)
       res.entities[roomId].prefs = {
         roles: roomPrefs.roles ?? {},
-        ...accessPrefs,
-        partyPresetFolderId: typeof roomPrefs.partyPresetFolderId === 'number' ? roomPrefs.partyPresetFolderId : null,
-        restrictCollaboratorsToPartyPresetFolder: roomPrefs.restrictCollaboratorsToPartyPresetFolder === true,
+        ...sanitizeRoomPrefsForClient(roomPrefs),
       }
     }
   })
