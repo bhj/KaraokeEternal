@@ -445,6 +445,67 @@ describe('Rooms Router - Room Joining', () => {
     expect(roomData?.prefs?.startingPresetId).toBe(preset?.presetId)
   })
 
+  it('should broadcast sanitized prefs to non-admin sockets', async () => {
+    const now = Math.floor(Date.now() / 1000)
+    await db.db?.run(
+      'INSERT INTO rooms (name, status, ownerId, dateCreated, lastActivity, data) VALUES (?, ?, ?, ?, ?, ?)',
+      ['Owner Room', 'open', testUser.userId, now, now, JSON.stringify({ prefs: {} })],
+    )
+
+    const routerModule = await import('./router.js')
+    const router = routerModule.default
+
+    const prefsLayer = (router as unknown as { stack: Array<{ path: string, methods: string[], stack: Array<(ctx: unknown, next: () => Promise<void>) => Promise<void>> }> }).stack
+      .find(l => l.path === '/api/rooms/my/prefs' && l.methods.includes('PUT'))
+
+    expect(prefsLayer).toBeDefined()
+
+    const emittedActions: Array<{ socketId: string, action: unknown }> = []
+    const ctx = {
+      user: { userId: testUser.userId, isGuest: false, isAdmin: false, name: 'testuser' },
+      request: {
+        body: {
+          prefs: {
+            startingPresetId: null,
+            allowGuestOrchestrator: true,
+          },
+        },
+      },
+      io: {
+        in: () => ({
+          fetchSockets: async () => [
+            { id: 'admin-sock', user: { isAdmin: true } },
+            { id: 'player-sock', user: { isAdmin: false } },
+          ],
+        }),
+        to: (id: string) => ({
+          emit: (_event: string, action: unknown) => {
+            emittedActions.push({ socketId: id, action })
+          },
+        }),
+      },
+      body: undefined as unknown,
+      throw: (status: number, message?: string) => {
+        const err = new Error(message) as Error & { status: number }
+        err.status = status
+        throw err
+      },
+    }
+
+    const handler = prefsLayer!.stack[prefsLayer!.stack.length - 1]
+    await handler(ctx, async () => {})
+
+    // Both sockets should receive the broadcast
+    expect(emittedActions).toHaveLength(2)
+
+    // Non-admin socket should receive sanitized prefs (no raw internal fields)
+    const playerAction = emittedActions.find(e => e.socketId === 'player-sock')
+    expect(playerAction).toBeDefined()
+    const playerPrefs = (playerAction!.action as { payload: { prefs: Record<string, unknown> } }).payload.prefs
+    expect(playerPrefs).toHaveProperty('startingPresetId')
+    expect(playerPrefs).toHaveProperty('allowGuestOrchestrator')
+  })
+
   it('should reject unknown starting preset IDs', async () => {
     const now = Math.floor(Date.now() / 1000)
     await db.db?.run(

@@ -16,7 +16,7 @@ import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
-import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition } from './transitionPolicy'
+import { shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
 
 interface PlayerControllerProps {
   width: number
@@ -199,6 +199,27 @@ const PlayerController = (props: PlayerControllerProps) => {
       lastTransitionKeyRef.current = null
     }
   }, [player.queueId, player.historyJSON])
+
+  // Idle init: apply starting preset (or first folder preset) when player is idle.
+  useEffect(() => {
+    if (shouldApplyStartingPresetOnIdle({
+      startingPresetId: roomPrefs?.startingPresetId,
+      queueId: player.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+    })) {
+      startingPresetAppliedRef.current = true
+      void emitStartingPresetById(roomPrefs.startingPresetId as number)
+    } else if (
+      player.queueId === -1
+      && !startingPresetAppliedRef.current
+      && typeof roomPrefs?.startingPresetId !== 'number'
+      && typeof roomPrefs?.playerPresetFolderId === 'number'
+      && runtimePresetPool.presets.length > 0
+    ) {
+      startingPresetAppliedRef.current = true
+      emitHydraPresetByIndex(0)
+    }
+  }, [roomPrefs?.startingPresetId, roomPrefs?.playerPresetFolderId, player.queueId, emitStartingPresetById, emitHydraPresetByIndex, runtimePresetPool.presets.length])
 
   // "lock in" the next user that isn't the currently up user, if possible
   useEffect(() => {

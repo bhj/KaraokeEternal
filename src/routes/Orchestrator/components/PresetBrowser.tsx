@@ -3,6 +3,7 @@ import Modal from 'components/Modal/Modal'
 import Button from 'components/Button/Button'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchCurrentRoom } from 'store/modules/rooms'
+import { ROOM_PREFS_PUSH } from 'shared/actionTypes'
 import { HYDRA_GALLERY } from './hydraGallery'
 import PresetTree from './PresetTree'
 import { buildPresetTree, type PresetLeaf, type PresetTreeNode, type PresetFolder, type PresetItem } from './presetTree'
@@ -367,8 +368,12 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     try {
       setUpdatingRoomPresetPolicy(true)
       setError(null)
-      await updateMyRoomPrefs({ startingPresetId: nextStartingPresetId })
-      await dispatch(fetchCurrentRoom())
+      const res = await updateMyRoomPrefs({ startingPresetId: nextStartingPresetId })
+      if (res.room?.prefs) {
+        dispatch({ type: ROOM_PREFS_PUSH, payload: { roomId: res.room.roomId, prefs: res.room.prefs } })
+      } else {
+        await dispatch(fetchCurrentRoom())
+      }
     } catch (err) {
       setError(toErrorMessage(err, 'Failed to update starting visual'))
     } finally {
@@ -384,8 +389,12 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     try {
       setUpdatingRoomPresetPolicy(true)
       setError(null)
-      await updateMyRoomPrefs({ playerPresetFolderId: nextPlayerPresetFolderId })
-      await dispatch(fetchCurrentRoom())
+      const res = await updateMyRoomPrefs({ playerPresetFolderId: nextPlayerPresetFolderId })
+      if (res.room?.prefs) {
+        dispatch({ type: ROOM_PREFS_PUSH, payload: { roomId: res.room.roomId, prefs: res.room.prefs } })
+      } else {
+        await dispatch(fetchCurrentRoom())
+      }
     } catch (err) {
       setError(toErrorMessage(err, 'Failed to update player preset folder'))
     } finally {

@@ -17,19 +17,7 @@ const router = new KoaRouter({ prefix: '/api/rooms' })
 const isSecureCookie = () => process.env.NODE_ENV === 'production' || process.env.KES_REQUIRE_PROXY === 'true'
 
 import { ROOM_PREFS_PUSH } from '../../shared/actionTypes.js'
-import { resolveRoomAccessPrefs } from '../../shared/roomAccess.js'
-
-const sanitizeRoomPrefsForClient = (roomPrefs: Record<string, unknown> = {}) => {
-  const accessPrefs = resolveRoomAccessPrefs(roomPrefs)
-
-  return {
-    ...accessPrefs,
-    partyPresetFolderId: typeof roomPrefs.partyPresetFolderId === 'number' ? roomPrefs.partyPresetFolderId : null,
-    playerPresetFolderId: typeof roomPrefs.playerPresetFolderId === 'number' ? roomPrefs.playerPresetFolderId : null,
-    restrictCollaboratorsToPartyPresetFolder: roomPrefs.restrictCollaboratorsToPartyPresetFolder === true,
-    startingPresetId: typeof roomPrefs.startingPresetId === 'number' ? roomPrefs.startingPresetId : null,
-  }
-}
+import { sanitizeRoomPrefsForClient } from './sanitizeRoomPrefs.js'
 
 const buildEnrollmentUrl = (invitationToken?: string | null): string | null => {
   const authentikUrl = process.env.KES_AUTHENTIK_PUBLIC_URL
@@ -220,15 +208,14 @@ router.put('/my/prefs', async (ctx) => {
 
   const sockets = await ctx.io.in(Rooms.prefix(room.roomId)).fetchSockets()
   for (const s of sockets) {
-    if (s?.user.isAdmin) {
-      ctx.io.to(s.id).emit('action', {
-        type: ROOM_PREFS_PUSH,
-        payload: {
-          roomId: room.roomId,
-          prefs: nextPrefs,
-        },
-      })
-    }
+    const prefs = s?.user.isAdmin ? nextPrefs : sanitizeRoomPrefsForClient(nextPrefs)
+    ctx.io.to(s.id).emit('action', {
+      type: ROOM_PREFS_PUSH,
+      payload: {
+        roomId: room.roomId,
+        prefs,
+      },
+    })
   }
 
   log.verbose('%s updated own room prefs (roomId: %s)', ctx.user.name, room.roomId)
@@ -360,15 +347,18 @@ router.put('/:roomId', async (ctx) => {
 
   log.verbose('%s updated a room (roomId: %s)', ctx.user.name, roomId)
 
-  const sockets = await ctx.io.in(Rooms.prefix(roomId)).fetchSockets()
+  const roomData = await Rooms.getRoomData(roomId)
+  const rawPrefs = roomData?.prefs && typeof roomData.prefs === 'object'
+    ? roomData.prefs as Record<string, unknown>
+    : {}
 
+  const sockets = await ctx.io.in(Rooms.prefix(roomId)).fetchSockets()
   for (const s of sockets) {
-    if (s?.user.isAdmin) {
-      ctx.io.to(s.id).emit('action', {
-        type: ROOM_PREFS_PUSH,
-        payload: await Rooms.get(roomId),
-      })
-    }
+    const prefs = s?.user.isAdmin ? rawPrefs : sanitizeRoomPrefsForClient(rawPrefs)
+    ctx.io.to(s.id).emit('action', {
+      type: ROOM_PREFS_PUSH,
+      payload: { roomId, prefs },
+    })
   }
 
   // send updated room list

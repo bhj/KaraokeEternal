@@ -1,4 +1,5 @@
 import Rooms from './Rooms.js'
+import { sanitizeRoomPrefsForClient } from './sanitizeRoomPrefs.js'
 import {
   ROOM_PREFS_PUSH_REQUEST,
   ROOM_PREFS_PUSH,
@@ -20,12 +21,11 @@ const ACTION_HANDLERS = {
     const sockets = await sock.server.in(Rooms.prefix(roomId)).fetchSockets()
 
     for (const s of sockets) {
-      if (s?.user.isAdmin) {
-        sock.server.to(s.id).emit('action', {
-          type: ROOM_PREFS_PUSH,
-          payload,
-        })
-      }
+      const prefs = s?.user.isAdmin ? payload.prefs : sanitizeRoomPrefsForClient(payload.prefs)
+      sock.server.to(s.id).emit('action', {
+        type: ROOM_PREFS_PUSH,
+        payload: { roomId, prefs },
+      })
     }
   },
 }

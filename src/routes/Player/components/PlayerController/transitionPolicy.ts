@@ -34,6 +34,27 @@ export function shouldApplyStartingPresetAtSessionStart ({
     && typeof nextQueueId === 'number'
 }
 
+interface IdlePresetParams {
+  startingPresetId?: number | null
+  queueId: number
+  hasAppliedStartingPreset: boolean
+}
+
+/**
+ * Idle init: apply the starting preset immediately when player is idle
+ * (queueId === -1) and a starting preset is configured.
+ * Fires once per idle session (guarded by hasAppliedStartingPreset).
+ */
+export function shouldApplyStartingPresetOnIdle ({
+  startingPresetId,
+  queueId,
+  hasAppliedStartingPreset,
+}: IdlePresetParams): boolean {
+  return typeof startingPresetId === 'number'
+    && queueId === -1
+    && hasAppliedStartingPreset !== true
+}
+
 /**
  * Cycle only on real song-to-song transitions when Hydra visualizer is active.
  */
