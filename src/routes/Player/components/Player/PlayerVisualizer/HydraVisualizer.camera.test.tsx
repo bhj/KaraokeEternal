@@ -96,4 +96,67 @@ describe('HydraVisualizer camera rebinding', () => {
       root.unmount()
     })
   })
+
+  it('re-inits camera source when switching from camera preset to non-camera and back', async () => {
+    const init = vi.fn()
+    ;(window as unknown as Record<string, unknown>).s0 = {
+      init,
+      initCam: vi.fn(),
+    }
+
+    const remote = document.createElement('video')
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <HydraVisualizer
+          audioSourceNode={null}
+          isPlaying={true}
+          sensitivity={1}
+          width={320}
+          height={180}
+          code='src(s0).out(o0)'
+          allowCamera={true}
+          remoteVideoElement={remote}
+        />,
+      )
+    })
+
+    await act(async () => {
+      root.render(
+        <HydraVisualizer
+          audioSourceNode={null}
+          isPlaying={true}
+          sensitivity={1}
+          width={320}
+          height={180}
+          code='osc(10).out(o0)'
+          allowCamera={true}
+          remoteVideoElement={remote}
+        />,
+      )
+    })
+
+    await act(async () => {
+      root.render(
+        <HydraVisualizer
+          audioSourceNode={null}
+          isPlaying={true}
+          sensitivity={1}
+          width={320}
+          height={180}
+          code='src(s0).out(o0)'
+          allowCamera={true}
+          remoteVideoElement={remote}
+        />,
+      )
+    })
+
+    expect(init).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
 })

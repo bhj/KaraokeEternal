@@ -102,6 +102,15 @@ function HydraVisualizer ({
     onCameraSourcesBoundChange(bound)
   }, [onCameraSourcesBoundChange])
 
+  const pruneStaleCameraBindings = useCallback((sources: string[]) => {
+    const activeSources = new Set(sources)
+    for (const src of Array.from(cameraInitRef.current)) {
+      if (!activeSources.has(src)) {
+        cameraInitRef.current.delete(src)
+      }
+    }
+  }, [])
+
   const { update: updateAudio, compat, audioRef } = useHydraAudio(
     audioSourceNode,
     sensitivity,
@@ -231,6 +240,8 @@ function HydraVisualizer ({
     const { sources } = detectCameraUsage(currentCode)
     const w = window as unknown as Record<string, unknown>
 
+    pruneStaleCameraBindings(sources)
+
     for (const src of sources) {
       if (cameraInitRef.current.has(src)) continue
       const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
@@ -249,7 +260,7 @@ function HydraVisualizer ({
     }
 
     reportCameraSourcesBound()
-  }, [allowCamera, remoteVideoElement, reportCameraSourcesBound])
+  }, [allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
 
   // Re-execute code when it changes
   useEffect(() => {
@@ -260,6 +271,9 @@ function HydraVisualizer ({
     if (allowCamera || remoteVideoElement) {
       const { sources } = detectCameraUsage(getHydraEvalCode(code))
       const w = window as unknown as Record<string, unknown>
+
+      pruneStaleCameraBindings(sources)
+
       for (const src of sources) {
         if (cameraInitRef.current.has(src)) continue
         const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
@@ -282,7 +296,7 @@ function HydraVisualizer ({
 
     executeHydraCode(hydra, getHydraEvalCode(code))
     errorCountRef.current = 0
-  }, [code, allowCamera, remoteVideoElement, reportCameraSourcesBound])
+  }, [code, allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
 
   // Animation tick
   const tick = useCallback((time: number) => {
