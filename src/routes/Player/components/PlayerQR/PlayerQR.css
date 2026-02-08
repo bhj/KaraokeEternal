@@ -9,6 +9,10 @@
     left: unset;
     right: 3vh;
   }
+
+  canvas {
+    border-radius: var(--border-radius);
+  }
 }
 
 .enterActive {

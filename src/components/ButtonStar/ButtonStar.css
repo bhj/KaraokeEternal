@@ -1,0 +1,40 @@
+.container {
+  position: relative;
+  color: var(--song-item-btn-bg-color);
+
+  svg {
+    display: block;
+  }
+}
+
+.starCount {
+  position: absolute;
+  font-size: 14px;
+  top: 0;
+  text-shadow: none;
+  color: var(--color-gray-6);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.starred {
+  color: var(--song-item-btn-active-bg-color);
+  filter: var(--song-item-btn-active-filter);
+}
+
+.starred .starCount {
+  color: var(--song-item-btn-active-color);
+}
+
+.animateStar {
+  animation: var(--animation-btn-star);
+  will-change: transform;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}

@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import Highlighter from 'react-highlight-words'
 import { useSwipeable } from 'react-swipeable'
 import Button from 'components/Button/Button'
+import ButtonStar from 'components/ButtonStar/ButtonStar'
 import Buttons from 'components/Buttons/Buttons'
 import Icon from 'components/Icon/Icon'
 import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
@@ -99,14 +100,12 @@ const SongItem = ({
       </ToggleAnimation>
 
       <Buttons btnWidth={56} isExpanded={isExpanded}>
-        <Button onClick={handleStarClick} className={clsx(styles.btn, styles.star)}>
-          <ToggleAnimation toggle={isStarred} className={styles.animateStar}>
-            <Icon icon='STAR_FULL' />
-          </ToggleAnimation>
-          <div className={styles.starCount}>
-            {numStars || ''}
-          </div>
-        </Button>
+        <ButtonStar
+          className={styles.btn}
+          onClick={handleStarClick}
+          isStarred={isStarred}
+          count={numStars}
+        />
         <Button onClick={handleInfoClick} className={clsx(styles.btn, styles.info)} data-hide>
           <Icon icon='INFO_OUTLINE' />
         </Button>

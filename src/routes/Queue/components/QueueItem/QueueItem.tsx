@@ -4,6 +4,7 @@ import { useSwipeable } from 'react-swipeable'
 import { useLongPress } from 'use-long-press'
 import { useAppDispatch } from 'store/hooks'
 import Button from 'components/Button/Button'
+import ButtonStar from 'components/ButtonStar/ButtonStar'
 import Buttons from 'components/Buttons/Buttons'
 import UserImage from 'components/UserImage/UserImage'
 import { requestPlayNext, requestReplay } from 'store/modules/status'
@@ -33,6 +34,7 @@ interface QueueItemProps {
   pctPlayed: number
   queueId: number
   songId: number
+  starCount: number
   title: string
   userDateUpdated: number
   userDisplayName: string
@@ -63,6 +65,7 @@ const QueueItem = ({
   pctPlayed,
   queueId,
   songId,
+  starCount,
   title,
   userDateUpdated,
   userDisplayName,
@@ -71,8 +74,8 @@ const QueueItem = ({
 }: QueueItemProps) => {
   const [isExpanded, setExpanded] = useState(false)
   const longPressActiveRef = useRef(false)
-
   const dispatch = useAppDispatch()
+
   const handleErrorInfoClick = () => dispatch(showErrorMessage(errorMessage))
   const handleInfoClick = () => dispatch(showSongInfo(songId))
   const handleMoveClick = () => {
@@ -87,8 +90,11 @@ const QueueItem = ({
     dispatch(queueSong(songId))
     setExpanded(false)
   }
+  const handleSkipClick = () => {
+    dispatch(requestPlayNext())
+    setExpanded(false)
+  }
   const handleRemoveClick = () => dispatch(removeItem({ queueId }))
-  const handleSkipClick = () => dispatch(requestPlayNext())
   const handleStarClick = () => dispatch(toggleSongStarred(songId))
 
   const swipeHandlers = useSwipeable({
@@ -159,11 +165,11 @@ const QueueItem = ({
               onClick={handleErrorInfoClick}
             />
           )}
-          <Button
-            animateClassName={styles.animateStar}
-            className={clsx(isStarred && styles.active)}
-            icon='STAR_FULL'
+          <ButtonStar
+            className={styles.btnStar}
+            isStarred={isStarred}
             onClick={handleStarClick}
+            count={starCount}
           />
           {isInfoable && (
             <Button

@@ -102,7 +102,20 @@
     position: relative;
     width: var(--queue-item-btn-size);
     height: var(--queue-item-btn-size);
+  }
+
+  button:not(.btnStar) {
     color: var(--song-item-btn-bg-color);
+
+    svg {
+      height: 100%;
+      width: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
   }
 
   button.active {
@@ -114,37 +127,12 @@
     color: var(--btn-danger-bg-color);
     filter: var(--btn-danger-filter);
   }
-
-  svg {
-    width: var(--queue-item-btn-size);
-    height: var(--queue-item-btn-size);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
 }
 
 .btnAdd svg,
 .btnPlayNext svg {
-  width: 60px;
-  height: 60px;
-}
-
-.btnMove svg {
-  width: 56px;
-  height: 56px;
-}
-
-.btnRemove svg {
-  width: 52px;
-  height: 52px;
-}
-
-.animateStar {
-  animation: var(--animation-btn-star);
-  will-change: transform;
+  width: 60px !important;
+  height: 60px !important;
 }
 
 /* Currently playing  */
