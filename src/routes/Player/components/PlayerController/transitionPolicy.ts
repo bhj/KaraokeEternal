@@ -55,6 +55,36 @@ export function shouldApplyStartingPresetOnIdle ({
     && hasAppliedStartingPreset !== true
 }
 
+interface IdleFolderDefaultParams {
+  startingPresetId?: number | null
+  playerPresetFolderId?: number | null
+  queueId: number
+  hasAppliedStartingPreset: boolean
+  runtimePresetSource: 'gallery' | 'folder'
+  runtimePresetCount: number
+}
+
+/**
+ * Idle init fallback: when no explicit starting preset is set, use the first
+ * preset from the configured player folder only after a folder-backed runtime
+ * pool is available.
+ */
+export function shouldApplyFolderDefaultOnIdle ({
+  startingPresetId,
+  playerPresetFolderId,
+  queueId,
+  hasAppliedStartingPreset,
+  runtimePresetSource,
+  runtimePresetCount,
+}: IdleFolderDefaultParams): boolean {
+  return typeof startingPresetId !== 'number'
+    && typeof playerPresetFolderId === 'number'
+    && queueId === -1
+    && hasAppliedStartingPreset !== true
+    && runtimePresetSource === 'folder'
+    && runtimePresetCount > 0
+}
+
 /**
  * Cycle only on real song-to-song transitions when Hydra visualizer is active.
  */

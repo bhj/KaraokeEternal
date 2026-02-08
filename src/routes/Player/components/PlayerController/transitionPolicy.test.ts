@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition, shouldApplyStartingPresetOnIdle } from './transitionPolicy'
+import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition, shouldApplyStartingPresetOnIdle, shouldApplyFolderDefaultOnIdle } from './transitionPolicy'
 
 describe('transitionPolicy', () => {
   it('applies starting preset only on true session start', () => {
@@ -98,6 +98,61 @@ describe('transitionPolicy', () => {
         startingPresetId: undefined,
         queueId: -1,
         hasAppliedStartingPreset: false,
+      })).toBe(false)
+    })
+  })
+
+  describe('shouldApplyFolderDefaultOnIdle', () => {
+    it('returns true only when folder-backed runtime pool is ready', () => {
+      expect(shouldApplyFolderDefaultOnIdle({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        queueId: -1,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(true)
+    })
+
+    it('returns false while runtime pool is still gallery fallback', () => {
+      expect(shouldApplyFolderDefaultOnIdle({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        queueId: -1,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'gallery',
+        runtimePresetCount: 58,
+      })).toBe(false)
+    })
+
+    it('returns false when starting preset exists', () => {
+      expect(shouldApplyFolderDefaultOnIdle({
+        startingPresetId: 42,
+        playerPresetFolderId: 5,
+        queueId: -1,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(false)
+    })
+
+    it('returns false when already applied or when not idle', () => {
+      expect(shouldApplyFolderDefaultOnIdle({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        queueId: -1,
+        hasAppliedStartingPreset: true,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(false)
+
+      expect(shouldApplyFolderDefaultOnIdle({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        queueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
       })).toBe(false)
     })
   })
