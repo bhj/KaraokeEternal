@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, shouldAutoApplyPreset, resolvePreviewHydraState } from './orchestratorViewHelpers'
+import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, shouldAutoApplyPreset, resolvePreviewHydraState, shouldShowUnsentDot, getNextMobileTab } from './orchestratorViewHelpers'
 import { getPresetByIndex } from '../components/hydraPresets'
 
 describe('orchestratorViewHelpers', () => {
@@ -196,6 +196,62 @@ describe('orchestratorViewHelpers', () => {
     it('returns false: remoteCode is undefined', () => {
       expect(shouldAutoApplyPreset(0, 5, true, undefined)).toBe(false)
     })
+  })
+})
+
+describe('shouldShowUnsentDot', () => {
+  it('returns true when on stage tab with unsent edits', () => {
+    expect(shouldShowUnsentDot('stage', true, 'idle')).toBe(true)
+  })
+
+  it('returns true when on ref tab with unsent edits', () => {
+    expect(shouldShowUnsentDot('ref', true, 'idle')).toBe(true)
+  })
+
+  it('returns false when on code tab', () => {
+    expect(shouldShowUnsentDot('code', true, 'idle')).toBe(false)
+  })
+
+  it('returns false when user has not edited', () => {
+    expect(shouldShowUnsentDot('stage', false, 'idle')).toBe(false)
+  })
+
+  it('returns false when already synced', () => {
+    expect(shouldShowUnsentDot('stage', true, 'synced')).toBe(false)
+  })
+
+  it('returns true when sending (not yet synced)', () => {
+    expect(shouldShowUnsentDot('stage', true, 'sending')).toBe(true)
+  })
+
+  it('returns true on error (needs resend)', () => {
+    expect(shouldShowUnsentDot('stage', true, 'error')).toBe(true)
+  })
+})
+
+describe('getNextMobileTab', () => {
+  it('swipe left: stage → code', () => {
+    expect(getNextMobileTab('stage', 'left')).toBe('code')
+  })
+
+  it('swipe left: code → ref', () => {
+    expect(getNextMobileTab('code', 'left')).toBe('ref')
+  })
+
+  it('swipe left: ref stays at ref (end of list)', () => {
+    expect(getNextMobileTab('ref', 'left')).toBe('ref')
+  })
+
+  it('swipe right: ref → code', () => {
+    expect(getNextMobileTab('ref', 'right')).toBe('code')
+  })
+
+  it('swipe right: code → stage', () => {
+    expect(getNextMobileTab('code', 'right')).toBe('stage')
+  })
+
+  it('swipe right: stage stays at stage (start of list)', () => {
+    expect(getNextMobileTab('stage', 'right')).toBe('stage')
   })
 })
 

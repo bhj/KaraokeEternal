@@ -1,4 +1,29 @@
 import { stripInjectedLines } from '../../../lib/injectedLines'
+
+export type MobileTab = 'stage' | 'code' | 'ref'
+
+const MOBILE_TAB_ORDER: MobileTab[] = ['stage', 'code', 'ref']
+
+/**
+ * Navigate mobile tabs by swipe direction.
+ */
+export function getNextMobileTab (current: MobileTab, direction: 'left' | 'right'): MobileTab {
+  const idx = MOBILE_TAB_ORDER.indexOf(current)
+  if (direction === 'left' && idx < MOBILE_TAB_ORDER.length - 1) return MOBILE_TAB_ORDER[idx + 1]
+  if (direction === 'right' && idx > 0) return MOBILE_TAB_ORDER[idx - 1]
+  return current
+}
+
+/**
+ * Whether to show the unsent-changes dot on the mobile Code tab.
+ */
+export function shouldShowUnsentDot (
+  activeMobileTab: string,
+  userHasEdited: boolean,
+  sendStatus: string,
+): boolean {
+  return activeMobileTab !== 'code' && userHasEdited && sendStatus !== 'synced'
+}
 import { AUDIO_RESPONSE_DEFAULTS, type AudioResponseState, type VisualizerMode } from 'shared/types'
 import { getPresetByIndex, getPresetCount } from '../components/hydraPresets'
 

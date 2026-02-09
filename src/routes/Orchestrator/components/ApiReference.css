@@ -347,7 +347,7 @@
   border-color: #2f475f;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 979px) {
   .workspaceBody {
     grid-template-columns: 1fr;
   }

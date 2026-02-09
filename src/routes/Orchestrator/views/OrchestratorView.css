@@ -142,6 +142,7 @@
 
 .mobileTab {
   flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -155,6 +156,20 @@
   letter-spacing: 0.05em;
   cursor: pointer;
   min-height: 44px;
+}
+
+.mobileTabDot {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 16px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--aqua-accent);
+}
+
+.mobileTabDotError {
+  background: #ff7b72;
 }
 
 .mobileTabActive {
@@ -215,6 +230,10 @@
     grid-template-rows: 1fr;
     grid-template-columns: 1fr;
     padding-bottom: calc(50px + env(safe-area-inset-bottom));
+  }
+
+  .containerKeyboardOpen {
+    padding-bottom: 0;
   }
 
   .refPanel {
@@ -281,6 +300,11 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.containerWithBanner .stageDock,
+.containerWithBanner .codeDock {
+  padding-top: 44px;
 }
 
 @media (min-width: 980px) {

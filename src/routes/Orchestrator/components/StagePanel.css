@@ -168,26 +168,36 @@
 }
 
 @media (max-width: 979px) {
+  .stageHeader {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0.5rem;
+  }
+
   .stageHeaderRight {
     width: 100%;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .cameraPipeline {
     max-width: 100%;
+    flex: 1 1 100%;
   }
 
   .cameraPipelineDetail {
-    max-width: 14rem;
+    max-width: 100%;
+  }
+
+  .bufferControls {
+    flex: 1 1 100%;
   }
 
   .bufferButton {
+    flex: 1;
     min-height: 44px;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .stageHeader {
-    gap: 8px;
+    padding: 0.375rem 0.5rem;
+    text-align: center;
   }
 }
 

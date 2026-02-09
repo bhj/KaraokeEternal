@@ -6,7 +6,8 @@ import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
 import type { PresetLeaf } from '../components/presetTree'
-import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, resolvePreviewHydraState, shouldAutoApplyPreset } from './orchestratorViewHelpers'
+import { useSwipeable } from 'react-swipeable'
+import { getEffectiveCode, getNextMobileTab, getPendingRemote, normalizeCodeForAck, resolvePreviewHydraState, shouldAutoApplyPreset, shouldShowUnsentDot } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
 import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
@@ -15,6 +16,7 @@ import { type StageBuffer } from '../components/stagePanelUtils'
 import { useCameraSender } from 'lib/webrtc/useCameraSender'
 import { fetchCurrentRoom } from 'store/modules/rooms'
 import { getPreviewSize } from './orchestratorLayout'
+import { useVisualViewport } from 'lib/useVisualViewport'
 import styles from './OrchestratorView.css'
 
 type SendHydraPayload = {
@@ -44,6 +46,7 @@ function OrchestratorView () {
   const previewHydraState = resolvePreviewHydraState(hasUpdate, playerVisualizer, status.visualizer)
 
   const ui = useAppSelector(state => state.ui)
+  const { isKeyboardOpen } = useVisualViewport()
   const containerRef = useRef<HTMLDivElement>(null)
   const [localCode, setLocalCode] = useState<string>(DEFAULT_SKETCH)
   const [previewBuffer, setPreviewBuffer] = useState<StageBuffer>('auto')
@@ -325,6 +328,24 @@ function OrchestratorView () {
 
   const previewSize = getPreviewSize(ui.innerWidth)
   const isMobile = ui.innerWidth < 980
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (isMobile) setActiveMobileTab(prev => getNextMobileTab(prev, 'left'))
+    },
+    onSwipedRight: () => {
+      if (isMobile) setActiveMobileTab(prev => getNextMobileTab(prev, 'right'))
+    },
+    trackMouse: false,
+    delta: 50,
+    preventScrollOnSwipe: false,
+  })
+
+  const mergedRef = useCallback((node: HTMLDivElement | null) => {
+    swipeHandlers.ref(node);
+    (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+  }, [swipeHandlers])
+
   const isRefOpen = isMobile && activeMobileTab === 'ref'
   const refPanelClass = isRefOpen
     ? `${styles.refPanel} ${styles.refPanelOpen}`
@@ -351,8 +372,9 @@ function OrchestratorView () {
 
   return (
     <div
-      className={`${styles.container} ${isResizingPanel ? styles.containerResizing : ''}`}
-      ref={containerRef}
+      {...swipeHandlers}
+      className={`${styles.container} ${isResizingPanel ? styles.containerResizing : ''} ${pendingRemoteCode ? styles.containerWithBanner : ''} ${isKeyboardOpen ? styles.containerKeyboardOpen : ''}`}
+      ref={mergedRef}
       style={containerStyle}
     >
       <div className={refPanelClass}>
@@ -442,7 +464,7 @@ function OrchestratorView () {
         </div>
       )}
 
-      {isMobile && (
+      {isMobile && !isKeyboardOpen && (
         <div className={styles.mobileToolbar}>
           <button
             type='button'
@@ -459,6 +481,9 @@ function OrchestratorView () {
           >
             <span className={styles.mobileTabIcon}>{'\u003c\u002f\u003e'}</span>
             <span>Code</span>
+            {shouldShowUnsentDot(activeMobileTab, userHasEdited, sendStatus) && (
+              <span className={`${styles.mobileTabDot} ${sendStatus === 'error' ? styles.mobileTabDotError : ''}`} />
+            )}
           </button>
           <button
             type='button'

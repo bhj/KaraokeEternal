@@ -32,14 +32,14 @@ function PresetPicker ({ onLoad, onSend, onRandomize }: PresetPickerProps) {
 
   useEffect(() => {
     if (!open) return
-    const handleClick = (event: MouseEvent) => {
+    const handleClick = (event: PointerEvent) => {
       if (!panelRef.current) return
       if (!panelRef.current.contains(event.target as Node)) {
         setOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    document.addEventListener('pointerdown', handleClick)
+    return () => document.removeEventListener('pointerdown', handleClick)
   }, [open])
 
   return (
