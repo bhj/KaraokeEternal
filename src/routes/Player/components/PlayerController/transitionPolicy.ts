@@ -116,6 +116,27 @@ export function shouldApplyFolderDefaultAtSessionStart ({
     && runtimePresetCount > 0
 }
 
+/**
+ * Session start pending marker: first play happened before a folder-backed pool
+ * was available. Queue a deferred apply so we can apply as soon as presets load.
+ */
+export function shouldQueueFolderDefaultAtSessionStart ({
+  startingPresetId,
+  currentQueueId,
+  historyJSON,
+  nextQueueId,
+  hasAppliedStartingPreset,
+  runtimePresetSource,
+  runtimePresetCount,
+}: SessionStartFolderDefaultParams): boolean {
+  return typeof startingPresetId !== 'number'
+    && hasAppliedStartingPreset !== true
+    && currentQueueId === -1
+    && historyJSON === '[]'
+    && typeof nextQueueId === 'number'
+    && !(runtimePresetSource === 'folder' && runtimePresetCount > 0)
+}
+
 interface PoolReadyFolderDefaultParams {
   startingPresetId?: number | null
   queueId: number

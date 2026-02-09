@@ -16,7 +16,7 @@ import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
-import { shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultOnPoolReady, shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
+import { shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultOnPoolReady, shouldQueueFolderDefaultAtSessionStart, shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
 
 interface PlayerControllerProps {
   width: number
@@ -36,6 +36,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
   const startingPresetAppliedRef = useRef(false)
+  const pendingFolderDefaultSessionStartRef = useRef(false)
   const lastTransitionKeyRef = useRef<string | null>(null)
 
   const { videoElement: remoteVideoElement } = useCameraReceiver()
@@ -146,6 +147,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       hasAppliedStartingPreset: startingPresetAppliedRef.current,
     })) {
       startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
       void emitStartingPresetById(roomPrefs.startingPresetId as number)
     } else if (shouldApplyFolderDefaultAtSessionStart({
       startingPresetId: roomPrefs?.startingPresetId,
@@ -157,7 +159,18 @@ const PlayerController = (props: PlayerControllerProps) => {
       runtimePresetCount: runtimePresetPool.presets.length,
     })) {
       startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
       emitHydraPresetByIndex(0)
+    } else if (shouldQueueFolderDefaultAtSessionStart({
+      startingPresetId: roomPrefs?.startingPresetId,
+      currentQueueId: player.queueId,
+      historyJSON: player.historyJSON,
+      nextQueueId: nextQueueItem.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+      runtimePresetSource: runtimePresetPool.source,
+      runtimePresetCount: runtimePresetPool.presets.length,
+    })) {
+      pendingFolderDefaultSessionStartRef.current = true
     }
 
     if (shouldCyclePresetOnSongTransition({
@@ -208,6 +221,7 @@ const PlayerController = (props: PlayerControllerProps) => {
   useEffect(() => {
     if (player.queueId === -1 && player.historyJSON === '[]') {
       startingPresetAppliedRef.current = false
+      pendingFolderDefaultSessionStartRef.current = false
       lastTransitionKeyRef.current = null
     }
   }, [player.queueId, player.historyJSON])
@@ -220,6 +234,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       hasAppliedStartingPreset: startingPresetAppliedRef.current,
     })) {
       startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
       void emitStartingPresetById(roomPrefs.startingPresetId as number)
     } else if (shouldApplyFolderDefaultOnIdle({
       startingPresetId: roomPrefs?.startingPresetId,
@@ -229,12 +244,20 @@ const PlayerController = (props: PlayerControllerProps) => {
       runtimePresetCount: runtimePresetPool.presets.length,
     })) {
       startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
       emitHydraPresetByIndex(0)
     }
   }, [roomPrefs?.startingPresetId, player.queueId, emitStartingPresetById, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])
 
-  // Pool-ready fallback: folder pool arrived after first song started playing.
+  // Pool-ready fallback: first play happened before folder pool was ready.
   useEffect(() => {
+    if (!pendingFolderDefaultSessionStartRef.current) return
+
+    if (player.historyJSON !== '[]') {
+      pendingFolderDefaultSessionStartRef.current = false
+      return
+    }
+
     if (shouldApplyFolderDefaultOnPoolReady({
       startingPresetId: roomPrefs?.startingPresetId,
       queueId: player.queueId,
@@ -244,6 +267,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       historyJSON: player.historyJSON,
     })) {
       startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
       emitHydraPresetByIndex(0)
     }
   }, [roomPrefs?.startingPresetId, player.queueId, player.historyJSON, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])

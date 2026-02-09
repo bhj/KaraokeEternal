@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition, shouldApplyStartingPresetOnIdle, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnPoolReady } from './transitionPolicy'
+import {
+  shouldApplyStartingPresetAtSessionStart,
+  shouldCyclePresetOnSongTransition,
+  shouldApplyStartingPresetOnIdle,
+  shouldApplyFolderDefaultOnIdle,
+  shouldApplyFolderDefaultAtSessionStart,
+  shouldQueueFolderDefaultAtSessionStart,
+  shouldApplyFolderDefaultOnPoolReady,
+} from './transitionPolicy'
 
 describe('transitionPolicy', () => {
   it('applies starting preset only on true session start', () => {
@@ -204,6 +212,44 @@ describe('transitionPolicy', () => {
     it('returns false when runtime pool is gallery (not yet loaded)', () => {
       expect(shouldApplyFolderDefaultAtSessionStart({
         startingPresetId: null,
+        currentQueueId: -1,
+        historyJSON: '[]',
+        nextQueueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'gallery',
+        runtimePresetCount: 58,
+      })).toBe(false)
+    })
+  })
+
+  describe('shouldQueueFolderDefaultAtSessionStart', () => {
+    it('returns true when session start happens before folder pool is ready', () => {
+      expect(shouldQueueFolderDefaultAtSessionStart({
+        startingPresetId: null,
+        currentQueueId: -1,
+        historyJSON: '[]',
+        nextQueueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'gallery',
+        runtimePresetCount: 58,
+      })).toBe(true)
+    })
+
+    it('returns false when folder pool is ready (immediate apply path)', () => {
+      expect(shouldQueueFolderDefaultAtSessionStart({
+        startingPresetId: null,
+        currentQueueId: -1,
+        historyJSON: '[]',
+        nextQueueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(false)
+    })
+
+    it('returns false when a starting preset exists', () => {
+      expect(shouldQueueFolderDefaultAtSessionStart({
+        startingPresetId: 42,
         currentQueueId: -1,
         historyJSON: '[]',
         nextQueueId: 100,
