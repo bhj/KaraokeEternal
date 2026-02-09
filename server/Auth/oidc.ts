@@ -163,7 +163,7 @@ export function extractUserClaims (tokenResponse: client.TokenEndpointResponse &
   if (Array.isArray(claims.groups)) {
     groups = claims.groups as string[]
   } else if (typeof claims.groups === 'string') {
-    groups = claims.groups.split('|').map(g => g.trim()).filter(g => g)
+    groups = claims.groups.split(/[,|]/).map(g => g.trim()).filter(g => g)
   }
 
   const adminGroup = process.env.KES_ADMIN_GROUP || 'admin'
