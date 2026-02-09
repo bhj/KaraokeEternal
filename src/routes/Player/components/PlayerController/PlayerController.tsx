@@ -16,7 +16,7 @@ import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
-import { shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnIdle, shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
+import { shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultOnPoolReady, shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
 
 interface PlayerControllerProps {
   width: number
@@ -232,6 +232,21 @@ const PlayerController = (props: PlayerControllerProps) => {
       emitHydraPresetByIndex(0)
     }
   }, [roomPrefs?.startingPresetId, player.queueId, emitStartingPresetById, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])
+
+  // Pool-ready fallback: folder pool arrived after first song started playing.
+  useEffect(() => {
+    if (shouldApplyFolderDefaultOnPoolReady({
+      startingPresetId: roomPrefs?.startingPresetId,
+      queueId: player.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+      runtimePresetSource: runtimePresetPool.source,
+      runtimePresetCount: runtimePresetPool.presets.length,
+      historyJSON: player.historyJSON,
+    })) {
+      startingPresetAppliedRef.current = true
+      emitHydraPresetByIndex(0)
+    }
+  }, [roomPrefs?.startingPresetId, player.queueId, player.historyJSON, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])
 
   // "lock in" the next user that isn't the currently up user, if possible
   useEffect(() => {

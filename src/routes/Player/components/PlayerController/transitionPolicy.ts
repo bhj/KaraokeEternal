@@ -116,6 +116,39 @@ export function shouldApplyFolderDefaultAtSessionStart ({
     && runtimePresetCount > 0
 }
 
+interface PoolReadyFolderDefaultParams {
+  startingPresetId?: number | null
+  queueId: number
+  hasAppliedStartingPreset: boolean
+  runtimePresetSource: 'gallery' | 'folder'
+  runtimePresetCount: number
+  historyJSON: string
+}
+
+/**
+ * Pool-ready fallback: the folder-backed runtime pool arrived after the first
+ * song already started playing (async fetch race). Apply the first folder
+ * preset if we are still on the very first song and no preset was applied yet.
+ *
+ * The queueId >= 0 check is mutually exclusive with the idle handler's
+ * queueId === -1, preventing double-fire.
+ */
+export function shouldApplyFolderDefaultOnPoolReady ({
+  startingPresetId,
+  queueId,
+  hasAppliedStartingPreset,
+  runtimePresetSource,
+  runtimePresetCount,
+  historyJSON,
+}: PoolReadyFolderDefaultParams): boolean {
+  return typeof startingPresetId !== 'number'
+    && hasAppliedStartingPreset !== true
+    && runtimePresetSource === 'folder'
+    && runtimePresetCount > 0
+    && historyJSON === '[]'
+    && queueId >= 0
+}
+
 /**
  * Cycle only on real song-to-song transitions when Hydra visualizer is active.
  */

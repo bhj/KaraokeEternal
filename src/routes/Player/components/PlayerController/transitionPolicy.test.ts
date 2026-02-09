@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition, shouldApplyStartingPresetOnIdle, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultAtSessionStart } from './transitionPolicy'
+import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition, shouldApplyStartingPresetOnIdle, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnPoolReady } from './transitionPolicy'
 
 describe('transitionPolicy', () => {
   it('applies starting preset only on true session start', () => {
@@ -210,6 +210,74 @@ describe('transitionPolicy', () => {
         hasAppliedStartingPreset: false,
         runtimePresetSource: 'gallery',
         runtimePresetCount: 58,
+      })).toBe(false)
+    })
+  })
+
+  describe('shouldApplyFolderDefaultOnPoolReady', () => {
+    it('returns true when pool becomes folder-backed during first song', () => {
+      expect(shouldApplyFolderDefaultOnPoolReady({
+        startingPresetId: null,
+        queueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+        historyJSON: '[]',
+      })).toBe(true)
+    })
+
+    it('returns false when startingPresetId is set', () => {
+      expect(shouldApplyFolderDefaultOnPoolReady({
+        startingPresetId: 42,
+        queueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+        historyJSON: '[]',
+      })).toBe(false)
+    })
+
+    it('returns false when already applied', () => {
+      expect(shouldApplyFolderDefaultOnPoolReady({
+        startingPresetId: null,
+        queueId: 100,
+        hasAppliedStartingPreset: true,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+        historyJSON: '[]',
+      })).toBe(false)
+    })
+
+    it('returns false when pool is still gallery', () => {
+      expect(shouldApplyFolderDefaultOnPoolReady({
+        startingPresetId: null,
+        queueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'gallery',
+        runtimePresetCount: 58,
+        historyJSON: '[]',
+      })).toBe(false)
+    })
+
+    it('returns false when past first song', () => {
+      expect(shouldApplyFolderDefaultOnPoolReady({
+        startingPresetId: null,
+        queueId: 101,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+        historyJSON: '[100]',
+      })).toBe(false)
+    })
+
+    it('returns false when still idle', () => {
+      expect(shouldApplyFolderDefaultOnPoolReady({
+        startingPresetId: null,
+        queueId: -1,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+        historyJSON: '[]',
       })).toBe(false)
     })
   })
