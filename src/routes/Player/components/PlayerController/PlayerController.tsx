@@ -149,7 +149,6 @@ const PlayerController = (props: PlayerControllerProps) => {
       void emitStartingPresetById(roomPrefs.startingPresetId as number)
     } else if (shouldApplyFolderDefaultAtSessionStart({
       startingPresetId: roomPrefs?.startingPresetId,
-      playerPresetFolderId: roomPrefs?.playerPresetFolderId,
       currentQueueId: player.queueId,
       historyJSON: player.historyJSON,
       nextQueueId: nextQueueItem.queueId,
@@ -224,7 +223,6 @@ const PlayerController = (props: PlayerControllerProps) => {
       void emitStartingPresetById(roomPrefs.startingPresetId as number)
     } else if (shouldApplyFolderDefaultOnIdle({
       startingPresetId: roomPrefs?.startingPresetId,
-      playerPresetFolderId: roomPrefs?.playerPresetFolderId,
       queueId: player.queueId,
       hasAppliedStartingPreset: startingPresetAppliedRef.current,
       runtimePresetSource: runtimePresetPool.source,
@@ -233,7 +231,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       startingPresetAppliedRef.current = true
       emitHydraPresetByIndex(0)
     }
-  }, [roomPrefs?.startingPresetId, roomPrefs?.playerPresetFolderId, player.queueId, emitStartingPresetById, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])
+  }, [roomPrefs?.startingPresetId, player.queueId, emitStartingPresetById, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])
 
   // "lock in" the next user that isn't the currently up user, if possible
   useEffect(() => {

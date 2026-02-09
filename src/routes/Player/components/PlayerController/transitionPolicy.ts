@@ -57,7 +57,6 @@ export function shouldApplyStartingPresetOnIdle ({
 
 interface IdleFolderDefaultParams {
   startingPresetId?: number | null
-  playerPresetFolderId?: number | null
   queueId: number
   hasAppliedStartingPreset: boolean
   runtimePresetSource: 'gallery' | 'folder'
@@ -71,14 +70,12 @@ interface IdleFolderDefaultParams {
  */
 export function shouldApplyFolderDefaultOnIdle ({
   startingPresetId,
-  playerPresetFolderId,
   queueId,
   hasAppliedStartingPreset,
   runtimePresetSource,
   runtimePresetCount,
 }: IdleFolderDefaultParams): boolean {
   return typeof startingPresetId !== 'number'
-    && typeof playerPresetFolderId === 'number'
     && queueId === -1
     && hasAppliedStartingPreset !== true
     && runtimePresetSource === 'folder'
@@ -87,7 +84,6 @@ export function shouldApplyFolderDefaultOnIdle ({
 
 interface SessionStartFolderDefaultParams {
   startingPresetId?: number | null
-  playerPresetFolderId?: number | null
   currentQueueId: number
   historyJSON: string
   nextQueueId?: number
@@ -98,12 +94,12 @@ interface SessionStartFolderDefaultParams {
 
 /**
  * Session start folder default: when no starting preset is configured but a
- * player folder is, apply the first folder preset on first play (session start).
- * This covers the case where the user presses Play before idle init fires.
+ * folder-backed runtime pool is active, apply the first folder preset on first
+ * play (session start). This covers the case where the user presses Play before
+ * idle init fires.
  */
 export function shouldApplyFolderDefaultAtSessionStart ({
   startingPresetId,
-  playerPresetFolderId,
   currentQueueId,
   historyJSON,
   nextQueueId,
@@ -112,7 +108,6 @@ export function shouldApplyFolderDefaultAtSessionStart ({
   runtimePresetCount,
 }: SessionStartFolderDefaultParams): boolean {
   return typeof startingPresetId !== 'number'
-    && typeof playerPresetFolderId === 'number'
     && hasAppliedStartingPreset !== true
     && currentQueueId === -1
     && historyJSON === '[]'

@@ -106,7 +106,6 @@ describe('transitionPolicy', () => {
     it('returns true only when folder-backed runtime pool is ready', () => {
       expect(shouldApplyFolderDefaultOnIdle({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         queueId: -1,
         hasAppliedStartingPreset: false,
         runtimePresetSource: 'folder',
@@ -117,7 +116,6 @@ describe('transitionPolicy', () => {
     it('returns false while runtime pool is still gallery fallback', () => {
       expect(shouldApplyFolderDefaultOnIdle({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         queueId: -1,
         hasAppliedStartingPreset: false,
         runtimePresetSource: 'gallery',
@@ -128,7 +126,6 @@ describe('transitionPolicy', () => {
     it('returns false when starting preset exists', () => {
       expect(shouldApplyFolderDefaultOnIdle({
         startingPresetId: 42,
-        playerPresetFolderId: 5,
         queueId: -1,
         hasAppliedStartingPreset: false,
         runtimePresetSource: 'folder',
@@ -139,7 +136,6 @@ describe('transitionPolicy', () => {
     it('returns false when already applied or when not idle', () => {
       expect(shouldApplyFolderDefaultOnIdle({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         queueId: -1,
         hasAppliedStartingPreset: true,
         runtimePresetSource: 'folder',
@@ -148,7 +144,6 @@ describe('transitionPolicy', () => {
 
       expect(shouldApplyFolderDefaultOnIdle({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         queueId: 100,
         hasAppliedStartingPreset: false,
         runtimePresetSource: 'folder',
@@ -161,7 +156,6 @@ describe('transitionPolicy', () => {
     it('returns true on session start with folder configured and no starting preset', () => {
       expect(shouldApplyFolderDefaultAtSessionStart({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         currentQueueId: -1,
         historyJSON: '[]',
         nextQueueId: 100,
@@ -174,7 +168,6 @@ describe('transitionPolicy', () => {
     it('returns false when starting preset is set (that path handles it)', () => {
       expect(shouldApplyFolderDefaultAtSessionStart({
         startingPresetId: 42,
-        playerPresetFolderId: 5,
         currentQueueId: -1,
         historyJSON: '[]',
         nextQueueId: 100,
@@ -187,7 +180,6 @@ describe('transitionPolicy', () => {
     it('returns false when not at session start', () => {
       expect(shouldApplyFolderDefaultAtSessionStart({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         currentQueueId: 10,
         historyJSON: '[10]',
         nextQueueId: 11,
@@ -200,7 +192,6 @@ describe('transitionPolicy', () => {
     it('returns false when already applied', () => {
       expect(shouldApplyFolderDefaultAtSessionStart({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         currentQueueId: -1,
         historyJSON: '[]',
         nextQueueId: 100,
@@ -213,7 +204,6 @@ describe('transitionPolicy', () => {
     it('returns false when runtime pool is gallery (not yet loaded)', () => {
       expect(shouldApplyFolderDefaultAtSessionStart({
         startingPresetId: null,
-        playerPresetFolderId: 5,
         currentQueueId: -1,
         historyJSON: '[]',
         nextQueueId: 100,
