@@ -85,6 +85,42 @@ export function shouldApplyFolderDefaultOnIdle ({
     && runtimePresetCount > 0
 }
 
+interface SessionStartFolderDefaultParams {
+  startingPresetId?: number | null
+  playerPresetFolderId?: number | null
+  currentQueueId: number
+  historyJSON: string
+  nextQueueId?: number
+  hasAppliedStartingPreset: boolean
+  runtimePresetSource: 'gallery' | 'folder'
+  runtimePresetCount: number
+}
+
+/**
+ * Session start folder default: when no starting preset is configured but a
+ * player folder is, apply the first folder preset on first play (session start).
+ * This covers the case where the user presses Play before idle init fires.
+ */
+export function shouldApplyFolderDefaultAtSessionStart ({
+  startingPresetId,
+  playerPresetFolderId,
+  currentQueueId,
+  historyJSON,
+  nextQueueId,
+  hasAppliedStartingPreset,
+  runtimePresetSource,
+  runtimePresetCount,
+}: SessionStartFolderDefaultParams): boolean {
+  return typeof startingPresetId !== 'number'
+    && typeof playerPresetFolderId === 'number'
+    && hasAppliedStartingPreset !== true
+    && currentQueueId === -1
+    && historyJSON === '[]'
+    && typeof nextQueueId === 'number'
+    && runtimePresetSource === 'folder'
+    && runtimePresetCount > 0
+}
+
 /**
  * Cycle only on real song-to-song transitions when Hydra visualizer is active.
  */

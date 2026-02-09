@@ -16,7 +16,7 @@ import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
-import { shouldApplyFolderDefaultOnIdle, shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
+import { shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnIdle, shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
 
 interface PlayerControllerProps {
   width: number
@@ -147,6 +147,18 @@ const PlayerController = (props: PlayerControllerProps) => {
     })) {
       startingPresetAppliedRef.current = true
       void emitStartingPresetById(roomPrefs.startingPresetId as number)
+    } else if (shouldApplyFolderDefaultAtSessionStart({
+      startingPresetId: roomPrefs?.startingPresetId,
+      playerPresetFolderId: roomPrefs?.playerPresetFolderId,
+      currentQueueId: player.queueId,
+      historyJSON: player.historyJSON,
+      nextQueueId: nextQueueItem.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+      runtimePresetSource: runtimePresetPool.source,
+      runtimePresetCount: runtimePresetPool.presets.length,
+    })) {
+      startingPresetAppliedRef.current = true
+      emitHydraPresetByIndex(0)
     }
 
     if (shouldCyclePresetOnSongTransition({
@@ -190,6 +202,7 @@ const PlayerController = (props: PlayerControllerProps) => {
     queueItem,
     roomPrefs,
     runtimePresetPool.presets.length,
+    runtimePresetPool.source,
   ])
 
   // Reset one-shot guards when a fresh session starts.

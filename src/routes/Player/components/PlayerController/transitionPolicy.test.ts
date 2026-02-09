@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition, shouldApplyStartingPresetOnIdle, shouldApplyFolderDefaultOnIdle } from './transitionPolicy'
+import { shouldApplyStartingPresetAtSessionStart, shouldCyclePresetOnSongTransition, shouldApplyStartingPresetOnIdle, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultAtSessionStart } from './transitionPolicy'
 
 describe('transitionPolicy', () => {
   it('applies starting preset only on true session start', () => {
@@ -153,6 +153,73 @@ describe('transitionPolicy', () => {
         hasAppliedStartingPreset: false,
         runtimePresetSource: 'folder',
         runtimePresetCount: 12,
+      })).toBe(false)
+    })
+  })
+
+  describe('shouldApplyFolderDefaultAtSessionStart', () => {
+    it('returns true on session start with folder configured and no starting preset', () => {
+      expect(shouldApplyFolderDefaultAtSessionStart({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        currentQueueId: -1,
+        historyJSON: '[]',
+        nextQueueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(true)
+    })
+
+    it('returns false when starting preset is set (that path handles it)', () => {
+      expect(shouldApplyFolderDefaultAtSessionStart({
+        startingPresetId: 42,
+        playerPresetFolderId: 5,
+        currentQueueId: -1,
+        historyJSON: '[]',
+        nextQueueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(false)
+    })
+
+    it('returns false when not at session start', () => {
+      expect(shouldApplyFolderDefaultAtSessionStart({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        currentQueueId: 10,
+        historyJSON: '[10]',
+        nextQueueId: 11,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(false)
+    })
+
+    it('returns false when already applied', () => {
+      expect(shouldApplyFolderDefaultAtSessionStart({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        currentQueueId: -1,
+        historyJSON: '[]',
+        nextQueueId: 100,
+        hasAppliedStartingPreset: true,
+        runtimePresetSource: 'folder',
+        runtimePresetCount: 12,
+      })).toBe(false)
+    })
+
+    it('returns false when runtime pool is gallery (not yet loaded)', () => {
+      expect(shouldApplyFolderDefaultAtSessionStart({
+        startingPresetId: null,
+        playerPresetFolderId: 5,
+        currentQueueId: -1,
+        historyJSON: '[]',
+        nextQueueId: 100,
+        hasAppliedStartingPreset: false,
+        runtimePresetSource: 'gallery',
+        runtimePresetCount: 58,
       })).toBe(false)
     })
   })
