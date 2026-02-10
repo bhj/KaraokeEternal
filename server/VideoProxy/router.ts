@@ -1,3 +1,4 @@
+import { Readable } from 'stream'
 import KoaRouter from '@koa/router'
 import getLogger from '../lib/Log.js'
 
@@ -116,8 +117,8 @@ router.get('/', async (ctx) => {
   ctx.set('Content-Type', contentType!)
   log.verbose('proxying %s (%sMB): %s', contentType, contentLength ? (parseInt(contentLength, 10) / 1_000_000).toFixed(2) : '?', url)
 
-  // Stream the response body directly — no buffering
-  ctx.body = res.body
+  // Convert Web ReadableStream to Node.js Readable for Koa compatibility
+  ctx.body = Readable.fromWeb(res.body as import('stream/web').ReadableStream)
 })
 
 export default router
