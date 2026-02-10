@@ -122,6 +122,16 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     [folders, presets, isPrivilegedPresetUser, currentRoomPrefs],
   )
 
+  const selectedPreset = useMemo(() => {
+    if (selectedPresetId === null) return null
+    for (const node of tree) {
+      for (const child of node.children) {
+        if (child.presetId === selectedPresetId) return child
+      }
+    }
+    return null
+  }, [tree, selectedPresetId])
+
   const filteredTree = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return tree
@@ -360,6 +370,23 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     }
   }, [presetName, presetFolderId, draftCode, refresh, savingPreset])
 
+  const handleOverwritePreset = useCallback(async () => {
+    if (!selectedPreset || !selectedPreset.presetId || selectedPreset.isGallery || savingPreset) return
+
+    try {
+      setSavingPreset(true)
+      setError(null)
+      await updatePreset(selectedPreset.presetId, { code: draftCode })
+      setShowSavePreset(false)
+      setDraftCode('')
+      await refresh()
+    } catch (err) {
+      setError(toErrorMessage(err, 'Failed to overwrite preset'))
+    } finally {
+      setSavingPreset(false)
+    }
+  }, [selectedPreset, draftCode, refresh, savingPreset])
+
   const handleSetStartingPreset = useCallback(async (preset: PresetLeaf) => {
     if (!canManageRoomPolicy || preset.isGallery || !preset.presetId) return
 
@@ -569,12 +596,21 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
         buttons={(
           <>
             <Button variant='default' onClick={() => setShowSavePreset(false)} disabled={savingPreset}>Cancel</Button>
+            {selectedPreset && !selectedPreset.isGallery && selectedPreset.presetId && canManagePreset(selectedPreset) && (
+              <Button
+                variant='default'
+                onClick={handleOverwritePreset}
+                disabled={savingPreset}
+              >
+                {savingPreset ? 'Saving...' : `Overwrite "${selectedPreset.name}"`}
+              </Button>
+            )}
             <Button
               variant='primary'
               onClick={handleSavePreset}
               disabled={savingPreset || folders.length === 0 || !presetName.trim() || !presetFolderId}
             >
-              {savingPreset ? 'Saving...' : 'Save'}
+              {savingPreset ? 'Saving...' : 'Save as New'}
             </Button>
           </>
         )}
