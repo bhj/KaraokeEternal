@@ -46,6 +46,20 @@ describe('videoProxyOverride', () => {
     expect(initVideo).toHaveBeenCalledWith(undefined)
   })
 
+  it('preserves this binding when calling original', () => {
+    let receiver: unknown = null
+    const initVideo = vi.fn(function (this: unknown) { receiver = this })
+    const source = { initVideo }
+    const globals: Record<string, unknown> = { s0: source }
+    const overrides = new Map<string, unknown>()
+
+    applyVideoProxyOverride(['s0'], globals, overrides)
+
+    const ext = globals.s0 as { initVideo: (url: string) => void }
+    ext.initVideo('https://example.com/video.mp4')
+    expect(receiver).toBe(source)
+  })
+
   it('restores original initVideo', () => {
     const initVideo = vi.fn()
     const globals: Record<string, unknown> = {

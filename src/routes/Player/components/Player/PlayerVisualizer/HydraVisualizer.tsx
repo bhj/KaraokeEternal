@@ -202,12 +202,18 @@ function HydraVisualizer ({
     hydraRef.current = hydra
     errorCountRef.current = 0
 
+    // Override initVideo() before first code execution so proxy is active immediately
+    const w = window as unknown as Record<string, unknown>
+    const videoSources = ['s0', 's1', 's2', 's3']
+    applyVideoProxyOverride(videoSources, w, videoProxyOverrideRef.current)
+
     // Execute initial patch and render first frame immediately
     executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
     hydra.tick(16.67)
 
     return () => {
       log('Destroying')
+      restoreVideoProxyOverride(w, videoProxyOverrideRef.current)
       cancelAnimationFrame(rafRef.current)
       try {
         hydra.regl.destroy()
@@ -217,14 +223,6 @@ function HydraVisualizer ({
       hydraRef.current = null
     }
   }, []) // mount-only — resize handled separately
-
-  // Override initVideo() to proxy external URLs (mount-only)
-  useEffect(() => {
-    const w = window as unknown as Record<string, unknown>
-    const sources = ['s0', 's1', 's2', 's3']
-    applyVideoProxyOverride(sources, w, videoProxyOverrideRef.current)
-    return () => restoreVideoProxyOverride(w, videoProxyOverrideRef.current)
-  }, [])
 
   // Resize without recreating WebGL context
   useEffect(() => {

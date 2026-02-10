@@ -19,12 +19,12 @@ export function applyVideoProxyOverride (
       overrides.set(src, ext.initVideo)
     }
 
-    const originalInitVideo = overrides.get(src) as HydraExternalSource['initVideo']
-    ext.initVideo = (url?: string) => {
+    const original = overrides.get(src) as HydraExternalSource['initVideo']
+    ext.initVideo = function (this: HydraExternalSource, url?: string) {
       if (url && /^https?:\/\//i.test(url)) {
-        originalInitVideo?.('/api/video-proxy?url=' + encodeURIComponent(url))
+        original?.call(this, '/api/video-proxy?url=' + encodeURIComponent(url))
       } else {
-        originalInitVideo?.(url)
+        original?.call(this, url)
       }
     }
   }
