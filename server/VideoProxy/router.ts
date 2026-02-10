@@ -79,18 +79,25 @@ router.get('/', async (ctx) => {
     ctx.throw(400, 'Invalid or disallowed URL')
   }
 
+  const fetchHeaders: Record<string, string> = {}
+  const clientRange = ctx.get('Range')
+  if (clientRange) {
+    fetchHeaders.Range = clientRange
+  }
+
   let res: Response
   try {
     res = await fetch(url, {
       signal: AbortSignal.timeout(TIMEOUT_MS),
       redirect: 'follow',
+      headers: fetchHeaders,
     })
   } catch (err) {
     ctx.throw(502, `Upstream fetch failed: ${(err as Error).message}`)
     return // unreachable but satisfies TS
   }
 
-  if (!res.ok) {
+  if (!res.ok && res.status !== 206) {
     ctx.throw(502, `Upstream returned ${res.status}`)
     return
   }
@@ -115,6 +122,16 @@ router.get('/', async (ctx) => {
   }
 
   ctx.set('Content-Type', contentType!)
+  ctx.set('Accept-Ranges', 'bytes')
+
+  if (res.status === 206) {
+    ctx.status = 206
+    const contentRange = res.headers.get('content-range')
+    if (contentRange) {
+      ctx.set('Content-Range', contentRange)
+    }
+  }
+
   log.verbose('proxying %s (%sMB): %s', contentType, contentLength ? (parseInt(contentLength, 10) / 1_000_000).toFixed(2) : '?', url)
 
   // Convert Web ReadableStream to Node.js Readable for Koa compatibility

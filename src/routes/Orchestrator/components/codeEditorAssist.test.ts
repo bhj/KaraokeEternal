@@ -11,10 +11,10 @@ describe('codeEditorAssist', () => {
     expect(getAutocompleteOptions().defaultKeymap).toBe(false)
   })
 
-  it('uses Tab as the only completion accept key', () => {
+  it('uses Enter as the only completion accept key', () => {
     const keys = getCompletionAcceptKeySpecs().map(spec => spec.key)
-    expect(keys).toEqual(['Tab'])
-    expect(keys).not.toContain('Enter')
+    expect(keys).toEqual(['Enter'])
+    expect(keys).not.toContain('Tab')
   })
 
   it('provides completion navigation keys when default completion keymap is disabled', () => {
@@ -34,10 +34,14 @@ describe('codeEditorAssist', () => {
     expect(keys).toContain('PageUp')
     expect(keys).toContain('Ctrl-Space')
     expect(keys).toContain('Escape')
+    expect(keys).toContain('Tab')
+    expect(keys).toContain('Shift-Tab')
     expect(keys).not.toContain('Enter')
   })
 
   it('provides passive hint copy for non-coder guidance', () => {
-    expect(AUTOCOMPLETE_PASSIVE_HINTS).toContain('Tab accepts autocomplete suggestions.')
+    const joined = AUTOCOMPLETE_PASSIVE_HINTS.join(' ')
+    expect(joined).toContain('Enter accepts')
+    expect(joined).toContain('Tab navigates')
   })
 })
