@@ -8,9 +8,9 @@ import { useHydraAudio } from './hooks/useHydraAudio'
 import { getHydraEvalCode, DEFAULT_PATCH } from './hydraEvalCode'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { applyRemoteCameraOverride, restoreRemoteCameraOverride } from 'lib/remoteCameraOverride'
+import { applyVideoProxyOverride, restoreVideoProxyOverride } from 'lib/videoProxyOverride'
 import { shouldEmitFft } from './hooks/emitFftPolicy'
 import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
-import type { AudioResponseState } from 'shared/types'
 import styles from './HydraVisualizer.css'
 
 const log = (...args: unknown[]) => console.log('[Hydra]', ...args)
@@ -54,7 +54,6 @@ interface HydraVisualizerProps {
   code?: string
   /** Override container z-index for previews or overlays. */
   layer?: number
-  audioResponse?: AudioResponseState
   /** When true, auto-init camera for detected source usage */
   allowCamera?: boolean
   /** When true, emit FFT data to server for remote preview */
@@ -75,7 +74,6 @@ function HydraVisualizer ({
   height,
   code,
   layer,
-  audioResponse,
   allowCamera,
   emitFft,
   overrideData,
@@ -94,6 +92,7 @@ function HydraVisualizer ({
   const codeRef = useRef(code)
   const cameraInitRef = useRef<Set<string>>(new Set())
   const cameraOverrideRef = useRef<Map<string, unknown>>(new Map())
+  const videoProxyOverrideRef = useRef<Map<string, unknown>>(new Map())
   const prevRemoteVideoRef = useRef<HTMLVideoElement | null>(null)
 
   const reportCameraSourcesBound = useCallback(() => {
@@ -114,7 +113,6 @@ function HydraVisualizer ({
   const { update: updateAudio, compat, audioRef } = useHydraAudio(
     audioSourceNode,
     sensitivity,
-    audioResponse,
     overrideData,
   )
 
@@ -219,6 +217,14 @@ function HydraVisualizer ({
       hydraRef.current = null
     }
   }, []) // mount-only — resize handled separately
+
+  // Override initVideo() to proxy external URLs (mount-only)
+  useEffect(() => {
+    const w = window as unknown as Record<string, unknown>
+    const sources = ['s0', 's1', 's2', 's3']
+    applyVideoProxyOverride(sources, w, videoProxyOverrideRef.current)
+    return () => restoreVideoProxyOverride(w, videoProxyOverrideRef.current)
+  }, [])
 
   // Resize without recreating WebGL context
   useEffect(() => {
