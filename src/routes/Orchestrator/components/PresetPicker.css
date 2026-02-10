@@ -115,6 +115,10 @@
 }
 
 @media (max-width: 979px) {
+  .toggle {
+    min-height: 44px;
+  }
+
   .panel {
     position: fixed;
     top: auto;

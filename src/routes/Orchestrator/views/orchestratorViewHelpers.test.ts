@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, shouldAutoApplyPreset, resolvePreviewHydraState, shouldShowUnsentDot, getNextMobileTab } from './orchestratorViewHelpers'
+import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, shouldAutoApplyPreset, resolvePreviewHydraState, shouldShowUnsentDot } from './orchestratorViewHelpers'
 import { getPresetByIndex } from '../components/hydraPresets'
 
 describe('orchestratorViewHelpers', () => {
@@ -226,32 +226,6 @@ describe('shouldShowUnsentDot', () => {
 
   it('returns true on error (needs resend)', () => {
     expect(shouldShowUnsentDot('stage', true, 'error')).toBe(true)
-  })
-})
-
-describe('getNextMobileTab', () => {
-  it('swipe left: stage → code', () => {
-    expect(getNextMobileTab('stage', 'left')).toBe('code')
-  })
-
-  it('swipe left: code → ref', () => {
-    expect(getNextMobileTab('code', 'left')).toBe('ref')
-  })
-
-  it('swipe left: ref stays at ref (end of list)', () => {
-    expect(getNextMobileTab('ref', 'left')).toBe('ref')
-  })
-
-  it('swipe right: ref → code', () => {
-    expect(getNextMobileTab('ref', 'right')).toBe('code')
-  })
-
-  it('swipe right: code → stage', () => {
-    expect(getNextMobileTab('code', 'right')).toBe('stage')
-  })
-
-  it('swipe right: stage stays at stage (start of list)', () => {
-    expect(getNextMobileTab('stage', 'right')).toBe('stage')
   })
 })
 

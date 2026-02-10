@@ -6,8 +6,7 @@ import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
 import type { PresetLeaf } from '../components/presetTree'
-import { useSwipeable } from 'react-swipeable'
-import { getEffectiveCode, getNextMobileTab, getPendingRemote, normalizeCodeForAck, resolvePreviewHydraState, shouldAutoApplyPreset, shouldShowUnsentDot } from './orchestratorViewHelpers'
+import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, resolvePreviewHydraState, shouldAutoApplyPreset, shouldShowUnsentDot } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
 import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
@@ -329,23 +328,6 @@ function OrchestratorView () {
   const previewSize = getPreviewSize(ui.innerWidth)
   const isMobile = ui.innerWidth < 980
 
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => {
-      if (isMobile) setActiveMobileTab(prev => getNextMobileTab(prev, 'left'))
-    },
-    onSwipedRight: () => {
-      if (isMobile) setActiveMobileTab(prev => getNextMobileTab(prev, 'right'))
-    },
-    trackMouse: false,
-    delta: 50,
-    preventScrollOnSwipe: false,
-  })
-
-  const mergedRef = useCallback((node: HTMLDivElement | null) => {
-    swipeHandlers.ref(node);
-    (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-  }, [swipeHandlers])
-
   const isRefOpen = isMobile && activeMobileTab === 'ref'
   const refPanelClass = isRefOpen
     ? `${styles.refPanel} ${styles.refPanelOpen}`
@@ -372,9 +354,8 @@ function OrchestratorView () {
 
   return (
     <div
-      {...swipeHandlers}
       className={`${styles.container} ${isResizingPanel ? styles.containerResizing : ''} ${pendingRemoteCode ? styles.containerWithBanner : ''} ${isKeyboardOpen ? styles.containerKeyboardOpen : ''}`}
-      ref={mergedRef}
+      ref={containerRef}
       style={containerStyle}
     >
       <div className={refPanelClass}>
@@ -465,9 +446,12 @@ function OrchestratorView () {
       )}
 
       {isMobile && !isKeyboardOpen && (
-        <div className={styles.mobileToolbar}>
+        <div className={styles.mobileToolbar} role='tablist'>
           <button
             type='button'
+            role='tab'
+            aria-selected={activeMobileTab === 'stage'}
+            aria-label='Stage'
             className={`${styles.mobileTab} ${activeMobileTab === 'stage' ? styles.mobileTabActive : ''}`}
             onClick={() => setActiveMobileTab('stage')}
           >
@@ -476,6 +460,9 @@ function OrchestratorView () {
           </button>
           <button
             type='button'
+            role='tab'
+            aria-selected={activeMobileTab === 'code'}
+            aria-label='Code'
             className={`${styles.mobileTab} ${activeMobileTab === 'code' ? styles.mobileTabActive : ''}`}
             onClick={() => setActiveMobileTab('code')}
           >
@@ -487,6 +474,9 @@ function OrchestratorView () {
           </button>
           <button
             type='button'
+            role='tab'
+            aria-selected={activeMobileTab === 'ref'}
+            aria-label='Presets'
             className={`${styles.mobileTab} ${activeMobileTab === 'ref' ? styles.mobileTabActive : ''}`}
             onClick={() => setActiveMobileTab('ref')}
           >
