@@ -271,6 +271,9 @@ function HydraVisualizer ({
     const hydra = hydraRef.current
     if (!hydra) return
 
+    // Clear previous render graph to prevent oscillator bleed between presets
+    hydra.hush()
+
     // Re-check camera init when code changes with camera enabled
     if (allowCamera || remoteVideoElement) {
       const { sources } = detectCameraUsage(getHydraEvalCode(code))
