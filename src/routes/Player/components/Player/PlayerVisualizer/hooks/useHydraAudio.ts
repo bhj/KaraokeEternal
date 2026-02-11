@@ -1,7 +1,6 @@
 import { useRef, useCallback, useMemo } from 'react'
 import { useAudioAnalyser, type AudioData } from './useAudioAnalyser'
 import { createHydraAudioCompat } from './hydraAudioCompat'
-import type { AudioResponseState } from 'shared/types'
 
 const defaultAudioData: AudioData = {
   rawFrequencyData: new Float32Array(64),
@@ -21,10 +20,9 @@ const defaultAudioData: AudioData = {
 export function useHydraAudio (
   audioSourceNode: MediaElementAudioSourceNode | null,
   sensitivity: number,
-  audioResponse?: AudioResponseState,
   overrideData?: AudioData | null,
 ) {
-  const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity, audioResponse })
+  const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity })
   const audioRef = useRef<AudioData>(defaultAudioData)
   const compat = useMemo(() => createHydraAudioCompat(), [])
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { type AudioData } from 'routes/Player/components/Player/PlayerVisualizer/hooks/useAudioAnalyser'
-import type { AudioResponseState, VisualizerMode } from 'shared/types'
+import type { VisualizerMode } from 'shared/types'
 import HydraVisualizer from '../../Player/components/Player/PlayerVisualizer/HydraVisualizer'
 import styles from './HydraPreview.css'
 
@@ -14,7 +14,6 @@ interface HydraPreviewProps {
   isEnabled: boolean
   sensitivity: number
   allowCamera: boolean
-  audioResponse: AudioResponseState
   onCameraBoundSourcesChange?: (sources: string[]) => void
 }
 
@@ -44,7 +43,6 @@ const HydraPreview = ({
   isEnabled,
   sensitivity,
   allowCamera,
-  audioResponse,
   onCameraBoundSourcesChange,
 }: HydraPreviewProps) => {
   const status = useAppSelector(state => state.status)
@@ -170,7 +168,6 @@ const HydraPreview = ({
           height={height}
           code={code}
           layer={0}
-          audioResponse={audioResponse}
           allowCamera={allowCamera}
           overrideData={overrideData}
           remoteVideoElement={previewVideoElement}

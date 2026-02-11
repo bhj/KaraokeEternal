@@ -1,4 +1,6 @@
 import { stripInjectedLines } from '../../../lib/injectedLines'
+import type { VisualizerMode } from 'shared/types'
+import { getPresetByIndex, getPresetCount } from '../components/hydraPresets'
 
 /**
  * Whether to show the unsent-changes dot on the mobile Code tab.
@@ -10,15 +12,12 @@ export function shouldShowUnsentDot (
 ): boolean {
   return activeMobileTab !== 'code' && userHasEdited && sendStatus !== 'synced'
 }
-import { AUDIO_RESPONSE_DEFAULTS, type AudioResponseState, type VisualizerMode } from 'shared/types'
-import { getPresetByIndex, getPresetCount } from '../components/hydraPresets'
 
 interface PreviewVisualizerSource {
   mode?: VisualizerMode
   isEnabled?: boolean
   sensitivity?: number
   allowCamera?: boolean
-  audioResponse?: Partial<AudioResponseState>
 }
 
 export interface PreviewHydraState {
@@ -26,7 +25,6 @@ export interface PreviewHydraState {
   isEnabled: boolean
   sensitivity: number
   allowCamera: boolean
-  audioResponse: AudioResponseState
 }
 
 function toFiniteNumber (value: unknown, fallback: number): number {
@@ -43,7 +41,6 @@ function normalizeMode (value: unknown): VisualizerMode {
  * - When Orchestrator has observed a direct hydra update, prefer playerVisualizer
  *   (authoritative latest stream from VISUALIZER_HYDRA_CODE / sync actions).
  * - Otherwise prefer status.visualizer (hydrated from PLAYER_STATUS / options).
- * - Always merge audioResponse with defaults and sanitize numerics.
  */
 export function resolvePreviewHydraState (
   hasHydraUpdate: boolean,
@@ -52,12 +49,6 @@ export function resolvePreviewHydraState (
 ): PreviewHydraState {
   const preferred = hasHydraUpdate ? playerVisualizer : statusVisualizer
   const fallback = hasHydraUpdate ? statusVisualizer : playerVisualizer
-
-  const rawAudioResponse = preferred?.audioResponse ?? fallback?.audioResponse ?? {}
-  const mergedAudioResponse = {
-    ...AUDIO_RESPONSE_DEFAULTS,
-    ...rawAudioResponse,
-  }
 
   return {
     mode: normalizeMode(preferred?.mode ?? fallback?.mode),
@@ -72,12 +63,6 @@ export function resolvePreviewHydraState (
       : typeof fallback?.allowCamera === 'boolean'
         ? fallback.allowCamera
         : false,
-    audioResponse: {
-      globalGain: Math.max(0, toFiniteNumber(mergedAudioResponse.globalGain, AUDIO_RESPONSE_DEFAULTS.globalGain)),
-      bassWeight: Math.max(0, toFiniteNumber(mergedAudioResponse.bassWeight, AUDIO_RESPONSE_DEFAULTS.bassWeight)),
-      midWeight: Math.max(0, toFiniteNumber(mergedAudioResponse.midWeight, AUDIO_RESPONSE_DEFAULTS.midWeight)),
-      trebleWeight: Math.max(0, toFiniteNumber(mergedAudioResponse.trebleWeight, AUDIO_RESPONSE_DEFAULTS.trebleWeight)),
-    },
   }
 }
 

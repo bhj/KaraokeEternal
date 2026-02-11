@@ -65,7 +65,6 @@ describe('HydraPreview', () => {
           isEnabled={true}
           sensitivity={1}
           allowCamera={true}
-          audioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
         />,
       )
     })
@@ -114,7 +113,6 @@ describe('HydraPreview', () => {
           isEnabled={true}
           sensitivity={1}
           allowCamera={true}
-          audioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
         />,
       )
     })

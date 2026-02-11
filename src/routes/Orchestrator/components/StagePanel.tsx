@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import type { AudioResponseState, VisualizerMode } from 'shared/types'
+import type { VisualizerMode } from 'shared/types'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import HydraPreview from './HydraPreview'
 import styles from './StagePanel.css'
@@ -21,7 +21,6 @@ interface StagePanelProps {
   visualizerEnabled: boolean
   visualizerSensitivity: number
   visualizerAllowCamera: boolean
-  visualizerAudioResponse: AudioResponseState
   cameraRelayStatus: CameraRelayStatus
 }
 
@@ -39,7 +38,6 @@ function StagePanel ({
   visualizerEnabled,
   visualizerSensitivity,
   visualizerAllowCamera,
-  visualizerAudioResponse,
   cameraRelayStatus,
 }: StagePanelProps) {
   const previewCode = useMemo(() => buildPreviewCode(code, buffer), [code, buffer])
@@ -124,7 +122,6 @@ function StagePanel ({
             isEnabled={visualizerEnabled}
             sensitivity={visualizerSensitivity}
             allowCamera={visualizerAllowCamera}
-            audioResponse={visualizerAudioResponse}
             onCameraBoundSourcesChange={handleCameraBoundSourcesChange}
           />
         </div>

@@ -10,7 +10,7 @@ import VolumeSlider from './VolumeSlider/VolumeSlider'
 import NoPlayer from './NoPlayer/NoPlayer'
 import DisplayCtrl from './DisplayCtrl/DisplayCtrl'
 import styles from './PlaybackCtrl.css'
-import { PlaybackOptions, AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
+import { PlaybackOptions } from 'shared/types'
 import { useRuntimeHydraPresets } from 'routes/Player/components/useRuntimeHydraPresets'
 import {
   getNextPresetIndex,
@@ -137,7 +137,6 @@ const PlaybackCtrl = () => {
           sensitivity={status.visualizer.sensitivity}
           visualizerPresetName={status.visualizer.hydraPresetName ?? ''}
           visualizerMode={status.visualizer.mode}
-          audioResponse={{ ...AUDIO_RESPONSE_DEFAULTS, ...status.visualizer.audioResponse }}
           allowCamera={status.visualizer.allowCamera ?? false}
           cycleOnSongTransition={status.visualizer.cycleOnSongTransition ?? false}
           onHydraPresetChange={handleHydraPresetChange}

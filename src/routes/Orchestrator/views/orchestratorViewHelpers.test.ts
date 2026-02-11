@@ -238,7 +238,6 @@ describe('resolvePreviewHydraState', () => {
         isEnabled: false,
         sensitivity: 0.75,
         allowCamera: true,
-        audioResponse: { globalGain: 1.5, bassWeight: 2, midWeight: 0.9, trebleWeight: 0.8 },
       },
       {
         mode: 'hydra',
@@ -252,7 +251,6 @@ describe('resolvePreviewHydraState', () => {
     expect(state.isEnabled).toBe(false)
     expect(state.sensitivity).toBe(0.75)
     expect(state.allowCamera).toBe(true)
-    expect(state.audioResponse.globalGain).toBe(1.5)
   })
 
   it('uses status visualizer values when hasHydraUpdate=false', () => {
@@ -285,6 +283,5 @@ describe('resolvePreviewHydraState', () => {
     expect(state.isEnabled).toBe(true)
     expect(state.sensitivity).toBe(1)
     expect(state.allowCamera).toBe(false)
-    expect(state.audioResponse.globalGain).toBe(1)
   })
 })

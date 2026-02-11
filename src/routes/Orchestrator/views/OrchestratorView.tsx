@@ -425,7 +425,6 @@ function OrchestratorView () {
             visualizerEnabled={previewHydraState.isEnabled}
             visualizerSensitivity={previewHydraState.sensitivity}
             visualizerAllowCamera={previewHydraState.allowCamera}
-            visualizerAudioResponse={previewHydraState.audioResponse}
             cameraRelayStatus={camera.status}
           />
         </div>

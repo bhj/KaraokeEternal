@@ -151,7 +151,6 @@ class Player extends React.Component<PlayerProps> {
               height={this.props.height}
               mode={this.props.visualizer.mode}
               hydraCode={this.props.visualizer.hydraCode}
-              audioResponse={this.props.visualizer.audioResponse}
               allowCamera={this.props.visualizer.allowCamera}
               remoteVideoElement={this.props.remoteVideoElement}
             />

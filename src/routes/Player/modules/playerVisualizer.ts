@@ -6,8 +6,7 @@ import {
   VISUALIZER_HYDRA_CODE,
   VISUALIZER_STATE_SYNC,
 } from 'shared/actionTypes'
-import type { AudioResponseState, PlaybackOptions, VisualizerMode } from 'shared/types'
-import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
+import type { PlaybackOptions, VisualizerMode } from 'shared/types'
 import { getDefaultPreset, getDefaultPresetIndex, getPresetLabel } from 'routes/Orchestrator/components/hydraPresets'
 import type { InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import type { PresetCategory } from 'routes/Player/components/Player/PlayerVisualizer/hooks/presetClassifier'
@@ -51,7 +50,6 @@ export interface PlayerVisualizerState {
   hydraPresetFolderId?: number | null
   hydraPresetSource?: 'gallery' | 'folder'
   hasHydraUpdate: boolean
-  audioResponse: AudioResponseState
   allowCamera: boolean
   cycleOnSongTransition: boolean
   injectionLevel: InjectionLevel
@@ -72,7 +70,6 @@ const initialState: PlayerVisualizerState = {
   hydraPresetFolderId: null,
   hydraPresetSource: 'gallery',
   hasHydraUpdate: false,
-  audioResponse: { ...AUDIO_RESPONSE_DEFAULTS },
   allowCamera: false,
   cycleOnSongTransition: false,
   injectionLevel: 'med',
@@ -100,9 +97,6 @@ const playerVisualizerReducer = createReducer(initialState, (builder) => {
         isEnabled: typeof visualizer.isEnabled === 'boolean' ? visualizer.isEnabled : state.isEnabled,
         sensitivity: typeof visualizer.sensitivity === 'number' ? visualizer.sensitivity : state.sensitivity,
         mode: validMode(visualizer.mode, state.mode),
-        audioResponse: visualizer.audioResponse
-          ? { ...AUDIO_RESPONSE_DEFAULTS, ...visualizer.audioResponse }
-          : state.audioResponse,
         allowCamera: typeof visualizer.allowCamera === 'boolean' ? visualizer.allowCamera : state.allowCamera,
         cycleOnSongTransition: typeof visualizer.cycleOnSongTransition === 'boolean'
           ? visualizer.cycleOnSongTransition
