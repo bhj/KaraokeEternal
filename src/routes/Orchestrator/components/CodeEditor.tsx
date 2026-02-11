@@ -412,7 +412,7 @@ function CodeEditor ({
   }, [cameraUsage.sources])
 
   const showCameraBanner = cameraUsage.sources.length > 0
-    && !cameraUsage.hasExplicitInit
+    && !cameraUsage.hasInitCam && !cameraUsage.hasExplicitSource
     && !cameraBannerDismissed
 
   const handleEnableCamera = useCallback(() => {
