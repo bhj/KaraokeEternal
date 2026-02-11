@@ -427,35 +427,35 @@ router.post('/setup', async (ctx) => {
     ctx.throw(403)
   }
 
-  // create default room
-  const fields = new Map()
-  fields.set('name', 'Room 1')
-  fields.set('status', 'open')
-  fields.set('dateCreated', Math.floor(Date.now() / 1000))
-
-  const query = sql`
-    INSERT INTO rooms ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
-    VALUES ${sql.tuple(Array.from(fields.values()))}
-  `
-  const res = db.run(String(query), query.parameters)
-
-  if (typeof res.lastID !== 'number') {
-    ctx.throw(500, 'Invalid default room lastID')
-  }
-
-  // create admin user
   try {
+    // create admin user
     const req = ctx.request as unknown as RequestWithBody
     const userId = await User.create({ ...req.body, image } as any, 'admin')
     const user = User.getById(userId, true)
-    const userCtx = createUserCtx(user, res.lastID)
-
-    // create JWT
-    const token = jwtSign(userCtx, ctx.jwtKey)
 
     if (!user) {
       throw new Error('User not found')
     }
+
+    // create default room
+    const fields = new Map()
+    fields.set('name', 'Room 1')
+    fields.set('status', 'open')
+    fields.set('dateCreated', Math.floor(Date.now() / 1000))
+
+    const roomQuery = sql`
+      INSERT INTO rooms ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const roomRes = db.run(String(roomQuery), roomQuery.parameters)
+
+    if (typeof roomRes.lastID !== 'number') {
+      ctx.throw(500, 'Invalid default room lastID')
+    }
+
+    // create JWT
+    const userCtx = createUserCtx(user, roomRes.lastID)
+    const token = jwtSign(userCtx, ctx.jwtKey)
 
     // set JWT as an httpOnly cookie
     ctx.cookies.set('keToken', token, {
