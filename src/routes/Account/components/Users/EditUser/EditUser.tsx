@@ -14,13 +14,14 @@ interface EditUserProps {
 
 const EditUser = ({ user, onClose }: EditUserProps) => {
   const dispatch = useAppDispatch()
+
   const handleSubmit = (data: FormData) => {
     if (user) dispatch(updateUser({ userId: user.userId, data }))
     else dispatch(createUser(data))
   }
 
   const handleRemoveClick = () => {
-    if (confirm(`Remove user "${user.username}"?\n\nTheir queued songs will also be removed.`)) {
+    if (user && confirm(`Remove user "${user.username}"?\n\nTheir queued songs will also be removed.`)) {
       dispatch(removeUser(user.userId))
     }
   }
