@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   CAMERA_OFFER,
   CAMERA_OFFER_REQ,
+  CAMERA_STOP,
+  CAMERA_STOP_REQ,
   PLAYER_CMD_NEXT,
   PLAYER_REQ_NEXT,
   VISUALIZER_HYDRA_CODE,
@@ -25,7 +27,7 @@ vi.mock('../lib/Log.js', () => ({
 }))
 
 import Rooms from '../Rooms/Rooms.js'
-import handlers, { canManageRoom } from './socket.js'
+import handlers, { canManageRoom, cleanupCameraPublisher } from './socket.js'
 
 interface MockSocket {
   id: string
@@ -40,18 +42,24 @@ interface MockSocket {
   }
 }
 
-function createMockSocket (user: MockSocket['user']) {
+function createMockSocket (user: MockSocket['user'], socketId = 'sock-1') {
   const othersEmit = vi.fn()
   const broadcastEmit = vi.fn()
   const serverTo = vi.fn(() => ({ emit: broadcastEmit }))
   const socketTo = vi.fn(() => ({ emit: othersEmit }))
   const sock = {
-    id: 'sock-1',
+    id: socketId,
     user,
     to: socketTo,
     server: { to: serverTo },
   }
   return { sock: sock as unknown as MockSocket, othersEmit, broadcastEmit, serverTo, socketTo }
+}
+
+function createMockIo () {
+  const emit = vi.fn()
+  const to = vi.fn(() => ({ emit }))
+  return { io: { to }, emit, to }
 }
 
 describe('Player socket permissions', () => {
@@ -276,5 +284,124 @@ describe('Player socket permissions', () => {
       payload: { sdp: 'offer' },
     })
     expect(broadcastEmit).not.toHaveBeenCalled()
+  })
+})
+
+describe('Camera publisher disconnect cleanup', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  function allowCameraRelay (roomId: number) {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [roomId],
+      entities: {
+        [roomId]: {
+          ownerId: 999,
+          prefs: { allowGuestCameraRelay: true },
+        },
+      },
+    })
+  }
+
+  it('broadcasts CAMERA_STOP when publisher socket disconnects', async () => {
+    allowCameraRelay(10)
+    const { sock } = createMockSocket({ userId: 50, roomId: 10, isAdmin: false }, 'pub-sock')
+
+    // Publisher sends offer → tracked
+    await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
+
+    // Simulate disconnect
+    const { io, emit } = createMockIo()
+    cleanupCameraPublisher(10, 'pub-sock', io)
+
+    expect(emit).toHaveBeenCalledWith('action', { type: CAMERA_STOP })
+  })
+
+  it('does not broadcast CAMERA_STOP when non-publisher socket disconnects', async () => {
+    allowCameraRelay(10)
+    const { sock } = createMockSocket({ userId: 50, roomId: 10, isAdmin: false }, 'pub-sock')
+
+    // Publisher sends offer → tracked
+    await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
+
+    // Different socket disconnects
+    const { io, emit } = createMockIo()
+    cleanupCameraPublisher(10, 'other-sock', io)
+
+    expect(emit).not.toHaveBeenCalled()
+  })
+
+  it('clears publisher tracking on explicit CAMERA_STOP_REQ', async () => {
+    allowCameraRelay(10)
+    const { sock } = createMockSocket({ userId: 50, roomId: 10, isAdmin: false }, 'pub-sock')
+
+    // Publisher sends offer → tracked
+    await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
+
+    // Publisher sends explicit stop
+    await handlers[CAMERA_STOP_REQ](sock, { payload: {} })
+
+    // Now disconnect should NOT broadcast again (already stopped)
+    const { io, emit } = createMockIo()
+    cleanupCameraPublisher(10, 'pub-sock', io)
+
+    expect(emit).not.toHaveBeenCalled()
+  })
+
+  it('new publisher takeover replaces previous publisher for same room', async () => {
+    allowCameraRelay(20)
+    const { sock: sock1 } = createMockSocket({ userId: 50, roomId: 20, isAdmin: false }, 'pub-1')
+    const { sock: sock2 } = createMockSocket({ userId: 60, roomId: 20, isAdmin: false }, 'pub-2')
+
+    // First publisher sends offer
+    await handlers[CAMERA_OFFER_REQ](sock1, { payload: { sdp: 'offer-1' } })
+
+    // Second publisher takes over
+    await handlers[CAMERA_OFFER_REQ](sock2, { payload: { sdp: 'offer-2' } })
+
+    // Old publisher disconnects → should NOT trigger CAMERA_STOP (replaced)
+    const { io: io1, emit: emit1 } = createMockIo()
+    cleanupCameraPublisher(20, 'pub-1', io1)
+    expect(emit1).not.toHaveBeenCalled()
+
+    // New publisher disconnects → should trigger CAMERA_STOP
+    const { io: io2, emit: emit2 } = createMockIo()
+    cleanupCameraPublisher(20, 'pub-2', io2)
+    expect(emit2).toHaveBeenCalledWith('action', { type: CAMERA_STOP })
+  })
+
+  it('cleanup is scoped to correct room in multi-room scenario', async () => {
+    // Mock Rooms.get to allow camera relay for any room
+    vi.mocked(Rooms.get).mockImplementation(async (roomId: number) => ({
+      result: [roomId],
+      entities: {
+        [roomId]: {
+          ownerId: 999,
+          prefs: { allowGuestCameraRelay: true },
+        },
+      },
+    }))
+
+    const { sock: sockA } = createMockSocket({ userId: 50, roomId: 30, isAdmin: false }, 'pub-a')
+    const { sock: sockB } = createMockSocket({ userId: 60, roomId: 40, isAdmin: false }, 'pub-b')
+
+    // Publishers in different rooms
+    await handlers[CAMERA_OFFER_REQ](sockA, { payload: { sdp: 'offer-a' } })
+    await handlers[CAMERA_OFFER_REQ](sockB, { payload: { sdp: 'offer-b' } })
+
+    // Disconnect publisher from room 30 → only room 30 gets CAMERA_STOP
+    const { io, emit, to } = createMockIo()
+    cleanupCameraPublisher(30, 'pub-a', io)
+
+    expect(to).toHaveBeenCalledWith('ROOM_ID_30')
+    expect(emit).toHaveBeenCalledWith('action', { type: CAMERA_STOP })
+
+    // Room 40 publisher still tracked — disconnect triggers CAMERA_STOP for room 40
+    const { io: io2, emit: emit2, to: to2 } = createMockIo()
+    cleanupCameraPublisher(40, 'pub-b', io2)
+
+    expect(to2).toHaveBeenCalledWith('ROOM_ID_40')
+    expect(emit2).toHaveBeenCalledWith('action', { type: CAMERA_STOP })
   })
 })

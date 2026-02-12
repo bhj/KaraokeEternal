@@ -37,6 +37,9 @@ import {
 
 const log = getLogger('PlayerSocket')
 
+// Track which socket is the active camera publisher per room
+const roomCameraPublishers = new Map<number, string>() // roomId → publisherSocketId
+
 interface RoomControlSocket {
   id?: string
   user?: {
@@ -163,6 +166,23 @@ function emitCameraRelay (sock: RoomControlSocket, type: string, payload: unknow
   relaySock.server?.to(roomPrefix).emit('action', { type, payload })
 }
 
+/**
+ * If the disconnecting socket was the camera publisher for this room,
+ * broadcast CAMERA_STOP and clear the tracking entry.
+ */
+export function cleanupCameraPublisher (
+  roomId: number,
+  socketId: string,
+  io: { to: (room: string) => { emit: (event: string, payload: unknown) => void } },
+): void {
+  if (roomCameraPublishers.get(roomId) !== socketId) return
+
+  roomCameraPublishers.delete(roomId)
+  const roomPrefix = Rooms.prefix(roomId)
+  io.to(roomPrefix).emit('action', { type: CAMERA_STOP })
+  log.verbose('auto-broadcast CAMERA_STOP room=%s (publisher %s disconnected)', roomId, socketId)
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -257,6 +277,11 @@ const ACTION_HANDLERS = {
       return
     }
 
+    const roomId = sock.user?.roomId
+    if (typeof roomId === 'number') {
+      roomCameraPublishers.set(roomId, sock.id)
+    }
+
     emitCameraRelay(sock, CAMERA_OFFER, payload)
   },
   [CAMERA_ANSWER_REQ]: async (sock, { payload }) => {
@@ -279,6 +304,11 @@ const ACTION_HANDLERS = {
     if (!(await canRelayCamera(sock))) {
       log.verbose('camera relay denied %s room=%s socket=%s', CAMERA_STOP_REQ, sock.user?.roomId, sock.id)
       return
+    }
+
+    const roomId = sock.user?.roomId
+    if (typeof roomId === 'number') {
+      roomCameraPublishers.delete(roomId)
     }
 
     emitCameraRelay(sock, CAMERA_STOP, payload)

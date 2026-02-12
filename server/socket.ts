@@ -3,7 +3,7 @@ import jsonWebToken from 'jsonwebtoken'
 import parseCookie from './lib/parseCookie.js'
 import Library from './Library/Library.js'
 import LibrarySocket from './Library/socket.js'
-import PlayerSocket from './Player/socket.js'
+import PlayerSocket, { cleanupCameraPublisher } from './Player/socket.js'
 import Prefs from './Prefs/Prefs.js'
 import PrefsSocket from './Prefs/socket.js'
 import Rooms from './Rooms/Rooms.js'
@@ -150,6 +150,9 @@ export default function (io, jwtKey, validateProxySource: (ip: string) => boolea
       log.verbose('%s (%s) left room %s (%s; %s in room)',
         sock.user.name, sock.id, roomId, reason, sock.adapter.rooms.size,
       )
+
+      // If this socket was the camera publisher, auto-broadcast CAMERA_STOP
+      cleanupCameraPublisher(roomId, sock.id, io)
 
       // any players left in room?
       if (!Rooms.isPlayerPresent(io, roomId)) {
