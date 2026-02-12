@@ -20,6 +20,26 @@ describe('remoteCameraOverride', () => {
     expect(overrides.get('s0')).toBe(originalInitCam)
   })
 
+  it('preserves source context when overridden initCam calls init', () => {
+    const remote = {} as HTMLVideoElement
+    const globals: Record<string, unknown> = {
+      s0: {
+        initCam: vi.fn(),
+        init (this: { boundSrc?: HTMLVideoElement }, opts: { src: HTMLVideoElement }) {
+          this.boundSrc = opts.src
+        },
+      },
+    }
+    const overrides = new Map<string, unknown>()
+
+    applyRemoteCameraOverride(['s0'], remote, globals, overrides)
+
+    const ext = globals.s0 as { initCam?: () => void, boundSrc?: HTMLVideoElement }
+    ext.initCam?.()
+
+    expect(ext.boundSrc).toBe(remote)
+  })
+
   it('restores original initCam when remote is cleared', () => {
     const remote = {} as HTMLVideoElement
     const originalInitCam = vi.fn()

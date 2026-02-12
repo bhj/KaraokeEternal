@@ -44,6 +44,12 @@ vi.mock('./hooks/useHydraAudio', () => ({
   }),
 }))
 
+function markVideoRenderable (video: HTMLVideoElement, width = 640, height = 360, readyState = 4) {
+  Object.defineProperty(video, 'videoWidth', { configurable: true, get: () => width })
+  Object.defineProperty(video, 'videoHeight', { configurable: true, get: () => height })
+  Object.defineProperty(video, 'readyState', { configurable: true, get: () => readyState })
+}
+
 describe('HydraVisualizer camera rebinding', () => {
   it('re-binds camera source when remote video element changes', async () => {
     const init = vi.fn()
@@ -53,7 +59,9 @@ describe('HydraVisualizer camera rebinding', () => {
     }
 
     const remoteA = document.createElement('video')
+    markVideoRenderable(remoteA)
     const remoteB = document.createElement('video')
+    markVideoRenderable(remoteB)
     const container = document.createElement('div')
     const root = createRoot(container)
 
@@ -105,6 +113,7 @@ describe('HydraVisualizer camera rebinding', () => {
     }
 
     const remote = document.createElement('video')
+    markVideoRenderable(remote)
     const container = document.createElement('div')
     const root = createRoot(container)
 
@@ -154,6 +163,48 @@ describe('HydraVisualizer camera rebinding', () => {
     })
 
     expect(init).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
+  it('waits for renderable remote video before binding camera source', async () => {
+    const init = vi.fn()
+    ;(window as unknown as Record<string, unknown>).s0 = {
+      init,
+      initCam: vi.fn(),
+    }
+
+    const remote = document.createElement('video')
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <HydraVisualizer
+          audioSourceNode={null}
+          isPlaying={true}
+          sensitivity={1}
+          width={320}
+          height={180}
+          code='src(s0).out(o0)'
+          allowCamera={true}
+          remoteVideoElement={remote}
+        />,
+      )
+    })
+
+    expect(init).not.toHaveBeenCalled()
+
+    markVideoRenderable(remote, 1280, 720)
+
+    await act(async () => {
+      remote.dispatchEvent(new Event('loadedmetadata'))
+    })
+
+    expect(init).toHaveBeenCalledTimes(1)
+    expect(init).toHaveBeenCalledWith({ src: remote })
 
     await act(async () => {
       root.unmount()

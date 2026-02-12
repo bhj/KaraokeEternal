@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react'
 import Hydra from 'hydra-synth'
 import throttle from 'lodash/throttle'
 import { useDispatch } from 'react-redux'
@@ -28,6 +28,13 @@ function snapshotVideoElement (videoEl: HTMLVideoElement | null) {
     videoHeight: videoEl.videoHeight,
     hasSrcObject: videoEl.srcObject !== null,
   }
+}
+
+function isRemoteVideoRenderable (videoEl: HTMLVideoElement | null) {
+  if (!videoEl) return false
+  return videoEl.readyState >= 2
+    && videoEl.videoWidth > 0
+    && videoEl.videoHeight > 0
 }
 
 // Audio globals exposed on window for Hydra code to reference
@@ -108,6 +115,7 @@ function HydraVisualizer ({
   const cameraOverrideRef = useRef<Map<string, unknown>>(new Map())
   const videoProxyOverrideRef = useRef<Map<string, unknown>>(new Map())
   const prevRemoteVideoRef = useRef<HTMLVideoElement | null>(null)
+  const [remoteVideoEpoch, setRemoteVideoEpoch] = useState(0)
 
   const reportCameraSourcesBound = useCallback(() => {
     if (!onCameraSourcesBoundChange) return
@@ -199,6 +207,7 @@ function HydraVisualizer ({
     const handlers = events.map((eventName) => {
       const handler = () => {
         cameraDiag('remote video event', { eventName, video: snapshotVideoElement(remoteVideoElement) })
+        setRemoteVideoEpoch((prev) => prev + 1)
       }
       remoteVideoElement.addEventListener(eventName, handler)
       return { eventName, handler }
@@ -288,12 +297,14 @@ function HydraVisualizer ({
     const currentCode = getHydraEvalCode(codeRef.current)
     const { sources } = detectCameraUsage(currentCode)
     const w = window as unknown as Record<string, unknown>
+    const remoteVideoReady = isRemoteVideoRenderable(remoteVideoElement ?? null)
 
     cameraDiag('camera auto-init pass', {
       sourceCount: sources.length,
       sources,
       allowCamera: Boolean(allowCamera),
       hasRemoteVideo: Boolean(remoteVideoElement),
+      remoteVideoReady,
       remoteVideo: snapshotVideoElement(remoteVideoElement ?? null),
     })
 
@@ -312,9 +323,17 @@ function HydraVisualizer ({
       }
 
       try {
+        if (remoteVideoElement && !remoteVideoReady) {
+          cameraDiag('remote video not renderable yet; skipping source bind', {
+            src,
+            video: snapshotVideoElement(remoteVideoElement),
+          })
+          continue
+        }
+
         if (remoteVideoElement && extSrc.init) {
           cameraDiag('binding remote video to hydra source', { src, video: snapshotVideoElement(remoteVideoElement) })
-          extSrc.init({ src: remoteVideoElement })
+          extSrc.init.call(extSrc, { src: remoteVideoElement })
           cameraInitRef.current.add(src)
         } else if (allowCamera && extSrc.initCam) {
           cameraDiag('calling extSrc.initCam()', { src })
@@ -335,7 +354,7 @@ function HydraVisualizer ({
     }
 
     reportCameraSourcesBound()
-  }, [allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
+  }, [allowCamera, remoteVideoElement, remoteVideoEpoch, reportCameraSourcesBound, pruneStaleCameraBindings])
 
   // Re-execute code when it changes
   useEffect(() => {
@@ -353,12 +372,14 @@ function HydraVisualizer ({
     if (allowCamera || remoteVideoElement) {
       const { sources } = detectCameraUsage(getHydraEvalCode(code))
       const w = window as unknown as Record<string, unknown>
+      const remoteVideoReady = isRemoteVideoRenderable(remoteVideoElement ?? null)
 
       cameraDiag('camera rebind on code change', {
         sourceCount: sources.length,
         sources,
         allowCamera: Boolean(allowCamera),
         hasRemoteVideo: Boolean(remoteVideoElement),
+        remoteVideoReady,
         remoteVideo: snapshotVideoElement(remoteVideoElement ?? null),
       })
 
@@ -377,9 +398,17 @@ function HydraVisualizer ({
         }
 
         try {
+          if (remoteVideoElement && !remoteVideoReady) {
+            cameraDiag('remote video not renderable yet on code change; skipping source rebind', {
+              src,
+              video: snapshotVideoElement(remoteVideoElement),
+            })
+            continue
+          }
+
           if (remoteVideoElement && extSrc.init) {
             cameraDiag('rebind remote video to source on code change', { src, video: snapshotVideoElement(remoteVideoElement) })
-            extSrc.init({ src: remoteVideoElement })
+            extSrc.init.call(extSrc, { src: remoteVideoElement })
             cameraInitRef.current.add(src)
           } else if (allowCamera && extSrc.initCam) {
             cameraDiag('re-run initCam on code change', { src })
@@ -404,7 +433,7 @@ function HydraVisualizer ({
 
     executeHydraCode(hydra, getHydraEvalCode(code))
     errorCountRef.current = 0
-  }, [code, allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
+  }, [code, allowCamera, remoteVideoElement, remoteVideoEpoch, reportCameraSourcesBound, pruneStaleCameraBindings])
 
   // Animation tick
   const tick = useCallback((time: number) => {

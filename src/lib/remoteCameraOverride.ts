@@ -23,7 +23,8 @@ export function applyRemoteCameraOverride (
 
     const init = ext.init
     ext.initCam = () => {
-      init({ src: remoteVideoElement })
+      // Preserve Hydra external source context for internal mutable state.
+      init.call(ext, { src: remoteVideoElement })
     }
   }
 }
