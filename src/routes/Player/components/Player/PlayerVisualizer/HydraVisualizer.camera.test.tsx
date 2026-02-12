@@ -18,6 +18,8 @@ vi.mock('react-redux', () => ({
 vi.mock('hydra-synth', () => {
   class FakeHydra {
     regl = { destroy: vi.fn() }
+    o = [{}, {}, {}, {}]
+    synth = { solid: vi.fn(() => ({ out: vi.fn() })), render: vi.fn() }
 
     constructor () {}
 
