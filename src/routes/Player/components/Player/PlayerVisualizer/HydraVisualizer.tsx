@@ -43,6 +43,24 @@ function setAudioGlobals (compat: HydraAudioCompat) {
   w.a = compat
 }
 
+// Self-healing guard: re-set window.a if it was clobbered (e.g. by hush/eval cycle)
+function ensureAudioGlobals (compat: HydraAudioCompat) {
+  const w = window as unknown as Record<string, unknown>
+  const current = w.a as HydraAudioCompat | undefined
+  if (!current || !current.fft || current !== compat) {
+    w.a = compat
+  }
+}
+
+// Clear render graph outputs without clearing sources (preserves WebRTC video tracks).
+// hydra.hush() calls source.clear() which stops video tracks via track.stop().
+function softHush (hydra: Hydra) {
+  const h = hydra as unknown as { o?: Array<{ clear: () => void }> }
+  if (h.o) {
+    h.o.forEach(output => output.clear())
+  }
+}
+
 function clearAudioGlobals () {
   const w = window as unknown as Record<string, unknown>
   // Defensive cleanup for sessions that previously exposed legacy helpers.
@@ -56,8 +74,9 @@ function clearAudioGlobals () {
   delete w.a
 }
 
-function executeHydraCode (hydra: Hydra, code: string) {
+function executeHydraCode (hydra: Hydra, code: string, compat?: HydraAudioCompat) {
   try {
+    if (compat) ensureAudioGlobals(compat)
     hydra.eval(getHydraEvalCode(code))
   } catch (err) {
     warn('Code execution error:', err)
@@ -115,6 +134,7 @@ function HydraVisualizer ({
   const cameraOverrideRef = useRef<Map<string, unknown>>(new Map())
   const videoProxyOverrideRef = useRef<Map<string, unknown>>(new Map())
   const prevRemoteVideoRef = useRef<HTMLVideoElement | null>(null)
+  const compatRef = useRef<HydraAudioCompat | null>(null)
   const [remoteVideoEpoch, setRemoteVideoEpoch] = useState(0)
 
   const reportCameraSourcesBound = useCallback(() => {
@@ -137,6 +157,7 @@ function HydraVisualizer ({
     sensitivity,
     overrideData,
   )
+  compatRef.current = compat
 
   // Throttle FFT emission to ~20Hz (50ms)
   const emitFftData = useMemo(() => throttle((data: AudioData) => {
@@ -267,7 +288,7 @@ function HydraVisualizer ({
     }
 
     // Execute initial patch and render first frame immediately
-    executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
+    executeHydraCode(hydra, codeRef.current)
     hydra.tick(16.67)
 
     return () => {
@@ -368,8 +389,12 @@ function HydraVisualizer ({
     const hydra = hydraRef.current
     if (!hydra) return
 
-    // Clear previous render graph to prevent oscillator bleed between presets
-    if (typeof (hydra as unknown as { hush?: () => void }).hush === 'function') {
+    // Clear previous render graph to prevent oscillator bleed between presets.
+    // When remote relay is active, use softHush (output-only clear) to preserve
+    // WebRTC video tracks. hydra.hush() calls source.clear() which stops tracks.
+    if (remoteVideoElement) {
+      softHush(hydra)
+    } else if (typeof (hydra as unknown as { hush?: () => void }).hush === 'function') {
       hydra.hush()
     } else {
       cameraDiag('hydra.hush unavailable; skipping graph clear for this runtime')
@@ -438,9 +463,9 @@ function HydraVisualizer ({
 
     reportCameraSourcesBound()
 
-    executeHydraCode(hydra, getHydraEvalCode(code))
+    executeHydraCode(hydra, code, compatRef.current ?? undefined)
     errorCountRef.current = 0
-  }, [code, allowCamera, remoteVideoElement, remoteVideoEpoch, reportCameraSourcesBound, pruneStaleCameraBindings])
+  }, [code, allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
 
   // Animation tick
   const tick = useCallback((time: number) => {
@@ -449,6 +474,9 @@ function HydraVisualizer ({
 
     // Update audio data from analyser
     updateAudio()
+
+    // Ensure window.a stays valid (guards against clobbering by eval/hush cycles)
+    if (compatRef.current) ensureAudioGlobals(compatRef.current)
 
     // Emit FFT if enabled (always emit while Hydra is running)
     if (emitFft && shouldEmitFft(isPlaying)) {
