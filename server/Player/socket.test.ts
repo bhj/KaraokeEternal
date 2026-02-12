@@ -15,28 +15,43 @@ vi.mock('../Rooms/Rooms.js', () => ({
   },
 }))
 
+vi.mock('../lib/Log.js', () => ({
+  default: () => ({
+    verbose: () => {},
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+  }),
+}))
+
 import Rooms from '../Rooms/Rooms.js'
 import handlers, { canManageRoom } from './socket.js'
 
 interface MockSocket {
+  id: string
   user: {
     userId: number
     roomId: number
     isAdmin: boolean
   }
+  to: ReturnType<typeof vi.fn>
   server: {
     to: ReturnType<typeof vi.fn>
   }
 }
 
 function createMockSocket (user: MockSocket['user']) {
-  const emit = vi.fn()
-  const to = vi.fn(() => ({ emit }))
+  const othersEmit = vi.fn()
+  const broadcastEmit = vi.fn()
+  const serverTo = vi.fn(() => ({ emit: broadcastEmit }))
+  const socketTo = vi.fn(() => ({ emit: othersEmit }))
   const sock = {
+    id: 'sock-1',
     user,
-    server: { to },
+    to: socketTo,
+    server: { to: serverTo },
   }
-  return { sock: sock as unknown as MockSocket, emit, to }
+  return { sock: sock as unknown as MockSocket, othersEmit, broadcastEmit, serverTo, socketTo }
 }
 
 describe('Player socket permissions', () => {
@@ -70,11 +85,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, broadcastEmit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()' } })
 
-    expect(emit).not.toHaveBeenCalled()
+    expect(broadcastEmit).not.toHaveBeenCalled()
   })
 
   it('allows hydra code broadcast when collaborator send is enabled', async () => {
@@ -90,11 +105,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, broadcastEmit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()' } })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(broadcastEmit).toHaveBeenCalledWith('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload: { code: 'osc(10).out()' },
     })
@@ -115,11 +130,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, broadcastEmit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()', hydraPresetFolderId: 2 } })
 
-    expect(emit).not.toHaveBeenCalled()
+    expect(broadcastEmit).not.toHaveBeenCalled()
   })
 
   it('allows collaborator hydra send when room is restricted and payload folder matches', async () => {
@@ -137,7 +152,7 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, broadcastEmit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, {
       payload: {
@@ -147,7 +162,7 @@ describe('Player socket permissions', () => {
       },
     })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(broadcastEmit).toHaveBeenCalledWith('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload: {
         code: 'osc(10).out()',
@@ -165,11 +180,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 42, roomId: 11, isAdmin: false })
+    const { sock, broadcastEmit } = createMockSocket({ userId: 42, roomId: 11, isAdmin: false })
 
     await handlers[PLAYER_REQ_NEXT](sock)
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(broadcastEmit).toHaveBeenCalledWith('action', {
       type: PLAYER_CMD_NEXT,
     })
   })
@@ -182,11 +197,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 200, roomId: 77, isAdmin: false })
+    const { sock, broadcastEmit } = createMockSocket({ userId: 200, roomId: 77, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'noise(4).out()' } })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(broadcastEmit).toHaveBeenCalledWith('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload: { code: 'noise(4).out()' },
     })
@@ -205,11 +220,12 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
+    const { sock, othersEmit, socketTo } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
 
     await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
 
-    expect(emit).not.toHaveBeenCalled()
+    expect(othersEmit).not.toHaveBeenCalled()
+    expect(socketTo).not.toHaveBeenCalled()
   })
 
   it('allows camera offer when collaborator relay is enabled', async () => {
@@ -225,13 +241,40 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
+    const { sock, othersEmit, broadcastEmit, socketTo, serverTo } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
 
     await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(othersEmit).toHaveBeenCalledWith('action', {
       type: CAMERA_OFFER,
       payload: { sdp: 'offer' },
     })
+    expect(socketTo).toHaveBeenCalledWith('ROOM_ID_88')
+    expect(serverTo).not.toHaveBeenCalled()
+    expect(broadcastEmit).not.toHaveBeenCalled()
+  })
+
+  it('does not echo camera offer back to sender socket', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [88],
+      entities: {
+        88: {
+          ownerId: 300,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const { sock, othersEmit, broadcastEmit } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
+
+    await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
+
+    expect(othersEmit).toHaveBeenCalledWith('action', {
+      type: CAMERA_OFFER,
+      payload: { sdp: 'offer' },
+    })
+    expect(broadcastEmit).not.toHaveBeenCalled()
   })
 })

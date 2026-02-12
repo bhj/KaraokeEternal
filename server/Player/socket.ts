@@ -1,5 +1,6 @@
 import Rooms from '../Rooms/Rooms.js'
 import { resolveRoomAccessPrefs } from '../../shared/roomAccess.js'
+import getLogger from '../lib/Log.js'
 
 import {
   PLAYER_CMD_NEXT,
@@ -34,11 +35,15 @@ import {
   CAMERA_STOP,
 } from '../../shared/actionTypes.js'
 
+const log = getLogger('PlayerSocket')
+
 interface RoomControlSocket {
+  id?: string
   user?: {
     userId?: number
     roomId?: number
     isAdmin?: boolean
+    name?: string
   }
 }
 
@@ -135,6 +140,29 @@ async function canRelayCamera (sock: RoomControlSocket): Promise<boolean> {
   return access.hasRoom && (access.canManage || access.accessPrefs.allowGuestCameraRelay)
 }
 
+function emitCameraRelay (sock: RoomControlSocket, type: string, payload: unknown): void {
+  const roomId = sock.user?.roomId
+  if (typeof roomId !== 'number') return
+
+  const relaySock = sock as RoomControlSocket & {
+    to?: (room: string) => { emit: (event: string, payload: unknown) => void }
+    server?: { to: (room: string) => { emit: (event: string, payload: unknown) => void } }
+  }
+
+  const roomPrefix = Rooms.prefix(roomId)
+  const userName = sock.user?.name ?? 'unknown'
+  log.verbose('camera relay %s room=%s sender=%s socket=%s', type, roomId, userName, sock.id)
+
+  // Keep signaling directional: do not echo back to sender.
+  if (typeof relaySock.to === 'function') {
+    relaySock.to(roomPrefix).emit('action', { type, payload })
+    return
+  }
+
+  // Fallback for tests/mocks that do not expose sock.to
+  relaySock.server?.to(roomPrefix).emit('action', { type, payload })
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -224,36 +252,36 @@ const ACTION_HANDLERS = {
     })
   },
   [CAMERA_OFFER_REQ]: async (sock, { payload }) => {
-    if (!(await canRelayCamera(sock))) return
+    if (!(await canRelayCamera(sock))) {
+      log.verbose('camera relay denied %s room=%s socket=%s', CAMERA_OFFER_REQ, sock.user?.roomId, sock.id)
+      return
+    }
 
-    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
-      type: CAMERA_OFFER,
-      payload,
-    })
+    emitCameraRelay(sock, CAMERA_OFFER, payload)
   },
   [CAMERA_ANSWER_REQ]: async (sock, { payload }) => {
-    if (!(await canRelayCamera(sock))) return
+    if (!(await canRelayCamera(sock))) {
+      log.verbose('camera relay denied %s room=%s socket=%s', CAMERA_ANSWER_REQ, sock.user?.roomId, sock.id)
+      return
+    }
 
-    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
-      type: CAMERA_ANSWER,
-      payload,
-    })
+    emitCameraRelay(sock, CAMERA_ANSWER, payload)
   },
   [CAMERA_ICE_REQ]: async (sock, { payload }) => {
-    if (!(await canRelayCamera(sock))) return
+    if (!(await canRelayCamera(sock))) {
+      log.verbose('camera relay denied %s room=%s socket=%s', CAMERA_ICE_REQ, sock.user?.roomId, sock.id)
+      return
+    }
 
-    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
-      type: CAMERA_ICE,
-      payload,
-    })
+    emitCameraRelay(sock, CAMERA_ICE, payload)
   },
   [CAMERA_STOP_REQ]: async (sock, { payload }) => {
-    if (!(await canRelayCamera(sock))) return
+    if (!(await canRelayCamera(sock))) {
+      log.verbose('camera relay denied %s room=%s socket=%s', CAMERA_STOP_REQ, sock.user?.roomId, sock.id)
+      return
+    }
 
-    sock.server.to(Rooms.prefix(sock.user.roomId)).emit('action', {
-      type: CAMERA_STOP,
-      payload,
-    })
+    emitCameraRelay(sock, CAMERA_STOP, payload)
   },
   [PLAYER_EMIT_LEAVE]: async (sock) => {
     sock._lastPlayerStatus = null
