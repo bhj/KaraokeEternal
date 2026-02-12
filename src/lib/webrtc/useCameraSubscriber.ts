@@ -33,6 +33,57 @@ function attachVideoDiagnostics (videoEl: HTMLVideoElement) {
   }
 }
 
+function attemptVideoPlay (videoEl: HTMLVideoElement, reason: string) {
+  if (!videoEl.srcObject) {
+    debug('skip video play (no srcObject)', { reason, video: videoDiagSnapshot(videoEl) })
+    return
+  }
+
+  const playResult = videoEl.play?.()
+  if (playResult && typeof playResult.catch === 'function') {
+    playResult.catch((err: unknown): void => {
+      console.debug('[CameraSubscriber] remote video play() failed', {
+        reason,
+        err,
+        video: videoDiagSnapshot(videoEl),
+      })
+    })
+  }
+}
+
+function attachPlaybackKeepAlive (videoEl: HTMLVideoElement): () => void {
+  if (typeof videoEl.addEventListener !== 'function' || typeof videoEl.removeEventListener !== 'function') {
+    return () => {}
+  }
+
+  const replayEvents = ['loadedmetadata', 'canplay', 'pause', 'waiting', 'stalled'] as const
+  const handlers = replayEvents.map((eventName) => {
+    const handler = () => {
+      attemptVideoPlay(videoEl, `event:${eventName}`)
+    }
+    videoEl.addEventListener(eventName, handler)
+    return { eventName, handler }
+  })
+
+  return () => {
+    for (const { eventName, handler } of handlers) {
+      videoEl.removeEventListener(eventName, handler)
+    }
+  }
+}
+
+function configureVideoElement (videoEl: HTMLVideoElement) {
+  videoEl.autoplay = true
+  videoEl.playsInline = true
+  videoEl.muted = true
+  videoEl.defaultMuted = true
+  if (typeof videoEl.setAttribute === 'function') {
+    videoEl.setAttribute('autoplay', '')
+    videoEl.setAttribute('playsinline', '')
+    videoEl.setAttribute('muted', '')
+  }
+}
+
 // ---- Testable core (no React dependency) ----
 
 export interface CameraSubscriber {
@@ -50,6 +101,7 @@ export function createCameraSubscriber (
   let status: SubscriberStatus = 'idle'
   let pc: RTCPeerConnection | null = null
   let videoEl: HTMLVideoElement | null = null
+  let detachPlaybackKeepAlive: (() => void) | null = null
   let hasRemoteDescription = false
   let pendingIce: CameraIcePayload[] = []
 
@@ -124,21 +176,14 @@ export function createCameraSubscriber (
 
       if (!videoEl) {
         videoEl = document.createElement('video')
-        videoEl.autoplay = true
-        videoEl.playsInline = true
-        videoEl.muted = true
+        configureVideoElement(videoEl)
         attachVideoDiagnostics(videoEl)
+        detachPlaybackKeepAlive = attachPlaybackKeepAlive(videoEl)
       }
 
       videoEl.srcObject = ev.streams[0] ?? new MediaStream([ev.track])
       debug('video srcObject assigned', videoDiagSnapshot(videoEl))
-
-      const playResult = videoEl.play?.()
-      if (playResult && typeof playResult.catch === 'function') {
-        playResult.catch((err: unknown): void => {
-          console.debug('[CameraSubscriber] remote video play() failed', err)
-        })
-      }
+      attemptVideoPlay(videoEl, 'ontrack')
 
       status = 'active'
       notifyStateChange()
@@ -181,7 +226,23 @@ export function createCameraSubscriber (
     }
     pendingIce = []
     hasRemoteDescription = false
+
+    if (detachPlaybackKeepAlive) {
+      detachPlaybackKeepAlive()
+      detachPlaybackKeepAlive = null
+    }
+
     debug('stop subscriber', videoDiagSnapshot(videoEl))
+
+    if (videoEl) {
+      try {
+        videoEl.pause?.()
+      } catch {
+        // no-op cleanup guard
+      }
+      videoEl.srcObject = null
+    }
+
     videoEl = null
     status = 'idle'
     notifyStateChange()

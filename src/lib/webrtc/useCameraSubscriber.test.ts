@@ -31,13 +31,51 @@ class MockRTCPeerConnection {
   close = vi.fn()
 }
 
+const videoListeners = new Map<string, Set<(event: Event) => void>>()
+
+function registerVideoListener (eventName: string, handler: EventListenerOrEventListenerObject) {
+  const listeners = videoListeners.get(eventName) ?? new Set<(event: Event) => void>()
+  const normalized = typeof handler === 'function'
+    ? handler
+    : (event: Event) => handler.handleEvent(event)
+  listeners.add(normalized)
+  videoListeners.set(eventName, listeners)
+}
+
+function unregisterVideoListener (eventName: string, handler: EventListenerOrEventListenerObject) {
+  const listeners = videoListeners.get(eventName)
+  if (!listeners) return
+  const normalized = typeof handler === 'function'
+    ? handler
+    : (event: Event) => handler.handleEvent(event)
+  listeners.delete(normalized)
+}
+
 // Mock video element
 const mockVideoEl = {
   autoplay: false,
   playsInline: false,
   muted: false,
+  defaultMuted: false,
+  paused: false,
   srcObject: null as MediaStream | null,
   play: vi.fn().mockResolvedValue(undefined),
+  pause: vi.fn(),
+  setAttribute: vi.fn(),
+  addEventListener: vi.fn((eventName: string, handler: EventListenerOrEventListenerObject) => {
+    registerVideoListener(eventName, handler)
+  }),
+  removeEventListener: vi.fn((eventName: string, handler: EventListenerOrEventListenerObject) => {
+    unregisterVideoListener(eventName, handler)
+  }),
+  dispatchEvent: vi.fn((event: Event) => {
+    const listeners = videoListeners.get(event.type)
+    if (!listeners) return true
+    for (const listener of listeners) {
+      listener(event)
+    }
+    return true
+  }),
 } as unknown as HTMLVideoElement
 
 function setupGlobals () {
@@ -73,6 +111,11 @@ describe('createCameraSubscriber', () => {
     subscriber = createCameraSubscriber(dispatch)
     mockVideoEl.srcObject = null
     ;(mockVideoEl.play as ReturnType<typeof vi.fn>).mockClear()
+    ;(mockVideoEl.pause as ReturnType<typeof vi.fn>).mockClear()
+    ;(mockVideoEl.addEventListener as ReturnType<typeof vi.fn>).mockClear()
+    ;(mockVideoEl.removeEventListener as ReturnType<typeof vi.fn>).mockClear()
+    ;(mockVideoEl.setAttribute as ReturnType<typeof vi.fn>).mockClear()
+    videoListeners.clear()
   })
 
   afterEach(() => {
@@ -153,6 +196,23 @@ describe('createCameraSubscriber', () => {
     expect(mockVideoEl.srcObject).toBe(mockRemoteStream)
     expect(mockVideoEl.play).toHaveBeenCalled()
     expect(subscriber.getStatus()).toBe('active')
+  })
+
+  it('retries video playback when stream pauses after ontrack', async () => {
+    await subscriber.handleOffer({
+      sdp: 'mock-offer-sdp',
+      type: 'offer',
+    })
+
+    const mockTrack = { kind: 'video', id: 'track-3' } as unknown as MediaStreamTrack
+    const mockRemoteStream = { id: 'remote-stream-3' } as unknown as MediaStream
+
+    mocks.mockPc.ontrack?.({ streams: [mockRemoteStream], track: mockTrack })
+    expect(mockVideoEl.play).toHaveBeenCalledTimes(1)
+
+    mockVideoEl.dispatchEvent(new Event('pause'))
+
+    expect(mockVideoEl.play).toHaveBeenCalledTimes(2)
   })
 
   it('should notify state changes when connection status/video state changes', async () => {
