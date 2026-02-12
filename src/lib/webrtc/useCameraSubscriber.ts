@@ -17,12 +17,19 @@ export interface CameraSubscriber {
   getVideoElement: () => HTMLVideoElement | null
 }
 
-export function createCameraSubscriber (dispatch: (action: unknown) => void): CameraSubscriber {
+export function createCameraSubscriber (
+  dispatch: (action: unknown) => void,
+  onStateChange?: () => void,
+): CameraSubscriber {
   let status: SubscriberStatus = 'idle'
   let pc: RTCPeerConnection | null = null
   let videoEl: HTMLVideoElement | null = null
   let hasRemoteDescription = false
   let pendingIce: CameraIcePayload[] = []
+
+  const notifyStateChange = () => {
+    onStateChange?.()
+  }
 
   const addIceCandidate = async (ice: CameraIcePayload) => {
     if (!pc || !ice.candidate) return
@@ -50,6 +57,7 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
     }
 
     status = 'connecting'
+    notifyStateChange()
     hasRemoteDescription = false
     pendingIce = []
 
@@ -86,6 +94,7 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
       }
 
       status = 'active'
+      notifyStateChange()
     }
 
     await pc.setRemoteDescription(new RTCSessionDescription(offer))
@@ -121,6 +130,7 @@ export function createCameraSubscriber (dispatch: (action: unknown) => void): Ca
     hasRemoteDescription = false
     videoEl = null
     status = 'idle'
+    notifyStateChange()
   }
 
   return {
@@ -139,11 +149,13 @@ export function useCameraSubscriber (dispatch: (action: unknown) => void) {
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null)
 
   const subscriber = useMemo(() => {
-    const sub = createCameraSubscriber((action) => {
-      dispatch(action)
-      setStatus(sub.getStatus())
-      setVideoElement(sub.getVideoElement())
-    })
+    const sub = createCameraSubscriber(
+      (action) => dispatch(action),
+      () => {
+        setStatus(sub.getStatus())
+        setVideoElement(sub.getVideoElement())
+      },
+    )
     return sub
   }, [dispatch])
 

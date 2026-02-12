@@ -155,6 +155,30 @@ describe('createCameraSubscriber', () => {
     expect(subscriber.getStatus()).toBe('active')
   })
 
+  it('should notify state changes when connection status/video state changes', async () => {
+    const onStateChange = vi.fn()
+    subscriber = createCameraSubscriber(dispatch, onStateChange)
+
+    await subscriber.handleOffer({
+      sdp: 'mock-offer-sdp',
+      type: 'offer',
+    })
+
+    expect(onStateChange).toHaveBeenCalledTimes(1)
+    onStateChange.mockClear()
+
+    const mockTrack = { kind: 'video', id: 'track-2' } as unknown as MediaStreamTrack
+    const mockRemoteStream = { id: 'remote-stream-2' } as unknown as MediaStream
+    mocks.mockPc.ontrack?.({ streams: [mockRemoteStream], track: mockTrack })
+
+    expect(onStateChange).toHaveBeenCalledTimes(1)
+    onStateChange.mockClear()
+
+    subscriber.stop()
+
+    expect(onStateChange).toHaveBeenCalledTimes(1)
+  })
+
   it('should queue remote ICE until remote description is ready', async () => {
     let resolveRemoteDescription: (() => void) | null = null
     mocks.mockPc.setRemoteDescription.mockImplementationOnce(async (desc) => {
