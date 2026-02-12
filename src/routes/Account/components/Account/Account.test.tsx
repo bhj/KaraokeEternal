@@ -240,4 +240,42 @@ describe('Account', () => {
       root.unmount()
     })
   })
+
+  it('shows Open Camera Relay for guest when camera relay is enabled', async () => {
+    mocks.user = {
+      ...mocks.user,
+      isGuest: true,
+      authProvider: 'guest',
+      ownRoomId: null,
+      roomId: 2,
+    }
+    mocks.statusVisualizer = {
+      ...mocks.statusVisualizer,
+      presetCategory: 'default',
+      allowCamera: true,
+    }
+    mocks.playerVisualizer = undefined
+
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(<Account />)
+    })
+
+    const openButton = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Open Camera Relay',
+    )
+    expect(openButton).toBeDefined()
+
+    await act(async () => {
+      openButton?.click()
+    })
+
+    expect(mocks.navigate).toHaveBeenCalledWith('/camera')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
 })

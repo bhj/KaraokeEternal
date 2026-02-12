@@ -108,12 +108,11 @@ async function registerCameraOfferRoute (sock: RoomControlSocket): Promise<Camer
   const roomId = getRoomId(sock)
   if (roomId === null || typeof sock.id !== 'string') return null
 
-  const existing = cameraRoutesByRoom.get(roomId)
   const subscriberSocketId = await resolveCameraSubscriberSocketId(sock)
 
   const route: CameraRoute = {
     publisherSocketId: sock.id,
-    subscriberSocketId: subscriberSocketId ?? existing?.subscriberSocketId ?? null,
+    subscriberSocketId: subscriberSocketId ?? null,
   }
 
   cameraRoutesByRoom.set(roomId, route)
@@ -298,22 +297,20 @@ const ACTION_HANDLERS = {
     const senderId = typeof sock.id === 'string' ? sock.id : null
 
     if (route && senderId) {
-      if (senderId === route.publisherSocketId && route.subscriberSocketId) {
-        emitToSocket(sock, route.subscriberSocketId, CAMERA_ANSWER, payload)
+      if (senderId === route.publisherSocketId) {
+        if (route.subscriberSocketId) {
+          emitToSocket(sock, route.subscriberSocketId, CAMERA_ANSWER, payload)
+        } else {
+          emitToRoom(sock, CAMERA_ANSWER, payload)
+        }
         return
       }
 
-      if (senderId === route.subscriberSocketId) {
-        emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
-        return
-      }
-
-      if (!route.subscriberSocketId && senderId !== route.publisherSocketId) {
+      if (route.subscriberSocketId !== senderId) {
         route.subscriberSocketId = senderId
-        emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
-        return
       }
 
+      emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
       return
     }
 
@@ -326,22 +323,20 @@ const ACTION_HANDLERS = {
     const senderId = typeof sock.id === 'string' ? sock.id : null
 
     if (route && senderId) {
-      if (senderId === route.publisherSocketId && route.subscriberSocketId) {
-        emitToSocket(sock, route.subscriberSocketId, CAMERA_ICE, payload)
+      if (senderId === route.publisherSocketId) {
+        if (route.subscriberSocketId) {
+          emitToSocket(sock, route.subscriberSocketId, CAMERA_ICE, payload)
+        } else {
+          emitToRoom(sock, CAMERA_ICE, payload)
+        }
         return
       }
 
-      if (senderId === route.subscriberSocketId) {
-        emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
-        return
-      }
-
-      if (!route.subscriberSocketId && senderId !== route.publisherSocketId) {
+      if (route.subscriberSocketId !== senderId) {
         route.subscriberSocketId = senderId
-        emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
-        return
       }
 
+      emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
       return
     }
 

@@ -34,13 +34,16 @@ const Account = () => {
     && user.roomId === user.ownRoomId
 
   const activePresetCategory = playerVisualizer?.presetCategory ?? statusVisualizer?.presetCategory
+  const isCameraRelayRelevant = activePresetCategory === 'camera'
+    || playerVisualizer?.allowCamera === true
+    || statusVisualizer?.allowCamera === true
   const canAccessCameraRelay = getRouteAccessDecision({
     path: '/camera',
     isAdmin: user.isAdmin,
     isRoomOwner,
     prefs: room?.prefs,
   }).allowed
-  const shouldShowCameraRelayButton = activePresetCategory === 'camera' && canAccessCameraRelay
+  const shouldShowCameraRelayButton = isCameraRelayRelevant && canAccessCameraRelay
 
   const handleSignOut = useCallback(() => {
     if (!user.isAdmin) {

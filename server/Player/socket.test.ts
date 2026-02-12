@@ -391,4 +391,77 @@ describe('Player socket permissions', () => {
       payload: { candidate: 'cand-1', sdpMid: '0', sdpMLineIndex: 0 },
     })
   })
+
+  it('broadcasts publisher ICE to room before subscriber is pinned', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [192],
+      entities: {
+        192: {
+          ownerId: 730,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const shared = createServerHarness()
+    const { sock: publisher } = createMockSocket(
+      { userId: 731, roomId: 192, isAdmin: false },
+      { id: 'publisher-4', server: shared.server },
+    )
+
+    // No active player detected, so offer and early ICE should fan out to room.
+    shared.fetchSockets.mockResolvedValue([publisher])
+
+    await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer', type: 'offer' } })
+    await handlers[CAMERA_ICE_REQ](publisher, {
+      payload: { candidate: 'cand-pre-answer', sdpMid: '0', sdpMLineIndex: 0 },
+    })
+
+    expect(shared.emitsByTarget.get('ROOM_ID_192')).toHaveBeenCalledWith('action', {
+      type: CAMERA_ICE,
+      payload: { candidate: 'cand-pre-answer', sdpMid: '0', sdpMLineIndex: 0 },
+    })
+  })
+
+  it('does not reuse stale subscriber route when no active player is detected', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [193],
+      entities: {
+        193: {
+          ownerId: 740,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const shared = createServerHarness()
+    const { sock: publisher } = createMockSocket(
+      { userId: 741, roomId: 193, isAdmin: false },
+      { id: 'publisher-5', server: shared.server },
+    )
+
+    const oldPlayer = {
+      id: 'player-old',
+      user: { userId: 742, roomId: 193, isAdmin: false },
+      _lastPlayerStatus: { queueId: 1 },
+      server: shared.server,
+    } as unknown as MockSocket
+
+    // First offer pins to old player route.
+    shared.fetchSockets.mockResolvedValueOnce([publisher, oldPlayer])
+    await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer-1', type: 'offer' } })
+
+    // Next offer has no active player; should broadcast, not target stale socket.
+    shared.fetchSockets.mockResolvedValueOnce([publisher])
+    await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer-2', type: 'offer' } })
+
+    expect(shared.emitsByTarget.get('ROOM_ID_193')).toHaveBeenCalledWith('action', {
+      type: CAMERA_OFFER,
+      payload: { sdp: 'offer-2', type: 'offer' },
+    })
+  })
 })
