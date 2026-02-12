@@ -260,12 +260,19 @@ function HydraVisualizer ({
     const videoProxyOverrides = videoProxyOverrideRef.current
     applyVideoProxyOverride(videoSources, w, videoProxyOverrides)
 
+    // If remote camera is already attached before Hydra init, apply override now.
+    if (remoteVideoElement) {
+      cameraDiag('applyRemoteCameraOverride after hydra init', snapshotVideoElement(remoteVideoElement))
+      applyRemoteCameraOverride(videoSources, remoteVideoElement, w, cameraOverrideRef.current)
+    }
+
     // Execute initial patch and render first frame immediately
     executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
     hydra.tick(16.67)
 
     return () => {
       log('Destroying')
+      restoreRemoteCameraOverride(w, cameraOverrideRef.current)
       restoreVideoProxyOverride(w, videoProxyOverrides)
       cancelAnimationFrame(rafRef.current)
       try {

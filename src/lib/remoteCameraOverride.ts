@@ -3,6 +3,12 @@ type HydraExternalSource = {
   init?: (opts: { src: HTMLVideoElement }) => void
 }
 
+function isVideoRenderable (videoEl: HTMLVideoElement): boolean {
+  return videoEl.readyState >= 2
+    && videoEl.videoWidth > 0
+    && videoEl.videoHeight > 0
+}
+
 /**
  * Override sN.initCam() to use a remote video element when present.
  * Stores original initCam in overrides map for restoration.
@@ -23,6 +29,8 @@ export function applyRemoteCameraOverride (
 
     const init = ext.init
     ext.initCam = () => {
+      // Avoid regl texture errors when the remote stream exists but has no decoded frame yet.
+      if (!isVideoRenderable(remoteVideoElement)) return
       // Preserve Hydra external source context for internal mutable state.
       init.call(ext, { src: remoteVideoElement })
     }
