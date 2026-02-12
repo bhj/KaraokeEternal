@@ -47,8 +47,7 @@ describe('videoProxyOverride', () => {
   })
 
   it('preserves this binding when calling original', () => {
-    let receiver: unknown = null
-    const initVideo = vi.fn(function (this: unknown) { receiver = this })
+    const initVideo = vi.fn(function (this: unknown) {})
     const source = { initVideo }
     const globals: Record<string, unknown> = { s0: source }
     const overrides = new Map<string, unknown>()
@@ -57,7 +56,7 @@ describe('videoProxyOverride', () => {
 
     const ext = globals.s0 as { initVideo: (url: string) => void }
     ext.initVideo('https://example.com/video.mp4')
-    expect(receiver).toBe(source)
+    expect(initVideo.mock.contexts[0]).toBe(source)
   })
 
   it('restores original initVideo', () => {

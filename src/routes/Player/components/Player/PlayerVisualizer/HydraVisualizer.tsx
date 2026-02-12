@@ -205,7 +205,8 @@ function HydraVisualizer ({
     // Override initVideo() before first code execution so proxy is active immediately
     const w = window as unknown as Record<string, unknown>
     const videoSources = ['s0', 's1', 's2', 's3']
-    applyVideoProxyOverride(videoSources, w, videoProxyOverrideRef.current)
+    const videoProxyOverrides = videoProxyOverrideRef.current
+    applyVideoProxyOverride(videoSources, w, videoProxyOverrides)
 
     // Execute initial patch and render first frame immediately
     executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
@@ -213,7 +214,7 @@ function HydraVisualizer ({
 
     return () => {
       log('Destroying')
-      restoreVideoProxyOverride(w, videoProxyOverrideRef.current)
+      restoreVideoProxyOverride(w, videoProxyOverrides)
       cancelAnimationFrame(rafRef.current)
       try {
         hydra.regl.destroy()
@@ -272,7 +273,9 @@ function HydraVisualizer ({
     if (!hydra) return
 
     // Clear previous render graph to prevent oscillator bleed between presets
-    hydra.hush()
+    if (typeof hydra.hush === 'function') {
+      hydra.hush()
+    }
 
     // Re-check camera init when code changes with camera enabled
     if (allowCamera || remoteVideoElement) {

@@ -123,7 +123,6 @@ describe('StagePanel', () => {
           visualizerEnabled={true}
           visualizerSensitivity={1}
           visualizerAllowCamera={false}
-          visualizerAudioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
           cameraRelayStatus='idle'
         />,
       )
@@ -158,7 +157,6 @@ describe('StagePanel', () => {
           visualizerEnabled={true}
           visualizerSensitivity={1}
           visualizerAllowCamera={true}
-          visualizerAudioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
           cameraRelayStatus='active'
         />,
       )
@@ -189,7 +187,6 @@ describe('StagePanel', () => {
           visualizerEnabled={true}
           visualizerSensitivity={1}
           visualizerAllowCamera={true}
-          visualizerAudioResponse={{ globalGain: 1, bassWeight: 1, midWeight: 1, trebleWeight: 1 }}
           cameraRelayStatus='connecting'
         />,
       )

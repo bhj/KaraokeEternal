@@ -120,7 +120,6 @@ export interface PlaybackOptions {
   }
 }
 
-
 export type MediaType = 'cdg' | 'mp4' | ''
 
 export interface Media {

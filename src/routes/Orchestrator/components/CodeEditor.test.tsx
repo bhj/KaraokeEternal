@@ -97,7 +97,7 @@ describe('CodeEditor', () => {
     })
 
     expect(findButtonByText(container, 'Hints')).not.toBeNull()
-    expect(container.textContent ?? '').not.toContain('Tab accepts autocomplete suggestions.')
+    expect(container.textContent ?? '').not.toContain('Enter accepts, Tab navigates autocomplete suggestions.')
 
     await act(async () => {
       root.unmount()
@@ -126,7 +126,7 @@ describe('CodeEditor', () => {
       hintsButton?.click()
     })
 
-    expect(container.textContent ?? '').toContain('Tab accepts autocomplete suggestions.')
+    expect(container.textContent ?? '').toContain('Enter accepts, Tab navigates autocomplete suggestions.')
     expect(container.textContent ?? '').not.toContain('a.fft[n]')
 
     await act(async () => {

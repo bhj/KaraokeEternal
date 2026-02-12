@@ -18,6 +18,8 @@ vi.mock('hydra-synth', () => {
 
     eval () {}
 
+    hush () {}
+
     tick () {}
 
     setResolution () {}

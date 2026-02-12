@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import type * as client from 'openid-client'
 import { extractUserClaims } from './oidc.js'
 
 /**
  * Minimal stub that satisfies the TokenEndpointResponse & TokenEndpointResponseHelpers
  * shape enough for extractUserClaims to work.
  */
-function fakeTokenResponse (claimsData: Record<string, unknown>) {
+function fakeTokenResponse (claimsData: Record<string, unknown>): client.TokenEndpointResponse & client.TokenEndpointResponseHelpers {
   return {
     claims: () => claimsData,
-  } as any
+  } as unknown as client.TokenEndpointResponse & client.TokenEndpointResponseHelpers
 }
 
 describe('extractUserClaims', () => {
