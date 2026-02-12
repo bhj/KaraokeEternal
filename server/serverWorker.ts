@@ -40,6 +40,10 @@ import { isPublicApiPath } from './lib/publicPaths.js'
 const log = getLogger('server')
 const { verify: jwtVerify } = jsonWebToken
 
+export function shouldRunGuestCleanup (runtimeEnv: NodeJS.ProcessEnv = process.env): boolean {
+  return runtimeEnv.KES_ENABLE_APP_GUEST_CLEANUP === 'true'
+}
+
 async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers }) {
   const indexFile = path.join(env.KES_PATH_WEBROOT, 'index.html')
   const urlPath = env.KES_URL_PATH.replace(/\/?$/, '/') // force trailing slash
@@ -128,20 +132,28 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     }, IDLE_CLEANUP_INTERVAL_MS)
 
     // Cleanup app-managed guests from closed rooms every hour
+    // Disabled by default to align with janitor-prohibition policy.
+    // Explicitly opt in only when needed.
     const GUEST_CLEANUP_INTERVAL_MS = 60 * 60 * 1000
-    const guestCleanupInterval = setInterval(async () => {
-      try {
-        await User.cleanupGuests()
-      } catch (err) {
-        log.error(`Error during guest cleanup: ${err.message}`)
-      }
-    }, GUEST_CLEANUP_INTERVAL_MS)
+    const guestCleanupInterval = shouldRunGuestCleanup(env)
+      ? setInterval(async () => {
+          try {
+            await User.cleanupGuests()
+          } catch (err) {
+            log.error(`Error during guest cleanup: ${err.message}`)
+          }
+        }, GUEST_CLEANUP_INTERVAL_MS)
+      : null
+
+    if (!guestCleanupInterval) {
+      log.info('App guest cleanup job disabled (set KES_ENABLE_APP_GUEST_CLEANUP=true to enable)')
+    }
 
     // handle shutdown gracefully
     shutdownHandlers.push(() => new Promise((resolve) => {
       // Stop cleanup intervals
       clearInterval(idleCleanupInterval)
-      clearInterval(guestCleanupInterval)
+      if (guestCleanupInterval) clearInterval(guestCleanupInterval)
 
       // Clear pending room cleanup timeouts to prevent SQLITE_MISUSE errors
       clearPendingCleanups()
