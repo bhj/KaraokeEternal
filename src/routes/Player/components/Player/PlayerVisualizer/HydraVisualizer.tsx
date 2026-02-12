@@ -52,15 +52,6 @@ function ensureAudioGlobals (compat: HydraAudioCompat) {
   }
 }
 
-// Clear render graph outputs without clearing sources (preserves WebRTC video tracks).
-// hydra.hush() calls source.clear() which stops video tracks via track.stop().
-function softHush (hydra: Hydra) {
-  const h = hydra as unknown as { o?: Array<{ clear: () => void }> }
-  if (h.o) {
-    h.o.forEach(output => output.clear())
-  }
-}
-
 function clearAudioGlobals () {
   const w = window as unknown as Record<string, unknown>
   // Defensive cleanup for sessions that previously exposed legacy helpers.
@@ -390,10 +381,11 @@ function HydraVisualizer ({
     if (!hydra) return
 
     // Clear previous render graph to prevent oscillator bleed between presets.
-    // When remote relay is active, use softHush (output-only clear) to preserve
-    // WebRTC video tracks. hydra.hush() calls source.clear() which stops tracks.
+    // Skip hush entirely when relay is active — hush() calls source.clear() which
+    // kills WebRTC tracks. The new code eval follows immediately and sets up a
+    // fresh render graph, so at most one frame of the old graph shows (~16ms).
     if (remoteVideoElement) {
-      softHush(hydra)
+      // no-op: new eval below replaces the render graph immediately
     } else if (typeof (hydra as unknown as { hush?: () => void }).hush === 'function') {
       hydra.hush()
     } else {
