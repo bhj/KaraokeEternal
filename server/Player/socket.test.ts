@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   CAMERA_ANSWER,
   CAMERA_ANSWER_REQ,
+  CAMERA_ICE,
+  CAMERA_ICE_REQ,
   CAMERA_OFFER,
   CAMERA_OFFER_REQ,
   PLAYER_CMD_NEXT,
@@ -350,5 +352,43 @@ describe('Player socket permissions', () => {
       payload: { sdp: 'answer', type: 'answer' },
     })
     expect(shared.emitsByTarget.get('ROOM_ID_190')).toBeUndefined()
+  })
+
+  it('locks route to first answering subscriber after fallback offer broadcast', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [191],
+      entities: {
+        191: {
+          ownerId: 720,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const shared = createServerHarness()
+    const { sock: publisher } = createMockSocket(
+      { userId: 721, roomId: 191, isAdmin: false },
+      { id: 'publisher-3', server: shared.server },
+    )
+    const { sock: subscriber } = createMockSocket(
+      { userId: 722, roomId: 191, isAdmin: false },
+      { id: 'player-3', server: shared.server },
+    )
+
+    // No active player known at offer time; falls back to room broadcast.
+    shared.fetchSockets.mockResolvedValue([publisher, subscriber])
+
+    await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer', type: 'offer' } })
+    await handlers[CAMERA_ANSWER_REQ](subscriber, { payload: { sdp: 'answer', type: 'answer' } })
+    await handlers[CAMERA_ICE_REQ](publisher, {
+      payload: { candidate: 'cand-1', sdpMid: '0', sdpMLineIndex: 0 },
+    })
+
+    expect(shared.emitsByTarget.get('player-3')).toHaveBeenCalledWith('action', {
+      type: CAMERA_ICE,
+      payload: { candidate: 'cand-1', sdpMid: '0', sdpMLineIndex: 0 },
+    })
   })
 })

@@ -295,15 +295,26 @@ const ACTION_HANDLERS = {
     if (!(await canRelayCamera(sock))) return
 
     const route = getCameraRoute(sock)
-    if (route) {
-      if (typeof sock.id === 'string' && sock.id === route.subscriberSocketId) {
-        emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
-        return
-      }
-      if (typeof sock.id === 'string' && sock.id === route.publisherSocketId && route.subscriberSocketId) {
+    const senderId = typeof sock.id === 'string' ? sock.id : null
+
+    if (route && senderId) {
+      if (senderId === route.publisherSocketId && route.subscriberSocketId) {
         emitToSocket(sock, route.subscriberSocketId, CAMERA_ANSWER, payload)
         return
       }
+
+      if (senderId === route.subscriberSocketId) {
+        emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
+        return
+      }
+
+      if (!route.subscriberSocketId && senderId !== route.publisherSocketId) {
+        route.subscriberSocketId = senderId
+        emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
+        return
+      }
+
+      return
     }
 
     emitToRoom(sock, CAMERA_ANSWER, payload)
@@ -312,15 +323,26 @@ const ACTION_HANDLERS = {
     if (!(await canRelayCamera(sock))) return
 
     const route = getCameraRoute(sock)
-    if (route) {
-      if (typeof sock.id === 'string' && sock.id === route.publisherSocketId && route.subscriberSocketId) {
+    const senderId = typeof sock.id === 'string' ? sock.id : null
+
+    if (route && senderId) {
+      if (senderId === route.publisherSocketId && route.subscriberSocketId) {
         emitToSocket(sock, route.subscriberSocketId, CAMERA_ICE, payload)
         return
       }
-      if (typeof sock.id === 'string' && sock.id === route.subscriberSocketId) {
+
+      if (senderId === route.subscriberSocketId) {
         emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
         return
       }
+
+      if (!route.subscriberSocketId && senderId !== route.publisherSocketId) {
+        route.subscriberSocketId = senderId
+        emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
+        return
+      }
+
+      return
     }
 
     emitToRoom(sock, CAMERA_ICE, payload)
