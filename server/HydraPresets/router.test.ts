@@ -278,4 +278,98 @@ describe('HydraPresets router', () => {
     await handler(ctx, async () => {})
     expect(ctx.body).toEqual({ success: true })
   })
+
+  it('PUT /api/hydra-presets/folders/reorder applies all sort order updates', async () => {
+    const folderA = await HydraFolders.create({
+      name: 'Folder A',
+      authorUserId: authorUser.userId,
+      authorName: authorUser.name,
+    })
+    const folderB = await HydraFolders.create({
+      name: 'Folder B',
+      authorUserId: authorUser.userId,
+      authorName: authorUser.name,
+    })
+
+    await HydraFolders.update(folderA.folderId, { sortOrder: 0 })
+    await HydraFolders.update(folderB.folderId, { sortOrder: 1 })
+
+    const layer = getLayer('/api/hydra-presets/folders/reorder', 'PUT')
+    const handler = layer.stack[layer.stack.length - 1]
+
+    const ctx = {
+      request: {
+        body: {
+          updates: [
+            { id: folderA.folderId, sortOrder: 1 },
+            { id: folderB.folderId, sortOrder: 0 },
+          ],
+        },
+      },
+      user: { userId: authorUser.userId, name: authorUser.name, isAdmin: false, isGuest: false },
+      body: undefined as unknown,
+      throw: throwWithStatus,
+    }
+
+    await handler(ctx, async () => {})
+
+    const folderAAfter = await HydraFolders.getById(folderA.folderId)
+    const folderBAfter = await HydraFolders.getById(folderB.folderId)
+
+    expect(folderAAfter?.sortOrder).toBe(1)
+    expect(folderBAfter?.sortOrder).toBe(0)
+    expect(ctx.body).toEqual({ success: true })
+  })
+
+  it('PUT /api/hydra-presets/reorder is atomic when one preset id is invalid', async () => {
+    const folder = await HydraFolders.create({
+      name: 'Atomic Folder',
+      authorUserId: authorUser.userId,
+      authorName: authorUser.name,
+    })
+
+    const presetA = await HydraPresets.create({
+      folderId: folder.folderId,
+      name: 'Preset A',
+      code: 'osc(10).out()',
+      authorUserId: authorUser.userId,
+      authorName: authorUser.name,
+    })
+
+    const presetB = await HydraPresets.create({
+      folderId: folder.folderId,
+      name: 'Preset B',
+      code: 'noise(2).out()',
+      authorUserId: authorUser.userId,
+      authorName: authorUser.name,
+    })
+
+    await HydraPresets.update(presetA.presetId, { sortOrder: 0 })
+    await HydraPresets.update(presetB.presetId, { sortOrder: 1 })
+
+    const layer = getLayer('/api/hydra-presets/reorder', 'PUT')
+    const handler = layer.stack[layer.stack.length - 1]
+
+    const ctx = {
+      request: {
+        body: {
+          updates: [
+            { id: presetA.presetId, sortOrder: 2 },
+            { id: 999999, sortOrder: 0 },
+          ],
+        },
+      },
+      user: { userId: authorUser.userId, name: authorUser.name, isAdmin: false, isGuest: false },
+      body: undefined as unknown,
+      throw: throwWithStatus,
+    }
+
+    await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 404 })
+
+    const presetAAfter = await HydraPresets.getById(presetA.presetId)
+    const presetBAfter = await HydraPresets.getById(presetB.presetId)
+
+    expect(presetAAfter?.sortOrder).toBe(0)
+    expect(presetBAfter?.sortOrder).toBe(1)
+  })
 })

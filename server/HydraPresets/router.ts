@@ -1,4 +1,6 @@
 import KoaRouter from '@koa/router'
+import sql from 'sqlate'
+import Database from '../lib/Database.js'
 import HydraFolders from './HydraFolders.js'
 import HydraPresets from './HydraPresets.js'
 
@@ -6,8 +8,14 @@ interface RequestWithBody {
   body: Record<string, unknown>
 }
 
+interface SortOrderUpdate {
+  id: number
+  sortOrder: number
+}
+
 const router = new KoaRouter({ prefix: '/api/hydra-presets' })
 const MAX_PRESET_CODE_LENGTH = 50_000
+const { db } = Database
 
 function requireUser (ctx, { nonGuest = false }: { nonGuest?: boolean } = {}) {
   if (!ctx.user?.userId) ctx.throw(401)
@@ -18,6 +26,48 @@ function parseId (value: string, ctx, label: string): number {
   const id = parseInt(value, 10)
   if (Number.isNaN(id)) ctx.throw(400, `Invalid ${label}`)
   return id
+}
+
+function parseSortOrderUpdates (ctx): SortOrderUpdate[] {
+  const body = (ctx.request as unknown as RequestWithBody).body as {
+    updates?: unknown
+  }
+
+  if (!Array.isArray(body.updates) || body.updates.length === 0) {
+    ctx.throw(400, 'Invalid updates payload')
+  }
+
+  const updatesRaw = body.updates as unknown[]
+  const updates: SortOrderUpdate[] = []
+  for (const item of updatesRaw) {
+    if (typeof item !== 'object' || item === null) ctx.throw(400, 'Invalid updates payload')
+
+    const update = item as { id?: unknown, sortOrder?: unknown }
+    if (!Number.isInteger(update.id) || !Number.isFinite(update.sortOrder as number)) {
+      ctx.throw(400, 'Invalid updates payload')
+    }
+
+    updates.push({ id: update.id as number, sortOrder: update.sortOrder as number })
+  }
+
+  return updates
+}
+
+async function withTransaction (ctx, fn: () => Promise<void>): Promise<void> {
+  if (!db) ctx.throw(500, 'Database not initialized')
+
+  await db.exec('BEGIN IMMEDIATE TRANSACTION')
+  try {
+    await fn()
+    await db.exec('COMMIT')
+  } catch (err) {
+    try {
+      await db.exec('ROLLBACK')
+    } catch {
+      // no-op
+    }
+    throw err
+  }
 }
 
 // Folders
@@ -39,6 +89,34 @@ router.post('/folders', async (ctx) => {
   })
 
   ctx.body = folder
+})
+
+router.put('/folders/reorder', async (ctx) => {
+  requireUser(ctx, { nonGuest: true })
+  const updates = parseSortOrderUpdates(ctx)
+
+  for (const update of updates) {
+    const folder = await HydraFolders.getById(update.id)
+    if (!folder) ctx.throw(404, 'Folder not found')
+
+    if (!ctx.user.isAdmin && ctx.user.userId !== folder.authorUserId) {
+      ctx.throw(403)
+    }
+  }
+
+  await withTransaction(ctx, async () => {
+    for (const update of updates) {
+      const query = sql`
+        UPDATE hydraFolders
+        SET sortOrder = ${update.sortOrder}
+        WHERE folderId = ${update.id}
+      `
+      const res = await db.run(String(query), query.parameters)
+      if (!res.changes) ctx.throw(404, 'Folder not found')
+    }
+  })
+
+  ctx.body = { success: true }
 })
 
 router.put('/folders/:folderId', async (ctx) => {
@@ -127,6 +205,44 @@ router.post('/', async (ctx) => {
   })
 
   ctx.body = preset
+})
+
+router.put('/reorder', async (ctx) => {
+  requireUser(ctx, { nonGuest: true })
+  const updates = parseSortOrderUpdates(ctx)
+
+  let rootFolderId: number | null = null
+  for (const update of updates) {
+    const preset = await HydraPresets.getById(update.id)
+    if (!preset) ctx.throw(404, 'Preset not found')
+
+    if (!ctx.user.isAdmin && ctx.user.userId !== preset.authorUserId) {
+      ctx.throw(403)
+    }
+
+    if (rootFolderId === null) {
+      rootFolderId = preset.folderId
+    } else if (preset.folderId !== rootFolderId) {
+      ctx.throw(400, 'All presets in a reorder request must belong to the same folder')
+    }
+  }
+
+  const now = Math.floor(Date.now() / 1000)
+
+  await withTransaction(ctx, async () => {
+    for (const update of updates) {
+      const query = sql`
+        UPDATE hydraPresets
+        SET sortOrder = ${update.sortOrder},
+            dateUpdated = ${now}
+        WHERE presetId = ${update.id}
+      `
+      const res = await db.run(String(query), query.parameters)
+      if (!res.changes) ctx.throw(404, 'Preset not found')
+    }
+  })
+
+  ctx.body = { success: true }
 })
 
 router.put('/:presetId', async (ctx) => {

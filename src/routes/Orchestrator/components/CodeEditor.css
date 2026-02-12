@@ -1,8 +1,8 @@
 .container {
   display: grid;
-  grid-template-rows: subgrid;
-  grid-row: span 2;
+  grid-template-rows: minmax(0, 1fr) auto;
   flex: 1;
+  height: 100%;
   position: relative;
   overflow: hidden;
   min-height: 0;

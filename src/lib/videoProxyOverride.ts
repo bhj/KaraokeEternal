@@ -2,6 +2,8 @@ type HydraExternalSource = {
   initVideo?: (url?: string) => void
 }
 
+const PROXY_PATH = 'api/video-proxy'
+
 /**
  * Override sN.initVideo() to rewrite external URLs through the video proxy.
  * Stores original initVideo in overrides map for restoration.
@@ -22,7 +24,7 @@ export function applyVideoProxyOverride (
     const original = overrides.get(src) as HydraExternalSource['initVideo']
     ext.initVideo = function (this: HydraExternalSource, url?: string) {
       if (url && /^https?:\/\//i.test(url)) {
-        original?.call(this, '/api/video-proxy?url=' + encodeURIComponent(url))
+        original?.call(this, `${PROXY_PATH}?url=` + encodeURIComponent(url))
       } else {
         original?.call(this, url)
       }

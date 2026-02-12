@@ -14,8 +14,25 @@ describe('videoProxyOverride', () => {
     const ext = globals.s0 as { initVideo: (url: string) => void }
     ext.initVideo('https://example.com/video.mp4')
     expect(initVideo).toHaveBeenCalledWith(
-      '/api/video-proxy?url=' + encodeURIComponent('https://example.com/video.mp4'),
+      'api/video-proxy?url=' + encodeURIComponent('https://example.com/video.mp4'),
     )
+  })
+
+  it('uses base-relative proxy path (no leading slash)', () => {
+    const initVideo = vi.fn()
+    const globals: Record<string, unknown> = {
+      s0: { initVideo },
+    }
+    const overrides = new Map<string, unknown>()
+
+    applyVideoProxyOverride(['s0'], globals, overrides)
+
+    const ext = globals.s0 as { initVideo: (url: string) => void }
+    ext.initVideo('https://example.com/video.mp4')
+
+    const calledWith = initVideo.mock.calls[0]?.[0]
+    expect(typeof calledWith).toBe('string')
+    expect((calledWith as string).startsWith('/')).toBe(false)
   })
 
   it('passes relative URL through unchanged', () => {
@@ -47,8 +64,7 @@ describe('videoProxyOverride', () => {
   })
 
   it('preserves this binding when calling original', () => {
-    let receiver: unknown = null
-    const initVideo = vi.fn(function (this: unknown) { receiver = this })
+    const initVideo = vi.fn(function (this: unknown) {})
     const source = { initVideo }
     const globals: Record<string, unknown> = { s0: source }
     const overrides = new Map<string, unknown>()
@@ -57,7 +73,7 @@ describe('videoProxyOverride', () => {
 
     const ext = globals.s0 as { initVideo: (url: string) => void }
     ext.initVideo('https://example.com/video.mp4')
-    expect(receiver).toBe(source)
+    expect(initVideo.mock.contexts[0]).toBe(source)
   })
 
   it('restores original initVideo', () => {

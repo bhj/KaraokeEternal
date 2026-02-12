@@ -1,10 +1,10 @@
 .stage {
   display: grid;
-  grid-template-rows: subgrid;
-  grid-row: span 2;
+  grid-template-rows: auto minmax(0, 1fr);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: radial-gradient(circle at 15% 20%, rgba(0, 255, 255, 0.08), transparent 55%), #07080c;
   min-height: 0;
+  height: 100%;
 }
 
 .stageHeader {
@@ -155,7 +155,7 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  min-height: 0;
+  min-height: 220px;
 }
 
 .stageFrame {

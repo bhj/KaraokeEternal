@@ -7,12 +7,13 @@ const router = new KoaRouter({ prefix: '/api/video-proxy' })
 
 export const MAX_SIZE_BYTES = 500 * 1024 * 1024 // 500 MB
 const TIMEOUT_MS = 15_000
+const MAX_REDIRECTS = 5
 
 const PRIVATE_IP_PATTERNS = [
-  /^127\./,          // 127.0.0.0/8
-  /^10\./,           // 10.0.0.0/8
-  /^192\.168\./,     // 192.168.0.0/16
-  /^0\.0\.0\.0$/,    // 0.0.0.0
+  /^127\./, // 127.0.0.0/8
+  /^10\./, // 10.0.0.0/8
+  /^192\.168\./, // 192.168.0.0/16
+  /^0\.0\.0\.0$/, // 0.0.0.0
 ]
 
 /**
@@ -74,8 +75,8 @@ router.get('/', async (ctx) => {
     ctx.throw(401)
   }
 
-  const url = typeof ctx.query.url === 'string' ? ctx.query.url : ''
-  if (!isUrlAllowed(url)) {
+  const requestedUrl = typeof ctx.query.url === 'string' ? ctx.query.url : ''
+  if (!isUrlAllowed(requestedUrl)) {
     ctx.throw(400, 'Invalid or disallowed URL')
   }
 
@@ -85,16 +86,55 @@ router.get('/', async (ctx) => {
     fetchHeaders.Range = clientRange
   }
 
-  let res: Response
-  try {
-    res = await fetch(url, {
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-      redirect: 'follow',
-      headers: fetchHeaders,
-    })
-  } catch (err) {
-    ctx.throw(502, `Upstream fetch failed: ${(err as Error).message}`)
-    return // unreachable but satisfies TS
+  let currentUrl = requestedUrl
+  let redirects = 0
+  let res: Response | null = null
+
+  while (true) {
+    try {
+      res = await fetch(currentUrl, {
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+        redirect: 'manual',
+        headers: fetchHeaders,
+      })
+    } catch (err) {
+      ctx.throw(502, `Upstream fetch failed: ${(err as Error).message}`)
+      return // unreachable but satisfies TS
+    }
+
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get('location')
+      await res.body?.cancel()
+
+      if (!location) {
+        ctx.throw(502, 'Upstream redirect missing location')
+      }
+      if (redirects >= MAX_REDIRECTS) {
+        ctx.throw(502, 'Upstream redirect limit exceeded')
+      }
+
+      let nextUrl: string
+      try {
+        nextUrl = new URL(location, currentUrl).toString()
+      } catch {
+        ctx.throw(400, 'Invalid upstream redirect URL')
+      }
+
+      if (!isUrlAllowed(nextUrl)) {
+        ctx.throw(400, 'Upstream redirect URL disallowed')
+      }
+
+      currentUrl = nextUrl
+      redirects += 1
+      continue
+    }
+
+    break
+  }
+
+  if (!res) {
+    ctx.throw(502, 'Upstream response missing')
+    return
   }
 
   if (!res.ok && res.status !== 206) {
@@ -132,7 +172,7 @@ router.get('/', async (ctx) => {
     }
   }
 
-  log.verbose('proxying %s (%sMB): %s', contentType, contentLength ? (parseInt(contentLength, 10) / 1_000_000).toFixed(2) : '?', url)
+  log.verbose('proxying %s (%sMB): %s', contentType, contentLength ? (parseInt(contentLength, 10) / 1_000_000).toFixed(2) : '?', currentUrl)
 
   // Convert Web ReadableStream to Node.js Readable for Koa compatibility
   ctx.body = Readable.fromWeb(res.body as import('stream/web').ReadableStream)

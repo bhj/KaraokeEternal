@@ -9,6 +9,10 @@ export const createFolder = (name: string) => api.post<PresetFolder>('folders', 
   body: { name },
 })
 
+export const reorderFolders = (updates: Array<{ id: number, sortOrder: number }>) => api.put<{ success: true }>('folders/reorder', {
+  body: { updates },
+})
+
 export const updateFolder = (folderId: number, data: { name?: string, sortOrder?: number }) => api.put<PresetFolder>(`folders/${folderId}`, {
   body: data,
 })
@@ -23,6 +27,10 @@ export const fetchPresetById = (presetId: number) => api.get<PresetItem>(`${pres
 
 export const createPreset = (data: { folderId: number, name: string, code: string }) => api.post<PresetItem>('', {
   body: data,
+})
+
+export const reorderPresets = (updates: Array<{ id: number, sortOrder: number }>) => api.put<{ success: true }>('reorder', {
+  body: { updates },
 })
 
 export const updatePreset = (presetId: number, data: { name?: string, code?: string, sortOrder?: number, folderId?: number }) => api.put<PresetItem>(`${presetId}`, {

@@ -145,6 +145,67 @@ describe('VideoProxy', () => {
     })
   })
 
+  describe('redirect safety', () => {
+    let originalFetch: typeof globalThis.fetch
+
+    beforeEach(() => {
+      originalFetch = globalThis.fetch
+    })
+
+    afterEach(() => {
+      globalThis.fetch = originalFetch
+    })
+
+    it('rejects redirect to disallowed private URL', async () => {
+      const fetchMock = vi.fn(async () => createUpstreamResponse({
+        status: 302,
+        ok: false,
+        headers: {
+          location: 'https://127.0.0.1/private.mp4',
+        },
+      })) as typeof fetch
+      globalThis.fetch = fetchMock
+
+      const handler = await getHandler()
+      const ctx = createCtx({ url: 'https://example.com/video.mp4' })
+
+      await expect(handler(ctx, async () => {})).rejects.toMatchObject({ status: 400 })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('follows safe redirect and streams final content', async () => {
+      const fetchMock = vi.fn()
+      fetchMock
+        .mockImplementationOnce(async () => createUpstreamResponse({
+          status: 302,
+          ok: false,
+          headers: {
+            location: 'https://cdn.example.com/video.mp4',
+          },
+        }))
+        .mockImplementationOnce(async () => createUpstreamResponse({
+          status: 200,
+          ok: true,
+          headers: {
+            'content-type': 'video/mp4',
+            'content-length': '1234',
+          },
+          body: 'video-data',
+        }))
+      globalThis.fetch = fetchMock as typeof fetch
+
+      const handler = await getHandler()
+      const ctx = createCtx({ url: 'https://example.com/video.mp4' })
+
+      await handler(ctx, async () => {})
+
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+      expect(fetchMock.mock.calls[0]?.[0]).toBe('https://example.com/video.mp4')
+      expect(fetchMock.mock.calls[1]?.[0]).toBe('https://cdn.example.com/video.mp4')
+      expect(ctx.body).toBeInstanceOf(Readable)
+    })
+  })
+
   describe('Range request handling', () => {
     let originalFetch: typeof globalThis.fetch
 

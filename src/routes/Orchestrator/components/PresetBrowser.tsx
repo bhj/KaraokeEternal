@@ -15,6 +15,8 @@ import {
   fetchFolders,
   createFolder,
   createPreset,
+  reorderFolders,
+  reorderPresets,
   updateFolder,
   updatePreset,
   deleteFolder,
@@ -273,9 +275,7 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     try {
       setError(null)
       const updates = toSortOrderUpdates(reordered)
-      await Promise.all(
-        updates.map(update => updateFolder(update.id, { sortOrder: update.sortOrder })),
-      )
+      await reorderFolders(updates)
       await refresh()
     } catch (err) {
       setError(toErrorMessage(err, 'Failed to reorder folders'))
@@ -297,9 +297,7 @@ function PresetBrowser ({ currentCode, onLoad, onSend }: PresetBrowserProps) {
     try {
       setError(null)
       const updates = toSortOrderUpdates(reordered)
-      await Promise.all(
-        updates.map(update => updatePreset(update.id, { sortOrder: update.sortOrder })),
-      )
+      await reorderPresets(updates)
       await refresh()
     } catch (err) {
       setError(toErrorMessage(err, 'Failed to reorder presets'))

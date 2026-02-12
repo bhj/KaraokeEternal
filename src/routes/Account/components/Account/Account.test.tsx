@@ -5,10 +5,20 @@ import { createRoot } from 'react-dom/client'
 
 const mocks = vi.hoisted(() => ({
   dispatch: vi.fn(),
+  navigate: vi.fn(),
   leaveRoom: vi.fn(() => ({ type: 'rooms/leave' })),
   requestLogout: vi.fn(() => ({ type: 'user/logout' })),
   removeItem: vi.fn(() => ({ type: 'queue/remove' })),
   upcomingQueueIds: [] as number[],
+  statusVisualizer: {
+    presetCategory: 'default',
+    isEnabled: true,
+    mode: 'hydra',
+  } as Record<string, unknown>,
+  playerVisualizer: undefined as Record<string, unknown> | undefined,
+  roomPrefs: {
+    allowGuestCameraRelay: true,
+  } as Record<string, unknown>,
   user: {
     userId: 11,
     username: 'tester',
@@ -22,7 +32,16 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('store/hooks', () => ({
   useAppDispatch: () => mocks.dispatch,
-  useAppSelector: (selector: (state: unknown) => unknown) => selector({ user: mocks.user }),
+  useAppSelector: (selector: (state: unknown) => unknown) => selector({
+    user: mocks.user,
+    status: { visualizer: mocks.statusVisualizer },
+    playerVisualizer: mocks.playerVisualizer,
+    rooms: {
+      entities: typeof mocks.user.roomId === 'number'
+        ? { [mocks.user.roomId]: { roomId: mocks.user.roomId, prefs: mocks.roomPrefs } }
+        : {},
+    },
+  }),
 }))
 
 vi.mock('routes/Queue/selectors/getUpcoming', () => ({
@@ -41,6 +60,14 @@ vi.mock('routes/Queue/modules/queue', () => ({
 vi.mock('store/modules/rooms', () => ({
   leaveRoom: mocks.leaveRoom,
 }))
+
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual<typeof import('react-router')>('react-router')
+  return {
+    ...actual,
+    useNavigate: () => mocks.navigate,
+  }
+})
 
 vi.mock('components/Panel/Panel', () => ({
   default: ({ children, title }: { children: React.ReactNode, title: string }) => (
@@ -70,7 +97,17 @@ describe('Account', () => {
     mocks.leaveRoom.mockClear()
     mocks.requestLogout.mockClear()
     mocks.removeItem.mockClear()
+    mocks.navigate.mockReset()
     mocks.upcomingQueueIds = []
+    mocks.statusVisualizer = {
+      presetCategory: 'default',
+      isEnabled: true,
+      mode: 'hydra',
+    }
+    mocks.playerVisualizer = undefined
+    mocks.roomPrefs = {
+      allowGuestCameraRelay: true,
+    }
     mocks.user = {
       userId: 11,
       username: 'tester',
@@ -169,6 +206,97 @@ describe('Account', () => {
 
     expect(mocks.leaveRoom).not.toHaveBeenCalled()
     expect(mocks.dispatch).not.toHaveBeenCalledWith({ type: 'rooms/leave' })
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
+  it('shows Open Camera Relay whenever route access allows it', async () => {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(<Account />)
+    })
+
+    const openButton = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Open Camera Relay',
+    )
+    expect(openButton).toBeDefined()
+
+    await act(async () => {
+      openButton?.click()
+    })
+
+    expect(mocks.navigate).toHaveBeenCalledWith('/camera')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
+  it('shows Open Camera Relay when camera preset is active and navigates to /camera', async () => {
+    mocks.statusVisualizer = {
+      ...mocks.statusVisualizer,
+      presetCategory: 'camera',
+    }
+
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(<Account />)
+    })
+
+    const openButton = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Open Camera Relay',
+    )
+    expect(openButton).toBeDefined()
+
+    await act(async () => {
+      openButton?.click()
+    })
+
+    expect(mocks.navigate).toHaveBeenCalledWith('/camera')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
+  it('shows Open Camera Relay for guest when camera relay is enabled', async () => {
+    mocks.user = {
+      ...mocks.user,
+      isGuest: true,
+      authProvider: 'guest',
+      ownRoomId: null,
+      roomId: 2,
+    }
+    mocks.statusVisualizer = {
+      ...mocks.statusVisualizer,
+      presetCategory: 'default',
+      allowCamera: false,
+    }
+    mocks.playerVisualizer = undefined
+
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(<Account />)
+    })
+
+    const openButton = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Open Camera Relay',
+    )
+    expect(openButton).toBeDefined()
+
+    await act(async () => {
+      openButton?.click()
+    })
+
+    expect(mocks.navigate).toHaveBeenCalledWith('/camera')
 
     await act(async () => {
       root.unmount()
