@@ -1,9 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { requestLogout, updateAccount } from 'store/modules/user'
 import { leaveRoom } from 'store/modules/rooms'
 import { removeItem } from 'routes/Queue/modules/queue'
 import getUpcoming from 'routes/Queue/selectors/getUpcoming'
+import { getRouteAccessDecision } from 'components/App/Routes/routeAccess'
 import Panel from 'components/Panel/Panel'
 import Button from 'components/Button/Button'
 import AccountForm from '../AccountForm/AccountForm'
@@ -11,14 +13,34 @@ import styles from './Account.css'
 
 const Account = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const user = useAppSelector(state => state.user)
   const upcomingQueueIds = useAppSelector(state => getUpcoming(state, user.userId))
+  const statusVisualizer = useAppSelector(state => state.status.visualizer)
+  const playerVisualizer = useAppSelector(state => state.playerVisualizer)
+  const room = useAppSelector(state => {
+    const roomId = state.user.roomId
+    return typeof roomId === 'number' ? state.rooms.entities[roomId] : null
+  })
 
   const curPassword = useRef(null)
   const [isDirty, setDirty] = useState(false)
   const isVisitingAnotherRoom = user.roomId !== null
     && user.ownRoomId !== null
     && user.roomId !== user.ownRoomId
+
+  const isRoomOwner = user.roomId !== null
+    && user.ownRoomId !== null
+    && user.roomId === user.ownRoomId
+
+  const activePresetCategory = playerVisualizer?.presetCategory ?? statusVisualizer?.presetCategory
+  const canAccessCameraRelay = getRouteAccessDecision({
+    path: '/camera',
+    isAdmin: user.isAdmin,
+    isRoomOwner,
+    prefs: room?.prefs,
+  }).allowed
+  const shouldShowCameraRelayButton = activePresetCategory === 'camera' && canAccessCameraRelay
 
   const handleSignOut = useCallback(() => {
     if (!user.isAdmin) {
@@ -54,6 +76,10 @@ const Account = () => {
 
     dispatch(leaveRoom())
   }, [dispatch, isVisitingAnotherRoom])
+
+  const handleOpenCameraRelay = useCallback(() => {
+    navigate('/camera')
+  }, [navigate])
 
   const handleSubmit = useCallback((data: FormData) => {
     // SSO users don't need to provide current password (they can only change display name/image)
@@ -99,6 +125,11 @@ const Account = () => {
             {isDirty && (
               <Button type='submit' variant='primary'>
                 Update Account
+              </Button>
+            )}
+            {shouldShowCameraRelayButton && (
+              <Button onClick={handleOpenCameraRelay} variant='default'>
+                Open Camera Relay
               </Button>
             )}
             <Button onClick={handleSignOut} variant='default'>
