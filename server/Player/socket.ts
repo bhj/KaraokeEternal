@@ -306,11 +306,20 @@ const ACTION_HANDLERS = {
         return
       }
 
-      if (route.subscriberSocketId !== senderId) {
+      if (route.subscriberSocketId === null) {
         route.subscriberSocketId = senderId
+        emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
+        return
       }
 
-      emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
+      if (senderId === route.subscriberSocketId) {
+        emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
+        return
+      }
+
+      // Unexpected sender while route is pinned: keep existing route and
+      // fall back to room relay to avoid dead-ending negotiation.
+      emitToRoom(sock, CAMERA_ANSWER, payload)
       return
     }
 
@@ -332,11 +341,20 @@ const ACTION_HANDLERS = {
         return
       }
 
-      if (route.subscriberSocketId !== senderId) {
+      if (route.subscriberSocketId === null) {
         route.subscriberSocketId = senderId
+        emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
+        return
       }
 
-      emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
+      if (senderId === route.subscriberSocketId) {
+        emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
+        return
+      }
+
+      // Unexpected sender while route is pinned: keep existing route and
+      // fall back to room relay to avoid dead-ending negotiation.
+      emitToRoom(sock, CAMERA_ICE, payload)
       return
     }
 

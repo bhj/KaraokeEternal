@@ -16,8 +16,6 @@ const Account = () => {
   const navigate = useNavigate()
   const user = useAppSelector(state => state.user)
   const upcomingQueueIds = useAppSelector(state => getUpcoming(state, user.userId))
-  const statusVisualizer = useAppSelector(state => state.status.visualizer)
-  const playerVisualizer = useAppSelector(state => state.playerVisualizer)
   const room = useAppSelector(state => {
     const roomId = state.user.roomId
     return typeof roomId === 'number' ? state.rooms.entities[roomId] : null
@@ -33,17 +31,13 @@ const Account = () => {
     && user.ownRoomId !== null
     && user.roomId === user.ownRoomId
 
-  const activePresetCategory = playerVisualizer?.presetCategory ?? statusVisualizer?.presetCategory
-  const isCameraRelayRelevant = activePresetCategory === 'camera'
-    || playerVisualizer?.allowCamera === true
-    || statusVisualizer?.allowCamera === true
   const canAccessCameraRelay = getRouteAccessDecision({
     path: '/camera',
     isAdmin: user.isAdmin,
     isRoomOwner,
     prefs: room?.prefs,
   }).allowed
-  const shouldShowCameraRelayButton = isCameraRelayRelevant && canAccessCameraRelay
+  const shouldShowCameraRelayButton = canAccessCameraRelay
 
   const handleSignOut = useCallback(() => {
     if (!user.isAdmin) {

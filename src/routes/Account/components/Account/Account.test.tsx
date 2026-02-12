@@ -212,6 +212,30 @@ describe('Account', () => {
     })
   })
 
+  it('shows Open Camera Relay whenever route access allows it', async () => {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(<Account />)
+    })
+
+    const openButton = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Open Camera Relay',
+    )
+    expect(openButton).toBeDefined()
+
+    await act(async () => {
+      openButton?.click()
+    })
+
+    expect(mocks.navigate).toHaveBeenCalledWith('/camera')
+
+    await act(async () => {
+      root.unmount()
+    })
+  })
+
   it('shows Open Camera Relay when camera preset is active and navigates to /camera', async () => {
     mocks.statusVisualizer = {
       ...mocks.statusVisualizer,
@@ -252,7 +276,7 @@ describe('Account', () => {
     mocks.statusVisualizer = {
       ...mocks.statusVisualizer,
       presetCategory: 'default',
-      allowCamera: true,
+      allowCamera: false,
     }
     mocks.playerVisualizer = undefined
 

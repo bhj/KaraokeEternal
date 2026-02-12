@@ -464,4 +464,59 @@ describe('Player socket permissions', () => {
       payload: { sdp: 'offer-2', type: 'offer' },
     })
   })
+
+  it('falls back to room for unexpected sender without rebinding pinned subscriber', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [194],
+      entities: {
+        194: {
+          ownerId: 750,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const shared = createServerHarness()
+    const { sock: publisher } = createMockSocket(
+      { userId: 751, roomId: 194, isAdmin: false },
+      { id: 'publisher-6', server: shared.server },
+    )
+    const { sock: subscriber } = createMockSocket(
+      { userId: 752, roomId: 194, isAdmin: false },
+      { id: 'player-6', server: shared.server },
+    )
+    const { sock: unexpected } = createMockSocket(
+      { userId: 753, roomId: 194, isAdmin: false },
+      { id: 'other-6', server: shared.server },
+    )
+
+    const activePlayer = {
+      ...subscriber,
+      _lastPlayerStatus: { queueId: 1 },
+    } as unknown as MockSocket
+
+    shared.fetchSockets.mockResolvedValue([publisher, activePlayer, unexpected])
+
+    await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer', type: 'offer' } })
+
+    await handlers[CAMERA_ICE_REQ](unexpected, {
+      payload: { candidate: 'cand-unexpected', sdpMid: '0', sdpMLineIndex: 0 },
+    })
+
+    await handlers[CAMERA_ICE_REQ](publisher, {
+      payload: { candidate: 'cand-from-publisher', sdpMid: '0', sdpMLineIndex: 0 },
+    })
+
+    expect(shared.emitsByTarget.get('ROOM_ID_194')).toHaveBeenCalledWith('action', {
+      type: CAMERA_ICE,
+      payload: { candidate: 'cand-unexpected', sdpMid: '0', sdpMLineIndex: 0 },
+    })
+
+    expect(shared.emitsByTarget.get('player-6')).toHaveBeenCalledWith('action', {
+      type: CAMERA_ICE,
+      payload: { candidate: 'cand-from-publisher', sdpMid: '0', sdpMLineIndex: 0 },
+    })
+  })
 })
