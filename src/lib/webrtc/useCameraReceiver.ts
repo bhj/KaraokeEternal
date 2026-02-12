@@ -43,7 +43,10 @@ export function useCameraReceiver () {
           if (subRef.current) {
             subRef.current.stop()
           }
-          subRef.current = createCameraSubscriber(a => dispatch(a as { type: string }))
+          subRef.current = createCameraSubscriber(
+            a => dispatch(a as { type: string }),
+            syncState,
+          )
           await subRef.current.handleOffer(action.payload)
 
           // Apply any ICE that arrived before the offer action.
