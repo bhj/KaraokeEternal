@@ -197,7 +197,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
 
   app.use(koaFavicon(path.join(env.KES_PATH_ASSETS, 'favicon.ico')))
   app.use(async (ctx, next) => {
-    if (ctx.path.startsWith('/api/video-proxy')) return next()
+    if (ctx.path.startsWith(urlPath + 'api/video-proxy')) return next()
     return koaRange(ctx, next)
   })
   app.use(koaBody({ multipart: true }))
