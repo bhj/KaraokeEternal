@@ -44,6 +44,18 @@ function executeHydraCode (hydra: Hydra, code: string) {
   }
 }
 
+function hasValidHydraSyntax (code: string): boolean {
+  try {
+    // Validate syntax before swapping render graph so we keep the last
+    // working frame when the incoming patch is malformed.
+    // eslint-disable-next-line no-new-func
+    new Function(code)
+    return true
+  } catch (err) {
+    return !(err instanceof SyntaxError)
+  }
+}
+
 interface HydraVisualizerProps {
   audioSourceNode: MediaElementAudioSourceNode | null
   isPlaying: boolean
@@ -209,7 +221,8 @@ function HydraVisualizer ({
     applyVideoProxyOverride(videoSources, w, videoProxyOverrides)
 
     // Execute initial patch and render first frame immediately
-    executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
+    const initialCode = getHydraEvalCode(codeRef.current)
+    executeHydraCode(hydra, hasValidHydraSyntax(initialCode) ? initialCode : DEFAULT_PATCH)
     hydra.tick(16.67)
 
     return () => {
@@ -272,14 +285,11 @@ function HydraVisualizer ({
     const hydra = hydraRef.current
     if (!hydra) return
 
-    // Clear previous render graph to prevent oscillator bleed between presets
-    if (typeof hydra.hush === 'function') {
-      hydra.hush()
-    }
+    const nextCode = getHydraEvalCode(code)
 
     // Re-check camera init when code changes with camera enabled
     if (allowCamera || remoteVideoElement) {
-      const { sources } = detectCameraUsage(getHydraEvalCode(code))
+      const { sources } = detectCameraUsage(nextCode)
       const w = window as unknown as Record<string, unknown>
 
       pruneStaleCameraBindings(sources)
@@ -304,7 +314,18 @@ function HydraVisualizer ({
 
     reportCameraSourcesBound()
 
-    executeHydraCode(hydra, getHydraEvalCode(code))
+    if (!hasValidHydraSyntax(nextCode)) {
+      warn('Skipping Hydra patch update due to syntax error')
+      return
+    }
+
+    // Clear previous render graph only after syntax validation so
+    // malformed code does not blank the current visualizer output.
+    if (typeof hydra.hush === 'function') {
+      hydra.hush()
+    }
+
+    executeHydraCode(hydra, nextCode)
     errorCountRef.current = 0
   }, [code, allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
 
