@@ -7,6 +7,32 @@ import { STUN_SERVERS, type CameraOfferPayload, type CameraIcePayload } from './
 
 export type SubscriberStatus = 'idle' | 'connecting' | 'active'
 
+const debug = (...args: unknown[]) => console.debug('[CameraSubscriber]', ...args)
+
+function videoDiagSnapshot (videoEl: HTMLVideoElement | null) {
+  if (!videoEl) return null
+  return {
+    readyState: videoEl.readyState,
+    networkState: videoEl.networkState,
+    paused: videoEl.paused,
+    muted: videoEl.muted,
+    videoWidth: videoEl.videoWidth,
+    videoHeight: videoEl.videoHeight,
+    hasSrcObject: videoEl.srcObject !== null,
+  }
+}
+
+function attachVideoDiagnostics (videoEl: HTMLVideoElement) {
+  if (typeof videoEl.addEventListener !== 'function') return
+
+  const events = ['loadedmetadata', 'canplay', 'playing', 'waiting', 'stalled', 'ended', 'error'] as const
+  for (const eventName of events) {
+    videoEl.addEventListener(eventName, () => {
+      debug(`video event=${eventName}`, videoDiagSnapshot(videoEl))
+    })
+  }
+}
+
 // ---- Testable core (no React dependency) ----
 
 export interface CameraSubscriber {
@@ -46,12 +72,19 @@ export function createCameraSubscriber (
     const queued = pendingIce
     pendingIce = []
 
+    debug('flushing pending ICE', { count: queued.length })
+
     for (const ice of queued) {
       await addIceCandidate(ice)
     }
   }
 
   const handleOffer = async (offer: CameraOfferPayload) => {
+    debug('handleOffer', {
+      hasExistingPeer: Boolean(pc),
+      sdpLength: typeof offer.sdp === 'string' ? offer.sdp.length : 0,
+    })
+
     if (pc) {
       pc.close()
     }
@@ -65,6 +98,12 @@ export function createCameraSubscriber (
 
     pc.onicecandidate = (ev) => {
       if (ev.candidate) {
+        debug('local ICE candidate generated', {
+          hasCandidate: Boolean(ev.candidate.candidate),
+          sdpMid: ev.candidate.sdpMid,
+          sdpMLineIndex: ev.candidate.sdpMLineIndex,
+        })
+
         dispatch({
           type: CAMERA_ICE_REQ,
           payload: {
@@ -77,14 +116,22 @@ export function createCameraSubscriber (
     }
 
     pc.ontrack = (ev) => {
+      debug('ontrack received', {
+        streamCount: ev.streams.length,
+        trackKind: ev.track?.kind,
+        trackId: ev.track?.id,
+      })
+
       if (!videoEl) {
         videoEl = document.createElement('video')
         videoEl.autoplay = true
         videoEl.playsInline = true
         videoEl.muted = true
+        attachVideoDiagnostics(videoEl)
       }
 
       videoEl.srcObject = ev.streams[0] ?? new MediaStream([ev.track])
+      debug('video srcObject assigned', videoDiagSnapshot(videoEl))
 
       const playResult = videoEl.play?.()
       if (playResult && typeof playResult.catch === 'function') {
@@ -95,14 +142,19 @@ export function createCameraSubscriber (
 
       status = 'active'
       notifyStateChange()
+      debug('subscriber status=active', videoDiagSnapshot(videoEl))
     }
 
     await pc.setRemoteDescription(new RTCSessionDescription(offer))
     hasRemoteDescription = true
+    debug('remote description set')
     await flushPendingIce()
 
     const answer = await pc.createAnswer()
     await pc.setLocalDescription(answer)
+    debug('local answer created', {
+      sdpLength: typeof answer.sdp === 'string' ? answer.sdp.length : 0,
+    })
 
     dispatch({
       type: CAMERA_ANSWER_REQ,
@@ -115,6 +167,7 @@ export function createCameraSubscriber (
 
     if (!hasRemoteDescription) {
       pendingIce.push(ice)
+      debug('queued remote ICE before remote description', { queued: pendingIce.length })
       return
     }
 
@@ -128,6 +181,7 @@ export function createCameraSubscriber (
     }
     pendingIce = []
     hasRemoteDescription = false
+    debug('stop subscriber', videoDiagSnapshot(videoEl))
     videoEl = null
     status = 'idle'
     notifyStateChange()
@@ -150,7 +204,7 @@ export function useCameraSubscriber (dispatch: (action: unknown) => void) {
 
   const subscriber = useMemo(() => {
     const sub = createCameraSubscriber(
-      (action) => dispatch(action),
+      action => dispatch(action),
       () => {
         setStatus(sub.getStatus())
         setVideoElement(sub.getVideoElement())

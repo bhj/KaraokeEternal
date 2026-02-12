@@ -10,6 +10,8 @@ import {
 import { isCameraOffer, isCameraIce, type CameraIcePayload } from './CameraSignaling'
 import { createCameraSubscriber, type CameraSubscriber, type SubscriberStatus } from './useCameraSubscriber'
 
+const debug = (...args: unknown[]) => console.debug('[CameraReceiver]', ...args)
+
 /**
  * Manages the camera subscriber lifecycle by listening for camera signaling
  * actions on the socket. Returns the remote video element when a WebRTC
@@ -36,8 +38,11 @@ export function useCameraReceiver () {
     const handleAction = async (action: { type: string, payload?: unknown }) => {
       if (!action || typeof action.type !== 'string') return
 
+      debug('socket action', { type: action.type })
+
       switch (action.type) {
         case CAMERA_OFFER: {
+          debug('received offer', { hasSubscriber: Boolean(subRef.current) })
           if (!isCameraOffer(action.payload)) return
           // Tear down existing subscriber if any
           if (subRef.current) {
@@ -48,6 +53,7 @@ export function useCameraReceiver () {
             syncState,
           )
           await subRef.current.handleOffer(action.payload)
+          debug('offer handled')
 
           // Apply any ICE that arrived before the offer action.
           if (pendingIceRef.current.length > 0) {
@@ -66,10 +72,12 @@ export function useCameraReceiver () {
           break
         }
         case CAMERA_ICE: {
+          debug('received ICE', { hasSubscriber: Boolean(subRef.current) })
           if (!isCameraIce(action.payload)) return
 
           if (!subRef.current) {
             pendingIceRef.current.push(action.payload)
+            debug('queued ICE until subscriber exists', { queued: pendingIceRef.current.length })
             return
           }
 
@@ -78,6 +86,7 @@ export function useCameraReceiver () {
           break
         }
         case CAMERA_STOP: {
+          debug('received stop')
           pendingIceRef.current = []
           if (!subRef.current) return
           subRef.current.stop()

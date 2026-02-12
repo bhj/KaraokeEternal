@@ -15,6 +15,20 @@ import styles from './HydraVisualizer.css'
 
 const log = (...args: unknown[]) => console.log('[Hydra]', ...args)
 const warn = (...args: unknown[]) => console.warn('[Hydra]', ...args)
+const cameraDiag = (...args: unknown[]) => console.debug('[HydraCameraDiag]', ...args)
+
+function snapshotVideoElement (videoEl: HTMLVideoElement | null) {
+  if (!videoEl) return null
+  return {
+    readyState: videoEl.readyState,
+    networkState: videoEl.networkState,
+    paused: videoEl.paused,
+    muted: videoEl.muted,
+    videoWidth: videoEl.videoWidth,
+    videoHeight: videoEl.videoHeight,
+    hasSrcObject: videoEl.srcObject !== null,
+  }
+}
 
 // Audio globals exposed on window for Hydra code to reference
 function setAudioGlobals (compat: HydraAudioCompat) {
@@ -157,18 +171,47 @@ function HydraVisualizer ({
     const nextRemote = remoteVideoElement ?? null
 
     if (previousRemote !== nextRemote) {
+      cameraDiag('remote video element changed', {
+        hadPreviousRemote: Boolean(previousRemote),
+        hasNextRemote: Boolean(nextRemote),
+        nextRemote: snapshotVideoElement(nextRemote),
+      })
       cameraInitRef.current.clear()
       reportCameraSourcesBound()
     }
 
     if (nextRemote) {
+      cameraDiag('applyRemoteCameraOverride', snapshotVideoElement(nextRemote))
       applyRemoteCameraOverride(sources, nextRemote, w, cameraOverrideRef.current)
     } else {
+      cameraDiag('restoreRemoteCameraOverride')
       restoreRemoteCameraOverride(w, cameraOverrideRef.current)
     }
 
     prevRemoteVideoRef.current = nextRemote
   }, [remoteVideoElement, reportCameraSourcesBound])
+
+  // Remote video lifecycle diagnostics to chase black-screen conditions.
+  useEffect(() => {
+    if (!remoteVideoElement) return
+
+    const events = ['loadedmetadata', 'canplay', 'playing', 'waiting', 'stalled', 'ended', 'error'] as const
+    const handlers = events.map((eventName) => {
+      const handler = () => {
+        cameraDiag('remote video event', { eventName, video: snapshotVideoElement(remoteVideoElement) })
+      }
+      remoteVideoElement.addEventListener(eventName, handler)
+      return { eventName, handler }
+    })
+
+    cameraDiag('attached remote video diagnostics', snapshotVideoElement(remoteVideoElement))
+
+    return () => {
+      for (const { eventName, handler } of handlers) {
+        remoteVideoElement.removeEventListener(eventName, handler)
+      }
+    }
+  }, [remoteVideoElement])
 
   // Set window.a compat on window so Hydra code can reference a.fft and controls
   useEffect(() => {
@@ -205,7 +248,8 @@ function HydraVisualizer ({
     // Override initVideo() before first code execution so proxy is active immediately
     const w = window as unknown as Record<string, unknown>
     const videoSources = ['s0', 's1', 's2', 's3']
-    applyVideoProxyOverride(videoSources, w, videoProxyOverrideRef.current)
+    const videoProxyOverrides = videoProxyOverrideRef.current
+    applyVideoProxyOverride(videoSources, w, videoProxyOverrides)
 
     // Execute initial patch and render first frame immediately
     executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
@@ -213,7 +257,7 @@ function HydraVisualizer ({
 
     return () => {
       log('Destroying')
-      restoreVideoProxyOverride(w, videoProxyOverrideRef.current)
+      restoreVideoProxyOverride(w, videoProxyOverrides)
       cancelAnimationFrame(rafRef.current)
       try {
         hydra.regl.destroy()
@@ -235,6 +279,7 @@ function HydraVisualizer ({
   // Uses remote WebRTC video when available, falls back to local initCam()
   useEffect(() => {
     if (!allowCamera && !remoteVideoElement) {
+      cameraDiag('camera auto-init disabled (no allowCamera + no remote video)')
       cameraInitRef.current.clear()
       reportCameraSourcesBound()
       return
@@ -244,19 +289,45 @@ function HydraVisualizer ({
     const { sources } = detectCameraUsage(currentCode)
     const w = window as unknown as Record<string, unknown>
 
+    cameraDiag('camera auto-init pass', {
+      sourceCount: sources.length,
+      sources,
+      allowCamera: Boolean(allowCamera),
+      hasRemoteVideo: Boolean(remoteVideoElement),
+      remoteVideo: snapshotVideoElement(remoteVideoElement ?? null),
+    })
+
     pruneStaleCameraBindings(sources)
 
     for (const src of sources) {
-      if (cameraInitRef.current.has(src)) continue
+      if (cameraInitRef.current.has(src)) {
+        cameraDiag('camera source already initialized; skipping', { src })
+        continue
+      }
+
       const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
-      if (!extSrc) continue
+      if (!extSrc) {
+        cameraDiag('hydra source missing on window', { src })
+        continue
+      }
+
       try {
         if (remoteVideoElement && extSrc.init) {
+          cameraDiag('binding remote video to hydra source', { src, video: snapshotVideoElement(remoteVideoElement) })
           extSrc.init({ src: remoteVideoElement })
           cameraInitRef.current.add(src)
         } else if (allowCamera && extSrc.initCam) {
+          cameraDiag('calling extSrc.initCam()', { src })
           extSrc.initCam()
           cameraInitRef.current.add(src)
+        } else {
+          cameraDiag('source had no compatible init method for current mode', {
+            src,
+            hasInit: typeof extSrc.init === 'function',
+            hasInitCam: typeof extSrc.initCam === 'function',
+            allowCamera: Boolean(allowCamera),
+            hasRemoteVideo: Boolean(remoteVideoElement),
+          })
         }
       } catch (err) {
         warn('Camera init failed for', src, err)
@@ -272,26 +343,56 @@ function HydraVisualizer ({
     if (!hydra) return
 
     // Clear previous render graph to prevent oscillator bleed between presets
-    hydra.hush()
+    if (typeof (hydra as unknown as { hush?: () => void }).hush === 'function') {
+      hydra.hush()
+    } else {
+      cameraDiag('hydra.hush unavailable; skipping graph clear for this runtime')
+    }
 
     // Re-check camera init when code changes with camera enabled
     if (allowCamera || remoteVideoElement) {
       const { sources } = detectCameraUsage(getHydraEvalCode(code))
       const w = window as unknown as Record<string, unknown>
 
+      cameraDiag('camera rebind on code change', {
+        sourceCount: sources.length,
+        sources,
+        allowCamera: Boolean(allowCamera),
+        hasRemoteVideo: Boolean(remoteVideoElement),
+        remoteVideo: snapshotVideoElement(remoteVideoElement ?? null),
+      })
+
       pruneStaleCameraBindings(sources)
 
       for (const src of sources) {
-        if (cameraInitRef.current.has(src)) continue
+        if (cameraInitRef.current.has(src)) {
+          cameraDiag('camera source already initialized on code change; skipping', { src })
+          continue
+        }
+
         const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
-        if (!extSrc) continue
+        if (!extSrc) {
+          cameraDiag('hydra source missing on window during code-change rebind', { src })
+          continue
+        }
+
         try {
           if (remoteVideoElement && extSrc.init) {
+            cameraDiag('rebind remote video to source on code change', { src, video: snapshotVideoElement(remoteVideoElement) })
             extSrc.init({ src: remoteVideoElement })
             cameraInitRef.current.add(src)
           } else if (allowCamera && extSrc.initCam) {
+            cameraDiag('re-run initCam on code change', { src })
             extSrc.initCam()
             cameraInitRef.current.add(src)
+          } else {
+            cameraDiag('no compatible init method during code-change rebind', {
+              src,
+              hasInit: typeof extSrc.init === 'function',
+              hasInitCam: typeof extSrc.initCam === 'function',
+              allowCamera: Boolean(allowCamera),
+              hasRemoteVideo: Boolean(remoteVideoElement),
+            })
           }
         } catch (err) {
           warn('Camera init failed for', src, err)
