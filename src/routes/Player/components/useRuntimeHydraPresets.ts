@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { fetchAllPresets, fetchFolders } from 'routes/Orchestrator/api/hydraPresetsApi'
 import type { PresetFolder, PresetItem } from 'routes/Orchestrator/components/presetTree'
-import { buildRuntimePresetPool } from './runtimePresets'
+import { buildRuntimePresetPool, resolvePlayerPresetFolderId } from './runtimePresets'
 
 export function useRuntimeHydraPresets () {
   const roomId = useAppSelector(state => state.user.roomId)
@@ -10,6 +10,7 @@ export function useRuntimeHydraPresets () {
     if (typeof state.user.roomId !== 'number') return undefined
     return state.rooms.entities[state.user.roomId]?.prefs
   })
+  const configuredFolderId = resolvePlayerPresetFolderId(roomPrefs)
 
   const [folders, setFolders] = useState<PresetFolder[]>([])
   const [presets, setPresets] = useState<PresetItem[]>([])
@@ -39,7 +40,7 @@ export function useRuntimeHydraPresets () {
     return () => {
       cancelled = true
     }
-  }, [roomId])
+  }, [roomId, configuredFolderId])
 
   return useMemo(() => buildRuntimePresetPool({ roomPrefs, folders, presets }), [roomPrefs, folders, presets])
 }

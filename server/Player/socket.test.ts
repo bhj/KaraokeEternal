@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  CAMERA_ANSWER,
+  CAMERA_ANSWER_REQ,
   CAMERA_OFFER,
   CAMERA_OFFER_REQ,
   PLAYER_CMD_NEXT,
@@ -19,6 +21,7 @@ import Rooms from '../Rooms/Rooms.js'
 import handlers, { canManageRoom } from './socket.js'
 
 interface MockSocket {
+  id: string
   user: {
     userId: number
     roomId: number
@@ -26,17 +29,54 @@ interface MockSocket {
   }
   server: {
     to: ReturnType<typeof vi.fn>
+    in: ReturnType<typeof vi.fn>
+  }
+  _lastPlayerStatus?: unknown
+}
+
+function createServerHarness () {
+  const emitsByTarget = new Map<string, ReturnType<typeof vi.fn>>()
+  const to = vi.fn((target: string) => {
+    let emit = emitsByTarget.get(target)
+    if (!emit) {
+      emit = vi.fn()
+      emitsByTarget.set(target, emit)
+    }
+
+    return { emit }
+  })
+  const fetchSockets = vi.fn(async () => [] as MockSocket[])
+  const inRoom = vi.fn(() => ({ fetchSockets }))
+
+  return {
+    server: { to, in: inRoom },
+    emitsByTarget,
+    to,
+    inRoom,
+    fetchSockets,
   }
 }
 
-function createMockSocket (user: MockSocket['user']) {
-  const emit = vi.fn()
-  const to = vi.fn(() => ({ emit }))
+function createMockSocket (
+  user: MockSocket['user'],
+  {
+    id,
+    server,
+  }: {
+    id?: string
+    server?: MockSocket['server']
+  } = {},
+) {
+  const harness = createServerHarness()
   const sock = {
+    id: id ?? `sock_${user.userId}`,
     user,
-    server: { to },
+    server: server ?? harness.server,
   }
-  return { sock: sock as unknown as MockSocket, emit, to }
+  return {
+    sock: sock as unknown as MockSocket,
+    harness,
+  }
 }
 
 describe('Player socket permissions', () => {
@@ -51,7 +91,7 @@ describe('Player socket permissions', () => {
         roomId: 5,
         isAdmin: true,
       },
-    } as unknown as MockSocket)
+    } as any)
 
     expect(allowed).toBe(true)
     expect(Rooms.get).not.toHaveBeenCalled()
@@ -70,11 +110,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()' } })
 
-    expect(emit).not.toHaveBeenCalled()
+    expect(harness.emitsByTarget.get('ROOM_ID_55')).toBeUndefined()
   })
 
   it('allows hydra code broadcast when collaborator send is enabled', async () => {
@@ -90,11 +130,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()' } })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(harness.emitsByTarget.get('ROOM_ID_55')).toHaveBeenCalledWith('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload: { code: 'osc(10).out()' },
     })
@@ -115,11 +155,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'osc(10).out()', hydraPresetFolderId: 2 } })
 
-    expect(emit).not.toHaveBeenCalled()
+    expect(harness.emitsByTarget.get('ROOM_ID_55')).toBeUndefined()
   })
 
   it('allows collaborator hydra send when room is restricted and payload folder matches', async () => {
@@ -137,7 +177,7 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 101, roomId: 55, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, {
       payload: {
@@ -147,7 +187,7 @@ describe('Player socket permissions', () => {
       },
     })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(harness.emitsByTarget.get('ROOM_ID_55')).toHaveBeenCalledWith('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload: {
         code: 'osc(10).out()',
@@ -165,11 +205,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 42, roomId: 11, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 42, roomId: 11, isAdmin: false })
 
     await handlers[PLAYER_REQ_NEXT](sock)
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(harness.emitsByTarget.get('ROOM_ID_11')).toHaveBeenCalledWith('action', {
       type: PLAYER_CMD_NEXT,
     })
   })
@@ -182,11 +222,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 200, roomId: 77, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 200, roomId: 77, isAdmin: false })
 
     await handlers[VISUALIZER_HYDRA_CODE_REQ](sock, { payload: { code: 'noise(4).out()' } })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(harness.emitsByTarget.get('ROOM_ID_77')).toHaveBeenCalledWith('action', {
       type: VISUALIZER_HYDRA_CODE,
       payload: { code: 'noise(4).out()' },
     })
@@ -205,11 +245,11 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
 
     await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
 
-    expect(emit).not.toHaveBeenCalled()
+    expect(harness.emitsByTarget.size).toBe(0)
   })
 
   it('allows camera offer when collaborator relay is enabled', async () => {
@@ -225,13 +265,90 @@ describe('Player socket permissions', () => {
       },
     })
 
-    const { sock, emit } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
+    const { sock, harness } = createMockSocket({ userId: 301, roomId: 88, isAdmin: false })
 
     await handlers[CAMERA_OFFER_REQ](sock, { payload: { sdp: 'offer' } })
 
-    expect(emit).toHaveBeenCalledWith('action', {
+    expect(harness.emitsByTarget.get('ROOM_ID_88')).toHaveBeenCalledWith('action', {
       type: CAMERA_OFFER,
       payload: { sdp: 'offer' },
     })
+  })
+
+  it('targets camera offer to active player socket when present', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [189],
+      entities: {
+        189: {
+          ownerId: 700,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const shared = createServerHarness()
+    const { sock: publisher } = createMockSocket(
+      { userId: 701, roomId: 189, isAdmin: false },
+      { id: 'publisher-1', server: shared.server },
+    )
+
+    const playerSocket = {
+      id: 'player-1',
+      user: { userId: 999, roomId: 189, isAdmin: false },
+      _lastPlayerStatus: { queueId: 1 },
+      server: shared.server,
+    } as unknown as MockSocket
+
+    shared.fetchSockets.mockResolvedValue([publisher, playerSocket])
+
+    await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer', type: 'offer' } })
+
+    expect(shared.emitsByTarget.get('player-1')).toHaveBeenCalledWith('action', {
+      type: CAMERA_OFFER,
+      payload: { sdp: 'offer', type: 'offer' },
+    })
+    expect(shared.emitsByTarget.get('ROOM_ID_189')).toBeUndefined()
+  })
+
+  it('routes camera answer back to originating publisher socket', async () => {
+    vi.mocked(Rooms.get).mockResolvedValue({
+      result: [190],
+      entities: {
+        190: {
+          ownerId: 710,
+          prefs: {
+            allowGuestCameraRelay: true,
+          },
+        },
+      },
+    })
+
+    const shared = createServerHarness()
+    const { sock: publisher } = createMockSocket(
+      { userId: 711, roomId: 190, isAdmin: false },
+      { id: 'publisher-2', server: shared.server },
+    )
+    const { sock: subscriber } = createMockSocket(
+      { userId: 712, roomId: 190, isAdmin: false },
+      { id: 'player-2', server: shared.server },
+    )
+
+    const playerSocket = {
+      ...subscriber,
+      _lastPlayerStatus: { queueId: 1 },
+    } as unknown as MockSocket
+
+    shared.fetchSockets.mockResolvedValue([publisher, playerSocket])
+
+    await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer', type: 'offer' } })
+    await handlers[CAMERA_ANSWER_REQ](subscriber, { payload: { sdp: 'answer', type: 'answer' } })
+
+    expect(shared.emitsByTarget.get('publisher-2')).toHaveBeenCalledWith('action', {
+      type: CAMERA_ANSWER,
+      payload: { sdp: 'answer', type: 'answer' },
+    })
+    expect(shared.emitsByTarget.get('ROOM_ID_190')).toBeUndefined()
   })
 })
