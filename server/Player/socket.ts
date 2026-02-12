@@ -82,37 +82,13 @@ function emitToSocket (sock: RoomControlSocket, socketId: string, type: string, 
   })
 }
 
-async function resolveCameraSubscriberSocketId (sock: RoomControlSocket): Promise<string | null> {
-  const roomId = getRoomId(sock)
-  if (roomId === null || !sock.server?.in) return null
-
-  try {
-    const room = sock.server.in(Rooms.prefix(roomId))
-    if (!room?.fetchSockets) return null
-
-    const sockets = await room.fetchSockets()
-    const activePlayer = sockets.find(s => {
-      return typeof s.id === 'string'
-        && s.id !== sock.id
-        && s.user?.roomId === roomId
-        && Boolean(s._lastPlayerStatus)
-    })
-
-    return typeof activePlayer?.id === 'string' ? activePlayer.id : null
-  } catch {
-    return null
-  }
-}
-
-async function registerCameraOfferRoute (sock: RoomControlSocket): Promise<CameraRoute | null> {
+function registerCameraOfferRoute (sock: RoomControlSocket): CameraRoute | null {
   const roomId = getRoomId(sock)
   if (roomId === null || typeof sock.id !== 'string') return null
 
-  const subscriberSocketId = await resolveCameraSubscriberSocketId(sock)
-
   const route: CameraRoute = {
     publisherSocketId: sock.id,
-    subscriberSocketId: subscriberSocketId ?? null,
+    subscriberSocketId: null,
   }
 
   cameraRoutesByRoom.set(roomId, route)
@@ -282,12 +258,7 @@ const ACTION_HANDLERS = {
   [CAMERA_OFFER_REQ]: async (sock, { payload }) => {
     if (!(await canRelayCamera(sock))) return
 
-    const route = await registerCameraOfferRoute(sock)
-    if (route?.subscriberSocketId) {
-      emitToSocket(sock, route.subscriberSocketId, CAMERA_OFFER, payload)
-      return
-    }
-
+    registerCameraOfferRoute(sock)
     emitToRoom(sock, CAMERA_OFFER, payload)
   },
   [CAMERA_ANSWER_REQ]: async (sock, { payload }) => {
@@ -300,8 +271,6 @@ const ACTION_HANDLERS = {
       if (senderId === route.publisherSocketId) {
         if (route.subscriberSocketId) {
           emitToSocket(sock, route.subscriberSocketId, CAMERA_ANSWER, payload)
-        } else {
-          emitToRoom(sock, CAMERA_ANSWER, payload)
         }
         return
       }
@@ -314,12 +283,8 @@ const ACTION_HANDLERS = {
 
       if (senderId === route.subscriberSocketId) {
         emitToSocket(sock, route.publisherSocketId, CAMERA_ANSWER, payload)
-        return
       }
 
-      // Unexpected sender while route is pinned: keep existing route and
-      // fall back to room relay to avoid dead-ending negotiation.
-      emitToRoom(sock, CAMERA_ANSWER, payload)
       return
     }
 
@@ -349,12 +314,8 @@ const ACTION_HANDLERS = {
 
       if (senderId === route.subscriberSocketId) {
         emitToSocket(sock, route.publisherSocketId, CAMERA_ICE, payload)
-        return
       }
 
-      // Unexpected sender while route is pinned: keep existing route and
-      // fall back to room relay to avoid dead-ending negotiation.
-      emitToRoom(sock, CAMERA_ICE, payload)
       return
     }
 

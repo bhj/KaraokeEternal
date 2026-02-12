@@ -277,7 +277,7 @@ describe('Player socket permissions', () => {
     })
   })
 
-  it('targets camera offer to active player socket when present', async () => {
+  it('broadcasts camera offer to room so first available player can answer', async () => {
     vi.mocked(Rooms.get).mockResolvedValue({
       result: [189],
       entities: {
@@ -296,22 +296,13 @@ describe('Player socket permissions', () => {
       { id: 'publisher-1', server: shared.server },
     )
 
-    const playerSocket = {
-      id: 'player-1',
-      user: { userId: 999, roomId: 189, isAdmin: false },
-      _lastPlayerStatus: { queueId: 1 },
-      server: shared.server,
-    } as unknown as MockSocket
-
-    shared.fetchSockets.mockResolvedValue([publisher, playerSocket])
-
     await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer', type: 'offer' } })
 
-    expect(shared.emitsByTarget.get('player-1')).toHaveBeenCalledWith('action', {
+    expect(shared.emitsByTarget.get('ROOM_ID_189')).toHaveBeenCalledWith('action', {
       type: CAMERA_OFFER,
       payload: { sdp: 'offer', type: 'offer' },
     })
-    expect(shared.emitsByTarget.get('ROOM_ID_189')).toBeUndefined()
+    expect(shared.emitsByTarget.get('player-1')).toBeUndefined()
   })
 
   it('routes camera answer back to originating publisher socket', async () => {
@@ -351,7 +342,10 @@ describe('Player socket permissions', () => {
       type: CAMERA_ANSWER,
       payload: { sdp: 'answer', type: 'answer' },
     })
-    expect(shared.emitsByTarget.get('ROOM_ID_190')).toBeUndefined()
+    expect(shared.emitsByTarget.get('ROOM_ID_190')).toHaveBeenCalledWith('action', {
+      type: CAMERA_OFFER,
+      payload: { sdp: 'offer', type: 'offer' },
+    })
   })
 
   it('locks route to first answering subscriber after fallback offer broadcast', async () => {
@@ -465,7 +459,7 @@ describe('Player socket permissions', () => {
     })
   })
 
-  it('falls back to room for unexpected sender without rebinding pinned subscriber', async () => {
+  it('ignores unexpected sender while preserving pinned subscriber route', async () => {
     vi.mocked(Rooms.get).mockResolvedValue({
       result: [194],
       entities: {
@@ -500,6 +494,7 @@ describe('Player socket permissions', () => {
     shared.fetchSockets.mockResolvedValue([publisher, activePlayer, unexpected])
 
     await handlers[CAMERA_OFFER_REQ](publisher, { payload: { sdp: 'offer', type: 'offer' } })
+    await handlers[CAMERA_ANSWER_REQ](subscriber, { payload: { sdp: 'answer', type: 'answer' } })
 
     await handlers[CAMERA_ICE_REQ](unexpected, {
       payload: { candidate: 'cand-unexpected', sdpMid: '0', sdpMLineIndex: 0 },
@@ -510,6 +505,11 @@ describe('Player socket permissions', () => {
     })
 
     expect(shared.emitsByTarget.get('ROOM_ID_194')).toHaveBeenCalledWith('action', {
+      type: CAMERA_OFFER,
+      payload: { sdp: 'offer', type: 'offer' },
+    })
+
+    expect(shared.emitsByTarget.get('ROOM_ID_194')).not.toHaveBeenCalledWith('action', {
       type: CAMERA_ICE,
       payload: { candidate: 'cand-unexpected', sdpMid: '0', sdpMLineIndex: 0 },
     })
