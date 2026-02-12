@@ -11,10 +11,10 @@ describe('buildHydraCompletions', () => {
     }
   })
 
-  it('topLevel includes 7 audio helper functions', () => {
-    const audio = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright']
-    for (const name of audio) {
-      expect(topLevel.some(c => c.label === name), `missing audio: ${name}`).toBe(true)
+  it('topLevel excludes legacy audio helper functions', () => {
+    const legacy = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright']
+    for (const name of legacy) {
+      expect(topLevel.some(c => c.label === name), `unexpected legacy audio helper: ${name}`).toBe(false)
     }
   })
 
@@ -41,6 +41,24 @@ describe('buildHydraCompletions', () => {
     for (const c of dotChain) {
       expect(typeof c.detail, `${c.label} missing detail`).toBe('string')
       expect(typeof c.section, `${c.label} missing section`).toBe('string')
+    }
+  })
+
+  it('completions include teaching info strings', () => {
+    for (const c of topLevel) {
+      const info = (c as { info?: string }).info
+      expect(typeof info, `${c.label} missing info`).toBe('string')
+      expect(info?.trim().length, `${c.label} empty info`).toBeGreaterThan(0)
+    }
+    for (const c of dotChain) {
+      const info = (c as { info?: string }).info
+      expect(typeof info, `${c.label} missing info`).toBe('string')
+      expect(info?.trim().length, `${c.label} empty info`).toBeGreaterThan(0)
+    }
+    for (const c of nativeAudioDot) {
+      const info = (c as { info?: string }).info
+      expect(typeof info, `${c.label} missing info`).toBe('string')
+      expect(info?.trim().length, `${c.label} empty info`).toBeGreaterThan(0)
     }
   })
 
@@ -97,6 +115,14 @@ describe('buildHydraCompletions - camera / external sources', () => {
     for (const c of sourceDot) {
       expect(typeof c.detail, `${c.label} missing detail`).toBe('string')
       expect(typeof c.section, `${c.label} missing section`).toBe('string')
+    }
+  })
+
+  it('sourceDot entries include teaching info', () => {
+    for (const c of sourceDot) {
+      const info = (c as { info?: string }).info
+      expect(typeof info, `${c.label} missing info`).toBe('string')
+      expect(info?.trim().length, `${c.label} empty info`).toBeGreaterThan(0)
     }
   })
 

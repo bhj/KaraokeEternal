@@ -13,6 +13,30 @@ import {
 } from './hydraPresets'
 import { HYDRA_GALLERY } from './hydraGallery'
 
+function stripComments (code: string): string {
+  return code
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/gm, '')
+}
+
+function countChar (code: string, ch: string): number {
+  let count = 0
+  for (let i = 0; i < code.length; i++) {
+    if (code[i] === ch) count++
+  }
+  return count
+}
+
+function canParseAsJavaScript (code: string): boolean {
+  try {
+    // Syntax-only parse check (does not execute sketch code)
+    new Function(code)
+    return true
+  } catch {
+    return false
+  }
+}
+
 describe('hydraPresets', () => {
   describe('decodeSketch', () => {
     it('decodes a gallery item from base64+URI encoding', () => {
@@ -45,6 +69,25 @@ describe('hydraPresets', () => {
       for (let i = 0; i < PRESETS.length; i++) {
         expect(PRESETS[i].length, `PRESETS[${i}] is empty`).toBeGreaterThan(0)
       }
+    })
+
+    it('all decoded sketches are syntactically valid JavaScript', () => {
+      for (let i = 0; i < PRESETS.length; i++) {
+        const sketchId = HYDRA_GALLERY[i].sketch_id
+        const code = PRESETS[i]
+        expect(
+          canParseAsJavaScript(code),
+          `Sketch ${i} (${sketchId}) has invalid JavaScript syntax`,
+        ).toBe(true)
+      }
+    })
+
+    it('flor_1 decodes with balanced parentheses', () => {
+      const idx = HYDRA_GALLERY.findIndex(item => item.sketch_id === 'flor_1')
+      expect(idx).toBeGreaterThanOrEqual(0)
+      const code = getPresetByIndex(idx)
+      const cleaned = stripComments(code)
+      expect(countChar(cleaned, '(')).toBe(countChar(cleaned, ')'))
     })
   })
 

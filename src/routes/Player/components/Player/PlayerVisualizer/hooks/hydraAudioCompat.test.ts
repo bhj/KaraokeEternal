@@ -18,6 +18,14 @@ describe('hydraAudioCompat', () => {
       expect(typeof compat.update).toBe('function')
     })
 
+    it('exposes Hydra audio compatibility methods used by gallery sketches', () => {
+      const compat = createHydraAudioCompat()
+      expect(typeof compat.show).toBe('function')
+      expect(typeof compat.hide).toBe('function')
+      expect(typeof compat.setCutoff).toBe('function')
+      expect(typeof compat.vol).toBe('number')
+    })
+
     it('default fft array length = 4 (Hydra default)', () => {
       const compat = createHydraAudioCompat()
       expect(compat.fft.length).toBe(4)
@@ -78,6 +86,26 @@ describe('hydraAudioCompat', () => {
     })
   })
 
+  describe('setCutoff', () => {
+    it('suppresses low amplitudes below cutoff', () => {
+      const compat = createHydraAudioCompat()
+      compat.setSmooth(0)
+      compat.setCutoff(0.6)
+      compat.update(makeAudioData(128, 0.4))
+      for (const v of compat.fft) {
+        expect(v).toBe(0)
+      }
+    })
+  })
+
+  describe('show/hide', () => {
+    it('can be called safely (no throw)', () => {
+      const compat = createHydraAudioCompat()
+      expect(() => compat.show()).not.toThrow()
+      expect(() => compat.hide()).not.toThrow()
+    })
+  })
+
   describe('update', () => {
     it('populates fft array from rawFrequencyData', () => {
       const compat = createHydraAudioCompat()
@@ -86,6 +114,12 @@ describe('hydraAudioCompat', () => {
       for (const v of compat.fft) {
         expect(v).toBeGreaterThan(0)
       }
+    })
+
+    it('updates vol from latest frame energy', () => {
+      const compat = createHydraAudioCompat()
+      compat.update(makeAudioData(128, 0.7))
+      expect(compat.vol).toBeGreaterThan(0)
     })
 
     it('fft values are clamped [0, 1]', () => {

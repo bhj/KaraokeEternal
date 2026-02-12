@@ -1,4 +1,70 @@
+import { stripInjectedLines } from '../../../lib/injectedLines'
+import type { VisualizerMode } from 'shared/types'
 import { getPresetByIndex, getPresetCount } from '../components/hydraPresets'
+
+/**
+ * Whether to show the unsent-changes dot on the mobile Code tab.
+ */
+export function shouldShowUnsentDot (
+  activeMobileTab: string,
+  userHasEdited: boolean,
+  sendStatus: string,
+): boolean {
+  return activeMobileTab !== 'code' && userHasEdited && sendStatus !== 'synced'
+}
+
+interface PreviewVisualizerSource {
+  mode?: VisualizerMode
+  isEnabled?: boolean
+  sensitivity?: number
+  allowCamera?: boolean
+}
+
+export interface PreviewHydraState {
+  mode: VisualizerMode
+  isEnabled: boolean
+  sensitivity: number
+  allowCamera: boolean
+}
+
+function toFiniteNumber (value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function normalizeMode (value: unknown): VisualizerMode {
+  return value === 'off' ? 'off' : 'hydra'
+}
+
+/**
+ * Resolve the visualizer settings the Orchestrator preview should use.
+ *
+ * - When Orchestrator has observed a direct hydra update, prefer playerVisualizer
+ *   (authoritative latest stream from VISUALIZER_HYDRA_CODE / sync actions).
+ * - Otherwise prefer status.visualizer (hydrated from PLAYER_STATUS / options).
+ */
+export function resolvePreviewHydraState (
+  hasHydraUpdate: boolean,
+  playerVisualizer: PreviewVisualizerSource | null | undefined,
+  statusVisualizer: PreviewVisualizerSource | null | undefined,
+): PreviewHydraState {
+  const preferred = hasHydraUpdate ? playerVisualizer : statusVisualizer
+  const fallback = hasHydraUpdate ? statusVisualizer : playerVisualizer
+
+  return {
+    mode: normalizeMode(preferred?.mode ?? fallback?.mode),
+    isEnabled: typeof preferred?.isEnabled === 'boolean'
+      ? preferred.isEnabled
+      : typeof fallback?.isEnabled === 'boolean'
+        ? fallback.isEnabled
+        : true,
+    sensitivity: Math.max(0.05, toFiniteNumber(preferred?.sensitivity, toFiniteNumber(fallback?.sensitivity, 1))),
+    allowCamera: typeof preferred?.allowCamera === 'boolean'
+      ? preferred.allowCamera
+      : typeof fallback?.allowCamera === 'boolean'
+        ? fallback.allowCamera
+        : false,
+  }
+}
 
 /**
  * Returns the code that should be displayed in the editor and preview.
@@ -37,6 +103,17 @@ export function getPendingRemote (
   if (!remoteCode || remoteCode.trim() === '') return null
   if (remoteCode === localCode) return null
   return remoteCode
+}
+
+/**
+ * Normalize code for send-ack comparisons.
+ * - Strips injected audio lines
+ * - Normalizes CRLF to LF
+ * - Trims trailing whitespace
+ */
+export function normalizeCodeForAck (code: string | null | undefined): string | null {
+  if (!code) return null
+  return stripInjectedLines(code).trimEnd().replace(/\r\n/g, '\n')
 }
 
 /**

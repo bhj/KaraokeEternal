@@ -1,7 +1,6 @@
-import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioizeHydraCode'
 import { getDefaultPreset, getRandomPreset, getPresetByIndex } from './hydraPresets'
 
-export const DEFAULT_SKETCH = audioizeHydraCode(getDefaultPreset())
+export const DEFAULT_SKETCH = getDefaultPreset()
 
 /**
  * Returns a random sketch from the gallery, with audio injection visible.
@@ -10,5 +9,5 @@ export const DEFAULT_SKETCH = audioizeHydraCode(getDefaultPreset())
  * previous curated SKETCHES[] array with the full gallery as the source.
  */
 export function getRandomSketch (): string {
-  return audioizeHydraCode(getPresetByIndex(getRandomPreset()))
+  return getPresetByIndex(getRandomPreset())
 }

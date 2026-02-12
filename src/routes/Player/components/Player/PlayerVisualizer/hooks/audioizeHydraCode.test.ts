@@ -12,25 +12,20 @@ describe('audioizeHydraCode', () => {
     }
 
     it.each([
-      ['bass(', 'osc().modulate(noise(3), () => bass() * 0.15).out()'],
-      ['mid(', 'osc().rotate(() => mid() * 0.03).out()'],
-      ['treble(', 'osc().color(1, 0.5, () => treble()).out()'],
-      ['beat(', 'osc().kaleid(() => 2 + beat() * 4).out()'],
-      ['bpm(', 'osc().scale(() => bpm() * 0.1).out()'],
-      ['energy(', 'osc().saturate(() => energy()).out()'],
-      ['bright(', 'osc().brightness(() => bright()).out()'],
       ['a.fft', 'osc().modulate(noise(3), () => a.fft[0]).out()'],
       ['a.setBins', 'a.setBins(4)\nosc().out()'],
+      ['a.setSmooth', 'a.setSmooth(0.4)\nosc().out()'],
+      ['a.setScale', 'a.setScale(1.25)\nosc().out()'],
     ])('detects %s as audio usage', (_label, code) => {
       expect(check(code)).toBe(true)
     })
 
     it('does NOT detect audio in // line comments', () => {
-      expect(check('// bass()\nosc().out()')).toBe(false)
+      expect(check('// a.fft[0]\nosc().out()')).toBe(false)
     })
 
     it('does NOT detect audio in /* block */ comments', () => {
-      expect(check('/* bass() */\nosc().out()')).toBe(false)
+      expect(check('/* a.setBins(4) */\nosc().out()')).toBe(false)
     })
   })
 
@@ -232,6 +227,73 @@ describe('audioizeHydraCode', () => {
       const result = audioizeHydraCode(code)
       // The real .out() outside the template should still be found
       expect(result).toContain('.modulate(osc(3, 0.05), () => a.fft[0] * 0.25)')
+    })
+  })
+
+  describe('default injection chain', () => {
+    it('camera preset gets full 4-line chain', () => {
+      const code = 's0.initCam()\nsrc(s0).out(o0)'
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.rotate(')
+      expect(result).toContain('.scale(')
+      expect(result).toContain('.color(')
+    })
+
+    it('feedback preset gets full 4-line chain', () => {
+      const code = 'src(o0).modulate(o0, 0.01).out(o0)'
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.rotate(')
+      expect(result).toContain('.scale(')
+      expect(result).toContain('.color(')
+    })
+
+    it('kaleid preset gets full 4-line chain', () => {
+      const code = 'osc(10).kaleid(4).out()'
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.rotate(')
+      expect(result).toContain('.scale(')
+      expect(result).toContain('.color(')
+    })
+
+    it('default chain is idempotent', () => {
+      const codes = [
+        's0.initCam()\nsrc(s0).out(o0)',
+        'src(o0).modulate(o0, 0.01).out(o0)',
+        'osc(10).kaleid(4).out()',
+        'osc(10).out()',
+      ]
+      for (const code of codes) {
+        const once = audioizeHydraCode(code)
+        const twice = audioizeHydraCode(once)
+        expect(twice).toBe(once)
+      }
+    })
+  })
+
+  describe('nested .out() handling', () => {
+    it('does NOT inject before .out(o0) nested inside .layer()', () => {
+      // flor_1 pattern: .out(o0) is inside .layer() at depth > 0
+      const code = 's0.initCam()\nsrc(s0).saturate(2).contrast(1.3).layer(src(o0).mask(shape(4,2)).modulate(o0,0.001).out(o0))'
+      const result = audioizeHydraCode(code)
+      // Nested .out(o0) inside .layer() must be preserved intact
+      expect(result).toContain('.layer(src(o0).mask(shape(4,2)).modulate(o0,0.001).out(o0))')
+      // Instead, injection is appended with a new top-level .out()
+      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result.endsWith('.out(o0)\n')).toBe(true)
+    })
+
+    it('flor_1 gets default chain', () => {
+      const florIdx = HYDRA_GALLERY.findIndex(g => g.sketch_id === 'flor_1')
+      expect(florIdx).toBeGreaterThan(-1)
+      const code = getPresetByIndex(florIdx)
+      const result = audioizeHydraCode(code)
+      expect(result).toContain('.modulate(osc(3, 0.05)')
+      expect(result).toContain('.rotate(')
+      expect(result).toContain('.scale(')
+      expect(result).toContain('.color(')
     })
   })
 

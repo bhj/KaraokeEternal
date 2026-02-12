@@ -4,6 +4,10 @@ dist/
 docs/public/
 docs/resources/
 docs/analysis/
+# keep analysis docs ignored by default, except explicitly curated snapshots
+!docs/analysis/
+docs/analysis/*
+!docs/analysis/red_team_preset_tree_josh_comeau_2026_02_05.md
 node_modules/
 .claude/
 

@@ -53,6 +53,13 @@ export interface IRoomPrefs {
   roles?: Record<number, {
     allowNew: boolean
   }>
+  allowGuestOrchestrator?: boolean
+  allowGuestCameraRelay?: boolean
+  allowRoomCollaboratorsToSendVisualizer?: boolean
+  partyPresetFolderId?: number | null
+  playerPresetFolderId?: number | null
+  restrictCollaboratorsToPartyPresetFolder?: boolean
+  startingPresetId?: number | null
   visualizer?: IRoomVisualizerPrefs
 }
 
@@ -108,23 +115,9 @@ export interface PlaybackOptions {
     sensitivity?: number
     isEnabled?: boolean
     mode?: VisualizerMode
-    audioResponse?: AudioResponseState
     allowCamera?: boolean
+    cycleOnSongTransition?: boolean
   }
-}
-
-export interface AudioResponseState {
-  globalGain: number // 0.2 – 3.0 (UI range; pipeline accepts 0+)
-  bassWeight: number // 0.0 – 3.0
-  midWeight: number // 0.0 – 3.0
-  trebleWeight: number // 0.0 – 3.0
-}
-
-export const AUDIO_RESPONSE_DEFAULTS: AudioResponseState = {
-  globalGain: 1.0,
-  bassWeight: 1.0,
-  midWeight: 1.0,
-  trebleWeight: 1.0,
 }
 
 export type MediaType = 'cdg' | 'mp4' | ''

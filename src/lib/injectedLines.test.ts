@@ -25,6 +25,24 @@ describe('isInjectedLine', () => {
     expect(isInjectedLine('  .color(1, 1 - a.fft[3] * 0.1, 1 + a.fft[3] * 0.1)')).toBe(true)
   })
 
+  it('matches .saturate injection with default multiplier', () => {
+    expect(isInjectedLine('  .saturate(() => 1 + a.fft[0] * 0.3)')).toBe(true)
+  })
+
+  it('matches .contrast injection with default multiplier', () => {
+    expect(isInjectedLine('  .contrast(() => 1 + a.fft[1] * 0.2)')).toBe(true)
+  })
+
+  it('matches .brightness injection with default multiplier', () => {
+    expect(isInjectedLine('  .brightness(() => a.fft[0] * 0.15)')).toBe(true)
+  })
+
+  it('matches new chain patterns with different multipliers', () => {
+    expect(isInjectedLine('  .saturate(() => 1 + a.fft[0] * 0.6)')).toBe(true)
+    expect(isInjectedLine('  .contrast(() => 1 + a.fft[1] * 0.4)')).toBe(true)
+    expect(isInjectedLine('  .brightness(() => a.fft[0] * 0.3)')).toBe(true)
+  })
+
   it('does NOT match .rotate(0.5) — no a.fft reference', () => {
     expect(isInjectedLine('.rotate(0.5)')).toBe(false)
   })
@@ -57,6 +75,28 @@ describe('stripInjectedLines', () => {
   it('returns unchanged code if no injected lines', () => {
     const code = 'osc(10)\n  .rotate(0.5)\n  .out()'
     expect(stripInjectedLines(code)).toBe(code)
+  })
+
+  it('strips camera chain (saturate + contrast)', () => {
+    const code = [
+      'src(s0)',
+      '  .saturate(() => 1 + a.fft[0] * 0.3)',
+      '  .contrast(() => 1 + a.fft[1] * 0.2)',
+      '  .out()',
+    ].join('\n')
+    const result = stripInjectedLines(code)
+    expect(result).toBe('src(s0)\n  .out()')
+  })
+
+  it('strips feedback chain (brightness + contrast)', () => {
+    const code = [
+      'src(o0)',
+      '  .brightness(() => a.fft[0] * 0.15)',
+      '  .contrast(() => 1 + a.fft[1] * 0.2)',
+      '  .out(o0)',
+    ].join('\n')
+    const result = stripInjectedLines(code)
+    expect(result).toBe('src(o0)\n  .out(o0)')
   })
 })
 
@@ -92,5 +132,19 @@ describe('isPartialInjectedLine', () => {
   it('matches modified color injection', () => {
     // Structure changed (added extra arg) but still has .color and a.fft[3]
     expect(isPartialInjectedLine('  .color(1, 1 - a.fft[3] * 0.2, 1 + a.fft[3] * 0.3, 0.5)')).toBe(true)
+  })
+
+  it('returns false for exact saturate/contrast/brightness injected lines', () => {
+    expect(isPartialInjectedLine('  .saturate(() => 1 + a.fft[0] * 0.3)')).toBe(false)
+    expect(isPartialInjectedLine('  .contrast(() => 1 + a.fft[1] * 0.2)')).toBe(false)
+    expect(isPartialInjectedLine('  .brightness(() => a.fft[0] * 0.15)')).toBe(false)
+  })
+
+  it('matches modified saturate injection', () => {
+    expect(isPartialInjectedLine('  .saturate(() => 2 + a.fft[0] * 0.5)')).toBe(true)
+  })
+
+  it('matches modified brightness injection', () => {
+    expect(isPartialInjectedLine('  .brightness(() => a.fft[0] * 0.5 + 0.1)')).toBe(true)
   })
 })

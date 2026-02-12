@@ -7,7 +7,6 @@ import {
   scaleProfile,
   INJECTION_FACTORS,
   type AudioInjectProfile,
-  type InjectionLevel,
 } from './audioInjectProfiles'
 
 describe('DEFAULT_PROFILE', () => {
@@ -17,6 +16,9 @@ describe('DEFAULT_PROFILE', () => {
       rotate: 0.08,
       scale: 0.08,
       colorShift: 0.06,
+      saturate: 0.3,
+      contrast: 0.2,
+      brightness: 0.15,
     })
   })
 })
@@ -83,6 +85,9 @@ describe('scaleProfile', () => {
     expect(result.rotate).toBeCloseTo(DEFAULT_PROFILE.rotate * 0.5)
     expect(result.scale).toBeCloseTo(DEFAULT_PROFILE.scale * 0.5)
     expect(result.colorShift).toBeCloseTo(DEFAULT_PROFILE.colorShift * 0.5)
+    expect(result.saturate).toBeCloseTo(DEFAULT_PROFILE.saturate * 0.5)
+    expect(result.contrast).toBeCloseTo(DEFAULT_PROFILE.contrast * 0.5)
+    expect(result.brightness).toBeCloseTo(DEFAULT_PROFILE.brightness * 0.5)
   })
 
   it('scales all values by factor 2.0', () => {
@@ -91,6 +96,9 @@ describe('scaleProfile', () => {
     expect(result.rotate).toBeCloseTo(DEFAULT_PROFILE.rotate * 2.0)
     expect(result.scale).toBeCloseTo(DEFAULT_PROFILE.scale * 2.0)
     expect(result.colorShift).toBeCloseTo(DEFAULT_PROFILE.colorShift * 2.0)
+    expect(result.saturate).toBeCloseTo(DEFAULT_PROFILE.saturate * 2.0)
+    expect(result.contrast).toBeCloseTo(DEFAULT_PROFILE.contrast * 2.0)
+    expect(result.brightness).toBeCloseTo(DEFAULT_PROFILE.brightness * 2.0)
   })
 
   it('scales all values to zero with factor 0', () => {
@@ -99,6 +107,9 @@ describe('scaleProfile', () => {
     expect(result.rotate).toBe(0)
     expect(result.scale).toBe(0)
     expect(result.colorShift).toBe(0)
+    expect(result.saturate).toBe(0)
+    expect(result.contrast).toBe(0)
+    expect(result.brightness).toBe(0)
   })
 
   it('does not mutate the input profile', () => {
@@ -134,6 +145,9 @@ describe('audioizeHydraCode with profiles', () => {
       rotate: 0.2,
       scale: 0.15,
       colorShift: 0.1,
+      saturate: 0.6,
+      contrast: 0.4,
+      brightness: 0.3,
     }
     const result = audioizeHydraCode(code, customProfile)
     expect(result).toContain('a.fft[0] * 0.5')
@@ -161,6 +175,9 @@ describe('audioizeHydraCode with profiles', () => {
       rotate: 0.2,
       scale: 0.15,
       colorShift: 0.1,
+      saturate: 0.6,
+      contrast: 0.4,
+      brightness: 0.3,
     }
     const second = audioizeHydraCode(first, customProfile)
     // Should NOT contain old multipliers

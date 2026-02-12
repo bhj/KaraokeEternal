@@ -5,8 +5,8 @@ import {
   PLAYER_LOAD,
   PLAYER_VISUALIZER_ERROR,
   VISUALIZER_HYDRA_CODE,
+  VISUALIZER_STATE_SYNC,
 } from 'shared/actionTypes'
-import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 
 /**
  * Tests for the playerVisualizer module.
@@ -237,6 +237,17 @@ describe('playerVisualizer actual implementation', () => {
     expect(state.hydraPresetName).toBe(getPresetLabel(5))
   })
 
+  it('should set hydraPresetName from VISUALIZER_HYDRA_CODE payload metadata', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'src(s0).out()', hydraPresetName: 'Working Standards / ws_a', hydraPresetId: 10 },
+    })
+    expect(newState.hydraPresetName).toBe('Working Standards / ws_a')
+    expect(newState.hydraPresetId).toBe(10)
+  })
+
   it('should preserve hydraPresetIndex when code-only payload received', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     let state = reducer(undefined, { type: '@@INIT' })
@@ -358,115 +369,113 @@ describe('playerVisualizer allowCamera', () => {
   })
 })
 
-describe('playerVisualizer audioResponse', () => {
-  it('should have audioResponse matching AUDIO_RESPONSE_DEFAULTS in initial state', async () => {
+describe('playerVisualizer cycleOnSongTransition', () => {
+  it('should have cycleOnSongTransition=false in initial state', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     const state = reducer(undefined, { type: '@@INIT' })
-    expect(state.audioResponse).toEqual(AUDIO_RESPONSE_DEFAULTS)
+    expect(state.cycleOnSongTransition).toBe(false)
   })
 
-  it('should update all audioResponse fields via PLAYER_CMD_OPTIONS', async () => {
+  it('should set cycleOnSongTransition=true via PLAYER_CMD_OPTIONS', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     const state = reducer(undefined, { type: '@@INIT' })
-    const newState = reducer(state, {
+    const nextState = reducer(state, {
       type: PLAYER_CMD_OPTIONS,
-      payload: {
-        visualizer: {
-          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
-        },
-      },
+      payload: { visualizer: { cycleOnSongTransition: true } },
     })
-    expect(newState.audioResponse).toEqual({
-      globalGain: 2.0,
-      bassWeight: 2.5,
-      midWeight: 1.5,
-      trebleWeight: 2.0,
-    })
+    expect(nextState.cycleOnSongTransition).toBe(true)
   })
 
-  it('should merge partial audioResponse with defaults', async () => {
-    const { default: reducer } = await import('./playerVisualizer')
-    const state = reducer(undefined, { type: '@@INIT' })
-    const newState = reducer(state, {
-      type: PLAYER_CMD_OPTIONS,
-      payload: {
-        visualizer: {
-          audioResponse: { bassWeight: 2.0 },
-        },
-      },
-    })
-    expect(newState.audioResponse).toEqual({
-      globalGain: 1.0,
-      bassWeight: 2.0,
-      midWeight: 1.0,
-      trebleWeight: 1.0,
-    })
-  })
-
-  it('should preserve audioResponse across PLAYER_CMD_OPTIONS with only sensitivity change', async () => {
+  it('should preserve cycleOnSongTransition when omitted', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     let state = reducer(undefined, { type: '@@INIT' })
     state = reducer(state, {
       type: PLAYER_CMD_OPTIONS,
-      payload: {
-        visualizer: {
-          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
-        },
-      },
+      payload: { visualizer: { cycleOnSongTransition: true } },
     })
-    const newState = reducer(state, {
+    const nextState = reducer(state, {
       type: PLAYER_CMD_OPTIONS,
       payload: { visualizer: { sensitivity: 0.5 } },
     })
-    expect(newState.audioResponse).toEqual({
-      globalGain: 2.0,
-      bassWeight: 2.5,
-      midWeight: 1.5,
-      trebleWeight: 2.0,
+    expect(nextState.cycleOnSongTransition).toBe(true)
+  })
+})
+
+describe('playerVisualizer state sync', () => {
+  it('should update injectionLevel via VISUALIZER_STATE_SYNC', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: VISUALIZER_STATE_SYNC,
+      payload: { injectionLevel: 'high' },
     })
-    expect(newState.sensitivity).toBe(0.5)
+    expect(newState.injectionLevel).toBe('high')
   })
 
-  it('should preserve audioResponse across PLAYER_LOAD', async () => {
+  it('should update allowCamera via VISUALIZER_STATE_SYNC', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: VISUALIZER_STATE_SYNC,
+      payload: { allowCamera: true },
+    })
+    expect(newState.allowCamera).toBe(true)
+  })
+
+  it('should update presetCategory via VISUALIZER_STATE_SYNC', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: VISUALIZER_STATE_SYNC,
+      payload: { presetCategory: 'camera' },
+    })
+    expect(newState.presetCategory).toBe('camera')
+  })
+
+  it('should not overwrite unspecified fields in VISUALIZER_STATE_SYNC', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     let state = reducer(undefined, { type: '@@INIT' })
     state = reducer(state, {
-      type: PLAYER_CMD_OPTIONS,
-      payload: {
-        visualizer: {
-          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
-        },
-      },
+      type: VISUALIZER_STATE_SYNC,
+      payload: { injectionLevel: 'high', allowCamera: true },
     })
-    const newState = reducer(state, { type: PLAYER_LOAD })
-    expect(newState.audioResponse).toEqual({
-      globalGain: 2.0,
-      bassWeight: 2.5,
-      midWeight: 1.5,
-      trebleWeight: 2.0,
+    // Only update presetCategory, injectionLevel and allowCamera should be preserved
+    const newState = reducer(state, {
+      type: VISUALIZER_STATE_SYNC,
+      payload: { presetCategory: 'feedback' },
     })
+    expect(newState.injectionLevel).toBe('high')
+    expect(newState.allowCamera).toBe(true)
+    expect(newState.presetCategory).toBe('feedback')
   })
 
-  it('should preserve audioResponse across VISUALIZER_HYDRA_CODE', async () => {
+  it('should update injectionLevel from VISUALIZER_HYDRA_CODE payload', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    const newState = reducer(state, {
+      type: VISUALIZER_HYDRA_CODE,
+      payload: { code: 'osc(10).out()', injectionLevel: 'low' },
+    })
+    expect(newState.injectionLevel).toBe('low')
+  })
+
+  it('should not overwrite injectionLevel when VISUALIZER_HYDRA_CODE has no injectionLevel', async () => {
     const { default: reducer } = await import('./playerVisualizer')
     let state = reducer(undefined, { type: '@@INIT' })
     state = reducer(state, {
-      type: PLAYER_CMD_OPTIONS,
-      payload: {
-        visualizer: {
-          audioResponse: { globalGain: 2.0, bassWeight: 2.5, midWeight: 1.5, trebleWeight: 2.0 },
-        },
-      },
+      type: VISUALIZER_STATE_SYNC,
+      payload: { injectionLevel: 'high' },
     })
     const newState = reducer(state, {
       type: VISUALIZER_HYDRA_CODE,
       payload: { code: 'osc(10).out()' },
     })
-    expect(newState.audioResponse).toEqual({
-      globalGain: 2.0,
-      bassWeight: 2.5,
-      midWeight: 1.5,
-      trebleWeight: 2.0,
-    })
+    expect(newState.injectionLevel).toBe('high')
+  })
+
+  it('should have injectionLevel=med in initial state', async () => {
+    const { default: reducer } = await import('./playerVisualizer')
+    const state = reducer(undefined, { type: '@@INIT' })
+    expect(state.injectionLevel).toBe('med')
   })
 })

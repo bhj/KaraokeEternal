@@ -8,8 +8,10 @@ import { getSkipRegions, type SkipRegion } from 'lib/skipRegions'
 export interface CameraUsageResult {
   /** Which external sources (s0–s3) are referenced via src() */
   sources: string[]
-  /** Whether any sN.initCam/initImage/initVideo/initScreen call is present */
-  hasExplicitInit: boolean
+  /** Whether any sN.initCam() call is present (requires app camera permission) */
+  hasInitCam: boolean
+  /** Whether any sN.initVideo/initImage/initScreen call is present (self-initializing, no permission needed) */
+  hasExplicitSource: boolean
 }
 
 function isInSkipRegion (pos: number, regions: readonly SkipRegion[]): boolean {
@@ -17,12 +19,14 @@ function isInSkipRegion (pos: number, regions: readonly SkipRegion[]): boolean {
 }
 
 const SRC_PATTERN = /\bsrc\s*\(\s*(s[0-3])\s*\)/g
-const INIT_PATTERN = /\bs[0-3]\.(initCam|initImage|initVideo|initScreen)\s*\(/g
+const INIT_CAM_PATTERN = /\bs[0-3]\.initCam\s*\(/g
+const INIT_SOURCE_PATTERN = /\bs[0-3]\.(initVideo|initImage|initScreen)\s*\(/g
 
 export function detectCameraUsage (code: string): CameraUsageResult {
   const { regions } = getSkipRegions(code)
   const sourceSet = new Set<string>()
-  let hasExplicitInit = false
+  let hasInitCam = false
+  let hasExplicitSource = false
 
   // Find src(sN) references outside skip regions
   let m: RegExpExecArray | null
@@ -33,14 +37,22 @@ export function detectCameraUsage (code: string): CameraUsageResult {
     }
   }
 
-  // Find sN.init*() calls outside skip regions
-  const initRe = new RegExp(INIT_PATTERN.source, 'g')
-  while ((m = initRe.exec(code)) !== null) {
+  // Find sN.initCam() calls outside skip regions
+  const camRe = new RegExp(INIT_CAM_PATTERN.source, 'g')
+  while ((m = camRe.exec(code)) !== null) {
     if (!isInSkipRegion(m.index, regions)) {
-      hasExplicitInit = true
+      hasInitCam = true
+    }
+  }
+
+  // Find sN.initVideo/initImage/initScreen() calls outside skip regions
+  const sourceRe = new RegExp(INIT_SOURCE_PATTERN.source, 'g')
+  while ((m = sourceRe.exec(code)) !== null) {
+    if (!isInSkipRegion(m.index, regions)) {
+      hasExplicitSource = true
     }
   }
 
   const sources = Array.from(sourceSet).sort()
-  return { sources, hasExplicitInit }
+  return { sources, hasInitCam, hasExplicitSource }
 }

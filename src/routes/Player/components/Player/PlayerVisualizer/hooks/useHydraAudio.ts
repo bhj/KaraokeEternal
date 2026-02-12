@@ -1,17 +1,6 @@
 import { useRef, useCallback, useMemo } from 'react'
 import { useAudioAnalyser, type AudioData } from './useAudioAnalyser'
 import { createHydraAudioCompat } from './hydraAudioCompat'
-import type { AudioResponseState } from 'shared/types'
-
-export interface AudioClosures {
-  bass: () => number
-  mid: () => number
-  treble: () => number
-  beat: () => number
-  energy: () => number
-  bpm: () => number
-  bright: () => number
-}
 
 const defaultAudioData: AudioData = {
   rawFrequencyData: new Float32Array(64),
@@ -31,10 +20,9 @@ const defaultAudioData: AudioData = {
 export function useHydraAudio (
   audioSourceNode: MediaElementAudioSourceNode | null,
   sensitivity: number,
-  audioResponse?: AudioResponseState,
   overrideData?: AudioData | null,
 ) {
-  const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity, audioResponse })
+  const { getAudioData } = useAudioAnalyser(audioSourceNode, { sensitivity })
   const audioRef = useRef<AudioData>(defaultAudioData)
   const compat = useMemo(() => createHydraAudioCompat(), [])
 
@@ -49,16 +37,5 @@ export function useHydraAudio (
     compat.update(audioRef.current)
   }, [getAudioData, compat, overrideData])
 
-  // Stable closures that Hydra code references via arrow functions
-  const closures: AudioClosures = useMemo(() => ({
-    bass: () => audioRef.current.bass,
-    mid: () => audioRef.current.mid,
-    treble: () => audioRef.current.treble,
-    beat: () => audioRef.current.beatIntensity,
-    energy: () => audioRef.current.energy,
-    bpm: () => audioRef.current.beatFrequency,
-    bright: () => audioRef.current.spectralCentroid,
-  }), [])
-
-  return { update, closures, audioRef, compat }
+  return { update, audioRef, compat }
 }

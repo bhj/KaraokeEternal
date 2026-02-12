@@ -256,6 +256,27 @@ class Rooms {
     const guestRole = await db.get('SELECT roleId FROM roles WHERE name = ?', ['guest'])
     const standardRole = await db.get('SELECT roleId FROM roles WHERE name = ?', ['standard'])
 
+    const parsedDefaultFolderId = Number.parseInt(process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID ?? '', 10)
+    const hasValidDefaultFolderId = Number.isInteger(parsedDefaultFolderId) && parsedDefaultFolderId > 0
+
+    let defaultPartyPresetFolderId: number | null = hasValidDefaultFolderId ? parsedDefaultFolderId : null
+
+    if (defaultPartyPresetFolderId === null) {
+      const defaultPartyPresetFolderName = process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_NAME?.trim()
+      if (defaultPartyPresetFolderName) {
+        const folderRow = await db.get(
+          'SELECT folderId FROM hydraFolders WHERE name = ? COLLATE NOCASE LIMIT 1',
+          [defaultPartyPresetFolderName],
+        )
+        if (Number.isInteger(folderRow?.folderId) && folderRow.folderId > 0) {
+          defaultPartyPresetFolderId = folderRow.folderId
+        }
+      }
+    }
+
+    const defaultRestrictCollaboratorsToPartyPresetFolder = defaultPartyPresetFolderId !== null
+      && process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS === 'true'
+
     // Set sensible defaults for party rooms:
     // - QR code enabled so visitors can easily join
     // - Guest and standard accounts allowed so visitors can enroll
@@ -268,6 +289,12 @@ class Rooms {
           size: 0.5,
         },
         roles: {},
+        allowGuestOrchestrator: true,
+        allowGuestCameraRelay: true,
+        allowRoomCollaboratorsToSendVisualizer: true,
+        partyPresetFolderId: defaultPartyPresetFolderId,
+        playerPresetFolderId: defaultPartyPresetFolderId,
+        restrictCollaboratorsToPartyPresetFolder: defaultRestrictCollaboratorsToPartyPresetFolder,
       },
     }
 

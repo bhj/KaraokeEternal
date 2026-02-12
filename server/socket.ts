@@ -34,6 +34,42 @@ const handlers = {
 
 const { verify: jwtVerify } = jsonWebToken
 
+interface SocketRoomContext {
+  isGuest?: boolean
+  roomId?: number | null
+}
+
+export async function resolveSocketRoomIdFromCookie (
+  user: SocketRoomContext,
+  cookieHeader: string | undefined,
+  ephemeralEnabled: boolean,
+): Promise<number | null> {
+  const currentRoomId = typeof user.roomId === 'number' ? user.roomId : null
+
+  if (!ephemeralEnabled || user.isGuest) {
+    return currentRoomId
+  }
+
+  const { keVisitedRoom } = parseCookie(cookieHeader)
+
+  if (!keVisitedRoom) {
+    return currentRoomId
+  }
+
+  const visitedRoomId = parseInt(keVisitedRoom, 10)
+  if (isNaN(visitedRoomId) || visitedRoomId === currentRoomId) {
+    return currentRoomId
+  }
+
+  try {
+    await Rooms.validate(visitedRoomId, null, { isOpen: true })
+    await Rooms.updateActivity(visitedRoomId)
+    return visitedRoomId
+  } catch {
+    return currentRoomId
+  }
+}
+
 // Track pending room cleanups for grace period
 const pendingCleanups = new Map<number, NodeJS.Timeout>()
 
@@ -46,6 +82,8 @@ export function clearPendingCleanups () {
 }
 
 export default function (io, jwtKey, validateProxySource: (ip: string) => boolean) {
+  const ephemeralEnabled = process.env.KES_EPHEMERAL_ROOMS !== 'false'
+
   io.on('connection', async (sock) => {
     // validate proxy source before doing anything else
     const remoteAddress = sock.handshake.address
@@ -55,13 +93,29 @@ export default function (io, jwtKey, validateProxySource: (ip: string) => boolea
       return
     }
 
-    const { keToken } = parseCookie(sock.handshake.headers.cookie)
+    const cookieHeader = sock.handshake.headers.cookie
+    const { keToken } = parseCookie(cookieHeader)
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
     const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
 
     // authenticate the JWT sent via cookie in http handshake
     try {
       sock.user = jwtVerify(keToken, jwtKey)
+
+      // Keep websocket room aligned with visited room cookie for standard users.
+      // Without this, sockets can stay in own room even when HTTP is visiting another room.
+      const originalRoomId = sock.user.roomId
+      const resolvedRoomId = await resolveSocketRoomIdFromCookie(
+        sock.user,
+        cookieHeader,
+        ephemeralEnabled,
+      )
+      sock.user.roomId = resolvedRoomId
+
+      if (resolvedRoomId !== originalRoomId) {
+        log.verbose('%s (%s) socket room override: %s -> %s',
+          sock.user.name, sock.id, originalRoomId, resolvedRoomId)
+      }
 
       // success
       log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)

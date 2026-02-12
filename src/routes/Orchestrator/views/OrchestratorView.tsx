@@ -4,20 +4,31 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
 import playerVisualizerReducer from 'routes/Player/modules/playerVisualizer'
 import { sliceInjectNoOp } from 'routes/Player/modules/player'
-import { audioizeHydraCode } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioizeHydraCode'
-import { scaleProfile, INJECTION_FACTORS, DEFAULT_PROFILE, getProfileForSketch, type InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import { DEFAULT_SKETCH, getRandomSketch } from '../components/hydraSketchBook'
-import { getEffectiveCode, getPendingRemote, shouldAutoApplyPreset } from './orchestratorViewHelpers'
+import type { PresetLeaf } from '../components/presetTree'
+import { getEffectiveCode, getPendingRemote, normalizeCodeForAck, resolvePreviewHydraState, shouldAutoApplyPreset, shouldShowUnsentDot } from './orchestratorViewHelpers'
 import ApiReference from '../components/ApiReference'
 import PresetBrowser from '../components/PresetBrowser'
 import CodeEditor from '../components/CodeEditor'
 import StagePanel from '../components/StagePanel'
 import { type StageBuffer } from '../components/stagePanelUtils'
+import { useCameraSender } from 'lib/webrtc/useCameraSender'
+import { fetchCurrentRoom } from 'store/modules/rooms'
 import { getPreviewSize } from './orchestratorLayout'
+import { useVisualViewport } from 'lib/useVisualViewport'
 import styles from './OrchestratorView.css'
+
+type SendHydraPayload = {
+  code: string
+  hydraPresetName?: string
+  hydraPresetId?: number | null
+  hydraPresetFolderId?: number | null
+  hydraPresetSource?: 'gallery' | 'folder'
+}
 
 function OrchestratorView () {
   const dispatch = useAppDispatch()
+  const camera = useCameraSender()
   const playerVisualizer = useAppSelector(state => state.playerVisualizer)
   const status = useAppSelector(state => state.status)
 
@@ -31,38 +42,59 @@ function OrchestratorView () {
   const remotePresetIndex = hasUpdate
     ? playerVisualizer.hydraPresetIndex
     : status.visualizer?.hydraPresetIndex
+  const previewHydraState = resolvePreviewHydraState(hasUpdate, playerVisualizer, status.visualizer)
 
   const ui = useAppSelector(state => state.ui)
+  const { isKeyboardOpen } = useVisualViewport()
+  const containerRef = useRef<HTMLDivElement>(null)
   const [localCode, setLocalCode] = useState<string>(DEFAULT_SKETCH)
   const [previewBuffer, setPreviewBuffer] = useState<StageBuffer>('auto')
   const [userHasEdited, setUserHasEdited] = useState(false)
   const [pendingRemoteCode, setPendingRemoteCode] = useState<string | null>(null)
   const [pendingRemoteCount, setPendingRemoteCount] = useState(0)
-  const [autoAudioOnSend, setAutoAudioOnSend] = useState(false)
-  const [injectionLevel, setInjectionLevel] = useState<InjectionLevel>('med')
   const [activeTab, setActiveTab] = useState<'presets' | 'api'>('presets')
   const [activeMobileTab, setActiveMobileTab] = useState<'stage' | 'code' | 'ref'>('stage')
   const [debouncedCode, setDebouncedCode] = useState<string>(DEFAULT_SKETCH)
+  const [refPanelWidth, setRefPanelWidth] = useState<number>(() => {
+    if (typeof window === 'undefined') return 280
+    const stored = window.localStorage.getItem('orchestratorRefPanelWidth')
+    const width = stored ? Number(stored) : NaN
+    if (!Number.isFinite(width)) return 280
+    return Math.min(520, Math.max(240, width))
+  })
+  const [isResizingPanel, setIsResizingPanel] = useState(false)
+  const [sendStatus, setSendStatus] = useState<'idle' | 'sending' | 'synced' | 'error'>('idle')
   const prevRemoteRef = useRef<string | undefined>(undefined)
   const prevPresetIndexRef = useRef<number | undefined>(undefined)
+  const lastSentRef = useRef<string | null>(null)
+  const remoteSyncRafRef = useRef<number | null>(null)
 
-  const getScaledProfile = useCallback((code: string) => {
-    const factor = INJECTION_FACTORS[injectionLevel]
-    return scaleProfile(DEFAULT_PROFILE, factor)
-  }, [injectionLevel])
-
-  const handleSendCode = useCallback((code: string) => {
-    const finalCode = autoAudioOnSend ? audioizeHydraCode(code, getScaledProfile(code)) : code
+  const handleSendCode = useCallback((input: string | SendHydraPayload) => {
+    const payload = typeof input === 'string' ? { code: input } : input
+    lastSentRef.current = normalizeCodeForAck(payload.code)
+    setSendStatus('sending')
     dispatch({
       type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code: finalCode },
+      payload,
     })
-  }, [dispatch, autoAudioOnSend, getScaledProfile])
+  }, [dispatch])
+
+  const cancelPendingRemoteSync = useCallback(() => {
+    if (remoteSyncRafRef.current !== null) {
+      cancelAnimationFrame(remoteSyncRafRef.current)
+      remoteSyncRafRef.current = null
+    }
+  }, [])
 
   const handleCodeChange = useCallback((code: string) => {
+    cancelPendingRemoteSync()
     setUserHasEdited(true)
     setLocalCode(code)
-  }, [])
+    if (sendStatus === 'synced' || sendStatus === 'error') {
+      setSendStatus('idle')
+      lastSentRef.current = null
+    }
+  }, [cancelPendingRemoteSync, sendStatus])
 
   /**
    * Random is LOCAL-ONLY: changes the editor code but does NOT dispatch to
@@ -71,46 +103,85 @@ function OrchestratorView () {
    */
   const handleRandomize = useCallback(() => {
     const sketch = getRandomSketch()
+    cancelPendingRemoteSync()
     setLocalCode(sketch)
+    setDebouncedCode(sketch)
     setUserHasEdited(true)
-  }, [])
+  }, [cancelPendingRemoteSync])
 
-  const handleAutoAudio = useCallback(() => {
-    const audioized = audioizeHydraCode(localCode, getScaledProfile(localCode))
-    if (audioized !== localCode) {
-      setLocalCode(audioized)
-      setUserHasEdited(true)
+  const handleCameraToggle = useCallback(async () => {
+    if (camera.status === 'idle' || camera.status === 'error') {
+      await camera.start()
+    } else {
+      camera.stop()
     }
-  }, [localCode, getScaledProfile])
-
-  const handleToggleAutoAudio = useCallback(() => {
-    setAutoAudioOnSend(prev => !prev)
-  }, [])
+  }, [camera])
 
   const handleLoadPreset = useCallback((code: string) => {
+    cancelPendingRemoteSync()
     setLocalCode(code)
+    setDebouncedCode(code)
     setUserHasEdited(true)
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
-  }, [ui.innerWidth])
+  }, [cancelPendingRemoteSync, ui.innerWidth])
 
-  const handleSendPreset = useCallback((code: string) => {
-    setLocalCode(code)
+  const handleSendPreset = useCallback((input: PresetLeaf | string) => {
+    const payload: SendHydraPayload = typeof input === 'string'
+      ? { code: input }
+      : {
+          code: input.code,
+          hydraPresetName: input.name,
+          hydraPresetId: input.presetId ?? null,
+          hydraPresetFolderId: input.folderId ?? null,
+          hydraPresetSource: input.isGallery ? 'gallery' : 'folder',
+        }
+
+    cancelPendingRemoteSync()
+    setLocalCode(payload.code)
+    setDebouncedCode(payload.code)
     setUserHasEdited(true)
-    const finalCode = autoAudioOnSend ? audioizeHydraCode(code, getScaledProfile(code)) : code
-    dispatch({
-      type: VISUALIZER_HYDRA_CODE_REQ,
-      payload: { code: finalCode },
-    })
+    handleSendCode(payload)
     if (ui.innerWidth < 980) {
       setActiveMobileTab('stage')
     }
-  }, [dispatch, autoAudioOnSend, ui.innerWidth, getScaledProfile])
+  }, [cancelPendingRemoteSync, handleSendCode, ui.innerWidth])
+
+  const handleInsertApiExample = useCallback((snippet: string) => {
+    const trimmed = snippet.trim()
+    if (trimmed.length === 0) return
+    const base = (userHasEdited ? localCode : (remoteHydraCode ?? localCode)).trimEnd()
+    const nextCode = base.length > 0 ? `${base}\n\n${trimmed}` : trimmed
+    cancelPendingRemoteSync()
+    setLocalCode(nextCode)
+    setDebouncedCode(nextCode)
+    setUserHasEdited(true)
+    if (ui.innerWidth < 980) {
+      setActiveMobileTab('code')
+    }
+  }, [cancelPendingRemoteSync, localCode, remoteHydraCode, ui.innerWidth, userHasEdited])
+
+  const handleReplaceApiExample = useCallback((snippet: string) => {
+    const nextCode = snippet.trim()
+    if (nextCode.length === 0) return
+    cancelPendingRemoteSync()
+    setLocalCode(nextCode)
+    setDebouncedCode(nextCode)
+    setUserHasEdited(true)
+    if (ui.innerWidth < 980) {
+      setActiveMobileTab('code')
+    }
+  }, [cancelPendingRemoteSync, ui.innerWidth])
+
+  const handleResend = useCallback(() => {
+    handleSendCode(localCode)
+  }, [handleSendCode, localCode])
 
   const handleApplyRemote = useCallback(() => {
     if (pendingRemoteCode) {
-      setLocalCode(audioizeHydraCode(pendingRemoteCode))
+      setLocalCode(pendingRemoteCode)
+      setDebouncedCode(pendingRemoteCode)
     }
     setPendingRemoteCode(null)
     setPendingRemoteCount(0)
@@ -126,17 +197,85 @@ function OrchestratorView () {
     dispatch(sliceInjectNoOp())
   }
 
+  useEffect(() => {
+    dispatch(fetchCurrentRoom())
+  }, [dispatch])
+
+  // Persist ref panel width
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('orchestratorRefPanelWidth', String(refPanelWidth))
+  }, [refPanelWidth])
+
+  // Handle ref panel resize drag
+  useEffect(() => {
+    if (!isResizingPanel) return
+    const handleMove = (event: PointerEvent) => {
+      const rect = containerRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const next = Math.min(520, Math.max(240, event.clientX - rect.left))
+      setRefPanelWidth(next)
+    }
+    const handleUp = () => {
+      setIsResizingPanel(false)
+    }
+    window.addEventListener('pointermove', handleMove)
+    window.addEventListener('pointerup', handleUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    return () => {
+      window.removeEventListener('pointermove', handleMove)
+      window.removeEventListener('pointerup', handleUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isResizingPanel])
+
   // Sync remote code to local (audioized) before user edits — runs once per remote change
   useEffect(() => {
     if (userHasEdited) return
     if (!remoteHydraCode || remoteHydraCode.trim() === '') return
-    const audioized = audioizeHydraCode(remoteHydraCode)
-    if (audioized === localCode) return
-    const id = requestAnimationFrame(() => {
-      setLocalCode(audioized)
+    if (remoteHydraCode === localCode) return
+
+    remoteSyncRafRef.current = requestAnimationFrame(() => {
+      setLocalCode(remoteHydraCode)
+      setDebouncedCode(remoteHydraCode)
+      remoteSyncRafRef.current = null
     })
-    return () => cancelAnimationFrame(id)
+
+    return () => {
+      if (remoteSyncRafRef.current !== null) {
+        cancelAnimationFrame(remoteSyncRafRef.current)
+        remoteSyncRafRef.current = null
+      }
+    }
   }, [remoteHydraCode, userHasEdited, localCode])
+
+  // Mark send status as synced when remote matches last sent code
+  useEffect(() => {
+    if (!lastSentRef.current || !remoteHydraCode) return
+    const normalizedRemote = normalizeCodeForAck(remoteHydraCode)
+    if (!normalizedRemote || normalizedRemote !== lastSentRef.current) return
+    let timeoutId: number | null = null
+    const rafId = requestAnimationFrame(() => {
+      setSendStatus('synced')
+      lastSentRef.current = null
+      timeoutId = window.setTimeout(() => setSendStatus('idle'), 1500)
+    })
+    return () => {
+      cancelAnimationFrame(rafId)
+      if (timeoutId) window.clearTimeout(timeoutId)
+    }
+  }, [remoteHydraCode])
+
+  // If no ack arrives, show error
+  useEffect(() => {
+    if (sendStatus !== 'sending') return
+    const id = window.setTimeout(() => {
+      if (sendStatus === 'sending') setSendStatus('error')
+    }, 4000)
+    return () => window.clearTimeout(id)
+  }, [sendStatus])
 
   // Track remote code changes — uses async callback to satisfy lint
   useEffect(() => {
@@ -145,10 +284,7 @@ function OrchestratorView () {
 
     if (!userHasEdited) return
 
-    // Audioize both sides before comparison so injection-only diffs don't trigger banner
-    const normalizedRemote = remoteHydraCode ? audioizeHydraCode(remoteHydraCode) : null
-    const normalizedLocal = audioizeHydraCode(localCode)
-    const pending = getPendingRemote(normalizedRemote, normalizedLocal, userHasEdited)
+    const pending = getPendingRemote(remoteHydraCode ?? null, localCode, userHasEdited)
     if (pending === null) return
 
     // Schedule state update asynchronously (external system sync pattern)
@@ -167,7 +303,7 @@ function OrchestratorView () {
     if (!shouldAutoApplyPreset(prevIdx, remotePresetIndex, userHasEdited, remoteHydraCode)) return
 
     const id = requestAnimationFrame(() => {
-      setLocalCode(audioizeHydraCode(remoteHydraCode!))
+      setLocalCode(remoteHydraCode!)
       setUserHasEdited(false)
       setPendingRemoteCode(null)
       setPendingRemoteCount(0)
@@ -192,9 +328,37 @@ function OrchestratorView () {
   const previewSize = getPreviewSize(ui.innerWidth)
   const isMobile = ui.innerWidth < 980
 
+  const isRefOpen = isMobile && activeMobileTab === 'ref'
+  const refPanelClass = isRefOpen
+    ? `${styles.refPanel} ${styles.refPanelOpen}`
+    : styles.refPanel
+  let tabContent: React.ReactNode
+  if (activeTab === 'presets') {
+    tabContent = (
+      <PresetBrowser
+        currentCode={localCode}
+        onLoad={handleLoadPreset}
+        onSend={handleSendPreset}
+      />
+    )
+  } else {
+    tabContent = (
+      <ApiReference
+        onInsertExample={handleInsertApiExample}
+        onReplaceWithExample={handleReplaceApiExample}
+      />
+    )
+  }
+
+  const containerStyle = { ['--ref-panel-width' as string]: `${refPanelWidth}px` } as React.CSSProperties
+
   return (
-    <div className={styles.container}>
-      <div className={`${styles.refPanel} ${(isMobile && activeMobileTab === 'ref') ? styles.refPanelOpen : ''}`}>
+    <div
+      className={`${styles.container} ${isResizingPanel ? styles.containerResizing : ''} ${pendingRemoteCode ? styles.containerWithBanner : ''} ${isKeyboardOpen ? styles.containerKeyboardOpen : ''}`}
+      ref={containerRef}
+      style={containerStyle}
+    >
+      <div className={refPanelClass}>
         <div className={styles.tabBar}>
           <button
             type='button'
@@ -212,10 +376,18 @@ function OrchestratorView () {
           </button>
         </div>
         <div className={styles.tabContent}>
-          {activeTab === 'presets'
-            ? <PresetBrowser onLoad={handleLoadPreset} onSend={handleSendPreset} />
-            : <ApiReference />}
+          {tabContent}
         </div>
+        {!isMobile && (
+          <div
+            className={styles.refPanelResize}
+            onPointerDown={() => setIsResizingPanel(true)}
+            role='separator'
+            aria-orientation='vertical'
+            aria-label='Resize presets panel'
+            tabIndex={-1}
+          />
+        )}
       </div>
       {isMobile && activeMobileTab === 'ref' && (
         <div
@@ -245,6 +417,15 @@ function OrchestratorView () {
             height={previewSize.height}
             buffer={previewBuffer}
             onBufferChange={setPreviewBuffer}
+            localCameraStream={camera.stream}
+            onPresetLoad={handleLoadPreset}
+            onPresetSend={handleSendPreset}
+            onRandomize={handleRandomize}
+            visualizerMode={previewHydraState.mode}
+            visualizerEnabled={previewHydraState.isEnabled}
+            visualizerSensitivity={previewHydraState.sensitivity}
+            visualizerAllowCamera={previewHydraState.allowCamera}
+            cameraRelayStatus={camera.status}
           />
         </div>
       )}
@@ -254,20 +435,22 @@ function OrchestratorView () {
             code={userHasEdited ? localCode : effectiveCode}
             onCodeChange={handleCodeChange}
             onSend={handleSendCode}
+            sendStatus={sendStatus}
+            onResend={handleResend}
             onRandomize={handleRandomize}
-            onAutoAudio={handleAutoAudio}
-            autoAudioOnSend={autoAudioOnSend}
-            onToggleAutoAudio={handleToggleAutoAudio}
-            injectionLevel={injectionLevel}
-            onInjectionLevelChange={setInjectionLevel}
+            cameraStatus={camera.status}
+            onCameraToggle={handleCameraToggle}
           />
         </div>
       )}
 
-      {isMobile && (
-        <div className={styles.mobileToolbar}>
+      {isMobile && !isKeyboardOpen && (
+        <div className={styles.mobileToolbar} role='tablist'>
           <button
             type='button'
+            role='tab'
+            aria-selected={activeMobileTab === 'stage'}
+            aria-label='Stage'
             className={`${styles.mobileTab} ${activeMobileTab === 'stage' ? styles.mobileTabActive : ''}`}
             onClick={() => setActiveMobileTab('stage')}
           >
@@ -276,14 +459,23 @@ function OrchestratorView () {
           </button>
           <button
             type='button'
+            role='tab'
+            aria-selected={activeMobileTab === 'code'}
+            aria-label='Code'
             className={`${styles.mobileTab} ${activeMobileTab === 'code' ? styles.mobileTabActive : ''}`}
             onClick={() => setActiveMobileTab('code')}
           >
             <span className={styles.mobileTabIcon}>{'\u003c\u002f\u003e'}</span>
             <span>Code</span>
+            {shouldShowUnsentDot(activeMobileTab, userHasEdited, sendStatus) && (
+              <span className={`${styles.mobileTabDot} ${sendStatus === 'error' ? styles.mobileTabDotError : ''}`} />
+            )}
           </button>
           <button
             type='button'
+            role='tab'
+            aria-selected={activeMobileTab === 'ref'}
+            aria-label='Presets'
             className={`${styles.mobileTab} ${activeMobileTab === 'ref' ? styles.mobileTabActive : ''}`}
             onClick={() => setActiveMobileTab('ref')}
           >

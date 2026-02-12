@@ -1,0 +1,317 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
+  min-height: 0;
+}
+
+.folder {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(30, 40, 50, 0.6), rgba(20, 30, 40, 0.7));
+}
+
+.folderHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  user-select: none;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.folderHeader:hover,
+.folderHeader:focus-visible {
+  background: rgba(78, 205, 196, 0.12);
+  outline: none;
+}
+
+.disclosure {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: transform 0.22s ease;
+}
+
+.disclosureOpen {
+  transform: rotate(90deg);
+}
+
+.folderName {
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: var(--text-xs);
+  background: rgba(78, 205, 196, 0.15);
+  color: #b2f5ea;
+  border: 1px solid rgba(78, 205, 196, 0.4);
+}
+
+.badgeSelected {
+  background: rgba(255, 214, 102, 0.18);
+  border-color: rgba(255, 214, 102, 0.42);
+  color: #ffe9a8;
+}
+
+.badgeCam {
+  background: rgba(120, 144, 156, 0.2);
+  color: #b0bec5;
+  border-color: rgba(120, 144, 156, 0.35);
+}
+
+.badgeStart {
+  background: rgba(255, 214, 102, 0.18);
+  border-color: rgba(255, 214, 102, 0.42);
+  color: #ffe9a8;
+}
+
+.folderActions {
+  margin-left: auto;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 26px;
+  gap: 6px;
+  opacity: 0;
+  transform: translateX(4px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.folderHeader:hover .folderActions,
+.folderHeader:focus-within .folderActions {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.folderActionButton {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.folderActionButton:hover,
+.folderActionButton:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.34);
+  outline: none;
+}
+
+.childrenWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  border-top: 1px solid rgba(255, 255, 255, 0);
+  transition: grid-template-rows 0.25s ease, border-color 0.25s ease;
+}
+
+.childrenWrapOpen {
+  grid-template-rows: 1fr;
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.children {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 10px 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease, padding 0.2s ease;
+}
+
+.childrenWrapOpen .children {
+  opacity: 1;
+  padding-top: 8px;
+  padding-bottom: 10px;
+}
+
+.empty {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: var(--text-xs);
+  padding: 6px 2px;
+}
+
+.presetRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 15, 20, 0.5);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.presetRow:hover,
+.presetRow:focus-visible,
+.presetRow:focus-within {
+  background: rgba(78, 205, 196, 0.1);
+  border-color: rgba(78, 205, 196, 0.42);
+  outline: none;
+}
+
+.presetRowSelected {
+  border-color: rgba(78, 205, 196, 0.62);
+  background: rgba(78, 205, 196, 0.16);
+  box-shadow: inset 3px 0 0 rgba(78, 205, 196, 0.8);
+}
+
+.presetMain {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.presetName {
+  font-size: var(--text-sm);
+  color: #e6edf3;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.presetMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 28px;
+  gap: 6px;
+  align-content: start;
+  align-items: start;
+  justify-content: end;
+}
+
+.actionButton {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.actionButton:hover,
+.actionButton:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.34);
+  outline: none;
+}
+
+.actionButton:disabled,
+.folderActionButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.actionPrimary {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: rgba(78, 205, 196, 0.5);
+  color: #dffcf8;
+}
+
+.actionPrimary:hover,
+.actionPrimary:focus-visible {
+  background: rgba(78, 205, 196, 0.3);
+}
+
+.actionActive {
+  background: rgba(255, 214, 102, 0.25);
+  border-color: rgba(255, 214, 102, 0.55);
+  color: #ffe9a8;
+}
+
+.actionDanger {
+  background: rgba(229, 115, 115, 0.2);
+  border-color: rgba(229, 115, 115, 0.5);
+  color: #ffd6d6;
+}
+
+.actionDanger:hover,
+.actionDanger:focus-visible {
+  background: rgba(229, 115, 115, 0.3);
+}
+
+@media (max-width: 980px) {
+  .tree {
+    gap: 10px;
+    padding-right: 0;
+  }
+
+  .folderHeader {
+    padding: 9px 10px;
+  }
+
+  .children {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .presetRow {
+    padding: 8px;
+    gap: 7px;
+  }
+
+  .actions {
+    grid-auto-columns: 36px;
+    gap: 5px;
+  }
+
+  .actionButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .folderActions {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    grid-auto-columns: 36px;
+  }
+
+  .folderActionButton {
+    width: 36px;
+    height: 36px;
+  }
+}

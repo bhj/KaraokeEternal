@@ -23,6 +23,8 @@ import mediaRouter from './Media/router.js'
 import prefsRouter from './Prefs/router.js'
 import roomsRouter from './Rooms/router.js'
 import userRouter from './User/router.js'
+import hydraPresetsRouter from './HydraPresets/router.js'
+import videoProxyRouter from './VideoProxy/router.js'
 import pushQueuesAndLibrary from './lib/pushQueuesAndLibrary.js'
 import { Server as SocketIO } from 'socket.io'
 import socketActions, { clearPendingCleanups } from './socket.js'
@@ -194,7 +196,10 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   app.use(koaLogger((str, args) => (args.length === 6 && args[3] >= 500) ? log.error(str) : log.debug(str)))
 
   app.use(koaFavicon(path.join(env.KES_PATH_ASSETS, 'favicon.ico')))
-  app.use(koaRange)
+  app.use(async (ctx, next) => {
+    if (ctx.path.startsWith(urlPath + 'api/video-proxy')) return next()
+    return koaRange(ctx, next)
+  })
   app.use(koaBody({ multipart: true }))
 
   // proxy source validation
@@ -317,13 +322,15 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   baseRouter.use(prefsRouter.routes())
   baseRouter.use(roomsRouter.routes())
   baseRouter.use(userRouter.routes())
+  baseRouter.use(hydraPresetsRouter.routes())
+  baseRouter.use(videoProxyRouter.routes())
   app.use(baseRouter.routes())
 
   // serve index.html with dynamic base tag at the main SPA routes
   const createIndexMiddleware = (content) => {
     const indexRoutes = [
       urlPath,
-      ...['account', 'library', 'queue', 'player', 'join', 'orchestrator'].map(r => urlPath + r + '/'),
+      ...['account', 'library', 'queue', 'player', 'join', 'orchestrator', 'camera'].map(r => urlPath + r + '/'),
     ]
 
     content = content.replace('<base href="/">', `<base href="${urlPath}">`)

@@ -2,18 +2,32 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EditorState, type Range } from '@codemirror/state'
 import { Decoration, EditorView, keymap, ViewPlugin, type DecorationSet, type ViewUpdate } from '@codemirror/view'
 import { javascript } from '@codemirror/lang-javascript'
-import { autocompletion, type CompletionContext, type CompletionResult } from '@codemirror/autocomplete'
+import {
+  autocompletion,
+  acceptCompletion,
+  closeCompletion,
+  moveCompletionSelection,
+  startCompletion,
+  type CompletionContext,
+  type CompletionResult,
+} from '@codemirror/autocomplete'
 import { linter, type Diagnostic } from '@codemirror/lint'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands'
 import { indentUnit } from '@codemirror/language'
 import { hydraExtensions } from './hydraHighlightStyle'
 import { buildHydraCompletions } from './hydraCompletions'
 import { lintHydraCode } from './hydraLint'
-import { isInjectedLine, isPartialInjectedLine, stripInjectedLines } from 'lib/injectedLines'
+import { formatHydraCode, getLintErrorSummary, type LintErrorSummary } from './codeEditorUtils'
+import {
+  AUTOCOMPLETE_PASSIVE_HINTS,
+  getAutocompleteOptions,
+  getCompletionAcceptKeyBindings,
+  getCompletionNavigationKeyBindings,
+} from './codeEditorAssist'
+import { isInjectedLine, isPartialInjectedLine } from 'lib/injectedLines'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
 import { HYDRA_SNIPPETS } from './hydraSnippets'
 import { getSkipRegions } from 'lib/skipRegions'
-import type { InjectionLevel } from 'routes/Player/components/Player/PlayerVisualizer/hooks/audioInjectProfiles'
 import styles from './CodeEditor.css'
 
 const { topLevel, dotChain, nativeAudioDot, sourceDot } = buildHydraCompletions()
@@ -79,6 +93,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -92,6 +107,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -105,6 +121,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -118,6 +135,7 @@ function hydraAutocomplete (context: CompletionContext): CompletionResult | null
         label: c.label,
         detail: c.detail,
         section: c.section,
+        info: c.info,
       })),
     }
   }
@@ -170,7 +188,7 @@ function hydraLinter (view: EditorView): Diagnostic[] {
         from: line.from,
         to: line.to,
         severity: 'info',
-        message: 'Modified audio injection — use Auto Audio to regenerate',
+        message: 'Modified audio injection — remove or reapply manually',
       })
     }
   }
@@ -233,27 +251,35 @@ function findCameraInsertLine (code: string): number {
   return i
 }
 
-const INJECTION_LEVELS: InjectionLevel[] = ['low', 'med', 'high']
-const INJECTION_LABELS: Record<InjectionLevel, string> = { low: 'Low', med: 'Med', high: 'High' }
-
 interface CodeEditorProps {
   code: string
   onCodeChange: (code: string) => void
   onSend: (code: string) => void
+  sendStatus?: 'idle' | 'sending' | 'synced' | 'error'
+  onResend?: () => void
   onRandomize: () => void
-  onAutoAudio: () => void
-  autoAudioOnSend: boolean
-  onToggleAutoAudio: () => void
-  injectionLevel: InjectionLevel
-  onInjectionLevelChange: (level: InjectionLevel) => void
+  cameraStatus?: 'idle' | 'connecting' | 'active' | 'error'
+  onCameraToggle?: () => void
 }
 
-function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, autoAudioOnSend, onToggleAutoAudio, injectionLevel, onInjectionLevelChange }: CodeEditorProps) {
+function CodeEditor ({
+  code,
+  onCodeChange,
+  onSend,
+  sendStatus = 'idle',
+  onResend,
+  onRandomize,
+  cameraStatus,
+  onCameraToggle,
+}: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onCodeChangeRef = useRef(onCodeChange)
   const onSendRef = useRef(onSend)
   const codeRef = useRef(code)
+  const sendAttemptRef = useRef<() => void>(() => {})
+  const [sendLintError, setSendLintError] = useState<LintErrorSummary | null>(null)
+  const [showPassiveHints, setShowPassiveHints] = useState(false)
 
   onCodeChangeRef.current = onCodeChange
   onSendRef.current = onSend
@@ -266,27 +292,43 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
       key: 'Ctrl-Enter',
       mac: 'Cmd-Enter',
       run: () => {
-        onSendRef.current(viewRef.current?.state.doc.toString() ?? '')
+        sendAttemptRef.current()
         return true
       },
     }])
+
+    const completionAcceptKeymap = keymap.of(getCompletionAcceptKeyBindings(acceptCompletion))
+    const completionNavigationKeymap = keymap.of(getCompletionNavigationKeyBindings({
+      startRun: startCompletion,
+      closeRun: closeCompletion,
+      moveDownRun: moveCompletionSelection(true),
+      moveUpRun: moveCompletionSelection(false),
+      pageDownRun: moveCompletionSelection(true, 'page'),
+      pageUpRun: moveCompletionSelection(false, 'page'),
+    }))
 
     const state = EditorState.create({
       doc: code,
       extensions: [
         sendKeymap,
         history(),
+        completionNavigationKeymap,
+        completionAcceptKeymap,
         keymap.of([...defaultKeymap, ...historyKeymap]),
         indentUnit.of('  '),
         javascript(),
         hydraExtensions,
-        autocompletion({ override: [hydraAutocomplete, slashCommandComplete] }),
+        autocompletion({
+          override: [hydraAutocomplete, slashCommandComplete],
+          ...getAutocompleteOptions(),
+        }),
         linter(hydraLinter),
         injectedLinePlugin,
         hydraTheme,
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onCodeChangeRef.current(update.state.doc.toString())
+            setSendLintError(null)
           }
         }),
         EditorView.lineWrapping,
@@ -314,18 +356,45 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
     })
   }, [code])
 
+  sendAttemptRef.current = () => {
+    const currentCode = viewRef.current?.state.doc.toString() ?? codeRef.current
+    const summary = getLintErrorSummary(currentCode)
+    if (summary) {
+      setSendLintError(summary)
+      viewRef.current?.focus()
+      return
+    }
+    setSendLintError(null)
+    onSendRef.current(currentCode)
+  }
+
   const handleSend = useCallback(() => {
-    onSend(viewRef.current?.state.doc.toString() ?? code)
-  }, [code, onSend])
+    sendAttemptRef.current()
+  }, [])
 
-  const hasInjectedLines = useMemo(
-    () => code.split('\n').some(isInjectedLine),
-    [code],
-  )
+  const handleUndo = useCallback(() => {
+    if (!viewRef.current) return
+    undo(viewRef.current)
+    viewRef.current.focus()
+  }, [])
 
-  const handleStripAudio = useCallback(() => {
-    onCodeChange(stripInjectedLines(code))
-  }, [code, onCodeChange])
+  const handleRedo = useCallback(() => {
+    if (!viewRef.current) return
+    redo(viewRef.current)
+    viewRef.current.focus()
+  }, [])
+
+  const handleFormat = useCallback(() => {
+    const view = viewRef.current
+    if (!view) return
+    const currentCode = view.state.doc.toString()
+    const formatted = formatHydraCode(currentCode)
+    if (formatted === currentCode) return
+    view.dispatch({
+      changes: { from: 0, to: currentCode.length, insert: formatted },
+    })
+    view.focus()
+  }, [])
 
   // Camera banner: show when code uses src(sN) without init
   const cameraUsage = useMemo(() => detectCameraUsage(code), [code])
@@ -343,7 +412,7 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
   }, [cameraUsage.sources])
 
   const showCameraBanner = cameraUsage.sources.length > 0
-    && !cameraUsage.hasExplicitInit
+    && !cameraUsage.hasInitCam && !cameraUsage.hasExplicitSource
     && !cameraBannerDismissed
 
   const handleEnableCamera = useCallback(() => {
@@ -357,6 +426,12 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
   const handleDismissCamera = useCallback(() => {
     setCameraBannerDismissed(true)
   }, [])
+
+  const handleTogglePassiveHints = useCallback(() => {
+    setShowPassiveHints(prev => !prev)
+  }, [])
+
+  const showSendStatus = sendStatus !== 'idle'
 
   return (
     <div className={styles.container}>
@@ -378,51 +453,59 @@ function CodeEditor ({ code, onCodeChange, onSend, onRandomize, onAutoAudio, aut
       <div ref={containerRef} className={styles.editor} />
       <div className={styles.footer}>
         <span className={styles.hint}>Ctrl+Enter to send</span>
-        <div className={styles.audioVars}>
-          <span>bass()</span>
-          <span>mid()</span>
-          <span>treble()</span>
-          <span>beat()</span>
-          <span>energy()</span>
-          <span>bpm()</span>
-          <span>bright()</span>
-          <span>a.fft[n]</span>
+        <div className={styles.editActions}>
+          <button type='button' className={styles.editButton} onClick={handleUndo}>Undo</button>
+          <button type='button' className={styles.editButton} onClick={handleRedo}>Redo</button>
+          <button type='button' className={styles.editButton} onClick={handleFormat}>Format</button>
         </div>
+        <button type='button' className={styles.hintToggle} onClick={handleTogglePassiveHints}>
+          {showPassiveHints ? 'Hide Hints' : 'Hints'}
+        </button>
+        {showPassiveHints && (
+          <div className={styles.passiveHints} role='note' aria-label='Editor hints'>
+            {AUTOCOMPLETE_PASSIVE_HINTS.map(hint => (
+              <span key={hint} className={styles.passiveHintItem}>{hint}</span>
+            ))}
+          </div>
+        )}
         <button type='button' className={styles.randomButton} onClick={onRandomize}>
           Random
         </button>
-        <button type='button' className={styles.autoAudioButton} onClick={onAutoAudio}>
-          Auto Audio
-        </button>
-        <div className={styles.injectionControl}>
-          {INJECTION_LEVELS.map(level => (
-            <button
-              key={level}
-              type='button'
-              className={`${styles.injectionPill} ${injectionLevel === level ? styles.injectionPillActive : ''}`}
-              onClick={() => onInjectionLevelChange(level)}
-            >
-              {INJECTION_LABELS[level]}
-            </button>
-          ))}
-        </div>
-        {hasInjectedLines && (
+        {onCameraToggle && (
           <button
             type='button'
-            className={styles.stripAudioButton}
-            onClick={handleStripAudio}
-            title='Remove auto-injected audio-reactive lines'
+            className={`${styles.randomButton} ${cameraStatus === 'active' ? styles.sendButton : ''}`}
+            onClick={onCameraToggle}
+            title={cameraStatus === 'idle' ? 'Share camera' : cameraStatus === 'connecting' ? 'Connecting...' : cameraStatus === 'active' ? 'Stop camera' : 'Camera error'}
           >
-            Strip Audio
+            {cameraStatus === 'idle' ? 'Cam' : cameraStatus === 'connecting' ? 'Cam...' : cameraStatus === 'active' ? 'Cam On' : 'Cam Err'}
           </button>
         )}
-        <label className={styles.autoOnSend} title='Auto-inject audio reactivity before sending'>
-          <input type='checkbox' checked={autoAudioOnSend} onChange={onToggleAutoAudio} />
-          Auto on Send
-        </label>
-        <button type='button' className={styles.sendButton} onClick={handleSend}>
-          Send
-        </button>
+        <div className={styles.sendGroup}>
+          <button type='button' className={styles.sendButton} onClick={handleSend}>
+            {sendStatus === 'sending' ? 'Sending…' : 'Send'}
+          </button>
+          {showSendStatus && sendStatus !== 'sending' && (
+            <span
+              className={`${styles.sendStatus} ${sendStatus === 'error' ? styles.sendStatusError : styles.sendStatusOk}`}
+            >
+              {sendStatus === 'synced' ? 'Synced' : 'Send failed'}
+            </span>
+          )}
+          {sendLintError && (
+            <>
+              <span className={styles.sendLintError}>
+                {`Fix ${sendLintError.count} error${sendLintError.count > 1 ? 's' : ''} (line ${sendLintError.firstLine})`}
+              </span>
+              <span className={styles.sendLintDebug}>{sendLintError.debugHint}</span>
+            </>
+          )}
+          {sendStatus === 'error' && onResend && (
+            <button type='button' className={styles.resendButton} onClick={onResend}>
+              Resend
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

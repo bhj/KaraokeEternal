@@ -4,54 +4,40 @@ import throttle from 'lodash/throttle'
 import { useDispatch } from 'react-redux'
 import { PLAYER_EMIT_FFT } from 'shared/actionTypes'
 import { type AudioData } from './hooks/useAudioAnalyser'
-import { useHydraAudio, type AudioClosures } from './hooks/useHydraAudio'
-import { audioizeHydraCode } from './hooks/audioizeHydraCode'
+import { useHydraAudio } from './hooks/useHydraAudio'
+import { getHydraEvalCode, DEFAULT_PATCH } from './hydraEvalCode'
 import { detectCameraUsage } from 'lib/detectCameraUsage'
+import { applyRemoteCameraOverride, restoreRemoteCameraOverride } from 'lib/remoteCameraOverride'
+import { applyVideoProxyOverride, restoreVideoProxyOverride } from 'lib/videoProxyOverride'
+import { shouldEmitFft } from './hooks/emitFftPolicy'
 import type { HydraAudioCompat } from './hooks/hydraAudioCompat'
-import type { AudioResponseState } from 'shared/types'
 import styles from './HydraVisualizer.css'
 
 const log = (...args: unknown[]) => console.log('[Hydra]', ...args)
 const warn = (...args: unknown[]) => console.warn('[Hydra]', ...args)
 
-const DEFAULT_PATCH = `
-osc(20, 0.1, () => bass() * 2)
-  .color(1, 0.5, () => treble())
-  .modulate(noise(3), () => beat() * 0.4)
-  .modulate(voronoi(5, () => energy() * 2), () => beat() * 0.2)
-  .rotate(() => mid() * 0.5)
-  .kaleid(() => 2 + beat() * 4)
-  .saturate(() => 0.6 + energy() * 0.4)
-  .out()
-`.trim()
-
-// Audio closure names exposed on window for Hydra code to reference
-const AUDIO_GLOBAL_NAMES = ['bass', 'mid', 'treble', 'beat', 'energy', 'bpm', 'bright'] as const
-
-function setAudioGlobals (closures: AudioClosures, compat: HydraAudioCompat) {
+// Audio globals exposed on window for Hydra code to reference
+function setAudioGlobals (compat: HydraAudioCompat) {
   const w = window as unknown as Record<string, unknown>
-  w.bass = closures.bass
-  w.mid = closures.mid
-  w.treble = closures.treble
-  w.beat = closures.beat
-  w.energy = closures.energy
-  w.bpm = closures.bpm
-  w.bright = closures.bright
-  // Hydra-native audio API: gallery sketches use a.fft[0], a.setBins(), etc.
   w.a = compat
 }
 
 function clearAudioGlobals () {
   const w = window as unknown as Record<string, unknown>
-  for (const name of AUDIO_GLOBAL_NAMES) {
-    delete w[name]
-  }
+  // Defensive cleanup for sessions that previously exposed legacy helpers.
+  delete w.bass
+  delete w.mid
+  delete w.treble
+  delete w.beat
+  delete w.energy
+  delete w.bpm
+  delete w.bright
   delete w.a
 }
 
 function executeHydraCode (hydra: Hydra, code: string) {
   try {
-    hydra.eval(audioizeHydraCode(code))
+    hydra.eval(getHydraEvalCode(code))
   } catch (err) {
     warn('Code execution error:', err)
     // Don't crash — keep last working frame
@@ -68,13 +54,16 @@ interface HydraVisualizerProps {
   code?: string
   /** Override container z-index for previews or overlays. */
   layer?: number
-  audioResponse?: AudioResponseState
   /** When true, auto-init camera for detected source usage */
   allowCamera?: boolean
   /** When true, emit FFT data to server for remote preview */
   emitFft?: boolean
   /** Remote audio data to drive visualizer (replaces audioSourceNode) */
   overrideData?: AudioData | null
+  /** Remote camera video element from WebRTC (replaces local initCam) */
+  remoteVideoElement?: HTMLVideoElement | null
+  /** Emits currently bound camera sources (s0-s3) after init/rebind passes */
+  onCameraSourcesBoundChange?: (sources: string[]) => void
 }
 
 function HydraVisualizer ({
@@ -85,10 +74,11 @@ function HydraVisualizer ({
   height,
   code,
   layer,
-  audioResponse,
   allowCamera,
   emitFft,
   overrideData,
+  remoteVideoElement,
+  onCameraSourcesBoundChange,
 }: HydraVisualizerProps) {
   const dispatch = useDispatch()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -101,11 +91,28 @@ function HydraVisualizer ({
   const heightRef = useRef(height)
   const codeRef = useRef(code)
   const cameraInitRef = useRef<Set<string>>(new Set())
+  const cameraOverrideRef = useRef<Map<string, unknown>>(new Map())
+  const videoProxyOverrideRef = useRef<Map<string, unknown>>(new Map())
+  const prevRemoteVideoRef = useRef<HTMLVideoElement | null>(null)
 
-  const { update: updateAudio, closures, compat, audioRef } = useHydraAudio(
+  const reportCameraSourcesBound = useCallback(() => {
+    if (!onCameraSourcesBoundChange) return
+    const bound = Array.from(cameraInitRef.current).sort()
+    onCameraSourcesBoundChange(bound)
+  }, [onCameraSourcesBoundChange])
+
+  const pruneStaleCameraBindings = useCallback((sources: string[]) => {
+    const activeSources = new Set(sources)
+    for (const src of Array.from(cameraInitRef.current)) {
+      if (!activeSources.has(src)) {
+        cameraInitRef.current.delete(src)
+      }
+    }
+  }, [])
+
+  const { update: updateAudio, compat, audioRef } = useHydraAudio(
     audioSourceNode,
     sensitivity,
-    audioResponse,
     overrideData,
   )
 
@@ -142,11 +149,32 @@ function HydraVisualizer ({
     codeRef.current = code
   }, [width, height, code])
 
-  // Set audio closures + window.a compat on window so Hydra code can reference them
+  // Override initCam() to use remote video when present
   useEffect(() => {
-    setAudioGlobals(closures, compat)
+    const w = window as unknown as Record<string, unknown>
+    const sources = ['s0', 's1', 's2', 's3']
+    const previousRemote = prevRemoteVideoRef.current
+    const nextRemote = remoteVideoElement ?? null
+
+    if (previousRemote !== nextRemote) {
+      cameraInitRef.current.clear()
+      reportCameraSourcesBound()
+    }
+
+    if (nextRemote) {
+      applyRemoteCameraOverride(sources, nextRemote, w, cameraOverrideRef.current)
+    } else {
+      restoreRemoteCameraOverride(w, cameraOverrideRef.current)
+    }
+
+    prevRemoteVideoRef.current = nextRemote
+  }, [remoteVideoElement, reportCameraSourcesBound])
+
+  // Set window.a compat on window so Hydra code can reference a.fft and controls
+  useEffect(() => {
+    setAudioGlobals(compat)
     return () => clearAudioGlobals()
-  }, [closures, compat])
+  }, [compat])
 
   // Initialize Hydra (mount-only)
   useEffect(() => {
@@ -174,12 +202,19 @@ function HydraVisualizer ({
     hydraRef.current = hydra
     errorCountRef.current = 0
 
+    // Override initVideo() before first code execution so proxy is active immediately
+    const w = window as unknown as Record<string, unknown>
+    const videoSources = ['s0', 's1', 's2', 's3']
+    const videoProxyOverrides = videoProxyOverrideRef.current
+    applyVideoProxyOverride(videoSources, w, videoProxyOverrides)
+
     // Execute initial patch and render first frame immediately
-    executeHydraCode(hydra, codeRef.current ?? DEFAULT_PATCH)
+    executeHydraCode(hydra, getHydraEvalCode(codeRef.current))
     hydra.tick(16.67)
 
     return () => {
       log('Destroying')
+      restoreVideoProxyOverride(w, videoProxyOverrides)
       cancelAnimationFrame(rafRef.current)
       try {
         hydra.regl.destroy()
@@ -198,56 +233,80 @@ function HydraVisualizer ({
   }, [width, height])
 
   // Camera auto-init: when allowCamera flips true, init camera for detected sources
+  // Uses remote WebRTC video when available, falls back to local initCam()
   useEffect(() => {
-    if (!allowCamera) {
+    if (!allowCamera && !remoteVideoElement) {
       cameraInitRef.current.clear()
+      reportCameraSourcesBound()
       return
     }
 
-    const currentCode = codeRef.current ?? DEFAULT_PATCH
+    const currentCode = getHydraEvalCode(codeRef.current)
     const { sources } = detectCameraUsage(currentCode)
     const w = window as unknown as Record<string, unknown>
 
+    pruneStaleCameraBindings(sources)
+
     for (const src of sources) {
       if (cameraInitRef.current.has(src)) continue
-      const extSrc = w[src] as { initCam?: (index?: number) => void } | undefined
-      if (extSrc?.initCam) {
-        try {
+      const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
+      if (!extSrc) continue
+      try {
+        if (remoteVideoElement && extSrc.init) {
+          extSrc.init({ src: remoteVideoElement })
+          cameraInitRef.current.add(src)
+        } else if (allowCamera && extSrc.initCam) {
           extSrc.initCam()
           cameraInitRef.current.add(src)
-        } catch (err) {
-          warn('Camera init failed for', src, err)
         }
+      } catch (err) {
+        warn('Camera init failed for', src, err)
       }
     }
-  }, [allowCamera])
+
+    reportCameraSourcesBound()
+  }, [allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
 
   // Re-execute code when it changes
   useEffect(() => {
     const hydra = hydraRef.current
     if (!hydra) return
 
+    // Clear previous render graph to prevent oscillator bleed between presets
+    if (typeof hydra.hush === 'function') {
+      hydra.hush()
+    }
+
     // Re-check camera init when code changes with camera enabled
-    if (allowCamera) {
-      const { sources } = detectCameraUsage(code ?? DEFAULT_PATCH)
+    if (allowCamera || remoteVideoElement) {
+      const { sources } = detectCameraUsage(getHydraEvalCode(code))
       const w = window as unknown as Record<string, unknown>
+
+      pruneStaleCameraBindings(sources)
+
       for (const src of sources) {
         if (cameraInitRef.current.has(src)) continue
-        const extSrc = w[src] as { initCam?: (index?: number) => void } | undefined
-        if (extSrc?.initCam) {
-          try {
+        const extSrc = w[src] as { initCam?: (index?: number) => void, init?: (opts: { src: HTMLVideoElement }) => void } | undefined
+        if (!extSrc) continue
+        try {
+          if (remoteVideoElement && extSrc.init) {
+            extSrc.init({ src: remoteVideoElement })
+            cameraInitRef.current.add(src)
+          } else if (allowCamera && extSrc.initCam) {
             extSrc.initCam()
             cameraInitRef.current.add(src)
-          } catch (err) {
-            warn('Camera init failed for', src, err)
           }
+        } catch (err) {
+          warn('Camera init failed for', src, err)
         }
       }
     }
 
-    executeHydraCode(hydra, code ?? DEFAULT_PATCH)
+    reportCameraSourcesBound()
+
+    executeHydraCode(hydra, getHydraEvalCode(code))
     errorCountRef.current = 0
-  }, [code, allowCamera])
+  }, [code, allowCamera, remoteVideoElement, reportCameraSourcesBound, pruneStaleCameraBindings])
 
   // Animation tick
   const tick = useCallback((time: number) => {
@@ -257,8 +316,8 @@ function HydraVisualizer ({
     // Update audio data from analyser
     updateAudio()
 
-    // Emit FFT if enabled
-    if (emitFft && isPlaying) {
+    // Emit FFT if enabled (always emit while Hydra is running)
+    if (emitFft && shouldEmitFft(isPlaying)) {
       emitFftData(audioRef.current)
     }
 

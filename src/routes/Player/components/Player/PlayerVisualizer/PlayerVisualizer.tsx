@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import type { AudioResponseState, VisualizerMode } from 'shared/types'
+import type { VisualizerMode } from 'shared/types'
 import styles from './PlayerVisualizer.css'
 
 // Lazy load visualizer to reduce initial bundle
@@ -13,8 +13,8 @@ interface PlayerVisualizerProps {
   height: number
   mode: VisualizerMode
   hydraCode?: string
-  audioResponse?: AudioResponseState
   allowCamera?: boolean
+  remoteVideoElement?: HTMLVideoElement | null
 }
 
 function PlayerVisualizer ({
@@ -25,8 +25,8 @@ function PlayerVisualizer ({
   height,
   mode,
   hydraCode,
-  audioResponse,
   allowCamera,
+  remoteVideoElement,
 }: PlayerVisualizerProps) {
   if (mode !== 'hydra') {
     return null
@@ -42,8 +42,8 @@ function PlayerVisualizer ({
           width={width}
           height={height}
           code={hydraCode}
-          audioResponse={audioResponse}
           allowCamera={allowCamera}
+          remoteVideoElement={remoteVideoElement}
           emitFft={true}
         />
       </Suspense>

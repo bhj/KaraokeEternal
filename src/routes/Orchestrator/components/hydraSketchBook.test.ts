@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { DEFAULT_SKETCH, getRandomSketch } from './hydraSketchBook'
-import { getPresetCount } from './hydraPresets'
+import * as hydraPresets from './hydraPresets'
+import { getDefaultPreset, getPresetByIndex, getPresetCount } from './hydraPresets'
 import { HYDRA_GALLERY } from './hydraGallery'
 
 describe('hydraSketchBook', () => {
@@ -17,8 +18,8 @@ describe('hydraSketchBook', () => {
       expect(DEFAULT_SKETCH).toContain('.out(')
     })
 
-    it('contains a.fft (audio injection visible)', () => {
-      expect(DEFAULT_SKETCH).toContain('a.fft')
+    it('matches the raw default preset (no auto audio injection)', () => {
+      expect(DEFAULT_SKETCH).toBe(getDefaultPreset())
     })
   })
 
@@ -32,6 +33,13 @@ describe('hydraSketchBook', () => {
       const result = getRandomSketch()
       const hasOutput = result.includes('.out(') || result.includes('render(')
       expect(hasOutput).toBe(true)
+    })
+
+    it('returns the raw gallery preset (no auto audio injection)', () => {
+      const spy = vi.spyOn(hydraPresets, 'getRandomPreset').mockReturnValue(0)
+      const result = getRandomSketch()
+      expect(result).toBe(getPresetByIndex(0))
+      spy.mockRestore()
     })
 
     it(`draws from the full gallery (${HYDRA_GALLERY.length} presets)`, () => {

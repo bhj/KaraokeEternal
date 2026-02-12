@@ -40,6 +40,35 @@
   align-self: flex-start;
 }
 
+.policySection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.875rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+.policyTitle {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.policySelect {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.policySaveBtn {
+  align-self: flex-start;
+}
+
+.policyError {
+  color: var(--danger-color);
+  margin: 0;
+}
+
 .noRoom {
   color: var(--text-secondary);
   font-style: italic;

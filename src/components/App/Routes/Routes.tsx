@@ -6,9 +6,11 @@ import AccountView from 'routes/Account/views/AccountView'
 import LibraryView from 'routes/Library/views/LibraryView'
 import QueueView from 'routes/Queue/views/QueueView'
 import JoinLandingPage from 'routes/Join/views/JoinLandingPage'
+import { getRouteAccessDecision } from './routeAccess'
 
 const PlayerView = React.lazy(() => import('routes/Player/views/PlayerView'))
 const OrchestratorView = React.lazy(() => import('routes/Orchestrator/views/OrchestratorView'))
+const CameraRelayView = React.lazy(() => import('routes/Camera/views/CameraRelayView'))
 
 const AppRoutes = () => (
   <Routes>
@@ -45,6 +47,14 @@ const AppRoutes = () => (
         </RequireAuth>
       )}
     />
+    <Route
+      path='/camera'
+      element={(
+        <RequireAuth path='/camera' redirectTo='/account'>
+          <CameraRelayView />
+        </RequireAuth>
+      )}
+    />
     <Route path='/join' element={<JoinLandingPage />} />
     <Route
       path='/'
@@ -74,13 +84,12 @@ const RequireAuth = ({
   path,
   redirectTo,
 }: RequireAuthProps) => {
-  const { isGuest, userId } = useAppSelector(state => state.user)
+  const { isAdmin, roomId, ownRoomId, userId } = useAppSelector(state => state.user)
+  const currentRoomPrefs = useAppSelector((state) => {
+    if (typeof state.user.roomId !== 'number') return undefined
+    return state.rooms.entities[state.user.roomId]?.prefs
+  })
   const location = useLocation()
-
-  // Player route requires non-guest user (admins and standard users can launch player)
-  if (path === '/player' && isGuest) {
-    return <Navigate to='/' replace />
-  }
 
   if (userId === null) {
     // set their originally-desired location in query parameter
@@ -88,6 +97,21 @@ const RequireAuth = ({
     params.set('redirect', path)
 
     return <Navigate to={redirectTo + '?' + params.toString()} replace />
+  }
+
+  const isRoomOwner = typeof roomId === 'number'
+    && typeof ownRoomId === 'number'
+    && roomId === ownRoomId
+
+  const access = getRouteAccessDecision({
+    path,
+    isAdmin,
+    isRoomOwner,
+    prefs: currentRoomPrefs,
+  })
+
+  if (!access.allowed) {
+    return <Navigate to={access.redirectTo ?? '/library'} replace />
   }
 
   return children

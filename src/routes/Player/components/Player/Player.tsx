@@ -23,6 +23,7 @@ interface PlayerProps {
   rgTrackGain?: number
   rgTrackPeak?: number
   visualizer: PlayerVisualizerState
+  remoteVideoElement?: HTMLVideoElement | null
   volume: number
   width: number
   height: number
@@ -150,8 +151,8 @@ class Player extends React.Component<PlayerProps> {
               height={this.props.height}
               mode={this.props.visualizer.mode}
               hydraCode={this.props.visualizer.hydraCode}
-              audioResponse={this.props.visualizer.audioResponse}
               allowCamera={this.props.visualizer.allowCamera}
+              remoteVideoElement={this.props.remoteVideoElement}
             />
           </React.Suspense>
         )}

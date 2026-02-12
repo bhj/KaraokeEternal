@@ -57,6 +57,8 @@ describe('Rooms.createEphemeral', () => {
     // Clean up between tests
     await db.db?.run('DELETE FROM rooms')
     await db.db?.run('DELETE FROM queue')
+    await db.db?.run('DELETE FROM hydraPresets')
+    await db.db?.run('DELETE FROM hydraFolders')
     await db.db?.run('DELETE FROM users')
 
     // Create test user
@@ -73,6 +75,12 @@ describe('Rooms.createEphemeral', () => {
     expect(room.prefs).toBeDefined()
     expect(room.prefs.qr).toBeDefined()
     expect(room.prefs.qr.isEnabled).toBe(true)
+    expect(room.prefs.allowGuestOrchestrator).toBe(true)
+    expect(room.prefs.allowGuestCameraRelay).toBe(true)
+    expect(room.prefs.allowRoomCollaboratorsToSendVisualizer).toBe(true)
+    expect(room.prefs.partyPresetFolderId).toBe(null)
+    expect(room.prefs.playerPresetFolderId).toBe(null)
+    expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(false)
   })
 
   it('should allow guest accounts by default', async () => {
@@ -112,6 +120,90 @@ describe('Rooms.createEphemeral', () => {
     await expect(Rooms.validate(roomId, undefined, { role: 'standard', validatePassword: false }))
       .resolves.toBe(true)
   })
+
+  it('applies preset policy defaults from environment for new ephemeral rooms', async () => {
+    const prevFolderId = process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
+    const prevRestrict = process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS
+
+    process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID = '123'
+    process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS = 'true'
+
+    try {
+      const roomId = await Rooms.createEphemeral(testUser.userId, 'Test Room')
+      const result = await Rooms.get(roomId)
+      const room = result.entities[roomId]
+
+      expect(room.prefs.partyPresetFolderId).toBe(123)
+      expect(room.prefs.playerPresetFolderId).toBe(123)
+      expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(true)
+    } finally {
+      if (prevFolderId === undefined) delete process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
+      else process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID = prevFolderId
+
+      if (prevRestrict === undefined) delete process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS
+      else process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS = prevRestrict
+    }
+  })
+
+  it('resolves default party preset folder by name when no numeric default is set', async () => {
+    const prevFolderId = process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
+    const prevFolderName = process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_NAME
+    const prevRestrict = process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS
+
+    process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID = ''
+    process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_NAME = 'Party Gold'
+    process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS = 'true'
+
+    try {
+      const now = Math.floor(Date.now() / 1000)
+      await db.db?.run(
+        'INSERT INTO hydraFolders (name, authorUserId, authorName, sortOrder, dateCreated) VALUES (?, ?, ?, ?, ?)',
+        ['Party Gold', testUser.userId, testUser.name, 0, now],
+      )
+
+      const folder = await db.db?.get('SELECT folderId FROM hydraFolders WHERE name = ? COLLATE NOCASE LIMIT 1', ['Party Gold'])
+
+      const roomId = await Rooms.createEphemeral(testUser.userId, 'Test Room')
+      const result = await Rooms.get(roomId)
+      const room = result.entities[roomId]
+
+      expect(room.prefs.partyPresetFolderId).toBe(folder?.folderId)
+      expect(room.prefs.playerPresetFolderId).toBe(folder?.folderId)
+      expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(true)
+    } finally {
+      if (prevFolderId === undefined) delete process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
+      else process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID = prevFolderId
+
+      if (prevFolderName === undefined) delete process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_NAME
+      else process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_NAME = prevFolderName
+
+      if (prevRestrict === undefined) delete process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS
+      else process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS = prevRestrict
+    }
+  })
+  it('ignores invalid preset policy defaults from environment', async () => {
+    const prevFolderId = process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
+    const prevRestrict = process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS
+
+    process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID = 'not-a-number'
+    process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS = 'true'
+
+    try {
+      const roomId = await Rooms.createEphemeral(testUser.userId, 'Test Room')
+      const result = await Rooms.get(roomId)
+      const room = result.entities[roomId]
+
+      expect(room.prefs.partyPresetFolderId).toBe(null)
+      expect(room.prefs.playerPresetFolderId).toBe(null)
+      expect(room.prefs.restrictCollaboratorsToPartyPresetFolder).toBe(false)
+    } finally {
+      if (prevFolderId === undefined) delete process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID
+      else process.env.KES_DEFAULT_PARTY_PRESET_FOLDER_ID = prevFolderId
+
+      if (prevRestrict === undefined) delete process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS
+      else process.env.KES_DEFAULT_RESTRICT_COLLAB_PRESETS = prevRestrict
+    }
+  })
 })
 
 describe('Rooms.getByInvitationToken', () => {
@@ -119,6 +211,8 @@ describe('Rooms.getByInvitationToken', () => {
     // Clean up between tests
     await db.db?.run('DELETE FROM rooms')
     await db.db?.run('DELETE FROM queue')
+    await db.db?.run('DELETE FROM hydraPresets')
+    await db.db?.run('DELETE FROM hydraFolders')
     await db.db?.run('DELETE FROM users')
   })
 

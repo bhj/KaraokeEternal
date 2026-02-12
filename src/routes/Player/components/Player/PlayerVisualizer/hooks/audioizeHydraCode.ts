@@ -1,10 +1,9 @@
 import { getSkipRegions, type SkipRegion } from 'lib/skipRegions'
 import { stripInjectedLines } from 'lib/injectedLines'
 import { DEFAULT_PROFILE, type AudioInjectProfile } from './audioInjectProfiles'
+import { getInjectionChain } from './presetClassifier'
 
 const AUDIO_PATTERNS = [
-  /bass\s*\(/, /mid\s*\(/, /treble\s*\(/, /beat\s*\(/,
-  /bpm\s*\(/, /energy\s*\(/, /bright\s*\(/,
   /a\.fft/, /a\.setBins/, /a\.setSmooth/, /a\.setScale/,
 ]
 
@@ -47,6 +46,20 @@ function findRenderTarget (code: string, regions: readonly SkipRegion[]): string
   return target
 }
 
+/**
+ * Compute parenthesis depth at a given position, ignoring skip regions.
+ * Depth 0 = top-level code chain. Depth > 0 = nested inside function args.
+ */
+function parenDepthAt (code: string, pos: number, regions: readonly SkipRegion[]): number {
+  let depth = 0
+  for (let i = 0; i < pos; i++) {
+    if (isInSkipRegion(i, regions)) continue
+    if (code[i] === '(') depth++
+    else if (code[i] === ')') depth--
+  }
+  return depth
+}
+
 export function audioizeHydraCode (code: string, profile?: AudioInjectProfile): string {
   const p = profile ?? DEFAULT_PROFILE
 
@@ -68,18 +81,38 @@ export function audioizeHydraCode (code: string, profile?: AudioInjectProfile): 
 
   const target = findRenderTarget(code, regions)
 
-  const matches: Array<{ index: number, buffer: string }> = []
+  // Find ALL .out() matches outside skip regions, tracking paren depth
+  const topLevel: Array<{ index: number, buffer: string }> = []
+  let hasNestedOut = false
   let m: RegExpExecArray | null
   const re = new RegExp(OUT_REGEX.source, 'g')
   while ((m = re.exec(code)) !== null) {
-    if (!isInSkipRegion(m.index, regions)) {
-      matches.push({ index: m.index, buffer: m[1] ?? 'o0' })
+    if (isInSkipRegion(m.index, regions)) continue
+    const depth = parenDepthAt(code, m.index, regions)
+    if (depth <= 0) {
+      topLevel.push({ index: m.index, buffer: m[1] ?? 'o0' })
+    } else {
+      hasNestedOut = true
     }
   }
-  if (matches.length === 0) {
+
+  // Use a single default injection chain for all presets
+  const audioChain = getInjectionChain('default', p)
+
+  // If only nested .out() found (no top-level), append a top-level .out() with injection.
+  // This handles presets like flor_1 where the only .out() is nested inside .layer().
+  if (topLevel.length === 0 && hasNestedOut) {
+    log('no top-level .out() — appending .out() with injection')
+    const trimmed = code.trimEnd()
+    return trimmed + audioChain + `.out(${target})\n`
+  }
+
+  if (topLevel.length === 0) {
     log('no injection point found (no .out() outside skip regions)')
     return code
   }
+
+  const matches = topLevel
 
   // Find last .out() matching the render target — NO fallback
   let insertMatch: { index: number } | undefined
@@ -93,13 +126,6 @@ export function audioizeHydraCode (code: string, profile?: AudioInjectProfile): 
     log(`no injection point found (no .out(${target}) match)`)
     return code
   }
-
-  const audioChain
-    = `\n  .modulate(osc(3, 0.05), () => a.fft[0] * ${p.modulate})`
-      + `\n  .rotate(() => a.fft[1] * ${p.rotate})`
-      + `\n  .scale(() => 0.95 + a.fft[2] * ${p.scale})`
-      + `\n  .color(1, 1 - a.fft[3] * ${p.colorShift}, 1 + a.fft[3] * ${p.colorShift})`
-      + '\n  '
 
   return code.slice(0, insertMatch.index) + audioChain + code.slice(insertMatch.index)
 }

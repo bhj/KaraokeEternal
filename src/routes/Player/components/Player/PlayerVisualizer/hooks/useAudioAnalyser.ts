@@ -1,6 +1,4 @@
 import { useRef, useEffect, useCallback } from 'react'
-import type { AudioResponseState } from 'shared/types'
-import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
 
 export interface AudioData {
   rawFrequencyData: Float32Array // Linear normalized 0-1, 128 bins (for window.a.fft compat)
@@ -22,26 +20,6 @@ interface UseAudioAnalyserOptions {
   fftSize?: number
   smoothingTimeConstant?: number
   sensitivity?: number
-  audioResponse?: AudioResponseState
-}
-
-export function applyAudioResponseWeights (
-  rawFreq: Float32Array,
-  gammaFreq: Float32Array,
-  bassEnd: number,
-  midEnd: number,
-  response: AudioResponseState,
-): void {
-  const g = Number.isFinite(response.globalGain) ? Math.max(0, response.globalGain) : 1
-  const bw = Number.isFinite(response.bassWeight) ? Math.max(0, response.bassWeight) : 1
-  const mw = Number.isFinite(response.midWeight) ? Math.max(0, response.midWeight) : 1
-  const tw = Number.isFinite(response.trebleWeight) ? Math.max(0, response.trebleWeight) : 1
-  for (let i = 0; i < rawFreq.length; i++) {
-    const w = i < bassEnd ? bw : i < midEnd ? mw : tw
-    const scale = g * w
-    rawFreq[i] = Math.min(1, Math.max(0, rawFreq[i] * scale))
-    gammaFreq[i] = Math.min(1, Math.max(0, gammaFreq[i] * scale))
-  }
 }
 
 const DEFAULT_FFT_SIZE = 256
@@ -61,7 +39,6 @@ export function useAudioAnalyser (
     fftSize = DEFAULT_FFT_SIZE,
     smoothingTimeConstant = DEFAULT_SMOOTHING,
     sensitivity = 1,
-    audioResponse,
   } = options
 
   const analyserRef = useRef<AnalyserNode | null>(null)
@@ -69,6 +46,10 @@ export function useAudioAnalyser (
   const silentGainRef = useRef<GainNode | null>(null)
   const frequencyDataRef = useRef<Float32Array<ArrayBuffer> | null>(null)
   const waveformDataRef = useRef<Float32Array<ArrayBuffer> | null>(null)
+  // Pre-allocated buffers reused per frame to avoid GC pressure
+  const rawNormRef = useRef<Float32Array | null>(null)
+  const gammaRef = useRef<Float32Array | null>(null)
+  const waveformCopyRef = useRef<Float32Array | null>(null)
   const previousBassRef = useRef<number>(0)
   const beatThresholdRef = useRef<number>(0.15)
   const diagLoggedRef = useRef(false)
@@ -77,12 +58,6 @@ export function useAudioAnalyser (
   // Hz-based band boundaries (computed once per audio source)
   const bassEndRef = useRef<number>(0)
   const midEndRef = useRef<number>(0)
-
-  // Audio response weights (updated on prop change, read in getAudioData)
-  const audioResponseRef = useRef<AudioResponseState>(audioResponse ?? AUDIO_RESPONSE_DEFAULTS)
-  useEffect(() => {
-    audioResponseRef.current = audioResponse ?? AUDIO_RESPONSE_DEFAULTS
-  }, [audioResponse])
 
   // Energy tracking for genre detection
   const energySmoothRef = useRef<number>(0)
@@ -136,6 +111,9 @@ export function useAudioAnalyser (
     waveformDataRef.current = new Float32Array(
       new ArrayBuffer(analyser.fftSize * Float32Array.BYTES_PER_ELEMENT),
     )
+    rawNormRef.current = new Float32Array(binCount)
+    gammaRef.current = new Float32Array(binCount)
+    waveformCopyRef.current = new Float32Array(analyser.fftSize)
 
     // Compute Hz-based band boundaries once per audio source
     // Known limitation: FFT 256 at 44.1kHz gives ~172Hz per bin — coarse for bass.
@@ -195,9 +173,9 @@ export function useAudioAnalyser (
     // Get waveform data (-1 to 1)
     analyser.getFloatTimeDomainData(waveformData)
 
-    // Normalize frequency data to 0-1 range (linear)
-    const rawNormalizedFreq = new Float32Array(frequencyData.length)
-    const gammaFreq = new Float32Array(frequencyData.length)
+    // Normalize frequency data to 0-1 range (linear) — reuse pre-allocated buffers
+    const rawNormalizedFreq = rawNormRef.current!
+    const gammaFreq = gammaRef.current!
     for (let i = 0; i < frequencyData.length; i++) {
       // Convert from dB (-100 to 0) to linear (0 to 1)
       const linear = Math.max(
@@ -277,9 +255,7 @@ export function useAudioAnalyser (
       beatFrequency = Math.max(0, Math.min(1, (bpm - 60) / 120))
     }
 
-    // --- WEIGHTED pass: apply audio response, then compute band averages for closures ---
-    applyAudioResponseWeights(rawNormalizedFreq, gammaFreq, bassEnd, midEnd, audioResponseRef.current)
-
+    // Compute band averages from gamma-shaped frequency data
     let bassSum = 0
     let midSum = 0
     let trebleSum = 0
@@ -321,10 +297,14 @@ export function useAudioAnalyser (
       }
     }
 
+    // Copy waveform into pre-allocated buffer
+    const waveformCopy = waveformCopyRef.current!
+    waveformCopy.set(waveformData)
+
     return {
       rawFrequencyData: rawNormalizedFreq,
       frequencyData: gammaFreq,
-      waveformData: new Float32Array(waveformData),
+      waveformData: waveformCopy,
       bass,
       mid,
       treble,

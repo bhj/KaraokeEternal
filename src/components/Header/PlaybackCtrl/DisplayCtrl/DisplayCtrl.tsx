@@ -6,8 +6,7 @@ import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Slider from 'components/Slider/Slider'
 import Icon from 'components/Icon/Icon'
 import styles from './DisplayCtrl.css'
-import type { AudioResponseState, MediaType, PlaybackOptions, VisualizerMode } from 'shared/types'
-import { AUDIO_RESPONSE_DEFAULTS } from 'shared/types'
+import type { MediaType, PlaybackOptions, VisualizerMode } from 'shared/types'
 
 interface DisplayCtrlProps {
   cdgAlpha: number
@@ -20,8 +19,8 @@ interface DisplayCtrlProps {
   sensitivity: number
   visualizerPresetName: string
   visualizerMode: VisualizerMode
-  audioResponse: AudioResponseState
   allowCamera: boolean
+  cycleOnSongTransition: boolean
   cameraHint?: string
   // actions
   onRequestOptions(opts: PlaybackOptions): void
@@ -43,11 +42,10 @@ const DisplayCtrl = ({
   isWebGLSupported,
   mediaType = '',
   mp4Alpha,
-  sensitivity,
   visualizerPresetName,
   visualizerMode,
-  audioResponse,
   allowCamera,
+  cycleOnSongTransition,
   cameraHint,
   onRequestOptions,
   onHydraPresetChange,
@@ -78,15 +76,12 @@ const DisplayCtrl = ({
     visualizer: { allowCamera: !allowCamera },
   })
 
-  const handleAudioResponseField = (field: keyof AudioResponseState, val: number) =>
-    onRequestOptions({ visualizer: { audioResponse: { ...audioResponse, [field]: val } } })
-
-  const handleResetAudioResponse = () =>
-    onRequestOptions({ visualizer: { audioResponse: AUDIO_RESPONSE_DEFAULTS } })
+  const handleToggleCycleOnSongTransition = () => onRequestOptions({
+    visualizer: { cycleOnSongTransition: !cycleOnSongTransition },
+  })
 
   // Show preset controls for hydra mode
   const showPresets = visualizerMode === 'hydra'
-  const showAudioResponse = visualizerMode === 'hydra'
 
   return (
     <Modal
@@ -173,66 +168,16 @@ const DisplayCtrl = ({
                   </div>
                 )}
 
-                {showAudioResponse && (
-                  <div className={styles.audioResponse}>
-                    <div className={styles.audioResponseHeader}>
-                      <label>Audio Response</label>
-                      <Button onClick={handleResetAudioResponse}>Reset</Button>
-                    </div>
-
-                    <div className={styles.field}>
-                      <label id='label-audio-gain'>Audio Sensitivity</label>
-                      <Slider
-                        min={0.2}
-                        max={3}
-                        step={0.1}
-                        value={audioResponse.globalGain}
-                        onChange={(val: number) => handleAudioResponseField('globalGain', val)}
-                        className={styles.slider}
-                        aria-labelledby='label-audio-gain'
-                      />
-                    </div>
-
-                    <div className={styles.field}>
-                      <label id='label-audio-bass'>Bass</label>
-                      <Slider
-                        min={0}
-                        max={3}
-                        step={0.1}
-                        value={audioResponse.bassWeight}
-                        onChange={(val: number) => handleAudioResponseField('bassWeight', val)}
-                        className={styles.slider}
-                        aria-labelledby='label-audio-bass'
-                      />
-                    </div>
-
-                    <div className={styles.field}>
-                      <label id='label-audio-mid'>Mid</label>
-                      <Slider
-                        min={0}
-                        max={3}
-                        step={0.1}
-                        value={audioResponse.midWeight}
-                        onChange={(val: number) => handleAudioResponseField('midWeight', val)}
-                        className={styles.slider}
-                        aria-labelledby='label-audio-mid'
-                      />
-                    </div>
-
-                    <div className={styles.field}>
-                      <label id='label-audio-treble'>Treble</label>
-                      <Slider
-                        min={0}
-                        max={3}
-                        step={0.1}
-                        value={audioResponse.trebleWeight}
-                        onChange={(val: number) => handleAudioResponseField('trebleWeight', val)}
-                        className={styles.slider}
-                        aria-labelledby='label-audio-treble'
-                      />
-                    </div>
+                {showPresets && (
+                  <div className={styles.field}>
+                    <InputCheckbox
+                      label='Cycle Preset On Song Change'
+                      checked={cycleOnSongTransition}
+                      onChange={handleToggleCycleOnSongTransition}
+                    />
                   </div>
                 )}
+
               </>
             )}
 

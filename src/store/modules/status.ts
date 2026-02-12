@@ -15,15 +15,12 @@ import {
 } from 'shared/actionTypes'
 import { MediaType, PlaybackOptions } from 'shared/types'
 
-// ------------------------------------
-// State & Slice
-// ------------------------------------
 export interface StatusState {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string
   fftData: FftPayload | null
-  historyJSON: string // queueIds in JSON array
+  historyJSON: string
   isAtQueueEnd: boolean
   isErrored: boolean
   isPlayerPresent: boolean
@@ -60,7 +57,6 @@ const initialState: StatusState = {
   volume: 1,
 }
 
-// Internal action creators for extraReducers (defined before slice)
 const playerLeaveInternal = createAction(PLAYER_LEAVE)
 const playerStatusInternal = createAction<Partial<StatusState>>(PLAYER_STATUS)
 const playerFftInternal = createAction<FftPayload>(PLAYER_FFT)
@@ -86,7 +82,6 @@ const statusSlice = createSlice({
       })
       .addCase(
         playerCmdOptionsInternal,
-
         (state, action: PayloadAction<{ visualizer?: Partial<PlayerVisualizerState> }>) => {
           const { payload } = action
           if (payload.visualizer && typeof payload.visualizer === 'object') {
@@ -97,7 +92,6 @@ const statusSlice = createSlice({
   },
 })
 
-// Actions with specific action types for socket middleware
 export const requestPlay = createAction(PLAYER_REQ_PLAY)
 export const requestPause = createAction(PLAYER_REQ_PAUSE)
 export const requestPlayNext = createAction(PLAYER_REQ_NEXT)

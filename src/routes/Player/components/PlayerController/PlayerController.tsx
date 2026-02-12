@@ -1,5 +1,14 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
+import { useCameraReceiver } from 'lib/webrtc/useCameraReceiver'
+import { VISUALIZER_HYDRA_CODE_REQ } from 'shared/actionTypes'
+import { fetchPresetById } from 'routes/Orchestrator/api/hydraPresetsApi'
+import { useRuntimeHydraPresets } from '../useRuntimeHydraPresets'
+import {
+  getNextPresetIndex,
+  normalizePresetIndex,
+  toVisualizerPresetLabel,
+} from '../runtimePresets'
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
@@ -7,6 +16,7 @@ import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import type { QueueItem } from 'shared/types'
+import { shouldApplyFolderDefaultAtSessionStart, shouldApplyFolderDefaultOnIdle, shouldApplyFolderDefaultOnPoolReady, shouldQueueFolderDefaultAtSessionStart, shouldApplyStartingPresetAtSessionStart, shouldApplyStartingPresetOnIdle, shouldCyclePresetOnSongTransition } from './transitionPolicy'
 
 interface PlayerControllerProps {
   width: number
@@ -21,9 +31,15 @@ const PlayerController = (props: PlayerControllerProps) => {
   const roomPrefs = useAppSelector(getRoomPrefs)
   const roomId = useAppSelector(state => state.user.roomId)
   const room = useAppSelector(state => roomId ? state.rooms.entities[roomId] : null)
+  const runtimePresetPool = useRuntimeHydraPresets()
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
 
+  const startingPresetAppliedRef = useRef(false)
+  const pendingFolderDefaultSessionStartRef = useRef(false)
+  const lastTransitionKeyRef = useRef<string | null>(null)
+
+  const { videoElement: remoteVideoElement } = useCameraReceiver()
   const dispatch = useAppDispatch()
   const handleStatus = useCallback<(status?: Partial<PlayerState>) => void>(status => dispatch(playerStatus(status)), [dispatch])
   const handleLoad = useCallback(() => dispatch(playerLoad()), [dispatch])
@@ -32,6 +48,51 @@ const PlayerController = (props: PlayerControllerProps) => {
     dispatch(playerError(msg))
     handleStatus()
   }, [dispatch, handleStatus])
+
+  const emitHydraPresetByIndex = useCallback((index: number) => {
+    const presets = runtimePresetPool.presets
+    if (presets.length === 0) return
+
+    const normalizedIndex = normalizePresetIndex(index, presets.length)
+    const preset = presets[normalizedIndex]
+    if (!preset) return
+
+    dispatch({
+      type: VISUALIZER_HYDRA_CODE_REQ,
+      payload: {
+        code: preset.code,
+        hydraPresetIndex: normalizedIndex,
+        hydraPresetName: toVisualizerPresetLabel(preset, runtimePresetPool.folderName),
+        hydraPresetId: preset.presetId,
+        hydraPresetFolderId: preset.folderId,
+        hydraPresetSource: preset.source,
+      },
+    })
+  }, [dispatch, runtimePresetPool])
+
+  const emitStartingPresetById = useCallback(async (presetId: number) => {
+    try {
+      const preset = await fetchPresetById(presetId)
+      if (!preset?.code || !preset.code.trim()) return
+
+      const folderName = runtimePresetPool.folderId === preset.folderId
+        ? runtimePresetPool.folderName
+        : null
+
+      dispatch({
+        type: VISUALIZER_HYDRA_CODE_REQ,
+        payload: {
+          code: preset.code,
+          hydraPresetName: folderName ? `${folderName} / ${preset.name}` : preset.name,
+          hydraPresetId: preset.presetId,
+          hydraPresetFolderId: preset.folderId,
+          hydraPresetSource: 'folder',
+        },
+      })
+    } catch {
+      // Preset may have been removed after room prefs were saved.
+    }
+  }, [dispatch, runtimePresetPool.folderId, runtimePresetPool.folderName])
 
   const handleReplay = useCallback((queueId: number) => {
     const nextItem = queue.entities[queueId]
@@ -78,6 +139,58 @@ const PlayerController = (props: PlayerControllerProps) => {
       return
     }
 
+    if (shouldApplyStartingPresetAtSessionStart({
+      startingPresetId: roomPrefs?.startingPresetId,
+      currentQueueId: player.queueId,
+      historyJSON: player.historyJSON,
+      nextQueueId: nextQueueItem.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+    })) {
+      startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
+      void emitStartingPresetById(roomPrefs.startingPresetId as number)
+    } else if (shouldApplyFolderDefaultAtSessionStart({
+      startingPresetId: roomPrefs?.startingPresetId,
+      currentQueueId: player.queueId,
+      historyJSON: player.historyJSON,
+      nextQueueId: nextQueueItem.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+      runtimePresetSource: runtimePresetPool.source,
+      runtimePresetCount: runtimePresetPool.presets.length,
+    })) {
+      startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
+      emitHydraPresetByIndex(0)
+    } else if (shouldQueueFolderDefaultAtSessionStart({
+      startingPresetId: roomPrefs?.startingPresetId,
+      currentQueueId: player.queueId,
+      historyJSON: player.historyJSON,
+      nextQueueId: nextQueueItem.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+      runtimePresetSource: runtimePresetPool.source,
+      runtimePresetCount: runtimePresetPool.presets.length,
+    })) {
+      pendingFolderDefaultSessionStartRef.current = true
+    }
+
+    if (shouldCyclePresetOnSongTransition({
+      cycleOnSongTransition: playerVisualizer.cycleOnSongTransition,
+      isVisualizerEnabled: playerVisualizer.isEnabled,
+      visualizerMode: playerVisualizer.mode,
+      currentQueueId: queueItem?.queueId,
+      nextQueueId: nextQueueItem.queueId,
+    })) {
+      const transitionKey = `${queueItem?.queueId}->${nextQueueItem.queueId}`
+      if (lastTransitionKeyRef.current !== transitionKey) {
+        lastTransitionKeyRef.current = transitionKey
+        const nextPresetIndex = getNextPresetIndex(
+          normalizePresetIndex(playerVisualizer.hydraPresetIndex, runtimePresetPool.presets.length),
+          runtimePresetPool.presets.length,
+        )
+        emitHydraPresetByIndex(nextPresetIndex)
+      }
+    }
+
     // play next
     handleStatus({
       historyJSON: JSON.stringify(history),
@@ -90,7 +203,74 @@ const PlayerController = (props: PlayerControllerProps) => {
       nextUserId: null,
       _isPlayingNext: false,
     })
-  }, [handleStatus, nextQueueItem, player.historyJSON, queueItem])
+  }, [
+    emitHydraPresetByIndex,
+    emitStartingPresetById,
+    handleStatus,
+    nextQueueItem,
+    player.historyJSON,
+    player.queueId,
+    playerVisualizer,
+    queueItem,
+    roomPrefs,
+    runtimePresetPool.presets.length,
+    runtimePresetPool.source,
+  ])
+
+  // Reset one-shot guards when a fresh session starts.
+  useEffect(() => {
+    if (player.queueId === -1 && player.historyJSON === '[]') {
+      startingPresetAppliedRef.current = false
+      pendingFolderDefaultSessionStartRef.current = false
+      lastTransitionKeyRef.current = null
+    }
+  }, [player.queueId, player.historyJSON])
+
+  // Idle init: apply starting preset (or first folder preset) when player is idle.
+  useEffect(() => {
+    if (shouldApplyStartingPresetOnIdle({
+      startingPresetId: roomPrefs?.startingPresetId,
+      queueId: player.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+    })) {
+      startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
+      void emitStartingPresetById(roomPrefs.startingPresetId as number)
+    } else if (shouldApplyFolderDefaultOnIdle({
+      startingPresetId: roomPrefs?.startingPresetId,
+      queueId: player.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+      runtimePresetSource: runtimePresetPool.source,
+      runtimePresetCount: runtimePresetPool.presets.length,
+    })) {
+      startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
+      emitHydraPresetByIndex(0)
+    }
+  }, [roomPrefs?.startingPresetId, player.queueId, emitStartingPresetById, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])
+
+  // Pool-ready fallback: first play happened before folder pool was ready.
+  useEffect(() => {
+    if (!pendingFolderDefaultSessionStartRef.current) return
+
+    if (player.historyJSON !== '[]') {
+      pendingFolderDefaultSessionStartRef.current = false
+      return
+    }
+
+    if (shouldApplyFolderDefaultOnPoolReady({
+      startingPresetId: roomPrefs?.startingPresetId,
+      queueId: player.queueId,
+      hasAppliedStartingPreset: startingPresetAppliedRef.current,
+      runtimePresetSource: runtimePresetPool.source,
+      runtimePresetCount: runtimePresetPool.presets.length,
+      historyJSON: player.historyJSON,
+    })) {
+      startingPresetAppliedRef.current = true
+      pendingFolderDefaultSessionStartRef.current = false
+      emitHydraPresetByIndex(0)
+    }
+  }, [roomPrefs?.startingPresetId, player.queueId, player.historyJSON, emitHydraPresetByIndex, runtimePresetPool.source, runtimePresetPool.presets.length])
 
   // "lock in" the next user that isn't the currently up user, if possible
   useEffect(() => {
@@ -170,6 +350,7 @@ const PlayerController = (props: PlayerControllerProps) => {
         rgTrackGain={queueItem ? queueItem.rgTrackGain : null}
         rgTrackPeak={queueItem ? queueItem.rgTrackPeak : null}
         visualizer={playerVisualizer}
+        remoteVideoElement={remoteVideoElement}
         volume={player.volume}
         width={props.width}
         height={props.height}
