@@ -1,3 +1,11 @@
+## v2.0.2 (2026-02-14)
+
+- **(App)** Star counts are now shown in the Queue view
+- **(App)** Fixed incorrect room password on sign-in (thanks [@omarcruzpantoja](https://github.com/omarcruzpantoja))
+- **(App)** Fixed potential duplicate rooms during initial setup (thanks **mjmeans**)
+- **(Server)** Now uses Node.js's built-in SQLite, improving performance and cross-arch compatibility
+- **(Server)** Now uses Node.js's built-in argon2 for password hashing; passwords will be migrated from bcrypt on sign-in
+
 ## v2.0.1 (2026-01-10)
 
 - Obligatory bug fixes and performance improvements
