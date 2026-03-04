@@ -1,0 +1,87 @@
+{
+  "signedOut": {
+    "joinRoom": "הצטרף לחדר...",
+    "joinAs": "הצטרף בתור...",
+    "returningUser": "משתמש חוזר",
+    "newUser": "משתמש חדש",
+    "guest": "אורח",
+    "signIn": "התחבר"
+  },
+  "firstRun": {
+    "welcome": "ברוך הבא",
+    "adminIntro": "צור חשבון",
+    "adminBold": "מנהל",
+    "adminIntroEnd": "כדי להתחיל. כל הנתונים מאוחסנים מקומית ולעולם אינם משותפים.",
+    "createAccount": "יצירת חשבון"
+  },
+  "accountForm": {
+    "usernameOrEmail": "שם משתמש או אימייל",
+    "changeUsername": "שנה שם משתמש (אופציונלי)",
+    "password": "סיסמה",
+    "changePassword": "שנה סיסמה (אופציונלי)",
+    "confirmPassword": "אשר סיסמה",
+    "newPasswordConfirm": "אישור סיסמה חדשה",
+    "displayName": "שם תצוגה",
+    "selectRole": "בחר תפקיד...",
+    "roleGuest": "אורח",
+    "roleStandard": "רגיל",
+    "roleAdmin": "מנהל"
+  },
+  "account": {
+    "title": "החשבון שלי",
+    "signedInAs": "מחובר בתור",
+    "guestLabel": "אורח",
+    "currentPassword": "סיסמה נוכחית",
+    "updateAccount": "עדכן חשבון",
+    "signOut": "התנתק",
+    "confirmSignOut": "האם אתה בטוח שברצונך להתנתק?",
+    "confirmSignOutGuestSongs": "האם אתה בטוח שברצונך להתנתק?\n\nהשירים הממתינים שלך יוסרו מהתור, ובהיותך אורח, לא תוכל להתחבר לחשבון זה שוב.",
+    "confirmSignOutGuest": "האם אתה בטוח שברצונך להתנתק?\n\nבהיותך אורח, לא תוכל להתחבר לחשבון זה שוב.",
+    "confirmSignOutSongs": "האם אתה בטוח שברצונך להתנתק?\n\nהשירים הממתינים שלך יוסרו מהתור.",
+    "passwordRequired": "אנא הזן את הסיסמה הנוכחית שלך כדי לבצע שינויים."
+  },
+  "users": {
+    "title": "משתמשים",
+    "createUser": "צור משתמש",
+    "colUsername": "שם משתמש",
+    "colRole": "תפקיד",
+    "colJoined": "הצטרף",
+    "filterAll": "הכל",
+    "filterOnline": "מחובר",
+    "filterOnlineIn": "מחובר ב..."
+  },
+  "rooms": {
+    "title": "חדרים",
+    "createRoom": "צור חדר",
+    "colName": "שם",
+    "colStatus": "סטטוס",
+    "colCreated": "נוצר",
+    "filterAll": "הכל",
+    "filterOpen": "פתוח",
+    "filterClosed": "סגור"
+  },
+  "prefs": {
+    "title": "העדפות"
+  },
+  "about": {
+    "title": "אודות",
+    "changelogSponsors": "יומן שינויים ותורמים",
+    "licenses": "רישיונות",
+    "done": "סיום"
+  },
+  "library": {
+    "empty": "הספרייה ריקה",
+    "addMediaFolders": "הוסף תיקיות מדיה",
+    "toGetStarted": "כדי להתחיל.",
+    "searchPlaceholder": "חיפוש"
+  },
+  "queue": {
+    "getARoom": "בחר חדר!",
+    "signInToRoom": "התחבר לחדר",
+    "toStartQueuing": "כדי להתחיל להוסיף שירים לתור.",
+    "empty": "התור ריק",
+    "tapSong": "הקש על שיר ב",
+    "library": "ספרייה",
+    "toQueueIt": "כדי להוסיף אותו לתור."
+  }
+}
