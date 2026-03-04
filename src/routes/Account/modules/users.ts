@@ -73,7 +73,7 @@ export const filterByRoom = createAction<number>(USERS_FILTER_ROOM_ID)
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface UsersState {
+export interface UsersState {
   result: number[]
   entities: Record<number, UserWithRoomsAndRole>
   filterOnline: boolean

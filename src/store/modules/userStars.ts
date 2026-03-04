@@ -46,7 +46,7 @@ const accountReceive = createAction<{ userId: number }>(ACCOUNT_RECEIVE)
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface UserStarsState {
+export interface UserStarsState {
   userId: number | null
   starredArtists: number[]
   starredSongs: number[]

@@ -18,9 +18,17 @@ const log = getLogger('FileScanner')
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
 
+interface PathEntity extends Record<string, unknown> {
+  path: string
+}
+
+interface IPCWithReq {
+  req: (action: Record<string, unknown>) => Promise<unknown>
+}
+
 class FileScanner extends Scanner {
-  paths: any
-  parser: any
+  paths: { result: number[], entities: Record<number, PathEntity> }
+  parser: (ctx: { dir: string, dirSep: string, name: string, meta: unknown }) => { artist: string, artistNorm: string, title: string, titleNorm: string }
 
   constructor (prefs, qStats) {
     super(qStats)
@@ -138,9 +146,9 @@ class FileScanner extends Scanner {
     })
 
     // get artistId and songId
-    const match = await (IPC as any).req({ type: LIBRARY_MATCH_SONG, payload: parsed })
+    const match = await (IPC as IPCWithReq).req({ type: LIBRARY_MATCH_SONG, payload: parsed }) as { songId: number }
 
-    const media = {
+    const media: Record<string, unknown> = {
       songId: match.songId,
       pathId,
       // normalize relPath to forward slashes with no leading slash
@@ -153,14 +161,14 @@ class FileScanner extends Scanner {
     // file already in database?
     const res = Media.search({
       pathId,
-      relPath: media.relPath,
+      relPath: media.relPath as string,
     })
 
     log.verbose('  => %s db result(s)', res.result.length)
 
     if (res.result.length) {
       const row = res.entities[res.result[0]]
-      const diff = {}
+      const diff: Record<string, unknown> = {}
 
       // did anything change?
       Object.keys(media).forEach((key) => {
@@ -168,7 +176,7 @@ class FileScanner extends Scanner {
       })
 
       if (Object.keys(diff).length) {
-        await (IPC as any).req({
+        await (IPC as IPCWithReq).req({
           type: MEDIA_UPDATE,
           payload: {
             mediaId: row.mediaId,
@@ -186,11 +194,10 @@ class FileScanner extends Scanner {
     } // end if
 
     // new media
-    ;(media as any).dateAdded = Math.round(new Date().getTime() / 1000) // seconds
     log.info('  => new: %s', JSON.stringify(match))
 
     return {
-      mediaId: await (IPC as any).req({ type: MEDIA_ADD, payload: media }),
+      mediaId: await (IPC as IPCWithReq).req({ type: MEDIA_ADD, payload: { ...media, dateAdded: Math.round(new Date().getTime() / 1000) } }),
       isNew: true,
     }
   }
@@ -200,7 +207,7 @@ class FileScanner extends Scanner {
     const invalid = res.result.filter(mediaId => !validMediaIds.includes(mediaId))
 
     if (invalid.length) {
-      await (IPC as any).req({ type: MEDIA_REMOVE, payload: invalid })
+      await (IPC as IPCWithReq).req({ type: MEDIA_REMOVE, payload: invalid })
     }
 
     return invalid.length

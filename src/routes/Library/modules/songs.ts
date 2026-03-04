@@ -13,7 +13,7 @@ const libraryPush = createAction<{
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface SongsState {
+export interface SongsState {
   result: number[]
   entities: Record<number, Song>
 }

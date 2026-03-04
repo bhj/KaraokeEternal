@@ -133,7 +133,7 @@ function startScanner (pathIds) {
       IPC.removeChild(refs.scanner)
       delete refs.scanner
 
-      ;(process as any).emit(SCANNER_WORKER_EXITED, { signal, code })
+      process.emit(SCANNER_WORKER_EXITED, { signal, code })
       log.info(`Media scanner process exited (${signal || code})`)
     })
 
