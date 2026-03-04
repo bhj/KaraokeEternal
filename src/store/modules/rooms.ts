@@ -107,7 +107,7 @@ export function requestPrefsPush (roomId: number, prefs: IRoomPrefs): AppThunk {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface RoomsState {
+export interface RoomsState {
   result: number[]
   entities: Record<number, Room>
   filterStatus: boolean | string

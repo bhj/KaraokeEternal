@@ -5,12 +5,30 @@ import Queue from '../Queue/Queue.js'
 
 const log = getLogger('Media')
 
+interface MediaEntity extends Record<string, unknown> {
+  mediaId: number
+  songId: number
+  artistId: number
+  duration: number
+  title: string
+  isPreferred: number
+  pathId: number
+  relPath: string
+}
+
+interface MediaInput extends Record<string, unknown> {
+  songId: number
+  duration: number
+  pathId: number
+  relPath: string
+}
+
 class Media {
   /**
    * Get media matching all search criteria
    */
-  static search (filter: object): { result: number[], entities: Record<string, any> } {
-    const media = {
+  static search (filter: object): { result: number[], entities: Record<string, MediaEntity> } {
+    const media: { result: number[], entities: Record<string, MediaEntity> } = {
       result: [],
       entities: {},
     }
@@ -32,11 +50,11 @@ class Media {
       WHERE ${whereClause}
       ORDER BY paths.priority ASC
     `
-    const rows = db.all<{ mediaId: number } & Record<string, any>>(String(query), query.parameters)
+    const rows = db.all<{ mediaId: number } & Record<string, unknown>>(String(query), query.parameters)
 
     for (const row of rows) {
       media.result.push(row.mediaId)
-      media.entities[row.mediaId] = row
+      media.entities[row.mediaId] = row as MediaEntity
     }
 
     return media
@@ -45,7 +63,7 @@ class Media {
   /**
    * Add media file to the library
    */
-  static add (media: any): number {
+  static add (media: MediaInput): number {
     if (!Number.isInteger(media.songId)
       || !Number.isInteger(media.duration)
       || !Number.isInteger(media.pathId)
@@ -69,7 +87,7 @@ class Media {
   /**
    * Update media item
    */
-  static update (media: any): void {
+  static update (media: { mediaId: number } & Record<string, unknown>): void {
     const { mediaId } = media
 
     if (!Number.isInteger(mediaId)) {
