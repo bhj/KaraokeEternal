@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import InputImage from 'components/InputImage/InputImage'
 import { UserWithRole } from 'shared/types'
+import { useT } from 'i18n'
 import styles from './AccountForm.css'
 
 interface AccountFormProps {
@@ -24,6 +25,7 @@ const AccountForm = ({
   showPassword = true,
   user,
 }: AccountFormProps) => {
+  const t = useT()
   const username = useRef<HTMLInputElement>(null)
   const newPassword = useRef<HTMLInputElement>(null)
   const newPasswordConfirm = useRef<HTMLInputElement>(null)
@@ -112,7 +114,7 @@ const AccountForm = ({
           autoComplete='off'
           autoFocus={autoFocus}
           onChange={updateDirty}
-          placeholder={user && user.userId !== null ? 'change username (optional)' : 'username or email'}
+          placeholder={user && user.userId !== null ? t('accountForm', 'changeUsername') : t('accountForm', 'usernameOrEmail')}
           // https://github.com/facebook/react/issues/23301
           ref={(r) => {
             if (r) username.current = r
@@ -126,7 +128,7 @@ const AccountForm = ({
           type='password'
           autoComplete='new-password'
           onChange={updateDirty}
-          placeholder={user && user.userId !== null ? 'change password (optional)' : 'password'}
+          placeholder={user && user.userId !== null ? t('accountForm', 'changePassword') : t('accountForm', 'password')}
           ref={newPassword}
         />
       )}
@@ -135,7 +137,7 @@ const AccountForm = ({
         <input
           type='password'
           autoComplete='new-password'
-          placeholder={user && user.userId !== null ? 'new password confirm' : 'confirm password'}
+          placeholder={user && user.userId !== null ? t('accountForm', 'newPasswordConfirm') : t('accountForm', 'confirmPassword')}
           ref={newPasswordConfirm}
         />
       )}
@@ -149,7 +151,7 @@ const AccountForm = ({
           type='text'
           defaultValue={user?.name ?? ''}
           onChange={updateDirty}
-          placeholder='display name'
+          placeholder={t('accountForm', 'displayName')}
           ref={name}
         />
       </div>
@@ -160,10 +162,10 @@ const AccountForm = ({
           onChange={updateDirty}
           ref={role}
         >
-          <option key='choose' value='' disabled>select role...</option>
-          {user?.role === 'guest' && <option key='guest' value='guest'>Guest</option>}
-          <option key='standard' value='standard'>Standard</option>
-          <option key='admin' value='admin'>Administrator</option>
+          <option key='choose' value='' disabled>{t('accountForm', 'selectRole')}</option>
+          {user?.role === 'guest' && <option key='guest' value='guest'>{t('accountForm', 'roleGuest')}</option>}
+          <option key='standard' value='standard'>{t('accountForm', 'roleStandard')}</option>
+          <option key='admin' value='admin'>{t('accountForm', 'roleAdmin')}</option>
         </select>
       )}
 

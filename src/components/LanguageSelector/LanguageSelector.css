@@ -1,0 +1,22 @@
+.selector {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.selector:hover,
+.selector:focus {
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.selector option {
+  background: #1a1a2e;
+  color: #fff;
+}

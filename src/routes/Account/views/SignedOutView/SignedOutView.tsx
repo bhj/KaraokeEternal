@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { fetchRooms } from 'store/modules/rooms'
 import { createAccount, login } from 'store/modules/user'
+import { useT } from 'i18n'
 import Logo from 'components/Logo/Logo'
 import SelectRoom from './SelectRoom/SelectRoom'
 import InputRadio from 'components/InputRadio/InputRadio'
@@ -11,6 +12,7 @@ import SignIn from './SignIn/SignIn'
 import styles from './SignedOutView.css'
 
 const SignedOutView = () => {
+  const t = useT()
   const userSectionRef = useRef<HTMLDivElement | null>(null)
   const firstFieldRef = useRef<HTMLInputElement | null>(null)
 
@@ -131,7 +133,7 @@ const SignedOutView = () => {
 
       {showRoomSection && (
         <>
-          <h1>Join room...</h1>
+          <h1>{t('signedOut', 'joinRoom')}</h1>
           <SelectRoom
             rooms={rooms}
             roomId={roomId}
@@ -147,15 +149,15 @@ const SignedOutView = () => {
         {allowNew
           ? (
               <>
-                <h1>Join as...</h1>
+                <h1>{t('signedOut', 'joinAs')}</h1>
                 <div className={styles.radioContainer}>
-                  <InputRadio name='type' value='returning' checked={mode === 'returning'} onChange={setMode} label='Returning user' />
-                  {allowNewStandard && <InputRadio name='type' value='standard' checked={mode === 'standard'} onChange={setMode} label='New user' />}
-                  {allowNewGuest && <InputRadio name='type' value='guest' checked={mode === 'guest'} onChange={setMode} label='Guest' />}
+                  <InputRadio name='type' value='returning' checked={mode === 'returning'} onChange={setMode} label={t('signedOut', 'returningUser')} />
+                  {allowNewStandard && <InputRadio name='type' value='standard' checked={mode === 'standard'} onChange={setMode} label={t('signedOut', 'newUser')} />}
+                  {allowNewGuest && <InputRadio name='type' value='guest' checked={mode === 'guest'} onChange={setMode} label={t('signedOut', 'guest')} />}
                 </div>
               </>
             )
-          : <h1>Sign in</h1>}
+          : <h1>{t('signedOut', 'signIn')}</h1>}
 
         {(mode === 'returning' || !allowNew) && (
           <SignIn

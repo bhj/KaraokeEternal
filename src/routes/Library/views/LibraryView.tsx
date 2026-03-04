@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { Link } from 'react-router'
+import { useT } from 'i18n'
 import ArtistList from '../components/ArtistList/ArtistList'
 import SearchResults from '../components/SearchResults/SearchResults'
 import TextOverlay from 'components/TextOverlay/TextOverlay'
@@ -8,6 +9,7 @@ import Spinner from 'components/Spinner/Spinner'
 import styles from './LibraryView.css'
 
 const LibraryView = () => {
+  const t = useT()
   const { isAdmin } = useAppSelector(state => state.user)
   const { isLoading, filterStr, filterStarred } = useAppSelector(state => state.library)
   const songsResult = useAppSelector(state => state.songs.result)
@@ -36,12 +38,12 @@ const LibraryView = () => {
 
       {!isLoading && songsResult.length === 0 && (
         <TextOverlay className={styles.empty}>
-          <h1>Library Empty</h1>
+          <h1>{t('library', 'empty')}</h1>
           {isAdmin && (
             <p>
-              <Link to='/account'>Add media folders</Link>
+              <Link to='/account'>{t('library', 'addMediaFolders')}</Link>
               {' '}
-              to get started.
+              {t('library', 'toGetStarted')}
             </p>
           )}
         </TextOverlay>
