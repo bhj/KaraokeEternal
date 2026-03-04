@@ -5,6 +5,7 @@ import Icon from 'components/Icon/Icon'
 import Logo from 'components/Logo/Logo'
 import Modal from 'components/Modal/Modal'
 import Button from 'components/Button/Button'
+import { useT } from 'i18n'
 // @ts-expect-error: not worth configuring TS for this one weird import
 import html from '<PROJECT_ROOT>/CHANGELOG.md'
 import styles from './About.css'
@@ -12,11 +13,12 @@ import styles from './About.css'
 const curYear = new Date().getFullYear()
 
 const About = () => {
+  const t = useT()
   const [isChangelogOpen, setChangelogOpen] = useState(false)
   const toggleChangelog = () => setChangelogOpen(prevState => !prevState)
 
   return (
-    <Panel title='About' contentClassName={styles.content}>
+    <Panel title={t('about', 'title')} contentClassName={styles.content}>
       <>
         {/* @ts-expect-error: global via Webpack */}
         <a href={__KE_URL_HOME__} target='_blank' rel='noreferrer'>
@@ -33,11 +35,11 @@ const About = () => {
           {__KE_VERSION__}
         </p>
         <p>
-          <a className={styles.pseudolink} onClick={toggleChangelog}>Changelog &amp; Sponsors</a>
+          <a className={styles.pseudolink} onClick={toggleChangelog}>{t('about', 'changelogSponsors')}</a>
           {' '}
           |
           {' '}
-          <a href='/licenses.txt' target='_blank'>Licenses</a>
+          <a href='/licenses.txt' target='_blank'>{t('about', 'licenses')}</a>
         </p>
 
         <div className={styles.ghButtonContainer}>
@@ -67,13 +69,13 @@ const About = () => {
 
         {isChangelogOpen && (
           <Modal
-            title='Changelog & Sponsors'
+            title={t('about', 'changelogSponsors')}
             className={styles.changelog}
             onClose={toggleChangelog}
             scrollable
             buttons={(
               <Button variant='primary' onClick={toggleChangelog}>
-                Done
+                {t('about', 'done')}
               </Button>
             )}
           >
