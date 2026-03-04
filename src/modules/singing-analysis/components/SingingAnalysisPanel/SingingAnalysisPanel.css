@@ -143,6 +143,26 @@
   text-transform: uppercase;
 }
 
+/* ── Timing accuracy row ──────────────────────────────────────────────────── */
+
+.timingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.timingLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.timingValue {
+  font-weight: 600;
+  color: #aef;
+}
+
 /* ── Cents deviation meter ────────────────────────────────────────────────── */
 
 .centsMeter {

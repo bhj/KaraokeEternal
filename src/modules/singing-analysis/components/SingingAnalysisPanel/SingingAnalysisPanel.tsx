@@ -9,8 +9,9 @@
  *   - Toggle button (bottom-right corner) to show/hide the panel
  *   - Microphone start/stop control
  *   - Real-time note name & cents-deviation meter
- *   - Running score (0–100)
- *   - Scrolling pitch history graph (canvas)
+ *   - Running score (0–100) combining pitch accuracy and timing accuracy
+ *   - Timing accuracy display (when song metadata is provided)
+ *   - Scrolling pitch history graph (canvas) using PitchGraph
  *
  * Integration
  * -----------
@@ -18,6 +19,10 @@
  * overhead when the panel is not in use.  It is rendered after all existing
  * player components and is absolutely positioned, so it does not affect
  * layout.
+ *
+ * @param props.songMetadata - Optional expected note events.  When provided,
+ *   timing accuracy is tracked and factored into the score (pitch × 70% +
+ *   timing × 30%).
  */
 
 import React, { useCallback, useEffect, useRef } from 'react'
@@ -31,83 +36,31 @@ import singingAnalysisReducer, {
   setAnalyzing,
   setEnabled,
   setMicrophoneError,
+  setScore,
   sliceInjectNoOp,
 } from '../../store/singingAnalysisSlice'
-import type { PitchSample } from '../../types'
+import { PitchGraph } from '../../pitchGraph'
+import type { PitchSample, SongNote } from '../../types'
 import styles from './SingingAnalysisPanel.css'
 
 // ---------------------------------------------------------------------------
-// Graph drawing
+// Component props
 // ---------------------------------------------------------------------------
 
-/** Frequency range displayed in the pitch graph. */
-const GRAPH_MIN_HZ = 80
-const GRAPH_MAX_HZ = 1400
-
-/**
- * Map a frequency (Hz) to a canvas Y coordinate.
- * Uses a logarithmic scale so musical intervals appear evenly spaced.
- */
-function freqToY (freq: number, canvasHeight: number): number {
-  const ratio = Math.log2(freq / GRAPH_MIN_HZ) / Math.log2(GRAPH_MAX_HZ / GRAPH_MIN_HZ)
-  return canvasHeight * (1 - Math.max(0, Math.min(1, ratio)))
-}
-
-function drawPitchGraph (
-  canvas: HTMLCanvasElement,
-  pitchHistory: readonly PitchSample[],
-): void {
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
-  const { width, height } = canvas
-  ctx.clearRect(0, 0, width, height)
-
-  if (pitchHistory.length < 2) return
-
-  const xStep = width / (pitchHistory.length - 1)
-
-  ctx.beginPath()
-  let pathStarted = false
-
-  pitchHistory.forEach((sample, i) => {
-    if (sample.frequency == null) {
-      if (pathStarted) {
-        ctx.stroke()
-        ctx.beginPath()
-        pathStarted = false
-      }
-      return
-    }
-
-    const x = i * xStep
-    const y = freqToY(sample.frequency, height)
-
-    // Colour based on cents deviation
-    const absCents = Math.abs(sample.cents ?? 50)
-    const inTune = absCents <= 25
-    ctx.strokeStyle = inTune ? '#44ee44' : '#ff6644'
-    ctx.lineWidth = 2
-
-    if (!pathStarted) {
-      ctx.moveTo(x, y)
-      pathStarted = true
-    } else {
-      ctx.lineTo(x, y)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.moveTo(x, y)
-    }
-  })
-
-  if (pathStarted) ctx.stroke()
+interface SingingAnalysisPanelProps {
+  /**
+   * Optional array of expected note events from song metadata.  When provided
+   * the analysis engine tracks note-onset timing and blends timing accuracy
+   * (30%) with pitch accuracy (70%) into the displayed score.
+   */
+  songMetadata?: SongNote[]
 }
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-const SingingAnalysisPanel: React.FC = () => {
+const SingingAnalysisPanel: React.FC<SingingAnalysisPanelProps> = ({ songMetadata }) => {
   const dispatch = useAppDispatch()
 
   // ── Lazy-inject the Redux slice on first render ───────────────────────────
@@ -126,15 +79,22 @@ const SingingAnalysisPanel: React.FC = () => {
   const currentNote = panelState?.currentNote ?? null
   const currentCents = panelState?.currentCents ?? null
   const score = panelState?.score ?? 0
+  const timingAccuracy = panelState?.timingAccuracy ?? 0
   const pitchHistory = panelState?.pitchHistory
+  const hasTimingData = timingAccuracy > 0
 
   // ── Audio engine instance – created once on mount, cleaned up on unmount ──
   const analysisRef = useRef<SingingAnalysis | null>(null)
 
-  // ── Canvas ref for pitch graph ────────────────────────────────────────────
+  // ── PitchGraph instance – canvas-based real-time pitch visualisation ──────
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const graphRef = useRef<PitchGraph | null>(null)
 
-  // ── Lifecycle: create and destroy the SingingAnalysis instance ───────────
+  // Track how many samples have already been fed to the graph so that
+  // re-renders don't re-add the same samples.
+  const lastGraphLengthRef = useRef(0)
+
+  // ── Lifecycle: create/destroy the SingingAnalysis instance ───────────────
   useEffect(() => {
     analysisRef.current = new SingingAnalysis()
     return () => {
@@ -143,12 +103,37 @@ const SingingAnalysisPanel: React.FC = () => {
     }
   }, [])
 
-  // ── Redraw graph whenever pitch history changes ───────────────────────────
+  // ── Lifecycle: create/destroy the PitchGraph instance ────────────────────
   useEffect(() => {
-    if (canvasRef.current && isEnabled && pitchHistory) {
-      drawPitchGraph(canvasRef.current, pitchHistory)
+    if (canvasRef.current) {
+      graphRef.current = new PitchGraph(canvasRef.current, { maxSamples: 100 })
     }
+    return () => {
+      graphRef.current = null
+    }
+  }, [])
+
+  // ── Feed only *new* pitch samples into the graph ──────────────────────────
+  useEffect(() => {
+    if (!isEnabled || !pitchHistory || !graphRef.current) return
+    const prev = lastGraphLengthRef.current
+    for (let i = prev; i < pitchHistory.length; i++) {
+      const sample = pitchHistory[i]
+      graphRef.current.addSample(
+        sample.frequency,
+        sample.expectedFrequency ?? null,
+      )
+    }
+    lastGraphLengthRef.current = pitchHistory.length
   }, [pitchHistory, isEnabled])
+
+  // ── Clear the graph when analysis resets ─────────────────────────────────
+  useEffect(() => {
+    if (!isAnalyzing) {
+      graphRef.current?.clear()
+      lastGraphLengthRef.current = 0
+    }
+  }, [isAnalyzing])
 
   // ── Stop analysis when panel is disabled ─────────────────────────────────
   useEffect(() => {
@@ -169,28 +154,38 @@ const SingingAnalysisPanel: React.FC = () => {
 
     if (isAnalyzing) {
       analysisRef.current.stopAnalysis()
+      // Dispatch the final combined score (including timing) before stopping
+      dispatch(setScore(analysisRef.current.getScore()))
       dispatch(setAnalyzing(false))
     } else {
       dispatch(setMicrophoneError(false))
       dispatch(setAnalyzing(true))
 
-      await analysisRef.current.startAnalysis({
-        onPitchSample: (sample: PitchSample) => {
-          dispatch(addPitchSample(sample))
+      await analysisRef.current.startAnalysis(
+        {
+          onPitchSample: (sample: PitchSample) => {
+            dispatch(addPitchSample(sample))
+            // Also dispatch combined score so timing accuracy is reflected
+            if (analysisRef.current) {
+              dispatch(setScore(analysisRef.current.getScore()))
+            }
+          },
+          onError: () => {
+            dispatch(setMicrophoneError(true))
+          },
         },
-        onError: () => {
-          dispatch(setMicrophoneError(true))
-        },
-      })
+        songMetadata,
+      )
 
       // startAnalysis sets isAnalyzing=false internally on error; keep Redux in sync
       if (!analysisRef.current.isAnalyzing) {
         dispatch(setAnalyzing(false))
       }
     }
-  }, [dispatch, isAnalyzing])
+  }, [dispatch, isAnalyzing, songMetadata])
 
   const handleReset = useCallback(() => {
+    graphRef.current?.clear()
     dispatch(resetScore())
   }, [dispatch])
 
@@ -250,6 +245,17 @@ const SingingAnalysisPanel: React.FC = () => {
               </div>
             </div>
 
+            {/* Timing accuracy row – only shown when timing data is available */}
+            {hasTimingData && (
+              <div className={styles.timingRow}>
+                <span className={styles.timingLabel}>Timing</span>
+                <span className={styles.timingValue}>
+                  {timingAccuracy}
+                  %
+                </span>
+              </div>
+            )}
+
             {/* Cents deviation meter */}
             <div className={styles.centsMeter}>
               <span>♭</span>
@@ -262,7 +268,7 @@ const SingingAnalysisPanel: React.FC = () => {
               <span>♯</span>
             </div>
 
-            {/* Pitch graph */}
+            {/* Pitch graph (drawn by PitchGraph instance onto the canvas) */}
             <canvas
               ref={canvasRef}
               className={styles.graphCanvas}

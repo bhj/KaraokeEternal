@@ -6,10 +6,14 @@
  * -----
  *   const analysis = new SingingAnalysis()
  *
- *   await analysis.startAnalysis({
- *     onPitchSample: sample => console.log(sample),
- *     onError: msg => console.error(msg),
- *   })
+ *   await analysis.startAnalysis(
+ *     {
+ *       onPitchSample: sample => console.log(sample),
+ *       onError: msg => console.error(msg),
+ *     },
+ *     // Optional: expected notes for pitch-accuracy + timing scoring
+ *     [{ time: 1.0, note: 440 }, { time: 1.5, note: 493.88 }],
+ *   )
  *
  *   // … later …
  *   analysis.stopAnalysis()
@@ -24,6 +28,9 @@
  *   user does not hear their own voice fed back.
  * - Analysis runs on a fixed timer rather than requestAnimationFrame so that
  *   it continues even when the browser tab is in the background.
+ * - When `songMetadata` is provided to `startAnalysis`, timing accuracy is
+ *   computed alongside pitch accuracy and blended into the final score
+ *   (pitch × 70% + timing × 30%).
  */
 
 import {
@@ -32,7 +39,14 @@ import {
   getCentsDeviation,
 } from './pitchDetection'
 import { calculateScore } from './scoringSystem'
-import type { PitchSample, SingingAnalysisCallbacks } from './types'
+import { analyzeTimings, findNearestMetadata } from './timingAnalyzer'
+import type {
+  PitchSample,
+  SingingAnalysisCallbacks,
+  SongNote,
+  TimingPair,
+} from './types'
+import type { ScoreBreakdown } from './scoringSystem'
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -60,6 +74,11 @@ class SingingAnalysis {
   private callbacks: SingingAnalysisCallbacks | null = null
   private frameHistory: PitchSample[] = []
 
+  // Timing-related state (populated when songMetadata is provided)
+  private songMetadata: SongNote[] = []
+  private timingPairs: TimingPair[] = []
+  private sessionStartMs: number | null = null
+
   /** True while the microphone is actively capturing audio. */
   isAnalyzing = false
 
@@ -76,11 +95,22 @@ class SingingAnalysis {
    * that callers do not need to add a `.catch()` handler.
    *
    * Calling `startAnalysis` while already analysing is a no-op.
+   *
+   * @param callbacks     - Event callbacks for pitch samples and errors.
+   * @param songMetadata  - Optional array of expected note events.  When
+   *                        supplied, timing accuracy is tracked and blended
+   *                        into the final score (pitch × 70% + timing × 30%).
    */
-  async startAnalysis (callbacks: SingingAnalysisCallbacks): Promise<void> {
+  async startAnalysis (
+    callbacks: SingingAnalysisCallbacks,
+    songMetadata: SongNote[] = [],
+  ): Promise<void> {
     if (this.isAnalyzing) return
 
     this.callbacks = callbacks
+    this.songMetadata = Array.isArray(songMetadata) ? songMetadata : []
+    this.timingPairs = []
+    this.sessionStartMs = null
 
     try {
       // ── Microphone access ─────────────────────────────────────────────────
@@ -108,6 +138,7 @@ class SingingAnalysis {
       // ── Start analysis loop ───────────────────────────────────────────────
       this.isAnalyzing = true
       this.frameHistory = []
+      this.sessionStartMs = Date.now()
       this.intervalId = setInterval(
         () => this.analyseFrame(),
         ANALYSIS_INTERVAL_MS,
@@ -128,13 +159,20 @@ class SingingAnalysis {
   }
 
   /**
-   * Return the current performance score (0–100) calculated from all frames
+   * Return the current performance score breakdown calculated from all frames
    * captured since the last `startAnalysis` call.
    *
-   * The score can be called at any time, including after `stopAnalysis`.
+   * The breakdown can be retrieved at any time, including after `stopAnalysis`.
+   *
+   * When `songMetadata` was supplied to `startAnalysis`, the `timingAccuracy`
+   * field is populated and the `score` reflects the combined formula
+   * (pitch × 70% + timing × 30%).
    */
-  getScore (): number {
-    return calculateScore(this.frameHistory).score
+  getScore (): ScoreBreakdown {
+    const timingAccuracy = this.timingPairs.length > 0
+      ? analyzeTimings(this.timingPairs)
+      : null
+    return calculateScore(this.frameHistory, timingAccuracy)
   }
 
   // ---------------------------------------------------------------------------
@@ -144,16 +182,36 @@ class SingingAnalysis {
   private analyseFrame (): void {
     if (!this.analyserNode || !this.audioCtx) return
 
+    const now = Date.now()
     const buffer = new Float32Array(BUFFER_SIZE)
     this.analyserNode.getFloatTimeDomainData(buffer)
 
     const frequency = detectPitch(buffer, this.audioCtx.sampleRate)
 
+    // ── Resolve expected frequency and timing for this frame ─────────────────
+    let expectedFrequency: number | undefined
+    let nearestNote = null
+
+    if (this.songMetadata.length > 0 && this.sessionStartMs !== null) {
+      const elapsedSeconds = (now - this.sessionStartMs) / 1000
+      nearestNote = findNearestMetadata(this.songMetadata, elapsedSeconds)
+      if (nearestNote != null) {
+        expectedFrequency = nearestNote.note
+      }
+    }
+
     const sample: PitchSample = {
-      timestamp: Date.now(),
+      timestamp: now,
       frequency,
       noteName: frequency != null ? frequencyToNoteName(frequency) : null,
       cents: frequency != null ? getCentsDeviation(frequency) : null,
+      ...(expectedFrequency != null ? { expectedFrequency } : {}),
+    }
+
+    // ── Track timing pair when a voiced frame has a matching metadata note ───
+    if (frequency != null && nearestNote != null && this.sessionStartMs !== null) {
+      const expectedMs = this.sessionStartMs + nearestNote.time * 1000
+      this.timingPairs.push({ userTimestamp: now, expectedTimestamp: expectedMs })
     }
 
     // Keep a rolling history for getScore()
@@ -185,6 +243,7 @@ class SingingAnalysis {
 
     this.isAnalyzing = false
     this.callbacks = null
+    this.sessionStartMs = null
   }
 }
 

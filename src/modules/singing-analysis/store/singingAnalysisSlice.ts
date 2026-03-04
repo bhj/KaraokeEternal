@@ -13,6 +13,7 @@
  * -----------------
  *   dispatch(setAnalyzing(true))         // microphone opened
  *   dispatch(addPitchSample(sample))     // new pitch measurement
+ *   dispatch(setScore(breakdown))        // update combined score (pitch + timing)
  *   dispatch(setMicrophoneError(true))   // permission denied / device error
  *   dispatch(resetScore())               // clear history & score
  */
@@ -20,6 +21,7 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { REDUX_SLICE_INJECT_NOOP } from 'shared/actionTypes'
 import type { PitchSample, SingingAnalysisState } from '../types'
+import type { ScoreBreakdown } from '../scoringSystem'
 import { calculateScore } from '../scoringSystem'
 
 // ---------------------------------------------------------------------------
@@ -41,6 +43,7 @@ const initialState: SingingAnalysisState = {
   currentNote: null,
   currentCents: null,
   score: 0,
+  timingAccuracy: 0,
   pitchHistory: [],
 }
 
@@ -60,6 +63,7 @@ const singingAnalysisSlice = createSlice({
         state.currentNote = null
         state.currentCents = null
         state.score = 0
+        state.timingAccuracy = 0
         state.pitchHistory = []
       }
     },
@@ -80,7 +84,7 @@ const singingAnalysisSlice = createSlice({
       state.isAnalyzing = false
     },
 
-    /** Append a new pitch sample and recalculate the score. */
+    /** Append a new pitch sample and recalculate the pitch-based score. */
     addPitchSample (state, { payload }: PayloadAction<PitchSample>) {
       state.currentPitch = payload.frequency
       state.currentNote = payload.noteName
@@ -92,12 +96,25 @@ const singingAnalysisSlice = createSlice({
         : [...state.pitchHistory, payload]
 
       state.pitchHistory = history
+      // Score here reflects pitch only; dispatch setScore for the combined value.
       state.score = calculateScore(history).score
     },
 
-    /** Reset the score and pitch history (e.g. on song change). */
+    /**
+     * Update the overall score from a full {@link ScoreBreakdown} returned by
+     * `SingingAnalysis.getScore()`.  When timing data is available this
+     * replaces the pitch-only score in `addPitchSample` with the blended
+     * (pitch × 70% + timing × 30%) value.
+     */
+    setScore (state, { payload }: PayloadAction<ScoreBreakdown>) {
+      state.score = payload.score
+      state.timingAccuracy = Math.round((payload.timingAccuracy ?? 0) * 100)
+    },
+
+    /** Reset the score, timing accuracy, and pitch history (e.g. on song change). */
     resetScore (state) {
       state.score = 0
+      state.timingAccuracy = 0
       state.pitchHistory = []
     },
   },
@@ -108,6 +125,7 @@ export const {
   setAnalyzing,
   setMicrophoneError,
   addPitchSample,
+  setScore,
   resetScore,
 } = singingAnalysisSlice.actions
 
