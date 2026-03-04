@@ -3,6 +3,11 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
+
+// Singing analysis panel – loaded lazily so it has zero cost unless used
+const SingingAnalysisPanel = React.lazy(
+  () => import('modules/singing-analysis/components/SingingAnalysisPanel/SingingAnalysisPanel'),
+)
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
@@ -188,6 +193,12 @@ const PlayerController = (props: PlayerControllerProps) => {
           queueItem={queueItem}
         />
       )}
+      {/* Singing analysis panel – absolutely positioned overlay; does not
+          affect playback logic.  Loaded lazily to keep the initial bundle
+          unchanged when the feature is not in use. */}
+      <React.Suspense fallback={null}>
+        <SingingAnalysisPanel />
+      </React.Suspense>
     </>
   )
 }
