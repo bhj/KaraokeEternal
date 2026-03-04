@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { formatDateTime } from 'lib/dateTime'
+import { useT } from 'i18n'
 import Panel from 'components/Panel/Panel'
 import Button from 'components/Button/Button'
 import EditRoom from './EditRoom/EditRoom'
@@ -10,6 +11,7 @@ import getRoomList from '../../selectors/getRoomList'
 import styles from './Rooms.css'
 
 const Rooms = () => {
+  const t = useT()
   const [editorRoom, setEditorRoom] = useState(null)
 
   const { isEditorOpen, filterStatus } = useAppSelector(state => state.rooms)
@@ -57,21 +59,21 @@ const Rooms = () => {
 
   const roomsFilter = (
     <select className={styles.roomsFilter} onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus as string}>
-      <option key='all' value='all'>All</option>
-      <option key='open' value='open'>Open</option>
-      <option key='closed' value='closed'>Closed</option>
+      <option key='all' value='all'>{t('rooms', 'filterAll')}</option>
+      <option key='open' value='open'>{t('rooms', 'filterOpen')}</option>
+      <option key='closed' value='closed'>{t('rooms', 'filterClosed')}</option>
     </select>
   )
 
   return (
-    <Panel title='Rooms' titleComponent={roomsFilter}>
+    <Panel title={t('rooms', 'title')} titleComponent={roomsFilter}>
       <>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Created</th>
+              <th>{t('rooms', 'colName')}</th>
+              <th>{t('rooms', 'colStatus')}</th>
+              <th>{t('rooms', 'colCreated')}</th>
             </tr>
           </thead>
           <tbody>
@@ -81,7 +83,7 @@ const Rooms = () => {
 
         <br />
         <Button onClick={handleOpen} variant='primary'>
-          Create Room
+          {t('rooms', 'createRoom')}
         </Button>
 
         {isEditorOpen && <EditRoom onClose={handleClose} room={editorRoom} />}

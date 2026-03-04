@@ -3,12 +3,14 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { requestLogout, updateAccount } from 'store/modules/user'
 import { removeItem } from 'routes/Queue/modules/queue'
 import getUpcoming from 'routes/Queue/selectors/getUpcoming'
+import { useT } from 'i18n'
 import Panel from 'components/Panel/Panel'
 import Button from 'components/Button/Button'
 import AccountForm from '../AccountForm/AccountForm'
 import styles from './Account.css'
 
 const Account = () => {
+  const t = useT()
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
   const upcomingQueueIds = useAppSelector(state => getUpcoming(state, user.userId))
@@ -22,11 +24,11 @@ const Account = () => {
       let message = ''
 
       if (user.isGuest && hasUpcomingSongs) {
-        message = `Are you sure you want to sign out?\n\nYour upcoming songs will be removed from the queue, and as a guest, you won't be able to sign back into this account.`
+        message = t('account', 'confirmSignOutGuestSongs')
       } else if (user.isGuest) {
-        message = `Are you sure you want to sign out?\n\nAs a guest, you won't be able to sign back into this account.`
+        message = t('account', 'confirmSignOutGuest')
       } else if (hasUpcomingSongs) {
-        message = `Are you sure you want to sign out?\n\nYour upcoming songs will be removed from the queue.`
+        message = t('account', 'confirmSignOutSongs')
       }
 
       if (message && !confirm(message)) return
@@ -42,7 +44,7 @@ const Account = () => {
   const handleSubmit = (data: FormData) => {
     if (!user.isGuest) {
       if (!curPassword.current.value.trim()) {
-        alert('Please enter your current password to make changes.')
+        alert(t('account', 'passwordRequired'))
         curPassword.current.focus()
         return
       }
@@ -54,11 +56,11 @@ const Account = () => {
   }
 
   return (
-    <Panel title='My Account' contentClassName={styles.content}>
+    <Panel title={t('account', 'title')} contentClassName={styles.content}>
       <>
         <p>
-          Signed in as&nbsp;
-          <strong>{user.isGuest ? 'guest' : user.username}</strong>
+          {t('account', 'signedInAs')}&nbsp;
+          <strong>{user.isGuest ? t('account', 'guestLabel') : user.username}</strong>
         </p>
 
         <AccountForm
@@ -72,7 +74,7 @@ const Account = () => {
             <input
               type='password'
               autoComplete='current-password'
-              placeholder='current password'
+              placeholder={t('account', 'currentPassword')}
               ref={curPassword}
             />
 
@@ -81,11 +83,11 @@ const Account = () => {
           <div className={styles.btnContainer}>
             {isDirty && (
               <Button type='submit' variant='primary'>
-                Update Account
+                {t('account', 'updateAccount')}
               </Button>
             )}
             <Button onClick={handleSignOut} variant='default'>
-              Sign Out
+              {t('account', 'signOut')}
             </Button>
           </div>
         </AccountForm>
