@@ -3,6 +3,12 @@
   "compilerOptions": {
     "composite": true,
     "paths": {
+      "i18n": [
+        "../src/modules/i18n"
+      ],
+      "i18n/*": [
+        "../src/modules/i18n/*"
+      ],
       "*": [
         "../src/*"
       ],

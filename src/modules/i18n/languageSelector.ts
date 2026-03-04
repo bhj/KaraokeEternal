@@ -16,5 +16,5 @@
  */
 
 export { default as LanguageSelector } from 'components/LanguageSelector/LanguageSelector'
-export { useI18n, useT, LANGUAGES } from 'i18n'
-export type { LanguageCode, LanguageMeta, I18nContextValue, TFunction } from 'i18n'
+export { useI18n, useT, LANGUAGES } from './core'
+export type { LanguageCode, LanguageMeta, I18nContextValue, TFunction } from './core'

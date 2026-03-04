@@ -6,7 +6,7 @@ import {
   getStoredLanguage,
   storeLanguage,
   type LanguageCode,
-} from './index'
+} from './core'
 
 interface I18nProviderProps {
   children: React.ReactNode

@@ -1,17 +1,17 @@
 /**
- * Karaoke Eternal – i18n module
+ * Karaoke Eternal – i18n core
  *
  * Lightweight, dependency-free internationalization system.
- * Translations live in src/i18n/locales/<lang>.json.
+ * Translations live in src/modules/i18n/languages/<lang>.json.
  * Adding a new language requires only:
- *   1. Creating src/i18n/locales/<lang>.json
+ *   1. Creating src/modules/i18n/languages/<lang>.json
  *   2. Adding an entry to LANGUAGES and importing the file below.
  */
 
 import { createContext, useContext } from 'react'
-import en from './locales/en.json'
-import ru from './locales/ru.json'
-import he from './locales/he.json'
+import en from './languages/en.json'
+import ru from './languages/ru.json'
+import he from './languages/he.json'
 
 // ---------------------------------------------------------------------------
 // Supported languages
@@ -30,7 +30,7 @@ export interface LanguageMeta {
 export const LANGUAGES: LanguageMeta[] = [
   { code: 'en', label: 'English', dir: 'ltr' },
   { code: 'ru', label: 'Русский', dir: 'ltr' },
-  { code: 'he', label: 'עברית',   dir: 'rtl' },
+  { code: 'he', label: 'עברית', dir: 'rtl' },
 ]
 
 // ---------------------------------------------------------------------------
@@ -45,14 +45,8 @@ const catalogue: Record<LanguageCode, TranslationDict> = { en, ru, he }
 // Nested key helper
 // ---------------------------------------------------------------------------
 
-type DeepValue<T> = T extends string
-  ? string
-  : T extends Record<string, unknown>
-    ? { [K in keyof T]: DeepValue<T[K]> }
-    : never
-
 /** Resolve "section.key" into the translation string, falling back to English. */
-function resolve(dict: TranslationDict, section: string, key: string): string {
+function resolve (dict: TranslationDict, section: string, key: string): string {
   const sec = (dict as Record<string, Record<string, string>>)[section]
   if (sec && key in sec) return sec[key]
 
@@ -67,7 +61,7 @@ function resolve(dict: TranslationDict, section: string, key: string): string {
 
 export type TFunction = (section: string, key: string) => string
 
-function createTranslator(lang: LanguageCode): TFunction {
+export function createTranslator (lang: LanguageCode): TFunction {
   const dict = catalogue[lang] ?? en
   return (section: string, key: string) => resolve(dict, section, key)
 }
@@ -78,7 +72,7 @@ function createTranslator(lang: LanguageCode): TFunction {
 
 const STORAGE_KEY = 'ke_language'
 
-export function getStoredLanguage(): LanguageCode {
+export function getStoredLanguage (): LanguageCode {
   try {
     const stored = localStorage.getItem(STORAGE_KEY) as LanguageCode | null
     if (stored && stored in catalogue) return stored
@@ -88,7 +82,7 @@ export function getStoredLanguage(): LanguageCode {
   return 'en'
 }
 
-export function storeLanguage(lang: LanguageCode): void {
+export function storeLanguage (lang: LanguageCode): void {
   try {
     localStorage.setItem(STORAGE_KEY, lang)
   } catch {
@@ -113,13 +107,11 @@ export const I18nContext = createContext<I18nContextValue>({
 })
 
 /** Primary hook – call inside any functional component to get the translator. */
-export function useT(): TFunction {
+export function useT (): TFunction {
   return useContext(I18nContext).t
 }
 
 /** Full context hook – use when you also need language/setLanguage. */
-export function useI18n(): I18nContextValue {
+export function useI18n (): I18nContextValue {
   return useContext(I18nContext)
 }
-
-export { createTranslator }
