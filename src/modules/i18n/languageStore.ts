@@ -29,14 +29,14 @@ export const SUPPORTED_LANGUAGES: LanguageMeta[] = LANGUAGES
  * Read the persisted language preference.
  * Falls back to 'en' when nothing is stored or localStorage is unavailable.
  */
-export function getLanguage(): LanguageCode {
+export function getLanguage (): LanguageCode {
   return getStoredLanguage()
 }
 
 /**
  * Persist a language preference so it survives page reloads.
  */
-export function saveLanguage(lang: LanguageCode): void {
+export function saveLanguage (lang: LanguageCode): void {
   storeLanguage(lang)
 }
 

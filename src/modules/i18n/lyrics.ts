@@ -83,7 +83,7 @@ export interface SongWithMultilingualLyrics {
  * )
  * // → 'It would have been enough'  (English fallback)
  */
-export function resolveLyrics(
+export function resolveLyrics (
   lyrics: MultilingualLyrics,
   lang: LanguageCode,
 ): string {
@@ -121,7 +121,7 @@ export function resolveLyrics(
  *
  * songLines.map(line => resolve(line.lyrics))
  */
-export function createLyricsResolver(
+export function createLyricsResolver (
   lang: LanguageCode,
 ): (lyrics: MultilingualLyrics) => string {
   return (lyrics: MultilingualLyrics) => resolveLyrics(lyrics, lang)
@@ -142,7 +142,7 @@ export function createLyricsResolver(
  * getAvailableVariants({ he: 'דיינו', translit: 'Dayenu' })
  * // → ['he', 'translit']
  */
-export function getAvailableVariants(lyrics: MultilingualLyrics): string[] {
+export function getAvailableVariants (lyrics: MultilingualLyrics): string[] {
   return Object.entries(lyrics)
     .filter(([, v]) => typeof v === 'string' && v.length > 0)
     .map(([k]) => k)

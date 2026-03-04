@@ -10,9 +10,9 @@
  *   import SingingAnalysis from 'modules/singing-analysis'
  *
  *   const analysis = new SingingAnalysis()
- *   await analysis.startAnalysis({ onPitchSample, onError })
+ *   await analysis.startAnalysis({ onPitchSample, onError }, songMetadata)
  *   analysis.stopAnalysis()
- *   const score = analysis.getScore()
+ *   const breakdown = analysis.getScore()   // ScoreBreakdown
  *
  * Redux slice
  * -----------
@@ -20,6 +20,7 @@
  *     setEnabled,
  *     setAnalyzing,
  *     addPitchSample,
+ *     setScore,
  *     resetScore,
  *   } from 'modules/singing-analysis/store/singingAnalysisSlice'
  *
@@ -30,11 +31,21 @@
  *
  * Types
  * -----
- *   import type { PitchSample, SingingAnalysisState } from 'modules/singing-analysis/types'
+ *   import type { PitchSample, SongNote, SingingAnalysisState } from 'modules/singing-analysis'
+ *
+ * Pitch graph (standalone canvas class)
+ * ----------------------------------------
+ *   import { PitchGraph } from 'modules/singing-analysis'
+ *   const graph = new PitchGraph(canvasElement, { maxSamples: 120 })
+ *   graph.addSample(detectedHz, expectedHz)
+ *
+ * Timing analyser
+ * ---------------
+ *   import { evaluateSample, analyzeTimings, findNearestMetadata } from 'modules/singing-analysis'
  */
 
 export { default } from './SingingAnalysis'
-export type { PitchSample, SingingAnalysisState, SingingAnalysisCallbacks } from './types'
+export type { PitchSample, SongNote, TimingPair, SingingAnalysisState, SingingAnalysisCallbacks } from './types'
 export {
   detectPitch,
   frequencyToNoteName,
@@ -44,3 +55,11 @@ export {
 } from './pitchDetection'
 export { calculateScore } from './scoringSystem'
 export type { ScoreBreakdown } from './scoringSystem'
+export {
+  evaluateSample,
+  analyzeTimings,
+  findNearestMetadata,
+  ALLOWED_DEVIATION_MS,
+} from './timingAnalyzer'
+export { PitchGraph } from './pitchGraph'
+export type { PitchGraphOptions } from './pitchGraph'

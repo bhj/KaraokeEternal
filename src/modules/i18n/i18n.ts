@@ -106,7 +106,7 @@ export {
  * const label = t('queue.empty')  // → "Queue Empty" (or translated)
  * const msg   = t('lyrics.noLyrics')
  */
-export function t(dotKey: string): string {
+export function t (dotKey: string): string {
   const lang: LanguageCode = getStoredLanguage()
   const translate = createTranslator(lang)
   const dotIdx = dotKey.indexOf('.')
