@@ -26,7 +26,7 @@
  * utilities consumed at the presentation layer.
  */
 
-import type { LanguageCode } from 'i18n'
+import type { LanguageCode } from './core'
 
 // ---------------------------------------------------------------------------
 // Types

@@ -37,6 +37,7 @@ let config = {
       'assets': path.join(baseDir, 'assets'),
       'fonts': path.join(baseDir, 'docs', 'assets', 'fonts'),
       'shared': path.join(baseDir, 'shared'),
+      'i18n': path.join(baseDir, 'src', 'modules', 'i18n'),
     },
     symlinks: false,
   },

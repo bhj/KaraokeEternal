@@ -33,10 +33,9 @@
  *   // → 'It would have been enough'  (English fallback)
  *
  * ── Adding a new UI language ────────────────────────────────────────────────
- *   1. Create  src/i18n/locales/<code>.json  (copy en.json, translate values)
- *   2. Create  src/modules/i18n/languages/<code>.json  (same content)
- *   3. Add an entry in  src/i18n/index.ts → LANGUAGES
- *   4. Import the new locale in  src/i18n/index.ts → catalogue
+ *   1. Create  src/modules/i18n/languages/<code>.json  (copy en.json, translate values)
+ *   2. Add an entry in  src/modules/i18n/core.ts → LANGUAGES
+ *   3. Import the new locale in  src/modules/i18n/core.ts → catalogue
  *   No other files need to change.
  */
 
@@ -55,10 +54,10 @@ export {
   type LanguageMeta,
   type TFunction,
   type I18nContextValue,
-} from 'i18n'
+} from './core'
 
 // createTranslator is exported separately so it can be used inside t() below
-import { createTranslator, getStoredLanguage, type LanguageCode } from 'i18n'
+import { createTranslator, getStoredLanguage, type LanguageCode } from './core'
 export { createTranslator }
 
 // ---------------------------------------------------------------------------
