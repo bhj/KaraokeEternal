@@ -1,0 +1,262 @@
+/*
+ * SingingAnalysisPanel – overlay panel styles.
+ *
+ * The panel is absolutely positioned so it never affects the player layout.
+ * All measurements use viewport-relative or rem units so the panel scales
+ * gracefully at any screen size.
+ */
+
+/* ── Toggle button (always visible in bottom-right corner) ──────────────── */
+
+.toggleBtn {
+  position: absolute;
+  bottom: 3vh;
+  right: 3vh;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--border-radius, 6px);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.75);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  &.active {
+    background: rgba(40, 120, 255, 0.75);
+    border-color: rgba(100, 170, 255, 0.6);
+  }
+}
+
+/* ── Main panel ──────────────────────────────────────────────────────────── */
+
+.panel {
+  position: absolute;
+  top: 3vh;
+  right: 3vh;
+  z-index: 10;
+  width: clamp(200px, 22vw, 320px);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--border-radius, 6px);
+  color: #fff;
+  font-size: 0.82rem;
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+/* ── Panel header ─────────────────────────────────────────────────────────── */
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 1rem;
+  line-height: 1;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+/* ── Panel body ───────────────────────────────────────────────────────────── */
+
+.panelBody {
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ── Current note & score row ─────────────────────────────────────────────── */
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.noteDisplay {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  min-width: 3.5ch;
+  text-align: center;
+  line-height: 1;
+  color: #7cf;
+
+  &.noNote {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 1.4rem;
+  }
+}
+
+.scoreDisplay {
+  text-align: right;
+}
+
+.scoreValue {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #aef;
+  line-height: 1;
+}
+
+.scoreLabel {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Cents deviation meter ────────────────────────────────────────────────── */
+
+.centsMeter {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.centsBar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.centsFill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  border-radius: 2px;
+  background: #7cf;
+  transition: left 0.08s ease;
+
+  &.inTune {
+    background: #4e4;
+  }
+
+  &.offPitch {
+    background: #f64;
+  }
+}
+
+/* ── Pitch graph canvas ───────────────────────────────────────────────────── */
+
+.graphCanvas {
+  width: 100%;
+  height: 64px;
+  display: block;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Controls row ─────────────────────────────────────────────────────────── */
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.micBtn {
+  flex: 1;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--border-radius, 6px);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  &.recording {
+    background: rgba(220, 50, 50, 0.6);
+    border-color: rgba(255, 100, 100, 0.5);
+    animation: pulse 1.5s ease infinite;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
+.resetBtn {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius, 6px);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+}
+
+/* ── Error message ────────────────────────────────────────────────────────── */
+
+.errorMsg {
+  font-size: 0.72rem;
+  color: #f87;
+  text-align: center;
+  padding: 0 0.25rem;
+}
+
+/* ── Pulse animation for active recording indicator ──────────────────────── */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
