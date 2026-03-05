@@ -8,7 +8,7 @@ class ScannerQueue {
   #instance
   #isCanceling = false
   #q = []
-  onIteration: (stats: any) => any
+  onIteration: (stats: { new: number, removed: number, existing: number }) => void
   onDone: () => void
 
   constructor (onIteration, onDone) {

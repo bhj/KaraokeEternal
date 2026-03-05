@@ -2,10 +2,12 @@ import React, { useState, useRef } from 'react'
 import clsx from 'clsx'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { setFilterStr, resetFilterStr, toggleFilterStarred } from '../../modules/library'
+import { useT } from 'i18n'
 import Button from 'components/Button/Button'
 import styles from './LibraryHeader.css'
 
 const LibraryHeader = () => {
+  const t = useT()
   const dispatch = useAppDispatch()
   const { filterStr, filterStarred } = useAppSelector(state => state.library)
 
@@ -37,7 +39,7 @@ const LibraryHeader = () => {
       <input
         type='search'
         className={styles.searchInput}
-        placeholder='search'
+        placeholder={t('library', 'searchPlaceholder')}
         value={value}
         onChange={handleChange}
         ref={searchInput}

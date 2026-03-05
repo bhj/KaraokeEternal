@@ -6,7 +6,7 @@ export default {
       {
         target: '18',
         logger: {
-          logEvent(filename, event) {
+          logEvent (filename, event) {
             if (event.kind === 'CompileSuccess') {
               console.log('Compiled:', filename)
             }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { closeUserEditor, fetchUsers, filterByOnline, filterByRoom, openUserEditor, type UserWithRoomsAndRole } from '../../modules/users'
 import { formatDateTime } from 'lib/dateTime'
+import { useT } from 'i18n'
 import Panel from 'components/Panel/Panel'
 import Button from 'components/Button/Button'
 import EditUser from './EditUser/EditUser'
@@ -9,6 +10,7 @@ import getUsers from '../../selectors/getUsers'
 import styles from './Users.css'
 
 const Users = () => {
+  const t = useT()
   const [editorUser, setEditorUser] = useState<UserWithRoomsAndRole | null>(null)
 
   const curUserId = useAppSelector(state => state.user.userId)
@@ -69,9 +71,9 @@ const Users = () => {
 
   const userFilter = (
     <select className={styles.usersFilter} onChange={handleFilterChange} value={filterOnline ? 'online' : filterRoomId || 'all'}>
-      <option key='all' value='all'>All</option>
-      <option key='online' value='online'>Online</option>
-      <optgroup label='Online in...'>
+      <option key='all' value='all'>{t('users', 'filterAll')}</option>
+      <option key='online' value='online'>{t('users', 'filterOnline')}</option>
+      <optgroup label={t('users', 'filterOnlineIn')}>
         {roomOpts}
       </optgroup>
     </select>
@@ -79,16 +81,16 @@ const Users = () => {
 
   return (
     <Panel
-      title='Users'
+      title={t('users', 'title')}
       titleComponent={userFilter}
     >
       <>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Joined</th>
+              <th>{t('users', 'colUsername')}</th>
+              <th>{t('users', 'colRole')}</th>
+              <th>{t('users', 'colJoined')}</th>
             </tr>
           </thead>
           <tbody>
@@ -98,7 +100,7 @@ const Users = () => {
 
         <br />
         <Button onClick={handleOpen} variant='primary'>
-          Create User
+          {t('users', 'createUser')}
         </Button>
 
         {isEditorOpen && (

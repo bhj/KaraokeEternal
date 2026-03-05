@@ -76,7 +76,7 @@ export const requestScanStop = createAsyncThunk(
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface PrefsState {
+export interface PrefsState {
   isFirstRun?: boolean
   isScanning: boolean
   isReplayGainEnabled: boolean

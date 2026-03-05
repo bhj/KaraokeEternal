@@ -38,7 +38,7 @@ class Queue {
    */
   static get (roomId: number): { result: number[], entities: Record<number, QueueItem> } {
     const result: number[] = []
-    const entities: Record<number, any> = {}
+    const entities: Record<number, Record<string, unknown>> = {}
     const map = new Map()
     const pathData = new Map()
     let curQueueId = null
@@ -101,12 +101,12 @@ class Queue {
 
     while (result.length < rows.length) {
       // get the item whose prevQueueId references the current one
-      const nextQueueId = entities[map.get(curQueueId)].queueId
+      const nextQueueId = entities[map.get(curQueueId) as number].queueId as number
       result.push(nextQueueId)
       curQueueId = nextQueueId
     }
 
-    return { result, entities }
+    return { result, entities: entities as unknown as Record<number, QueueItem> }
   }
 
   /**
@@ -203,7 +203,7 @@ class Queue {
   /**
    * Get media type from file extension
    */
-  static getType (file: string): string {
+  static getType (file: string): 'cdg' | 'mp4' {
     return /\.mp4/i.test(path.extname(file)) ? 'mp4' : 'cdg'
   }
 }

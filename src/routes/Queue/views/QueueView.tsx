@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import { Link } from 'react-router'
+import { useT } from 'i18n'
 import getRoundRobinQueue from '../selectors/getRoundRobinQueue'
 import QueueList from '../components/QueueList/QueueList'
 import Spinner from 'components/Spinner/Spinner'
@@ -11,6 +12,7 @@ import styles from './QueueView.css'
 const QUEUE_ITEM_HEIGHT = 92
 
 const QueueView = () => {
+  const t = useT()
   const { innerWidth, innerHeight, headerHeight, footerHeight } = useAppSelector(state => state.ui)
   const isInRoom = useAppSelector(state => !!state.user.roomId)
   const isLoading = useAppSelector(state => ensureState(state.queue).isLoading)
@@ -39,11 +41,11 @@ const QueueView = () => {
     >
       {!isInRoom && (
         <TextOverlay>
-          <h1>Get a Room!</h1>
+          <h1>{t('queue', 'getARoom')}</h1>
           <p>
-            <Link to='/account'>Sign in to a room</Link>
+            <Link to='/account'>{t('queue', 'signInToRoom')}</Link>
             {' '}
-            to start queueing songs.
+            {t('queue', 'toStartQueuing')}
           </p>
         </TextOverlay>
       )}
@@ -52,13 +54,13 @@ const QueueView = () => {
 
       {!isLoading && queue.result.length === 0 && (
         <TextOverlay>
-          <h1>Queue Empty</h1>
+          <h1>{t('queue', 'empty')}</h1>
           <p>
-            Tap a song in the
+            {t('queue', 'tapSong')}
             {' '}
-            <Link to='/library'>library</Link>
+            <Link to='/library'>{t('queue', 'library')}</Link>
             {' '}
-            to queue it.
+            {t('queue', 'toQueueIt')}
           </p>
         </TextOverlay>
       )}

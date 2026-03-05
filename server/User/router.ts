@@ -25,7 +25,7 @@ interface File {
 }
 
 interface RequestWithBody {
-  body: Record<string, any>
+  body: Record<string, unknown>
   files?: Record<string, File | File[]>
 }
 
@@ -53,14 +53,14 @@ const createUserCtx = (user, roomId) => {
 // login
 router.post('/login', async (ctx) => {
   const req = ctx.request as unknown as RequestWithBody
-  const roomId = parseInt(req.body.roomId, 10) || null
+  const roomId = parseInt(req.body.roomId as string, 10) || null
   let user
 
   try {
-    user = await User.validate(req.body as any)
+    user = await User.validate(req.body as { username: string, password: string })
 
     if (roomId) {
-      await Rooms.validate(roomId, req.body.roomPassword, {
+      await Rooms.validate(roomId, req.body.roomPassword as string | undefined, {
         isOpen: user.role !== 'admin', // admins can sign in to closed rooms
         validatePassword: true,
       })
@@ -72,7 +72,7 @@ router.post('/login', async (ctx) => {
   }
 
   if (crypto.isLegacy(user.password)) {
-    const newHash = await crypto.hash(req.body.password)
+    const newHash = await crypto.hash(req.body.password as string)
     const query = sql`
       UPDATE users
       SET password = ${newHash}, dateUpdated = ${Math.floor(Date.now() / 1000)}
@@ -197,8 +197,8 @@ router.put('/user/:userId', async (ctx) => {
   }
 
   const req = ctx.request as unknown as RequestWithBody
-  let { name, username } = req.body
-  const { password, newPassword, newPasswordConfirm } = req.body
+  let { name, username } = req.body as { name?: string, username?: string }
+  const { password, newPassword, newPasswordConfirm } = req.body as { password?: string, newPassword?: string, newPasswordConfirm?: string }
 
   // validate current password if updating own account
   if (targetId === user.userId && !ctx.user.isGuest) {
@@ -355,16 +355,17 @@ router.post('/user', async (ctx) => {
     }
 
     // only possible roles; further validated per-room below
-    if (!['guest', 'standard'].includes(req.body.role)) {
+    if (!['guest', 'standard'].includes(req.body.role as string)) {
       ctx.throw(401, 'Invalid role')
     }
 
     // new users must choose a room at the same time
+    // guests are always allowed regardless of room role settings (allowNewGuest is always true on the client)
     try {
       await Rooms.validate(
-        req.body.roomId,
-        req.body.roomPassword,
-        { role: req.body.role },
+        req.body.roomId as number,
+        req.body.roomPassword as string | undefined,
+        { role: req.body.role !== 'guest' ? req.body.role as string : undefined },
       )
     } catch (err) {
       ctx.throw(401, err.message)
@@ -385,7 +386,13 @@ router.post('/user', async (ctx) => {
 
   // create user
   try {
-    const userId = await User.create({ ...req.body, image } as any, req.body.role)
+    const userId = await User.create({
+      username: req.body.username as string,
+      newPassword: req.body.newPassword as string,
+      newPasswordConfirm: req.body.newPasswordConfirm as string,
+      name: req.body.name as string,
+      image,
+    }, req.body.role as string)
 
     // if admin creating another user, we're done
     if (ctx.user.isAdmin) {
@@ -419,7 +426,7 @@ router.post('/user', async (ctx) => {
 
 // first-time setup
 router.post('/setup', async (ctx) => {
-  const prefs: any = Prefs.get()
+  const prefs = Prefs.get() as { isFirstRun?: boolean, [key: string]: unknown }
   let image
 
   // must be first run
@@ -430,7 +437,13 @@ router.post('/setup', async (ctx) => {
   try {
     // create admin user
     const req = ctx.request as unknown as RequestWithBody
-    const userId = await User.create({ ...req.body, image } as any, 'admin')
+    const userId = await User.create({
+      username: req.body.username as string,
+      newPassword: req.body.newPassword as string,
+      newPasswordConfirm: req.body.newPasswordConfirm as string,
+      name: req.body.name as string,
+      image,
+    }, 'admin')
     const user = User.getById(userId, true)
 
     if (!user) {
