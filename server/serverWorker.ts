@@ -21,6 +21,7 @@ import mediaRouter from './Media/router.js'
 import prefsRouter from './Prefs/router.js'
 import roomsRouter from './Rooms/router.js'
 import userRouter from './User/router.js'
+import googleAuthRouter from './User/googleAuth.js'
 import pushQueuesAndLibrary from './lib/pushQueuesAndLibrary.js'
 import { Server as SocketIO } from 'socket.io'
 import socketActions from './socket.js'
@@ -142,10 +143,12 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   app.use(async (ctx, next) => {
     ctx.jwtKey = jwtKey // used by login route
 
-    // skip JWT/session validation if non-API request or logging in/out
+    // skip JWT/session validation if non-API request, logging in/out, or Google OAuth
     if (!ctx.request.path.startsWith(`${urlPath}api/`)
       || ctx.request.path === `${urlPath}api/login`
-      || ctx.request.path === `${urlPath}api/logout`) {
+      || ctx.request.path === `${urlPath}api/logout`
+      || ctx.request.path === `${urlPath}api/auth/google`
+      || ctx.request.path === `${urlPath}api/auth/google/callback`) {
       return next()
     }
 
@@ -183,6 +186,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   baseRouter.use(prefsRouter.routes())
   baseRouter.use(roomsRouter.routes())
   baseRouter.use(userRouter.routes())
+  baseRouter.use(googleAuthRouter(urlPath).routes())
   app.use(baseRouter.routes())
 
   // serve index.html with dynamic base tag at the main SPA routes
