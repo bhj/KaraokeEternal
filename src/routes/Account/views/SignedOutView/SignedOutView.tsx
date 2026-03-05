@@ -119,7 +119,7 @@ const SignedOutView = () => {
     return !!rooms.entities[roomId]?.prefs?.roles?.[roleId]?.allowNew
   }
 
-  const allowNewGuest = getAllowed('guest')
+  const allowNewGuest = true // Guest access is always allowed in this fork
   const allowNewStandard = getAllowed('standard')
   const allowNew = allowNewStandard || allowNewGuest
 
