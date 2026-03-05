@@ -7,3 +7,50 @@
     margin-top: var(--space-s);
   }
 }
+
+.divider {
+  text-align: center;
+  color: hsl(var(--hue-blue), 10%, 55%);
+  font-size: var(--font-size-s);
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: hsl(var(--hue-blue), 10%, 30%);
+  }
+
+  &::before { left: 0; }
+  &::after { right: 0; }
+}
+
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s);
+  padding: 0 var(--space-m);
+  height: 38px;
+  border-radius: var(--border-radius);
+  border: 1px solid hsl(var(--hue-blue), 10%, 35%);
+  background: hsl(var(--hue-blue), 10%, 12%);
+  color: hsl(var(--hue-blue), 10%, 85%);
+  font-size: var(--font-size-m);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: hsl(var(--hue-blue), 10%, 18%);
+  }
+}
+
+.googleIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}

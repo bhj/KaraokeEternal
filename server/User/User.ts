@@ -8,6 +8,7 @@ import { User as UserType } from '../../shared/types.js'
 export type ServerUser = UserType & {
   role: string
   password?: string // only populated if requesting creds
+  googleId?: string | null // Google OAuth user ID
   image?: string
   rooms?: number[] // populated in router
 }
@@ -31,6 +32,70 @@ class User {
     }
 
     return User._get({ userId, username: undefined }, creds)
+  }
+
+  /**
+   * Get user by Google OAuth ID
+   */
+  static getByGoogleId (googleId: string): ServerUser | false {
+    if (typeof googleId !== 'string') {
+      throw new Error('googleId must be a string')
+    }
+
+    const query = sql`
+      SELECT users.*, roles.name AS role
+      FROM users
+        INNER JOIN roles USING (roleId)
+      WHERE users.googleId = ${googleId}
+    `
+
+    const user = db.get<ServerUser>(String(query), query.parameters)
+    if (!user) return false
+
+    delete user.password
+    return user
+  }
+
+  /**
+   * Create a new user from Google OAuth profile
+   */
+  static async createGoogleUser ({
+    googleId,
+    email,
+    name,
+  }: { googleId: string, email: string, name: string }, role = 'standard') {
+    name = name?.trim()
+
+    const fields = new Map()
+
+    // Use email as username, but ensure uniqueness
+    let username = email.trim()
+    if (User.getByUsername(username)) {
+      username = `${username}-${randomChars(5)}`
+    }
+
+    if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+      name = email.split('@')[0].trim().slice(0, NAME_MAX_LENGTH) || 'User'
+    }
+
+    fields.set('username', username)
+    fields.set('password', await crypto.hash(randomChars(32)))
+    fields.set('name', name)
+    fields.set('googleId', googleId)
+    fields.set('dateCreated', Math.floor(Date.now() / 1000))
+    fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${role})`)
+
+    const query = sql`
+      INSERT INTO users ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = db.run(String(query), query.parameters)
+
+    if (typeof res.lastID !== 'number') {
+      throw new Error('Unable to create user')
+    }
+
+    return res.lastID
   }
 
   /**

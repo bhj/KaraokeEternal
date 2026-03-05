@@ -163,6 +163,8 @@ const SignedOutView = () => {
           <SignIn
             username={username}
             password={password}
+            roomId={roomId}
+            roomPassword={roomPassword}
             onUsernameChange={setUsername}
             onPasswordChange={setPassword}
             onSubmit={handleLogin}
