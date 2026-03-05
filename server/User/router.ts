@@ -360,11 +360,12 @@ router.post('/user', async (ctx) => {
     }
 
     // new users must choose a room at the same time
+    // guests are always allowed regardless of room role settings (allowNewGuest is always true on the client)
     try {
       await Rooms.validate(
         req.body.roomId as number,
         req.body.roomPassword as string | undefined,
-        { role: req.body.role as string },
+        { role: req.body.role !== 'guest' ? req.body.role as string : undefined },
       )
     } catch (err) {
       ctx.throw(401, err.message)
