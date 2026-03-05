@@ -57,6 +57,16 @@ npm run build   # compiles client (Webpack) + server (TypeScript)
 npm run serve   # starts the production server
 ```
 
+## Deploy to Vercel
+
+A `vercel.json` is included so that Vercel can build and serve the React frontend as a static site:
+
+```bash
+vercel deploy
+```
+
+> **Note:** Vercel serves only the static frontend (the React SPA). Features that require the Node.js backend — such as song library scanning, the SQLite database, and real-time Socket.IO sync — are not available in a Vercel-only deployment. For the full application, deploy to a self-hosted server or a platform that supports persistent Node.js processes (e.g. Railway, Render, Fly.io).
+
 ---
 
 ## Available Scripts

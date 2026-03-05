@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npm run build:client",
+  "outputDirectory": "build/client",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
