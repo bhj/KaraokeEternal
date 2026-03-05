@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Button from 'components/Button/Button'
+import { useAppDispatch } from 'store/hooks'
+import { fetchAccount } from 'store/modules/user'
 import styles from './SignIn.css'
 
 interface SignInProps {
@@ -23,11 +25,28 @@ const SignIn = ({
   onSubmit,
   onFirstFieldRef,
 }: SignInProps) => {
+  const dispatch = useAppDispatch()
   const basename = new URL(document.baseURI).pathname.replace(/\/$/, '')
   const googleParams = new URLSearchParams()
   if (roomId !== null) googleParams.set('roomId', String(roomId))
   if (roomPassword) googleParams.set('roomPassword', roomPassword)
-  const googleHref = `${basename}/api/auth/google${googleParams.toString() ? '?' + googleParams.toString() : ''}`
+  googleParams.set('popup', '1')
+  const googleHref = `${basename}/api/auth/google?${googleParams.toString()}`
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'google-auth-success') {
+        dispatch(fetchAccount())
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [dispatch])
+
+  const handleGoogleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    window.open(googleHref, 'google-signin', 'width=500,height=600,menubar=no,toolbar=no,location=no')
+  }
 
   return (
     <form noValidate onSubmit={onSubmit} className={styles.container}>
@@ -50,7 +69,7 @@ const SignIn = ({
         Sign In
       </Button>
       <div className={styles.divider}>or</div>
-      <a href={googleHref} className={styles.googleButton}>
+      <a href={googleHref} className={styles.googleButton} onClick={handleGoogleClick}>
         <svg className={styles.googleIcon} viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
           <path d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z' fill='#4285F4' />
           <path d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z' fill='#34A853' />

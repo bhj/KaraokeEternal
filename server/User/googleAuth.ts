@@ -8,8 +8,8 @@ import Rooms from '../Rooms/Rooms.js'
 const log = getLogger('googleAuth')
 const { sign: jwtSign } = jsonWebToken
 
-// CSRF state store: nonce -> { roomId, roomPassword, createdAt }
-const pendingStates = new Map<string, { roomId: number | null, roomPassword: string, createdAt: number }>()
+// CSRF state store: nonce -> { roomId, roomPassword, popup, createdAt }
+const pendingStates = new Map<string, { roomId: number | null, roomPassword: string, popup: boolean, createdAt: number }>()
 const STATE_TTL_MS = 10 * 60 * 1000 // 10 minutes
 
 function cleanExpiredStates () {
@@ -51,11 +51,12 @@ function createRouter (urlPath: string) {
 
     const roomId = ctx.query.roomId ? parseInt(ctx.query.roomId as string, 10) : null
     const roomPassword = (ctx.query.roomPassword as string) || ''
+    const popup = ctx.query.popup === '1'
 
     cleanExpiredStates()
 
     const nonce = randomChars(32)
-    pendingStates.set(nonce, { roomId, roomPassword, createdAt: Date.now() })
+    pendingStates.set(nonce, { roomId, roomPassword, popup, createdAt: Date.now() })
 
     const params = new URLSearchParams({
       client_id: clientId,
@@ -103,7 +104,20 @@ function createRouter (urlPath: string) {
     }
     pendingStates.delete(state)
 
-    const { roomId, roomPassword } = pendingState
+    const { roomId, roomPassword, popup } = pendingState
+
+    // Helper: finish the flow depending on whether we're in a popup
+    const finishError = (errorCode: string) => {
+      if (popup) {
+        ctx.type = 'html'
+        ctx.body = `<!DOCTYPE html><html><body><script>
+          window.opener && window.opener.postMessage({type:'google-auth-error',error:${JSON.stringify(errorCode)}}, '*');
+          window.close();
+        </script></body></html>`
+      } else {
+        ctx.redirect(`${appBase}account?error=${errorCode}`)
+      }
+    }
 
     // Exchange authorization code for tokens
     let googleAccessToken: string
@@ -124,14 +138,14 @@ function createRouter (urlPath: string) {
 
       if (!tokenData.access_token) {
         log.error('Google OAuth: token exchange failed: %s', tokenData.error)
-        ctx.redirect(`${appBase}account?error=google_token_failed`)
+        finishError('google_token_failed')
         return
       }
 
       googleAccessToken = tokenData.access_token
     } catch (err) {
       log.error('Google OAuth: token exchange error: %s', err.message)
-      ctx.redirect(`${appBase}account?error=google_token_failed`)
+      finishError('google_token_failed')
       return
     }
 
@@ -148,7 +162,7 @@ function createRouter (urlPath: string) {
 
       if (!profile.id || !profile.email) {
         log.error('Google OAuth: missing profile data')
-        ctx.redirect(`${appBase}account?error=google_profile_failed`)
+        finishError('google_profile_failed')
         return
       }
 
@@ -157,7 +171,7 @@ function createRouter (urlPath: string) {
       name = profile.name || email
     } catch (err) {
       log.error('Google OAuth: profile fetch error: %s', err.message)
-      ctx.redirect(`${appBase}account?error=google_profile_failed`)
+      finishError('google_profile_failed')
       return
     }
 
@@ -170,14 +184,14 @@ function createRouter (urlPath: string) {
         user = User.getById(userId)
       } catch (err) {
         log.error('Google OAuth: user creation failed: %s', err.message)
-        ctx.redirect(`${appBase}account?error=google_user_failed`)
+        finishError('google_user_failed')
         return
       }
     }
 
     if (!user) {
       log.error('Google OAuth: user not found after creation')
-      ctx.redirect(`${appBase}account?error=google_user_failed`)
+      finishError('google_user_failed')
       return
     }
 
@@ -190,11 +204,11 @@ function createRouter (urlPath: string) {
         })
       } catch (err) {
         log.warn('Google OAuth: room validation failed: %s', err.message)
-        ctx.redirect(`${appBase}account?error=google_room_invalid`)
+        finishError('google_room_invalid')
         return
       }
     } else if (user.role !== 'admin') {
-      ctx.redirect(`${appBase}account?error=google_room_required`)
+      finishError('google_room_required')
       return
     }
 
@@ -209,8 +223,16 @@ function createRouter (urlPath: string) {
       sameSite: 'lax',
     })
 
-    // Redirect to the app
-    ctx.redirect(appBase)
+    // Finish: in popup mode send a message to the opener and close; otherwise redirect
+    if (popup) {
+      ctx.type = 'html'
+      ctx.body = `<!DOCTYPE html><html><body><script>
+        window.opener && window.opener.postMessage({type:'google-auth-success'}, '*');
+        window.close();
+      </script></body></html>`
+    } else {
+      ctx.redirect(appBase)
+    }
   })
 
   return router
