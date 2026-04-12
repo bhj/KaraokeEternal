@@ -119,36 +119,61 @@ class Queue {
 
     if (prevQueueId === -1) prevQueueId = null
 
-    const query = sql`
-      UPDATE queue
-      SET prevQueueId = CASE
-        WHEN queueId = newChild THEN ${queueId}
-        WHEN queueId = curChild AND curParent IS NOT NULL AND newChild IS NOT NULL THEN curParent
-        WHEN queueId = ${queueId} THEN ${prevQueueId}
-        ELSE queue.prevQueueId
-      END
-      FROM (SELECT
-        (
-          SELECT prevQueueId
-          FROM queue
-          WHERE queueId = ${queueId}
-        ) AS curParent,
-        (
-          SELECT queueId
-          FROM queue
-          WHERE prevQueueId = ${queueId}
-        ) AS curChild,
-        (
-          SELECT queueId
-          FROM queue
-          WHERE queueId != ${queueId}
-            AND prevQueueId ${prevQueueId === null ? sql`IS NULL` : sql`= ${prevQueueId}`}
-            AND roomId = ${roomId}
-        ) AS newChild
-      )
-      WHERE roomId = ${roomId}
-    `
-    db.run(String(query), query.parameters)
+    db.exec('BEGIN IMMEDIATE')
+    db.exec('PRAGMA defer_foreign_keys = ON')
+
+    try {
+      // get the current parent and validate prevQueueId
+      const curQuery = sql`
+        SELECT q.prevQueueId,
+          CASE WHEN ${prevQueueId} IS NULL THEN 1
+               WHEN EXISTS (SELECT 1 FROM queue WHERE queueId = ${prevQueueId} AND roomId = ${roomId}) THEN 1
+               ELSE 0
+          END AS prevValid
+        FROM queue q
+        WHERE q.queueId = ${queueId} AND q.roomId = ${roomId}
+      `
+      const curRow = db.get<{ prevQueueId: number | null, prevValid: number }>(String(curQuery), curQuery.parameters)
+
+      if (!curRow) {
+        throw new Error(`queueId ${queueId} not found in room ${roomId}`)
+      }
+
+      if (!curRow.prevValid) {
+        throw new Error(`prevQueueId ${prevQueueId} not found in room ${roomId}`)
+      }
+
+      const curParent = curRow.prevQueueId
+
+      // already in correct position?
+      if (curParent === prevQueueId) {
+        db.exec('COMMIT')
+        return
+      }
+
+      // perform the move
+      const updateQuery = sql`
+        UPDATE queue
+        SET prevQueueId = CASE
+          WHEN prevQueueId = ${queueId} THEN ${curParent}
+          WHEN queueId != ${queueId} AND prevQueueId ${prevQueueId === null ? sql`IS NULL` : sql`= ${prevQueueId}`} THEN ${queueId}
+          WHEN queueId = ${queueId} THEN ${prevQueueId}
+          ELSE prevQueueId
+        END
+        WHERE roomId = ${roomId} 
+          AND (
+            prevQueueId = ${queueId} 
+            OR (queueId != ${queueId} AND prevQueueId ${prevQueueId === null ? sql`IS NULL` : sql`= ${prevQueueId}`})
+            OR queueId = ${queueId}
+          )
+      `
+      db.run(String(updateQuery), updateQuery.parameters)
+
+      db.exec('COMMIT')
+    } catch (err) {
+      db.exec('ROLLBACK')
+      throw err
+    }
   }
 
   /**
