@@ -18,7 +18,7 @@ class Queue {
       WHERE roomId = ${roomId} AND queueId NOT IN (
         SELECT prevQueueId
         FROM queue
-        WHERE prevQueueId IS NOT NULL
+        WHERE prevQueueId IS NOT NULL AND roomId = ${roomId}
       )
     )`)
 
