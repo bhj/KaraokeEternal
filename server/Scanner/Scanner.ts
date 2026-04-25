@@ -3,7 +3,7 @@ import { SCANNER_WORKER_STATUS } from '../../shared/actionTypes.js'
 
 class Scanner {
   isCanceling: boolean
-  emitStatus: (text: any, progress: any, isScanning?: boolean) => void
+  emitStatus: (text: string, progress: number, isScanning?: boolean) => void
 
   constructor (qStats) {
     this.isCanceling = false

@@ -13,14 +13,15 @@ import Scanner from '../Scanner.js'
 import IPC from '../../lib/IPCBridge.js'
 import fileTypes from '../../Media/fileTypes.js'
 import { LIBRARY_MATCH_SONG, MEDIA_ADD, MEDIA_REMOVE, MEDIA_UPDATE } from '../../../shared/actionTypes.js'
+import type { Path } from '../../../shared/types.js'
 const log = getLogger('FileScanner')
 
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
 
 class FileScanner extends Scanner {
-  paths: any
-  parser: any
+  paths: { result: number[], entities: Record<number, Path> }
+  parser: ReturnType<typeof MetaParser>
 
   constructor (prefs, qStats) {
     super(qStats)
@@ -138,7 +139,7 @@ class FileScanner extends Scanner {
     })
 
     // get artistId and songId
-    const match = await (IPC as any).req({ type: LIBRARY_MATCH_SONG, payload: parsed })
+    const match = await IPC.req({ type: LIBRARY_MATCH_SONG, payload: parsed }) as { songId: number }
 
     const media = {
       songId: match.songId,
@@ -168,7 +169,7 @@ class FileScanner extends Scanner {
       })
 
       if (Object.keys(diff).length) {
-        await (IPC as any).req({
+        await IPC.req({
           type: MEDIA_UPDATE,
           payload: {
             mediaId: row.mediaId,
@@ -186,11 +187,11 @@ class FileScanner extends Scanner {
     } // end if
 
     // new media
-    ;(media as any).dateAdded = Math.round(new Date().getTime() / 1000) // seconds
+    const mediaWithDate = { ...media, dateAdded: Math.round(new Date().getTime() / 1000) } // seconds
     log.info('  => new: %s', JSON.stringify(match))
 
     return {
-      mediaId: await (IPC as any).req({ type: MEDIA_ADD, payload: media }),
+      mediaId: await IPC.req({ type: MEDIA_ADD, payload: mediaWithDate }) as number,
       isNew: true,
     }
   }
@@ -200,7 +201,7 @@ class FileScanner extends Scanner {
     const invalid = res.result.filter(mediaId => !validMediaIds.includes(mediaId))
 
     if (invalid.length) {
-      await (IPC as any).req({ type: MEDIA_REMOVE, payload: invalid })
+      await IPC.req({ type: MEDIA_REMOVE, payload: invalid })
     }
 
     return invalid.length

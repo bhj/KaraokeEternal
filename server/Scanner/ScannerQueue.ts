@@ -4,11 +4,17 @@ import getLogger from '../lib/Log.js'
 
 const log = getLogger('queue')
 
+interface ScanStats {
+  new: number
+  removed: number
+  existing: number
+}
+
 class ScannerQueue {
   #instance
   #isCanceling = false
   #q = []
-  onIteration: (stats: any) => any
+  onIteration: (stats: ScanStats) => void
   onDone: () => void
 
   constructor (onIteration, onDone) {

@@ -71,6 +71,12 @@ class IPCParent {
     }
   }
 
+  // Stub so the exported union type includes req(); only used by child processes
+  static req (action: { type: string, payload?: unknown }): Promise<unknown> {
+    void action
+    throw new Error('req() is only available in child processes')
+  }
+
   static addChild (subprocess) {
     // parent: handle messages from child process
     subprocess.on('message', action => this.handle(action))

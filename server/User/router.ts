@@ -25,7 +25,7 @@ interface File {
 }
 
 interface RequestWithBody {
-  body: Record<string, any>
+  body: Record<string, string>
   files?: Record<string, File | File[]>
 }
 
@@ -57,7 +57,7 @@ router.post('/login', async (ctx) => {
   let user
 
   try {
-    user = await User.validate(req.body as any)
+    user = await User.validate(req.body as { username: string, password: string })
 
     if (roomId) {
       await Rooms.validate(roomId, req.body.roomPassword, {
@@ -362,7 +362,7 @@ router.post('/user', async (ctx) => {
     // new users must choose a room at the same time
     try {
       await Rooms.validate(
-        req.body.roomId,
+        parseInt(req.body.roomId, 10),
         req.body.roomPassword,
         { role: req.body.role },
       )
@@ -385,7 +385,7 @@ router.post('/user', async (ctx) => {
 
   // create user
   try {
-    const userId = await User.create({ ...req.body, image } as any, req.body.role)
+    const userId = await User.create({ ...req.body, image }, req.body.role)
 
     // if admin creating another user, we're done
     if (ctx.user.isAdmin) {
@@ -419,18 +419,17 @@ router.post('/user', async (ctx) => {
 
 // first-time setup
 router.post('/setup', async (ctx) => {
-  const prefs: any = Prefs.get()
   let image
 
   // must be first run
-  if (prefs.isFirstRun !== true) {
+  if ((Prefs.get() as { isFirstRun?: boolean }).isFirstRun !== true) {
     ctx.throw(403)
   }
 
   try {
     // create admin user
     const req = ctx.request as unknown as RequestWithBody
-    const userId = await User.create({ ...req.body, image } as any, 'admin')
+    const userId = await User.create({ ...req.body, image }, 'admin')
     const user = User.getById(userId, true)
 
     if (!user) {

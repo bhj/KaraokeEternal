@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd'
 import HttpApi from 'lib/HttpApi'
@@ -19,17 +19,18 @@ const PathPrefs = () => {
   const [isChoosing, setChoosing] = useState(false)
   const [editingPath, setEditingPath] = useState<Path | null>(null)
   const [priority, setPriority] = useState(paths.result)
+  const [prevPaths, setPrevPaths] = useState(paths)
+
+  if (paths !== prevPaths) {
+    setPrevPaths(paths)
+    setPriority(paths.result)
+  }
 
   const handleCloseChooser = () => setChoosing(false)
   const handleOpenChooser = () => setChoosing(true)
   const handleCloseInfo = () => setEditingPath(null)
 
   const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    // local state for immediate UI updates
-    setPriority(paths.result)
-  }, [paths])
 
   const handleDragEnd = (dnd: DropResult) => {
     // dropped outside the list?

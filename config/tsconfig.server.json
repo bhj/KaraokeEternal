@@ -8,7 +8,10 @@
     "moduleResolution": "node16",
     "target": "es2022",
     "noImplicitAny": false,
-    "declaration": false
+    "declaration": false,
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "../server/**/*.ts",

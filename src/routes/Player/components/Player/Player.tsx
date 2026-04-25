@@ -117,7 +117,8 @@ class Player extends React.Component<PlayerProps> {
   render () {
     if (!this.props.isVisible || typeof this.props.mediaId !== 'number') return null
 
-    let PlayerComponent
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let PlayerComponent: React.ComponentType<any> | undefined
 
     if (this.props.mediaType === 'cdg') PlayerComponent = CDGPlayer
     else if (this.props.mediaType === 'mp4') PlayerComponent = this.props.isVideoKeyingEnabled ? MP4AlphaPlayer : MP4Player

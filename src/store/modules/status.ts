@@ -48,7 +48,7 @@ export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOp
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface StatusState {
+export interface StatusState {
   cdgAlpha: number
   cdgSize: number
   errorMessage: string

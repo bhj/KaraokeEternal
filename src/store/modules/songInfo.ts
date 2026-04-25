@@ -34,7 +34,7 @@ export const setPreferredSong = createAsyncThunk(
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface SongInfoState {
+export interface SongInfoState {
   isLoading: boolean
   isVisible: boolean
   songId: number | null

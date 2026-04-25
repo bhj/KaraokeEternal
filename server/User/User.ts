@@ -77,6 +77,13 @@ class User {
     newPasswordConfirm,
     name,
     image,
+  }: {
+    username?: string
+    newPassword?: string
+    newPasswordConfirm?: string
+    name?: string
+    image?: Buffer
+    [key: string]: unknown
   }, role = 'standard') {
     username = username?.trim()
     name = name?.trim()

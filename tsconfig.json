@@ -15,8 +15,8 @@
       ]
     },
     "skipLibCheck": true,
+    "strict": false,
     "noImplicitAny": true,
-    "downlevelIteration": true,
     "esModuleInterop": true,
     "typeRoots": [
       "types",

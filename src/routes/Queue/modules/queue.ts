@@ -31,7 +31,7 @@ export const removeUpcomingItems = (userId: number): AppThunk => (dispatch: AppD
 // ------------------------------------
 // Reducer
 // ------------------------------------
-interface QueueState {
+export interface QueueState {
   isLoading: boolean
   result: number[] // queueIds
   entities: Record<number, QueueItem | OptimisticQueueItem>

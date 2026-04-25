@@ -68,7 +68,7 @@ class Prefs {
    * @param data - the value to be JSON-encoded
    * @return Success/fail boolean
    */
-  static set (key: string, data: any): boolean {
+  static set (key: string, data: unknown): boolean {
     const query = sql`
       REPLACE INTO prefs (key, data)
       VALUES (${key}, ${JSON.stringify(data)})

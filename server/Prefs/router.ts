@@ -54,7 +54,7 @@ router.post('/path', (ctx) => {
   ctx.body = prefs
 
   // (re)start watcher
-  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
+  ;(process as NodeJS.EventEmitter).emit(PREFS_PATHS_CHANGED, prefs.paths)
 
   ctx.startScanner(pathId)
 })
@@ -79,7 +79,7 @@ router.put('/path/:pathId', (ctx) => {
 
   // (re)start watcher?
   if ('isWatchingEnabled' in (ctx.request as unknown as RequestWithBody).body) {
-    process.emit(PREFS_PATHS_CHANGED, prefs.paths)
+    ;(process as NodeJS.EventEmitter).emit(PREFS_PATHS_CHANGED, prefs.paths)
   }
 
   // need to push updated queue items?
@@ -114,7 +114,7 @@ router.delete('/path/:pathId', (ctx) => {
   ctx.body = prefs
 
   // (re)start watcher
-  process.emit(PREFS_PATHS_CHANGED, prefs.paths)
+  ;(process as NodeJS.EventEmitter).emit(PREFS_PATHS_CHANGED, prefs.paths)
 
   Media.cleanup()
 

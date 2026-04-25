@@ -3,6 +3,24 @@ import { db } from '../lib/Database.js'
 import sql from 'sqlate'
 import { QueueItem } from '../../shared/types.js'
 
+interface QueueEntityBuilding {
+  queueId: number
+  songId: number
+  userId: number
+  prevQueueId: number | null
+  mediaId: number
+  relPath?: string
+  rgTrackGain: number
+  rgTrackPeak: number
+  userDisplayName: string
+  userDateUpdated: number
+  pathId: number
+  pathData?: string
+  isPreferred?: number
+  mediaType?: 'cdg' | 'mp4'
+  isVideoKeyingEnabled?: boolean
+}
+
 class Queue {
   /**
    * Add a songId to a room's queue
@@ -38,7 +56,7 @@ class Queue {
    */
   static get (roomId: number): { result: number[], entities: Record<number, QueueItem> } {
     const result: number[] = []
-    const entities: Record<number, any> = {}
+    const entities: Record<number, QueueEntityBuilding> = {}
     const map = new Map()
     const pathData = new Map()
     let curQueueId = null
@@ -106,7 +124,7 @@ class Queue {
       curQueueId = nextQueueId
     }
 
-    return { result, entities }
+    return { result, entities: entities as unknown as Record<number, QueueItem> }
   }
 
   /**
@@ -228,7 +246,7 @@ class Queue {
   /**
    * Get media type from file extension
    */
-  static getType (file: string): string {
+  static getType (file: string): 'cdg' | 'mp4' {
     return /\.mp4/i.test(path.extname(file)) ? 'mp4' : 'cdg'
   }
 }
