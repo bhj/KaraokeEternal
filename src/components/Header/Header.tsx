@@ -49,6 +49,9 @@ const getStatusProps = createSelector(
 // component
 const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const role = useAppSelector(state => state.user.role)
+  const roomId = useAppSelector(state => state.user.roomId)
+  const managedRoomIds = useAppSelector(state => state.user.managedRoomIds)
   const isPlayerPresent = useAppSelector(state => state.status.isPlayerPresent)
   const isScanning = useAppSelector(state => state.prefs.isScanning)
   const scannerText = useAppSelector(state => state.prefs.scannerText)
@@ -59,6 +62,9 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
+  const canControlPlayer = isAdmin
+    || (role === 'room_manager' && roomId !== null && (managedRoomIds || []).includes(roomId))
+
   const dispatch = useAppDispatch()
   const cancelScan = () => dispatch(requestScanStop())
 
@@ -67,7 +73,7 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
       {!isPlayer && isPlayerPresent
         && <UpNext isUpNext={isUpNext} isUpNow={isUpNow} wait={wait} />}
 
-      {(isUpNow || isAdmin)
+      {(isUpNow || canControlPlayer)
         && <PlaybackCtrl />}
 
       {isAdmin && !isPlayer
