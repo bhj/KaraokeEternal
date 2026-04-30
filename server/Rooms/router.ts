@@ -118,7 +118,10 @@ router.put('/:roomId', async (ctx) => {
   const sockets = await ctx.io.in(Rooms.prefix(roomId)).fetchSockets()
 
   for (const s of sockets) {
-    if (s?.user.isAdmin) {
+    const recipientCanSee = s?.user.isAdmin
+      || (s?.user.role === 'room_manager' && Rooms.isManager(roomId, s.user.userId))
+
+    if (recipientCanSee) {
       ctx.io.to(s.id).emit('action', {
         type: ROOM_PREFS_PUSH,
         payload: Rooms.get(roomId),
