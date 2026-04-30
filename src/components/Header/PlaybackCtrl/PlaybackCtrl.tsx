@@ -25,7 +25,12 @@ const PlaybackCtrl = () => {
 
   const isAdmin = useAppSelector(state => state.user.isAdmin)
   const isInRoom = useAppSelector(state => state.user.roomId !== null)
+  const role = useAppSelector(state => state.user.role)
+  const roomId = useAppSelector(state => state.user.roomId)
+  const managedRoomIds = useAppSelector(state => state.user.managedRoomIds)
   const status = useAppSelector(state => state.status)
+  const canOpenPlayer = isAdmin
+    || (role === 'room_manager' && roomId !== null && (managedRoomIds || []).includes(roomId))
 
   const dispatch = useAppDispatch()
   const handleOptions = (opts: PlaybackOptions) => dispatch(requestOptions(opts))
@@ -39,7 +44,7 @@ const PlaybackCtrl = () => {
   }
 
   if (!status.isPlayerPresent) {
-    return (isAdmin && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
+    return (canOpenPlayer && isInRoom && screenfull.isEnabled) ? <NoPlayer /> : null
   }
 
   return (

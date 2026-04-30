@@ -83,7 +83,8 @@ router.get('/:mediaId', async (ctx) => {
 
 // set isPreferred flag
 router.all('/:mediaId/prefer', (ctx) => {
-  if (!ctx.user.isAdmin) {
+  // global flag — admins and room managers may toggle the default version
+  if (!ctx.user.isAdmin && ctx.user.role !== 'room_manager') {
     ctx.throw(401)
   }
 

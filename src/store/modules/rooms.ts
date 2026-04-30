@@ -10,6 +10,7 @@ import {
   ROOM_UPDATE,
   ROOM_CREATE,
   ROOM_REMOVE,
+  ROOM_CLEAR_QUEUE,
   ROOM_PREFS_PUSH,
   ROOM_PREFS_PUSH_REQUEST,
   LOGOUT,
@@ -78,6 +79,13 @@ export const removeRoom = createAsyncThunk(
 
     thunkAPI.dispatch(receiveRooms(response))
     thunkAPI.dispatch(closeRoomEditor())
+  },
+)
+
+export const clearRoomQueue = createAsyncThunk(
+  ROOM_CLEAR_QUEUE,
+  async (roomId: number) => {
+    return await api.post(`/${roomId}/clear`)
   },
 )
 

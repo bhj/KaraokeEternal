@@ -14,6 +14,10 @@ const Rooms = () => {
 
   const { isEditorOpen, filterStatus } = useAppSelector(state => state.rooms)
   const rooms = useAppSelector(getRoomList)
+  const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const role = useAppSelector(state => state.user.role)
+  const managedRoomIds = useAppSelector(state => state.user.managedRoomIds)
+  const isManager = role === 'room_manager'
 
   const dispatch = useAppDispatch()
   const handleClose = () => dispatch(closeRoomEditor())
@@ -32,14 +36,18 @@ const Rooms = () => {
     dispatch(fetchRooms())
   }, [dispatch])
 
-  const rows = rooms.result.map((roomId) => {
+  const visibleResult = isAdmin
+    ? rooms.result
+    : rooms.result.filter(roomId => (managedRoomIds || []).includes(roomId))
+
+  const rows = visibleResult.map((roomId) => {
     const room = rooms.entities[roomId]
     return (
       <tr key={String(roomId)}>
         <td translate='no'><a data-room-id={roomId} onClick={handleOpen}>{room.name}</a></td>
         <td>
           {room.status}
-          {room.numUsers > 0 && (
+          {isAdmin && room.numUsers > 0 && (
             <>
 &nbsp;
               <a data-room-id={roomId} onClick={handleFilterUsers}>
@@ -55,16 +63,20 @@ const Rooms = () => {
     )
   })
 
-  const roomsFilter = (
-    <select className={styles.roomsFilter} onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus as string}>
-      <option key='all' value='all'>All</option>
-      <option key='open' value='open'>Open</option>
-      <option key='closed' value='closed'>Closed</option>
-    </select>
-  )
+  const roomsFilter = isAdmin
+    ? (
+        <select className={styles.roomsFilter} onChange={handleFilterChange} value={filterStatus === false ? 'all' : filterStatus as string}>
+          <option key='all' value='all'>All</option>
+          <option key='open' value='open'>Open</option>
+          <option key='closed' value='closed'>Closed</option>
+        </select>
+      )
+    : null
+
+  const panelTitle = isManager && !isAdmin ? 'My Rooms' : 'Rooms'
 
   return (
-    <Panel title='Rooms' titleComponent={roomsFilter}>
+    <Panel title={panelTitle} titleComponent={roomsFilter}>
       <>
         <table className={styles.table}>
           <thead>
@@ -79,10 +91,14 @@ const Rooms = () => {
           </tbody>
         </table>
 
-        <br />
-        <Button onClick={handleOpen} variant='primary'>
-          Create Room
-        </Button>
+        {isAdmin && (
+          <>
+            <br />
+            <Button onClick={handleOpen} variant='primary'>
+              Create Room
+            </Button>
+          </>
+        )}
 
         {isEditorOpen && <EditRoom onClose={handleClose} room={editorRoom} />}
       </>

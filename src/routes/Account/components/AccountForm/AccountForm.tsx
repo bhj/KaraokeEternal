@@ -163,6 +163,7 @@ const AccountForm = ({
           <option key='choose' value='' disabled>select role...</option>
           {user?.role === 'guest' && <option key='guest' value='guest'>Guest</option>}
           <option key='standard' value='standard'>Standard</option>
+          <option key='room_manager' value='room_manager'>Room Manager</option>
           <option key='admin' value='admin'>Administrator</option>
         </select>
       )}

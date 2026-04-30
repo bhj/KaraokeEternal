@@ -55,6 +55,7 @@ class Rooms {
       dateCreated: string | number
       prefs?: any
       hasPassword?: boolean
+      managers?: number[]
     }>(String(query), query.parameters)
 
     res.forEach((row) => {
@@ -66,12 +67,128 @@ class Rooms {
       if (!includePassword) delete row.password
 
       row.dateCreated = parseInt(String(row.dateCreated), 10) // v1.0 schema used 'text' column
+      row.managers = []
 
       result.push(row.roomId)
       entities[row.roomId] = row
     })
 
+    if (result.length > 0) {
+      const mgrQuery = sql`
+        SELECT roomId, userId
+        FROM roomManagers
+        WHERE roomId IN ${sql.tuple(result)}
+      `
+      const mgrRows = db.all<{ roomId: number, userId: number }>(String(mgrQuery), mgrQuery.parameters)
+      for (const r of mgrRows) {
+        entities[r.roomId].managers.push(r.userId)
+      }
+    }
+
     return { result, entities }
+  }
+
+  /**
+   * Get manager userIds for a room
+   */
+  static getManagers (roomId: number): number[] {
+    const query = sql`
+      SELECT userId
+      FROM roomManagers
+      WHERE roomId = ${roomId}
+      ORDER BY userId ASC
+    `
+    return db.all<{ userId: number }>(String(query), query.parameters).map(r => r.userId)
+  }
+
+  /**
+   * Replace the manager set for a room
+   */
+  static setManagers (roomId: number, userIds: number[]): void {
+    if (!Array.isArray(userIds)) {
+      throw new ValidationError('managers must be an array of userIds')
+    }
+
+    const cleaned: number[] = []
+    for (const id of userIds) {
+      const n = typeof id === 'number' ? id : parseInt(String(id), 10)
+      if (!Number.isInteger(n) || n <= 0) {
+        throw new ValidationError('managers contains an invalid userId')
+      }
+      if (!cleaned.includes(n)) cleaned.push(n)
+    }
+
+    if (cleaned.length > 0) {
+      // verify all userIds exist and have role 'room_manager'
+      const verifyQuery = sql`
+        SELECT users.userId
+        FROM users
+          INNER JOIN roles USING (roleId)
+        WHERE roles.name = 'room_manager' AND users.userId IN ${sql.tuple(cleaned)}
+      `
+      const found = db.all<{ userId: number }>(String(verifyQuery), verifyQuery.parameters).map(r => r.userId)
+      const missing = cleaned.filter(id => !found.includes(id))
+      if (missing.length > 0) {
+        throw new ValidationError(`Cannot assign manager: user must have the room_manager role (userIds: ${missing.join(',')})`)
+      }
+    }
+
+    db.exec('BEGIN')
+    try {
+      const delQuery = sql`DELETE FROM roomManagers WHERE roomId = ${roomId}`
+      db.run(String(delQuery), delQuery.parameters)
+
+      for (const userId of cleaned) {
+        const insQuery = sql`
+          INSERT INTO roomManagers (roomId, userId) VALUES (${roomId}, ${userId})
+        `
+        db.run(String(insQuery), insQuery.parameters)
+      }
+      db.exec('COMMIT')
+    } catch (err) {
+      db.exec('ROLLBACK')
+      throw err
+    }
+  }
+
+  /**
+   * Whether a user manages a specific room
+   */
+  static isManager (roomId: number, userId: number): boolean {
+    if (typeof roomId !== 'number' || typeof userId !== 'number') return false
+    const query = sql`
+      SELECT 1 AS one
+      FROM roomManagers
+      WHERE roomId = ${roomId} AND userId = ${userId}
+      LIMIT 1
+    `
+    return !!db.get(String(query), query.parameters)
+  }
+
+  /**
+   * List roomIds a user manages
+   */
+  static getManagedRoomIds (userId: number): number[] {
+    if (typeof userId !== 'number') return []
+    const query = sql`
+      SELECT roomId
+      FROM roomManagers
+      WHERE userId = ${userId}
+      ORDER BY roomId ASC
+    `
+    return db.all<{ roomId: number }>(String(query), query.parameters).map(r => r.roomId)
+  }
+
+  /**
+   * Delete all queue rows for a room
+   */
+  static clearQueue (roomId: number): number {
+    const query = sql`
+      DELETE FROM queue
+      WHERE roomId = ${roomId}
+    `
+    const res = db.run(String(query), query.parameters)
+    return res.changes ?? 0
   }
 
   static async set (roomId, room) {

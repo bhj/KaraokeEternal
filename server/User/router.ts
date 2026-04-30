@@ -43,7 +43,9 @@ const createUserCtx = (user, roomId) => {
     dateUpdated: user.dateUpdated,
     isAdmin: user.role === 'admin',
     isGuest: user.role === 'guest',
+    managedRoomIds: user.role === 'room_manager' ? Rooms.getManagedRoomIds(user.userId) : [],
     name: user.name,
+    role: user.role,
     roomId: parseInt(roomId, 10) || null,
     userId: user.userId,
     username: user.username,
@@ -275,6 +277,10 @@ router.put('/user/:userId', async (ctx) => {
     // remaining, changing one's own role is currently disallowed
     if (user.role !== 'admin' || targetId === user.userId) {
       ctx.throw(403)
+    }
+
+    if (!['admin', 'room_manager', 'standard', 'guest'].includes(req.body.role)) {
+      ctx.throw(400, 'Invalid role')
     }
 
     fields.set('roleId', sql`(SELECT roleId FROM roles WHERE name = ${req.body.role})`)

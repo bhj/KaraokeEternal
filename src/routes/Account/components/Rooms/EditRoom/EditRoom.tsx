@@ -1,11 +1,18 @@
 import React, { useRef, useState } from 'react'
-import { useAppDispatch } from 'store/hooks'
-import { createRoom, removeRoom, updateRoom, requestPrefsPush } from 'store/modules/rooms'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
+import {
+  clearRoomQueue,
+  createRoom,
+  removeRoom,
+  updateRoom,
+  requestPrefsPush,
+} from 'store/modules/rooms'
 import { getFormData } from 'lib/util'
 import Button from 'components/Button/Button'
 import Modal from 'components/Modal/Modal'
 import UserPrefs from './UserPrefs/UserPrefs'
 import QRPrefs from './QRPrefs/QRPrefs'
+import ManagersPicker from './ManagersPicker/ManagersPicker'
 import type { Room, IRoomPrefs } from 'shared/types'
 import styles from './EditRoom.css'
 
@@ -18,20 +25,32 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
   const formRef = useRef(null)
   const [roomPassword, setRoomPassword] = useState(room && room.hasPassword ? '*'.repeat(32) : '')
   const [prefs, setPrefs] = useState<IRoomPrefs>(room?.prefs || {} as IRoomPrefs)
+  const [managers, setManagers] = useState<number[]>(room?.managers ?? [])
   const [prevRoom, setPrevRoom] = useState(room)
   const [isPasswordDirty, setIsPasswordDirty] = useState(false)
   const dispatch = useAppDispatch()
 
+  const isAdmin = useAppSelector(state => state.user.isAdmin)
+  // a non-admin in this editor is necessarily a room manager (Rooms panel guards this)
+  const canRemove = isAdmin
+  const canClearQueue = !!room
+  const canEditManagers = isAdmin
+
   if (room !== prevRoom) {
     setPrevRoom(room)
     if (room?.prefs) setPrefs(room.prefs)
+    setManagers(room?.managers ?? [])
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    const data = getFormData(new FormData(formRef.current)) as Record<string, string | IRoomPrefs>
+    const data = getFormData(new FormData(formRef.current)) as Record<string, string | IRoomPrefs | number[]>
     data.prefs = prefs
+
+    if (canEditManagers) {
+      data.managers = managers
+    }
 
     if (room) {
       if (!isPasswordDirty) delete data.password
@@ -45,6 +64,12 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
   const handleRemoveClick = () => {
     if (room && confirm(`Remove room "${room.name}" and its queue?`)) {
       dispatch(removeRoom(room.roomId))
+    }
+  }
+
+  const handleClearQueueClick = () => {
+    if (room && confirm(`Clear all songs from "${room.name}"'s queue?`)) {
+      dispatch(clearRoomQueue(room.roomId))
     }
   }
 
@@ -108,13 +133,21 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
         <div className={styles.prefsContainer}>
           <UserPrefs prefs={prefs} onChange={handlePrefsChange} />
           <QRPrefs prefs={prefs} onChange={handlePrefsChange} roomPassword={roomPassword} roomPasswordDirty={isPasswordDirty} />
+          {canEditManagers && (
+            <ManagersPicker selected={managers} onChange={setManagers} />
+          )}
         </div>
 
         <div className={styles.btnContainer}>
           <Button type='submit' variant='primary' className={styles.btn}>
             {room ? 'Update Room' : 'Create Room'}
           </Button>
-          {room && (
+          {canClearQueue && (
+            <Button onClick={handleClearQueueClick} className={styles.btn} variant='default'>
+              Clear Queue
+            </Button>
+          )}
+          {canRemove && room && (
             <Button onClick={handleRemoveClick} className={styles.btn} variant='danger'>
               Remove Room
             </Button>

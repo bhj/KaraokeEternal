@@ -45,7 +45,10 @@ const ACTION_HANDLERS = {
       })
     }
 
-    if (!sock.user.isAdmin && !(Queue.isOwner(sock.user.userId, queueId))) {
+    const canManageRoom = sock.user.isAdmin
+      || (sock.user.role === 'room_manager' && Rooms.isManager(sock.user.roomId, sock.user.userId))
+
+    if (!canManageRoom && !(Queue.isOwner(sock.user.userId, queueId))) {
       return acknowledge({
         type: QUEUE_MOVE + '_ERROR',
         error: 'Cannot move another user\'s song',
@@ -71,7 +74,10 @@ const ACTION_HANDLERS = {
     const { queueId } = payload
     const ids = Array.isArray(queueId) ? queueId : [queueId]
 
-    if (!sock.user.isAdmin && !(Queue.isOwner(sock.user.userId, ids))) {
+    const canManageRoom = sock.user.isAdmin
+      || (sock.user.role === 'room_manager' && Rooms.isManager(sock.user.roomId, sock.user.userId))
+
+    if (!canManageRoom && !(Queue.isOwner(sock.user.userId, ids))) {
       return acknowledge({
         type: QUEUE_REMOVE + '_ERROR',
         error: 'Cannot remove another user\'s song',

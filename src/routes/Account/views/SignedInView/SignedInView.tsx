@@ -10,7 +10,8 @@ import Rooms from '../../components/Rooms/Rooms'
 import Users from '../../components/Users/Users'
 
 const SignedInView = () => {
-  const { isAdmin } = useAppSelector(state => state.user)
+  const { isAdmin, role } = useAppSelector(state => state.user)
+  const isRoomManager = role === 'room_manager'
   const sliceExists = !!useAppSelector(state => state.users)
   const dispatch = useAppDispatch()
 
@@ -26,7 +27,7 @@ const SignedInView = () => {
 
   return (
     <>
-      {isAdmin
+      {(isAdmin || isRoomManager)
         && <Rooms />}
 
       {isAdmin

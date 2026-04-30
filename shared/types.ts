@@ -58,6 +58,7 @@ export interface Room {
   hasPassword: boolean
   numUsers: number
   prefs?: IRoomPrefs
+  managers?: number[]
 }
 
 export interface Role {

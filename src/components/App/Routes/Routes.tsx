@@ -63,11 +63,16 @@ const RequireAuth = ({
   path,
   redirectTo,
 }: RequireAuthProps) => {
-  const { isAdmin, userId } = useAppSelector(state => state.user)
+  const { isAdmin, role, managedRoomIds, roomId, userId } = useAppSelector(state => state.user)
   const location = useLocation()
 
-  if (path === '/player' && !isAdmin) {
-    return <Navigate to='/' replace />
+  if (path === '/player') {
+    const canOpenPlayer = isAdmin
+      || (role === 'room_manager' && roomId !== null && (managedRoomIds || []).includes(roomId))
+
+    if (!canOpenPlayer) {
+      return <Navigate to='/' replace />
+    }
   }
 
   if (userId === null) {
