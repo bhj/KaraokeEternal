@@ -23,7 +23,11 @@ const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.s
 router.get('/:mediaId', async (ctx) => {
   const { type } = ctx.query
 
-  if (!ctx.user.isAdmin) {
+  const isManagerOfRoom = ctx.user.role === 'room_manager'
+    && typeof ctx.user.roomId === 'number'
+    && Rooms.isManager(ctx.user.roomId, ctx.user.userId)
+
+  if (!ctx.user.isAdmin && !isManagerOfRoom) {
     ctx.throw(401)
   }
 
