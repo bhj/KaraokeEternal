@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { ensureState } from 'redux-optimistic-ui'
 import { RootState } from 'store/store'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
@@ -64,11 +64,14 @@ const ArtistList = ({
   const alphaPickerMap = useAppSelector(getAlphaPickerMap)
   const artists = useAppSelector(state => state.artists)
 
-  const lastScrollRow = useRef(scrollRow)
+  const initialScrollRow = useRef(scrollRow) // frozen target for restoration
+  const lastScrollRow = useRef(scrollRow) // current visible row
   const list = useRef<ListImperativeAPI | null>(null)
+  const hasRestoredScroll = useRef(false)
 
   useEffect(() => {
     return () => {
+      // console.log(`[scroll] UNMOUNT: dispatching scrollArtists(${lastScrollRow.current})`)
       dispatch(scrollArtists(lastScrollRow.current))
     }
   }, [dispatch])
@@ -85,7 +88,14 @@ const ArtistList = ({
   }
 
   const handleRowsRendered = ({ startIndex }: { startIndex: number }) => {
-    // console.log('rendered rows: ', { startIndex })
+    // before restoration runs, ignore the initial startIndex=0 that fires
+    // because the list defaults to scrollTop=0; otherwise it would falsely
+    // overwrite our saved row when the user navigates away before scrolling.
+    if (!hasRestoredScroll.current && startIndex === 0 && initialScrollRow.current) {
+      // console.log(`[scroll] rowsRendered IGNORED (pre-restore zero): startIndex=${startIndex}`)
+      return
+    }
+    // console.log(`[scroll] rowsRendered: startIndex=${startIndex} → lastScrollRow.current=${startIndex} (hasRestored=${hasRestoredScroll.current})`)
     lastScrollRow.current = startIndex
   }
 
@@ -97,16 +107,17 @@ const ArtistList = ({
     }
   }
 
-  const handleRef = (ref: ListImperativeAPI | null) => {
-    if (ref) {
-      list.current = ref
+  const handleRef = useCallback((ref: ListImperativeAPI | null) => {
+    list.current = ref
 
-      if (lastScrollRow.current) {
-      // console.log(`handleRef: scrolling to ${lastScrollRow.current}`)
-        list.current.scrollToRow({ index: lastScrollRow.current, align: 'start', behavior: 'instant' })
-      }
+    if (ref?.element && !hasRestoredScroll.current && initialScrollRow.current) {
+      // const el = ref.element
+      // console.log(`[scroll] BEFORE: target=${initialScrollRow.current} scrollTop=${el.scrollTop} scrollHeight=${el.scrollHeight} clientHeight=${el.clientHeight}`)
+      ref.scrollToRow({ index: initialScrollRow.current, align: 'start', behavior: 'instant' })
+      // console.log(`[scroll] AFTER: scrollTop=${el.scrollTop} scrollHeight=${el.scrollHeight}`)
+      hasRestoredScroll.current = true
     }
-  }
+  }, [])
 
   if (artists.result.length === 0) return null
 

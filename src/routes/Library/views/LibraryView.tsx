@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAppSelector } from 'store/hooks'
 import { Link } from 'react-router'
 import ArtistList from '../components/ArtistList/ArtistList'
@@ -14,17 +14,21 @@ const LibraryView = () => {
   const ui = useAppSelector(state => state.ui)
 
   const isSearching = !!filterStr.trim().length || filterStarred
-  const [initialHeaderHeight] = useState(ui.headerHeight)
-  const [finalHeaderHeight, setFinalHeaderHeight] = useState(null)
 
-  // don't render ArtistList until headerHeight is stable; otherwise
-  // scroll position restoration does not work well (appears OBO)
-  // @todo - this is hacky
-  if (finalHeaderHeight === null && ui.headerHeight > initialHeaderHeight) {
-    setFinalHeaderHeight(ui.headerHeight)
-  }
+  // ArtistList virtualizes rows against ui.headerHeight (the header includes
+  // LibraryHeader on this route, measured async via ResizeObserver). Mounting
+  // before the height settles makes saved scroll positions land off by
+  // (delta / rowHeight) rows. Wait for the first growth past the value at
+  // mount before rendering ArtistList.
+  const initialHeaderHeight = useRef(ui.headerHeight)
+  const [isReady, setIsReady] = useState(false)
+  useEffect(() => {
+    if (!isReady && ui.headerHeight > initialHeaderHeight.current) {
+      setIsReady(true)
+    }
+  }, [ui.headerHeight, isReady])
 
-  if (!finalHeaderHeight) return null
+  if (!isReady) return null
 
   return (
     <>
