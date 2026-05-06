@@ -180,6 +180,89 @@ class Media {
 
     return songId
   }
+
+  /**
+   * Set or clear the room-level default version for a song.
+   *
+   * Room managers can override the global isPreferred choice for users in
+   * their room who have not set a personal preference.  Setting isPreferred
+   * to false removes the row entirely so the global default takes effect again.
+   *
+   * Returns the songId so callers can emit LIBRARY_PUSH_SONG.
+   */
+  static setRoomPreferred (mediaId: number, roomId: number, isPreferred: boolean): number {
+    if (!Number.isInteger(mediaId) || !Number.isInteger(roomId) || typeof isPreferred !== 'boolean') {
+      throw new Error('invalid mediaId, roomId, or value')
+    }
+
+    const res = Media.search({ mediaId })
+
+    if (!res.result.length) {
+      throw new Error(`mediaId not found: ${mediaId}`)
+    }
+
+    const songId = res.entities[mediaId].songId
+
+    if (isPreferred) {
+      // UPSERT: one row per (roomId, songId) pair
+      const query = sql`
+        INSERT INTO roomMediaPrefs (roomId, songId, mediaId)
+        VALUES (${roomId}, ${songId}, ${mediaId})
+        ON CONFLICT(roomId, songId) DO UPDATE SET mediaId = excluded.mediaId
+      `
+      db.run(String(query), query.parameters)
+    } else {
+      const query = sql`
+        DELETE FROM roomMediaPrefs
+        WHERE roomId = ${roomId} AND songId = ${songId}
+      `
+      db.run(String(query), query.parameters)
+    }
+
+    return songId
+  }
+
+  /**
+   * Set or clear a user's personal version preference for a song.
+   *
+   * Personal preferences are the highest priority in the resolution chain and
+   * apply even for guests (their row is removed when the user account is
+   * deleted via ON DELETE CASCADE).  Setting isPreferred to false removes the
+   * row, allowing the room or global default to take effect.
+   *
+   * Returns the songId so callers can emit LIBRARY_PUSH_SONG.
+   */
+  static setUserPreferred (mediaId: number, userId: number, isPreferred: boolean): number {
+    if (!Number.isInteger(mediaId) || !Number.isInteger(userId) || typeof isPreferred !== 'boolean') {
+      throw new Error('invalid mediaId, userId, or value')
+    }
+
+    const res = Media.search({ mediaId })
+
+    if (!res.result.length) {
+      throw new Error(`mediaId not found: ${mediaId}`)
+    }
+
+    const songId = res.entities[mediaId].songId
+
+    if (isPreferred) {
+      // UPSERT: one row per (userId, songId) pair
+      const query = sql`
+        INSERT INTO userMediaPrefs (userId, songId, mediaId)
+        VALUES (${userId}, ${songId}, ${mediaId})
+        ON CONFLICT(userId, songId) DO UPDATE SET mediaId = excluded.mediaId
+      `
+      db.run(String(query), query.parameters)
+    } else {
+      const query = sql`
+        DELETE FROM userMediaPrefs
+        WHERE userId = ${userId} AND songId = ${songId}
+      `
+      db.run(String(query), query.parameters)
+    }
+
+    return songId
+  }
 }
 
 export default Media
