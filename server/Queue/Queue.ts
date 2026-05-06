@@ -5,13 +5,146 @@ import { QueueItem } from '../../shared/types.js'
 
 class Queue {
   /**
-   * Add a songId to a room's queue
+   * Resolve which mediaId to use for a given (songId, userId, roomId) triple.
+   *
+   * Resolution order (highest priority wins):
+   *   1. userMediaPrefs  — the user's explicit personal choice
+   *   2. roomMediaPrefs  — the room manager's default for this room
+   *   3. media.isPreferred — the global admin default
+   *   4. paths.priority ASC — lowest-priority path, first media file (fallback)
+   *
+   * The ORDER BY trick: correlated subqueries return 1 when the row matches
+   * the preference, 0 otherwise. Sorting DESC on these puts the matching row
+   * first without needing multiple queries.
+   */
+  static resolveMediaId (songId: number, userId: number, roomId: number): number {
+    const query = sql`
+      SELECT m.mediaId
+      FROM media m
+      INNER JOIN paths p ON m.pathId = p.pathId
+      WHERE m.songId = ${songId}
+      ORDER BY
+        (SELECT COUNT(*) FROM userMediaPrefs WHERE userId = ${userId} AND songId = ${songId} AND mediaId = m.mediaId) DESC,
+        (SELECT COUNT(*) FROM roomMediaPrefs WHERE roomId = ${roomId} AND songId = ${songId} AND mediaId = m.mediaId) DESC,
+        m.isPreferred DESC,
+        p.priority ASC
+      LIMIT 1
+    `
+    const row = db.get<{ mediaId: number }>(String(query), query.parameters)
+
+    if (!row) {
+      throw new Error(`No media found for songId ${songId}`)
+    }
+
+    return row.mediaId
+  }
+
+  /**
+   * Re-resolve queue.mediaId for rows affected by a preference change.
+   *
+   * Called after any preference is set or cleared so that already-queued
+   * songs reflect the new choice immediately.  Returns the distinct roomIds
+   * whose queues were updated so the caller can emit QUEUE_PUSH for them.
+   *
+   * Scope rules:
+   *   'user'   — re-resolve only rows queued by this user (highest priority;
+   *              no need to exclude others since their prefs are unaffected)
+   *   'room'   — re-resolve rows in this room that have no personal pref
+   *              (personal prefs override room default, so those rows keep
+   *              their existing mediaId)
+   *   'global' — re-resolve rows that have neither a personal nor room pref
+   */
+  static rerouteForPref (params: {
+    scope: 'user' | 'room' | 'global'
+    songId: number
+    userId?: number
+    roomId?: number
+  }): number[] {
+    const { scope, songId, userId, roomId } = params
+
+    // Collect the roomIds we're about to touch (needed for socket emit).
+    let roomIdsQuery: ReturnType<typeof sql>
+    if (scope === 'user') {
+      roomIdsQuery = sql`
+        SELECT DISTINCT roomId FROM queue
+        WHERE songId = ${songId} AND userId = ${userId}
+      `
+    } else if (scope === 'room') {
+      roomIdsQuery = sql`
+        SELECT DISTINCT roomId FROM queue
+        WHERE songId = ${songId} AND roomId = ${roomId}
+          AND userId NOT IN (SELECT userId FROM userMediaPrefs WHERE songId = ${songId})
+      `
+    } else {
+      roomIdsQuery = sql`
+        SELECT DISTINCT roomId FROM queue
+        WHERE songId = ${songId}
+          AND userId  NOT IN (SELECT userId  FROM userMediaPrefs WHERE songId = ${songId})
+          AND roomId  NOT IN (SELECT roomId  FROM roomMediaPrefs  WHERE songId = ${songId})
+      `
+    }
+
+    const affectedRoomIds = db.all<{ roomId: number }>(String(roomIdsQuery), roomIdsQuery.parameters)
+      .map(r => r.roomId)
+
+    if (affectedRoomIds.length === 0) return []
+
+    // Re-resolve using the full hierarchy. The subquery is identical for all
+    // scopes; only the WHERE filter (which rows to touch) differs.
+    const resolutionSubquery = sql`
+      SELECT m.mediaId
+      FROM media m
+      INNER JOIN paths p ON m.pathId = p.pathId
+      WHERE m.songId = queue.songId
+      ORDER BY
+        (SELECT COUNT(*) FROM userMediaPrefs WHERE userId = queue.userId AND songId = queue.songId AND mediaId = m.mediaId) DESC,
+        (SELECT COUNT(*) FROM roomMediaPrefs WHERE roomId = queue.roomId AND songId = queue.songId AND mediaId = m.mediaId) DESC,
+        m.isPreferred DESC,
+        p.priority ASC
+      LIMIT 1
+    `
+
+    let updateQuery: ReturnType<typeof sql>
+    if (scope === 'user') {
+      updateQuery = sql`
+        UPDATE queue SET mediaId = (${resolutionSubquery})
+        WHERE songId = ${songId} AND userId = ${userId}
+      `
+    } else if (scope === 'room') {
+      updateQuery = sql`
+        UPDATE queue SET mediaId = (${resolutionSubquery})
+        WHERE songId = ${songId} AND roomId = ${roomId}
+          AND userId NOT IN (SELECT userId FROM userMediaPrefs WHERE songId = ${songId})
+      `
+    } else {
+      updateQuery = sql`
+        UPDATE queue SET mediaId = (${resolutionSubquery})
+        WHERE songId = ${songId}
+          AND userId  NOT IN (SELECT userId  FROM userMediaPrefs WHERE songId = ${songId})
+          AND roomId  NOT IN (SELECT roomId  FROM roomMediaPrefs  WHERE songId = ${songId})
+      `
+    }
+
+    db.run(String(updateQuery), updateQuery.parameters)
+    return affectedRoomIds
+  }
+
+  /**
+   * Add a songId to a room's queue.
+   *
+   * The mediaId to play is resolved immediately via the three-tier preference
+   * hierarchy (user > room > global) so that each queue entry carries its own
+   * version choice.  Two users queuing the same song in the same room can end
+   * up with different mediaIds if they have different personal preferences.
    */
   static add ({ roomId, songId, userId }: { roomId: number, songId: number, userId: number }): void {
+    const mediaId = this.resolveMediaId(songId, userId, roomId)
+
     const fields = new Map()
     fields.set('roomId', roomId)
     fields.set('songId', songId)
     fields.set('userId', userId)
+    fields.set('mediaId', mediaId)
     fields.set('prevQueueId', sql`(
       SELECT queueId
       FROM queue
@@ -34,7 +167,11 @@ class Queue {
   }
 
   /**
-   * Get queued items for a given room
+   * Get queued items for a given room.
+   *
+   * Now that each queue row stores its own mediaId (resolved at add-time),
+   * the query is a simple direct join — no more GROUP BY / MAX(isPreferred)
+   * workaround that was silently returning an arbitrary media row.
    */
   static get (roomId: number): { result: number[], entities: Record<number, QueueItem> } {
     const result: number[] = []
@@ -44,18 +181,15 @@ class Queue {
     let curQueueId = null
 
     const query = sql`
-      SELECT queueId, songId, userId, prevQueueId,
-        media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
-        users.name AS userDisplayName, users.dateUpdated AS userDateUpdated,
-        paths.pathId, paths.data AS pathData,
-        MAX(isPreferred) AS isPreferred
-      FROM queue
-        INNER JOIN users USING(userId)
-        INNER JOIN media USING(songId)
-        INNER JOIN paths USING(pathId)
-      WHERE roomId = ${roomId}
-      GROUP BY queueId
-      ORDER BY queueId, paths.priority ASC
+      SELECT q.queueId, q.songId, q.userId, q.prevQueueId,
+        m.mediaId, m.relPath, m.rgTrackGain, m.rgTrackPeak,
+        u.name AS userDisplayName, u.dateUpdated AS userDateUpdated,
+        p.pathId, p.data AS pathData
+      FROM queue q
+        INNER JOIN users u ON q.userId = u.userId
+        INNER JOIN media m ON q.mediaId = m.mediaId
+        INNER JOIN paths p ON m.pathId = p.pathId
+      WHERE q.roomId = ${roomId}
     `
     const rows = db.all<{
       queueId: number
@@ -70,7 +204,6 @@ class Queue {
       userDateUpdated: number
       pathId: number
       pathData: string
-      isPreferred: number
     }>(String(query), query.parameters)
 
     for (const row of rows) {
@@ -86,7 +219,6 @@ class Queue {
 
       // don't send over the wire
       delete entities[row.queueId].relPath
-      delete entities[row.queueId].isPreferred
       delete entities[row.queueId].pathData
 
       if (row.prevQueueId === null) {
