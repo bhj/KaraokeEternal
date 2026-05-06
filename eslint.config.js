@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import stylistic from '@stylistic/eslint-plugin'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
-import pluginRefresh from 'eslint-plugin-react-refresh'
+import { reactRefresh } from 'eslint-plugin-react-refresh'
 import pluginPromise from 'eslint-plugin-promise'
 import pluginNode from 'eslint-plugin-n'
 import globals from 'globals'
@@ -39,7 +39,7 @@ export default defineConfig(
       'react': pluginReact,
       // @ts-expect-error - eslint-plugin-react-hooks types are incomplete
       'react-hooks': pluginReactHooks,
-      'react-refresh': pluginRefresh,
+      'react-refresh': reactRefresh.plugin,
     },
     rules: {
       ...pluginReact.configs.flat.recommended.rules,
@@ -65,6 +65,9 @@ export default defineConfig(
     rules: {
       ...pluginNode.configs['flat/recommended-module'].rules,
       'n/hashbang': 'off', // suppress incorrect warning
+      'n/no-unsupported-features/node-builtins': ['error', {
+        ignores: ['crypto.argon2'], // experimental in Node 24 but intentionally used
+      }],
     },
     languageOptions: {
       globals: globals.node,
