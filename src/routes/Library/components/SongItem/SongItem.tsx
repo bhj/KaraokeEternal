@@ -56,7 +56,9 @@ const SongItem = ({
 
   const handleClick = () => {
     if (ignoreMouseup) ignoreMouseup = false
-    else if (!isUpcoming) onSongQueue(songId)
+    // Queuing allowed even when song is already upcoming. Server enforces the
+    // only hard rule: same user cannot queue the same song consecutively.
+    else onSongQueue(songId)
   }
   const handleInfoClick = () => onSongInfo(songId)
   const handleStarClick = () => onSongStarClick(songId)

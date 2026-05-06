@@ -15,27 +15,58 @@ const QueueList = () => {
 
   const playerHistory = useAppSelector(getPlayerHistory)
   const queue = useAppSelector(getRoundRobinQueue)
+  const realQueue = useAppSelector(state => ensureState(state.queue))
   const songs = useAppSelector(state => state.songs)
   const starredSongs = useAppSelector(state => ensureState(state.userStars).starredSongs)
   const starCounts = useAppSelector(state => state.starCounts)
   const user = useAppSelector(state => state.user)
   const waits = useAppSelector(getWaits)
 
+  const canManageRoom = user.isAdmin || user.role === 'room_manager'
+
   // actions
   const dispatch = useAppDispatch()
   const handleMoveClick = (qId: number) => {
-    // reference user's last-played item as the new prevQueueId
     const userId = queue.entities[qId].userId
-    let lastPlayed = queueId // default in case user has no played items
 
-    for (let i = queue.result.indexOf(queueId); i >= 0; i--) {
-      if (queue.entities[queue.result[i]].userId === userId) {
-        lastPlayed = queue.result[i]
-        break
+    if (canManageRoom) {
+      // Admins and room managers have full reorder control: move the item to
+      // just after the song's owner last appeared in the played history, which
+      // effectively promotes it to the front of that user's upcoming turn.
+      let lastPlayed = queueId // fallback: after currently playing
+
+      for (let i = queue.result.indexOf(queueId); i >= 0; i--) {
+        if (queue.entities[queue.result[i]].userId === userId) {
+          lastPlayed = queue.result[i]
+          break
+        }
       }
-    }
 
-    dispatch(moveItem({ queueId: qId, prevQueueId: lastPlayed }))
+      dispatch(moveItem({ queueId: qId, prevQueueId: lastPlayed }))
+    } else {
+      // Standard/guest users may only move their own songs, and only to the
+      // front of their own upcoming turn — not ahead of other users' turns.
+      //
+      // Strategy: in the REAL queue order (not round-robin), find the user's
+      // first upcoming song that isn't the one being moved.  Insert just before
+      // it so this song becomes the user's next song to sing while everyone
+      // else's turn order is undisturbed.
+      const firstOwnIdx = realQueue.result.findIndex(
+        id => id !== qId
+          && id !== queueId
+          && !playerHistory.includes(id)
+          && realQueue.entities[id]?.userId === userId,
+      )
+
+      // prevQueueId = the item just before the user's first upcoming song.
+      // If no other own songs exist, fall back to after the currently playing
+      // song (round-robin will schedule it normally from there).
+      const prevQueueId = firstOwnIdx > 0
+        ? realQueue.result[firstOwnIdx - 1]
+        : queueId
+
+      dispatch(moveItem({ queueId: qId, prevQueueId }))
+    }
   }
 
   const handleRemoveUpcoming = (userId: number) => {
@@ -59,7 +90,7 @@ const QueueList = () => {
         key={qId}
         isErrored={isCurrent && isErrored}
         isInfoable={user.isAdmin}
-        isMovable={isUpcoming && (isOwner || user.isAdmin)}
+        isMovable={isUpcoming && (isOwner || user.isAdmin || user.role === 'room_manager')}
         isOwner={isOwner}
         isPlayed={!isUpcoming && !isCurrent}
         isPlaying={isCurrent && isPlaying}

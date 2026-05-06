@@ -18,6 +18,16 @@ const ACTION_HANDLERS = {
       })
     }
 
+    // Prevent the same user from queuing the same song consecutively.
+    // Other users queuing the same song is allowed — only back-to-back
+    // repeats by the same user are rejected.
+    if (Queue.isLastQueuedSong(sock.user.roomId, sock.user.userId, songId)) {
+      return acknowledge({
+        type: QUEUE_ADD + '_ERROR',
+        error: 'You already have this song at the end of the queue',
+      })
+    }
+
     Queue.add({
       roomId: sock.user.roomId,
       songId,
@@ -48,6 +58,8 @@ const ACTION_HANDLERS = {
     const canManageRoom = sock.user.isAdmin
       || (sock.user.role === 'room_manager' && Rooms.isManager(sock.user.roomId, sock.user.userId))
 
+    // Standard/guest users may only move their own songs.
+    // Admins and room managers may move any song in the queue.
     if (!canManageRoom && !(Queue.isOwner(sock.user.userId, queueId))) {
       return acknowledge({
         type: QUEUE_MOVE + '_ERROR',

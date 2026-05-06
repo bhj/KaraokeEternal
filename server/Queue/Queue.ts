@@ -338,6 +338,22 @@ class Queue {
   }
 
   /**
+   * Return true if songId is the most recent song this user queued in the room.
+   * Used to prevent back-to-back duplicates by the same user; other users
+   * queuing the same song is still allowed.
+   */
+  static isLastQueuedSong (roomId: number, userId: number, songId: number): boolean {
+    const query = sql`
+      SELECT songId FROM queue
+      WHERE roomId = ${roomId} AND userId = ${userId}
+      ORDER BY queueId DESC
+      LIMIT 1
+    `
+    const row = db.get<{ songId: number }>(String(query), query.parameters)
+    return row?.songId === songId
+  }
+
+  /**
    * Get media type from file extension
    */
   static getType (file: string): string {
