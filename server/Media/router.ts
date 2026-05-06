@@ -85,7 +85,28 @@ router.get('/:mediaId', async (ctx) => {
   ctx.body = buffer ? Readable.from(buffer) : fs.createReadStream(file)
 })
 
-// set isPreferred flag
+/**
+ * Emit QUEUE_PUSH to a specific set of rooms (by roomId).
+ * Used after preference changes to push only affected queues.
+ */
+function emitQueuePushToRooms (io: any, roomIds: number[]): void {
+  if (roomIds.length === 0) return
+  const roomIdSet = new Set(roomIds)
+
+  for (const { room, roomId } of Rooms.getActive(io)) {
+    if (roomIdSet.has(roomId)) {
+      io.to(room).emit('action', {
+        type: QUEUE_PUSH,
+        payload: Queue.get(roomId),
+      })
+    }
+  }
+}
+
+// Set the global default version for a song (admin only).
+// Clears any existing isPreferred flag for the song and optionally sets a new
+// one.  Also re-resolves any queued instances of the song that are not already
+// overridden by a room or user preference.
 router.all('/:mediaId/prefer', (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
@@ -97,18 +118,78 @@ router.all('/:mediaId/prefer', (ctx) => {
     ctx.throw(422)
   }
 
-  const songId = Media.setPreferred(mediaId, ctx.request.method === 'PUT')
-  ctx.status = 200
+  const isPreferred = ctx.request.method === 'PUT'
+  const songId = Media.setPreferred(mediaId, isPreferred)
 
-  // emit (potentially) updated queues to each room
-  for (const { room, roomId } of Rooms.getActive(ctx.io)) {
-    ctx.io.to(room).emit('action', {
-      type: QUEUE_PUSH,
-      payload: Queue.get(roomId),
-    })
+  // Re-resolve queue rows not covered by a room or user override, then push
+  // only the affected rooms rather than broadcasting to every active room.
+  const affectedRoomIds = Queue.rerouteForPref({ scope: 'global', songId })
+  emitQueuePushToRooms(ctx.io, affectedRoomIds)
+
+  ctx.status = 200
+  ctx.io.emit('action', {
+    type: LIBRARY_PUSH_SONG,
+    payload: Library.getSong(songId),
+  })
+})
+
+// Set a room-level default version for a song (room managers only).
+// Overrides the global isPreferred for users in this room who have not set a
+// personal preference.  The room manager must manage the target room.
+router.all('/:mediaId/prefer/room/:roomId', (ctx) => {
+  const roomId = parseInt(ctx.params.roomId, 10)
+
+  // Must be admin, or a manager of the specific room being modified.
+  const canEdit = ctx.user.isAdmin
+    || (ctx.user.role === 'room_manager' && Rooms.isManager(roomId, ctx.user.userId))
+
+  if (!canEdit || Number.isNaN(roomId)) {
+    ctx.throw(401)
   }
 
-  // emit (potentially) new duration
+  const mediaId = parseInt(ctx.params.mediaId, 10)
+
+  if (Number.isNaN(mediaId) || (ctx.request.method !== 'PUT' && ctx.request.method !== 'DELETE')) {
+    ctx.throw(422)
+  }
+
+  const isPreferred = ctx.request.method === 'PUT'
+  const songId = Media.setRoomPreferred(mediaId, roomId, isPreferred)
+
+  // Re-resolve queue rows in this room that are not overridden by a user pref.
+  const affectedRoomIds = Queue.rerouteForPref({ scope: 'room', songId, roomId })
+  emitQueuePushToRooms(ctx.io, affectedRoomIds)
+
+  ctx.status = 200
+  ctx.io.emit('action', {
+    type: LIBRARY_PUSH_SONG,
+    payload: Library.getSong(songId),
+  })
+})
+
+// Set a personal version preference for a song (any authenticated user).
+// Highest priority in the resolution chain; applies even for guest accounts.
+// Clearing the preference (DELETE) falls back to the room or global default.
+router.all('/:mediaId/prefer/user', (ctx) => {
+  // Must be a real user (not an unauthenticated request)
+  if (typeof ctx.user.userId !== 'number') {
+    ctx.throw(401)
+  }
+
+  const mediaId = parseInt(ctx.params.mediaId, 10)
+
+  if (Number.isNaN(mediaId) || (ctx.request.method !== 'PUT' && ctx.request.method !== 'DELETE')) {
+    ctx.throw(422)
+  }
+
+  const isPreferred = ctx.request.method === 'PUT'
+  const songId = Media.setUserPreferred(mediaId, ctx.user.userId, isPreferred)
+
+  // Re-resolve only this user's queued instances of the song across all rooms.
+  const affectedRoomIds = Queue.rerouteForPref({ scope: 'user', songId, userId: ctx.user.userId })
+  emitQueuePushToRooms(ctx.io, affectedRoomIds)
+
+  ctx.status = 200
   ctx.io.emit('action', {
     type: LIBRARY_PUSH_SONG,
     payload: Library.getSong(songId),
