@@ -29,7 +29,7 @@ const ManagersPicker = ({ selected, onChange }: ManagersPickerProps) => {
     }
   }
 
-  const candidates = users?.result.filter(uid => users.entities[uid].role === 'room_manager') ?? []
+  const candidates = (users?.result ?? []).filter(uid => users!.entities[uid].role === 'room_manager')
 
   return (
     <Accordion
