@@ -3,6 +3,7 @@ import fsPromises from 'node:fs/promises'
 import { Readable } from 'stream'
 import path from 'path'
 import { unzip } from 'unzipit'
+import { Server as SocketIO } from 'socket.io'
 import getLogger from '../lib/Log.js'
 import getCdgName from '../lib/getCdgName.js'
 import { getExt } from '../lib/util.js'
@@ -89,7 +90,7 @@ router.get('/:mediaId', async (ctx) => {
  * Emit QUEUE_PUSH to a specific set of rooms (by roomId).
  * Used after preference changes to push only affected queues.
  */
-function emitQueuePushToRooms (io: any, roomIds: number[]): void {
+function emitQueuePushToRooms (io: SocketIO, roomIds: number[]): void {
   if (roomIds.length === 0) return
   const roomIdSet = new Set(roomIds)
 

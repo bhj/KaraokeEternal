@@ -71,8 +71,20 @@ const SongInfo = () => {
             <br />
             <span className={styles.label}>Global default: </span>
             {isGlobal
-              ? <span><strong>Yes</strong>&nbsp;<a onClick={() => handleSetGlobal(mediaId, false)}>(Unset)</a></span>
-              : <span>No&nbsp;<a onClick={() => handleSetGlobal(mediaId, true)}>(Set)</a></span>}
+              && (
+                <span>
+                  <strong>Yes</strong>
+&nbsp;
+                  <a onClick={() => handleSetGlobal(mediaId, false)}>(Unset)</a>
+                </span>
+              )}
+            {!isGlobal
+              && (
+                <span>
+                  No&nbsp;
+                  <a onClick={() => handleSetGlobal(mediaId, true)}>(Set)</a>
+                </span>
+              )}
           </>
         )}
 
@@ -82,8 +94,20 @@ const SongInfo = () => {
             <br />
             <span className={styles.label}>Room default: </span>
             {isRoom
-              ? <span><strong>Yes</strong>&nbsp;<a onClick={() => handleSetRoom(mediaId, false)}>(Unset)</a></span>
-              : <span>No&nbsp;<a onClick={() => handleSetRoom(mediaId, true)}>(Set)</a></span>}
+              && (
+                <span>
+                  <strong>Yes</strong>
+&nbsp;
+                  <a onClick={() => handleSetRoom(mediaId, false)}>(Unset)</a>
+                </span>
+              )}
+            {!isRoom
+              && (
+                <span>
+                  No&nbsp;
+                  <a onClick={() => handleSetRoom(mediaId, true)}>(Set)</a>
+                </span>
+              )}
           </>
         )}
 
@@ -93,8 +117,20 @@ const SongInfo = () => {
             <br />
             <span className={styles.label}>My version: </span>
             {isUser
-              ? <span><strong>Yes</strong>&nbsp;<a onClick={() => handleSetUser(mediaId, false)}>(Clear)</a></span>
-              : <span>No&nbsp;<a onClick={() => handleSetUser(mediaId, true)}>(Set)</a></span>}
+              && (
+                <span>
+                  <strong>Yes</strong>
+&nbsp;
+                  <a onClick={() => handleSetUser(mediaId, false)}>(Clear)</a>
+                </span>
+              )}
+            {!isUser
+              && (
+                <span>
+                  No&nbsp;
+                  <a onClick={() => handleSetUser(mediaId, true)}>(Set)</a>
+                </span>
+              )}
           </>
         )}
       </div>
