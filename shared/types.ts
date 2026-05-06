@@ -108,7 +108,12 @@ export type MediaType = 'cdg' | 'mp4' | ''
 export interface Media {
   songId: number
   mediaId: number
+  /** Admin-set global default for this song group */
   isPreferred: boolean
+  /** Room manager-set default for the requesting user's current room */
+  roomPreferred?: boolean
+  /** This user's personal version choice */
+  userPreferred?: boolean
   path: string
   relPath: string
   duration: number

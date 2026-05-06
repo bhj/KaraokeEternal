@@ -104,6 +104,8 @@ export const UI_WINDOW_RESIZE = 'ui/WINDOW_RESIZE'
 // Song Info
 export const SONG_INFO_REQUEST = 'songInfo/SONG_INFO_REQUEST'
 export const SONG_INFO_SET_PREFERRED = 'songInfo/SET_PREFERRED'
+export const SONG_INFO_SET_ROOM_PREFERRED = 'songInfo/SET_ROOM_PREFERRED'
+export const SONG_INFO_SET_USER_PREFERRED = 'songInfo/SET_USER_PREFERRED'
 export const SONG_INFO_CLOSE = 'songInfo/SONG_INFO_CLOSE'
 
 // IPC Messages

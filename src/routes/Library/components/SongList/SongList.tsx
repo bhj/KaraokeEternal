@@ -20,6 +20,7 @@ const SongList = (props: SongListProps) => {
   const starredSongs = useAppSelector(state => ensureState(state.userStars).starredSongs)
   const starredSongCounts = useAppSelector(state => state.starCounts.songs)
   const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const isRoomManager = useAppSelector(state => state.user.role === 'room_manager')
   const { played, upcoming, current } = useAppSelector(getSongsStatus)
 
   const handleSongQueue = (songId: number) => dispatch(queueSong(songId))
@@ -35,6 +36,7 @@ const SongList = (props: SongListProps) => {
       isUpcoming={upcoming.includes(songId) || current === songId}
       isStarred={starredSongs.includes(songId)}
       isAdmin={isAdmin}
+      isRoomManager={isRoomManager}
       key={songId}
       numStars={starredSongCounts[songId] || 0}
       onSongQueue={handleSongQueue}

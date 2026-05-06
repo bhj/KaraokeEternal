@@ -3,6 +3,8 @@ import HttpApi from 'lib/HttpApi'
 import {
   SONG_INFO_REQUEST,
   SONG_INFO_SET_PREFERRED,
+  SONG_INFO_SET_ROOM_PREFERRED,
+  SONG_INFO_SET_USER_PREFERRED,
   SONG_INFO_CLOSE,
 } from 'shared/actionTypes'
 import { Media } from 'shared/types'
@@ -19,6 +21,7 @@ export const showSongInfo = createAsyncThunk(
 
 export const closeSongInfo = createAction(SONG_INFO_CLOSE)
 
+// Set or clear the admin-level global default version for a song.
 export const setPreferredSong = createAsyncThunk(
   SONG_INFO_SET_PREFERRED,
   async ({
@@ -27,6 +30,35 @@ export const setPreferredSong = createAsyncThunk(
     isPreferred,
   }: Pick<Media, 'songId' | 'mediaId' | 'isPreferred'>, thunkAPI) => {
     await api.request(isPreferred ? 'PUT' : 'DELETE', `media/${mediaId}/prefer`)
+    thunkAPI.dispatch(showSongInfo(songId))
+  },
+)
+
+// Set or clear the room manager's default version for a song in a specific room.
+// Falls back to the global default for users in that room who have no personal pref.
+export const setRoomPreferredSong = createAsyncThunk(
+  SONG_INFO_SET_ROOM_PREFERRED,
+  async ({
+    songId,
+    mediaId,
+    roomId,
+    isPreferred,
+  }: Pick<Media, 'songId' | 'mediaId' | 'isPreferred'> & { roomId: number }, thunkAPI) => {
+    await api.request(isPreferred ? 'PUT' : 'DELETE', `media/${mediaId}/prefer/room/${roomId}`)
+    thunkAPI.dispatch(showSongInfo(songId))
+  },
+)
+
+// Set or clear the current user's personal version preference for a song.
+// Highest priority in the resolution chain; applies even for guest accounts.
+export const setUserPreferredSong = createAsyncThunk(
+  SONG_INFO_SET_USER_PREFERRED,
+  async ({
+    songId,
+    mediaId,
+    isPreferred,
+  }: Pick<Media, 'songId' | 'mediaId' | 'isPreferred'>, thunkAPI) => {
+    await api.request(isPreferred ? 'PUT' : 'DELETE', `media/${mediaId}/prefer/user`)
     thunkAPI.dispatch(showSongInfo(songId))
   },
 )
