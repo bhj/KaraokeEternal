@@ -62,71 +62,51 @@ class Queue {
   }): number[] {
     const { scope, songId, userId, roomId } = params
 
-    // Collect the roomIds we're about to touch (needed for socket emit).
-    let roomIdsQuery: ReturnType<typeof sql>
+    // Fetch the full row context for each queue entry we need to update.
+    // We cannot use a single correlated UPDATE with ORDER BY subqueries because
+    // SQLite cannot resolve outer-table column references (queue.userId etc.)
+    // from inside a scalar subquery's ORDER BY — only two levels of correlation
+    // are supported.  Instead we fetch rows in JS and call resolveMediaId()
+    // per row, which uses bound parameters rather than SQL correlation.
+    let rowsQuery: ReturnType<typeof sql>
     if (scope === 'user') {
-      roomIdsQuery = sql`
-        SELECT DISTINCT roomId FROM queue
+      rowsQuery = sql`
+        SELECT queueId, songId, userId, roomId FROM queue
         WHERE songId = ${songId} AND userId = ${userId}
       `
     } else if (scope === 'room') {
-      roomIdsQuery = sql`
-        SELECT DISTINCT roomId FROM queue
+      // Skip rows where the user has set a personal preference — those are
+      // at a higher priority tier and must not be overwritten.
+      rowsQuery = sql`
+        SELECT queueId, songId, userId, roomId FROM queue
         WHERE songId = ${songId} AND roomId = ${roomId}
           AND userId NOT IN (SELECT userId FROM userMediaPrefs WHERE songId = ${songId})
       `
     } else {
-      roomIdsQuery = sql`
-        SELECT DISTINCT roomId FROM queue
+      // Global scope: skip rows covered by either a room or user preference.
+      rowsQuery = sql`
+        SELECT queueId, songId, userId, roomId FROM queue
         WHERE songId = ${songId}
-          AND userId  NOT IN (SELECT userId  FROM userMediaPrefs WHERE songId = ${songId})
-          AND roomId  NOT IN (SELECT roomId  FROM roomMediaPrefs  WHERE songId = ${songId})
-      `
-    }
-
-    const affectedRoomIds = db.all<{ roomId: number }>(String(roomIdsQuery), roomIdsQuery.parameters)
-      .map(r => r.roomId)
-
-    if (affectedRoomIds.length === 0) return []
-
-    // Re-resolve using the full hierarchy. The subquery is identical for all
-    // scopes; only the WHERE filter (which rows to touch) differs.
-    const resolutionSubquery = sql`
-      SELECT m.mediaId
-      FROM media m
-      INNER JOIN paths p ON m.pathId = p.pathId
-      WHERE m.songId = queue.songId
-      ORDER BY
-        (SELECT COUNT(*) FROM userMediaPrefs WHERE userId = queue.userId AND songId = queue.songId AND mediaId = m.mediaId) DESC,
-        (SELECT COUNT(*) FROM roomMediaPrefs WHERE roomId = queue.roomId AND songId = queue.songId AND mediaId = m.mediaId) DESC,
-        m.isPreferred DESC,
-        p.priority ASC
-      LIMIT 1
-    `
-
-    let updateQuery: ReturnType<typeof sql>
-    if (scope === 'user') {
-      updateQuery = sql`
-        UPDATE queue SET mediaId = (${resolutionSubquery})
-        WHERE songId = ${songId} AND userId = ${userId}
-      `
-    } else if (scope === 'room') {
-      updateQuery = sql`
-        UPDATE queue SET mediaId = (${resolutionSubquery})
-        WHERE songId = ${songId} AND roomId = ${roomId}
           AND userId NOT IN (SELECT userId FROM userMediaPrefs WHERE songId = ${songId})
-      `
-    } else {
-      updateQuery = sql`
-        UPDATE queue SET mediaId = (${resolutionSubquery})
-        WHERE songId = ${songId}
-          AND userId  NOT IN (SELECT userId  FROM userMediaPrefs WHERE songId = ${songId})
-          AND roomId  NOT IN (SELECT roomId  FROM roomMediaPrefs  WHERE songId = ${songId})
+          AND roomId NOT IN (SELECT roomId FROM roomMediaPrefs  WHERE songId = ${songId})
       `
     }
 
-    db.run(String(updateQuery), updateQuery.parameters)
-    return affectedRoomIds
+    const rows = db.all<{ queueId: number, songId: number, userId: number, roomId: number }>(
+      String(rowsQuery), rowsQuery.parameters,
+    )
+
+    if (rows.length === 0) return []
+
+    // Re-resolve and update each row individually using the full hierarchy.
+    for (const row of rows) {
+      const newMediaId = this.resolveMediaId(row.songId, row.userId, row.roomId)
+      const updateQuery = sql`UPDATE queue SET mediaId = ${newMediaId} WHERE queueId = ${row.queueId}`
+      db.run(String(updateQuery), updateQuery.parameters)
+    }
+
+    // Return distinct roomIds so callers can emit QUEUE_PUSH to affected rooms.
+    return [...new Set(rows.map(r => r.roomId))]
   }
 
   /**
