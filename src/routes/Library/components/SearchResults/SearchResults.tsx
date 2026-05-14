@@ -1,90 +1,62 @@
-import React, { useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import { ensureState } from 'redux-optimistic-ui'
+import type { Artist, Song } from 'shared/types'
 import { RootState } from 'store/store'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import { toggleArtistResultExpanded } from '../../modules/library'
+import { queueSong } from 'routes/Queue/modules/queue'
+import { showSongInfo } from 'store/modules/songInfo'
+import { toggleSongStarred } from 'store/modules/userStars'
 import getSearchResults from '../../selectors/getSearchResults'
 import getSongsStatus from '../../selectors/getSongsStatus'
+import buildHighlightPattern from '../Highlight/buildHighlightPattern'
 import PaddedList from 'components/PaddedList/PaddedList'
-import ArtistItem from '../ArtistItem/ArtistItem'
-import SongList from '../SongList/SongList'
+import SongItem from '../SongItem/SongItem'
 import type { ListImperativeAPI, RowComponentProps } from 'react-window'
 import styles from './SearchResults.css'
 
 const ROW_HEIGHT_RESULT_HEADING = 24
-const ROW_HEIGHT_ARTIST = 48
-const ROW_HEIGHT_SONG = 56 // 52px + 4px margin
 const ROW_HEIGHT_SONG_WITH_ARTIST = 68 // 64px + 4px margin
 
 interface SearchResultsProps {
-  // starredArtistCounts: Record<number, number> // @todo
   ui: RootState['ui']
 }
 
 interface CustomRowProps {
-  artists: RootState['artists']
-  dispatch: ReturnType<typeof useAppDispatch>
-  expandedArtists: number[]
-  filterKeywords: string[]
+  highlight: RegExp | null
   filterStarred: boolean
-  artistsResult: number[]
   songsResult: number[]
-  expandedArtistResults: number[]
+  songs: Record<number, Song>
+  artists: Record<number, Artist>
+  starredSongs: number[]
+  starredSongCounts: Record<number, number>
+  isAdmin: boolean
+  played: Set<number>
+  upcoming: Set<number>
+  currentSongId: number | undefined
+  onSongQueue: (id: number) => void
+  onSongInfo: (id: number) => void
+  onSongStar: (id: number) => void
 }
 
-// this is outside the SearchResults component to keep the reference as stable as possible,
-// as react-window will re-render the list (breaking animations) when RowComponent changes
 const RowComponent = ({
   index,
   style,
-  // below are also used in SearchResults and passed via rowProps to avoid duplicate effort
-  dispatch,
-  artists,
-  filterKeywords,
+  highlight,
   filterStarred,
-  artistsResult,
   songsResult,
-  expandedArtistResults,
+  songs,
+  artists,
+  starredSongs,
+  starredSongCounts,
+  isAdmin,
+  played,
+  upcoming,
+  currentSongId,
+  onSongQueue,
+  onSongInfo,
+  onSongStar,
 }: RowComponentProps<CustomRowProps>) => {
-  const { starredSongs } = useAppSelector(state => ensureState(state.userStars))
-  const { upcoming } = useAppSelector(getSongsStatus)
-
-  // # artist results heading
   if (index === 0) {
-    return (
-      <div key='artistsHeading' style={style} className={styles.artistsHeading}>
-        {artistsResult.length}
-        {' '}
-        {filterStarred ? 'starred ' : ''}
-        {artistsResult.length === 1 ? 'artist' : 'artists'}
-      </div>
-    )
-  }
-
-  // artist results
-  if (index > 0 && index < artistsResult.length + 1) {
-    const artistId = artistsResult[index - 1]
-    const artist = artists.entities[artistId]
-
-    return (
-      <ArtistItem
-        artistSongIds={artist.songIds}
-        // numStars={props.starredArtistCounts[artistId] || 0}
-        filterKeywords={filterKeywords}
-        isExpanded={expandedArtistResults.includes(artistId)}
-        key={artistId}
-        name={artist.name}
-        numStars={0}
-        onArtistClick={() => dispatch(toggleArtistResultExpanded(artistId))}
-        upcomingSongs={upcoming}
-        starredSongs={starredSongs}
-        style={style}
-      />
-    )
-  }
-
-  // # song results heading
-  if (index === artistsResult.length + 1) {
     return (
       <div key='songsHeading' style={style} className={styles.songsHeading}>
         {songsResult.length}
@@ -95,13 +67,24 @@ const RowComponent = ({
     )
   }
 
-  // song results
+  const songId = songsResult[index - 1]
+  const song = songs[songId]
+  if (!song) return null
+
   return (
-    <div style={style} key='songs'>
-      <SongList
-        songIds={songsResult}
-        showArtist
-        filterKeywords={filterKeywords}
+    <div style={style}>
+      <SongItem
+        {...song}
+        artist={artists[song.artistId]?.name ?? ''}
+        highlight={highlight}
+        isPlayed={played.has(songId)}
+        isUpcoming={upcoming.has(songId) || currentSongId === songId}
+        isStarred={starredSongs.includes(songId)}
+        isAdmin={isAdmin}
+        numStars={starredSongCounts[songId] || 0}
+        onSongQueue={onSongQueue}
+        onSongStarClick={onSongStar}
+        onSongInfo={onSongInfo}
       />
     </div>
   )
@@ -109,58 +92,52 @@ const RowComponent = ({
 
 const SearchResults = ({ ui }: SearchResultsProps) => {
   const dispatch = useAppDispatch()
-  const artists = useAppSelector(state => state.artists)
-  const expandedArtistResults = useAppSelector(state => state.library.expandedArtistResults)
   const { filterStr, filterStarred } = useAppSelector(state => state.library)
-  const { artistsResult, songsResult } = useAppSelector(getSearchResults)
+  const { songsResult } = useAppSelector(getSearchResults)
+  const artists = useAppSelector(state => state.artists.entities)
+  const songs = useAppSelector(state => state.songs.entities)
+  const starredSongs = useAppSelector(state => ensureState(state.userStars).starredSongs)
+  const starredSongCounts = useAppSelector(state => state.starCounts.songs)
+  const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const { played, upcoming, current } = useAppSelector(getSongsStatus)
 
   const listRef = useRef<ListImperativeAPI | null>(null)
-  const filterKeywords = filterStr.trim() ? filterStr.trim().toLowerCase().split(' ') : []
+  const highlight = useMemo(() => buildHighlightPattern(filterStr), [filterStr])
 
-  const rowHeight = (index: number) => {
-    // artists heading
+  const onSongQueue = useCallback((id: number) => dispatch(queueSong(id)), [dispatch])
+  const onSongInfo = useCallback((id: number) => dispatch(showSongInfo(id)), [dispatch])
+  const onSongStar = useCallback((id: number) => dispatch(toggleSongStarred(id)), [dispatch])
+
+  const rowHeight = useCallback((index: number) => {
     if (index === 0) return ROW_HEIGHT_RESULT_HEADING
-
-    // artist results
-    if (index > 0 && index < artistsResult.length + 1) {
-      const artistId = artistsResult[index - 1]
-      let height = ROW_HEIGHT_ARTIST
-
-      if (expandedArtistResults.includes(artistId)) {
-        height += artists.entities[artistId].songIds.length * ROW_HEIGHT_SONG
-      }
-
-      return height
-    }
-
-    // songs heading
-    if (index === artistsResult.length + 1) return ROW_HEIGHT_RESULT_HEADING
-
-    // song results
-    return songsResult.length * ROW_HEIGHT_SONG_WITH_ARTIST
-  }
+    return ROW_HEIGHT_SONG_WITH_ARTIST
+  }, [])
 
   const handleRef = (ref: ListImperativeAPI) => {
-    if (ref) {
-      listRef.current = ref
-      // listRef.current.scrollToRow({ index: props.scrollRow, align: 'start' })
-    }
+    if (ref) listRef.current = ref
   }
 
   return (
     <PaddedList
       rowComponent={RowComponent}
       rowProps={{
-        dispatch,
-        artists,
         filterStarred,
-        filterKeywords,
-        artistsResult,
+        highlight,
         songsResult,
-        expandedArtistResults,
+        songs,
+        artists,
+        starredSongs,
+        starredSongCounts,
+        isAdmin,
+        played,
+        upcoming,
+        currentSongId: current,
+        onSongQueue,
+        onSongInfo,
+        onSongStar,
       }}
       rowHeight={rowHeight}
-      numRows={artistsResult.length + 3}
+      numRows={1 + songsResult.length}
       paddingTop={ui.headerHeight}
       paddingRight={4}
       paddingBottom={ui.footerHeight}

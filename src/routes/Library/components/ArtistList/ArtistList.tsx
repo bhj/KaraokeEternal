@@ -38,7 +38,6 @@ const RowComponent = ({
   const { upcoming, current } = useAppSelector(getSongsStatus)
 
   const artist = artists.entities[artists.result[index]]
-  if (current) upcoming.push(current)
 
   return (
     <ArtistItem
@@ -49,6 +48,7 @@ const RowComponent = ({
       numStars={starredArtistCounts[artist.artistId] || 0}
       onArtistClick={() => dispatch(toggleArtistExpanded(artist.artistId))}
       upcomingSongs={upcoming}
+      currentSongId={current}
       starredSongs={starredSongs}
       style={style}
     />

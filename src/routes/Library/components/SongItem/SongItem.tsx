@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
-import Highlighter from 'react-highlight-words'
 import { useSwipeable } from 'react-swipeable'
 import Button from 'components/Button/Button'
 import ButtonStar from 'components/ButtonStar/ButtonStar'
 import Buttons from 'components/Buttons/Buttons'
 import Icon from 'components/Icon/Icon'
 import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
+import Highlight from '../Highlight/Highlight'
 import { formatDuration } from 'lib/dateTime'
 import styles from './SongItem.css'
 
@@ -26,7 +26,7 @@ interface SongItemProps {
   isAdmin: boolean
   numStars: number
   numMedia: number
-  filterKeywords: string[]
+  highlight?: RegExp | null
 }
 
 const SongItem = ({
@@ -43,7 +43,7 @@ const SongItem = ({
   isAdmin,
   numStars,
   numMedia,
-  filterKeywords,
+  highlight,
 }: SongItemProps) => {
   const [isExpanded, setExpanded] = useState(false)
 
@@ -85,7 +85,7 @@ const SongItem = ({
         </div>
         <div onClick={handleClick} className={styles.primary}>
           <div className={styles.title}>
-            {filterKeywords?.length ? <Highlighter autoEscape textToHighlight={title} searchWords={filterKeywords} /> : title}
+            <Highlight text={title} pattern={highlight ?? null} />
             {isAdmin && numMedia > 1 && (
               <i>
                 {' '}
@@ -94,7 +94,11 @@ const SongItem = ({
                 )
               </i>
             )}
-            {artist && <div className={styles.artist}>{artist}</div>}
+            {artist && (
+              <div className={styles.artist}>
+                <Highlight text={artist} pattern={highlight ?? null} />
+              </div>
+            )}
           </div>
         </div>
       </ToggleAnimation>
@@ -114,4 +118,4 @@ const SongItem = ({
   )
 }
 
-export default SongItem
+export default React.memo(SongItem)

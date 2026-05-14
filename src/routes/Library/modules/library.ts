@@ -5,7 +5,6 @@ import {
   LIBRARY_FILTER_TOGGLE_STARRED,
   LIBRARY_PUSH,
   TOGGLE_ARTIST_EXPANDED,
-  TOGGLE_ARTIST_RESULT_EXPANDED,
   SCROLL_ARTISTS,
 } from 'shared/actionTypes'
 
@@ -14,7 +13,6 @@ import {
 // ------------------------------------
 export const scrollArtists = createAction<number>(SCROLL_ARTISTS)
 export const toggleArtistExpanded = createAction<number>(TOGGLE_ARTIST_EXPANDED)
-export const toggleArtistResultExpanded = createAction<number>(TOGGLE_ARTIST_RESULT_EXPANDED)
 const libraryPush = createAction<LibraryState>(LIBRARY_PUSH)
 
 export const resetFilterStr = createAction(LIBRARY_FILTER_STRING_RESET)
@@ -39,7 +37,6 @@ export interface LibraryState {
   filterStarred: boolean
   scrollRow: number
   expandedArtists: number[]
-  expandedArtistResults: number[]
 }
 
 const initialState: LibraryState = {
@@ -49,7 +46,6 @@ const initialState: LibraryState = {
   filterStarred: false,
   scrollRow: 0,
   expandedArtists: [],
-  expandedArtistResults: [],
 }
 
 const libraryReducer = createReducer(initialState, (builder) => {
@@ -71,12 +67,6 @@ const libraryReducer = createReducer(initialState, (builder) => {
 
       if (idx === -1) state.expandedArtists.push(payload)
       else state.expandedArtists.splice(idx, 1)
-    })
-    .addCase(toggleArtistResultExpanded, (state, { payload }) => {
-      const idx = state.expandedArtistResults.indexOf(payload)
-
-      if (idx === -1) state.expandedArtistResults.push(payload)
-      else state.expandedArtistResults.splice(idx, 1)
     })
     .addCase(libraryPush, (state, { payload }) => ({
       ...state,

@@ -7,23 +7,25 @@ const getCurrentQueueId = (state: RootState) => state.status.isAtQueueEnd ? unde
 const getPlayerHistoryJSON = (state: RootState) => state.status.historyJSON
 
 type SongsStatus = {
-  played: number[]
-  upcoming: number[]
+  played: Set<number>
+  upcoming: Set<number>
   current: number | undefined
 }
 
 const getSongsStatus: Selector<RootState, SongsStatus> = createSelector(
   [getQueue, getCurrentQueueId, getPlayerHistoryJSON],
   (queue, curId, historyJSON): SongsStatus => {
-    const history = JSON.parse(historyJSON)
-    const played: number[] = []
-    const upcoming: number[] = []
+    const history: number[] = JSON.parse(historyJSON)
+    const historySet = new Set(history)
+    const played = new Set<number>()
+    const upcoming = new Set<number>()
 
     queue.result.forEach((queueId) => {
-      if (history.includes(queueId)) {
-        played.push(queue.entities[queueId].songId)
+      const songId = queue.entities[queueId].songId
+      if (historySet.has(queueId)) {
+        played.add(songId)
       } else if (queueId !== curId) {
-        upcoming.push(queue.entities[queueId].songId)
+        upcoming.add(songId)
       }
     })
 

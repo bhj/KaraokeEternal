@@ -1,6 +1,5 @@
 import React from 'react'
 import clsx from 'clsx'
-import Highlighter from 'react-highlight-words'
 import SongList from '../SongList/SongList'
 import Icon from 'components/Icon/Icon'
 import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
@@ -8,27 +7,29 @@ import styles from './ArtistItem.css'
 
 interface ArtistItemProps {
   artistSongIds: number[]
-  filterKeywords?: string[]
   isExpanded: boolean
   name: string
   numStars: number
   onArtistClick: () => void
   starredSongs: number[]
   style?: object
-  upcomingSongs: number[]
+  upcomingSongs: Set<number>
+  currentSongId: number | undefined
 }
 
 const ArtistItem = ({
   artistSongIds,
-  filterKeywords,
   isExpanded,
   name,
   onArtistClick,
   starredSongs,
   style,
   upcomingSongs,
+  currentSongId,
 }: ArtistItemProps): React.ReactElement => {
-  const isChildUpcoming = artistSongIds.some(songId => upcomingSongs.includes(songId))
+  const isChildUpcoming = artistSongIds.some(songId =>
+    upcomingSongs.has(songId) || currentSongId === songId,
+  )
   const isChildStarred = artistSongIds.some(songId => starredSongs.includes(songId))
 
   return (
@@ -45,7 +46,7 @@ const ArtistItem = ({
         </div>
         <ToggleAnimation toggle={isChildUpcoming} className={styles.animateGlow}>
           <div className={clsx(styles.name, isChildUpcoming && styles.isChildUpcoming)}>
-            {filterKeywords?.length ? <Highlighter autoEscape textToHighlight={name} searchWords={filterKeywords} /> : name}
+            {name}
           </div>
         </ToggleAnimation>
       </div>
@@ -54,7 +55,6 @@ const ArtistItem = ({
         <SongList
           songIds={artistSongIds}
           showArtist={false}
-          filterKeywords={filterKeywords}
         />
       )}
     </div>

@@ -1,3 +1,7 @@
+## TBD
+
+- **(App)** Search no longer separates results by artist and song and now works for keywords spanning both (e.g. "beatles all together now")
+
 ## v2.0.2 (2026-02-14)
 
 - **(App)** Star counts are now shown in the Queue view
