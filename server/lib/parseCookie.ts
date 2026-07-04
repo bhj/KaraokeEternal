@@ -7,7 +7,14 @@ export default function parseCookie (cookie) {
     cookie.split(';')
       .forEach((c) => {
         const parts = c.split('=')
-        list[parts.shift().trim()] = decodeURI(parts.join('='))
+        const name = parts.shift().trim()
+        const raw = parts.join('=')
+
+        try {
+          list[name] = decodeURI(raw)
+        } catch {
+          list[name] = raw
+        }
       })
   }
 
