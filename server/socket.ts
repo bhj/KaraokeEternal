@@ -42,7 +42,10 @@ export default function (io, jwtKey) {
 
     // authenticate the JWT sent via cookie in http handshake
     try {
-      sock.user = jwtVerify(keToken, jwtKey)
+      const decoded = jwtVerify(keToken, jwtKey) as { exp?: number }
+      // Reject tokens without an expiry (e.g. issued before JWT expiry existed).
+      if (typeof decoded.exp !== 'number') throw new Error('token missing exp')
+      sock.user = decoded
 
       // success
       log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)
@@ -68,7 +71,8 @@ export default function (io, jwtKey) {
       // beyond this point assumes there is a room
 
       log.verbose('%s (%s) left room %s (%s; %s in room)',
-        sock.user.name, sock.id, sock.user.roomId, reason, sock.adapter.rooms.size,
+        sock.user.name, sock.id, sock.user.roomId, reason,
+        sock.adapter.rooms.get(Rooms.prefix(sock.user.roomId))?.size ?? 0,
       )
 
       // any players left in room?
@@ -167,7 +171,8 @@ export default function (io, jwtKey) {
     }
 
     log.verbose('%s (%s) joined room %s (%s in room)',
-      sock.user.name, sock.id, sock.user.roomId, sock.adapter.rooms.size,
+      sock.user.name, sock.id, sock.user.roomId,
+      sock.adapter.rooms.get(Rooms.prefix(sock.user.roomId))?.size ?? 0,
     )
 
     // send room's queue

@@ -33,6 +33,7 @@ const router = new KoaRouter({ prefix: '/api' })
 const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
 const { sign: jwtSign } = jsonWebToken
+const JWT_EXPIRES_IN = 60 * 60 * 48 // 48 hours
 
 // Takes the "raw" object returned by the User class and massages it
 // into the shape used by the client (state.user) and in server-side
@@ -84,7 +85,7 @@ router.post('/login', async (ctx) => {
   const userCtx = createUserCtx(user, roomId)
 
   // create JWT
-  const token = jwtSign(userCtx, ctx.jwtKey)
+  const token = jwtSign(userCtx, ctx.jwtKey, { expiresIn: JWT_EXPIRES_IN })
 
   // set JWT as an httpOnly cookie
   ctx.cookies.set('keToken', token, {
@@ -330,9 +331,10 @@ router.put('/user/:userId', async (ctx) => {
 
   const userCtx = createUserCtx(updatedUser, ctx.user.roomId || null)
 
-  // create JWT
-  // @todo: this should not extend the JWT expiry date
-  const token = jwtSign(userCtx, ctx.jwtKey)
+  // Re-mint so claims (name, username, role) stay current, but keep the
+  // ORIGINAL expiry so repeated edits can't extend the session indefinitely.
+  // ctx.user.exp is guaranteed present since verify rejects tokens without it.
+  const token = jwtSign({ ...userCtx, exp: ctx.user.exp }, ctx.jwtKey)
 
   // set JWT as an httpOnly cookie
   ctx.cookies.set('keToken', token, {
@@ -403,7 +405,7 @@ router.post('/user', async (ctx) => {
     const userCtx = createUserCtx(user, req.body.roomId || null)
 
     // create JWT
-    const token = jwtSign(userCtx, ctx.jwtKey)
+    const token = jwtSign(userCtx, ctx.jwtKey, { expiresIn: JWT_EXPIRES_IN })
 
     // set JWT as an httpOnly cookie
     ctx.cookies.set('keToken', token, {
@@ -454,7 +456,7 @@ router.post('/setup', async (ctx) => {
 
     // create JWT
     const userCtx = createUserCtx(user, roomRes.lastID)
-    const token = jwtSign(userCtx, ctx.jwtKey)
+    const token = jwtSign(userCtx, ctx.jwtKey, { expiresIn: JWT_EXPIRES_IN })
 
     // set JWT as an httpOnly cookie
     ctx.cookies.set('keToken', token, {

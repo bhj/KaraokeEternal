@@ -1,3 +1,8 @@
+import store from 'store/store'
+import socket from 'lib/socket'
+import Persistor from 'store/Persistor'
+import { LOGOUT } from 'shared/actionTypes'
+
 export default class HttpApi {
   prefix: string
   options: RequestInit
@@ -35,6 +40,14 @@ export default class HttpApi {
     }
 
     const res = await fetch(`${document.baseURI}api/${this.prefix}${url}`, opts)
+
+    if (res.headers.get('X-Session-Expired')) {
+      // The server rejected our session token (expired/invalid). Tear down the
+      // session; the RequireAuth route guard then redirects to the login page.
+      Persistor.get().purge()
+      store.dispatch({ type: LOGOUT })
+      socket.close()
+    }
 
     if (res.ok) {
       const type = res.headers.get('Content-Type')

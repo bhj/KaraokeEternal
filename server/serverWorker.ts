@@ -150,9 +150,13 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     }
 
     // verify JWT
+    const { keToken } = parseCookie(ctx.request.header.cookie)
+
     try {
-      const { keToken } = parseCookie(ctx.request.header.cookie)
-      ctx.user = jwtVerify(keToken, jwtKey)
+      const decoded = jwtVerify(keToken, jwtKey) as { exp?: number }
+      // Reject tokens without an expiry (e.g. issued before JWT expiry existed).
+      if (typeof decoded.exp !== 'number') throw new Error('token missing exp')
+      ctx.user = decoded
     } catch {
       ctx.user = {
         dateUpdated: null,
@@ -162,6 +166,16 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
         roomId: null,
         userId: null,
         username: null,
+      }
+
+      // A token cookie was present but failed verification (expired / missing
+      // exp / malformed): an authentication failure, not authorization. Clear
+      // the dead cookie and flag the response so the client can redirect to
+      // login instead of surfacing an error. A request with no token, or a
+      // valid-but-unprivileged token, never reaches this branch.
+      if (keToken) {
+        ctx.cookies.set('keToken', '')
+        ctx.set('X-Session-Expired', '1')
       }
     }
 
