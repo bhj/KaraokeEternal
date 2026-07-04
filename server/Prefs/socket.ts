@@ -7,7 +7,7 @@ const log = getLogger(`server[${process.pid}]`)
 const ACTION_HANDLERS = {
   [PREFS_SET]: (sock, { payload }, acknowledge) => {
     if (!sock.user.isAdmin) {
-      acknowledge({
+      return acknowledge({
         type: PREFS_SET + _ERROR,
         error: 'Unauthorized',
       })
@@ -20,7 +20,7 @@ const ACTION_HANDLERS = {
   },
   [PREFS_PATH_SET_PRIORITY]: (sock, { payload }, acknowledge) => {
     if (!sock.user.isAdmin) {
-      acknowledge({
+      return acknowledge({
         type: PREFS_PATH_SET_PRIORITY + _ERROR,
         error: 'Unauthorized',
       })

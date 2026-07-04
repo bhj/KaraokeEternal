@@ -10,7 +10,7 @@ const ACTION_HANDLERS = {
     const { roomId } = payload
 
     if (!sock.user.isAdmin || !roomId) {
-      acknowledge({
+      return acknowledge({
         type: ROOM_PREFS_PUSH_REQUEST + _ERROR,
         error: 'Unauthorized',
       })
