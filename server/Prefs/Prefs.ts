@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
 
+const RESERVED_KEYS = ['jwtKey', 'isFirstRun']
 const log = getLogger('Prefs')
 
 class Prefs {
@@ -69,6 +70,10 @@ class Prefs {
    * @return Success/fail boolean
    */
   static set (key: string, data: unknown): boolean {
+    if (RESERVED_KEYS.includes(key)) {
+      throw new Error(`Cannot set reserved pref key: ${key}`)
+    }
+
     const query = sql`
       REPLACE INTO prefs (key, data)
       VALUES (${key}, ${JSON.stringify(data)})
