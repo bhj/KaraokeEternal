@@ -180,7 +180,11 @@ class User {
 
     const user = User.getByUsername(username, true) as ServerUser
 
-    if (!user || !(await crypto.compare(password, user.password))) {
+    // Always compare against a dummy hash so response time doesn't
+    // reveal whether the account exists
+    const passwordOk = await crypto.compare(password, user ? user.password : await crypto.getDummyHash())
+
+    if (!user || !passwordOk) {
       throw new Error('Incorrect username/email or password')
     }
 

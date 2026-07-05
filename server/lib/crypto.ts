@@ -111,8 +111,18 @@ function isLegacy (hashStr: string) {
   return typeof hashStr === 'string' && hashStr.startsWith('$2')
 }
 
+// Callers compare against this when no account matches so a failed
+// login takes the same time whether or not the username exists.
+let dummyHashPromise: Promise<string>
+
+function getDummyHash (): Promise<string> {
+  dummyHashPromise ??= hash(crypto.randomBytes(32).toString('base64'))
+  return dummyHashPromise
+}
+
 export default {
   hash,
   compare,
   isLegacy,
+  getDummyHash,
 }
