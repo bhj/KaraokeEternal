@@ -45,9 +45,17 @@ if (Number.isInteger(env.KES_PUID)) {
   process.setuid(env.KES_PUID)
 }
 
-// handle shutdown gracefully
-['SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'uncaughtException'].forEach((event) => {
-  process.on(event, shutdown)
+// graceful shutdown on normal termination signals (a clean exit)
+['SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2'].forEach((signal) => {
+  process.on(signal, () => shutdown(signal))
+})
+
+// an uncaught exception leaves the process in an unknown state: log it, run
+// best-effort cleanup, then exit non-zero so a process manager treats it as a
+// crash (and restarts) rather than a deliberate shutdown
+process.on('uncaughtException', (err) => {
+  log.error('Uncaught exception:', err?.stack || err)
+  shutdown('uncaughtException', 1)
 })
 
 // make sure child processes don't hang around
@@ -149,9 +157,12 @@ function stopScanner () {
   }
 }
 
-async function shutdown (signal) {
-  log.info('Received %s', signal)
+async function shutdown (reason, code = 0) {
+  log.info('Shutting down (%s)', reason)
+
+  // don't let a hung cleanup handler prevent exit; force the intended code
+  setTimeout(() => process.exit(code), 10000) // eslint-disable-line n/no-process-exit
 
   await Promise.allSettled(shutdownHandlers.map(f => f()))
-  process.exit(0) // eslint-disable-line n/no-process-exit
+  process.exit(code) // eslint-disable-line n/no-process-exit
 }
