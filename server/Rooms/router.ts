@@ -91,7 +91,7 @@ router.delete('/:roomId', (ctx) => {
 
   const roomId = parseInt(ctx.params.roomId, 10)
 
-  if (typeof roomId !== 'number') {
+  if (Number.isNaN(roomId)) {
     ctx.throw(422, 'Invalid roomId')
   }
 
