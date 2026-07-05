@@ -136,22 +136,23 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
 
   app.use(koaFavicon(path.join(env.KES_PATH_ASSETS, 'favicon.ico')))
   app.use(koaRange)
-  app.use(koaBody({
+  // Only /api routes ever read a body, so scope the parser there.
+  // The public API routes (login/setup/signup) still parse before auth out of
+  // necessity, so the limits below bound what an unauthenticated client can
+  // force us to read. The client only ever sends JSON or multipart FormData,
+  // so the urlencoded and text parsers are disabled entirely.
+  app.use(koaMount(`${urlPath}api`, koaBody({
     multipart: true,
-    // Body parsing runs before auth on every route, so these bound what an
-    // unauthenticated client can make the server buffer/spool to disk. The
-    // client only ever sends JSON or multipart FormData, so the urlencoded
-    // and text parsers are disabled entirely.
     urlencoded: false,
     text: false,
     jsonLimit: '16kb', // largest JSON bodies (room/prefs objects) are well under 1kb
     formidable: {
-      maxFileSize: 128 * 1024, // only upload is the avatar; User routes 413 anything over IMG_MAX_LENGTH (50KB)
+      maxFileSize: 128 * 1024, // only upload is the avatar; IMG_MAX_LENGTH (50KB)
       maxFiles: 1,
       maxFields: 12, // largest form (signup) sends 8 fields
       maxFieldsSize: 8 * 1024,
     },
-  }))
+  })))
 
   // all http requests
   app.use(async (ctx, next) => {
