@@ -122,7 +122,7 @@ router.delete('/path/:pathId', (ctx) => {
 })
 
 // scan a media path
-router.get('/path/:pathId/scan', async (ctx) => {
+router.post('/path/:pathId/scan', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -138,7 +138,7 @@ router.get('/path/:pathId/scan', async (ctx) => {
 })
 
 // scan all media paths
-router.get('/paths/scan', async (ctx) => {
+router.post('/paths/scan', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }
@@ -148,7 +148,7 @@ router.get('/paths/scan', async (ctx) => {
 })
 
 // stop scanning
-router.get('/paths/scan/stop', async (ctx) => {
+router.post('/paths/scan/stop', async (ctx) => {
   if (!ctx.user.isAdmin) {
     ctx.throw(401)
   }

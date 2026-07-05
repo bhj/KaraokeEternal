@@ -60,17 +60,17 @@ export const fetchPrefs = createAsyncThunk<object, void, { state: RootState }>(
 
 export const requestScan = createAsyncThunk(
   PREFS_REQ_SCANNER_START,
-  async (pathId: number) => await api.get(`/path/${pathId}/scan`),
+  async (pathId: number) => await api.post(`/path/${pathId}/scan`),
 )
 
 export const requestScanAll = createAsyncThunk(
   PREFS_REQ_SCANNER_START,
-  async () => await api.get('/paths/scan'),
+  async () => await api.post('/paths/scan'),
 )
 
 export const requestScanStop = createAsyncThunk(
   PREFS_REQ_SCANNER_STOP,
-  async () => await api.get('/paths/scan/stop'),
+  async () => await api.post('/paths/scan/stop'),
 )
 
 // ------------------------------------

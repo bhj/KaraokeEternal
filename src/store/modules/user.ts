@@ -63,7 +63,7 @@ export const requestLogout = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       // server response should clear our cookie
-      await api.get('logout')
+      await api.post('logout')
     } catch {
       // ignore errors
     }

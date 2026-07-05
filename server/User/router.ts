@@ -97,7 +97,7 @@ router.post('/login', async (ctx) => {
 })
 
 // logout
-router.get('/logout', (ctx) => {
+router.post('/logout', (ctx) => {
   // @todo force socket room leave
   ctx.cookies.set('keToken', '')
   ctx.status = 200
