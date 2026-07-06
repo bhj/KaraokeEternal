@@ -9,7 +9,7 @@ import PathInfo from './PathInfo/PathInfo'
 import PathItem from './PathItem/PathItem'
 import Button from 'components/Button/Button'
 import styles from './PathPrefs.css'
-import { receivePrefs, requestScan, requestScanAll, setPathPriority, setPathPrefs } from 'store/modules/prefs'
+import { receivePrefs, requestScan, setPathPriority, setPathPrefs } from 'store/modules/prefs'
 import type { Path } from 'shared/types'
 
 const api = new HttpApi('prefs/path')
@@ -79,7 +79,7 @@ const PathPrefs = () => {
 
   const handleInfo = (pathId: number) => setEditingPath(paths.entities[pathId])
   const handleRefresh = (pathId: number) => dispatch(requestScan(pathId))
-  const handleRefreshAll = () => dispatch(requestScanAll())
+  const handleRefreshAll = () => dispatch(requestScan())
 
   return (
     <Accordion headingComponent={(

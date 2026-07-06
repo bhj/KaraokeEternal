@@ -12,3 +12,5 @@ node_modules/
 *.tsbuildinfo
 .hugo_build.lock
 .vscode
+.claude
+.playwright
