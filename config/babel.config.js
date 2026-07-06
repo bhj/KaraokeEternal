@@ -4,7 +4,7 @@ export default {
     [
       'babel-plugin-react-compiler',
       {
-        target: '18',
+        target: '19',
         logger: {
           logEvent (filename, event) {
             if (event.kind === 'CompileSuccess') {

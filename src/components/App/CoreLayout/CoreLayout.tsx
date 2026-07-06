@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { useMatch } from 'react-router'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import useResizeObserver from 'use-resize-observer'
+import useResizeObserver from 'lib/useResizeObserver'
 // global stylesheets should be imported before any
 // components that will import their own modular css
 import '../../../styles/global.css'
