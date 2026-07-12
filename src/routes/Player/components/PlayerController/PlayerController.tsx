@@ -150,6 +150,7 @@ const PlayerController = (props: PlayerControllerProps) => {
       <Player
         cdgAlpha={player.cdgAlpha}
         cdgSize={player.cdgSize}
+        isFetching={player._isFetching}
         isPlaying={player.isPlaying}
         isVisible={!!queueItem && !player.isErrored && !player.isAtQueueEnd}
         isReplayGainEnabled={prefs.isReplayGainEnabled}

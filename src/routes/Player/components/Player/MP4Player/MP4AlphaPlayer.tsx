@@ -39,7 +39,6 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
     this.video.oncanplaythrough = this.updateIsPlaying
     this.video.onended = this.handleEnded
     this.video.onerror = this.handleError
-    this.video.onloadstart = this.props.onLoad
     this.video.onloadedmetadata = this.handleLoadedMetadata
     this.video.onplay = this.handlePlay
     this.video.ontimeupdate = this.handleTimeUpdate
@@ -144,6 +143,7 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
 
   updateSources = () => {
     this.stopChroma()
+    this.props.onLoad()
     this.video.src = `${document.baseURI}api/media/${this.props.mediaId}?type=video`
     this.video.load()
   }

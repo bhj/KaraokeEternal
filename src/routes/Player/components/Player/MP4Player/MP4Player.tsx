@@ -53,7 +53,6 @@ class MP4Player extends React.Component<MP4PlayerProps> {
         onCanPlayThrough={this.updateIsPlaying}
         onEnded={this.props.onEnd}
         onError={this.handleError}
-        onLoadStart={this.props.onLoad}
         onPlay={this.handlePlay}
         onTimeUpdate={this.handleTimeUpdate}
         ref={this.video}
@@ -63,6 +62,7 @@ class MP4Player extends React.Component<MP4PlayerProps> {
 
   updateSources = () => {
     if (!this.video.current) return
+    this.props.onLoad()
     this.video.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=video`
     this.video.current.load()
   }

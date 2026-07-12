@@ -1,4 +1,5 @@
 import React from 'react'
+import Spinner from 'components/Spinner/Spinner'
 import CDGPlayer from './CDGPlayer/CDGPlayer'
 import MP4Player from './MP4Player/MP4Player'
 import MP4AlphaPlayer from './MP4Player/MP4AlphaPlayer'
@@ -10,6 +11,7 @@ const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisua
 interface PlayerProps {
   cdgAlpha: number
   cdgSize: number
+  isFetching: boolean
   isPlaying: boolean
   isVisible: boolean
   isReplayGainEnabled: boolean
@@ -140,16 +142,31 @@ class Player extends React.Component<PlayerProps> {
           onAudioElement={this.handleAudioElement}
           onPlay={this.handlePlay}
         />
+        {this.props.isFetching && (
+          <div style={{ position: 'absolute', width: this.props.width, height: this.props.height }}>
+            <Spinner />
+          </div>
+        )}
         {isVisualizerActive && (
-          <PlayerVisualizer
-            audioSourceNode={this.state.visualizerAudioSourceNode}
-            isPlaying={this.props.isPlaying}
-            onError={this.props.onError}
-            presetKey={this.props.visualizer.presetKey}
-            sensitivity={this.props.visualizer.sensitivity}
-            width={this.props.width}
-            height={this.props.height}
-          />
+          <React.Suspense
+            fallback={this.props.isFetching
+              ? null
+              : (
+                  <div style={{ position: 'absolute', zIndex: -1, width: this.props.width, height: this.props.height }}>
+                    <Spinner />
+                  </div>
+                )}
+          >
+            <PlayerVisualizer
+              audioSourceNode={this.state.visualizerAudioSourceNode}
+              isPlaying={this.props.isPlaying}
+              onError={this.props.onError}
+              presetKey={this.props.visualizer.presetKey}
+              sensitivity={this.props.visualizer.sensitivity}
+              width={this.props.width}
+              height={this.props.height}
+            />
+          </React.Suspense>
         )}
       </>
     )

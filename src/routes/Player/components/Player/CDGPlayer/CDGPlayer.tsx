@@ -116,7 +116,6 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
           onCanPlayThrough={this.updateIsPlaying}
           onEnded={this.handleEnded}
           onError={this.handleError}
-          onLoadStart={this.props.onLoad}
           onPlay={this.handlePlay}
           onTimeUpdate={this.handleTimeUpdate}
           ref={this.audio}
@@ -127,6 +126,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
   updateSources = async () => {
     this.stopCDG()
+    this.props.onLoad() // loading includes the .cdg fetch, before the audio's loadstart
 
     // load .cdg file
     try {

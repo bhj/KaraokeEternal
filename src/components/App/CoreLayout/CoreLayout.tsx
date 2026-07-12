@@ -10,6 +10,7 @@ import Header from 'components/Header/Header'
 import Navigation from 'components/Navigation/Navigation'
 import Modal from 'components/Modal/Modal'
 import SongInfo from 'components/SongInfo/SongInfo'
+import Spinner from 'components/Spinner/Spinner'
 import Routes from '../Routes/Routes'
 import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modules/ui'
 
@@ -36,7 +37,9 @@ const CoreLayout = () => {
     <>
       <Header ref={headerRef} />
 
-      <Routes />
+      <React.Suspense fallback={<Spinner />}>
+        <Routes />
+      </React.Suspense>
 
       {!isPlayerRoute && <Navigation ref={navRef} />}
 
