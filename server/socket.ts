@@ -111,74 +111,82 @@ export default function (io, jwtKey) {
       }
     })
 
-    // push prefs (admin only)
-    if (sock.user.isAdmin) {
-      log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
-      io.to(sock.id).emit('action', {
-        type: PREFS_PUSH,
-        payload: Prefs.get(),
-      })
-    }
-
-    // push library (only if client's is outdated)
-    if (clientLibraryVersion !== Library.cache.version) {
-      log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
-        sock.user.name, sock.id, clientLibraryVersion, Library.cache.version)
-
-      io.to(sock.id).emit('action', {
-        type: LIBRARY_PUSH,
-        payload: Library.get(),
-      })
-    }
-
-    // push user's stars
-    io.to(sock.id).emit('action', {
-      type: STARS_PUSH,
-      payload: Library.getUserStars(sock.user.userId),
-    })
-
-    // push star counts (only if client's is outdated)
-    if (clientStarsVersion !== Library.starCountsCache.version) {
-      log.verbose('pushing star counts to %s (%s) (client=%s, server=%s)',
-        sock.user.name, sock.id, clientStarsVersion, Library.starCountsCache.version)
-
-      io.to(sock.id).emit('action', {
-        type: STAR_COUNTS_PUSH,
-        payload: Library.getStarCounts(),
-      })
-    }
-
-    // it's possible for an admin to not be in a room
-    if (typeof sock.user.roomId !== 'number') return
-
-    // beyond this point assumes there is a room
-
-    // add user to room and track membership
-    sock.join(Rooms.prefix(sock.user.roomId))
-    Rooms.trackUser(sock.user.roomId, sock.user.userId)
-
-    // if there's a player in room, emit its last known status
-    // @todo this just emits the first status found
-    for (const s of io.of('/').sockets.values()) {
-      if (s.user && s.user.roomId === sock.user.roomId && s._lastPlayerStatus) {
+    // a throw below would escape socket.io's connect path and crash the
+    // process via uncaughtException, so one bad payload (e.g. a corrupted
+    // room queue) must not go unhandled
+    try {
+      // push prefs (admin only)
+      if (sock.user.isAdmin) {
+        log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
         io.to(sock.id).emit('action', {
-          type: PLAYER_STATUS,
-          payload: s._lastPlayerStatus,
+          type: PREFS_PUSH,
+          payload: Prefs.get(),
         })
-
-        break
       }
+
+      // push library (only if client's is outdated)
+      if (clientLibraryVersion !== Library.cache.version) {
+        log.verbose('pushing library to %s (%s) (client=%s, server=%s)',
+          sock.user.name, sock.id, clientLibraryVersion, Library.cache.version)
+
+        io.to(sock.id).emit('action', {
+          type: LIBRARY_PUSH,
+          payload: Library.get(),
+        })
+      }
+
+      // push user's stars
+      io.to(sock.id).emit('action', {
+        type: STARS_PUSH,
+        payload: Library.getUserStars(sock.user.userId),
+      })
+
+      // push star counts (only if client's is outdated)
+      if (clientStarsVersion !== Library.starCountsCache.version) {
+        log.verbose('pushing star counts to %s (%s) (client=%s, server=%s)',
+          sock.user.name, sock.id, clientStarsVersion, Library.starCountsCache.version)
+
+        io.to(sock.id).emit('action', {
+          type: STAR_COUNTS_PUSH,
+          payload: Library.getStarCounts(),
+        })
+      }
+
+      // it's possible for an admin to not be in a room
+      if (typeof sock.user.roomId !== 'number') return
+
+      // beyond this point assumes there is a room
+
+      // add user to room and track membership
+      sock.join(Rooms.prefix(sock.user.roomId))
+      Rooms.trackUser(sock.user.roomId, sock.user.userId)
+
+      // if there's a player in room, emit its last known status
+      // @todo this just emits the first status found
+      for (const s of io.of('/').sockets.values()) {
+        if (s.user && s.user.roomId === sock.user.roomId && s._lastPlayerStatus) {
+          io.to(sock.id).emit('action', {
+            type: PLAYER_STATUS,
+            payload: s._lastPlayerStatus,
+          })
+
+          break
+        }
+      }
+
+      log.verbose('%s (%s) joined room %s (%s in room)',
+        sock.user.name, sock.id, sock.user.roomId,
+        sock.adapter.rooms.get(Rooms.prefix(sock.user.roomId))?.size ?? 0,
+      )
+
+      // send room's queue
+      io.to(sock.id).emit('action', {
+        type: QUEUE_PUSH,
+        payload: Queue.get(sock.user.roomId),
+      })
+    } catch (err) {
+      log.error('error pushing initial state to %s (%s): %s',
+        sock.user.name, sock.id, err?.stack || err)
     }
-
-    log.verbose('%s (%s) joined room %s (%s in room)',
-      sock.user.name, sock.id, sock.user.roomId,
-      sock.adapter.rooms.get(Rooms.prefix(sock.user.roomId))?.size ?? 0,
-    )
-
-    // send room's queue
-    io.to(sock.id).emit('action', {
-      type: QUEUE_PUSH,
-      payload: Queue.get(sock.user.roomId),
-    })
   })
 }
