@@ -1,22 +1,25 @@
 import path from 'path'
 import { db } from '../lib/Database.js'
+import getLogger from '../lib/Log.js'
 import sql from 'sqlate'
 import { QueueItem } from '../../shared/types.js'
+
+const log = getLogger('Queue')
 
 interface QueueEntityBuilding {
   queueId: number
   songId: number
   userId: number
   prevQueueId: number | null
-  mediaId: number
-  relPath?: string
-  rgTrackGain: number
-  rgTrackPeak: number
+  mediaId: number | null
+  relPath?: string | null
+  rgTrackGain: number | null
+  rgTrackPeak: number | null
   userDisplayName: string
   userDateUpdated: number
-  pathId: number
-  pathData?: string
-  isPreferred?: number
+  pathId: number | null
+  pathData?: string | null
+  isPreferred?: number | null
   mediaType?: 'cdg' | 'mp4'
   isVideoKeyingEnabled?: boolean
 }
@@ -55,12 +58,16 @@ class Queue {
    * Get queued items for a given room
    */
   static get (roomId: number): { result: number[], entities: Record<number, QueueItem> } {
-    const result: number[] = []
+    const chain: number[] = []
+    const orphaned = new Set<number>()
     const entities: Record<number, QueueEntityBuilding> = {}
     const map = new Map()
     const pathData = new Map()
     let curQueueId = null
 
+    // media and paths are LEFT JOINed so that queue items whose media was
+    // removed (e.g. mid-scan) still anchor the prevQueueId chain; they're
+    // kept out of the payload below
     const query = sql`
       SELECT queueId, songId, userId, prevQueueId,
         media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
@@ -69,61 +76,82 @@ class Queue {
         MAX(isPreferred) AS isPreferred
       FROM queue
         INNER JOIN users USING(userId)
-        INNER JOIN media USING(songId)
-        INNER JOIN paths USING(pathId)
+        LEFT JOIN media USING(songId)
+        LEFT JOIN paths USING(pathId)
       WHERE roomId = ${roomId}
       GROUP BY queueId
-      ORDER BY queueId, paths.priority ASC
+      ORDER BY queueId
     `
     const rows = db.all<{
       queueId: number
       songId: number
       userId: number
       prevQueueId: number
-      mediaId: number
-      relPath: string
-      rgTrackGain: number
-      rgTrackPeak: number
+      mediaId: number | null
+      relPath: string | null
+      rgTrackGain: number | null
+      rgTrackPeak: number | null
       userDisplayName: string
       userDateUpdated: number
-      pathId: number
-      pathData: string
-      isPreferred: number
+      pathId: number | null
+      pathData: string | null
+      isPreferred: number | null
     }>(String(query), query.parameters)
 
     for (const row of rows) {
-      if (!pathData.has(row.pathId)) {
-        pathData.set(row.pathId, JSON.parse(row.pathData))
+      // every row participates in the chain, orphaned or not
+      if (row.prevQueueId === null) {
+        // found the first item
+        chain.push(row.queueId)
+        curQueueId = row.queueId
+      } else {
+        // map indexed by prevQueueId
+        map.set(row.prevQueueId, row.queueId)
       }
 
-      const pathPrefs = pathData.get(row.pathId)?.prefs
+      const { relPath, pathId } = row
+
+      if (row.mediaId === null || relPath === null || pathId === null) {
+        orphaned.add(row.queueId)
+        continue
+      }
+
+      if (!pathData.has(pathId)) {
+        pathData.set(pathId, row.pathData === null ? null : JSON.parse(row.pathData))
+      }
+
+      const pathPrefs = pathData.get(pathId)?.prefs
 
       entities[row.queueId] = row
-      entities[row.queueId].mediaType = this.getType(row.relPath)
+      entities[row.queueId].mediaType = this.getType(relPath)
       entities[row.queueId].isVideoKeyingEnabled = !!pathPrefs?.isVideoKeyingEnabled
 
       // don't send over the wire
       delete entities[row.queueId].relPath
       delete entities[row.queueId].isPreferred
       delete entities[row.queueId].pathData
-
-      if (row.prevQueueId === null) {
-        // found the first item
-        result.push(row.queueId)
-        curQueueId = row.queueId
-      } else {
-        // map indexed by prevQueueId
-        map.set(row.prevQueueId, row.queueId)
-      }
     }
 
-    while (result.length < rows.length) {
+    while (chain.length < rows.length) {
       // get the item whose prevQueueId references the current one
-      const nextQueueId = entities[map.get(curQueueId)].queueId
-      result.push(nextQueueId)
+      const nextQueueId = map.get(curQueueId)
+
+      if (nextQueueId === undefined) {
+        log.error('queue chain broken in room %s at queueId %s', roomId, curQueueId)
+
+        // degrade to insertion order for the unreachable remainder
+        for (const row of rows) {
+          if (!chain.includes(row.queueId)) chain.push(row.queueId)
+        }
+
+        break
+      }
+
+      chain.push(nextQueueId)
       curQueueId = nextQueueId
     }
 
+    const result = chain.filter(queueId => !orphaned.has(queueId))
     return { result, entities: entities as unknown as Record<number, QueueItem> }
   }
 
