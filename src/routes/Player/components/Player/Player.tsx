@@ -117,7 +117,7 @@ class Player extends React.Component<PlayerProps> {
   render () {
     if (!this.props.isVisible || typeof this.props.mediaId !== 'number') return null
 
-    let PlayerComponent
+    let PlayerComponent: React.ElementType
 
     if (this.props.mediaType === 'cdg') PlayerComponent = CDGPlayer
     else if (this.props.mediaType === 'mp4') PlayerComponent = this.props.isVideoKeyingEnabled ? MP4AlphaPlayer : MP4Player

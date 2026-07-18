@@ -8,6 +8,7 @@ class ScannerQueue {
   #instance
   #isCanceling = false
   #q = []
+  #activePathId: number | null = null
   onIteration: (stats: any) => any
   onDone: () => void
 
@@ -35,7 +36,7 @@ class ScannerQueue {
 
       if (!dir) {
         log.warn('ignoring (invalid pathId): %s', id)
-      } else if (this.#q.includes(id)) {
+      } else if (id === this.#activePathId || this.#q.includes(id)) {
         log.info('ignoring (path already queued): %s', dir)
       } else {
         log.info('path queued for scan: %s', dir)
@@ -54,9 +55,14 @@ class ScannerQueue {
     while (this.#q.length && !this.#isCanceling) {
       const prefs = Prefs.get()
       this.#instance = new FileScanner(prefs, { length: this.#q.length })
+      this.#activePathId = this.#q.shift()
 
-      const stats = await this.#instance.scan(this.#q.shift())
-      this.onIteration(stats)
+      try {
+        const stats = await this.#instance.scan(this.#activePathId)
+        this.onIteration(stats)
+      } finally {
+        this.#activePathId = null
+      }
     }
 
     this.onDone()

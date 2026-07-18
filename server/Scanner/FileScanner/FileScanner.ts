@@ -1,13 +1,13 @@
 import path from 'path'
 import fsPromises from 'node:fs/promises'
-import { parseBuffer } from 'music-metadata'
+import { parseBuffer, parseFile } from 'music-metadata'
 import { unzip } from 'unzipit'
 import getLogger from '../../lib/Log.js'
 import { getExt } from '../../lib/util.js'
 import getFiles from './getFiles.js'
 import getConfig from './getConfig.js'
 import getCdgName from '../../lib/getCdgName.js'
-import Media from '../../Media/Media.js'
+import Media, { type MediaScanRow } from '../../Media/Media.js'
 import MetaParser from '../MetaParser/MetaParser.js'
 import Scanner from '../Scanner.js'
 import IPC from '../../lib/IPCBridge.js'
@@ -18,9 +18,16 @@ const log = getLogger('FileScanner')
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
 
+interface MediaIdentity {
+  relPath: string
+  fileMtime: number
+  sidecarPath: string | false | null
+}
+
 class FileScanner extends Scanner {
   paths: any
   parser: any
+  existingMedia: Record<string, MediaScanRow> = {}
 
   constructor (prefs, qStats) {
     super(qStats)
@@ -29,7 +36,7 @@ class FileScanner extends Scanner {
 
   async scan (pathId) {
     const dir = this.paths.entities[pathId]?.path
-    const validMediaIds = []
+    const validMediaIds = new Set<number>()
     const stats = { new: 0, removed: 0, existing: 0 }
     let files // { file, stats }[]
     let prevDir
@@ -44,6 +51,7 @@ class FileScanner extends Scanner {
 
     try {
       files = getFiles(dir, file => searchExts.includes(getExt(file)))
+      this.existingMedia = Media.scanRows(pathId)
 
       log.info('  => found %s files with valid extensions %s',
         files.length.toLocaleString(),
@@ -71,7 +79,7 @@ class FileScanner extends Scanner {
       // process file
       try {
         const res = await this.process(files[i], pathId)
-        validMediaIds.push(res.mediaId)
+        validMediaIds.add(res.mediaId)
 
         if (res.isNew) stats.new++
         else stats.existing++
@@ -85,7 +93,7 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Scanned %s valid media files', validMediaIds.length.toLocaleString())
+    log.info('Scanned %s valid media files', validMediaIds.size.toLocaleString())
     log.info('Searching for invalid media entries')
 
     const numRemoved = await this.removeInvalid(pathId, validMediaIds)
@@ -95,11 +103,22 @@ class FileScanner extends Scanner {
     return stats
   }
 
-  async process ({ file }, pathId) {
-    let buffer = await fsPromises.readFile(file)
+  async process ({ file, stats }, pathId) {
+    const mediaIdentity = this.getMediaIdentity(file, stats, pathId)
+    const row = this.existingMedia[mediaIdentity.relPath]
+
+    if (row && this.isUnchanged(row, mediaIdentity)) {
+      log.info('  => unchanged')
+      return { mediaId: row.mediaId, isNew: false }
+    }
+
+    let buffer
     let mimeType = fileTypes[getExt(file)].mimeType
+    let data
 
     if (getExt(file) === '.zip') {
+      buffer = await fsPromises.readFile(file)
+
       const { entries } = await unzip(new Uint8Array(buffer))
 
       const audioName = Object.keys(entries).find(f => !f.includes('/') && audioExts.includes(getExt(f)))
@@ -110,14 +129,20 @@ class FileScanner extends Scanner {
 
       buffer = Buffer.from(await entries[audioName].arrayBuffer())
       mimeType = fileTypes[getExt(audioName)].mimeType
+      data = await parseBuffer(buffer, mimeType, {
+        duration: true,
+        skipCovers: true,
+      })
     } else {
-      if (fileTypes[getExt(file)].requiresCDG && !(getCdgName(file))) throw new Error('no .cdg sidecar found')
-    }
+      if (fileTypes[getExt(file)].requiresCDG && !mediaIdentity.sidecarPath) {
+        throw new Error('no .cdg sidecar found')
+      }
 
-    const data = await parseBuffer(buffer, mimeType, {
-      duration: true,
-      skipCovers: true,
-    })
+      data = await parseFile(file, {
+        duration: true,
+        skipCovers: true,
+      })
+    }
 
     if (!data.format.duration) {
       throw new Error('could not determine duration')
@@ -144,22 +169,14 @@ class FileScanner extends Scanner {
       songId: match.songId,
       pathId,
       // normalize relPath to forward slashes with no leading slash
-      relPath: file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
+      relPath: mediaIdentity.relPath,
       duration: Math.round(data.format.duration),
       rgTrackGain: data.common.replaygain_track_gain ? data.common.replaygain_track_gain.dB : null,
       rgTrackPeak: data.common.replaygain_track_peak ? data.common.replaygain_track_peak.ratio : null,
+      dateUpdated: mediaIdentity.fileMtime,
     }
 
-    // file already in database?
-    const res = Media.search({
-      pathId,
-      relPath: media.relPath,
-    })
-
-    log.verbose('  => %s db result(s)', res.result.length)
-
-    if (res.result.length) {
-      const row = res.entities[res.result[0]]
+    if (row) {
       const diff = {}
 
       // did anything change?
@@ -172,7 +189,6 @@ class FileScanner extends Scanner {
           type: MEDIA_UPDATE,
           payload: {
             mediaId: row.mediaId,
-            dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
             ...diff,
           },
         })
@@ -195,15 +211,34 @@ class FileScanner extends Scanner {
     }
   }
 
-  async removeInvalid (pathId, validMediaIds = []) {
-    const res = Media.search({ pathId })
-    const invalid = res.result.filter(mediaId => !validMediaIds.includes(mediaId))
+  async removeInvalid (pathId, validMediaIds = new Set<number>()) {
+    const rows = Object.values(Media.scanRows(pathId))
+    const invalid = rows
+      .filter(row => !validMediaIds.has(row.mediaId))
+      .map(row => row.mediaId)
 
     if (invalid.length) {
       await (IPC as any).req({ type: MEDIA_REMOVE, payload: invalid })
     }
 
     return invalid.length
+  }
+
+  getMediaIdentity (file, stats, pathId): MediaIdentity {
+    const sidecarPath = fileTypes[getExt(file)].requiresCDG ? getCdgName(file) : null
+
+    return {
+      // normalize relPath to forward slashes with no leading slash
+      relPath: file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
+      fileMtime: Math.round(stats.mtimeMs / 1000),
+      sidecarPath,
+    }
+  }
+
+  isUnchanged (row: MediaScanRow, mediaIdentity: MediaIdentity) {
+    return row.dateUpdated > 0
+      && row.dateUpdated === mediaIdentity.fileMtime
+      && (fileTypes[getExt(mediaIdentity.relPath)].requiresCDG ? Boolean(mediaIdentity.sidecarPath) : true)
   }
 }
 

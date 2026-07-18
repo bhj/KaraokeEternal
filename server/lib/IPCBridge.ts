@@ -114,7 +114,7 @@ class IPCChild {
 
       // console.log(`${PROCESS_NAME} ack:`, type)
 
-      delete IPCChild.requests[meta.ipcId]
+      delete IPCChild.requests[meta.reqId]
       return
     }
 
