@@ -7,12 +7,13 @@ import { getExt } from '../../lib/util.js'
 import getFiles from './getFiles.js'
 import getConfig from './getConfig.js'
 import getCdgName from '../../lib/getCdgName.js'
+import { CONFIG_FILENAME, fingerprintsEqual, getMtimeSec, getRelPath, isUnchanged, shouldKeepReplayGain } from './scanUtils.js'
 import Media from '../../Media/Media.js'
 import MetaParser from '../MetaParser/MetaParser.js'
 import Scanner from '../Scanner.js'
 import IPC from '../../lib/IPCBridge.js'
 import fileTypes from '../../Media/fileTypes.js'
-import { LIBRARY_MATCH_SONG, MEDIA_ADD, MEDIA_REMOVE, MEDIA_UPDATE } from '../../../shared/actionTypes.js'
+import { LIBRARY_MATCH_SONG, MEDIA_ADD, MEDIA_REMOVE, MEDIA_UPDATE, PATH_DATA_SET } from '../../../shared/actionTypes.js'
 import type { Path } from '../../../shared/types.js'
 const log = getLogger('FileScanner')
 
@@ -28,10 +29,10 @@ class FileScanner extends Scanner {
     this.paths = prefs.paths
   }
 
-  async scan (pathId) {
+  async scan (pathId, full = false) {
     const dir = this.paths.entities[pathId]?.path
-    const validMediaIds = []
-    const stats = { new: 0, removed: 0, existing: 0 }
+    const validMediaIds = new Set<number>()
+    const stats = { new: 0, removed: 0, existing: 0, skipped: 0 }
     let files // { file, stats }[]
     let prevDir
 
@@ -40,44 +41,100 @@ class FileScanner extends Scanner {
       return stats
     }
 
+    if (!full && this.paths.entities[pathId].prefs?.scanFull) {
+      log.info('scanFull pref enabled; ignoring stored file dates for this scan')
+      full = true
+    }
+
     log.info('Searching: %s', dir)
     this.emitStatus(`Searching: ${dir}`, 0)
 
     try {
-      files = getFiles(dir, file => searchExts.includes(getExt(file)))
-
-      log.info('  => found %s files with valid extensions %s',
-        files.length.toLocaleString(),
-        JSON.stringify(searchExts),
-      )
+      files = getFiles(dir, file => searchExts.includes(getExt(file))
+        || path.basename(file).toLowerCase() === CONFIG_FILENAME)
     } catch (err) {
       log.error(`  => ${err.message} (path offline)`)
       return stats
     }
 
+    // separate parser configs from media files and fingerprint them
+    const configs: Record<string, number> = {}
+
+    files = files.filter((f) => {
+      if (path.basename(f.file).toLowerCase() !== CONFIG_FILENAME) return true
+      configs[getRelPath(dir, f.file)] = getMtimeSec(f.mtimeMs)
+      return false
+    })
+
+    log.info('  => found %s files with valid extensions %s',
+      files.length.toLocaleString(),
+      JSON.stringify(searchExts),
+    )
+
+    // a parser config change means unchanged files could parse differently
+    const configsChanged = !fingerprintsEqual(configs, this.paths.entities[pathId].scanner?.configs ?? {})
+
+    if (configsChanged && !full) {
+      log.info('parser config change detected; ignoring stored file dates for this scan')
+      full = true
+    }
+
+    // load this path's media once; it's held for the duration of the scan
+    const { mediaIds, byRelPath } = Media.getPathIndex(pathId)
+
     for (let i = 0; i < files.length; i++) {
       const curDir = path.dirname(files[i].file)
+      const relPath = getRelPath(dir, files[i].file)
+      const row = byRelPath.get(relPath)
 
-      if (prevDir !== curDir) {
-        prevDir = curDir
-
-        // (re)init parser with this folder's config, if any
-        const cfg = getConfig(curDir, dir)
-        this.parser = MetaParser(cfg)
-      }
+      const skip = row && isUnchanged(row, getMtimeSec(files[i].mtimeMs), {
+        full,
+        requiresCDG: !!fileTypes[getExt(files[i].file)].requiresCDG,
+        cdgExists: () => !!getCdgName(files[i].file),
+      })
 
       log.info('[%s/%s] %s', i + 1, files.length, files[i].file)
-      this.emitStatus(`Scanning (${i + 1} of ${files.length})`, (i + 1) / files.length)
 
-      // process file
-      try {
-        const res = await this.process(files[i], pathId)
-        validMediaIds.push(res.mediaId)
+      if (skip) {
+        validMediaIds.add(row.mediaId)
+        stats.skipped++
+        log.verbose('  => unchanged (skipped)')
 
-        if (res.isNew) stats.new++
-        else stats.existing++
-      } catch (err) {
-        log.warn(`  => ${err.message}`)
+        // skipped iterations are cheap; don't emit one IPC status message per file
+        if ((i + 1) % 50 === 0 || i + 1 === files.length) {
+          this.emitStatus(`Scanning (${i + 1} of ${files.length})`, (i + 1) / files.length)
+        }
+      } else {
+        if (prevDir !== curDir) {
+          // (re)init parser with this folder's config, if any
+          let cfg
+
+          try {
+            cfg = getConfig(curDir, dir)
+          } catch (err) {
+            // returning here also leaves removeInvalid and the config
+            // fingerprint alone, so the scan can simply be run again
+            log.error(`  => ${err.message}`)
+            log.error('Aborting scan of %s (fix the parser config, then scan again)', dir)
+            return stats
+          }
+
+          prevDir = curDir
+          this.parser = MetaParser(cfg)
+        }
+
+        this.emitStatus(`Scanning (${i + 1} of ${files.length})`, (i + 1) / files.length)
+
+        // process file
+        try {
+          const res = await this.process(files[i], pathId, { relPath, row })
+          validMediaIds.add(res.mediaId)
+
+          if (res.isNew) stats.new++
+          else stats.existing++
+        } catch (err) {
+          log.warn(`  => ${err.message}`)
+        }
       }
 
       if (this.isCanceling) {
@@ -86,17 +143,30 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Scanned %s valid media files', validMediaIds.length.toLocaleString())
+    log.info('Scanned %s valid media files (%s unchanged)',
+      validMediaIds.size.toLocaleString(),
+      stats.skipped.toLocaleString(),
+    )
     log.info('Searching for invalid media entries')
 
-    const numRemoved = await this.removeInvalid(pathId, validMediaIds)
+    const numRemoved = await this.removeInvalid(mediaIds, validMediaIds)
     stats.removed = numRemoved
     log.info(`Removed ${numRemoved} invalid media entries`)
+
+    // remember current parser configs only after a completed scan; a canceled
+    // scan keeps the old fingerprint so the change is re-detected next time
+    if (configsChanged) {
+      await IPC.req({
+        type: PATH_DATA_SET,
+        payload: { pathId, data: { scanner: { configs } } },
+      })
+    }
 
     return stats
   }
 
-  async process ({ file, stats }, pathId) {
+  async process ({ file, mtimeMs }, pathId, { relPath, row }) {
+    const mtimeSec = getMtimeSec(mtimeMs)
     let buffer = await fsPromises.readFile(file)
     let mimeType = fileTypes[getExt(file)].mimeType
 
@@ -144,48 +214,42 @@ class FileScanner extends Scanner {
     const media = {
       songId: match.songId,
       pathId,
-      // normalize relPath to forward slashes with no leading slash
-      relPath: file.substring(this.paths.entities[pathId].path.length).replace(/\\/g, '/').replace(/^\//, ''),
+      relPath,
       duration: Math.round(data.format.duration),
       rgTrackGain: data.common.replaygain_track_gain ? data.common.replaygain_track_gain.dB : null,
       rgTrackPeak: data.common.replaygain_track_peak ? data.common.replaygain_track_peak.ratio : null,
     }
 
     // file already in database?
-    const res = Media.search({
-      pathId,
-      relPath: media.relPath,
-    })
-
-    log.verbose('  => %s db result(s)', res.result.length)
-
-    if (res.result.length) {
-      const row = res.entities[res.result[0]]
+    if (row) {
       const diff = {}
 
       // did anything change?
       Object.keys(media).forEach((key) => {
-        // preserve JIT-calculated ReplayGain values while the untagged file is unchanged
+        // An unchanged file normally skips processing entirely, so this mainly
+        // covers a full rescan, which bypasses the skip; without it every full
+        // rescan would discard client-calculated values for the whole library.
         if ((key === 'rgTrackGain' || key === 'rgTrackPeak')
-          && media[key] === null && row[key] !== null
-          && Math.round(stats.mtimeMs / 1000) <= row.dateUpdated) {
+          && shouldKeepReplayGain(media[key], row[key], mtimeSec, row.dateUpdated)) {
           return
         }
 
         if (media[key] !== row[key]) diff[key] = media[key]
       })
 
-      if (Object.keys(diff).length) {
+      // dateUpdated stores the file's mtime; sync it even when content is
+      // unchanged so the file can be skipped next scan
+      if (Object.keys(diff).length || row.dateUpdated !== mtimeSec) {
         await IPC.req({
           type: MEDIA_UPDATE,
           payload: {
             mediaId: row.mediaId,
-            dateUpdated: Math.round(new Date().getTime() / 1000), // seconds
+            dateUpdated: mtimeSec,
             ...diff,
           },
         })
 
-        log.info('  => updated: %s', Object.keys(diff).join(', '))
+        log.info('  => updated: %s', Object.keys(diff).join(', ') || 'dateUpdated')
       } else {
         log.info('  => ok')
       }
@@ -194,7 +258,11 @@ class FileScanner extends Scanner {
     } // end if
 
     // new media
-    const mediaWithDate = { ...media, dateAdded: Math.round(new Date().getTime() / 1000) } // seconds
+    const mediaWithDate = {
+      ...media,
+      dateAdded: Math.round(new Date().getTime() / 1000), // seconds
+      dateUpdated: mtimeSec,
+    }
     log.info('  => new: %s', JSON.stringify(match))
 
     return {
@@ -203,9 +271,15 @@ class FileScanner extends Scanner {
     }
   }
 
-  async removeInvalid (pathId, validMediaIds = []) {
-    const res = Media.search({ pathId })
-    const invalid = res.result.filter(mediaId => !validMediaIds.includes(mediaId))
+  /**
+   * Removes media rows whose file is no longer in the path
+   *
+   * @param mediaIds - every mediaId the path had when this scan started. Rows
+   *   added during the scan are necessarily valid, so omitting them is safe.
+   * @param validMediaIds - mediaIds processed or skipped during this scan
+   */
+  async removeInvalid (mediaIds: number[], validMediaIds: Set<number>) {
+    const invalid = mediaIds.filter(mediaId => !validMediaIds.has(mediaId))
 
     if (invalid.length) {
       await IPC.req({ type: MEDIA_REMOVE, payload: invalid })

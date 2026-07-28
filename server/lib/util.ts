@@ -9,27 +9,23 @@ import crypto from 'crypto'
  */
 export const getExt = filename => path.extname(filename).toLowerCase()
 
+/**
+ * Parses a scan spec: a comma-separated list of pathIds, "all", and/or "full".
+ *
+ * @param {string} str The scan spec to parse.
+ * @returns {{ pathIds: number[] | boolean, full: boolean }} pathIds is an array
+ *   of ids, or a boolean (true when only non-numeric tokens like "all" remain).
+ */
 export const parsePathIds = (str) => {
-  const nums = []
+  const parts = str ? String(str).split(',').map(p => p.trim()) : []
+  const full = parts.some(p => p.toLowerCase() === 'full')
+  const rest = parts.filter(p => p.toLowerCase() !== 'full')
+  const nums = rest.map(p => parseInt(p, 10)).filter(n => !isNaN(n))
 
-  // multiple ids?
-  if (str && str.includes(',')) {
-    const parts = str.split(',')
-
-    for (const part of parts) {
-      const n = parseInt(part.trim(), 10)
-      if (!isNaN(n)) nums.push(n)
-    }
-  } else {
-    // single id?
-    const n = parseInt(str, 10)
-
-    if (!isNaN(n)) nums.push(n)
+  return {
+    full,
+    pathIds: nums.length ? nums : !!rest.length,
   }
-
-  if (nums.length) return nums
-
-  return !!str
 }
 
 export const randomChars = (length) => {

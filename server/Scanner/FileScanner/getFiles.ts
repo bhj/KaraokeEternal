@@ -9,10 +9,10 @@ const log = getLogger('FileScanner:getFiles')
  *
  * @param dir path to recursively list
  * @param filterFn filter function applied to each file
- * @return array of objects with path and stat properties
+ * @return array of objects with path and mtime properties
  */
-function getFiles (dir: string, filterFn?: (file: string) => boolean): { file: string, stats: fs.Stats }[] {
-  let results: { file: string, stats: fs.Stats }[] = []
+function getFiles (dir: string, filterFn?: (file: string) => boolean): { file: string, mtimeMs: number }[] {
+  let results: { file: string, mtimeMs: number }[] = []
   const list = fs.readdirSync(dir)
 
   list.forEach((file) => {
@@ -34,7 +34,9 @@ function getFiles (dir: string, filterFn?: (file: string) => boolean): { file: s
       }
     } else {
       if (!filterFn || filterFn(file)) {
-        results.push({ file, stats })
+        // keep only the mtime; a retained fs.Stats per file carries four Date
+        // objects, which adds up over a large library
+        results.push({ file, mtimeMs: stats.mtimeMs })
       }
     }
   })

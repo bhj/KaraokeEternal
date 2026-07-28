@@ -2,6 +2,7 @@
 
 - **(App)** ReplayGain for all
 - **(App)** Combined search view now works for keywords spanning both an artist name and song title (e.g. "beatles all together now")
+- **(Server)** Only scan changed files by default
 
 ## v2.0.2 (2026-02-14)
 

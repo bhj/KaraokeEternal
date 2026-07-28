@@ -35,7 +35,7 @@ let IPC
 
   IPC.use({
     [REQUEST_SCAN]: ({ payload }) => {
-      q.queue(payload.pathIds) // no need to await; fire and forget
+      q.queue(payload.pathIds, payload.full === true) // no need to await; fire and forget
     },
     [REQUEST_SCAN_STOP]: () => {
       q.stop()
@@ -51,19 +51,22 @@ let IPC
     process.exit(1) // eslint-disable-line n/no-process-exit
   }
 
-  const pathIds = parsePathIds(args[0])
-  log.debug('parsed pathIds: %s', pathIds)
+  // main.ts passes full separately in args[1], but honor it in args[0] too so
+  // this worker can be run directly with the same spec as --scan
+  const { pathIds, full } = parsePathIds(args[0])
+  log.debug('parsed pathIds: %s (full=%s)', pathIds, full || args[1] === 'true')
 
-  q.queue(pathIds)
+  q.queue(pathIds, full || args[1] === 'true')
 })()
 
-const totals = { new: 0, existing: 0, removed: 0 }
+const totals = { new: 0, existing: 0, removed: 0, skipped: 0 }
 
 function onIteration (stats) {
   if (stats) {
     totals.new += stats.new
     totals.existing += stats.existing
     totals.removed += stats.removed
+    totals.skipped += stats.skipped
   }
 
   return stats
@@ -75,7 +78,7 @@ function onDone () {
     payload: {
       isScanning: false,
       pct: 100,
-      text: `Scan finished (${totals.new} new, ${totals.removed} removed)`,
+      text: `Scan finished (${totals.new} new, ${totals.removed} removed, ${totals.skipped} unchanged)`,
     },
   })
 

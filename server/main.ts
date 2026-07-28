@@ -90,9 +90,9 @@ process.on('unhandledRejection', (reason) => {
   const serverWorker = await import('./serverWorker.js')
   serverWorker.default({ env, startScanner, stopScanner, shutdownHandlers })
 
-  // scanning on startup?
-  const pathIds = parsePathIds(env.KES_SCAN)
-  if (pathIds) startScanner(pathIds)
+  // scanning on startup? ("full" with no pathIds means all paths)
+  const { pathIds, full } = parsePathIds(env.KES_SCAN)
+  if (pathIds || full) startScanner(pathIds || true, full)
 
   // any paths with watching enabled?
   const { default: Prefs } = await import('./Prefs/Prefs.js')
@@ -127,11 +127,11 @@ function startWatcher (paths) {
   })
 }
 
-function startScanner (pathIds) {
+function startScanner (pathIds, full = false) {
   if (refs.scanner === undefined) {
     log.info('Starting media scanner process')
 
-    refs.scanner = childProcess.fork(path.join(import.meta.dirname, 'scannerWorker.js'), [pathIds.toString()], {
+    refs.scanner = childProcess.fork(path.join(import.meta.dirname, 'scannerWorker.js'), [pathIds.toString(), String(full)], {
       env: { KES_ENV_JSON: JSON.stringify(env), KES_CHILD_PROCESS: 'scanner' },
       gid: Number.isInteger(env.KES_PGID) ? env.KES_PGID : undefined,
       uid: Number.isInteger(env.KES_PUID) ? env.KES_PUID : undefined,
@@ -147,7 +147,7 @@ function startScanner (pathIds) {
 
     IPC.addChild(refs.scanner)
   } else {
-    IPC.send({ type: REQUEST_SCAN, payload: { pathIds } })
+    IPC.send({ type: REQUEST_SCAN, payload: { pathIds, full } })
   }
 }
 

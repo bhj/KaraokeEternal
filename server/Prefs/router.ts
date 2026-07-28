@@ -134,7 +134,7 @@ router.post('/path/:pathId/scan', async (ctx) => {
   }
 
   ctx.status = 200
-  ctx.startScanner(pathId)
+  ctx.startScanner(pathId, ctx.query.full === 'true')
 })
 
 // scan all media paths
@@ -144,7 +144,7 @@ router.post('/paths/scan', async (ctx) => {
   }
 
   ctx.status = 200
-  ctx.startScanner(true)
+  ctx.startScanner(true, ctx.query.full === 'true')
 })
 
 // stop scanning

@@ -72,6 +72,10 @@ export interface Path {
   prefs: {
     isVideoKeyingEnabled: boolean
     isWatchingEnabled: boolean
+    scanFull: boolean
+  }
+  scanner?: {
+    configs?: Record<string, number>
   }
 }
 

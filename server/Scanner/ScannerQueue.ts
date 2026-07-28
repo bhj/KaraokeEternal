@@ -8,12 +8,13 @@ interface ScanStats {
   new: number
   removed: number
   existing: number
+  skipped: number
 }
 
 class ScannerQueue {
   #instance
   #isCanceling = false
-  #q = []
+  #q: { pathId: number, full: boolean }[] = []
   onIteration: (stats: ScanStats) => void
   onDone: () => void
 
@@ -22,7 +23,7 @@ class ScannerQueue {
     this.onDone = onDone
   }
 
-  queue (pathIds) {
+  queue (pathIds, full = false) {
     const prefs = Prefs.get()
 
     if (pathIds === true) {
@@ -38,14 +39,16 @@ class ScannerQueue {
 
     pathIds.forEach((id) => {
       const dir = prefs.paths.entities[id]?.path
+      const queued = this.#q.find(item => item.pathId === id)
 
       if (!dir) {
         log.warn('ignoring (invalid pathId): %s', id)
-      } else if (this.#q.includes(id)) {
+      } else if (queued) {
+        queued.full = queued.full || full
         log.info('ignoring (path already queued): %s', dir)
       } else {
         log.info('path queued for scan: %s', dir)
-        this.#q.push(id)
+        this.#q.push({ pathId: id, full })
       }
     })
 
@@ -61,7 +64,8 @@ class ScannerQueue {
       const prefs = Prefs.get()
       this.#instance = new FileScanner(prefs, { length: this.#q.length })
 
-      const stats = await this.#instance.scan(this.#q.shift())
+      const { pathId, full } = this.#q.shift()
+      const stats = await this.#instance.scan(pathId, full)
       this.onIteration(stats)
     }
 

@@ -27,6 +27,7 @@ import socketActions from './socket.js'
 import IPC from './lib/IPCBridge.js'
 import IPCLibraryActions from './Library/ipc.js'
 import IPCMediaActions from './Media/ipc.js'
+import IPCPrefsActions from './Prefs/ipc.js'
 import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from '../shared/actionTypes.js'
 
 const log = getLogger('server')
@@ -68,6 +69,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
     // attach IPC action handlers
     IPC.use(IPCLibraryActions(io))
     IPC.use(IPCMediaActions(io))
+    IPC.use(IPCPrefsActions(io))
 
     // success callback in 3rd arg
     server.listen(env.KES_PORT, () => {

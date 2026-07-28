@@ -57,7 +57,7 @@ const argv = yargs(hideBin(process.argv))
     describe: 'Rotate the session key at startup',
   })
   .option('scan', {
-    describe: 'Run the media scanner at startup. Accepts a comma-separated list of pathIds, or "all"',
+    describe: 'Run the media scanner at startup. Accepts a comma-separated list of pathIds, "all", and/or "full" (also scans unchanged files)',
     type: 'string',
   })
   .option('scannerConsoleLevel', {

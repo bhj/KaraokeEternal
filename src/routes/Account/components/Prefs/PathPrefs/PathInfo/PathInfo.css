@@ -13,3 +13,12 @@
   gap: var(--space-m);
   margin-bottom: var(--space-m);
 }
+
+/* left-aligns with the InputCheckbox label: the box it draws is 1.25em wide,
+   plus the flex gap between that box and the label */
+.description {
+  margin: var(--space-xs) 0 0;
+  padding-left: calc(1.25em + var(--space-s));
+  color: var(--color-gray-6);
+  font-size: var(--font-size-s);
+}

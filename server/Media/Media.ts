@@ -20,7 +20,45 @@ interface MediaRow {
   [key: string]: unknown
 }
 
+/** the only columns FileScanner needs to diff a file against its row */
+export interface MediaIndexRow {
+  mediaId: number
+  songId: number
+  pathId: number
+  relPath: string
+  duration: number
+  rgTrackGain: number | null
+  rgTrackPeak: number | null
+  dateUpdated: number
+}
+
 class Media {
+  /**
+   * Index of a path's media, for the scanner: every mediaId, plus the columns
+   * needed to diff a file against its row, keyed by relPath (first row wins for
+   * any duplicate).
+   *
+   * Deliberately narrower than search(): the scanner holds this for the whole
+   * scan, and search()'s joined songs/artists/paths columns would multiply that
+   * for data it never reads.
+   */
+  static getPathIndex (pathId: number): { mediaIds: number[], byRelPath: Map<string, MediaIndexRow> } {
+    const query = sql`
+      SELECT mediaId, songId, pathId, relPath, duration, rgTrackGain, rgTrackPeak, dateUpdated
+      FROM media
+      WHERE pathId = ${pathId}
+      ORDER BY mediaId
+    `
+    const rows = db.all<MediaIndexRow>(String(query), query.parameters)
+    const byRelPath = new Map<string, MediaIndexRow>()
+
+    for (const row of rows) {
+      if (!byRelPath.has(row.relPath)) byRelPath.set(row.relPath, row)
+    }
+
+    return { mediaIds: rows.map(row => row.mediaId), byRelPath }
+  }
+
   /**
    * Get media matching all search criteria
    */
@@ -114,13 +152,13 @@ class Media {
       throw new Error(`invalid mediaId: ${mediaId}`)
     }
 
-    // dateUpdated lets rescans distinguish files modified after calculation,
-    // which is what preserves these values in FileScanner
+    // deliberately leaves dateUpdated alone: it mirrors the file's mtime, and
+    // the file hasn't changed. Touching it here would make the scanner treat
+    // the file as modified and re-parse it on the next scan.
     const query = sql`
       UPDATE media
       SET rgTrackGain = ${rgTrackGain},
-        rgTrackPeak = ${rgTrackPeak},
-        dateUpdated = ${Math.round(new Date().getTime() / 1000)}
+        rgTrackPeak = ${rgTrackPeak}
       WHERE mediaId = ${mediaId}
         AND (rgTrackGain IS NULL OR rgTrackPeak IS NULL)
     `

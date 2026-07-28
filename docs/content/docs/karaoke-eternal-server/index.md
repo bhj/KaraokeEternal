@@ -182,7 +182,7 @@ Karaoke Eternal Server supports the following CLI options and environment variab
 | <span style="white-space: nowrap;">`--data <string>`</span>| <span style="white-space: nowrap;">`KES_PATH_DATA`</span> | Absolute path of folder for database files | |
 | <span style="white-space: nowrap;">`-p, --port <number>`</span>| <span style="white-space: nowrap;">`KES_PORT`</span> | Web server port | auto |
 | <span style="white-space: nowrap;">`--rotateKey`</span>| <span style="white-space: nowrap;">`KES_ROTATE_KEY`</span> | Rotate the session key at startup | |
-| <span style="white-space: nowrap;">`--scan`</span>| <span style="white-space: nowrap;">`KES_SCAN`</span> | Run the media scanner at startup. Accepts a comma-separated list of pathIds, or "all" | |
+| <span style="white-space: nowrap;">`--scan`</span>| <span style="white-space: nowrap;">`KES_SCAN`</span> | Run the media scanner at startup. Accepts a comma-separated list of pathIds, "all", and/or "full" (also scans unchanged files) | |
 | <span style="white-space: nowrap;">`--scannerConsoleLevel <number>`</span>| `KES_SCANNER_CONSOLE_LEVEL` | Media scanner console output level (default=4) | 4 |
 | <span style="white-space: nowrap;">`--scannerLogLevel <number>`</span>| <span style="white-space: nowrap;">`KES_SCANNER_LOG_LEVEL`</span> | Media scanner log file level | 3 |
 | <span style="white-space: nowrap;">`--serverConsoleLevel <number>`</span>| <span style="white-space: nowrap;">`KES_SERVER_CONSOLE_LEVEL`</span> | Web server console output level | 4 |

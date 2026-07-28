@@ -3,6 +3,7 @@ import pathLib from 'path'
 import { initLogger } from './lib/Log.js'
 import accumulatedThrottle from './lib/accumulatedThrottle.js'
 import fileTypes from './Media/fileTypes.js'
+import { CONFIG_FILENAME } from './Scanner/FileScanner/scanUtils.js'
 import {
   WATCHER_WORKER_EVENT,
   WATCHER_WORKER_WATCH,
@@ -46,7 +47,8 @@ const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== 
         log.info('  => %s', entities[pathId].path)
 
         const cb = accumulatedThrottle((events) => {
-          const event = events.find(([, filename]) => searchExts.includes(pathLib.extname(filename).toLowerCase()))
+          const event = events.find(([, filename]) => searchExts.includes(pathLib.extname(filename).toLowerCase())
+            || pathLib.basename(filename).toLowerCase() === CONFIG_FILENAME)
           if (!event) return
 
           log.info('event in path: %s (filename=%s) (type=%s)', entities[pathId].path, event[1], event[0])

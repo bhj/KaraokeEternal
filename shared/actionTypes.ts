@@ -118,6 +118,7 @@ export const MEDIA_ADD = 'scannerWorker/MEDIA_ADD'
 export const MEDIA_CLEANUP = 'scannerWorker/MEDIA_CLEANUP'
 export const MEDIA_REMOVE = 'scannerWorker/MEDIA_REMOVE'
 export const MEDIA_UPDATE = 'scannerWorker/MEDIA_UPDATE'
+export const PATH_DATA_SET = 'scannerWorker/PATH_DATA_SET'
 export const WATCHER_WORKER_EVENT = 'watcherWorker/EVENT'
 export const WATCHER_WORKER_WATCH = 'watcherWorker/WATCH'
 
