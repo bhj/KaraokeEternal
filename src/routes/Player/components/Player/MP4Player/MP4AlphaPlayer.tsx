@@ -10,6 +10,7 @@ interface MP4AlphaPlayerProps {
   mediaId: number
   mediaKey: number
   mediaReplayKey?: number
+  mediaSrc?: string | null
   mp4Alpha: number
   width: number
   height: number
@@ -53,7 +54,8 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   }
 
   componentDidUpdate (prevProps: MP4AlphaPlayerProps) {
-    if (prevProps.mediaKey !== this.props.mediaKey) {
+    // mediaSrc resolves asynchronously, so it can arrive after the mediaKey change
+    if (prevProps.mediaKey !== this.props.mediaKey || prevProps.mediaSrc !== this.props.mediaSrc) {
       this.updateSources()
       return
     }
@@ -144,7 +146,11 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
   updateSources = () => {
     this.stopChroma()
     this.props.onLoad()
-    this.video.src = `${document.baseURI}api/media/${this.props.mediaId}?type=video`
+
+    // src is still being resolved; we'll be called again once it is
+    if (!this.props.mediaSrc) return
+
+    this.video.src = this.props.mediaSrc
     this.video.load()
   }
 

@@ -18,8 +18,8 @@ export interface QueueItem {
   userId: number
   prevQueueId: number
   mediaId: number
-  rgTrackGain: number
-  rgTrackPeak: number
+  rgTrackGain: number | null
+  rgTrackPeak: number | null
   userDateUpdated: number
   userDisplayName: string
   mediaType: 'cdg' | 'mp4'

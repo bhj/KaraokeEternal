@@ -13,6 +13,9 @@ interface MediaRow {
   duration: number
   pathId: number
   relPath: string
+  rgTrackGain: number | null
+  rgTrackPeak: number | null
+  dateUpdated: number
   isPreferred?: number
   [key: string]: unknown
 }
@@ -97,6 +100,31 @@ class Media {
       WHERE mediaId = ${mediaId}
     `
     db.run(String(query), query.parameters)
+  }
+
+  /**
+   * Store client-calculated ReplayGain values, but only for media that doesn't
+   * already have them. Compare-and-set rather than read-then-write since two
+   * players in different rooms can analyze the same media concurrently.
+   *
+   * Returns whether the values were stored.
+   */
+  static setReplayGain (mediaId: number, rgTrackGain: number, rgTrackPeak: number): boolean {
+    if (!Number.isInteger(mediaId)) {
+      throw new Error(`invalid mediaId: ${mediaId}`)
+    }
+
+    // dateUpdated lets rescans distinguish files modified after calculation,
+    // which is what preserves these values in FileScanner
+    const query = sql`
+      UPDATE media
+      SET rgTrackGain = ${rgTrackGain},
+        rgTrackPeak = ${rgTrackPeak},
+        dateUpdated = ${Math.round(new Date().getTime() / 1000)}
+      WHERE mediaId = ${mediaId}
+        AND (rgTrackGain IS NULL OR rgTrackPeak IS NULL)
+    `
+    return db.run(String(query), query.parameters).changes === 1
   }
 
   /**

@@ -96,7 +96,7 @@ class FileScanner extends Scanner {
     return stats
   }
 
-  async process ({ file }, pathId) {
+  async process ({ file, stats }, pathId) {
     let buffer = await fsPromises.readFile(file)
     let mimeType = fileTypes[getExt(file)].mimeType
 
@@ -165,6 +165,13 @@ class FileScanner extends Scanner {
 
       // did anything change?
       Object.keys(media).forEach((key) => {
+        // preserve JIT-calculated ReplayGain values while the untagged file is unchanged
+        if ((key === 'rgTrackGain' || key === 'rgTrackPeak')
+          && media[key] === null && row[key] !== null
+          && Math.round(stats.mtimeMs / 1000) <= row.dateUpdated) {
+          return
+        }
+
         if (media[key] !== row[key]) diff[key] = media[key]
       })
 

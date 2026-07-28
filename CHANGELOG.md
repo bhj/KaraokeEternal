@@ -1,6 +1,7 @@
 ## TBD
 
-- **(App)** Search no longer separates results by artist and song and now works for keywords spanning both (e.g. "beatles all together now")
+- **(App)** ReplayGain for all
+- **(App)** Combined search view now works for keywords spanning both an artist name and song title (e.g. "beatles all together now")
 
 ## v2.0.2 (2026-02-14)
 

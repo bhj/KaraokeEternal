@@ -3,6 +3,7 @@ import sql from 'sqlate'
 import crypto from 'crypto'
 import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
+import type { Path } from '../../shared/types.js'
 
 const RESERVED_KEYS = ['jwtKey', 'isFirstRun']
 const log = getLogger('Prefs')
@@ -12,7 +13,11 @@ class Prefs {
    * Get all global preferences (includes media paths; excludes JWT secret key)
    */
   static get () {
-    const prefs = {
+    const prefs: {
+      paths: { result: number[], entities: Record<number, Path> }
+      roles: { result: number[], entities: Record<number, { roleId: number, name: string }> }
+      [key: string]: unknown
+    } = {
       paths: { result: [], entities: {} },
       roles: { result: [], entities: {} },
     }

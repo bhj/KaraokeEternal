@@ -6,6 +6,7 @@ import PlayerQR from '../PlayerQR/PlayerQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
 import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
+import useMediaSource from './useMediaSource'
 import type { QueueItem } from 'shared/types'
 
 interface PlayerControllerProps {
@@ -21,6 +22,14 @@ const PlayerController = (props: PlayerControllerProps) => {
   const roomPrefs = useAppSelector(getRoomPrefs)
   const queueItem = queue.entities[player.queueId]
   const nextQueueItem = queue.entities[queue.result[queue.result.indexOf(player.queueId) + 1]]
+
+  const { mediaSrc, rgTrackGain, rgTrackPeak } = useMediaSource({
+    mediaId: queueItem ? queueItem.mediaId : null,
+    mediaType: queueItem ? queueItem.mediaType : null,
+    rgTrackGain: queueItem ? queueItem.rgTrackGain : null,
+    rgTrackPeak: queueItem ? queueItem.rgTrackPeak : null,
+    isReplayGainEnabled: prefs.isReplayGainEnabled,
+  })
 
   const dispatch = useAppDispatch()
   const handleStatus = useCallback((status?: Partial<PlayerState>) => dispatch(playerStatus(status)), [dispatch])
@@ -159,6 +168,7 @@ const PlayerController = (props: PlayerControllerProps) => {
         mediaId={queueItem ? queueItem.mediaId : null}
         mediaKey={queueItem ? queueItem.queueId : null}
         mediaReplayKey={player._lastReplayTime}
+        mediaSrc={mediaSrc}
         mediaType={queueItem ? queueItem.mediaType : null}
         mp4Alpha={player.mp4Alpha}
         onEnd={handleLoadNext}
@@ -166,8 +176,8 @@ const PlayerController = (props: PlayerControllerProps) => {
         onLoad={handleLoad}
         onPlay={handlePlay}
         onStatus={handleStatus}
-        rgTrackGain={queueItem ? queueItem.rgTrackGain : null}
-        rgTrackPeak={queueItem ? queueItem.rgTrackPeak : null}
+        rgTrackGain={rgTrackGain}
+        rgTrackPeak={rgTrackPeak}
         visualizer={playerVisualizer}
         volume={player.volume}
         width={props.width}

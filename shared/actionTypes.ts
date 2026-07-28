@@ -13,6 +13,9 @@ export const STAR_COUNTS_PUSH = 'library/STAR_COUNTS_PUSH'
 export const LIBRARY_PUSH = 'library/PUSH'
 export const LIBRARY_PUSH_SONG = 'library/PUSH_SONG'
 
+// Media
+export const MEDIA_RG_SET = 'server/MEDIA_RG_SET'
+
 // Queue
 export const QUEUE_ADD = 'server/QUEUE_ADD'
 export const QUEUE_MOVE = 'server/QUEUE_MOVE'

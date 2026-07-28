@@ -8,6 +8,22 @@ import { type PlayerVisualizerState } from '../../modules/playerVisualizer'
 
 const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisualizer'))
 
+// kept below full scale to absorb resampler overshoot
+const HEADROOM_DB = 0.5
+
+const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max)
+
+/**
+ * The dB adjustment to apply for a track, or null when the values are unusable.
+ * Values can come from tags, which are garbage often enough to check.
+ */
+function replayGainDb (gainDb: number, peak: number): number | null {
+  if (!Number.isFinite(gainDb) || !Number.isFinite(peak) || peak <= 0) return null
+
+  // never let the gain push the track's peak up to full scale
+  return clamp(Math.min(gainDb, -HEADROOM_DB - 20 * Math.log10(peak)), -60, 20)
+}
+
 interface PlayerProps {
   cdgAlpha: number
   cdgSize: number
@@ -20,10 +36,11 @@ interface PlayerProps {
   mediaId: number
   mediaKey: number
   mediaReplayKey?: number
+  mediaSrc?: string | null
   mediaType?: string
   mp4Alpha: number
-  rgTrackGain?: number
-  rgTrackPeak?: number
+  rgTrackGain?: number | null
+  rgTrackPeak?: number | null
   visualizer: PlayerVisualizerState
   volume: number
   width: number
@@ -45,6 +62,7 @@ class Player extends React.Component<PlayerProps> {
   audioGainNode: GainNode | null = null
   audioSourceNode: MediaElementAudioSourceNode | null = null
   isFetching = false // internal
+  appliedRG: { gain?: number | null, peak?: number | null } = {} // RG values latched at play
 
   state: State = {
     visualizerAudioSourceNode: null,
@@ -70,10 +88,9 @@ class Player extends React.Component<PlayerProps> {
       this.isFetching = true
     }
 
-    // don't change volume if we know we're changing songs
+    // don't change volume if we know we're changing songs; RG value changes
+    // deliberately don't re-apply until the next play event (never mid-song)
     if (!this.isFetching && (prevProps.volume !== this.props.volume
-      || prevProps.rgTrackGain !== this.props.rgTrackGain
-      || prevProps.rgTrackPeak !== this.props.rgTrackPeak
       || prevProps.isReplayGainEnabled !== this.props.isReplayGainEnabled)) {
       this.updateVolume()
     }
@@ -95,20 +112,45 @@ class Player extends React.Component<PlayerProps> {
 
   handlePlay = () => {
     this.isFetching = false
+    this.appliedRG = { gain: this.props.rgTrackGain, peak: this.props.rgTrackPeak }
+    this.logReplayGain()
     this.updateVolume()
     this.props.onPlay()
   }
 
+  // once per song, and the only place that reports what was actually applied
+  logReplayGain = () => {
+    if (!this.props.isReplayGainEnabled) return
+
+    const { gain, peak } = this.appliedRG
+    const adjustDb = replayGainDb(gain, peak)
+
+    if (adjustDb === null) {
+      console.info('[ReplayGain] mediaId %s: no values; playing at room volume', this.props.mediaId)
+      return
+    }
+
+    console.info('[ReplayGain] mediaId %s: applying %sdB%s (track gain %sdB, peak %s)',
+      this.props.mediaId, adjustDb.toFixed(2),
+      adjustDb < gain ? ', reduced to stay below clipping' : '',
+      gain.toFixed(2), peak.toFixed(4))
+  }
+
+  handleError = (error: string) => {
+    // otherwise volume changes are ignored until the next successful play
+    this.isFetching = false
+    this.props.onError(error)
+  }
+
   updateVolume = () => {
     let vol = this.props.volume
-    const { isReplayGainEnabled, rgTrackGain, rgTrackPeak } = this.props
+    const { gain, peak } = this.appliedRG
+    const adjustDb = this.props.isReplayGainEnabled ? replayGainDb(gain, peak) : null
 
-    if (isReplayGainEnabled && typeof rgTrackGain === 'number' && typeof rgTrackPeak === 'number') {
-      const gainDb = this.props.rgTrackGain
-      const peakDb = 20 * Math.log10(this.props.rgTrackPeak) // linear amplitude factor to dB
-      const safeGainDb = (gainDb + peakDb >= 0) ? -0.01 - peakDb : gainDb
-
-      vol = vol * Math.pow(10, safeGainDb / 20) // dB to linear amplitude factor
+    // no upper clamp on vol: the peak clamp already guarantees headroom, and
+    // clamping would defeat boosting quiet tracks
+    if (adjustDb !== null) {
+      vol = vol * Math.pow(10, adjustDb / 20) // dB to linear amplitude factor
     }
 
     if (this.audioCtx && this.audioGainNode) {
@@ -140,6 +182,7 @@ class Player extends React.Component<PlayerProps> {
         <PlayerComponent
           {...this.props}
           onAudioElement={this.handleAudioElement}
+          onError={this.handleError}
           onPlay={this.handlePlay}
         />
         {this.props.isFetching && (

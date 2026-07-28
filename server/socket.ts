@@ -3,6 +3,7 @@ import jsonWebToken from 'jsonwebtoken'
 import parseCookie from './lib/parseCookie.js'
 import Library from './Library/Library.js'
 import LibrarySocket from './Library/socket.js'
+import MediaSocket from './Media/socket.js'
 import PlayerSocket from './Player/socket.js'
 import Prefs from './Prefs/Prefs.js'
 import PrefsSocket from './Prefs/socket.js'
@@ -26,6 +27,7 @@ const log = getLogger('server')
 
 const handlers = {
   ...LibrarySocket,
+  ...MediaSocket,
   ...QueueSocket,
   ...PlayerSocket,
   ...PrefsSocket,

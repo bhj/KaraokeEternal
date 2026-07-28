@@ -12,8 +12,9 @@ interface CDGPlayerProps {
   cdgSize: number
   isPlaying: boolean
   mediaId: number
-  mediaKey: string
+  mediaKey: number
   mediaReplayKey?: number
+  mediaSrc?: string | null
   width: number
   height: number
   onAudioElement(video: HTMLAudioElement): void
@@ -32,6 +33,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   cdg: CDGraphics = null
   frameId: number | null = null
   lastBitmap: ImageBitmap | null = null
+  loadToken = 0
   supportsFilters = CSS.supports('backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)') || CSS.supports('-webkit-backdrop-filter', 'blur(10px) brightness(100%) saturate(100%)')
 
   state = {
@@ -46,7 +48,8 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
   }
 
   componentDidUpdate (prevProps: CDGPlayerProps) {
-    if (prevProps.mediaKey !== this.props.mediaKey) {
+    // mediaSrc resolves asynchronously, so it can arrive after the mediaKey change
+    if (prevProps.mediaKey !== this.props.mediaKey || prevProps.mediaSrc !== this.props.mediaSrc) {
       this.updateSources()
       return
     }
@@ -128,20 +131,26 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     this.stopCDG()
     this.props.onLoad() // loading includes the .cdg fetch, before the audio's loadstart
 
+    // src is still being resolved; we'll be called again once it is
+    if (!this.props.mediaSrc) return
+
+    // two rapid song changes would otherwise race, with the slower .cdg fetch winning
+    const token = ++this.loadToken
+
     // load .cdg file
     try {
       const response = await api.get(`/${this.props.mediaId}?type=cdg`)
       if (!(response instanceof Response)) return
       const buffer = await response.arrayBuffer()
-      // in case we've unmounted by this point
-      if (!this.audio.current) return
+      // in case we've unmounted or moved on by this point
+      if (!this.audio.current || token !== this.loadToken) return
 
       this.cdg = new CDGraphics(buffer)
-      this.audio.current.src = `${document.baseURI}api/media/${this.props.mediaId}?type=audio`
+      this.audio.current.src = this.props.mediaSrc
       this.audio.current.load()
       return
     } catch (err) {
-      this.props.onError(err.message)
+      if (token === this.loadToken) this.props.onError(err.message)
     }
   }
 
