@@ -49,10 +49,6 @@
   "productName": "Karaoke Eternal Server",
   "author": "RadRoot LLC",
   "license": "ISC",
-  "overrides": {
-    "is-generator-function": "1.0.10",
-    "get-generator-function": "1.0.10"
-  },
   "dependencies": {
     "@babel/runtime": "^7.29.7",
     "@jcoreio/async-throttle": "^1.7.0",

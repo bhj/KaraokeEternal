@@ -19,6 +19,8 @@
   ],
   "exclude": [
     "src",
-    "node_modules"
+    "node_modules",
+    "../server/**/*.test.ts",
+    "../server/lib/test-setup.ts"
   ]
 }

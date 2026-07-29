@@ -1,4 +1,4 @@
-import { configDefaults, defineConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -17,9 +17,6 @@ export default defineConfig({
     },
   },
   test: {
-    // build/ holds compiled copies of these same specs, which fail because the
-    // setup file initializes the source logger and not the built one
-    exclude: [...configDefaults.exclude, '**/build/**'],
     setupFiles: [path.resolve(__dirname, '../server/lib/test-setup.ts')],
   },
 })

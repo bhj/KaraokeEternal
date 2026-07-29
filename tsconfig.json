@@ -6,6 +6,9 @@
     },
     {
       "path": "./config/tsconfig.server.json"
+    },
+    {
+      "path": "./config/tsconfig.test.json"
     }
   ],
   "compilerOptions": {
