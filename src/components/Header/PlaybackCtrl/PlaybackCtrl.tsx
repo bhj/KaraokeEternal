@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { createAction } from '@reduxjs/toolkit'
+import { ensureState } from 'redux-optimistic-ui'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { useLocation } from 'react-router'
 import clsx from 'clsx'
@@ -7,9 +9,12 @@ import { requestOptions, requestPause, requestPlay, requestPlayNext, requestVolu
 import Button from 'components/Button/Button'
 import VolumeSlider from './VolumeSlider/VolumeSlider'
 import NoPlayer from './NoPlayer/NoPlayer'
-import DisplayCtrl from './DisplayCtrl/DisplayCtrl'
+import PlayerOptions from './PlayerOptions/PlayerOptions'
 import styles from './PlaybackCtrl.css'
+import { MEDIA_PITCH_SET } from 'shared/actionTypes'
 import { PlaybackOptions } from 'shared/types'
+
+const setMediaPitch = createAction<{ mediaId: number, pitch: number }>(MEDIA_PITCH_SET)
 
 const handleFullscreen = () => {
   if (screenfull.isEnabled) {
@@ -19,7 +24,7 @@ const handleFullscreen = () => {
 }
 
 const PlaybackCtrl = () => {
-  const [isDisplayCtrlVisible, setDisplayCtrlVisible] = useState(false)
+  const [isPlayerOptionsVisible, setPlayerOptionsVisible] = useState(false)
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
@@ -27,15 +32,24 @@ const PlaybackCtrl = () => {
   const isInRoom = useAppSelector(state => state.user.roomId !== null)
   const status = useAppSelector(state => state.status)
 
+  // the media being played, for saving its default pitch
+  const curMedia = useAppSelector((state) => {
+    if (state.status.isAtQueueEnd) return null
+
+    const item = ensureState(state.queue).entities[state.status.queueId]
+    return item && item.isOptimistic !== true ? item : null
+  })
+
   const dispatch = useAppDispatch()
   const handleOptions = (opts: PlaybackOptions) => dispatch(requestOptions(opts))
+  const handleSetDefaultPitch = (pitch: number) => dispatch(setMediaPitch({ mediaId: curMedia.mediaId, pitch }))
   const handlePause = () => dispatch(requestPause())
   const handlePlay = () => dispatch(requestPlay())
   const handlePlayNext = () => dispatch(requestPlayNext())
   const handleVolume = (val: number) => dispatch(requestVolume(val))
 
-  const toggleDisplayCtrl = () => {
-    setDisplayCtrlVisible(!isDisplayCtrlVisible)
+  const togglePlayerOptions = () => {
+    setPlayerOptionsVisible(!isPlayerOptionsVisible)
   }
 
   if (!status.isPlayerPresent) {
@@ -66,11 +80,11 @@ const PlaybackCtrl = () => {
       />
 
       <Button
-        className={clsx(styles.btn, styles.displayCtrl)}
+        className={clsx(styles.btn, styles.playerOptions)}
         icon='TUNE'
-        onClick={toggleDisplayCtrl}
+        onClick={togglePlayerOptions}
         size={48}
-        aria-label='Display Options'
+        aria-label='Player Options'
       />
 
       {isPlayer && screenfull.isEnabled && (
@@ -82,17 +96,21 @@ const PlaybackCtrl = () => {
         />
       )}
 
-      {isDisplayCtrlVisible && (
-        <DisplayCtrl
+      {isPlayerOptionsVisible && (
+        <PlayerOptions
           cdgAlpha={status.cdgAlpha}
           cdgSize={status.cdgSize}
+          defaultPitch={curMedia?.pitch ?? 0}
+          isPitchSupported={status.isPitchSupported}
           isVideoKeyingEnabled={status.isVideoKeyingEnabled}
           isVisualizerEnabled={status.visualizer.isEnabled}
           isWebGLSupported={status.isWebGLSupported}
           mediaType={status.mediaType}
           mp4Alpha={status.mp4Alpha}
-          onClose={toggleDisplayCtrl}
+          onClose={togglePlayerOptions}
           onRequestOptions={handleOptions}
+          onSetDefaultPitch={isAdmin && curMedia ? handleSetDefaultPitch : undefined}
+          pitch={status.pitch}
           sensitivity={status.visualizer.sensitivity}
           visualizerPresetName={status.visualizer.presetName}
         />

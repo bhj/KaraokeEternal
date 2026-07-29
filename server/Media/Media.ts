@@ -17,6 +17,7 @@ interface MediaRow {
   rgTrackPeak: number | null
   dateUpdated: number
   isPreferred?: number
+  pitch?: number | null
   [key: string]: unknown
 }
 
@@ -161,6 +162,35 @@ class Media {
         rgTrackPeak = ${rgTrackPeak}
       WHERE mediaId = ${mediaId}
         AND (rgTrackGain IS NULL OR rgTrackPeak IS NULL)
+    `
+    return db.run(String(query), query.parameters).changes === 1
+  }
+
+  /**
+   * Store an admin-set default pitch offset (semitones) for a media file. A
+   * pitch of 0 is stored as NULL: they're equivalent at playback, and NULL keeps
+   * the column sparse and "has a default" meaningful.
+   *
+   * Returns whether the stored value actually changed.
+   */
+  static setPitch (mediaId: number, pitch: number): boolean {
+    if (!Number.isInteger(mediaId)) {
+      throw new Error(`invalid mediaId: ${mediaId}`)
+    }
+
+    const value = pitch === 0 ? null : pitch
+
+    // deliberately leaves dateUpdated alone: it mirrors the file's mtime, and
+    // the file hasn't changed. Touching it here would make the scanner treat
+    // the file as modified and re-parse it on the next scan.
+    //
+    // IS NOT (null-safe) rather than != so that changes === 1 means the value
+    // really changed, not merely that the row exists
+    const query = sql`
+      UPDATE media
+      SET pitch = ${value}
+      WHERE mediaId = ${mediaId}
+        AND pitch IS NOT ${value}
     `
     return db.run(String(query), query.parameters).changes === 1
   }

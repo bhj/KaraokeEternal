@@ -3,19 +3,7 @@
   margin: 0 34px 0 30px;
 }
 
-.handle {
-  cursor: pointer;
+.handleIcon {
   color: var(--transport-btn-bg-color);
   filter: var(--transport-btn-filter);
-  position: absolute;
-  touch-action: pan-x;
-  outline: none;
-
-  &:focus-visible {
-    outline: var(--focus-outline);
-  }
-
-  svg {
-    height: var(--icon-size-xl);
-  }
 }

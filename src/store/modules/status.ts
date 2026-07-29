@@ -55,6 +55,7 @@ export interface StatusState {
   historyJSON: string // queueIds in JSON array
   isAtQueueEnd: boolean
   isErrored: boolean
+  isPitchSupported: boolean
   isPlayerPresent: boolean
   isPlaying: boolean
   isVideoKeyingEnabled: boolean
@@ -62,6 +63,7 @@ export interface StatusState {
   mediaType: MediaType | null
   mp4Alpha: number
   nextUserId: number | null
+  pitch: number
   position: number
   queueId: number
   visualizer: PlayerVisualizerState | Record<string, never>
@@ -75,6 +77,7 @@ const initialState: StatusState = {
   historyJSON: '[]', // queueIds in JSON array
   isAtQueueEnd: false,
   isErrored: false,
+  isPitchSupported: false,
   isPlayerPresent: false,
   isPlaying: false,
   isVideoKeyingEnabled: false,
@@ -82,6 +85,7 @@ const initialState: StatusState = {
   mediaType: null,
   mp4Alpha: 1,
   nextUserId: null,
+  pitch: 0,
   position: 0,
   queueId: -1,
   visualizer: {},

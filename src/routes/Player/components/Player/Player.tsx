@@ -3,6 +3,7 @@ import Spinner from 'components/Spinner/Spinner'
 import CDGPlayer from './CDGPlayer/CDGPlayer'
 import MP4Player from './MP4Player/MP4Player'
 import MP4AlphaPlayer from './MP4Player/MP4AlphaPlayer'
+import { pitchShifterEngine, type PitchShifter } from 'lib/pitchShifter'
 import { type PlayerState } from '../../modules/player'
 import { type PlayerVisualizerState } from '../../modules/playerVisualizer'
 
@@ -39,6 +40,7 @@ interface PlayerProps {
   mediaSrc?: string | null
   mediaType?: string
   mp4Alpha: number
+  pitch: number
   rgTrackGain?: number | null
   rgTrackPeak?: number | null
   visualizer: PlayerVisualizerState
@@ -54,24 +56,58 @@ interface PlayerProps {
 }
 
 interface State {
-  visualizerAudioSourceNode: MediaElementAudioSourceNode | null
+  audioLatency: number
+  pitchShifterState: 'unavailable' | 'loading' | 'ready'
+  visualizerAudioNode: AudioNode | null
 }
 
 class Player extends React.Component<PlayerProps> {
   audioCtx: AudioContext | null = null
   audioGainNode: GainNode | null = null
+  audioPitchBusNode: GainNode | null = null
   audioSourceNode: MediaElementAudioSourceNode | null = null
+  pitchShifter: PitchShifter | null = null
   isFetching = false // internal
   appliedRG: { gain?: number | null, peak?: number | null } = {} // RG values latched at play
 
   state: State = {
-    visualizerAudioSourceNode: null,
+    audioLatency: 0,
+    pitchShifterState: pitchShifterEngine.isSupported() ? 'loading' : 'unavailable',
+    visualizerAudioNode: null,
+  }
+
+  /**
+   * Whether playback should wait for the shifter. Only while one is actually
+   * coming: if it can't be had there's nothing to wait for, and holding would
+   * stall the song forever.
+   */
+  get isAwaitingPitchShifter () {
+    return this.props.pitch !== 0 && this.state.pitchShifterState === 'loading'
   }
 
   componentDidMount () {
     if (!this.audioCtx) {
       this.audioCtx = new (window.AudioContext || window.webkitAudioContext)()
       this.audioGainNode = this.audioCtx.createGain()
+
+      // permanent post-pitch tap point; the pitch shifter is
+      // (dis)engaged on the source → bus leg only
+      this.audioPitchBusNode = this.audioCtx.createGain()
+      this.audioPitchBusNode.connect(this.audioGainNode)
+
+      if (this.state.pitchShifterState === 'loading') {
+        pitchShifterEngine.prepare(this.audioCtx)
+          .then(() => {
+            // apply any pitch commanded while preparing, and release playback
+            // if it was waiting on us
+            this.setState({ pitchShifterState: 'ready' }, this.updatePitch)
+            return
+          })
+          .catch(() => {
+            this.setState({ pitchShifterState: 'unavailable' })
+            this.props.onStatus({ isPitchSupported: false, pitch: 0 })
+          })
+      }
     }
 
     this.updateVolume()
@@ -94,6 +130,17 @@ class Player extends React.Component<PlayerProps> {
       || prevProps.isReplayGainEnabled !== this.props.isReplayGainEnabled)) {
       this.updateVolume()
     }
+
+    if (prevProps.pitch !== this.props.pitch) {
+      this.updatePitch()
+    }
+  }
+
+  componentWillUnmount () {
+    if (this.pitchShifter) {
+      this.pitchShifter.dispose()
+      this.pitchShifter = null
+    }
   }
 
   handleAudioElement = (el: HTMLVideoElement | HTMLAudioElement) => {
@@ -101,13 +148,20 @@ class Player extends React.Component<PlayerProps> {
       return
     }
 
-    this.audioSourceNode = this.audioCtx.createMediaElementSource(el)
-    this.audioSourceNode.connect(this.audioGainNode)
-    this.audioGainNode.connect(this.audioCtx.destination)
+    // new media element; discard routing tied to the old source
+    // (safe to fully disconnect since the visualizer taps the pitch bus)
+    this.audioSourceNode?.disconnect()
 
-    // hand back copy of original audio source
-    const sourceNodeCopy = this.audioSourceNode
-    this.setState({ visualizerAudioSourceNode: sourceNodeCopy })
+    if (this.pitchShifter) {
+      this.pitchShifter.dispose()
+      this.pitchShifter = null
+    }
+
+    this.audioSourceNode = this.audioCtx.createMediaElementSource(el)
+    this.audioGainNode.connect(this.audioCtx.destination)
+    this.updatePitch() // wires source → [pitchShifter →] pitch bus
+
+    this.setState({ visualizerAudioNode: this.audioPitchBusNode })
   }
 
   handlePlay = () => {
@@ -140,6 +194,51 @@ class Player extends React.Component<PlayerProps> {
     // otherwise volume changes are ignored until the next successful play
     this.isFetching = false
     this.props.onError(error)
+  }
+
+  updatePitch = () => {
+    const source = this.audioSourceNode
+
+    if (!this.audioCtx || !this.audioPitchBusNode || !source) return
+
+    if (this.props.pitch === 0 || this.state.pitchShifterState !== 'ready') {
+      // bypass: source feeds the bus directly (no added latency)
+      if (this.pitchShifter) {
+        try {
+          source.disconnect(this.pitchShifter.node)
+        } catch {
+          // wasn't connected
+        }
+
+        this.pitchShifter.dispose()
+        this.pitchShifter = null
+      }
+
+      source.connect(this.audioPitchBusNode) // no-op if already connected
+
+      if (this.state.audioLatency !== 0) {
+        this.setState({ audioLatency: 0 })
+      }
+
+      return
+    }
+
+    if (!this.pitchShifter) {
+      // fresh instance per engagement; disposed on return to 0
+      this.pitchShifter = pitchShifterEngine.create(this.audioCtx)
+      this.pitchShifter.node.connect(this.audioPitchBusNode)
+      source.connect(this.pitchShifter.node)
+
+      try {
+        source.disconnect(this.audioPitchBusNode)
+      } catch {
+        // wasn't connected
+      }
+
+      this.setState({ audioLatency: this.pitchShifter.latency })
+    }
+
+    this.pitchShifter.setPitchSemitones(this.props.pitch)
   }
 
   updateVolume = () => {
@@ -175,12 +274,16 @@ class Player extends React.Component<PlayerProps> {
     const isVisualizerActive = (this.props.mediaType === 'cdg' || this.props.isVideoKeyingEnabled)
       && this.props.isWebGLSupported
       && this.props.visualizer.isEnabled
-      && this.state.visualizerAudioSourceNode
+      && this.state.visualizerAudioNode
 
     return (
       <>
         <PlayerComponent
           {...this.props}
+          audioLatency={this.state.audioLatency}
+          // hold playback rather than start unshifted and jump when the
+          // worklet module lands; the isFetching spinner covers the wait
+          isPlaying={this.props.isPlaying && !this.isAwaitingPitchShifter}
           onAudioElement={this.handleAudioElement}
           onError={this.handleError}
           onPlay={this.handlePlay}
@@ -201,7 +304,7 @@ class Player extends React.Component<PlayerProps> {
                 )}
           >
             <PlayerVisualizer
-              audioSourceNode={this.state.visualizerAudioSourceNode}
+              audioNode={this.state.visualizerAudioNode}
               isPlaying={this.props.isPlaying}
               onError={this.props.onError}
               presetKey={this.props.visualizer.presetKey}

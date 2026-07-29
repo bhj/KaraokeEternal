@@ -1,6 +1,7 @@
 import React from 'react'
 import Slider from 'components/Slider/Slider'
 import Icon from 'components/Icon/Icon'
+import useOptimisticValue from 'lib/useOptimisticValue'
 import styles from './VolumeSlider.css'
 
 interface VolumeSliderProps {
@@ -8,39 +9,32 @@ interface VolumeSliderProps {
   onVolumeChange: (value: number) => void
 }
 
-interface HandleProps {
-  'className'?: string
-  'aria-label'?: string
-}
+const VolumeSlider = ({ volume, onVolumeChange }: VolumeSliderProps) => {
+  // optimistic value, since the player-reported volume is throttled
+  const [displayVolume, setDisplayVolume] = useOptimisticValue(volume)
 
-// volume slider handle/grabber
-const handle = (node: React.ReactElement<HandleProps>, { value }: { value: number }) => {
+  const handleChange = (val: number) => {
+    setDisplayVolume(val)
+    onVolumeChange(val)
+  }
+
   const icon = (() => {
-    if (value === 0) return 'VOLUME_OFF'
-    if (value < 0.4) return 'VOLUME_MUTE'
-    if (value < 0.7) return 'VOLUME_DOWN'
+    if (displayVolume === 0) return 'VOLUME_OFF'
+    if (displayVolume < 0.4) return 'VOLUME_MUTE'
+    if (displayVolume < 0.7) return 'VOLUME_DOWN'
     return 'VOLUME_UP'
   })()
 
-  // rc-slider passes a node (div) to which we add style and children
-  return React.cloneElement(node, {
-    'aria-label': 'Volume',
-    'className': styles.handle,
-  }, (
-    <Icon icon={icon} />
-  ))
-}
-
-const VolumeSlider = ({ volume, onVolumeChange }: VolumeSliderProps) => {
   return (
     <Slider
+      aria-label='Volume'
       className={styles.slider}
-      handle={handle}
+      handleComponent={<Icon icon={icon} className={styles.handleIcon} />}
       min={0}
       max={1}
-      onChange={onVolumeChange}
+      onChange={handleChange}
       step={0.01}
-      value={volume}
+      value={displayVolume}
     />
   )
 }

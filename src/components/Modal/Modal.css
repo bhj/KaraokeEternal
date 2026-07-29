@@ -5,8 +5,8 @@
   color: var(--text-color);
   background: transparent;
   padding: var(--space-m);
-  border: 1.5px solid hsl(var(--hue-blue), 20%, 30%);
-  border-radius: 16px;
+  border: 1.5px solid var(--modal-border-color);
+  border-radius: var(--modal-border-radius);
   max-width: min(800px, 90vw);
   box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0);
   backdrop-filter: blur(30px) brightness(50%) saturate(100%);
@@ -37,13 +37,11 @@
   top: calc(var(--space-s) * -1);
   right: calc(var(--space-s) * -1);
   align-self: flex-start;
+  /* stay right-aligned even if headingComponent has no flexible element */
+  margin-left: auto;
   color: var(--btn-active-bg-color);
   padding: var(--space-s);
   line-height: 1em;
-
-  &:focus-visible {
-    outline: none;
-  }
 
   svg {
     height: var(--icon-size-l);

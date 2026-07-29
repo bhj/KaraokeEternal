@@ -44,6 +44,8 @@
   --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   --drop-shadow-filter: drop-shadow(0 2px 5px #222);
   --border-radius: 8px;
+  --modal-border-radius: 16px;
+  --modal-border-color: hsl(var(--hue-blue), 20%, 30%);
   --focus-outline: 4px solid var(--btn-danger-bg-color);
 
   --input-color: var(--color-gray-1);

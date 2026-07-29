@@ -1,35 +1,3 @@
-.modal {
-  width: 90vw;
-  max-width: 480px;
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-m);
-}
-
-.section {
-
-  /* Safari REALLY doesn't like fieldsets to be flex *items*, hence the .section wrapper */
-  fieldset {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-m);
-    margin: 0;
-    padding: var(--container-padding);
-    border: 1px solid var(--btn-bg-color);
-    border-radius: var(--border-radius);
-    /* Prevent fieldset from overflowing parent */
-    min-width: 0;
-  }
-
-  legend {
-    font-size: var(--font-size-m);
-    width: fit-content;
-  }
-}
-
 .visualizer legend {
   label {
     display: flex;
@@ -72,6 +40,11 @@
   line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--color-gray-6);
+}
+
+.field label {
+  color: var(--color-gray-7);
 }
 
 .unsupported {

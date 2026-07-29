@@ -12,6 +12,7 @@ const applyLicenseConfig = (config) => {
     perChunkOutput: false,
     renderLicenses: (modules) => {
       modules.unshift(karaokeEternal)
+      modules.push(soundTouchJS)
       modules.push(materialDesignIcons)
 
       return modules.reduce((txt, m, i) => {
@@ -49,6 +50,34 @@ const karaokeEternal = {
     name: 'Karaoke Eternal',
   },
   licenseText: fs.readFileSync('./LICENSE', 'utf8'),
+}
+
+// The @soundtouchjs packages are bundled into the AudioWorklet processor, which
+// is a separate webpack entry that this plugin doesn't scan — so they never show
+// up on their own. src/lib/pitchShifter/bespoke/stretch.ts is MPL-2.0 too: it's
+// a patched copy of the phase vocoder stretch stage, carried in-tree until the
+// fix is published. Either way MPL-2.0 requires the notice ship with the code.
+const soundTouchJS = {
+  // https://github.com/cutterbl/SoundTouchJS
+  packageJson: {
+    name: '@soundtouchjs/core, @soundtouchjs/worklet-base,\n'
+      + '@soundtouchjs/stretch-phase-vocoder,\n'
+      + '@soundtouchjs/interpolation-strategy-lanczos,\n'
+      + 'and src/lib/pitchShifter/bespoke/stretch.ts',
+  },
+  licenseText:
+`Copyright (c) Steve 'Cutter' Blades
+
+Licensed under the Mozilla Public License, v. 2.0 (the "License").
+You may obtain a copy of the License at
+
+    https://mozilla.org/MPL/2.0/
+
+This Source Code Form is "Incompatible With Secondary Licenses", as
+defined by the Mozilla Public License, v. 2.0. Source for the files
+covered by this notice is available at
+https://www.karaoke-eternal.com/repo
+`,
 }
 
 const materialDesignIcons = {

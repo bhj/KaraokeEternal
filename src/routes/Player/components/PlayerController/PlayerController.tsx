@@ -4,7 +4,7 @@ import Player from '../Player/Player'
 import PlayerTextOverlay from '../PlayerTextOverlay/PlayerTextOverlay'
 import PlayerQR from '../PlayerQR/PlayerQR'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
-import { playerLeave, playerError, playerLoad, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
+import { playerLeave, playerError, playerLoadCurrent, playerPlay, playerStatus, type PlayerState } from '../../modules/player'
 import getRoomPrefs from '../../selectors/getRoomPrefs'
 import useMediaSource from './useMediaSource'
 import type { QueueItem } from 'shared/types'
@@ -33,7 +33,7 @@ const PlayerController = (props: PlayerControllerProps) => {
 
   const dispatch = useAppDispatch()
   const handleStatus = useCallback((status?: Partial<PlayerState>) => dispatch(playerStatus(status)), [dispatch])
-  const handleLoad = () => dispatch(playerLoad())
+  const handleLoad = () => dispatch(playerLoadCurrent())
   const handlePlay = () => dispatch(playerPlay())
   const handleError = (msg: string) => {
     dispatch(playerError(msg))
@@ -118,6 +118,7 @@ const PlayerController = (props: PlayerControllerProps) => {
     player.cdgSize,
     player.isPlaying,
     player.mp4Alpha,
+    player.pitch,
     player.volume,
     playerVisualizer,
     queueItem?.isVideoKeyingEnabled,
@@ -176,6 +177,7 @@ const PlayerController = (props: PlayerControllerProps) => {
         onLoad={handleLoad}
         onPlay={handlePlay}
         onStatus={handleStatus}
+        pitch={player.pitch}
         rgTrackGain={rgTrackGain}
         rgTrackPeak={rgTrackPeak}
         visualizer={playerVisualizer}

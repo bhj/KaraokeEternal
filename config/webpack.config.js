@@ -11,6 +11,7 @@ const __DEV__ = NODE_ENV === 'development'
 const __TEST__ = NODE_ENV === 'test'
 const __PROD__ = NODE_ENV === 'production'
 const baseDir = path.resolve(import.meta.dirname, '..')
+const WORKLET_ENTRY = 'pitchShifterProcessor'
 
 /** @type {import('webpack').Configuration} */
 let config = {
@@ -20,6 +21,27 @@ let config = {
       './src/main',
       __DEV__ && 'webpack-hot-middleware/client', // https://github.com/pmmmwh/react-refresh-webpack-plugin/issues/213
     ].filter(Boolean),
+    // AudioWorklet processor. Loaded by URL at runtime rather than imported, so
+    // it needs a stable unhashed filename; koa-static revalidates it like any
+    // other asset. Must match PROCESSOR_FILENAME in
+    // src/lib/pitchShifter/bespoke/constants.ts.
+    [WORKLET_ENTRY]: {
+      import: './src/lib/pitchShifter/bespoke/processor',
+      filename: 'pitchShifterProcessor.js',
+      // Neither of these is optional in development, where HMR adds runtimes to
+      // every chunk that reach at top level for globals AudioWorkletGlobalScope
+      // doesn't have, taking the bundle down before registerProcessor() runs:
+      // publicPath 'auto' infers the path from document.currentScript and
+      // throws when it can't, and jsonp chunk loading assigns
+      // self["webpackHotUpdate..."]. addModule() resolves regardless — an
+      // evaluation error is reported to the worklet scope, not the promise — so
+      // the sole symptom is the processor name being undefined when the node is
+      // constructed. This bundle fetches nothing, so it needs neither, and
+      // chunkLoading: false also keeps a stray dynamic import inlined here
+      // rather than split into a chunk the worklet could never load.
+      publicPath: '',
+      chunkLoading: false,
+    },
   },
   output: {
     filename: __DEV__ ? '[name].js' : '[name].[fullhash].js',
@@ -62,7 +84,9 @@ let config = {
   ].filter(Boolean),
   optimization: {
     splitChunks: {
-      chunks: 'all',
+      // the worklet bundle has to stay one self-contained file: its global
+      // scope can't import or fetch anything a split would move out of it
+      chunks: chunk => chunk.name !== WORKLET_ENTRY,
     },
   },
   stats: 'minimal',
@@ -72,6 +96,7 @@ let config = {
 config.plugins.push(new HtmlWebpackPlugin({
   template: './src/index.html',
   base: '/',
+  excludeChunks: [WORKLET_ENTRY], // the AudioWorklet loads it, not the document
 }))
 
 // Loaders

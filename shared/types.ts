@@ -18,6 +18,7 @@ export interface QueueItem {
   userId: number
   prevQueueId: number
   mediaId: number
+  pitch: number | null
   rgTrackGain: number | null
   rgTrackPeak: number | null
   userDateUpdated: number
@@ -93,10 +94,14 @@ export interface UserWithRole extends User {
   role?: string
 }
 
+export const PITCH_SEMITONES_MIN = -6
+export const PITCH_SEMITONES_MAX = 6
+
 export interface PlaybackOptions {
   cdgAlpha?: number
   cdgSize?: number
   mp4Alpha?: number
+  pitch?: number
   visualizer?: {
     sensitivity?: number
     isEnabled?: boolean

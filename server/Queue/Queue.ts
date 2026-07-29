@@ -13,6 +13,7 @@ interface QueueEntityBuilding {
   prevQueueId: number | null
   mediaId: number | null
   relPath?: string | null
+  pitch: number | null
   rgTrackGain: number | null
   rgTrackPeak: number | null
   userDisplayName: string
@@ -70,9 +71,12 @@ class Queue {
     // kept out of the payload below
     const query = sql`
       SELECT queueId, songId, userId, prevQueueId,
-        media.mediaId, media.relPath, media.rgTrackGain, media.rgTrackPeak,
+        media.mediaId, media.relPath, media.pitch, media.rgTrackGain, media.rgTrackPeak,
         users.name AS userDisplayName, users.dateUpdated AS userDateUpdated,
         paths.pathId, paths.data AS pathData,
+        -- the only aggregate here, so sqlite's bare column rule makes every
+        -- media.* above come from the row it picked: adding a second aggregate
+        -- would break that, and a song's media could then disagree
         MAX(isPreferred) AS isPreferred
       FROM queue
         INNER JOIN users USING(userId)
@@ -89,6 +93,7 @@ class Queue {
       prevQueueId: number
       mediaId: number | null
       relPath: string | null
+      pitch: number | null
       rgTrackGain: number | null
       rgTrackPeak: number | null
       userDisplayName: string

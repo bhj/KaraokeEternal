@@ -1,0 +1,120 @@
+.modal {
+  width: 90vw;
+  max-width: 480px;
+}
+
+.modal .tabRow {
+  /* negative margins offset the modal's padding to reach its inner edges */
+  margin: calc(var(--space-m) * -1) calc(var(--space-m) * -1) var(--space-m);
+
+  /* the baseline is stitched from the segments below, each stretched to the row's full
+     height so their bottom borders are collinear. a border on the row itself would show
+     through the selected tab, which is transparent by design */
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--modal-border-color);
+  }
+
+  /* Modal's close button: the row's last segment, no longer hugging the modal's corner */
+  &>button {
+    /* after the filler above, which absorbs the space between it and the tabs */
+    order: 1;
+    align-self: stretch;
+    top: 0;
+    right: 0;
+    /* aligns the icon with the right edge of the content below */
+    padding-right: var(--space-m);
+    border-bottom: 1px solid var(--modal-border-color);
+
+    &:focus-visible {
+      /* inset so the outline stays clear of the modal's edge */
+      outline-offset: -4px;
+    }
+  }
+}
+
+.tabs {
+  display: flex;
+}
+
+.tab {
+  padding: var(--space-s) var(--space-m);
+  color: var(--btn-bg-color);
+  background-color: var(--chrome-bg-color);
+  border: 1px solid var(--modal-border-color);
+  border-top: none;
+  border-left: none;
+  cursor: pointer;
+
+  svg {
+    display: block;
+    height: var(--icon-size-xl);
+  }
+
+  &:focus-visible {
+    /* inset so the outline hugs the rounded corners */
+    outline: var(--focus-outline);
+    outline-offset: -4px;
+  }
+
+  &[aria-selected='true'] {
+    color: var(--link-color);
+    background-color: transparent;
+    border-bottom-color: transparent;
+
+    /* on the icon, not the button, so the glow doesn't halo the tab's border */
+    svg {
+      filter: var(--btn-active-filter) drop-shadow(0 0 1px rgba(0, 0, 0, 1));
+    }
+  }
+}
+
+.tabAnimate svg {
+  animation: tab-glow 1s var(--activate-1);
+}
+
+@keyframes tab-glow {
+  from {
+    filter: var(--btn-activate-filter) drop-shadow(0 0 0 transparent);
+  }
+
+  to {
+    filter: var(--btn-active-filter) drop-shadow(0 0 1px rgba(0, 0, 0, 1));
+  }
+}
+
+/* panels are stacked in the same grid cell so the modal sizes to the tallest tab */
+.panels {
+  display: grid;
+}
+
+.panel {
+  grid-area: 1 / 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+
+  /* Safari REALLY doesn't like fieldsets to be flex *items*, hence each section's wrapper <div> */
+  fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    margin: 0;
+    padding: var(--container-padding);
+    border: 1px solid var(--chrome-border-color);
+    border-radius: var(--border-radius);
+    /* Prevent fieldset from overflowing parent */
+    min-width: 0;
+  }
+
+  legend {
+    font-size: var(--font-size-m);
+    width: fit-content;
+  }
+}
+
+.panelHidden {
+  visibility: hidden;
+}

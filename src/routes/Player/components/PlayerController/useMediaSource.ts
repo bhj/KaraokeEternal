@@ -4,7 +4,7 @@ import HttpApi from 'lib/HttpApi'
 import { analyzeBlob, hasFailed, isAnalysisInFlight } from 'lib/replayGain/analyze'
 import { useAppDispatch } from 'store/hooks'
 import { MEDIA_RG_SET } from 'shared/actionTypes'
-import { playerLoad } from '../../modules/player'
+import { playerLoadCurrent } from '../../modules/player'
 
 const api = new HttpApi('media')
 
@@ -107,7 +107,7 @@ export default function useMediaSource ({
 
     const run = async () => {
       // nothing else covers the download+decode window
-      dispatch(playerLoad())
+      dispatch(playerLoadCurrent())
 
       // decoding can't be aborted, so don't stack decodes when the player is
       // skipped through several songs; this one just plays without gain

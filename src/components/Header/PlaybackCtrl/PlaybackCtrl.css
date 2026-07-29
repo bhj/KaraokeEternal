@@ -28,7 +28,7 @@
   margin: 0 var(--space-s);
 }
 
-.displayCtrl {
+.playerOptions {
   color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }

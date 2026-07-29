@@ -8,6 +8,7 @@ const BACKDROP_PADDING = 10 // px at 1:1 scale
 const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue('--border-radius'))
 
 interface CDGPlayerProps {
+  audioLatency: number
   cdgAlpha: number
   cdgSize: number
   isPlaying: boolean
@@ -209,7 +210,9 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     this.frameId = requestAnimationFrame(this.startCDG)
     if (!this.audio.current) return
 
-    const frame = this.cdg.render(this.audio.current.currentTime, { forceKey: true })
+    // render at the audible timeline (pitch shifting delays audio behind currentTime)
+    const audibleTime = Math.max(0, this.audio.current.currentTime - this.props.audioLatency)
+    const frame = this.cdg.render(audibleTime, { forceKey: true })
     if (!frame.isChanged) return
 
     // background color changed?

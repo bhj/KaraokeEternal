@@ -1,0 +1,32 @@
+.slider {
+  margin: 0 1.25rem;
+}
+
+.handleValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--handle-height, 3rem);
+  height: var(--handle-height, 3rem);
+  border-radius: 50%;
+  color: #000;
+  background-color: var(--btn-active-bg-color);
+  font-size: var(--font-size-s);
+  font-weight: var(--font-weight-bold);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.buttons button:disabled {
+  opacity: 0.5;
+}
+
+.unsupported {
+  text-align: center;
+  margin: var(--space-m) 0;
+  color: grey;
+}
