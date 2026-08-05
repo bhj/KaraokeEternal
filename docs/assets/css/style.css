@@ -1,10 +1,8 @@
-@import "variables.scss";
-@import "poole.scss";
-@import "logo.scss";
+/* Load order (variables, poole, logo, then this file) is set in layouts/partials/head.html */
 
 html {
   font: 16px/1.5 sans-serif;
-  font-size: unquote("min(max(calc(.5rem + 1vw), 1rem), 1.5rem)"); // min=16, max=24, fluid between
+  font-size: clamp(1rem, .5rem + 1vw, 1.5rem); /* min=16, max=24, fluid between */
   font-family: var(--font-family);
 }
 
@@ -88,7 +86,6 @@ tbody tr:nth-child(odd) th {
 
 hr {
   color: var(--color-gray-7);
-
 }
 
 .copyright {
@@ -240,7 +237,7 @@ aside.info {
 
 aside.warn {
   background-color: var(--warn-bg-color);
-  border: 3px solid hsl(var(--warn-color), 50%, 20%);
+  border: 3px solid hsl(var(--hue-pink), 50%, 20%);
 
   .icon {
     fill: var(--warn-color);
@@ -371,7 +368,6 @@ figure {
   max-height: 90vh !important;
   margin: auto !important;
   width: auto !important;
-  ;
   height: auto !important;
   object-fit: contain;
 }
@@ -479,7 +475,7 @@ figure {
   opacity: 1;
 }
 
-// FAQ section
+/* FAQ section */
 details {
   margin: .5rem;
   padding: 0.5rem 1rem;

@@ -1,6 +1,6 @@
 .logo {
   font-size: 2rem;
-  line-height: 1.15; // from app's <html> style
+  line-height: 1.15; /* from app's <html> style */
   text-align: center;
   white-space: nowrap;
   padding-top: .5rem;

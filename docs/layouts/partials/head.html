@@ -14,6 +14,7 @@
       url('{{ (resources.Get "fonts/beon.woff2").Permalink }}') format('woff2');
     }
   </style>
-  {{ $style := resources.Get "css/style.scss" | toCSS | minify | fingerprint }}
+  {{ $css := slice (resources.Get "css/variables.css") (resources.Get "css/poole.css") (resources.Get "css/logo.css") (resources.Get "css/style.css") }}
+  {{ $style := $css | resources.Concat "css/style.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $style.Permalink }}">
 </head>
