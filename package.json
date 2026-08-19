@@ -73,6 +73,7 @@
     "yargs": "^18.0.0"
   },
   "devDependencies": {
+    "@audio/loudness-replaygain": "^1.2.0",
     "@babel/core": "^7.29.7",
     "@babel/eslint-parser": "^7.29.7",
     "@babel/eslint-plugin": "^7.29.7",

@@ -2,9 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { measureReplayGain } from './measure'
 
 /**
- * Conformance for whichever backend measure.ts currently exports, so flipping
- * the A/B switch doesn't change what's expected. loudness.test.ts covers the
- * in-tree DSP directly.
+ * Conformance for whichever backend measure.ts currently exports, so swapping
+ * the backend doesn't change what's expected.
  */
 
 const dbfsToAmp = (dbfs: number) => 10 ** (dbfs / 20)
@@ -44,8 +43,8 @@ describe('measureReplayGain', () => {
   })
 
   it('excludes LFE from loudness but not from peak', () => {
-    // also a canary for swapping in a published @audio/loudness-replaygain: if
-    // it weights every channel 1.0, lufs lands near -8.9 instead of -23
+    // canary for the backend's BS.1770-4 Table 1 channel weights: if it
+    // weights every channel 1.0, lufs lands near -8.9 instead of -23
     const surround = [
       sine(997, -28, 20, sr), sine(997, -28, 20, sr), sine(997, -24, 20, sr),
       sine(997, -6, 20, sr), // LFE, loudest channel in the file
