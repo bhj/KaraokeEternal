@@ -225,6 +225,13 @@ class User {
     `
     db.run(String(artistStarsQuery), artistStarsQuery.parameters)
 
+    // remove user's pitch preferences
+    const userPitchesQuery = sql`
+      DELETE FROM userPitches
+      WHERE userId = ${userId}
+    `
+    db.run(String(userPitchesQuery), userPitchesQuery.parameters)
+
     // remove the user
     const usersQuery = sql`
       DELETE FROM users

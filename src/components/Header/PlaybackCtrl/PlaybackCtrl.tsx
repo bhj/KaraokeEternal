@@ -11,10 +11,11 @@ import VolumeSlider from './VolumeSlider/VolumeSlider'
 import NoPlayer from './NoPlayer/NoPlayer'
 import PlayerOptions from './PlayerOptions/PlayerOptions'
 import styles from './PlaybackCtrl.css'
-import { MEDIA_PITCH_SET } from 'shared/actionTypes'
+import { MEDIA_PITCH_SET, MEDIA_USER_PITCH_SET } from 'shared/actionTypes'
 import { PlaybackOptions } from 'shared/types'
 
 const setMediaPitch = createAction<{ mediaId: number, pitch: number }>(MEDIA_PITCH_SET)
+const setUserPitch = createAction<{ mediaId: number, pitch: number | null }>(MEDIA_USER_PITCH_SET)
 
 const handleFullscreen = () => {
   if (screenfull.isEnabled) {
@@ -29,10 +30,12 @@ const PlaybackCtrl = () => {
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
   const isAdmin = useAppSelector(state => state.user.isAdmin)
+  const isGuest = useAppSelector(state => state.user.isGuest)
+  const userId = useAppSelector(state => state.user.userId)
   const isInRoom = useAppSelector(state => state.user.roomId !== null)
   const status = useAppSelector(state => state.status)
 
-  // the media being played, for saving its default pitch
+  // the media being played, for saving global/user pitches
   const curMedia = useAppSelector((state) => {
     if (state.status.isAtQueueEnd) return null
 
@@ -40,9 +43,13 @@ const PlaybackCtrl = () => {
     return item && item.isOptimistic !== true ? item : null
   })
 
+  // a preference is the singer's own, so it's only offered to them
+  const canSetUserPitch = !!curMedia && !isGuest && curMedia.userId === userId
+
   const dispatch = useAppDispatch()
   const handleOptions = (opts: PlaybackOptions) => dispatch(requestOptions(opts))
-  const handleSetDefaultPitch = (pitch: number) => dispatch(setMediaPitch({ mediaId: curMedia.mediaId, pitch }))
+  const handleSetGlobalPitch = (pitch: number) => dispatch(setMediaPitch({ mediaId: curMedia.mediaId, pitch }))
+  const handleSetUserPitch = (pitch: number | null) => dispatch(setUserPitch({ mediaId: curMedia.mediaId, pitch }))
   const handlePause = () => dispatch(requestPause())
   const handlePlay = () => dispatch(requestPlay())
   const handlePlayNext = () => dispatch(requestPlayNext())
@@ -100,7 +107,7 @@ const PlaybackCtrl = () => {
         <PlayerOptions
           cdgAlpha={status.cdgAlpha}
           cdgSize={status.cdgSize}
-          defaultPitch={curMedia?.pitch ?? 0}
+          globalPitch={curMedia?.pitch ?? 0}
           isPitchSupported={status.isPitchSupported}
           isVideoKeyingEnabled={status.isVideoKeyingEnabled}
           isVisualizerEnabled={status.visualizer.isEnabled}
@@ -109,9 +116,11 @@ const PlaybackCtrl = () => {
           mp4Alpha={status.mp4Alpha}
           onClose={togglePlayerOptions}
           onRequestOptions={handleOptions}
-          onSetDefaultPitch={isAdmin && curMedia ? handleSetDefaultPitch : undefined}
+          onSetGlobalPitch={isAdmin && curMedia ? handleSetGlobalPitch : undefined}
+          onSetUserPitch={canSetUserPitch ? handleSetUserPitch : undefined}
           pitch={status.pitch}
           sensitivity={status.visualizer.sensitivity}
+          userPitch={curMedia?.userPitch ?? null}
           visualizerPresetName={status.visualizer.presetName}
         />
       )}

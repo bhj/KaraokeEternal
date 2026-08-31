@@ -4,19 +4,31 @@ import Queue from '../Queue/Queue.js'
 import Rooms from '../Rooms/Rooms.js'
 import { isValidReplayGain } from '../lib/ReplayGain.js'
 import { PITCH_SEMITONES_MAX, PITCH_SEMITONES_MIN } from '../../shared/types.js'
-import { MEDIA_PITCH_SET, MEDIA_RG_SET, QUEUE_PUSH, _ERROR, _SUCCESS } from '../../shared/actionTypes.js'
+import {
+  MEDIA_PITCH_SET,
+  MEDIA_RG_SET,
+  MEDIA_USER_PITCH_SET,
+  QUEUE_PUSH,
+  _ERROR,
+  _SUCCESS,
+} from '../../shared/actionTypes.js'
 
 const log = getLogger(`server[${process.pid}]`)
 
 /**
- * Emit the queue of each room that has an item for the media, so clients pick up
- * its new stored values. Rooms that aren't singing it have nothing to update.
+ * Emit the queue of each room that has an item for the media (from a particular
+ * user, if given), so clients pick up its new stored values. Rooms that aren't
+ * singing it have nothing to update.
  */
-const pushQueuesWithMedia = (io, mediaId: number) => {
+const pushQueuesWithMedia = (io, mediaId: number, userId?: number) => {
   for (const { room, roomId } of Rooms.getActive(io)) {
     const queue = Queue.get(roomId)
 
-    if (Object.values(queue.entities).some(item => item.mediaId === mediaId)) {
+    const hasMedia = Object.values(queue.entities).some(item =>
+      item.mediaId === mediaId && (userId === undefined || item.userId === userId),
+    )
+
+    if (hasMedia) {
       io.to(room).emit('action', { type: QUEUE_PUSH, payload: queue })
     }
   }
@@ -89,6 +101,39 @@ const ACTION_HANDLERS = {
     // the reporting player already has the values; this is only to keep other
     // clients' queues consistent
     pushQueuesWithMedia(sock.server, mediaId)
+  },
+
+  [MEDIA_USER_PITCH_SET]: (sock, { payload }, acknowledge) => {
+    // guests can't save preferences; everyone else only ever writes their own
+    if (sock.user.isGuest) {
+      return acknowledge({
+        type: MEDIA_USER_PITCH_SET + _ERROR,
+        error: 'Unauthorized',
+      })
+    }
+
+    const { mediaId, pitch } = payload
+
+    // null clears the preference; anything else has to be a usable offset
+    if (!Number.isInteger(mediaId) || (pitch !== null && (!Number.isInteger(pitch)
+      || pitch < PITCH_SEMITONES_MIN || pitch > PITCH_SEMITONES_MAX))) {
+      return acknowledge({
+        type: MEDIA_USER_PITCH_SET + _ERROR,
+        error: 'Invalid pitch',
+      })
+    }
+
+    // no-op if the media is gone or already has this value, which also bounds
+    // the broadcast below to writes that changed something
+    const isChanged = Media.setUserPitch(sock.user.userId, mediaId, pitch)
+
+    acknowledge({ type: MEDIA_USER_PITCH_SET + _SUCCESS })
+    if (!isChanged) return
+
+    log.info('mediaId %s: user pitch=%s (from %s)', mediaId, pitch, sock.user.name)
+
+    // only rooms where this user has this media queued see a different value
+    pushQueuesWithMedia(sock.server, mediaId, sock.user.userId)
   },
 }
 

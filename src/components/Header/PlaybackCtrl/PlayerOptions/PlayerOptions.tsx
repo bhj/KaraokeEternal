@@ -20,7 +20,7 @@ let lastActiveTab: TabId = 'display'
 interface PlayerOptionsProps {
   cdgAlpha: number
   cdgSize: number
-  defaultPitch: number
+  globalPitch: number
   isPitchSupported: boolean
   isVideoKeyingEnabled: boolean
   isVisualizerEnabled: boolean
@@ -29,17 +29,19 @@ interface PlayerOptionsProps {
   mp4Alpha: number
   pitch: number
   sensitivity: number
+  userPitch: number | null
   visualizerPresetName: string
   // actions
   onRequestOptions(opts: PlaybackOptions): void
-  onSetDefaultPitch?(pitch: number): void
+  onSetGlobalPitch?(pitch: number): void
+  onSetUserPitch?(pitch: number | null): void
   onClose: ModalProps['onClose']
 }
 
 const PlayerOptions = ({
   cdgAlpha,
   cdgSize,
-  defaultPitch,
+  globalPitch,
   isPitchSupported,
   isVideoKeyingEnabled,
   isVisualizerEnabled,
@@ -48,9 +50,11 @@ const PlayerOptions = ({
   mp4Alpha,
   pitch,
   sensitivity,
+  userPitch,
   visualizerPresetName,
   onRequestOptions,
-  onSetDefaultPitch,
+  onSetGlobalPitch,
+  onSetUserPitch,
   onClose,
 }: PlayerOptionsProps) => {
   const [activeTab, setActiveTab] = useState<TabId>(lastActiveTab)
@@ -135,12 +139,14 @@ const PlayerOptions = ({
           aria-labelledby='tab-audio'
         >
           <AudioCtrl
-            defaultPitch={defaultPitch}
+            globalPitch={globalPitch}
             isPitchSupported={isPitchSupported}
             mediaType={mediaType}
             pitch={pitch}
+            userPitch={userPitch}
             onRequestOptions={onRequestOptions}
-            onSetDefaultPitch={onSetDefaultPitch}
+            onSetGlobalPitch={onSetGlobalPitch}
+            onSetUserPitch={onSetUserPitch}
           />
         </div>
       </div>

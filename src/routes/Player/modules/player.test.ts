@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import playerReducer, { playerLoad, playerUpdate } from './player'
+import playerReducer, { playerLoad, playerLoadCurrent, playerUpdate } from './player'
+import type { QueueItem } from 'shared/types'
 
 // hoisted above the import above: the engine subclasses AudioWorkletNode at
 // module scope, which doesn't exist outside a browser. The reducer only ever
@@ -65,5 +66,44 @@ describe('playerLoad', () => {
 
     expect(state.isErrored).toBe(false)
     expect(state.errorMessage).toBe('')
+  })
+})
+
+describe('playerLoadCurrent', () => {
+  // the thunk reads only player.queueId and that item from the queue
+  const loadWith = (item?: Partial<QueueItem> | { isOptimistic: true }) => {
+    const dispatch = vi.fn()
+    const getState = () => ({
+      player: { queueId: 1 },
+      queue: { result: item ? [1] : [], entities: item ? { 1: item } : {} },
+    })
+
+    playerLoadCurrent()(dispatch, getState as never, undefined)
+
+    return dispatch.mock.calls[0][0].payload.pitch
+  }
+
+  it('prefers the singer\'s saved pitch over the media default', () => {
+    expect(loadWith({ pitch: 4, userPitch: 2 })).toBe(2)
+  })
+
+  it('treats a saved 0 as a preference, not the absence of one', () => {
+    expect(loadWith({ pitch: 4, userPitch: 0 })).toBe(0)
+  })
+
+  it('falls back to the media default without a saved pitch', () => {
+    expect(loadWith({ pitch: 4, userPitch: null })).toBe(4)
+  })
+
+  it('uses 0 when neither is set', () => {
+    expect(loadWith({ pitch: null, userPitch: null })).toBe(0)
+  })
+
+  it('uses 0 for an optimistic item, which has no media yet', () => {
+    expect(loadWith({ isOptimistic: true })).toBe(0)
+  })
+
+  it('uses 0 when the item is gone', () => {
+    expect(loadWith()).toBe(0)
   })
 })

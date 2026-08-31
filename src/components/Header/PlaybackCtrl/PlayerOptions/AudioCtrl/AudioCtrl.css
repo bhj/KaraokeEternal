@@ -15,14 +15,47 @@
   font-weight: var(--font-weight-bold);
 }
 
-.buttons {
-  display: flex;
-  flex-direction: column;
+.saved {
+  /* the value track takes the slack, which pins the label to the left and the
+     links to the right edge */
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
   gap: var(--space-s);
+  margin: 0;
+
+  dt {
+    text-align: right;
+    color: var(--color-gray-6);
+  }
+
+  dd {
+    margin: 0;
+  }
 }
 
-.buttons button:disabled {
-  opacity: 0.5;
+.value {
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  /* cancels the last link's padding so it sits flush with the Reset button above */
+  margin-right: calc(var(--space-s) * -1);
+}
+
+.link {
+  /* a tappable target without the look of a button; also spaces the links apart */
+  padding: var(--space-xs) var(--space-s);
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.link:disabled {
+  color: var(--color-gray-5);
+  text-decoration: none;
+  cursor: default;
 }
 
 .unsupported {

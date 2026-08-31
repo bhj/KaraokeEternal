@@ -16,6 +16,7 @@ export const LIBRARY_PUSH_SONG = 'library/PUSH_SONG'
 // Media
 export const MEDIA_PITCH_SET = 'server/MEDIA_PITCH_SET'
 export const MEDIA_RG_SET = 'server/MEDIA_RG_SET'
+export const MEDIA_USER_PITCH_SET = 'server/MEDIA_USER_PITCH_SET'
 
 // Queue
 export const QUEUE_ADD = 'server/QUEUE_ADD'

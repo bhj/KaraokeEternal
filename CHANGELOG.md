@@ -2,6 +2,7 @@
 
 - **(App)** Pitch shifting
 - **(App)** Pitch offsets can be saved as a media file's default
+- **(App)** Singers can save their own default pitch for a song, which takes precedence over the file's default
 - **(App)** ReplayGain for all
 - **(App)** Combined search view now works for keywords spanning both an artist name and song title (e.g. "beatles all together now")
 - **(Server)** Only scan changed files by default

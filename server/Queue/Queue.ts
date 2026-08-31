@@ -14,6 +14,7 @@ interface QueueEntityBuilding {
   mediaId: number | null
   relPath?: string | null
   pitch: number | null
+  userPitch: number | null
   rgTrackGain: number | null
   rgTrackPeak: number | null
   userDisplayName: string
@@ -70,18 +71,22 @@ class Queue {
     // removed (e.g. mid-scan) still anchor the prevQueueId chain; they're
     // kept out of the payload below
     const query = sql`
-      SELECT queueId, songId, userId, prevQueueId,
-        media.mediaId, media.relPath, media.pitch, media.rgTrackGain, media.rgTrackPeak,
+      SELECT queueId, songId, queue.userId, prevQueueId,
+        media.mediaId, media.relPath, media.pitch, userPitches.pitch AS userPitch,
+        media.rgTrackGain, media.rgTrackPeak,
         users.name AS userDisplayName, users.dateUpdated AS userDateUpdated,
         paths.pathId, paths.data AS pathData,
         -- the only aggregate here, so sqlite's bare column rule makes every
         -- media.* above come from the row it picked: adding a second aggregate
-        -- would break that, and a song's media could then disagree
+        -- would break that, and a song's media could then disagree. userPitches
+        -- is unique per (userId, mediaId), so it adds no rows and its pitch is
+        -- the one for the picked media.
         MAX(isPreferred) AS isPreferred
       FROM queue
         INNER JOIN users USING(userId)
         LEFT JOIN media USING(songId)
         LEFT JOIN paths USING(pathId)
+        LEFT JOIN userPitches ON userPitches.mediaId = media.mediaId AND userPitches.userId = queue.userId
       WHERE roomId = ${roomId}
       GROUP BY queueId
       ORDER BY queueId
@@ -94,6 +99,7 @@ class Queue {
       mediaId: number | null
       relPath: string | null
       pitch: number | null
+      userPitch: number | null
       rgTrackGain: number | null
       rgTrackPeak: number | null
       userDisplayName: string

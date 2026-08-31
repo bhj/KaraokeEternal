@@ -18,7 +18,8 @@ export interface QueueItem {
   userId: number
   prevQueueId: number
   mediaId: number
-  pitch: number | null
+  pitch: number | null // the media's default
+  userPitch: number | null // the singer's own; takes precedence over pitch
   rgTrackGain: number | null
   rgTrackPeak: number | null
   userDateUpdated: number

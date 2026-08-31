@@ -13,6 +13,8 @@ interface SliderProps extends RCSliderProps {
   'min': number
   'max': number
   'onChange': RCSliderProps['onChange']
+  /** the value once the interaction settles, after any drag */
+  'onChangeComplete'?: RCSliderProps['onChangeComplete']
   'step': number
   'value': number
 }
@@ -32,6 +34,7 @@ const Slider = ({
   min,
   max,
   onChange,
+  onChangeComplete,
   step,
   value,
   ...rest
@@ -60,6 +63,10 @@ const Slider = ({
         setTempVal(null)
       }, 2000)
     }
+
+    // destructured out of `rest` above: spreading it onto RCSlider would replace
+    // this handler and with it the scroll lock and temp value cleanup
+    onChangeComplete?.(val)
   }
 
   // slider handle/grabber

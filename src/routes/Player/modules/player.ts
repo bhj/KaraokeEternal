@@ -77,7 +77,8 @@ export function playerStatus (status: Partial<PlayerState> = {}, deferEmit = fal
 }
 
 /**
- * Apply the media's stored default pitch for the item being loaded. Derived here
+ * Apply the stored pitch for the item being loaded: the singer's own preference
+ * for the media if they've saved one, else the media's default. Derived here
  * rather than passed in so both callers agree, and so neither has to take the
  * queue as a dependency (see useMediaSource).
  */
@@ -88,7 +89,9 @@ export function playerLoadCurrent (): AppThunk {
 
     dispatch(playerLoad({
       queueId: player.queueId,
-      pitch: queueItem && queueItem.isOptimistic !== true ? queueItem.pitch ?? 0 : 0,
+      pitch: queueItem && queueItem.isOptimistic !== true
+        ? queueItem.userPitch ?? queueItem.pitch ?? 0
+        : 0,
     }))
   }
 }

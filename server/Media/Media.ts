@@ -196,6 +196,48 @@ class Media {
   }
 
   /**
+   * Store a user's own pitch offset (semitones) for a media file, which takes
+   * precedence over the media's default whenever that user sings it. Unlike
+   * setPitch, 0 is stored as-is: it means "original pitch, whatever the default
+   * says". Passing null clears the preference so the default applies again.
+   *
+   * Returns whether the stored value actually changed.
+   */
+  static setUserPitch (userId: number, mediaId: number, pitch: number | null): boolean {
+    if (!Number.isInteger(userId) || !Number.isInteger(mediaId)) {
+      throw new Error(`invalid userId or mediaId: ${userId}, ${mediaId}`)
+    }
+
+    if (pitch !== null && !Number.isInteger(pitch)) {
+      throw new Error(`invalid pitch: ${pitch}`)
+    }
+
+    if (pitch === null) {
+      const query = sql`
+        DELETE FROM userPitches
+        WHERE userId = ${userId} AND mediaId = ${mediaId}
+      `
+      return db.run(String(query), query.parameters).changes === 1
+    }
+
+    // sourcing the row from media means an unknown mediaId inserts nothing, so
+    // a client can't grow this table with ids that don't exist (it also gives
+    // the SELECT a WHERE, without which INSERT ... SELECT ... ON CONFLICT is
+    // ambiguous to sqlite's parser). The DO UPDATE's own WHERE makes
+    // changes === 1 mean the value really changed, as in setPitch.
+    const query = sql`
+      INSERT INTO userPitches (userId, mediaId, pitch)
+      SELECT ${userId}, mediaId, ${pitch}
+      FROM media
+      WHERE mediaId = ${mediaId}
+      ON CONFLICT (userId, mediaId) DO UPDATE
+      SET pitch = excluded.pitch
+      WHERE pitch IS NOT excluded.pitch
+    `
+    return db.run(String(query), query.parameters).changes === 1
+  }
+
+  /**
    * Removes media from the db in sqlite-friendly batches
    */
   static remove (mediaIds: number[]): void {
@@ -241,6 +283,14 @@ class Media {
       )
     `)
     log.info(`cleanup: ${res.changes} stars for nonexistent songs`)
+
+    // remove user pitches for nonexistent media
+    res = db.run(`
+      DELETE FROM userPitches WHERE mediaId IN (
+        SELECT userPitches.mediaId FROM userPitches LEFT JOIN media USING(mediaId) WHERE media.mediaId IS NULL
+      )
+    `)
+    log.info(`cleanup: ${res.changes} user pitches for nonexistent media`)
 
     // remove queue items for nonexistent songs
     const rows = db.all<{ queueId: number }>(`
