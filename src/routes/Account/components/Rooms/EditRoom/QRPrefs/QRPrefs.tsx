@@ -44,55 +44,70 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
             onChange={event => handleSetPref({ qr: { ...prefs.qr, isEnabled: event.currentTarget.checked } })}
           />
         </div>
-        {prefs?.qr?.isEnabled && roomPassword && (
-          <div className={styles.field}>
-            <InputCheckbox
-              label='Include room password'
-              checked={isQRPasswordEnabled}
-              onChange={(event) => {
-                const checked = event.currentTarget.checked
-                setIsQRPasswordEnabled(checked)
-                if (!checked) handleSetPref({ qr: { ...prefs.qr, password: '' } })
-              }}
-            />
-          </div>
+        {prefs?.qr?.isEnabled && (
+          <>
+            <div className={styles.field}>
+              <input
+                type='text'
+                autoComplete='off'
+                inputMode='url'
+                value={prefs?.qr?.url ?? ''}
+                onChange={e => handleSetPref({ qr: { ...prefs.qr, url: e.target.value || undefined } })}
+                onFocus={e => e.target.select()}
+                placeholder='QR code URL (optional)'
+              />
+            </div>
+            {roomPassword && (
+              <div className={styles.field}>
+                <InputCheckbox
+                  label='Include room password'
+                  checked={isQRPasswordEnabled}
+                  onChange={(event) => {
+                    const checked = event.currentTarget.checked
+                    setIsQRPasswordEnabled(checked)
+                    if (!checked) handleSetPref({ qr: { ...prefs.qr, password: '' } })
+                  }}
+                />
+              </div>
+            )}
+            {(isQRPasswordEnabled && !roomPasswordDirty) && (
+              <div className={styles.field}>
+                <input
+                  type='password'
+                  autoComplete='new-password'
+                  value={prefs?.qr?.password ?? ''}
+                  onChange={e => handleSetPref({ qr: { ...prefs.qr, password: e.target.value } })}
+                  onFocus={e => e.target.select()}
+                  placeholder='re-enter room password'
+                />
+              </div>
+            )}
+            <div className={clsx(styles.field)}>
+              <label id='label-qr-size'>Size</label>
+              <Slider
+                className={styles.slider}
+                min={0}
+                max={1}
+                step={0.05}
+                value={prefs?.qr?.size ?? 0.5}
+                onChange={(val: number) => handleSetPref({ qr: { ...prefs.qr, size: val } })}
+                aria-labelledby='label-qr-size'
+              />
+            </div>
+            <div className={clsx(styles.field)}>
+              <label id='label-qr-opacity'>Opacity</label>
+              <Slider
+                className={styles.slider}
+                min={0.25}
+                max={1}
+                step={0.075}
+                value={prefs?.qr?.opacity ?? 0.625}
+                onChange={(val: number) => handleSetPref({ qr: { ...prefs.qr, opacity: val } })}
+                aria-labelledby='label-qr-opacity'
+              />
+            </div>
+          </>
         )}
-        {(isQRPasswordEnabled && !roomPasswordDirty) && (
-          <div className={styles.field}>
-            <input
-              type='password'
-              autoComplete='new-password'
-              value={prefs?.qr?.password ?? ''}
-              onChange={e => handleSetPref({ qr: { ...prefs.qr, password: e.target.value } })}
-              onFocus={e => e.target.select()}
-              placeholder='re-enter room password'
-            />
-          </div>
-        )}
-        <div className={clsx(styles.field)}>
-          <label id='label-qr-size'>Size</label>
-          <Slider
-            className={styles.slider}
-            min={0}
-            max={1}
-            step={0.05}
-            value={prefs?.qr?.size ?? 0.5}
-            onChange={(val: number) => handleSetPref({ qr: { ...prefs.qr, size: val } })}
-            aria-labelledby='label-qr-size'
-          />
-        </div>
-        <div className={clsx(styles.field)}>
-          <label id='label-qr-opacity'>Opacity</label>
-          <Slider
-            className={styles.slider}
-            min={0.25}
-            max={1}
-            step={0.075}
-            value={prefs?.qr?.opacity ?? 0.625}
-            onChange={(val: number) => handleSetPref({ qr: { ...prefs.qr, opacity: val } })}
-            aria-labelledby='label-qr-opacity'
-          />
-        </div>
       </div>
     </Accordion>
   )

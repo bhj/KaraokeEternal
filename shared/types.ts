@@ -42,6 +42,7 @@ export interface IRoomPrefs {
     opacity: number
     password: string
     size: number
+    url?: string
   }
   user?: {
     isNewAllowed?: boolean

@@ -50,6 +50,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
 
   const handlePrefsChange = (newPrefs: IRoomPrefs) => {
     setPrefs(newPrefs)
+
     if (room) {
       dispatch(requestPrefsPush(room.roomId, newPrefs))
     }

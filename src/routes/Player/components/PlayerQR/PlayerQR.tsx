@@ -9,6 +9,19 @@ import styles from './PlayerQR.css'
 const MIN_STATIC_MS = 10000 // 10 sec
 const MAX_STATIC_MS = 180000 // 3 min
 
+// an admin-supplied URL is unconstrained, so anything unparseable falls back
+const getBaseURL = (customURL?: string) => {
+  if (customURL) {
+    try {
+      return new URL(customURL)
+    } catch { /* fall through */ }
+  }
+
+  const url = new URL(window.location.href)
+  url.pathname = url.pathname.replace(/\/player$/, '')
+  return url
+}
+
 interface PlayerQRProps {
   height: number
   prefs: IRoomPrefs['qr']
@@ -74,12 +87,11 @@ const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
     }
   }
 
-  const url = new URL(window.location.href)
-  url.pathname = url.pathname.replace(/\/player$/, '')
-  url.searchParams.append('roomId', String(roomId))
+  const url = getBaseURL(prefs.url)
+  url.searchParams.set('roomId', String(roomId))
 
   if (prefs.password) {
-    url.searchParams.append('password', btoa(prefs.password))
+    url.searchParams.set('password', btoa(prefs.password))
   }
 
   const size = Math.round(height * (0.05 + (prefs.size ?? 0.5) / 5)) // min: 5vh, max: 25vh

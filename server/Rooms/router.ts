@@ -68,14 +68,19 @@ router.put('/:roomId', async (ctx) => {
 
   log.verbose('%s updated a room (roomId: %s)', ctx.user.name, roomId)
 
-  const sockets = await ctx.io.in(Rooms.prefix(roomId)).fetchSockets()
+  // closed rooms included since a player may still be connected to one
+  const room = Rooms.get(roomId, { status: STATUSES }).entities[roomId]
 
-  for (const s of sockets) {
-    if (s?.user.isAdmin) {
-      ctx.io.to(s.id).emit('action', {
-        type: ROOM_PREFS_PUSH,
-        payload: Rooms.get(roomId),
-      })
+  if (room) {
+    const sockets = await ctx.io.in(Rooms.prefix(roomId)).fetchSockets()
+
+    for (const s of sockets) {
+      if (s?.user.isAdmin) {
+        ctx.io.to(s.id).emit('action', {
+          type: ROOM_PREFS_PUSH,
+          payload: { roomId, prefs: room.prefs },
+        })
+      }
     }
   }
 
