@@ -1,6 +1,12 @@
 import IPC from '../lib/IPCBridge.js'
 import { SCANNER_WORKER_STATUS } from '../../shared/actionTypes.js'
 
+export interface ScanStats {
+  new: number
+  updated: number
+  removed: number
+}
+
 class Scanner {
   isCanceling: boolean
   emitStatus: (text: string, progress: number, isScanning?: boolean) => void

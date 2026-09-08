@@ -59,26 +59,31 @@ let IPC
   q.queue(pathIds, full || args[1] === 'true')
 })()
 
-const totals = { new: 0, existing: 0, removed: 0, skipped: 0 }
+const totals = { new: 0, updated: 0, removed: 0 }
 
 function onIteration (stats) {
   if (stats) {
     totals.new += stats.new
-    totals.existing += stats.existing
+    totals.updated += stats.updated
     totals.removed += stats.removed
-    totals.skipped += stats.skipped
   }
 
   return stats
 }
 
 function onDone () {
+  // key order is the display order
+  const summary = Object.entries(totals)
+    .filter(([, n]) => n > 0)
+    .map(([type, n]) => `${n} ${type}`)
+    .join(', ')
+
   IPC.send({
     type: SCANNER_WORKER_STATUS,
     payload: {
       isScanning: false,
       pct: 100,
-      text: `Scan finished (${totals.new} new, ${totals.removed} removed, ${totals.skipped} unchanged)`,
+      text: `Scan finished (${summary || 'no changes'})`,
     },
   })
 

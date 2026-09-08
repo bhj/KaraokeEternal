@@ -11,6 +11,7 @@ import { CONFIG_FILENAME, fingerprintsEqual, getMtimeSec, getRelPath, isUnchange
 import Media from '../../Media/Media.js'
 import MetaParser from '../MetaParser/MetaParser.js'
 import Scanner from '../Scanner.js'
+import type { ScanStats } from '../Scanner.js'
 import IPC from '../../lib/IPCBridge.js'
 import fileTypes from '../../Media/fileTypes.js'
 import { LIBRARY_MATCH_SONG, MEDIA_ADD, MEDIA_REMOVE, MEDIA_UPDATE, PATH_DATA_SET } from '../../../shared/actionTypes.js'
@@ -19,6 +20,10 @@ const log = getLogger('FileScanner')
 
 const audioExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].mimeType.startsWith('audio/'))
 const searchExts = Object.keys(fileTypes).filter(ext => fileTypes[ext].scan !== false)
+
+// "unchanged" is a processed file whose row already matched (e.g. on a
+// full scan); it is not tallied since the scan changed nothing for it
+type ProcessStatus = 'new' | 'updated' | 'unchanged'
 
 class FileScanner extends Scanner {
   paths: { result: number[], entities: Record<number, Path> }
@@ -32,7 +37,7 @@ class FileScanner extends Scanner {
   async scan (pathId, full = false) {
     const dir = this.paths.entities[pathId]?.path
     const validMediaIds = new Set<number>()
-    const stats = { new: 0, removed: 0, existing: 0, skipped: 0 }
+    const stats: ScanStats = { new: 0, updated: 0, removed: 0 }
     let files // { file, stats }[]
     let prevDir
 
@@ -97,7 +102,6 @@ class FileScanner extends Scanner {
 
       if (skip) {
         validMediaIds.add(row.mediaId)
-        stats.skipped++
         log.verbose('  => unchanged (skipped)')
 
         // skipped iterations are cheap; don't emit one IPC status message per file
@@ -129,9 +133,7 @@ class FileScanner extends Scanner {
         try {
           const res = await this.process(files[i], pathId, { relPath, row })
           validMediaIds.add(res.mediaId)
-
-          if (res.isNew) stats.new++
-          else stats.existing++
+          if (res.status !== 'unchanged') stats[res.status]++
         } catch (err) {
           log.warn(`  => ${err.message}`)
         }
@@ -143,10 +145,7 @@ class FileScanner extends Scanner {
       }
     } // end for
 
-    log.info('Scanned %s valid media files (%s unchanged)',
-      validMediaIds.size.toLocaleString(),
-      stats.skipped.toLocaleString(),
-    )
+    log.info('Scanned %s valid media files', validMediaIds.size.toLocaleString())
     log.info('Searching for invalid media entries')
 
     const numRemoved = await this.removeInvalid(mediaIds, validMediaIds)
@@ -165,7 +164,7 @@ class FileScanner extends Scanner {
     return stats
   }
 
-  async process ({ file, mtimeMs }, pathId, { relPath, row }) {
+  async process ({ file, mtimeMs }, pathId, { relPath, row }): Promise<{ mediaId: number, status: ProcessStatus }> {
     const mtimeSec = getMtimeSec(mtimeMs)
     let buffer = await fsPromises.readFile(file)
     let mimeType = fileTypes[getExt(file)].mimeType
@@ -237,9 +236,11 @@ class FileScanner extends Scanner {
         if (media[key] !== row[key]) diff[key] = media[key]
       })
 
+      const isChanged = Object.keys(diff).length > 0
+
       // dateUpdated stores the file's mtime; sync it even when content is
       // unchanged so the file can be skipped next scan
-      if (Object.keys(diff).length || row.dateUpdated !== mtimeSec) {
+      if (isChanged || row.dateUpdated !== mtimeSec) {
         await IPC.req({
           type: MEDIA_UPDATE,
           payload: {
@@ -254,7 +255,8 @@ class FileScanner extends Scanner {
         log.info('  => ok')
       }
 
-      return { mediaId: row.mediaId, isNew: false }
+      // a dateUpdated-only sync is bookkeeping, not a change to the media entry
+      return { mediaId: row.mediaId, status: isChanged ? 'updated' : 'unchanged' }
     } // end if
 
     // new media
@@ -267,7 +269,7 @@ class FileScanner extends Scanner {
 
     return {
       mediaId: await IPC.req({ type: MEDIA_ADD, payload: mediaWithDate }) as number,
-      isNew: true,
+      status: 'new',
     }
   }
 

@@ -1,15 +1,9 @@
 import FileScanner from './FileScanner/FileScanner.js'
+import type { ScanStats } from './Scanner.js'
 import Prefs from '../Prefs/Prefs.js'
 import getLogger from '../lib/Log.js'
 
 const log = getLogger('queue')
-
-interface ScanStats {
-  new: number
-  removed: number
-  existing: number
-  skipped: number
-}
 
 class ScannerQueue {
   #instance
