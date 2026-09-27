@@ -1,6 +1,5 @@
 ---
 title: The media scanner stops before scanning all my files?
-category: Troubleshooting
 weight: 5
 ---
 

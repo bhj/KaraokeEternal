@@ -48,16 +48,24 @@
     openFaq()
     window.addEventListener('hashchange', openFaq)
 
-    // Dismiss screenshot overlay with Escape key
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && window.location.hash) {
-        try {
-          const el = document.querySelector(window.location.hash)
-          if (el && el.classList.contains('overlay')) {
-            window.location.hash = "_"
-          }
-        } catch (err) { /* ignore invalid selectors */ }
-      }
-    })
+    // Open image links in a modal lightbox (Escape closes natively)
+    const lightbox = document.getElementById('lightbox')
+
+    if (lightbox && typeof lightbox.showModal === 'function') {
+      const img = lightbox.querySelector('img')
+
+      document.querySelectorAll('a.lightbox-link').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault()
+          const thumb = link.querySelector('img')
+          img.src = link.href
+          img.alt = thumb ? thumb.alt : ''
+          lightbox.showModal()
+        })
+      })
+
+      lightbox.addEventListener('click', () => lightbox.close())
+      lightbox.addEventListener('close', () => img.removeAttribute('src'))
+    }
   })
 })();

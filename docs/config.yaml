@@ -1,5 +1,5 @@
 baseURL: https://www.karaoke-eternal.com/
-languageCode: en-us
+locale: en-US
 title: Karaoke Eternal
 permalinks:
   page: "/:slug/"

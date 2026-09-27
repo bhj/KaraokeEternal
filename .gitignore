@@ -14,3 +14,4 @@ node_modules/
 .vscode
 .claude
 .playwright
+.playwright-cli

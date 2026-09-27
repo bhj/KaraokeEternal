@@ -23,9 +23,7 @@
     0 0 .75em hsl(var(--hue-pink), 100%, 50%),
     0 0 1em hsl(var(--hue-pink), 100%, 50%),
     0 0 1.5em hsl(var(--hue-pink), 100%, 50%),
-    0 0 3em hsl(var(--hue-pink), 100%, 50%),
-    0 0 6em hsl(var(--hue-pink), 100%, 50%),
-    0 0 9em hsl(var(--hue-pink), 100%, 50%);
+    0 0 3em hsl(var(--hue-pink), 100%, 50%);
 }
 
 .logo-eternal {

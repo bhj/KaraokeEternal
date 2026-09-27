@@ -6,10 +6,7 @@
   {{ end }}
 {{ end }}
 <figure>
-  <a href="#{{ anchorize $img.RelPermalink }}">
-    <img srcset="{{ $img.RelPermalink }} {{ $density }}" src="{{ $img.RelPermalink }}" alt="{{ (.Get 1) }}" />
-  </a>
-  <a href="#_" class="overlay" id="{{ anchorize $img.RelPermalink }}">
+  <a href="{{ $img.RelPermalink }}" class="lightbox-link">
     <img srcset="{{ $img.RelPermalink }} {{ $density }}" src="{{ $img.RelPermalink }}" alt="{{ (.Get 1) }}" />
   </a>
   <figcaption>

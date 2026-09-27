@@ -1,0 +1,5 @@
+{{- /* Appends the external-link icon when a markdown link's host differs from the site's. */ -}}
+{{- $u := urls.Parse .Destination -}}
+{{- $external := and $u.Host (ne $u.Host (urls.Parse site.BaseURL).Host) -}}
+<a href="{{ .Destination | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text }}</a>
+{{- if $external }}{{ partialCached "icon-external.html" . }}{{ end -}}

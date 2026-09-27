@@ -99,7 +99,7 @@ class User {
         throw new Error(`Username or email must have ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters`)
       }
 
-      if (!newPassword) {
+      if (!newPassword || typeof newPassword !== 'string') {
         throw new Error('Password is required')
       }
 
@@ -107,7 +107,7 @@ class User {
         throw new Error(`Password must have at least ${PASSWORD_MIN_LENGTH} characters`)
       }
 
-      if (!newPasswordConfirm) {
+      if (!newPasswordConfirm || typeof newPasswordConfirm !== 'string') {
         throw new Error('Password confirmation is required')
       }
 

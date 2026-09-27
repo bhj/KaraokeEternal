@@ -1,6 +1,5 @@
 ---
 title: What's the recommended audio/microphone setup?
-category: General
 weight: 1
 ---
 

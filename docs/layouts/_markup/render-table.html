@@ -1,0 +1,23 @@
+{{- /* Wraps markdown tables so wide ones scroll themselves instead of the page. */ -}}
+<div class="table-scroll">
+  <table>
+    <thead>
+      {{- range .THead }}
+      <tr>
+        {{- range . }}
+        <th {{- with .Alignment }} style="text-align: {{ . }}"{{ end }}>{{ .Text }}</th>
+        {{- end }}
+      </tr>
+      {{- end }}
+    </thead>
+    <tbody>
+      {{- range .TBody }}
+      <tr>
+        {{- range . }}
+        <td {{- with .Alignment }} style="text-align: {{ . }}"{{ end }}>{{ .Text }}</td>
+        {{- end }}
+      </tr>
+      {{- end }}
+    </tbody>
+  </table>
+</div>

@@ -46,23 +46,23 @@
               href="{{ .Site.BaseURL }}docs/getting-started/">Getting Started</a></li>
           <li class="{{ if eq $lastSeg "karaoke-eternal-app" }} active{{ end }}"><a
               href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/">Karaoke Eternal <span>(the app)</span></a>
+            {{ with site.GetPage "/docs/karaoke-eternal-app" }}{{ $p := . }}
             <ul id="karaoke-eternal-app-toc">
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/#library">Library</a></li>
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/#queue">Queue</a></li>
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/#account">Account</a>
-              </li>
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-app/#player">Player</a></li>
+              {{ range .Fragments.Headings }}{{ range .Headings }}{{ if eq .Level 2 }}
+              <li><a href="{{ $p.Permalink }}#{{ .ID }}">{{ .Title | safeHTML }}</a></li>
+              {{ end }}{{ end }}{{ end }}
             </ul>
+            {{ end }}
           </li>
           <li class="{{ if eq $lastSeg "karaoke-eternal-server" }} active{{ end }}"><a
               href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/">Karaoke Eternal Server</a>
+            {{ with site.GetPage "/docs/karaoke-eternal-server" }}{{ $p := . }}
             <ul id="karaoke-eternal-server-toc">
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/#installation">Installation</a></li>
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/#media-files">Media Files</a></li>
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/#metadata-parser">Metadata Parser</a></li>
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/#cli--env">CLI &amp; ENV</a></li>
-              <li><a href="{{ .Site.BaseURL }}docs/karaoke-eternal-server/#file-locations">File Locations</a></li>
+              {{ range .Fragments.Headings }}{{ range .Headings }}{{ if eq .Level 2 }}
+              <li><a href="{{ $p.Permalink }}#{{ .ID }}">{{ .Title | safeHTML }}</a></li>
+              {{ end }}{{ end }}{{ end }}
             </ul>
+            {{ end }}
           </li>
         </ul>
       </li>

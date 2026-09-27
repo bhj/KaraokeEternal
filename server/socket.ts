@@ -36,8 +36,9 @@ const handlers = {
 
 const { verify: jwtVerify } = jsonWebToken
 
-export default function (io, jwtKey) {
+export default function (io, jwtKey, getClientIp) {
   io.on('connection', (sock) => {
+    const clientIp = getClientIp(sock)
     const { keToken } = parseCookie(sock.handshake.headers.cookie)
     const clientLibraryVersion = parseInt(sock.handshake.query.library, 10)
     const clientStarsVersion = parseInt(sock.handshake.query.stars, 10)
@@ -50,7 +51,7 @@ export default function (io, jwtKey) {
       sock.user = decoded
 
       // success
-      log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, sock.handshake.address)
+      log.verbose('%s (%s) connected from %s', sock.user.name, sock.id, clientIp)
     } catch (err) {
       io.to(sock.id).emit('action', {
         type: SOCKET_AUTH_ERROR,
@@ -58,7 +59,7 @@ export default function (io, jwtKey) {
 
       sock.user = null
       sock.disconnect()
-      log.verbose('disconnected %s (%s)', sock.handshake.address, err.message)
+      log.verbose('disconnected %s (%s)', clientIp, err.message)
       return
     }
 

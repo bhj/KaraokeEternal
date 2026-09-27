@@ -142,7 +142,14 @@ const AudioCtrl = ({
         )}
 
         {!isPitchSupported && (
-          <p className={styles.unsupported}>Not available (Player requires a secure connection)</p>
+          <p className={styles.unsupported}>
+            Not available (Player requires a secure connection)
+            <br />
+            {/* @ts-expect-error: global via Webpack */}
+            <a href={__KE_URL_PITCH_HELP__} target='_blank' rel='noreferrer'>
+              How to enable
+            </a>
+          </p>
         )}
       </fieldset>
     </div>

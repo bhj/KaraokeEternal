@@ -1,6 +1,7 @@
 import getLogger from './Log.js'
 import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
+import pLimit from 'p-limit'
 
 const log = getLogger('crypto')
 
@@ -11,7 +12,13 @@ const ARGON2_CONFIG = {
   passes: 3,
 }
 
-function hash (password: string): Promise<string> {
+// argon2 runs on libuv's threadpool (4 threads by default), which also serves
+// the file reads behind media streaming, and each hash holds 64 MiB. Bound
+// concurrent hashing so a burst of sign-in attempts can't starve playback.
+const MAX_CONCURRENT_HASHES = 2
+const limitHashing = pLimit(MAX_CONCURRENT_HASHES)
+
+function computeHash (password: string): Promise<string> {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(16, (err, nonce) => {
       if (err) {
@@ -19,29 +26,33 @@ function hash (password: string): Promise<string> {
         return reject(err)
       }
 
-      crypto.argon2('argon2id', {
-        message: password,
-        nonce,
-        ...ARGON2_CONFIG,
-      }, (err, derivedKey) => {
-        if (err) {
-          log.error(err)
-          return reject(err)
-        }
+      // argon2 throws synchronously on bad input; uncaught here it would crash the process
+      try {
+        crypto.argon2('argon2id', {
+          message: password,
+          nonce,
+          ...ARGON2_CONFIG,
+        }, (err, derivedKey) => {
+          if (err) {
+            log.error(err)
+            return reject(err)
+          }
 
-        const saltB64 = nonce.toString('base64').replace(/=/g, '')
-        const hashB64 = derivedKey.toString('base64').replace(/=/g, '')
-        const str = `$argon2id$v=19$m=${ARGON2_CONFIG.memory},t=${ARGON2_CONFIG.passes},p=${ARGON2_CONFIG.parallelism}$${saltB64}$${hashB64}`
+          const saltB64 = nonce.toString('base64').replace(/=/g, '')
+          const hashB64 = derivedKey.toString('base64').replace(/=/g, '')
+          const str = `$argon2id$v=19$m=${ARGON2_CONFIG.memory},t=${ARGON2_CONFIG.passes},p=${ARGON2_CONFIG.parallelism}$${saltB64}$${hashB64}`
 
-        resolve(str)
-      })
+          resolve(str)
+        })
+      } catch (e) {
+        log.error(e)
+        reject(e)
+      }
     })
   })
 }
 
-function compare (password: string, hashStr: string): Promise<boolean> {
-  if (!hashStr) return Promise.resolve(false)
-
+function computeCompare (password: string, hashStr: string): Promise<boolean> {
   // legacy bcrypt verify
   if (hashStr.startsWith('$2')) {
     return new Promise((resolve, reject) => {
@@ -105,6 +116,16 @@ function compare (password: string, hashStr: string): Promise<boolean> {
       resolve(false)
     }
   })
+}
+
+function hash (password: string): Promise<string> {
+  if (typeof password !== 'string') return Promise.reject(new TypeError('Password must be a string'))
+  return limitHashing(() => computeHash(password))
+}
+
+function compare (password: string, hashStr: string): Promise<boolean> {
+  if (typeof password !== 'string' || !hashStr) return Promise.resolve(false)
+  return limitHashing(() => computeCompare(password, hashStr))
 }
 
 function isLegacy (hashStr: string) {

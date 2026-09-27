@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en-US">
 {{ partial "head.html" . }}
 
 <body>
@@ -8,6 +8,9 @@
     {{ block "main" . }}
     {{ end }}
   </div>
+  <dialog id="lightbox">
+    <img alt="" />
+  </dialog>
   <script src='{{ (resources.Get "js/gumshoe.min.js").Permalink }}'></script>
   <script src='{{ (resources.Get "js/main.js").Permalink }}'></script>
   <script src='{{ (resources.Get "js/copy-code.js").Permalink }}'></script>

@@ -71,6 +71,7 @@ let config = {
       __KE_VERSION__: JSON.stringify(process.env.npm_package_version),
       __KE_URL_HOME__: JSON.stringify('https://www.karaoke-eternal.com'),
       __KE_URL_LICENSE__: JSON.stringify('/licenses.txt'),
+      __KE_URL_PITCH_HELP__: JSON.stringify('https://www.karaoke-eternal.com/faq/#pitch-shifting-https'),
       __KE_URL_REPO__: JSON.stringify('https://www.karaoke-eternal.com/repo'),
       __KE_URL_SPONSOR__: JSON.stringify('https://www.karaoke-eternal.com/sponsor'),
     })),

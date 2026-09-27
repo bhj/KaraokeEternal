@@ -28,6 +28,8 @@ const env = {
   KES_PATH_DATA: process.env.KES_PATH_DATA || getAppPath('Karaoke Eternal Server'),
   KES_PATH_WEBROOT: path.join(baseDir, 'build', 'client'),
   KES_PORT: parseInt(process.env.KES_PORT, 10) || 0,
+  KES_PROXY_CLIENT_IP_HEADER: process.env.KES_PROXY_CLIENT_IP_HEADER?.trim() || undefined,
+  KES_PROXY_TRUST: process.env.KES_PROXY_TRUST?.trim() || undefined,
   KES_ROTATE_KEY: ['1', 'true'].includes(process.env.KES_ROTATE_KEY?.toLowerCase()),
   KES_SCAN: process.env.KES_SCAN?.trim(),
   KES_SCANNER_CONSOLE_LEVEL: parseInt(process.env.KES_SCANNER_CONSOLE_LEVEL, 10) || undefined,
@@ -52,6 +54,16 @@ const argv = yargs(hideBin(process.argv))
     describe: 'Web server port (default=0/auto)',
     number: true,
     requiresArg: true,
+  })
+  .option('proxyClientIpHeader', {
+    describe: 'Header holding the real client IP, for proxies that do not send X-Forwarded-For; honored only from a trusted proxy',
+    requiresArg: true,
+    type: 'string',
+  })
+  .option('proxyTrust', {
+    describe: 'Comma-separated proxy IPs/CIDRs, or presets (loopback, private), to trust X-Forwarded-* from. Enables reverse-proxy mode',
+    requiresArg: true,
+    type: 'string',
   })
   .option('rotateKey', {
     describe: 'Rotate the session key at startup',
@@ -107,6 +119,8 @@ if (argv.rotateKey) {
 const opts = {
   data: 'KES_PATH_DATA',
   port: 'KES_PORT',
+  proxyClientIpHeader: 'KES_PROXY_CLIENT_IP_HEADER',
+  proxyTrust: 'KES_PROXY_TRUST',
   scan: 'KES_SCAN',
   scannerConsoleLevel: 'KES_SCANNER_CONSOLE_LEVEL',
   scannerLogLevel: 'KES_SCANNER_LOG_LEVEL',
