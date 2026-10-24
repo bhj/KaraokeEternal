@@ -16,10 +16,10 @@ const LibraryView = () => {
   const isSearching = !!filterStr.trim().length || filterStarred
 
   // ArtistList virtualizes rows against ui.headerHeight (the header includes
-  // LibraryHeader on this route, measured async via ResizeObserver). Mounting
-  // before the height settles makes saved scroll positions land off by
-  // (delta / rowHeight) rows. Wait for the first growth past the value at
-  // mount before rendering ArtistList.
+  // LibraryHeader on this route, measured async via ResizeObserver). Its saved
+  // scroll offset is only applied once at mount, so mounting before the height
+  // settles makes the restored position land off by the delta. Wait for the
+  // first growth past the value at mount before rendering ArtistList.
   const initialHeaderHeight = useRef(ui.headerHeight)
   const [isReady, setIsReady] = useState(false)
   useEffect(() => {

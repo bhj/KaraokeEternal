@@ -3,15 +3,10 @@ import { List, type RowComponentProps, type ListImperativeAPI } from 'react-wind
 import styles from './PaddedList.css'
 
 interface PaddedListProps {
+  defaultScrollOffset?: number
   numRows: number
-  onRowsRendered?: (visibleRows: {
-    startIndex: number
-    stopIndex: number
-  }, allRows: {
-      startIndex: number
-      stopIndex: number
-    }) => void
   onRef?(ref: ListImperativeAPI | null): void
+  onScroll?: React.UIEventHandler<HTMLDivElement>
   paddingTop: number
   paddingRight?: number
   paddingBottom: number
@@ -23,9 +18,10 @@ interface PaddedListProps {
 }
 
 const PaddedList = ({
+  defaultScrollOffset,
   numRows,
-  onRowsRendered,
   onRef,
+  onScroll,
   paddingTop,
   paddingRight,
   paddingBottom,
@@ -64,7 +60,8 @@ const PaddedList = ({
       rowComponent={PaddedRowComponent}
       rowCount={numRows + 2} // top & bottom spacer
       rowHeight={getRowHeight}
-      onRowsRendered={onRowsRendered}
+      defaultScrollOffset={defaultScrollOffset}
+      onScroll={onScroll}
       overscanCount={10}
       listRef={handleListRef}
       className={styles.container}

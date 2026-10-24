@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { ensureState } from 'redux-optimistic-ui'
 import type { Artist, Song } from 'shared/types'
 import { RootState } from 'store/store'
@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { queueSong } from 'routes/Queue/modules/queue'
 import { showSongInfo } from 'store/modules/songInfo'
 import { toggleSongStarred } from 'store/modules/userStars'
+import { scrollSearchResults } from '../../modules/library'
 import getSearchResults from '../../selectors/getSearchResults'
 import getSongsStatus from '../../selectors/getSongsStatus'
 import buildHighlightPattern from '../Highlight/buildHighlightPattern'
@@ -100,7 +101,9 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
   const starredSongCounts = useAppSelector(state => state.starCounts.songs)
   const isAdmin = useAppSelector(state => state.user.isAdmin)
   const { played, upcoming, current } = useAppSelector(getSongsStatus)
+  const scrollOffset = useAppSelector(state => state.library.searchScrollOffset)
 
+  const lastScrollOffset = useRef(scrollOffset)
   const listRef = useRef<ListImperativeAPI | null>(null)
   const highlight = useMemo(() => buildHighlightPattern(filterStr), [filterStr])
 
@@ -112,6 +115,16 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
     if (index === 0) return ROW_HEIGHT_RESULT_HEADING
     return ROW_HEIGHT_SONG_WITH_ARTIST
   }, [])
+
+  useEffect(() => {
+    return () => {
+      dispatch(scrollSearchResults(lastScrollOffset.current))
+    }
+  }, [dispatch])
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    lastScrollOffset.current = e.currentTarget.scrollTop
+  }
 
   const handleRef = (ref: ListImperativeAPI) => {
     if (ref) listRef.current = ref
@@ -138,6 +151,8 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
       }}
       rowHeight={rowHeight}
       numRows={1 + songsResult.length}
+      defaultScrollOffset={scrollOffset}
+      onScroll={handleScroll}
       paddingTop={ui.headerHeight}
       paddingRight={4}
       paddingBottom={ui.footerHeight}

@@ -6,12 +6,14 @@ import {
   LIBRARY_PUSH,
   TOGGLE_ARTIST_EXPANDED,
   SCROLL_ARTISTS,
+  SCROLL_SEARCH_RESULTS,
 } from 'shared/actionTypes'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 export const scrollArtists = createAction<number>(SCROLL_ARTISTS)
+export const scrollSearchResults = createAction<number>(SCROLL_SEARCH_RESULTS)
 export const toggleArtistExpanded = createAction<number>(TOGGLE_ARTIST_EXPANDED)
 const libraryPush = createAction<LibraryState>(LIBRARY_PUSH)
 
@@ -35,7 +37,8 @@ export interface LibraryState {
   version: number
   filterStr: string
   filterStarred: boolean
-  scrollRow: number
+  artistsScrollOffset: number
+  searchScrollOffset: number
   expandedArtists: number[]
 }
 
@@ -44,7 +47,8 @@ const initialState: LibraryState = {
   version: 0,
   filterStr: '',
   filterStarred: false,
-  scrollRow: 0,
+  artistsScrollOffset: 0,
+  searchScrollOffset: 0,
   expandedArtists: [],
 }
 
@@ -52,15 +56,21 @@ const libraryReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(setFilterStr, (state, { payload }) => {
       state.filterStr = payload
+      state.searchScrollOffset = 0
     })
     .addCase(resetFilterStr, (state) => {
       state.filterStr = ''
+      state.searchScrollOffset = 0
     })
     .addCase(toggleFilterStarred, (state) => {
       state.filterStarred = !state.filterStarred
+      state.searchScrollOffset = 0
     })
     .addCase(scrollArtists, (state, { payload }) => {
-      state.scrollRow = payload
+      state.artistsScrollOffset = payload
+    })
+    .addCase(scrollSearchResults, (state, { payload }) => {
+      state.searchScrollOffset = payload
     })
     .addCase(toggleArtistExpanded, (state, { payload }) => {
       const idx = state.expandedArtists.indexOf(payload)
