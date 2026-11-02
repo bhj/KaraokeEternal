@@ -1,0 +1,13 @@
+.container {
+  background-color: transparent;
+  position: relative;
+}
+
+.backdrop {
+  border-radius: var(--border-radius);
+  position: absolute;
+}
+
+.canvas {
+  position: relative;
+}

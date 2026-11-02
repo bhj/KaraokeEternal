@@ -244,7 +244,7 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
   const user = useAppSelector(state => state.user)
   const providers = useAppSelector(state => state.prefs.providers)
 
-  const lastScrollOffset = useRef(scrollOffset)
+  const lastScrollOffsetRef = useRef(scrollOffset)
   const listRef = useRef<ListImperativeAPI | null>(null)
   const isProviderSearchActiveRef = useRef(isProviderSearchActive)
   useEffect(() => {
@@ -364,12 +364,12 @@ const SearchResults = ({ ui }: SearchResultsProps) => {
 
   useEffect(() => {
     return () => {
-      dispatch(scrollSearchResults(lastScrollOffset.current))
+      dispatch(scrollSearchResults(lastScrollOffsetRef.current))
     }
   }, [dispatch])
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    lastScrollOffset.current = e.currentTarget.scrollTop
+    lastScrollOffsetRef.current = e.currentTarget.scrollTop
   }
 
   const handleRef = (ref: ListImperativeAPI) => {

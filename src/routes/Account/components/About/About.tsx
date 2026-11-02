@@ -12,7 +12,7 @@ import styles from './About.css'
 const curYear = new Date().getFullYear()
 
 const About = () => {
-  const [isChangelogOpen, setChangelogOpen] = useState(false)
+  const [changelogOpen, setChangelogOpen] = useState(false)
   const toggleChangelog = () => setChangelogOpen(prevState => !prevState)
 
   return (
@@ -65,7 +65,7 @@ const About = () => {
           </div>
         </div>
 
-        {isChangelogOpen && (
+        {changelogOpen && (
           <Modal
             title='Changelog & Sponsors'
             className={styles.changelog}
@@ -80,6 +80,7 @@ const About = () => {
             {/* @todo: without this anchor the changelog gets scrolled to
               the first "real" link, even with focusTrapped=false */}
             <a href='' aria-hidden></a>
+            {/* eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml -- CHANGELOG.md compiled at build time */}
             <div dangerouslySetInnerHTML={{ __html: html }} />
           </Modal>
         )}

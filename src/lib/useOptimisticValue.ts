@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 export default function useOptimisticValue<T> (value: T, timeout = 2000): [T, (val: T) => void] {
   const [tempValue, setTempValue] = useState<T | null>(null)
   const [prevValue, setPrevValue] = useState<T>(value)
-  const timerId = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const timerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // clear the optimistic value once the authoritative value catches up
   if (value !== prevValue) {
@@ -17,14 +17,14 @@ export default function useOptimisticValue<T> (value: T, timeout = 2000): [T, (v
   }
 
   useEffect(() => () => {
-    if (timerId.current) clearTimeout(timerId.current)
+    if (timerIdRef.current) clearTimeout(timerIdRef.current)
   }, [])
 
   const setOptimisticValue = (val: T) => {
-    if (timerId.current) clearTimeout(timerId.current)
+    if (timerIdRef.current) clearTimeout(timerIdRef.current)
 
     // fall back to the authoritative value if it never converges
-    timerId.current = setTimeout(() => setTempValue(null), timeout)
+    timerIdRef.current = setTimeout(() => setTempValue(null), timeout)
     setTempValue(val)
   }
 

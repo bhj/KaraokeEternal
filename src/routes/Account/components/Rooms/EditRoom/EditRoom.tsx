@@ -19,7 +19,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
   const [roomPassword, setRoomPassword] = useState(room && room.hasPassword ? '*'.repeat(32) : '')
   const [prefs, setPrefs] = useState<IRoomPrefs>(room?.prefs || {} as IRoomPrefs)
   const [prevRoom, setPrevRoom] = useState(room)
-  const [isPasswordDirty, setIsPasswordDirty] = useState(false)
+  const [passwordDirty, setPasswordDirty] = useState(false)
   const dispatch = useAppDispatch()
 
   if (room !== prevRoom) {
@@ -34,7 +34,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
     data.prefs = prefs
 
     if (room) {
-      if (!isPasswordDirty) delete data.password
+      if (!passwordDirty) delete data.password
       dispatch(updateRoom({ roomId: room.roomId, data }))
     } else {
       if (!data.password) delete data.password
@@ -65,7 +65,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
   }
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsPasswordDirty(true)
+    setPasswordDirty(true)
     setRoomPassword(e.target.value)
   }
 
@@ -75,7 +75,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
       onClose={handleClose}
       title={room ? 'Edit Room' : 'Create Room'}
     >
-      <form onSubmit={handleSubmit} ref={formRef} className={styles.form}>
+      <form onSubmit={handleSubmit} ref={formRef}>
         <div className={styles.fieldContainer}>
           <input
             type='text'
@@ -108,15 +108,15 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
 
         <div className={styles.prefsContainer}>
           <UserPrefs prefs={prefs} onChange={handlePrefsChange} />
-          <QRPrefs prefs={prefs} onChange={handlePrefsChange} roomPassword={roomPassword} roomPasswordDirty={isPasswordDirty} />
+          <QRPrefs prefs={prefs} onChange={handlePrefsChange} roomPassword={roomPassword} roomPasswordDirty={passwordDirty} />
         </div>
 
         <div className={styles.btnContainer}>
-          <Button type='submit' variant='primary' className={styles.btn}>
+          <Button type='submit' variant='primary'>
             {room ? 'Update Room' : 'Create Room'}
           </Button>
           {room && (
-            <Button onClick={handleRemoveClick} className={styles.btn} variant='danger'>
+            <Button onClick={handleRemoveClick} variant='danger'>
               Remove Room
             </Button>
           )}

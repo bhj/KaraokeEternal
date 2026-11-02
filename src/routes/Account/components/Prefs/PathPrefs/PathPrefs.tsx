@@ -16,7 +16,7 @@ const api = new HttpApi('prefs/path')
 
 const PathPrefs = () => {
   const paths = useAppSelector(state => state.prefs.paths)
-  const [isChoosing, setChoosing] = useState(false)
+  const [choosing, setChoosing] = useState(false)
   const [editingPath, setEditingPath] = useState<Path | null>(null)
   const [priority, setPriority] = useState(paths.result)
   const [prevPaths, setPrevPaths] = useState(paths)
@@ -82,12 +82,14 @@ const PathPrefs = () => {
   const handleRefreshAll = () => dispatch(requestScan())
 
   return (
-    <Accordion headingComponent={(
-      <div className={styles.heading}>
-        <Icon icon='FOLDER_MUSIC' />
-        <div className={styles.title}>Media Folders</div>
-      </div>
-    )}
+    <Accordion
+      renderHeading={button => <div className={styles.heading}>{button}</div>}
+      heading={(
+        <>
+          <Icon icon='FOLDER_MUSIC' />
+          <div>Media Folders</div>
+        </>
+      )}
     >
       <div className={styles.content}>
         {paths.result.length === 0
@@ -123,7 +125,7 @@ const PathPrefs = () => {
           </Button>
         </div>
 
-        {isChoosing && (
+        {choosing && (
           <PathChooser
             onCancel={handleCloseChooser}
             onChoose={handleAdd}

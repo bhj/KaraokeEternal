@@ -5,7 +5,7 @@ import Button from 'components/Button/Button'
 import ButtonStar from 'components/ButtonStar/ButtonStar'
 import Buttons from 'components/Buttons/Buttons'
 import Icon from 'components/Icon/Icon'
-import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
+import useToggleAnimation from 'lib/useToggleAnimation'
 import Highlight from '../Highlight/Highlight'
 import { formatDuration } from 'lib/dateTime'
 import styles from './SongItem.css'
@@ -45,7 +45,8 @@ const SongItem = ({
   numMedia,
   highlight,
 }: SongItemProps) => {
-  const [isExpanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const glow = useToggleAnimation(isUpcoming, styles.animateGlow)
 
   const handleClick = () => {
     if (ignoreMouseup) ignoreMouseup = false
@@ -74,36 +75,32 @@ const SongItem = ({
         styles.container,
         isPlayed && styles.played,
         isUpcoming && styles.upcoming,
-        isStarred && styles.starred,
-        isExpanded && styles.expanded,
         artist && styles.withArtist,
       )}
     >
-      <ToggleAnimation toggle={isUpcoming} className={styles.animateGlow}>
-        <div className={styles.duration}>
-          {formatDuration(duration)}
+      <div className={clsx(styles.duration, glow.className)} onAnimationEnd={glow.onAnimationEnd}>
+        {formatDuration(duration)}
+      </div>
+      <div onClick={handleClick} className={clsx(styles.primary, glow.className)} onAnimationEnd={glow.onAnimationEnd}>
+        <div className={styles.title}>
+          <Highlight text={title} pattern={highlight ?? null} />
+          {isAdmin && numMedia > 1 && (
+            <i>
+              {' '}
+              (
+              {numMedia}
+              )
+            </i>
+          )}
+          {artist && (
+            <div className={styles.artist}>
+              <Highlight text={artist} pattern={highlight ?? null} />
+            </div>
+          )}
         </div>
-        <div onClick={handleClick} className={styles.primary}>
-          <div className={styles.title}>
-            <Highlight text={title} pattern={highlight ?? null} />
-            {isAdmin && numMedia > 1 && (
-              <i>
-                {' '}
-                (
-                {numMedia}
-                )
-              </i>
-            )}
-            {artist && (
-              <div className={styles.artist}>
-                <Highlight text={artist} pattern={highlight ?? null} />
-              </div>
-            )}
-          </div>
-        </div>
-      </ToggleAnimation>
+      </div>
 
-      <Buttons btnWidth={56} isExpanded={isExpanded}>
+      <Buttons btnWidth={56} isExpanded={expanded}>
         <ButtonStar
           className={styles.btn}
           onClick={handleStarClick}

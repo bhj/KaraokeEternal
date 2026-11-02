@@ -12,7 +12,7 @@ import type { Provider } from 'shared/types'
 
 const ProviderPrefs = () => {
   const providers = useAppSelector(state => state.prefs.providers)
-  const [isEditorOpen, setEditorOpen] = useState(false)
+  const [editorOpen, setEditorOpen] = useState(false)
   const [editorProvider, setEditorProvider] = useState<Provider | undefined>()
   const [priority, setPriority] = useState(providers.result)
   const [prevProviders, setPrevProviders] = useState(providers)
@@ -48,12 +48,14 @@ const ProviderPrefs = () => {
   const handleClose = () => setEditorOpen(false)
 
   return (
-    <Accordion headingComponent={(
-      <div className={styles.heading}>
-        <Icon icon='EXPERIMENTAL' />
-        <div className={styles.title}>Providers</div>
-      </div>
-    )}
+    <Accordion
+      renderHeading={button => <div className={styles.heading}>{button}</div>}
+      heading={(
+        <>
+          <Icon icon='EXPERIMENTAL' />
+          <div>Providers</div>
+        </>
+      )}
     >
       <div className={styles.content}>
         {providers.result.length === 0
@@ -82,7 +84,7 @@ const ProviderPrefs = () => {
           </Button>
         </div>
 
-        {isEditorOpen && <EditProvider onClose={handleClose} provider={editorProvider} />}
+        {editorOpen && <EditProvider onClose={handleClose} provider={editorProvider} />}
       </div>
     </Accordion>
   )

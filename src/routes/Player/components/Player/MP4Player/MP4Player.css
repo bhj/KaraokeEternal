@@ -1,17 +1,3 @@
-.container {
-  background-color: transparent;
-  position: relative;
-}
-
-.backdrop {
-  border-radius: var(--border-radius);
-  position: absolute;
-}
-
-.canvas {
-  position: relative;
-}
-
 .video {
   object-position: 50% 50%;
   object-fit: contain;

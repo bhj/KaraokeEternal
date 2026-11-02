@@ -40,12 +40,12 @@ const Slider = ({
   ...rest
 }: SliderProps) => {
   const [tempVal, setTempVal] = useState<number | null>(null)
-  const timerId = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const timerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleChange = (val: number) => {
-    if (timerId.current) {
-      clearTimeout(timerId.current)
-      timerId.current = null
+    if (timerIdRef.current) {
+      clearTimeout(timerIdRef.current)
+      timerIdRef.current = null
     }
 
     lockScrolling(true)
@@ -59,7 +59,7 @@ const Slider = ({
     if (val === value) {
       setTempVal(null)
     } else {
-      timerId.current = setTimeout(() => {
+      timerIdRef.current = setTimeout(() => {
         setTempVal(null)
       }, 2000)
     }
@@ -72,6 +72,7 @@ const Slider = ({
   // slider handle/grabber
   const defaultHandle = (node: React.ReactElement): React.ReactElement => {
   // rc-slider passes a node (div) to which we add style and children
+    // eslint-disable-next-line @eslint-react/no-clone-element -- required by rc-slider's handleRender API
     return React.cloneElement(node as React.ReactElement<HandleProps>, {
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledby,

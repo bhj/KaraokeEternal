@@ -28,7 +28,7 @@ const QueueListAnimator = ({
   // Flipped applies data-* props to its child; using a div wrapper
   // here so QueueItems need not be concerned with rendering them
   // https://github.com/aholachek/react-flip-toolkit#wrapping-a-react-component
-  const items = React.Children.map(queueItems, (child) => {
+  const items = queueItems.map((child) => {
     return (
       <Flipped
         flipId={child.key}

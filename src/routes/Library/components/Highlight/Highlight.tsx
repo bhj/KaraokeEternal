@@ -15,6 +15,7 @@ const Highlight = ({ text, pattern }: HighlightProps) => {
   return (
     <>
       {parts.map((part, i) => (
+        // eslint-disable-next-line @eslint-react/no-array-index-key -- parts of a split string; position is identity
         i % 2 === 1 ? <mark key={i}>{part}</mark> : part
       ))}
     </>

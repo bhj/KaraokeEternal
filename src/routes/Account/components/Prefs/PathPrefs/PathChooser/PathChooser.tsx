@@ -82,8 +82,8 @@ const PathChooser = ({ onCancel, onChoose }: PathChooserProps) => {
           {pathInfo.parent !== false
             && <strong><PathItem path='..' onSelect={() => ls(pathInfo.parent as string)} /></strong>}
 
-          {pathInfo.children.map((item, i) =>
-            <PathItem key={i} path={item.label} onSelect={() => ls(item.path)} />,
+          {pathInfo.children.map(item =>
+            <PathItem key={item.path} path={item.label} onSelect={() => ls(item.path)} />,
           )}
         </div>
       </div>

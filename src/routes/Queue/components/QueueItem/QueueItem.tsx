@@ -72,7 +72,7 @@ const QueueItem = ({
   userId,
   wait,
 }: QueueItemProps) => {
-  const [isExpanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const longPressActiveRef = useRef(false)
   const dispatch = useAppDispatch()
 
@@ -157,7 +157,7 @@ const QueueItem = ({
           </div>
         </div>
 
-        <Buttons btnWidth={56} isExpanded={isExpanded} className={styles.btnContainer}>
+        <Buttons btnWidth={56} isExpanded={expanded} className={styles.btnContainer}>
           {isErrored && (
             <Button
               className={styles.danger}
@@ -181,7 +181,7 @@ const QueueItem = ({
           )}
           {isMovable && (
             <Button
-              className={clsx(styles.btnMove, styles.active)}
+              className={styles.active}
               data-hide
               icon='MOVE_TOP'
               onClick={handleMoveClick}
@@ -205,7 +205,7 @@ const QueueItem = ({
           )}
           {isRemovable && (
             <Button
-              className={clsx(styles.btnRemove, styles.danger)}
+              className={styles.danger}
               data-hide
               icon='DELETE'
               onTouchEnd={(e: React.TouchEvent<HTMLButtonElement>) => {

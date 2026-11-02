@@ -59,7 +59,7 @@ const PlayerOptions = ({
 }: PlayerOptionsProps) => {
   const [activeTab, setActiveTab] = useState<TabId>(lastActiveTab)
   const [animatingTab, setAnimatingTab] = useState<TabId | null>(null)
-  const tabRefs = useRef<Partial<Record<TabId, HTMLButtonElement | null>>>({})
+  const tabsRef = useRef<Partial<Record<TabId, HTMLButtonElement | null>>>({})
 
   useEffect(() => {
     lastActiveTab = activeTab
@@ -78,7 +78,7 @@ const PlayerOptions = ({
     const nextTab = TABS[(curIdx + delta + TABS.length) % TABS.length].id
 
     selectTab(nextTab)
-    tabRefs.current[nextTab]?.focus()
+    tabsRef.current[nextTab]?.focus()
   }
 
   return (
@@ -92,7 +92,7 @@ const PlayerOptions = ({
           {TABS.map(({ id, label, icon }) => (
             <button
               key={id}
-              ref={(el) => { tabRefs.current[id] = el }}
+              ref={(el) => { tabsRef.current[id] = el }}
               className={clsx(styles.tab, animatingTab === id && styles.tabAnimate)}
               type='button'
               role='tab'

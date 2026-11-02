@@ -35,19 +35,19 @@ const EditUser = ({ user, onClose }: EditUserProps) => {
       <AccountForm user={user} onSubmit={handleSubmit} showRole autoFocus={!user}>
         <div className={styles.btnContainer}>
           {!user && (
-            <Button type='submit' className={styles.btn} variant='primary'>
+            <Button type='submit' variant='primary'>
               Create User
             </Button>
           )}
 
           {user && (
-            <Button type='submit' className={styles.btn} variant='primary'>
+            <Button type='submit' variant='primary'>
               Update User
             </Button>
           )}
 
           {user && (
-            <Button onClick={handleRemoveClick} className={styles.btn} variant='danger'>
+            <Button onClick={handleRemoveClick} variant='danger'>
               Remove User
             </Button>
           )}

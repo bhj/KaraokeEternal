@@ -17,7 +17,7 @@ function getConfig (dir, baseDir) {
   } catch (err) {
     // only a missing config means "keep looking"; anything else is a config
     // the admin wrote and we can't honor
-    if (err.code !== 'ENOENT') throw new Error(`${cfgPath}: ${err.message}`)
+    if (err.code !== 'ENOENT') throw new Error(`${cfgPath}: ${err.message}`, { cause: err })
 
     log.verbose('No parser config found: %s', dir)
 
@@ -39,7 +39,7 @@ function getConfig (dir, baseDir) {
     // every artist and title in the folder from a format they were never meant
     // to be parsed with. That mints new songs, orphaning the previous ones along
     // with any stars on them, so make a broken config fatal to the scan instead.
-    throw new Error(`${cfgPath}: ${err.message}`)
+    throw new Error(`${cfgPath}: ${err.message}`, { cause: err })
   }
 }
 

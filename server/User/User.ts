@@ -122,7 +122,7 @@ class User {
       fields.set('username', username)
       fields.set('password', await crypto.hash(newPassword))
     } else {
-      let res: { count?: number } = {}
+      let res: { count: number }
 
       // ensure unique guest username
       do {

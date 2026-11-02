@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import clsx from 'clsx'
 import Accordion from 'components/Accordion/Accordion'
 import InputCheckbox from 'components/InputCheckbox/InputCheckbox'
 import Icon from 'components/Icon/Icon'
@@ -15,29 +14,30 @@ interface QRPrefsProps {
 }
 
 const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPrefsProps) => {
-  const [isQRPasswordEnabled, setIsQRPasswordEnabled] = useState(!!prefs?.qr?.password)
+  const [qrPasswordEnabled, setQrPasswordEnabled] = useState(!!prefs?.qr?.password)
 
   const handleSetPref = useCallback((update: Partial<IRoomPrefs>) => {
     onChange({ ...prefs, ...update })
   }, [onChange, prefs])
 
   useEffect(() => {
-    if (isQRPasswordEnabled && roomPasswordDirty && prefs?.qr?.password !== roomPassword) {
+    if (qrPasswordEnabled && roomPasswordDirty && prefs?.qr?.password !== roomPassword) {
       handleSetPref({ qr: { ...prefs.qr, password: roomPassword } })
     }
-  }, [handleSetPref, isQRPasswordEnabled, prefs, roomPassword, roomPasswordDirty])
+  }, [handleSetPref, qrPasswordEnabled, prefs, roomPassword, roomPasswordDirty])
 
   return (
     <Accordion
-      headingComponent={(
-        <div className={styles.heading}>
+      renderHeading={button => <div className={styles.heading}>{button}</div>}
+      heading={(
+        <>
           <Icon icon='QR_CODE' />
-          <div className={styles.title}>QR Code</div>
-        </div>
+          <div>QR Code</div>
+        </>
       )}
     >
       <div className={styles.content}>
-        <div className={styles.field}>
+        <div>
           <InputCheckbox
             label='Show QR code'
             checked={prefs?.qr?.isEnabled ?? false}
@@ -46,7 +46,7 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
         </div>
         {prefs?.qr?.isEnabled && (
           <>
-            <div className={styles.field}>
+            <div>
               <input
                 type='text'
                 autoComplete='off'
@@ -58,20 +58,20 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
               />
             </div>
             {roomPassword && (
-              <div className={styles.field}>
+              <div>
                 <InputCheckbox
                   label='Include room password'
-                  checked={isQRPasswordEnabled}
+                  checked={qrPasswordEnabled}
                   onChange={(event) => {
                     const checked = event.currentTarget.checked
-                    setIsQRPasswordEnabled(checked)
+                    setQrPasswordEnabled(checked)
                     if (!checked) handleSetPref({ qr: { ...prefs.qr, password: '' } })
                   }}
                 />
               </div>
             )}
-            {(isQRPasswordEnabled && !roomPasswordDirty) && (
-              <div className={styles.field}>
+            {(qrPasswordEnabled && !roomPasswordDirty) && (
+              <div>
                 <input
                   type='password'
                   autoComplete='new-password'
@@ -82,7 +82,7 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
                 />
               </div>
             )}
-            <div className={clsx(styles.field)}>
+            <div>
               <label id='label-qr-size'>Size</label>
               <Slider
                 className={styles.slider}
@@ -94,7 +94,7 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
                 aria-labelledby='label-qr-size'
               />
             </div>
-            <div className={clsx(styles.field)}>
+            <div>
               <label id='label-qr-opacity'>Opacity</label>
               <Slider
                 className={styles.slider}

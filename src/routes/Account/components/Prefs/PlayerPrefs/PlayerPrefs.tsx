@@ -16,12 +16,12 @@ const PlayerPrefs = () => {
 
   return (
     <Accordion
-      className={styles.container}
-      headingComponent={(
-        <div className={styles.heading}>
-          <Icon icon='TELEVISION_PLAY' size={32} className={styles.icon} />
-          <div className={styles.title}>Player</div>
-        </div>
+      renderHeading={button => <div className={styles.heading}>{button}</div>}
+      heading={(
+        <>
+          <Icon icon='TELEVISION_PLAY' size={32} />
+          <div>Player</div>
+        </>
       )}
     >
       <div className={styles.content}>

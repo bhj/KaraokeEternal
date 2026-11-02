@@ -1,6 +1,6 @@
 import React from 'react'
 import GLChroma from 'gl-chromakey'
-import styles from './MP4Player.css'
+import styles from './MP4AlphaPlayer.css'
 
 const BACKDROP_PADDING = 10 // px at 1:1 scale
 const BORDER_RADIUS = parseInt(getComputedStyle(document.body).getPropertyValue('--border-radius'))
@@ -77,6 +77,7 @@ class MP4AlphaPlayer extends React.Component<MP4AlphaPlayerProps> {
       const contentBounds = this.chroma.render({ passthrough: this.props.mp4Alpha === 1 }).getContentBounds()
 
       if (!contentBounds.every((val, i) => val === this.state.contentBounds[i])) {
+        // eslint-disable-next-line @eslint-react/no-set-state-in-component-did-update -- canvas measurement; guarded by the comparison above
         this.setState({ contentBounds })
       }
     }

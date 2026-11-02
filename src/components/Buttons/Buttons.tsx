@@ -9,30 +9,15 @@ interface ButtonsProps {
   isExpanded: boolean
 }
 
-export default class Buttons extends React.Component<ButtonsProps> {
-  render () {
-    let visible = 0
+// children with a data-hide attribute are hidden until expanded (see Buttons.css)
+const Buttons = ({ btnWidth, className, children, isExpanded }: ButtonsProps) => (
+  <div
+    className={clsx(styles.container, className)}
+    style={{ '--btn-width': `${btnWidth}px` } as React.CSSProperties}
+    {...(isExpanded && { 'data-expanded': '' })}
+  >
+    {children}
+  </div>
+)
 
-    const children = React.Children.map(this.props.children, (c) => {
-      if (React.isValidElement<{ 'className': string, 'data-hide'?: boolean }>(c)) {
-        if (c.props['data-hide'] && !this.props.isExpanded) {
-          return React.cloneElement(c, {
-            className: clsx(c.props.className, styles.btnHide),
-          })
-        }
-
-        visible++
-        return c
-      }
-    })
-
-    return (
-      <div
-        className={clsx(styles.container, this.props.className)}
-        style={{ width: this.props.btnWidth * visible }}
-      >
-        {children}
-      </div>
-    )
-  }
-}
+export default Buttons

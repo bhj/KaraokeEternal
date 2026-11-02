@@ -8,7 +8,3 @@
   gap: var(--space-s);
   margin-top: var(--space-m);
 }
-
-.field {
-  margin-bottom: var(--input-margin);
-}

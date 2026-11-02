@@ -26,16 +26,16 @@ const SelectRoom = ({
   roomPassword,
   showAllRooms,
 }: SelectRoomProps) => {
-  const roomPasswordRefs = useRef<Record<number, HTMLInputElement | null>>({})
+  const roomPasswordsRef = useRef<Record<number, HTMLInputElement | null>>({})
 
   const setPasswordRef = (roomId: number) => (el: HTMLInputElement | null) => {
-    roomPasswordRefs.current[roomId] = el
+    roomPasswordsRef.current[roomId] = el
   }
 
   const handleRoomChange = (value: string) => {
     const selectedRoomId = value
 
-    Object.entries(roomPasswordRefs.current).forEach(([id, ref]) => {
+    Object.entries(roomPasswordsRef.current).forEach(([id, ref]) => {
       if (ref) {
         if (id === selectedRoomId) {
           ref.classList.remove(styles.hidden)
@@ -58,7 +58,6 @@ const SelectRoom = ({
           <div key={`room-${id}`}>
             <InputRadio
               name='roomId'
-              className={clsx(styles.option, id === roomId && styles.checked)}
               label={rooms.entities[id].name}
               value={id}
               onChange={handleRoomChange}

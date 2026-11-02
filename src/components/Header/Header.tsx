@@ -47,7 +47,7 @@ const getStatusProps = createSelector(
 )
 
 // component
-const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
+const Header = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
   const isAdmin = useAppSelector(state => state.user.isAdmin)
   const isPlayerPresent = useAppSelector(state => state.status.isPlayerPresent)
   const isScanning = useAppSelector(state => state.prefs.isScanning)
@@ -85,8 +85,6 @@ const Header = React.forwardRef<HTMLDivElement>((_, ref) => {
       </Routes>
     </div>
   )
-})
-
-Header.displayName = 'Header'
+}
 
 export default Header

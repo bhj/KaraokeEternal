@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, use } from 'react'
 import type { ProviderFetchStatus } from 'routes/Library/modules/library'
 
 export interface ProviderInfoData {
@@ -15,4 +15,4 @@ export interface ProviderInfoData {
 // useProviderInfo() don't re-render when the modal opens or closes.
 export const ProviderInfoContext = createContext<(info: ProviderInfoData) => void>(() => {})
 
-export const useProviderInfo = () => useContext(ProviderInfoContext)
+export const useProviderInfo = () => use(ProviderInfoContext)

@@ -7,7 +7,7 @@ import Buttons from 'components/Buttons/Buttons'
 import ProviderFetchStatusIndicator from 'components/ProviderFetchStatus/ProviderFetchStatus'
 import { isInFlight } from 'components/ProviderFetchStatus/isInFlight'
 import { useProviderInfo } from 'components/ProviderInfo/ProviderInfoContext'
-import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
+import useToggleAnimation from 'lib/useToggleAnimation'
 import { showErrorMessage } from 'store/modules/ui'
 import { formatDuration } from 'lib/dateTime'
 import Highlight from '../Highlight/Highlight'
@@ -55,11 +55,12 @@ const ProviderResultItem = ({
   fetchView,
   onFetch,
 }: ProviderResultItemProps) => {
-  const [isExpanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const dispatch = useAppDispatch()
   const showProviderInfo = useProviderInfo()
 
   const disabled = isInFlight(fetchView?.status)
+  const glow = useToggleAnimation(disabled, styles.animateGlow)
   const isRequester = fetchView?.requests.some(r => r.userId === userId) ?? false
   const isCancelable = disabled && (isAdmin || isRequester)
   const isErrored = fetchView?.status === 'error'
@@ -140,17 +141,15 @@ const ProviderResultItem = ({
             </div>
           )}
         </div>
-        <ToggleAnimation toggle={disabled} className={styles.animateGlow}>
-          <div className={styles.title}>
-            <Highlight text={title} pattern={highlight} />
-            <div className={styles.artist}>
-              <Highlight text={artist} pattern={highlight} />
-            </div>
+        <div className={clsx(styles.title, glow.className)} onAnimationEnd={glow.onAnimationEnd}>
+          <Highlight text={title} pattern={highlight} />
+          <div className={styles.artist}>
+            <Highlight text={artist} pattern={highlight} />
           </div>
-        </ToggleAnimation>
+        </div>
       </div>
 
-      <Buttons btnWidth={56} isExpanded={isExpanded}>
+      <Buttons btnWidth={56} isExpanded={expanded}>
         {isErrored && (
           <Button
             className={styles.danger}

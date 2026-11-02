@@ -48,9 +48,9 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
   const [enabled, setEnabled] = useState(provider?.prefs.enabled ?? true)
   const storedSong = provider?.prefs.types.song
   const [songEnabled, setSongEnabled] = useState(storedSong?.enabled ?? false)
-  const [isAlwaysShown, setIsAlwaysShown] = useState((storedSong?.maxLibraryResults ?? null) === null)
+  const [alwaysShown, setAlwaysShown] = useState((storedSong?.maxLibraryResults ?? null) === null)
   const [maxLibraryResults, setMaxLibraryResults] = useState(String(storedSong?.maxLibraryResults ?? 0))
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // an existing provider's saved url/apiKey pair is trusted as-is
@@ -64,7 +64,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
   const isSongShown = !!provider && (!!status?.types.song || !!storedSong)
   const songStatusText = describeType('song', status)
   const parsedMaxLibraryResults = Number(maxLibraryResults)
-  const isMaxLibraryResultsValid = isAlwaysShown
+  const isMaxLibraryResultsValid = alwaysShown
     || (maxLibraryResults.trim() !== '' && Number.isInteger(parsedMaxLibraryResults) && parsedMaxLibraryResults >= 0)
 
   const connect = () => providersApi.post<ProbeResult>('/', {
@@ -72,7 +72,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
   })
 
   const handleSubmit = async () => {
-    setIsSubmitting(true)
+    setSubmitting(true)
     setError(null)
 
     try {
@@ -90,7 +90,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
         if (isSongShown) {
           const song: Partial<SongProviderPrefs> = {}
           if (songEnabled !== (storedSong?.enabled ?? false)) song.enabled = songEnabled
-          const newMax = isAlwaysShown ? null : parsedMaxLibraryResults
+          const newMax = alwaysShown ? null : parsedMaxLibraryResults
           if (newMax !== (storedSong?.maxLibraryResults ?? null)) song.maxLibraryResults = newMax
           if (Object.keys(song).length > 0) prefs.types = { song }
         }
@@ -119,7 +119,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
-      setIsSubmitting(false)
+      setSubmitting(false)
     }
   }
 
@@ -135,12 +135,12 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
   }
 
   const isSubmitDisabled
-    = isSubmitting
+    = submitting
       || !url.trim()
       || (!!provider && !name.trim())
       || (isSongShown && !isMaxLibraryResultsValid)
 
-  const submitLabel = isSubmitting && needsConnect
+  const submitLabel = submitting && needsConnect
     ? 'Connecting…'
     : provider ? 'Update Provider' : 'Add Provider'
 
@@ -245,11 +245,12 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
 
             <div className={styles.prefsContainer}>
               <Accordion
-                headingComponent={(
-                  <div className={styles.heading}>
+                renderHeading={button => <div className={styles.heading}>{button}</div>}
+                heading={(
+                  <>
                     <Icon icon='CLOUD' />
                     <div>Connection</div>
-                  </div>
+                  </>
                 )}
               >
                 <div className={styles.content}>
@@ -260,12 +261,13 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
 
               {isSongShown && (
                 <Accordion
-                  headingComponent={(
-                    <div className={styles.heading}>
+                  renderHeading={button => <div className={styles.heading}>{button}</div>}
+                  heading={(
+                    <>
                       <Icon icon='MUSIC_NOTE' />
                       <div>Songs</div>
                       {songStatusText && <div className={styles.headingStatus}>{songStatusText}</div>}
-                    </div>
+                    </>
                   )}
                 >
                   <div className={styles.content}>
@@ -280,16 +282,16 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
                     <InputRadio
                       name='maxLibraryResults'
                       value='always'
-                      checked={isAlwaysShown}
-                      onChange={() => setIsAlwaysShown(true)}
+                      checked={alwaysShown}
+                      onChange={() => setAlwaysShown(true)}
                       label='Always'
                     />
                     <div className={styles.sentence}>
                       <InputRadio
                         name='maxLibraryResults'
                         value='max'
-                        checked={!isAlwaysShown}
-                        onChange={() => setIsAlwaysShown(false)}
+                        checked={!alwaysShown}
+                        onChange={() => setAlwaysShown(false)}
                         label='When library searches have'
                       />
                       <input
@@ -300,7 +302,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
                         aria-label='maximum library results'
                         value={maxLibraryResults}
                         onChange={e => setMaxLibraryResults(e.target.value)}
-                        onFocus={() => setIsAlwaysShown(false)}
+                        onFocus={() => setAlwaysShown(false)}
                       />
                       or fewer results
                     </div>

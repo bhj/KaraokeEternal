@@ -1,16 +1,32 @@
+/* data-hide children must come after visible ones: the container slides
+   them off the row's edge by pulling its right margin in by one button each */
 .container {
+  --buttons-hidden: 0;
+
   display: flex;
   align-items: center;
-  transition: width var(--spring-duration) var(--spring-function);
+  margin-right: calc(var(--buttons-hidden) * var(--btn-width) * -1);
+  transition: margin-right var(--spring-duration) var(--spring-function);
 
-  button {
+  & > * {
     margin-right: var(--space-s);
     cursor: pointer;
-    transition: opacity .3s linear;
     flex-shrink: 0;
+    /* visibility flips at once when shown, and only after the fade when hidden */
+    transition: opacity .3s linear, visibility .3s linear;
   }
-}
 
-.btnHide {
-  opacity: 0;
+  &:not([data-expanded]) {
+    & > [data-hide="true"] {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    &:has(> [data-hide="true"]) { --buttons-hidden: 1; }
+    &:has(> [data-hide="true"] ~ [data-hide="true"]) { --buttons-hidden: 2; }
+    &:has(> [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"]) { --buttons-hidden: 3; }
+    &:has(> [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"]) { --buttons-hidden: 4; }
+    &:has(> [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"]) { --buttons-hidden: 5; }
+    &:has(> [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"] ~ [data-hide="true"]) { --buttons-hidden: 6; }
+  }
 }

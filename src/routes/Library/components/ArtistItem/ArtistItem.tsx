@@ -2,7 +2,7 @@ import React from 'react'
 import clsx from 'clsx'
 import SongList from '../SongList/SongList'
 import Icon from 'components/Icon/Icon'
-import ToggleAnimation from 'components/ToggleAnimation/ToggleAnimation'
+import useToggleAnimation from 'lib/useToggleAnimation'
 import styles from './ArtistItem.css'
 
 interface ArtistItemProps {
@@ -31,6 +31,7 @@ const ArtistItem = ({
     upcomingSongs.has(songId) || currentSongId === songId,
   )
   const isChildStarred = artistSongIds.some(songId => starredSongs.includes(songId))
+  const glow = useToggleAnimation(isChildUpcoming, styles.animateGlow)
 
   return (
     <div style={style} translate='no'>
@@ -44,11 +45,12 @@ const ArtistItem = ({
           )}
           {!isExpanded && <div className={styles.count}>{artistSongIds.length}</div>}
         </div>
-        <ToggleAnimation toggle={isChildUpcoming} className={styles.animateGlow}>
-          <div className={clsx(styles.name, isChildUpcoming && styles.isChildUpcoming)}>
-            {name}
-          </div>
-        </ToggleAnimation>
+        <div
+          className={clsx(styles.name, isChildUpcoming && styles.isChildUpcoming, glow.className)}
+          onAnimationEnd={glow.onAnimationEnd}
+        >
+          {name}
+        </div>
       </div>
 
       {isExpanded && (

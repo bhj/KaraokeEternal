@@ -25,6 +25,7 @@ class ColorCycle extends React.Component<ColorCycleProps> {
 
       return (
         <span
+          // eslint-disable-next-line @eslint-react/no-array-index-key -- characters of a string; position is identity
           key={this.props.text + i}
           className={styles.char}
           style={{ animationDelay: `${delay}ms` }}

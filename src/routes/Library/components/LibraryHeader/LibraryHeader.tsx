@@ -9,7 +9,7 @@ const LibraryHeader = () => {
   const dispatch = useAppDispatch()
   const { filterStr, filterStarred } = useAppSelector(state => state.library)
 
-  const searchInput = useRef<HTMLInputElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [value, setValue] = useState(filterStr)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,7 +24,7 @@ const LibraryHeader = () => {
 
   const handleMagnifierClick = () => {
     if (value.trim()) clearSearch()
-    else searchInput.current?.focus()
+    else searchInputRef.current?.focus()
   }
 
   return (
@@ -40,7 +40,7 @@ const LibraryHeader = () => {
         placeholder='search'
         value={value}
         onChange={handleChange}
-        ref={searchInput}
+        ref={searchInputRef}
       />
       {filterStr && (
         <Button

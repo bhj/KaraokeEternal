@@ -11,7 +11,7 @@ interface UserImageProps {
 }
 
 const InputImage = ({ user, onSelect }: UserImageProps) => {
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [imageURL, setImageURL] = useState<string | null>(
     user && user.userId !== null
       ? `${document.baseURI}api/user/${user.userId}/image?v=${user.dateUpdated}`
@@ -27,12 +27,12 @@ const InputImage = ({ user, onSelect }: UserImageProps) => {
   }, [imageURL])
 
   const handleImgLoad = () => {
-    setIsLoading(false)
+    setLoading(false)
   }
 
   const handleImgError = () => {
     setImageURL(null)
-    setIsLoading(false)
+    setLoading(false)
   }
 
   const handleImgClear = () => {
@@ -92,7 +92,7 @@ const InputImage = ({ user, onSelect }: UserImageProps) => {
         />
       )}
 
-      {imageURL && !isLoading && (
+      {imageURL && !loading && (
         <Button
           className={styles.btnClear}
           icon='CLEAR'

@@ -36,7 +36,7 @@ const Button = <E extends ButtonElementType = 'button'>({
   ...rest
 }: ButtonProps<E>) => {
   const elementRef = useRef<HTMLButtonElement | HTMLSpanElement>(null)
-  const [isAnimating, setAnimating] = useState(false)
+  const [animating, setAnimating] = useState(false)
   const [prevCancelAnimation, setPrevCancelAnimation] = useState(cancelAnimation)
   const ElementType = as || 'button' as E
 
@@ -66,7 +66,7 @@ const Button = <E extends ButtonElementType = 'button'>({
     ? (rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type || 'button'
     : undefined
 
-  const animationProps = animateClassName && isAnimating
+  const animationProps = animateClassName && animating
     ? {
         className: clsx(styles.container, styles[variant], className, animateClassName),
         onAnimationEnd: handleAnimationEnd,

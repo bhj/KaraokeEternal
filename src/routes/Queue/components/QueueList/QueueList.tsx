@@ -117,11 +117,11 @@ const QueueList = () => {
 
     items.push(
       <QueueItem
+        key={row.key}
         {...item}
         artist={artists.entities[song.artistId].name}
         errorMessage={isCurrent && errorMessage ? errorMessage : ''}
         isCurrent={isCurrent}
-        key={row.key}
         isErrored={isCurrent && isErrored}
         isInfoable={user.isAdmin}
         isMovable={isUpcoming && (isOwner || user.isAdmin)}

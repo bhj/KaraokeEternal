@@ -56,7 +56,7 @@ const ProviderQueueItem = ({
 }: ProviderQueueItemProps) => {
   const dispatch = useAppDispatch()
   const showProviderInfo = useProviderInfo()
-  const [isExpanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const handleCancelClick = () => {
     onCancel(providerId, itemId, userId)
@@ -117,7 +117,7 @@ const ProviderQueueItem = ({
           </div>
         </div>
 
-        <Buttons btnWidth={56} isExpanded={isExpanded} className={styles.btnContainer}>
+        <Buttons btnWidth={56} isExpanded={expanded} className={styles.btnContainer}>
           {status === 'error' && (
             <Button
               className={styles.danger}
@@ -143,7 +143,7 @@ const ProviderQueueItem = ({
           )}
           {isCancelable && (
             <Button
-              className={clsx(styles.btnCancel, styles.danger)}
+              className={styles.danger}
               data-hide
               icon='CLEAR'
               onClick={handleCancelClick}

@@ -24,11 +24,11 @@ const AccountForm = ({
   showPassword = true,
   user,
 }: AccountFormProps) => {
-  const username = useRef<HTMLInputElement>(null)
-  const newPassword = useRef<HTMLInputElement>(null)
-  const newPasswordConfirm = useRef<HTMLInputElement>(null)
-  const name = useRef<HTMLInputElement>(null)
-  const role = useRef<HTMLSelectElement>(null)
+  const usernameRef = useRef<HTMLInputElement>(null)
+  const newPasswordRef = useRef<HTMLInputElement>(null)
+  const newPasswordConfirmRef = useRef<HTMLInputElement>(null)
+  const nameRef = useRef<HTMLInputElement>(null)
+  const roleRef = useRef<HTMLSelectElement>(null)
   const [prevDateUpdated, setPrevDateUpdated] = useState(user?.dateUpdated)
   const [state, setState] = useState({
     isDirty: false,
@@ -36,7 +36,7 @@ const AccountForm = ({
     userImage: undefined as Blob | undefined,
   })
 
-  const prevIsDirty = useRef(state.isDirty)
+  const prevIsDirtyRef = useRef(state.isDirty)
 
   if (user && user.dateUpdated !== prevDateUpdated) {
     setPrevDateUpdated(user.dateUpdated)
@@ -44,11 +44,11 @@ const AccountForm = ({
   }
 
   useEffect(() => {
-    if (onDirtyChange && prevIsDirty.current !== state.isDirty) {
+    if (onDirtyChange && prevIsDirtyRef.current !== state.isDirty) {
       onDirtyChange(state.isDirty)
     }
 
-    prevIsDirty.current = state.isDirty
+    prevIsDirtyRef.current = state.isDirty
   }, [state.isDirty, onDirtyChange])
 
   const updateDirty = () => {
@@ -56,10 +56,10 @@ const AccountForm = ({
 
     setState(prev => ({
       ...prev,
-      isDirty: !!username.current?.value || !!newPassword.current?.value
-        || (name.current?.value !== user.name)
-        || (role.current && role.current.value !== (user.isAdmin ? '1' : '0')),
-      isChangingPassword: !!newPassword.current?.value,
+      isDirty: !!usernameRef.current?.value || !!newPasswordRef.current?.value
+        || (nameRef.current?.value !== user.name)
+        || (roleRef.current && roleRef.current.value !== (user.isAdmin ? '1' : '0')),
+      isChangingPassword: !!newPasswordRef.current?.value,
     }))
   }
 
@@ -75,25 +75,25 @@ const AccountForm = ({
     e.preventDefault()
     const data = new FormData()
 
-    if (name.current?.value.trim()) {
-      data.append('name', name.current.value.trim())
+    if (nameRef.current?.value.trim()) {
+      data.append('name', nameRef.current.value.trim())
     }
 
-    if (username.current?.value.trim()) {
-      data.append('username', username.current.value.trim())
+    if (usernameRef.current?.value.trim()) {
+      data.append('username', usernameRef.current.value.trim())
     }
 
     if (state.isChangingPassword) {
-      data.append('newPassword', newPassword.current?.value || '')
-      data.append('newPasswordConfirm', newPasswordConfirm.current?.value || '')
+      data.append('newPassword', newPasswordRef.current?.value || '')
+      data.append('newPasswordConfirm', newPasswordConfirmRef.current?.value || '')
     }
 
     if (typeof state.userImage !== 'undefined') {
       data.append('image', state.userImage)
     }
 
-    if (role.current) {
-      data.append('role', role.current.value)
+    if (roleRef.current) {
+      data.append('role', roleRef.current.value)
     }
 
     onSubmit(data)
@@ -115,7 +115,7 @@ const AccountForm = ({
           placeholder={user && user.userId !== null ? 'change username (optional)' : 'username or email'}
           // https://github.com/facebook/react/issues/23301
           ref={(r) => {
-            if (r) username.current = r
+            if (r) usernameRef.current = r
             if (autoFocus) r?.setAttribute('autofocus', 'true')
           }}
         />
@@ -127,7 +127,7 @@ const AccountForm = ({
           autoComplete='new-password'
           onChange={updateDirty}
           placeholder={user && user.userId !== null ? 'change password (optional)' : 'password'}
-          ref={newPassword}
+          ref={newPasswordRef}
         />
       )}
 
@@ -136,7 +136,7 @@ const AccountForm = ({
           type='password'
           autoComplete='new-password'
           placeholder={user && user.userId !== null ? 'new password confirm' : 'confirm password'}
-          ref={newPasswordConfirm}
+          ref={newPasswordConfirmRef}
         />
       )}
 
@@ -150,7 +150,7 @@ const AccountForm = ({
           defaultValue={user?.name ?? ''}
           onChange={updateDirty}
           placeholder='display name'
-          ref={name}
+          ref={nameRef}
         />
       </div>
 
@@ -158,7 +158,7 @@ const AccountForm = ({
         <select
           defaultValue={user?.role}
           onChange={updateDirty}
-          ref={role}
+          ref={roleRef}
         >
           <option key='choose' value='' disabled>select role...</option>
           {user?.role === 'guest' && <option key='guest' value='guest'>Guest</option>}

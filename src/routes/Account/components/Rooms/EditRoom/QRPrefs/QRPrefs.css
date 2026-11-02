@@ -22,7 +22,3 @@
   gap: var(--space-m);
   padding: var(--space-m) var(--container-padding);
 }
-
-.hidden {
-  display: none;
-}

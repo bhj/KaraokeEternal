@@ -30,6 +30,7 @@ const SongList = (props: SongListProps) => {
 
   return props.songIds.map(songId => (
     <SongItem
+      key={songId}
       {...songs[songId]}
       artist={props.showArtist ? artists[songs[songId].artistId].name : ''}
       highlight={props.highlight}
@@ -37,7 +38,6 @@ const SongList = (props: SongListProps) => {
       isUpcoming={upcoming.has(songId) || current === songId}
       isStarred={starredSet.has(songId)}
       isAdmin={isAdmin}
-      key={songId}
       numStars={starredSongCounts[songId] || 0}
       onSongQueue={handleSongQueue}
       onSongStarClick={handleSongStar}

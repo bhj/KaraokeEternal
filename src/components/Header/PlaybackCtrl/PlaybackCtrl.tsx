@@ -25,7 +25,7 @@ const handleFullscreen = () => {
 }
 
 const PlaybackCtrl = () => {
-  const [isPlayerOptionsVisible, setPlayerOptionsVisible] = useState(false)
+  const [playerOptionsVisible, setPlayerOptionsVisible] = useState(false)
   const location = useLocation()
   const isPlayer = location.pathname.replace(/\/$/, '').endsWith('/player')
 
@@ -56,7 +56,7 @@ const PlaybackCtrl = () => {
   const handleVolume = (val: number) => dispatch(requestVolume(val))
 
   const togglePlayerOptions = () => {
-    setPlayerOptionsVisible(!isPlayerOptionsVisible)
+    setPlayerOptionsVisible(!playerOptionsVisible)
   }
 
   if (!status.isPlayerPresent) {
@@ -103,7 +103,7 @@ const PlaybackCtrl = () => {
         />
       )}
 
-      {isPlayerOptionsVisible && (
+      {playerOptionsVisible && (
         <PlayerOptions
           cdgAlpha={status.cdgAlpha}
           cdgSize={status.cdgSize}

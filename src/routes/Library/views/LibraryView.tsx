@@ -20,15 +20,15 @@ const LibraryView = () => {
   // scroll offset is only applied once at mount, so mounting before the height
   // settles makes the restored position land off by the delta. Wait for the
   // first growth past the value at mount before rendering ArtistList.
-  const initialHeaderHeight = useRef(ui.headerHeight)
-  const [isReady, setIsReady] = useState(false)
+  const initialHeaderHeightRef = useRef(ui.headerHeight)
+  const [ready, setReady] = useState(false)
   useEffect(() => {
-    if (!isReady && ui.headerHeight > initialHeaderHeight.current) {
-      setIsReady(true)
+    if (!ready && ui.headerHeight > initialHeaderHeightRef.current) {
+      setReady(true)
     }
-  }, [ui.headerHeight, isReady])
+  }, [ui.headerHeight, ready])
 
-  if (!isReady) return null
+  if (!ready) return null
 
   return (
     <>

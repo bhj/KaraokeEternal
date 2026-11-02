@@ -30,46 +30,46 @@ interface PlayerQRProps {
 
 const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
   const ref = useRef<HTMLDivElement>(null)
-  const maxTimerID = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lastToggleTime = useRef<number>(0)
+  const maxTimerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastToggleTimeRef = useRef<number>(0)
   const [show, setShow] = useState(true)
   const [alternate, setAlternate] = useState(false)
   const { isPlaying } = useAppSelector(state => state.player)
   const { roomId } = useAppSelector(state => state.user)
 
   const scheduleNextToggle = useCallback(() => {
-    if (maxTimerID.current) {
-      clearTimeout(maxTimerID.current)
-      maxTimerID.current = null
+    if (maxTimerIdRef.current) {
+      clearTimeout(maxTimerIdRef.current)
+      maxTimerIdRef.current = null
     }
 
     // wait for current song to end?
     if (isPlaying) return
 
     const now = Date.now()
-    const timeSinceLastToggle = now - lastToggleTime.current
+    const timeSinceLastToggle = now - lastToggleTimeRef.current
     const timeUntilMax = Math.max(MAX_STATIC_MS - timeSinceLastToggle, 0)
 
-    maxTimerID.current = setTimeout(() => {
+    maxTimerIdRef.current = setTimeout(() => {
       setShow(false)
     }, timeUntilMax)
   }, [isPlaying])
 
   useEffect(() => {
-    lastToggleTime.current = Date.now()
+    lastToggleTimeRef.current = Date.now()
   }, [])
 
   useEffect(() => {
     scheduleNextToggle()
 
     return () => {
-      if (maxTimerID.current) clearTimeout(maxTimerID.current)
+      if (maxTimerIdRef.current) clearTimeout(maxTimerIdRef.current)
     }
   }, [scheduleNextToggle])
 
   useEffect(() => {
     const now = Date.now()
-    const timeSinceLastToggle = now - lastToggleTime.current
+    const timeSinceLastToggle = now - lastToggleTimeRef.current
 
     if (timeSinceLastToggle > MIN_STATIC_MS) {
       const timeout = setTimeout(() => setShow(false), 0)
@@ -81,7 +81,7 @@ const PlayerQR = ({ height, prefs, queueItem }: PlayerQRProps) => {
     if (!show) {
       setAlternate(prev => !prev)
       setShow(true) // trigger enter transition
-      lastToggleTime.current = Date.now()
+      lastToggleTimeRef.current = Date.now()
 
       scheduleNextToggle()
     }

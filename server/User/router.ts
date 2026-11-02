@@ -479,8 +479,6 @@ router.post('/user', async (ctx) => {
 
 // first-time setup
 router.post('/setup', async (ctx) => {
-  let image
-
   // must be first run
   if ((Prefs.get() as { isFirstRun?: boolean }).isFirstRun !== true) {
     ctx.throw(403)
@@ -489,7 +487,7 @@ router.post('/setup', async (ctx) => {
   try {
     // create admin user
     const req = ctx.request as unknown as RequestWithBody
-    const userId = await User.create({ ...req.body, image }, 'admin')
+    const userId = await User.create({ ...req.body, image: undefined }, 'admin')
     const user = User.getById(userId, true)
 
     if (!user) {

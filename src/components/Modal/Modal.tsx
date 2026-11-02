@@ -19,7 +19,7 @@ export type ModalProps = {
 
 const Modal = ({ 'aria-label': ariaLabel, buttons, className, children, headingClassName, headingComponent, visible = true, onClose, scrollable, title }: ModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const isOutsideClick = useRef(false)
+  const isOutsideClickRef = useRef(false)
 
   useLayoutEffect(() => {
     const dialog = dialogRef.current
@@ -32,14 +32,14 @@ const Modal = ({ 'aria-label': ariaLabel, buttons, className, children, headingC
   }, [visible])
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDialogElement>) => {
-    isOutsideClick.current = event.target === dialogRef.current
+    isOutsideClickRef.current = event.target === dialogRef.current
   }
 
   const handleMouseUp = (event: React.MouseEvent<HTMLDialogElement>) => {
-    if (isOutsideClick.current && event.target === dialogRef.current) {
+    if (isOutsideClickRef.current && event.target === dialogRef.current) {
       onClose()
     }
-    isOutsideClick.current = false
+    isOutsideClickRef.current = false
   }
 
   const handleCancel = (e: React.SyntheticEvent) => {

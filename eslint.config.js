@@ -1,10 +1,10 @@
 // @ts-check
 
-import eslint from '@eslint/js' // eslint-disable-line n/no-extraneous-import
+import eslint from '@eslint/js'
 import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 import stylistic from '@stylistic/eslint-plugin'
-import pluginReact from 'eslint-plugin-react'
+import pluginReact from '@eslint-react/eslint-plugin'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import { reactRefresh } from 'eslint-plugin-react-refresh'
 import pluginPromise from 'eslint-plugin-promise'
@@ -35,27 +35,23 @@ export default defineConfig(
   // client-only config
   {
     files: ['src/**/*.{js,jsx,ts,tsx}', 'shared/**/*.{js,ts}'],
+    extends: [pluginReact.configs['recommended-typescript']],
     plugins: {
-      'react': pluginReact,
       // @ts-expect-error - eslint-plugin-react-hooks types are incomplete
       'react-hooks': pluginReactHooks,
       'react-refresh': reactRefresh.plugin,
     },
     rules: {
-      ...pluginReact.configs.flat.recommended.rules,
-      ...pluginReact.configs.flat['jsx-runtime'].rules,
       ...pluginReactHooks.configs.recommended.rules,
+      // react-hooks reports these from the React Compiler itself, so skip @eslint-react's copies
+      ...Object.fromEntries(Object.keys(pluginReact.configs['disable-conflict-eslint-plugin-react-hooks'].rules)
+        .map(rule => [rule.replace('react-hooks/', '@eslint-react/'), 'off'])),
       'react-refresh/only-export-components': 'error',
       '@stylistic/jsx-quotes': ['error', 'prefer-single'],
     },
     languageOptions: {
       parser: tseslint.parser,
       globals: globals.browser,
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
     },
   },
   // server-only config

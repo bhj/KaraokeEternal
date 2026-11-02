@@ -7,7 +7,7 @@ interface LogoProps {
 }
 
 const Logo = (props: LogoProps) => {
-  const [isFontLoaded, setIsFontLoaded] = useState(() => {
+  const [fontLoaded, setFontLoaded] = useState(() => {
     // if the font loading API is not supported, we can't wait for it
     return typeof document !== 'undefined' && !document.fonts
   })
@@ -16,11 +16,11 @@ const Logo = (props: LogoProps) => {
     if (document.fonts) {
       document.fonts.load('1em Beon')
         .then(() => {
-          setIsFontLoaded(true)
+          setFontLoaded(true)
           return true
         })
         .catch(() => {
-          setIsFontLoaded(true)
+          setFontLoaded(true)
           return false
         })
     }
@@ -30,7 +30,7 @@ const Logo = (props: LogoProps) => {
     <div className={clsx(styles.container, props.className)} role='img' aria-label='Karaoke Eternal'>
       <span className={styles.title} aria-hidden='true'>
         Karaoke
-        <span className={clsx(styles.eternal, { [styles.eternalVisible]: isFontLoaded })}>
+        <span className={clsx(styles.eternal, { [styles.eternalVisible]: fontLoaded })}>
           Eterna
           <span className={styles.lastChar}>l</span>
         </span>

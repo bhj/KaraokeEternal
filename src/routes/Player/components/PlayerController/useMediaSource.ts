@@ -62,7 +62,7 @@ export default function useMediaSource ({
   isReplayGainEnabled,
 }: UseMediaSourceProps) {
   const dispatch = useAppDispatch()
-  const generation = useRef(0)
+  const generationRef = useRef(0)
 
   const [resolved, setResolved] = useState<{
     mediaId: number | null
@@ -95,13 +95,13 @@ export default function useMediaSource ({
   useEffect(() => {
     if (!needsAnalysis) return
 
-    const gen = ++generation.current
+    const gen = ++generationRef.current
     const ctrl = new AbortController()
     let objectUrl: string | null = null
 
     // ignore anything that finishes after we've moved on to another song
     const resolve = (src: string, gain: number | null = null, peak: number | null = null) => {
-      if (generation.current !== gen) return
+      if (generationRef.current !== gen) return
       setResolved(prev => prev.mediaId === mediaId ? { ...prev, src, gain, peak } : prev)
     }
 

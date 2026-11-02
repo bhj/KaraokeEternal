@@ -4,20 +4,20 @@ import { ProviderInfoContext, type ProviderInfoData } from './ProviderInfoContex
 
 const ProviderInfoHost = ({ children }: { children: React.ReactNode }) => {
   const [info, setInfo] = useState<ProviderInfoData | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
+  const [visible, setVisible] = useState(false)
 
   const open = useCallback((info: ProviderInfoData) => {
     setInfo(info)
-    setIsVisible(true)
+    setVisible(true)
   }, [])
 
-  const handleClose = useCallback(() => setIsVisible(false), [])
+  const handleClose = useCallback(() => setVisible(false), [])
 
   return (
-    <ProviderInfoContext.Provider value={open}>
+    <ProviderInfoContext value={open}>
       {children}
-      <ProviderInfo info={info} isVisible={isVisible} onClose={handleClose} />
-    </ProviderInfoContext.Provider>
+      <ProviderInfo info={info} isVisible={visible} onClose={handleClose} />
+    </ProviderInfoContext>
   )
 }
 

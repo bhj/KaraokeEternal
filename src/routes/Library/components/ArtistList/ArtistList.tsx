@@ -64,12 +64,12 @@ const ArtistList = ({
   const alphaPickerMap = useAppSelector(getAlphaPickerMap)
   const artists = useAppSelector(state => state.artists)
 
-  const lastScrollOffset = useRef(scrollOffset)
-  const list = useRef<ListImperativeAPI | null>(null)
+  const lastScrollOffsetRef = useRef(scrollOffset)
+  const listRef = useRef<ListImperativeAPI | null>(null)
 
   useEffect(() => {
     return () => {
-      dispatch(scrollArtists(lastScrollOffset.current))
+      dispatch(scrollArtists(lastScrollOffsetRef.current))
     }
   }, [dispatch])
 
@@ -85,19 +85,19 @@ const ArtistList = ({
   }
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    lastScrollOffset.current = e.currentTarget.scrollTop
+    lastScrollOffsetRef.current = e.currentTarget.scrollTop
   }
 
   const handleAlphaPick = (char: string) => {
     const row = alphaPickerMap[char]
 
-    if (typeof row !== 'undefined' && list.current) {
-      list.current.scrollToRow({ index: row > 0 ? row - 1 : row, align: 'start' })
+    if (typeof row !== 'undefined' && listRef.current) {
+      listRef.current.scrollToRow({ index: row > 0 ? row - 1 : row, align: 'start' })
     }
   }
 
   const handleRef = (ref: ListImperativeAPI | null) => {
-    list.current = ref
+    listRef.current = ref
   }
 
   if (artists.result.length === 0) return null

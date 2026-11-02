@@ -10,29 +10,29 @@ interface UserImageProps {
 }
 
 const UserImageContent = ({ dateUpdated, userId }: { dateUpdated: number, userId: number }) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isErrored, setIsErrored] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [errored, setErrored] = useState(false)
 
-  const handleLoaded = () => setIsLoading(false)
+  const handleLoaded = () => setLoading(false)
 
   const handleError = () => {
-    setIsLoading(false)
-    setIsErrored(true)
+    setLoading(false)
+    setErrored(true)
   }
 
   return (
     <>
-      {(isLoading || isErrored) && (
+      {(loading || errored) && (
         <Icon icon='ACCOUNT' />
       )}
 
-      {!isErrored && (
+      {!errored && (
         <img
           src={`${document.baseURI}api/user/${userId}/image?v=${dateUpdated}`}
           onLoad={handleLoaded}
           onError={handleError}
           style={{
-            display: isLoading ? 'none' : 'initial',
+            display: loading ? 'none' : 'initial',
           }}
         />
       )}
