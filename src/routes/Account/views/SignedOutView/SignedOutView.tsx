@@ -13,6 +13,7 @@ import styles from './SignedOutView.css'
 const SignedOutView = () => {
   const userSectionRef = useRef<HTMLDivElement | null>(null)
   const firstFieldRef = useRef<HTMLInputElement | null>(null)
+  const scrollOnFocusRef = useRef(false)
 
   const prefs = useAppSelector(state => state.prefs)
   const rooms = useAppSelector(state => state.rooms)
@@ -71,8 +72,8 @@ const SignedOutView = () => {
     setMode('returning')
 
     if (!rooms.entities[id]?.hasPassword || !showRoomSection) {
+      scrollOnFocusRef.current = true
       setFocusRequest(r => r + 1)
-      userSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 
@@ -122,7 +123,37 @@ const SignedOutView = () => {
   const allowNew = allowNewStandard || allowNewGuest
 
   useEffect(() => {
-    firstFieldRef.current?.focus()
+    const scroll = scrollOnFocusRef.current
+    scrollOnFocusRef.current = false
+
+    // focus synchronously so iOS shows the keyboard (requires a user gesture)
+    firstFieldRef.current?.focus({ preventScroll: scroll })
+    if (!scroll) return
+
+    const scrollToUserSection = () => {
+      userSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    // WebKit cancels smooth scrolls during the first rendering update after a text field
+    // is focused, so wait until that frame has rendered before starting the scroll
+    let raf = requestAnimationFrame(() => {
+      raf = requestAnimationFrame(scrollToUserSection)
+    })
+
+    // iOS also cancels it when the on-screen keyboard opens and reveals the field,
+    // so scroll again as the viewport resizes for the keyboard (ignoring unrelated resizes later)
+    const focusedAt = performance.now()
+
+    const handleViewportResize = () => {
+      if (performance.now() - focusedAt < 1000) scrollToUserSection()
+    }
+
+    window.visualViewport?.addEventListener('resize', handleViewportResize)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.visualViewport?.removeEventListener('resize', handleViewportResize)
+    }
   }, [focusRequest, mode])
 
   return (
