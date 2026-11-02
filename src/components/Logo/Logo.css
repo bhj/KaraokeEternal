@@ -24,6 +24,7 @@
 }
 
 .eternal {
+  position: relative;
   font-size: 40%;
   text-transform: uppercase;
   display: block;
@@ -36,19 +37,67 @@
     0 0 .25em hsl(var(--hue-blue), 100%, 90%),
     0 0 .25em hsl(var(--hue-blue), 100%, 50%),
     0 0 .5em hsl(var(--hue-blue), 100%, 50%);
-}
 
-.eternalVisible {
-  border-color: hsl(var(--hue-blue), 100%, 90%);
-  box-shadow:
-    0 0 .1em hsl(var(--hue-blue), 100%, 90%),
-    0 0 .25em hsl(var(--hue-blue), 100%, 90%),
-    0 0 .5em hsl(var(--hue-blue), 100%, 50%),
-    0 0 .75em hsl(var(--hue-blue), 100%, 50%),
-    inset 0 0 .5em hsl(var(--hue-blue), 100%, 50%),
-    inset 0 0 .75em hsl(var(--hue-blue), 100%, 50%);
+  /* the border is its own tube, separate from the letters */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -.1em;
+    border: .1em solid hsl(var(--hue-blue), 100%, 90%);
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      0 0 .1em hsl(var(--hue-blue), 100%, 90%),
+      0 0 .25em hsl(var(--hue-blue), 100%, 90%),
+      0 0 .5em hsl(var(--hue-blue), 100%, 50%),
+      0 0 .75em hsl(var(--hue-blue), 100%, 50%),
+      inset 0 0 .5em hsl(var(--hue-blue), 100%, 50%),
+      inset 0 0 .75em hsl(var(--hue-blue), 100%, 50%);
+  }
 }
 
 .lastChar {
   letter-spacing: normal;
+}
+
+/* power-on sequence (tubes stay dark until the font is loaded) */
+.letter,
+.eternal::before {
+  opacity: 0;
+}
+
+.on {
+  .letter,
+  .eternal::before {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .letter,
+    .eternal::before {
+      animation: power-on 200ms ease-in var(--delay) both;
+    }
+
+    .letter.blinker,
+    .eternal.blinker::before {
+      animation: blink var(--blink-duration) linear var(--delay) both;
+    }
+  }
+}
+
+@keyframes power-on {
+  0% { opacity: 0; }
+  40% { opacity: .8; }
+  55% { opacity: .4; }
+  100% { opacity: 1; }
+}
+
+/* abrupt on/off flickers that settle on */
+@keyframes blink {
+  0%, 10% { opacity: 0; }
+  11%, 28% { opacity: 1; }
+  29%, 50% { opacity: 0; }
+  51%, 56% { opacity: .7; }
+  57%, 64% { opacity: .2; }
+  65%, 100% { opacity: 1; }
 }

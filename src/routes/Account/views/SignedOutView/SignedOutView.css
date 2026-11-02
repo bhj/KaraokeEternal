@@ -4,10 +4,22 @@
   padding: var(--container-padding);
 
   h1 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
     margin: var(--space-l) 0 var(--space-m) 0;
     font-family: var(--font-family-custom);
     font-size: var(--font-size-l);
     color: hsl(var(--hue-blue), 10%, 60%);
+    white-space: nowrap;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: hsl(var(--hue-blue), 20%, 30%);
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useState } from 'react'
 import { useMatch } from 'react-router'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import useResizeObserver from 'lib/useResizeObserver'
@@ -18,17 +18,18 @@ import { clearErrorMessage, setFooterHeight, setHeaderHeight } from 'store/modul
 const CoreLayout = () => {
   const isPlayerRoute = useMatch('/player')
   const dispatch = useAppDispatch()
-  const headerRef = useRef<HTMLDivElement>(null)
-  const navRef = useRef<HTMLDivElement>(null)
+  const isSignedIn = useAppSelector(state => state.user.userId !== null)
+  const [headerEl, setHeaderEl] = useState<HTMLDivElement | null>(null)
+  const [navEl, setNavEl] = useState<HTMLDivElement | null>(null)
 
   useResizeObserver({
     onResize: ({ height }) => { dispatch(setHeaderHeight(height)) },
-    ref: headerRef,
+    element: headerEl,
   })
 
   useResizeObserver({
     onResize: ({ height }) => { dispatch(setFooterHeight(height)) },
-    ref: navRef,
+    element: navEl,
   })
 
   const ui = useAppSelector(state => state.ui)
@@ -36,13 +37,13 @@ const CoreLayout = () => {
 
   return (
     <ProviderInfoHost>
-      <Header ref={headerRef} />
+      <Header ref={setHeaderEl} />
 
       <React.Suspense fallback={<Spinner />}>
         <Routes />
       </React.Suspense>
 
-      {!isPlayerRoute && <Navigation ref={navRef} />}
+      {isSignedIn && !isPlayerRoute && <Navigation ref={setNavEl} />}
 
       <SongInfo />
 

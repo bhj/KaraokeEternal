@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react'
-import type { RefObject } from 'react'
 
 interface UseResizeObserverOptions {
   onResize: (size: { width: number, height: number }) => void
-  ref: RefObject<HTMLElement | null>
+  element: HTMLElement | null
 }
 
 // reports rounded content-box dimensions and skips no-op callbacks,
-// matching the behavior of the use-resize-observer package it replaces
-const useResizeObserver = ({ onResize, ref }: UseResizeObserverOptions) => {
+// matching the behavior of the use-resize-observer package it replaces.
+// takes the element itself (e.g. from a callback ref) so conditionally-rendered
+// elements are observed when they mount and report zero size when they unmount
+const useResizeObserver = ({ onResize, element }: UseResizeObserverOptions) => {
   const onResizeRef = useRef(onResize)
 
   useEffect(() => {
@@ -16,8 +17,10 @@ const useResizeObserver = ({ onResize, ref }: UseResizeObserverOptions) => {
   }, [onResize])
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    if (!element) {
+      onResizeRef.current({ width: 0, height: 0 })
+      return
+    }
 
     let prevWidth = -1
     let prevHeight = -1
@@ -33,9 +36,9 @@ const useResizeObserver = ({ onResize, ref }: UseResizeObserverOptions) => {
       }
     })
 
-    observer.observe(el)
+    observer.observe(element)
     return () => observer.disconnect()
-  }, [ref])
+  }, [element])
 }
 
 export default useResizeObserver
