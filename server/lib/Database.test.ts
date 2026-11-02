@@ -101,6 +101,34 @@ describe('migrate', () => {
     expect(tables()).toEqual(['first'])
   })
 
+  it('adds a REFERENCES column with a non-NULL default to a populated table', () => {
+    write('001-first.sql', 'CREATE TABLE "parent" ("id" integer PRIMARY KEY);\nCREATE TABLE "child" ("id" integer);', '')
+    db.migrate({ migrationsPath })
+    db.run('INSERT INTO "child" ("id") VALUES (1)')
+
+    write('002-second.sql', 'ALTER TABLE "child" ADD COLUMN "parentId" integer NOT NULL DEFAULT 0 REFERENCES parent(id);', '')
+    db.migrate({ migrationsPath })
+
+    expect(applied()).toEqual([{ id: 1, name: 'first' }, { id: 2, name: 'second' }])
+    expect(db.get<{ foreign_keys: number }>('PRAGMA foreign_keys')?.foreign_keys).toBe(1)
+  })
+
+  it('upgrades a populated v1.0 database through the real migrations', () => {
+    const v1 = path.join(import.meta.dirname, 'schemas')
+
+    for (const file of ['001-initial-schema.sql', '002-replaygain.sql', '003-queue-linked-list.sql']) {
+      fs.copyFileSync(path.join(v1, file), path.join(migrationsPath, file))
+    }
+
+    db.migrate({ migrationsPath })
+    db.run(`INSERT INTO users (username, password, name, isAdmin, dateCreated, dateUpdated) VALUES ('admin', '', 'Admin', 1, 0, 0)`)
+
+    db.migrate({ migrationsPath: v1 })
+
+    expect(db.get<{ name: string }>('SELECT r.name FROM users u JOIN roles r USING (roleId)')?.name).toBe('admin')
+    expect(db.all('PRAGMA foreign_key_check')).toEqual([])
+  })
+
   it('throws when two files claim the same id', () => {
     write('001-first.sql', 'CREATE TABLE "first" ("id" integer);', 'DROP TABLE "first";')
     write('002-media-pitch.sql', 'CREATE TABLE "pitch" ("id" integer);', 'DROP TABLE "pitch";')

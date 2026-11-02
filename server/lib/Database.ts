@@ -68,7 +68,21 @@ export class DatabaseWrapper {
     this.db.exec(sql)
   }
 
-  migrate ({ migrationsPath, force = false, table = 'migrations' }: { migrationsPath: string, force?: boolean, table?: string }) {
+  migrate (opts: { migrationsPath: string, force?: boolean, table?: string }) {
+    // node:sqlite enforces foreign keys by default, and with them on SQLite won't
+    // ADD COLUMN a REFERENCES column with a non-NULL default to a non-empty table
+    // (005-roles on any upgraded install). the pragma is ignored inside a
+    // transaction, so it has to wrap the whole run rather than each migration
+    this.db.exec('PRAGMA foreign_keys = OFF')
+
+    try {
+      this.applyMigrations(opts)
+    } finally {
+      this.db.exec('PRAGMA foreign_keys = ON')
+    }
+  }
+
+  private applyMigrations ({ migrationsPath, force = false, table = 'migrations' }: { migrationsPath: string, force?: boolean, table?: string }) {
     this.db.exec(`CREATE TABLE IF NOT EXISTS "${table}" (
       id INTEGER PRIMARY KEY,
       name TEXT,
