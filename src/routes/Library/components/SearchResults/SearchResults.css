@@ -1,9 +1,79 @@
 .artistsHeading,
-.songsHeading {
+.songsHeading,
+.providerHeading {
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-color);
   background-color: hsl(var(--hue-blue), 90%, 25%);
   font-size: 18px;
+}
+
+.providerHeading {
+  gap: var(--space-xs);
+}
+
+/* matches the About panel's pseudolink */
+.providerHeadingCancel {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--link-color);
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.providerSearchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-s);
+}
+
+/* the shared Button is full-width by default */
+.providerSearchButton button {
+  width: auto;
+}
+
+/* mirrors ProviderResultItem's container/title layout */
+.providerError {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 0 var(--space-s);
+  margin-left: var(--space-xs);
+  margin-bottom: var(--space-xs);
+  background-color: hsl(var(--hue-blue), 40%, 6%);
+  border-left: var(--space-xs) solid var(--btn-danger-bg-color);
+  height: 64px;
+}
+
+.providerErrorIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  color: var(--btn-danger-bg-color);
+  filter: var(--btn-danger-filter);
+}
+
+.providerErrorText {
+  flex: 1;
+  overflow: hidden;
+  color: var(--color-gray-9);
+  font-size: 18px;
+  line-height: normal;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.providerErrorMessage {
+  margin-top: var(--space-xs);
+  overflow: hidden;
+  color: var(--color-gray-7);
+  font-size: 16px;
+  text-overflow: ellipsis;
 }

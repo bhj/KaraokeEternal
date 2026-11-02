@@ -93,11 +93,27 @@ export class DatabaseWrapper {
           name: match[2],
           up: upSql,
           down: downSql,
+          file,
         })
       }
     }
 
     migrations.sort((a, b) => a.id - b.id)
+
+    // only one file can own an id: the first to apply gets recorded and every
+    // other claimant is skipped for good, since ids are applied in order and
+    // only once. usually a merge that brought in a migration alongside our own
+    const seenIds = new Map<number, string>()
+
+    for (const migration of migrations) {
+      const dupe = seenIds.get(migration.id)
+
+      if (dupe !== undefined) {
+        throw new Error(`Duplicate migration id ${migration.id}: "${dupe}" and "${migration.file}". Renumber one of them.`)
+      }
+
+      seenIds.set(migration.id, migration.file)
+    }
 
     let dbMigrations = this.all<{ id: number, name: string, up: string, down: string }>(
       `SELECT id, name, up, down FROM "${table}" ORDER BY id ASC`,
@@ -126,9 +142,28 @@ export class DatabaseWrapper {
       }
     }
 
+    // whatever survived the down pass must still be the migration we recorded.
+    // a differing name means files were renumbered after being applied, so the
+    // up pass would skip the file now sitting at that id
+    for (const applied of dbMigrations) {
+      const migration = migrations.find(x => x.id === applied.id)
+
+      if (migration && migration.name !== applied.name) {
+        throw new Error(`Migration ${applied.id} is recorded as "${applied.name}" but the file at that id is "${migration.file}". This database was migrated before the files were renumbered; roll it back or recreate it.`)
+      }
+    }
+
     const lastMigrationId = dbMigrations.length
       ? dbMigrations[dbMigrations.length - 1].id
       : 0
+
+    // migrations only ever run forward, so anything at or below the high-water
+    // mark that never got applied never will be
+    for (const migration of migrations) {
+      if (migration.id <= lastMigrationId && !dbMigrations.some(x => x.id === migration.id)) {
+        throw new Error(`Migration "${migration.file}" was never applied but the database is already at ${lastMigrationId}. Renumber it above ${lastMigrationId}.`)
+      }
+    }
 
     for (const migration of migrations) {
       if (migration.id > lastMigrationId) {

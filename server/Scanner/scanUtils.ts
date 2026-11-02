@@ -1,7 +1,7 @@
 /**
- * Pure helpers for FileScanner, kept free of database/IPC/logger imports
- * so they can be unit tested in isolation and safely imported by workers
- * before their logger is initialized.
+ * Pure helpers shared by PathScanner and FileScanner, kept free of
+ * database/IPC/logger imports so they can be unit tested in isolation and
+ * safely imported by workers before their logger is initialized.
  */
 
 // per-folder parser config

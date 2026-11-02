@@ -18,5 +18,5 @@
 
 .label {
   font-weight: bold;
-  color: #777;
+  color: var(--color-gray-5);
 }

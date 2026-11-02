@@ -17,6 +17,34 @@ interface PaddedListProps {
   height: number
 }
 
+interface PaddedRowProps {
+  padNumRows: number
+  padPaddingRight?: number
+  padRowComponent: React.ComponentType<RowComponentProps>
+  [key: string]: unknown
+}
+
+// module scope so its identity is stable across PaddedList renders; a changing
+// rowComponent identity makes React remount every row (and reload row images)
+const PaddedRowComponent = ({
+  index,
+  style,
+  ariaAttributes,
+  padNumRows,
+  padPaddingRight,
+  padRowComponent: RowComponent,
+  ...rest
+}: RowComponentProps<PaddedRowProps>) => {
+  // top & bottom spacer
+  if (index === 0 || index === padNumRows + 1) {
+    return (
+      <div style={style} />
+    )
+  }
+
+  return <RowComponent index={index - 1} style={{ ...style, paddingRight: padPaddingRight }} ariaAttributes={ariaAttributes} {...rest} />
+}
+
 const PaddedList = ({
   defaultScrollOffset,
   numRows,
@@ -25,7 +53,7 @@ const PaddedList = ({
   paddingTop,
   paddingRight,
   paddingBottom,
-  rowComponent: RowComponent,
+  rowComponent,
   rowHeight,
   rowProps = {},
   width,
@@ -33,17 +61,6 @@ const PaddedList = ({
 }: PaddedListProps) => {
   const handleListRef = (ref: ListImperativeAPI | null) => {
     if (onRef) onRef(ref)
-  }
-
-  const PaddedRowComponent = ({ index, style, ariaAttributes, ...rest }: RowComponentProps) => {
-    // top & bottom spacer
-    if (index === 0 || index === numRows + 1) {
-      return (
-        <div key={index === 0 ? 'top' : 'bottom'} style={style} />
-      )
-    }
-
-    return <RowComponent index={--index} style={{ ...style, paddingRight }} ariaAttributes={ariaAttributes} {...rest} />
   }
 
   const getRowHeight = (index: number) => {
@@ -56,7 +73,12 @@ const PaddedList = ({
 
   return (
     <List
-      rowProps={rowProps}
+      rowProps={{
+        ...rowProps,
+        padNumRows: numRows,
+        padPaddingRight: paddingRight,
+        padRowComponent: rowComponent,
+      }}
       rowComponent={PaddedRowComponent}
       rowCount={numRows + 2} // top & bottom spacer
       rowHeight={getRowHeight}

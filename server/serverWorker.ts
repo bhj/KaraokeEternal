@@ -20,11 +20,14 @@ import Prefs from './Prefs/Prefs.js'
 import libraryRouter from './Library/router.js'
 import mediaRouter from './Media/router.js'
 import prefsRouter from './Prefs/router.js'
+import providersRouter from './Providers/router.js'
 import roomsRouter from './Rooms/router.js'
 import userRouter from './User/router.js'
 import pushQueuesAndLibrary from './lib/pushQueuesAndLibrary.js'
 import { Server as SocketIO } from 'socket.io'
 import socketActions from './socket.js'
+import ProviderFetch from './Providers/ProviderFetch.js'
+import ProviderStatus from './Providers/ProviderStatus.js'
 import IPC from './lib/IPCBridge.js'
 import IPCLibraryActions from './Library/ipc.js'
 import IPCMediaActions from './Media/ipc.js'
@@ -34,7 +37,7 @@ import { SCANNER_WORKER_EXITED, SERVER_WORKER_STATUS, SERVER_WORKER_ERROR } from
 const log = getLogger('server')
 const { verify: jwtVerify } = jsonWebToken
 
-async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers }) {
+async function serverWorker ({ env, startPathScanner, startFileScanner, stopPathScanner, shutdownHandlers }) {
   const indexFile = path.join(env.KES_PATH_WEBROOT, 'index.html')
   const urlPath = env.KES_URL_PATH.replace(/\/?$/, '/') // force trailing slash
   const jwtKey = Prefs.getJwtKey(env.KES_ROTATE_KEY)
@@ -144,6 +147,11 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
       )
     })
 
+    // check providers and start their song status SSE subscriptions
+    ProviderStatus.init(io)
+    ProviderFetch.init(io, { startFileScanner })
+    ProviderFetch.startAll().catch(err => log.error('ProviderFetch.startAll: %s', err.message))
+
     // attach IPC action handlers
     IPC.use(IPCLibraryActions(io))
     IPC.use(IPCMediaActions(io))
@@ -177,6 +185,9 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
 
     // handle shutdown gracefully
     shutdownHandlers.push(() => new Promise((resolve) => {
+      ProviderFetch.stopAll()
+      ProviderStatus.stopAll()
+
       // also calls http server's close method, which ultimately handles the callback
       io.close(resolve)
 
@@ -325,8 +336,8 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
 
     // validated
     ctx.io = io
-    ctx.startScanner = startScanner
-    ctx.stopScanner = stopScanner
+    ctx.startScanner = startPathScanner
+    ctx.stopScanner = stopPathScanner
 
     await next()
   })
@@ -339,6 +350,7 @@ async function serverWorker ({ env, startScanner, stopScanner, shutdownHandlers 
   baseRouter.use(libraryRouter.routes())
   baseRouter.use(mediaRouter.routes())
   baseRouter.use(prefsRouter.routes())
+  baseRouter.use(providersRouter.routes())
   baseRouter.use(roomsRouter.routes())
   baseRouter.use(userRouter.routes())
   app.use(baseRouter.routes())

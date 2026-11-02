@@ -8,6 +8,10 @@ const isParent = typeof process.env.KES_CHILD_PROCESS === 'undefined' // @todo
 class IPCParent {
   static children = new Map()
   static handlers = {}
+  // Pending parent-issued requests awaiting child responses.
+  // Keyed by reqId; value tracks pid so removeChild() can reject them.
+  static requests: Record<number, { resolve: (v: unknown) => void, reject: (err: unknown) => void, pid: number }> = {}
+  static reqId = 0
 
   static send (action, pid?) {
     // log.debug(`${PROCESS_NAME} emit: `, action.type)
@@ -26,9 +30,20 @@ class IPCParent {
   // 'this' keyword won't work when this method is passed as the
   // message handler callback, so using the class name (IPCParent)
   static handle (action) {
-    const { meta, type } = action
+    const { error, meta, type } = action
 
     // log.debug(`${PROCESS_NAME} rcv:`, type)
+
+    // Is this a reply to one of our outbound parent → child requests?
+    // meta.parent === true identifies it as ours (set by IPCParent.req and
+    // preserved through the child's auto-reply).
+    if (meta?.parent && meta?.reqId && IPCParent.requests[meta.reqId]) {
+      const pending = IPCParent.requests[meta.reqId]
+      delete IPCParent.requests[meta.reqId]
+      if (type?.endsWith(_ERROR)) pending.reject(error)
+      else pending.resolve(action.payload)
+      return
+    }
 
     if (!type || typeof IPCParent.handlers[type] !== 'function') {
       log.verbose(`${PROCESS_NAME}: no handler for action: ${type}`)
@@ -71,10 +86,35 @@ class IPCParent {
     }
   }
 
-  // Stub so the exported union type includes req(); only used by child processes
-  static req (action: { type: string, payload?: unknown }): Promise<unknown> {
-    void action
-    throw new Error('req() is only available in child processes')
+  // Parent → child request/response. Mirrors IPCChild.req. The target child's
+  // handler should return a Promise; the bridge auto-routes the +_SUCCESS /
+  // +_ERROR reply back to the returned promise here.
+  // The pid arg is optional only for type-compatibility with IPCChild.req
+  // (the union-typed default export); at runtime it is required.
+  static req (action: { type: string, payload?: unknown }, pid?: number): Promise<unknown> {
+    if (pid === undefined) {
+      return Promise.reject(new Error('IPCParent.req requires a target pid'))
+    }
+    if (!this.children.has(pid)) {
+      return Promise.reject(new Error(`req: no child with pid ${pid}`))
+    }
+
+    const reqId = ++this.reqId
+    const promise = new Promise<unknown>((resolve, reject) => {
+      this.requests[reqId] = { resolve, reject, pid }
+    })
+
+    this.send({
+      ...action,
+      meta: {
+        ...(action as { meta?: object }).meta,
+        reqId,
+        pid,
+        parent: true,
+      },
+    }, pid)
+
+    return promise
   }
 
   static addChild (subprocess) {
@@ -85,6 +125,14 @@ class IPCParent {
 
   static removeChild (subprocess) {
     this.children.delete(subprocess.pid)
+
+    // Reject any pending requests targeting this child so callers don't hang.
+    for (const [reqId, pending] of Object.entries(this.requests)) {
+      if (pending.pid === subprocess.pid) {
+        pending.reject(new Error(`child process ${subprocess.pid} exited before responding`))
+        delete this.requests[Number(reqId)]
+      }
+    }
   }
 
   static use (obj) {
@@ -111,7 +159,8 @@ class IPCChild {
     const { error, meta, type } = action
 
     // is this a response to a pending request?
-    if (meta?.pid === process.pid && IPCChild.requests[meta.reqId]) {
+    // meta.parent === true means parent → child request; ignore in this branch.
+    if (!meta?.parent && meta?.pid === process.pid && IPCChild.requests[meta.reqId]) {
       if (error) {
         IPCChild.requests[meta.reqId].reject(error)
       } else {
@@ -120,7 +169,7 @@ class IPCChild {
 
       // console.log(`${PROCESS_NAME} ack:`, type)
 
-      delete IPCChild.requests[meta.ipcId]
+      delete IPCChild.requests[meta.reqId]
       return
     }
 
@@ -167,13 +216,16 @@ class IPCChild {
     }
   }
 
-  // used by child processes only
-  static req (action) {
+  // used by child processes only. The second arg matches IPCParent.req's
+  // signature so the union-typed default export has a consistent shape;
+  // the child ignores it (child requests are always to the parent).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static req (action: { type: string, payload?: unknown, meta?: object }, _pid?: number): Promise<unknown> {
     const promise = new Promise((resolve, reject) => {
       this.requests[++this.reqId] = { resolve, reject }
     })
 
-    action = {
+    const stamped = {
       ...action,
       meta: {
         ...action.meta,
@@ -182,7 +234,7 @@ class IPCChild {
       },
     }
 
-    this.send(action)
+    this.send(stamped)
 
     return promise
   }

@@ -3,7 +3,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import getConfig from './getConfig.js'
-import { CONFIG_FILENAME } from './scanUtils.js'
+import { CONFIG_FILENAME } from '../scanUtils.js'
 
 describe('getConfig', () => {
   let baseDir: string

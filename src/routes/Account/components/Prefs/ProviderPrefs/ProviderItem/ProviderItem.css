@@ -1,0 +1,39 @@
+.providerItem {
+  display: flex;
+  align-items: center;
+  background-color: var(--panel-bg-color);
+  padding: var(--space-xs);
+  margin-bottom: var(--space-s);
+  border-radius: var(--border-radius);
+}
+
+.providerName {
+  flex: 1;
+  user-select: text;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.disabled {
+  opacity: 0.5;
+}
+
+.btnDrag {
+  cursor: grab;
+  color: var(--btn-bg-color);
+  height: var(--icon-size-l);
+}
+
+.btnInfo {
+  color: var(--btn-active-bg-color);
+  padding: var(--space-xs);
+
+  svg {
+    height: var(--icon-size-l);
+  }
+}
+
+.alert {
+  color: var(--btn-danger-bg-color);
+}

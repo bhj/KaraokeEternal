@@ -78,12 +78,29 @@ export const STAR_SONG = 'server/STAR_SONG'
 export const UNSTAR_SONG = 'server/UNSTAR_SONG'
 export const STARS_PUSH = 'user/STARS_PUSH'
 
+// Provider search
+export const PROVIDER_SEARCH_REQUEST = 'server/PROVIDER_SEARCH_REQUEST'
+export const PROVIDER_SEARCH_CANCEL = 'server/PROVIDER_SEARCH_CANCEL'
+export const PROVIDER_SEARCH_RESULT = 'library/PROVIDER_SEARCH_RESULT'
+export const PROVIDER_SEARCH_PROVIDER_ERROR = 'library/PROVIDER_SEARCH_PROVIDER_ERROR'
+export const PROVIDER_SEARCH_COMPLETE = 'library/PROVIDER_SEARCH_COMPLETE'
+export const PROVIDER_SEARCH_CLEAR = 'library/PROVIDER_SEARCH_CLEAR'
+
+// Provider fetch (item download)
+export const PROVIDER_FETCH_REQUEST = 'server/PROVIDER_FETCH_REQUEST'
+export const PROVIDER_FETCH_CANCEL = 'server/PROVIDER_FETCH_CANCEL'
+export const PROVIDER_FETCH_STATUS = 'library/PROVIDER_FETCH_STATUS'
+
 // Preferences
 export const PREFS_RECEIVE = 'prefs/RECEIVE'
 export const PREFS_REQUEST = 'prefs/REQUEST'
 export const PREFS_SET = 'server/PREFS_SET'
 export const PREFS_PATH_SET_PRIORITY = 'server/PREFS_PATH_SET_PRIORITY'
 export const PREFS_PATH_UPDATE = 'prefs/PREFS_PATH_UPDATE'
+export const PREFS_PROVIDER_SET_PRIORITY = 'server/PREFS_PROVIDER_SET_PRIORITY'
+export const PREFS_PROVIDER_UPDATE = 'prefs/PREFS_PROVIDER_UPDATE'
+// runtime provider status, pushed to admins only
+export const PROVIDER_STATUS_PUSH = 'prefs/PROVIDER_STATUS_PUSH'
 export const PREFS_PUSH = 'prefs/PREFS_PUSH'
 export const PREFS_REQ_SCANNER_START = 'prefs/REQ_SCANNER_START'
 export const PREFS_REQ_SCANNER_STOP = 'prefs/REQ_SCANNER_STOP'
@@ -113,6 +130,7 @@ export const SONG_INFO_CLOSE = 'songInfo/SONG_INFO_CLOSE'
 // IPC Messages
 export const REQUEST_SCAN = 'scannerWorker/REQUEST_SCAN'
 export const REQUEST_SCAN_STOP = 'scannerWorker/REQUEST_SCAN_STOP'
+export const REQUEST_SCAN_FILE = 'scannerWorker/REQUEST_SCAN_FILE'
 export const SCANNER_WORKER_STATUS = 'scannerWorker/STATUS'
 export const SERVER_WORKER_STATUS = 'serverWorker/STATUS'
 export const SERVER_WORKER_ERROR = 'serverWorker/ERROR'

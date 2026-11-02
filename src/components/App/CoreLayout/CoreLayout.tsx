@@ -9,6 +9,7 @@ import Button from 'components/Button/Button'
 import Header from 'components/Header/Header'
 import Navigation from 'components/Navigation/Navigation'
 import Modal from 'components/Modal/Modal'
+import ProviderInfoHost from 'components/ProviderInfo/ProviderInfoHost'
 import SongInfo from 'components/SongInfo/SongInfo'
 import Spinner from 'components/Spinner/Spinner'
 import Routes from '../Routes/Routes'
@@ -34,7 +35,7 @@ const CoreLayout = () => {
   const closeError = () => dispatch(clearErrorMessage())
 
   return (
-    <>
+    <ProviderInfoHost>
       <Header ref={headerRef} />
 
       <React.Suspense fallback={<Spinner />}>
@@ -56,7 +57,7 @@ const CoreLayout = () => {
           </p>
         </Modal>
       )}
-    </>
+    </ProviderInfoHost>
   )
 }
 

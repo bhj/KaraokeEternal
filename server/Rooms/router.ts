@@ -3,6 +3,7 @@ import sql from 'sqlate'
 import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
 import Rooms, { STATUSES } from '../Rooms/Rooms.js'
+import ProviderFetch from '../Providers/ProviderFetch.js'
 import { ValidationError } from '../lib/Errors.js'
 
 interface RequestWithBody {
@@ -47,6 +48,9 @@ router.post('/', async (ctx) => {
     throw err
   }
 
+  // remove provider entries that aren't needed anymore
+  ProviderFetch.prune()
+
   // send updated room list
   ctx.body = Rooms.get(null, { status: STATUSES })
 })
@@ -65,6 +69,9 @@ router.put('/:roomId', async (ctx) => {
     if (err instanceof ValidationError) ctx.throw(422, err.message)
     throw err
   }
+
+  // remove provider entries that aren't needed anymore
+  ProviderFetch.prune()
 
   log.verbose('%s updated a room (roomId: %s)', ctx.user.name, roomId)
 
@@ -113,6 +120,9 @@ router.delete('/:roomId', (ctx) => {
     WHERE roomId = ${roomId}
   `
   db.run(String(roomQuery), roomQuery.parameters)
+
+  // remove provider entries that aren't needed anymore
+  ProviderFetch.prune()
 
   log.verbose('%s deleted roomId %s', ctx.user.name, roomId)
 

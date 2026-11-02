@@ -1,0 +1,88 @@
+.modal {
+  min-width: 360px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  margin-bottom: var(--space-m);
+}
+
+.fieldContainer,
+.prefsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.heading {
+  flex: 1;
+  min-width: 0;
+
+  button {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-s);
+    font-size: var(--font-size-s);
+  }
+
+  svg {
+    height: var(--icon-size-m);
+  }
+}
+
+.headingStatus {
+  margin-left: auto;
+  color: #777;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  padding: var(--space-m) var(--container-padding);
+}
+
+fieldset.content {
+  gap: var(--space-s);
+  margin: 0;
+  border: none;
+  min-width: 0;
+}
+
+.legend {
+  float: left;
+  padding: 0;
+  margin-bottom: var(--space-s);
+}
+
+.sentence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.sentence input[type="number"] {
+  width: 2.5em;
+}
+
+.metaLabel {
+  font-weight: bold;
+  color: #777;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger, #d32f2f);
+  font-size: var(--font-size-s);
+}
+
+.meta {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+

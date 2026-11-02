@@ -1,29 +1,29 @@
-import FileScanner from './FileScanner/FileScanner.js'
+import PathScanner from './PathScanner/PathScanner.js'
 import type { ScanStats } from './Scanner.js'
 import Prefs from '../Prefs/Prefs.js'
 import getLogger from '../lib/Log.js'
 
 const log = getLogger('queue')
 
-class ScannerQueue {
-  #instance
+class PathScannerQueue {
+  #instance: PathScanner | undefined
   #isCanceling = false
   #q: { pathId: number, full: boolean }[] = []
   onIteration: (stats: ScanStats) => void
   onDone: () => void
 
-  constructor (onIteration, onDone) {
+  constructor (onIteration: (stats: ScanStats) => void, onDone: () => void) {
     this.onIteration = onIteration
     this.onDone = onDone
   }
 
-  queue (pathIds, full = false) {
+  queue (pathIds: number | number[] | true, full = false): void {
     const prefs = Prefs.get()
 
     if (pathIds === true) {
-      pathIds = prefs.paths.result // queueing all paths
+      pathIds = prefs.paths.result
     } else if (Number.isInteger(pathIds)) {
-      pathIds = [pathIds]
+      pathIds = [pathIds as number]
     }
 
     if (!Array.isArray(pathIds)) {
@@ -51,12 +51,12 @@ class ScannerQueue {
     }
   }
 
-  async start () {
+  async start (): Promise<void> {
     log.info('Starting media scan')
 
     while (this.#q.length && !this.#isCanceling) {
       const prefs = Prefs.get()
-      this.#instance = new FileScanner(prefs, { length: this.#q.length })
+      this.#instance = new PathScanner(prefs, { length: this.#q.length })
 
       const { pathId, full } = this.#q.shift()
       const stats = await this.#instance.scan(pathId, full)
@@ -66,14 +66,12 @@ class ScannerQueue {
     this.onDone()
   }
 
-  stop () {
+  stop (): void {
     log.info('Stopping media scan (user requested)')
     this.#isCanceling = true
 
-    if (this.#instance) {
-      this.#instance.cancel()
-    }
+    if (this.#instance) this.#instance.cancel()
   }
 }
 
-export default ScannerQueue
+export default PathScannerQueue

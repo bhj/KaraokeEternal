@@ -10,6 +10,7 @@ import type { Context } from 'koa'
 import Prefs from '../Prefs/Prefs.js'
 import Queue from '../Queue/Queue.js'
 import Rooms from '../Rooms/Rooms.js'
+import ProviderFetch from '../Providers/ProviderFetch.js'
 import User from '../User/User.js'
 import { QUEUE_PUSH } from '../../shared/actionTypes.js'
 import {
@@ -198,6 +199,7 @@ router.delete('/user/:userId', async (ctx) => {
   }
 
   User.remove(targetId)
+  ProviderFetch.dropUser(targetId)
 
   // disconnect their socket session(s)
   const sockets = await ctx.io.fetchSockets()

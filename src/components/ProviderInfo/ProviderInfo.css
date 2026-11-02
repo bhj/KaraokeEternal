@@ -1,0 +1,11 @@
+.container {
+  line-height: normal;
+  -webkit-user-select: text;
+  user-select: text;
+  overflow-wrap: break-word;
+}
+
+.label {
+  font-weight: bold;
+  color: var(--color-gray-5);
+}

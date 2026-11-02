@@ -4,6 +4,10 @@ import KoaRouter from '@koa/router'
 import getFolders from '../lib/getFolders.js'
 import getWindowsDrives from '../lib/getWindowsDrives.js'
 import Prefs from './Prefs.js'
+import pushPrefs from './pushPrefs.js'
+import ProviderFetch from '../Providers/ProviderFetch.js'
+import { normalizeProviderUrl } from '../Providers/Providers.js'
+import validateProviderFields from './validateProviderFields.js'
 import Media from '../Media/Media.js'
 import pushQueuesAndLibrary from '../lib/pushQueuesAndLibrary.js'
 import Rooms from '../Rooms/Rooms.js'
@@ -28,8 +32,11 @@ router.get('/', (ctx) => {
     return
   }
 
-  // non-admins only get roles
-  ctx.body = { roles: prefs.roles }
+  // non-admins get roles and the sanitized provider subset
+  ctx.body = {
+    roles: prefs.roles,
+    providers: Prefs.getSanitizedProviders(prefs.providers),
+  }
 })
 
 // add a media path
@@ -155,6 +162,107 @@ router.post('/paths/scan/stop', async (ctx) => {
 
   ctx.status = 200
   ctx.stopScanner()
+})
+
+// add a provider
+router.post('/provider', (ctx) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  const fields = (ctx.request as unknown as RequestWithBody).body
+  if (typeof fields.url === 'string') fields.url = normalizeProviderUrl(fields.url)
+  const { name, url, ...data } = fields
+
+  if (!name || typeof name !== 'string') {
+    ctx.throw(422, 'Invalid name')
+    return
+  }
+
+  if (!url || typeof url !== 'string') {
+    ctx.throw(422, 'Invalid url')
+    return
+  }
+
+  const err = validateProviderFields(fields)
+
+  if (err) {
+    ctx.throw(422, err)
+    return
+  }
+
+  Prefs.addProvider(name, url, data)
+  ProviderFetch.syncProviders()
+
+  ctx.body = Prefs.get() as unknown as PrefsType
+
+  pushPrefs(ctx.io)
+})
+
+// update provider data
+router.put('/provider/:providerId', (ctx) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  const providerId = parseInt(ctx.params.providerId, 10)
+
+  if (isNaN(providerId)) {
+    ctx.throw(422, 'Invalid providerId')
+  }
+
+  const { body } = ctx.request as unknown as RequestWithBody
+
+  const provider = Prefs.get().providers.entities[providerId]
+
+  if (!provider) {
+    ctx.throw(404, 'Provider not found')
+    return
+  }
+
+  if (typeof body.url === 'string') body.url = normalizeProviderUrl(body.url)
+  const err = validateProviderFields(body)
+
+  if (err) {
+    ctx.throw(422, err)
+    return
+  }
+
+  Prefs.updateProvider(providerId, body)
+  ProviderFetch.syncProviders()
+
+  ctx.body = Prefs.get() as unknown as PrefsType
+
+  pushPrefs(ctx.io)
+})
+
+// remove a provider
+router.delete('/provider/:providerId', (ctx) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  const providerId = parseInt(ctx.params.providerId, 10)
+
+  if (isNaN(providerId)) {
+    ctx.throw(422, 'Invalid providerId')
+  }
+
+  const provider = Prefs.get().providers.entities[providerId]
+
+  if (!provider) {
+    ctx.throw(404, 'Provider not found')
+    return
+  }
+
+  // before removal, while the provider's url/apiKey are still available
+  ProviderFetch.cancelInFlight(provider)
+  Prefs.removeProvider(providerId)
+  ProviderFetch.syncProviders()
+
+  ctx.body = Prefs.get() as unknown as PrefsType
+
+  pushPrefs(ctx.io)
 })
 
 // get folder listing for path browser

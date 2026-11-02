@@ -1,0 +1,66 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-gray-5);
+
+  img, svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* keep the img in layout but unpainted until decoded, so iOS Safari
+   never flashes its loading/missing-image glyph */
+.iconLoading {
+  visibility: hidden;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: hsl(var(--hue-blue), 40%, 14%);
+  stroke-width: 2;
+}
+
+.ringProgress {
+  fill: none;
+  stroke: var(--btn-active-bg-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 200ms linear;
+}
+
+.ringSpinner {
+  fill: none;
+  stroke: var(--color-gray-6);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: providerFetchSpin 0.9s linear infinite;
+}
+
+@keyframes providerFetchSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

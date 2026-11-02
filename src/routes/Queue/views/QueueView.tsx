@@ -3,6 +3,7 @@ import { useAppSelector } from 'store/hooks'
 import { ensureState } from 'redux-optimistic-ui'
 import { Link } from 'react-router'
 import getRoundRobinQueue from '../selectors/getRoundRobinQueue'
+import getPendingQueue from '../selectors/getPendingQueue'
 import QueueList from '../components/QueueList/QueueList'
 import Spinner from 'components/Spinner/Spinner'
 import TextOverlay from 'components/TextOverlay/TextOverlay'
@@ -15,6 +16,7 @@ const QueueView = () => {
   const isInRoom = useAppSelector(state => !!state.user.roomId)
   const isLoading = useAppSelector(state => ensureState(state.queue).isLoading)
   const queue = useAppSelector(getRoundRobinQueue)
+  const pending = useAppSelector(getPendingQueue)
   const queueId = useAppSelector(state => state.status.queueId)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -50,7 +52,7 @@ const QueueView = () => {
 
       {isLoading && <Spinner />}
 
-      {!isLoading && queue.result.length === 0 && (
+      {!isLoading && queue.result.length === 0 && pending.length === 0 && (
         <TextOverlay>
           <h1>Queue Empty</h1>
           <p>

@@ -7,6 +7,7 @@ import { createSelector } from '@reduxjs/toolkit'
 
 import { requestScanStop } from 'store/modules/prefs'
 import getRoundRobinQueue from 'routes/Queue/selectors/getRoundRobinQueue'
+import getDisplayQueue from 'routes/Queue/selectors/getDisplayQueue'
 import getWaits from 'routes/Queue/selectors/getWaits'
 import LibraryHeader from 'routes/Library/components/LibraryHeader/LibraryHeader'
 import PlaybackCtrl from './PlaybackCtrl/PlaybackCtrl'
@@ -19,14 +20,13 @@ const getIsAtQueueEnd = (state: RootState) => state.status.isAtQueueEnd
 const getQueueId = (state: RootState) => state.status.queueId
 const getUserId = (state: RootState) => state.user.userId
 
+// wait for the user's first upcoming row, including an in-flight provider song
 const getUserWait = createSelector(
-  [getRoundRobinQueue, getQueueId, getUserId, getWaits],
-  (queue, queueId, userId, waits) => {
-    const curIdx = queue.result.indexOf(queueId)
-
-    for (let i = curIdx + 1; i < queue.result.length; i++) {
-      if (queue.entities[queue.result[i]].userId === userId) {
-        return waits[queue.result[i]]
+  [getDisplayQueue, getUserId, getWaits],
+  (rows, userId, waits) => {
+    for (const row of rows) {
+      if (row.userId === userId && waits[row.key] !== undefined) {
+        return waits[row.key]
       }
     }
   },

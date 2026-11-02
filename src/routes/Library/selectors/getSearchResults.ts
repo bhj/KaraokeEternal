@@ -3,7 +3,7 @@ import { createSelector } from '@reduxjs/toolkit'
 import { Searcher } from 'fast-fuzzy'
 import { RootState } from 'store/store'
 
-const THRESHOLD = 0.6
+const THRESHOLD = 0.7
 
 const getArtists = (state: RootState) => state.artists
 const getSongs = (state: RootState) => state.songs

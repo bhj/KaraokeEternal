@@ -2,8 +2,8 @@ import path from 'path'
 import getLogger from '../../lib/Log.js'
 import fs from 'fs'
 import JSON5 from 'json5'
-import { CONFIG_FILENAME } from './scanUtils.js'
-const log = getLogger('FileScanner')
+import { CONFIG_FILENAME } from '../scanUtils.js'
+const log = getLogger('PathScanner')
 
 // search each folder from dir up to baseDir
 function getConfig (dir, baseDir) {

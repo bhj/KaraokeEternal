@@ -3,13 +3,16 @@ import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from '@reduxjs/toolkit'
 import type { QueueItem } from 'shared/types'
 import getPlayerHistory from './getPlayerHistory'
+import roundRobin from './roundRobin'
 
 const getResult = (state: RootState) => ensureState(state.queue).result
 const getEntities = (state: RootState) => ensureState(state.queue).entities
 const getQueueId = (state: RootState) => state.status.queueId
 const getNextUserId = (state: RootState) => state.status.nextUserId
 
-const getRoundRobinQueue = createSelector(
+// The items that aren't re-ordered: played, current, and the next user's
+// locked-in item, in that order
+export const getQueueHistory = createSelector(
   [getResult, getEntities, getPlayerHistory, getQueueId, getNextUserId],
   (result, entities, history, curId, nextUserId) => {
     // in case history references non-existent items or queue is still loading
@@ -21,18 +24,28 @@ const getRoundRobinQueue = createSelector(
     }
 
     // "lock in" next user's item (don't re-order it)
+    let lockedQueueId: number | null = null
+
     if (nextUserId !== null) {
       for (const queueId of result) {
         if (!history.includes(queueId) && entities[queueId].isOptimistic !== true && entities[queueId].userId === nextUserId) {
           history.push(queueId)
+          lockedQueueId = queueId
           break
         }
       }
     }
 
-    const map = new Map()
-    const upcoming = []
-    const resultByUser = history.map(queueId => (entities[queueId] as QueueItem).userId) // should be no optimistic items
+    return { history, lockedQueueId }
+  },
+)
+
+// Each user's upcoming items in queue order, users in order of their first
+// upcoming item
+export const getUpcomingByUser = createSelector(
+  [getResult, getEntities, getQueueHistory],
+  (result, entities, { history }) => {
+    const map = new Map<number, number[]>()
 
     result.forEach((queueId) => {
       if (history.includes(queueId) // only concerned with upcoming songs
@@ -40,38 +53,23 @@ const getRoundRobinQueue = createSelector(
       ) return
 
       const userId = entities[queueId].userId
-      map.set(userId, map.has(userId) ? [...map.get(userId), queueId] : [queueId])
+      const list = map.get(userId)
+
+      if (list) list.push(queueId)
+      else map.set(userId, [queueId])
     })
 
-    while (map.size) {
-      let max = -1
-      let maxUserId
+    return map
+  },
+)
 
-      for (const userId of map.keys()) {
-        const idx = resultByUser.lastIndexOf(userId)
-        const distance = idx === -1 ? Infinity : resultByUser.length - idx
-
-        if (distance > max) {
-          max = distance
-          maxUserId = userId
-        }
-      }
-
-      const userItems = map.get(maxUserId)
-      const queueId = userItems.shift()
-
-      if (userItems.length) {
-        map.set(maxUserId, userItems)
-      } else {
-        map.delete(maxUserId)
-      }
-
-      resultByUser.push(maxUserId)
-      upcoming.push(queueId)
-    }
+const getRoundRobinQueue = createSelector(
+  [getEntities, getQueueHistory, getUpcomingByUser],
+  (entities, { history }, upcomingByUser) => {
+    const playedUserIds = history.map(queueId => (entities[queueId] as QueueItem).userId) // should be no optimistic items
 
     return {
-      result: history.concat(upcoming) as number[],
+      result: history.concat(roundRobin(upcomingByUser, playedUserIds)),
       entities: entities as Record<number, QueueItem>,
     }
   },

@@ -11,6 +11,10 @@ import Rooms from './Rooms/Rooms.js'
 import RoomsSocket from './Rooms/socket.js'
 import Queue from './Queue/Queue.js'
 import QueueSocket from './Queue/socket.js'
+import ProvidersSocket, { disposeProviderSearch } from './Providers/socket.js'
+import ProviderFetch from './Providers/ProviderFetch.js'
+import ProviderStatus from './Providers/ProviderStatus.js'
+import type { Prefs as PrefsType } from '../shared/types.js'
 
 import {
   LIBRARY_PUSH,
@@ -20,6 +24,8 @@ import {
   PLAYER_STATUS,
   PLAYER_LEAVE,
   PREFS_PUSH,
+  PROVIDER_FETCH_STATUS,
+  PROVIDER_STATUS_PUSH,
   SOCKET_AUTH_ERROR,
   _ERROR,
 } from '../shared/actionTypes.js'
@@ -32,6 +38,7 @@ const handlers = {
   ...PlayerSocket,
   ...PrefsSocket,
   ...RoomsSocket,
+  ...ProvidersSocket,
 }
 
 const { verify: jwtVerify } = jsonWebToken
@@ -68,6 +75,8 @@ export default function (io, jwtKey, getClientIp) {
       log.verbose('%s (%s) disconnected (%s)',
         sock.user.name, sock.id, reason,
       )
+
+      disposeProviderSearch(sock)
 
       if (typeof sock.user.roomId !== 'number') return
 
@@ -118,12 +127,20 @@ export default function (io, jwtKey, getClientIp) {
     // process via uncaughtException, so one bad payload (e.g. a corrupted
     // room queue) must not go unhandled
     try {
-      // push prefs (admin only)
+      // push prefs (full for admins; sanitized providers for everyone else)
+      log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
+      const prefs = Prefs.get() as unknown as PrefsType
+      io.to(sock.id).emit('action', {
+        type: PREFS_PUSH,
+        payload: sock.user.isAdmin
+          ? prefs
+          : { providers: Prefs.getSanitizedProviders(prefs.providers) },
+      })
+
       if (sock.user.isAdmin) {
-        log.verbose('pushing prefs to %s (%s)', sock.user.name, sock.id)
         io.to(sock.id).emit('action', {
-          type: PREFS_PUSH,
-          payload: Prefs.get(),
+          type: PROVIDER_STATUS_PUSH,
+          payload: ProviderStatus.getAll(),
         })
       }
 
@@ -187,6 +204,15 @@ export default function (io, jwtKey, getClientIp) {
         type: QUEUE_PUSH,
         payload: Queue.get(sock.user.roomId),
       })
+
+      // rehydrate any in-flight provider fetches for this room
+      const fetchItems = ProviderFetch.rehydrateForRoom(sock.user.roomId)
+      if (fetchItems.length) {
+        io.to(sock.id).emit('action', {
+          type: PROVIDER_FETCH_STATUS,
+          payload: fetchItems,
+        })
+      }
     } catch (err) {
       log.error('error pushing initial state to %s (%s): %s',
         sock.user.name, sock.id, err?.stack || err)

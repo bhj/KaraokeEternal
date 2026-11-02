@@ -1,13 +1,16 @@
 import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import { RootState } from 'store/store'
-import type { Path, Role } from 'shared/types'
+import type { Path, Provider, ProviderStatus, Role } from 'shared/types'
 import {
   PREFS_RECEIVE,
   PREFS_REQUEST,
   PREFS_SET,
   PREFS_PATH_UPDATE,
   PREFS_PATH_SET_PRIORITY,
+  PREFS_PROVIDER_SET_PRIORITY,
+  PREFS_PROVIDER_UPDATE,
   PREFS_PUSH,
+  PROVIDER_STATUS_PUSH,
   PREFS_REQ_SCANNER_START,
   PREFS_REQ_SCANNER_STOP,
   SCANNER_WORKER_STATUS,
@@ -24,7 +27,9 @@ const logout = createAction(LOGOUT)
 export const setPref = createAction<{ key: string, data: unknown }>(PREFS_SET)
 export const receivePrefs = createAction<object>(PREFS_RECEIVE)
 export const setPathPriority = createAction<number[]>(PREFS_PATH_SET_PRIORITY)
-const prefsPush = createAction<PrefsState>(PREFS_PUSH)
+export const setProviderPriority = createAction<number[]>(PREFS_PROVIDER_SET_PRIORITY)
+const prefsPush = createAction<object>(PREFS_PUSH)
+const providerStatusPush = createAction<Record<number, ProviderStatus>>(PROVIDER_STATUS_PUSH)
 const scannerWorkerStatus = createAction<{ isScanning: boolean, pct: number, text: string }>(SCANNER_WORKER_STATUS)
 
 export const setPathPrefs = createAsyncThunk(
@@ -37,6 +42,23 @@ export const setPathPrefs = createAsyncThunk(
     data: FormData
   }, thunkAPI) => {
     const response = await api.put(`/path/${pathId}`, {
+      body: data,
+    })
+
+    thunkAPI.dispatch(receivePrefs(response))
+  },
+)
+
+export const setProviderPrefs = createAsyncThunk(
+  PREFS_PROVIDER_UPDATE,
+  async ({
+    providerId,
+    data,
+  }: {
+    providerId: number
+    data: object
+  }, thunkAPI) => {
+    const response = await api.put(`/provider/${providerId}`, {
       body: data,
     })
 
@@ -84,6 +106,12 @@ export interface PrefsState {
     result: number[]
     entities: Record<number, Path>
   }
+  providers: {
+    result: number[]
+    entities: Record<number, Provider>
+  }
+  // runtime status of enabled providers (admins only)
+  providerStatus: Record<number, ProviderStatus>
   roles: {
     result: number[]
     entities: Record<number, Role>
@@ -99,6 +127,11 @@ const initialState: PrefsState = {
     result: [],
     entities: {},
   },
+  providers: {
+    result: [],
+    entities: {},
+  },
+  providerStatus: {},
   roles: {
     result: [],
     entities: {},
@@ -120,6 +153,10 @@ const prefsReducer = createReducer(initialState, (builder) => {
     .addCase(prefsPush, (state, { payload }) => ({
       ...state,
       ...payload,
+    }))
+    .addCase(providerStatusPush, (state, { payload }) => ({
+      ...state,
+      providerStatus: payload,
     }))
     .addCase(scannerWorkerStatus, (state, { payload }) => ({
       ...state,

@@ -1,38 +1,48 @@
 import { RootState } from 'store/store'
+import { ensureState } from 'redux-optimistic-ui'
 import { createSelector } from '@reduxjs/toolkit'
 import getPlayerHistory from './getPlayerHistory'
-import getRoundRobinQueue from './getRoundRobinQueue'
+import getDisplayQueue from './getDisplayQueue'
 
+const getEntities = (state: RootState) => ensureState(state.queue).entities
 const getPosition = (state: RootState) => state.status.position
-const getQueue = (state: RootState) => getRoundRobinQueue(state)
 const getQueueId = (state: RootState) => state.status.queueId
 const getSongs = (state: RootState) => state.songs
 
+// Seconds until each upcoming row's turn, keyed by DisplayRow key. Errs low,
+// so singers are ready when they're up: a pending song only adds its length
+// when the provider expects it to be ready by its turn, since otherwise the
+// player skips past it.
 const getWaits = createSelector(
-  [getQueue, getQueueId, getPlayerHistory, getPosition, getSongs],
-  (queue, queueId, history, position, songs) => {
-    const curIdx = queue.result.indexOf(queueId)
-    const waits: Record<number, number> = {}
-    let curWait = 0
-    let nextWait = 0
+  [getDisplayQueue, getEntities, getQueueId, getPlayerHistory, getPosition, getSongs],
+  (rows, entities, curId, history, position, songs) => {
+    const waits: Record<string, number> = {}
+    let wait = 0
 
-    queue.result.forEach((queueId, i) => {
-      const songId = queue.entities[queueId].songId
-      if (!songs.entities[songId]) return
+    for (const row of rows) {
+      if (row.kind === 'pending') {
+        if (row.item.status === 'error') continue
+        waits[row.key] = wait
 
-      if (i === curIdx) {
-        // if history includes the current item it's already been played
-        if (history.lastIndexOf(queueId) === -1) {
-          nextWait = Math.round(songs.entities[songId].duration - position)
-        }
-      } else if (i > curIdx) {
-        // upcoming
-        curWait += nextWait
-        nextWait = songs.entities[songId].duration
+        const { duration, eta } = row.item
+        if (duration !== undefined && eta !== undefined && eta <= wait) wait += duration
+        continue
       }
 
-      waits[queueId] = curWait
-    })
+      const song = songs.entities[entities[row.queueId].songId]
+      if (!song) continue
+
+      if (row.queueId === curId) {
+        // if history includes the current item it's already been played
+        if (!history.includes(curId)) wait += Math.max(0, Math.round(song.duration - position))
+        continue
+      }
+
+      if (history.includes(row.queueId)) continue // played
+
+      waits[row.key] = wait
+      wait += song.duration
+    }
 
     return waits
   },

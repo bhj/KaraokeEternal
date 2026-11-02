@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import getLogger from '../../lib/Log.js'
-const log = getLogger('FileScanner:getFiles')
+const log = getLogger('PathScanner:getFiles')
 
 /**
  * Directory walker that only throws if parent directory

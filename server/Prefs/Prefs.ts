@@ -1,12 +1,33 @@
 import path from 'path'
 import sql from 'sqlate'
 import crypto from 'crypto'
+import type { Path, Provider, ProviderPrefs, ProviderTypePrefs, SongProviderPrefs } from '../../shared/types.js'
 import { db } from '../lib/Database.js'
 import getLogger from '../lib/Log.js'
-import type { Path } from '../../shared/types.js'
 
 const RESERVED_KEYS = ['jwtKey', 'isFirstRun']
 const log = getLogger('Prefs')
+
+// provider prefs as stored in the data column (validated on write)
+interface StoredProviderPrefs {
+  enabled?: boolean
+  types?: { song?: Partial<SongProviderPrefs> }
+}
+
+/**
+ * Provider prefs built from known keys only, so they're safe to expose to
+ * non-admins. A type with no stored entry is left out (disabled).
+ */
+function buildProviderPrefs (stored: StoredProviderPrefs | undefined): ProviderPrefs {
+  const types: ProviderTypePrefs = {}
+  const song = stored?.types?.song
+
+  if (song) {
+    types.song = { enabled: song.enabled ?? false, maxLibraryResults: song.maxLibraryResults ?? null }
+  }
+
+  return { enabled: stored?.enabled ?? true, types }
+}
 
 class Prefs {
   /**
@@ -15,10 +36,12 @@ class Prefs {
   static get () {
     const prefs: {
       paths: { result: number[], entities: Record<number, Path> }
+      providers: { result: number[], entities: Record<number, Provider> }
       roles: { result: number[], entities: Record<number, { roleId: number, name: string }> }
       [key: string]: unknown
     } = {
       paths: { result: [], entities: {} },
+      providers: { result: [], entities: {} },
       roles: { result: [], entities: {} },
     }
 
@@ -65,7 +88,41 @@ class Prefs {
       }
     }
 
+    // include providers
+    {
+      const query = sql`
+        SELECT * FROM providers
+        ORDER BY priority
+      `
+      const rows = db.all<{ providerId: number, name: string, url: string, priority: number, data: string }>(String(query), query.parameters)
+
+      for (const row of rows) {
+        const { prefs: storedPrefs, ...data } = JSON.parse(row.data)
+        delete row.data
+
+        // columns win so a stray data key can't shadow them (e.g. url)
+        prefs.providers.entities[row.providerId] = { ...data, ...row, prefs: buildProviderPrefs(storedPrefs) }
+        prefs.providers.result.push(row.providerId)
+      }
+    }
+
     return prefs
+  }
+
+  /**
+   * Enabled providers, whitelisted to fields safe for non-admin users
+   * (entities can hold url, apiKey, and other stored provider config)
+   */
+  static getSanitizedProviders (providers: { result: number[], entities: Record<number, Provider> }) {
+    const result = providers.result.filter(id => providers.entities[id].prefs.enabled)
+
+    return {
+      result,
+      entities: Object.fromEntries(result.map((id) => {
+        const { providerId, name, priority, prefs } = providers.entities[id]
+        return [id, { providerId, name, priority, prefs }]
+      })),
+    }
   }
 
   /**
@@ -96,14 +153,27 @@ class Prefs {
   static addPath (dir: string, data?: object): number {
     const prefs = Prefs.get()
     const { result, entities } = prefs.paths
+    const candidate = path.resolve(dir)
 
-    // is it a subfolder of an already-added folder?
-    if (result.some(pathId => (dir + path.sep).indexOf(entities[pathId].path + path.sep) === 0)) {
-      throw new Error('Folder has already been added')
+    // Reject any nesting (either direction) or exact duplicate after normalization.
+    // resolvePathId() depends on this invariant to return a unique match.
+    for (const pathId of result) {
+      const existing = path.resolve(entities[pathId].path)
+      if (candidate === existing) {
+        throw new Error('Folder has already been added')
+      }
+      const childRel = path.relative(existing, candidate)
+      if (!childRel.startsWith('..' + path.sep) && childRel !== '..' && !path.isAbsolute(childRel)) {
+        throw new Error('Folder is inside an existing media path')
+      }
+      const parentRel = path.relative(candidate, existing)
+      if (!parentRel.startsWith('..' + path.sep) && parentRel !== '..' && !path.isAbsolute(parentRel)) {
+        throw new Error('Folder contains an existing media path')
+      }
     }
 
     const fields = new Map()
-    fields.set('path', dir)
+    fields.set('path', candidate)
     // priority defaults to one higher than current highest
     fields.set('priority', result.length ? entities[result[result.length - 1]].priority + 1 : 0)
     if (data) fields.set('data', JSON.stringify(data))
@@ -151,6 +221,32 @@ class Prefs {
   }
 
   /**
+   * Resolve an absolute filesystem path to its configured library pathId.
+   * Returns null if `absPath` lies outside every configured base, or — defensively —
+   * if a legacy database has nested bases that both contain it (current
+   * `addPath` rejects nesting in both directions, so this is unreachable for
+   * fresh databases).
+   */
+  static resolvePathId (absPath: string): number | null {
+    if (!path.isAbsolute(absPath)) return null
+    const resolved = path.resolve(absPath)
+    const paths = this.get().paths.entities as Record<number, Path>
+    let match: number | null = null
+    for (const [idStr, entity] of Object.entries(paths)) {
+      const base = path.resolve(entity.path)
+      const rel = path.relative(base, resolved)
+      const inside = rel === '' || (!rel.startsWith('..' + path.sep) && rel !== '..' && !path.isAbsolute(rel))
+      if (!inside) continue
+      if (match !== null) {
+        log.warn('resolvePathId: multiple configured bases contain %s (legacy nested paths?)', resolved)
+        return null
+      }
+      match = Number(idStr)
+    }
+    return match
+  }
+
+  /**
    * Set a path's JSON data
    * @param keyPrefix - key prefix; e.g. `prefs.`
    * @param data - key:value pair to set
@@ -166,6 +262,91 @@ class Prefs {
       WHERE pathId = ${pathId}
     `
     db.run(String(query), query.parameters)
+  }
+
+  /**
+   * Add provider
+   */
+  static addProvider (name: string, url: string, data?: object): number {
+    const prefs = Prefs.get()
+    const { result, entities } = prefs.providers
+
+    const fields = new Map()
+    fields.set('name', name)
+    fields.set('url', url)
+    fields.set('priority', result.length ? entities[result[result.length - 1]].priority + 1 : 0)
+    if (data) fields.set('data', JSON.stringify(data))
+
+    const query = sql`
+      INSERT INTO providers ${sql.tuple(Array.from(fields.keys()).map(sql.column))}
+      VALUES ${sql.tuple(Array.from(fields.values()))}
+    `
+    const res = db.run(String(query), query.parameters)
+
+    if (!Number.isInteger(res.lastID)) {
+      throw new Error('invalid lastID from provider insert')
+    }
+
+    return res.lastID
+  }
+
+  /**
+   * Remove a provider
+   */
+  static removeProvider (providerId: number): void {
+    const query = sql`
+      DELETE FROM providers
+      WHERE providerId = ${providerId}
+    `
+    db.run(String(query), query.parameters)
+  }
+
+  /**
+   * Set provider priorities
+   */
+  static setProviderPriority (providerIds: number[]): void {
+    if (!Array.isArray(providerIds)) {
+      throw new Error('providerIds must be an array')
+    }
+
+    const query = sql`
+      UPDATE providers
+        SET priority = CASE providerId
+          ${sql.concat(providerIds.map((providerId, i) => sql`WHEN ${providerId} THEN ${i} `))}
+        END
+      WHERE providerId IN ${sql.tuple(providerIds)}
+      `
+    db.run(String(query), query.parameters)
+  }
+
+  /**
+   * Update a provider's name, url, and/or JSON data fields
+   */
+  static updateProvider (providerId: number, fields: Record<string, unknown>): void {
+    const { name, url, ...dataFields } = fields
+
+    if (name !== undefined) {
+      const query = sql`UPDATE providers SET name = ${name} WHERE providerId = ${providerId}`
+      db.run(String(query), query.parameters)
+    }
+
+    if (url !== undefined) {
+      const query = sql`UPDATE providers SET url = ${url} WHERE providerId = ${providerId}`
+      db.run(String(query), query.parameters)
+    }
+
+    if (Object.keys(dataFields).length > 0) {
+      // json_patch merges nested objects, so a partial prefs object keeps the
+      // other stored prefs. A null value removes its key (RFC 7396); that is
+      // what makes `maxLibraryResults: null` work, since buildProviderPrefs
+      // reads a missing key back as null. Validation rejects null elsewhere.
+      const query = sql`
+        UPDATE providers
+        SET data = json_patch(data, ${JSON.stringify(dataFields)})
+        WHERE providerId = ${providerId}
+      `
+      db.run(String(query), query.parameters)
+    }
   }
 
   /**
