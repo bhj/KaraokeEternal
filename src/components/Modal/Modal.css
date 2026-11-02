@@ -11,7 +11,9 @@
   box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0);
   backdrop-filter: blur(30px) brightness(50%) saturate(100%);
   -webkit-backdrop-filter: blur(30px) brightness(50%) saturate(100%);
-  
+  /* the dialog itself takes initial focus (see Modal.tsx) */
+  outline: none;
+
   &[open] {
     animation: fadeIn 0.15s forwards;
     box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5);

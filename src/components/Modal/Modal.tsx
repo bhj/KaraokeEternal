@@ -25,6 +25,10 @@ const Modal = ({ 'aria-label': ariaLabel, buttons, className, children, headingC
     const dialog = dialogRef.current
 
     if (visible && dialog) {
+      // without an [autofocus] descendant, showModal() focuses the close button, which
+      // iOS Safari rings as :focus-visible. Focus the dialog itself instead; the first Tab
+      // then lands on the close button. An [autofocus] descendant (e.g. a form field) still wins
+      dialog.autofocus = !dialog.querySelector('[autofocus]')
       dialog.showModal()
       // close() while still in the DOM so the browser restores focus to the opener
       return () => dialog.close()
