@@ -14,14 +14,20 @@
  * against this arrangement. Adopting it would mean re-verifying audioLatency
  * against CDG sync.
  */
-import { PitchShifterNode } from './bespoke/node'
 import type { PitchShifter, PitchShifterEngine } from './index'
+
+// ./bespoke/node subclasses AudioWorkletNode at module scope, which throws where
+// that global is missing (insecure contexts), so it's only loaded once supported
+let PitchShifterNode: typeof import('./bespoke/node').PitchShifterNode
 
 export const phaseVocoderEngine: PitchShifterEngine = {
   // AudioWorklet is only exposed in secure contexts
   isSupported: () => typeof window !== 'undefined' && 'AudioWorklet' in window,
 
-  prepare: (ctx: AudioContext) => PitchShifterNode.register(ctx),
+  prepare: async (ctx: AudioContext) => {
+    ({ PitchShifterNode } = await import('./bespoke/node'))
+    return PitchShifterNode.register(ctx)
+  },
 
   create: (ctx: AudioContext): PitchShifter => {
     const node = new PitchShifterNode(ctx)
