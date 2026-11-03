@@ -8,7 +8,6 @@ import {
 } from 'shared/actionTypes'
 import { RootState } from 'store/store'
 
-const MAX_CONTENT_WIDTH = 768
 let scrollLockTimer: ReturnType<typeof setTimeout> | null
 
 // ------------------------------------
@@ -69,7 +68,6 @@ export interface UIState {
   headerHeight: number
   innerWidth: number
   innerHeight: number
-  contentWidth: number
 }
 
 const initialState: UIState = {
@@ -79,7 +77,6 @@ const initialState: UIState = {
   headerHeight: 0,
   innerWidth: window.innerWidth,
   innerHeight: window.innerHeight,
-  contentWidth: Math.min(window.innerWidth, MAX_CONTENT_WIDTH),
 }
 
 const uiReducer = createReducer(initialState, (builder) => {
@@ -100,7 +97,6 @@ const uiReducer = createReducer(initialState, (builder) => {
     .addCase(windowResize, (state, { payload }) => {
       state.innerWidth = payload.innerWidth
       state.innerHeight = payload.innerHeight
-      state.contentWidth = Math.min(payload.innerWidth, MAX_CONTENT_WIDTH)
     })
     .addMatcher(
       (action): action is AnyAction => !!action.error,

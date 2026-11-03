@@ -35,6 +35,10 @@
   --space-xl: 32px;
   --container-padding: 12px;
 
+  /* horizontally contains the app on wide viewports */
+  --content-max-width: 768px;
+  --content-gutter: max(0px, calc((100vw - var(--content-max-width)) / 2));
+
   --bg-color: hsl(var(--hue-blue), 40%, 2%);
   --text-color: var(--color-gray-8);
   --link-color: hsl(var(--hue-blue), 92%, 69%);

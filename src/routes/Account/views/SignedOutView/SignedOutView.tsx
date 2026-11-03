@@ -17,7 +17,6 @@ const SignedOutView = () => {
 
   const prefs = useAppSelector(state => state.prefs)
   const rooms = useAppSelector(state => state.rooms)
-  const ui = useAppSelector(state => state.ui)
   const dispatch = useAppDispatch()
 
   const [mode, setMode] = useState('returning')
@@ -173,7 +172,7 @@ const SignedOutView = () => {
   }, [focusRequest, mode, isReady])
 
   return (
-    <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
+    <div className={styles.container}>
       <Logo className={styles.logo} />
 
       {showRoomSection && (

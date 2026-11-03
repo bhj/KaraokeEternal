@@ -1,4 +1,5 @@
 .container {
+  max-width: max(340px, calc(min(100vw, var(--content-max-width)) * 0.66));
   margin: 0 auto;
   overflow: hidden;
   padding: var(--container-padding);

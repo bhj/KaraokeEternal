@@ -26,16 +26,18 @@ const VolumeSlider = ({ volume, onVolumeChange }: VolumeSliderProps) => {
   })()
 
   return (
-    <Slider
-      aria-label='Volume'
-      className={styles.slider}
-      handleComponent={<Icon icon={icon} className={styles.handleIcon} />}
-      min={0}
-      max={1}
-      onChange={handleChange}
-      step={0.01}
-      value={displayVolume}
-    />
+    <div className={styles.container}>
+      <Slider
+        aria-label='Volume'
+        className={styles.slider}
+        handleComponent={<Icon icon={icon} className={styles.handleIcon} />}
+        min={0}
+        max={1}
+        onChange={handleChange}
+        step={0.01}
+        value={displayVolume}
+      />
+    </div>
   )
 }
 

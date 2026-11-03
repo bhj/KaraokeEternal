@@ -6,7 +6,7 @@
   font-size: 2vh;
   padding: 5px 0;
   position: fixed;
-  right: 0;
+  right: var(--content-gutter);
   width: 32px;
   cursor: pointer;
   touch-action: none;

@@ -4,6 +4,7 @@
   left: 0;
   display: flex;
   width: 100%;
+  padding-inline: var(--content-gutter);
   background-color: var(--chrome-bg-color);
   border-top: 1px solid var(--chrome-border-color);
   z-index: 99;

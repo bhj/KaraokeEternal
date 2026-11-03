@@ -1,6 +1,13 @@
-.slider {
+.container {
+  display: flex;
+  justify-content: center;
   width: 100%;
   margin: 0 34px 0 30px;
+}
+
+.slider {
+  width: 100%;
+  max-width: 360px;
 }
 
 .handleIcon {

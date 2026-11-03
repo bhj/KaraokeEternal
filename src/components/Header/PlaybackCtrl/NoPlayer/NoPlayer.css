@@ -1,4 +1,6 @@
 .container {
+  /* break out of the Header's inset to span the viewport */
+  margin-inline: calc(-1 * var(--content-gutter));
   font-size: 16px;
   color: var(--header-notice-color);
   background-color: var(--header-notice-bg-color);

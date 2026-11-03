@@ -3,6 +3,7 @@
   top: 0;
   left: 0;
   width: 100%;
+  padding-inline: var(--content-gutter);
   background-color: var(--chrome-bg-color);
   border-bottom: 1px solid var(--chrome-border-color);
   z-index: 1;

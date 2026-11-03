@@ -10,6 +10,12 @@
   background-color: hsl(var(--hue-blue), 40%, 6%);
   margin: var(--space-s) 0;
   line-height: normal;
+
+  /* inset: the queue scroller clips anything outside the row */
+  &:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: -4px;
+  }
   opacity: 0.85;
 }
 

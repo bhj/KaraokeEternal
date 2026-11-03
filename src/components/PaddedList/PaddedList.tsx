@@ -42,7 +42,21 @@ const PaddedRowComponent = ({
     )
   }
 
-  return <RowComponent index={index - 1} style={{ ...style, paddingRight: padPaddingRight }} ariaAttributes={ariaAttributes} {...rest} />
+  // inset the row itself (not just its content) so row backgrounds are contained too,
+  // while the scroll container stays full-width so wheeling over the gutter still scrolls
+  return (
+    <RowComponent
+      index={index - 1}
+      style={{
+        ...style,
+        left: 'var(--content-gutter)',
+        width: 'calc(100% - 2 * var(--content-gutter))',
+        paddingRight: padPaddingRight,
+      }}
+      ariaAttributes={ariaAttributes}
+      {...rest}
+    />
+  )
 }
 
 const PaddedList = ({

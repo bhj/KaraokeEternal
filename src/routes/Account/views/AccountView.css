@@ -1,5 +1,5 @@
 .container {
-  margin: 0 auto;
+  padding-inline: var(--content-gutter);
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

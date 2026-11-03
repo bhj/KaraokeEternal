@@ -11,6 +11,12 @@
   background-color: hsl(var(--hue-blue), 40%, 6%);
   margin: var(--space-s) 0;
   line-height: normal;
+
+  /* inset: the queue scroller clips anything outside the row */
+  &:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: -4px;
+  }
 }
 
 .content {
@@ -154,7 +160,7 @@
   right: auto;
   width: var(--progress, 0%);
   --queue-item-crawl-span: 300%;
-  --queue-item-shine-width: 55vw;
+  --queue-item-shine-width: calc(min(100vw, var(--content-max-width)) * 0.55);
   /* Tile must exceed shine width; gap factor creates transparent buffer so repeat is seamless */
   --queue-item-gap-factor: 1.5;
   --queue-item-tile-size: calc(var(--queue-item-shine-width) * var(--queue-item-gap-factor));
