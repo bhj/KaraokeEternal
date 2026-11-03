@@ -21,3 +21,6 @@ declare function registerProcessor (
 
 /** The context's sample rate, injected into the worklet scope. */
 declare const sampleRate: number
+
+/** Context time (s) of the render block being processed. */
+declare const currentTime: number

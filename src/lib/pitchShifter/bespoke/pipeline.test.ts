@@ -1,6 +1,6 @@
 import { SoundTouch } from '@soundtouchjs/core'
 import { describe, expect, it } from 'vitest'
-import { ANALYSIS_HOP, FFT_SIZE, LATENCY_FRAMES, RENDER_QUANTUM } from './constants'
+import { ANALYSIS_HOP, FFT_SIZE, LATENCY_FRAMES, RENDER_QUANTUM, SETTLE_FRAMES } from './constants'
 import { quantizePitch } from './pitch'
 import { pipeOptions, prefill } from './pipe'
 
@@ -12,8 +12,8 @@ const SR = 44100
  * the silence the base class would write — so what this measures is what the
  * worklet does. Pitch goes through quantizePitch for the same reason.
  */
-function render (l: Float32Array, r: Float32Array, semitones: number) {
-  const pipe = new SoundTouch(pipeOptions(SR))
+function render (l: Float32Array, r: Float32Array, semitones: number, sampleRate = SR) {
+  const pipe = new SoundTouch(pipeOptions(sampleRate))
   prefill(pipe)
   pipe.pitch = quantizePitch(semitones)
 
@@ -116,6 +116,19 @@ function measureLag (input: Float32Array, out: Float32Array, maxLag: number) {
   return best
 }
 
+/** Energy-weighted centre of x over [from, to), in frames. */
+function energyCentroid (x: Float32Array, from: number, to: number) {
+  let num = 0
+  let den = 0
+
+  for (let i = from; i < to; i++) {
+    num += x[i] * x[i] * i
+    den += x[i] * x[i]
+  }
+
+  return num / den
+}
+
 const SEMITONES = [-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6]
 
 describe('quantizePitch', () => {
@@ -158,6 +171,55 @@ describe('pitch shifter pipeline', () => {
 
     expect(measured.corr).toBeGreaterThan(0.99)
     expect(measured.lag).toBe(LATENCY_FRAMES)
+  })
+
+  it.each(SEMITONES)('stays within a hop of the reported delay at %i semitones', (semitones) => {
+    // Cross-correlation can't line up shifted output with its input, so this
+    // tracks where a tone burst's energy lands instead. The point is CDG sync,
+    // which only gets LATENCY_FRAMES whatever the shift.
+    const center = FFT_SIZE * 8
+    const sigma = 600
+    const input = new Float32Array(SR)
+
+    for (let i = center - 6 * sigma; i < center + 6 * sigma; i++) {
+      input[i] = Math.exp(-0.5 * ((i - center) / sigma) ** 2) * Math.sin(2 * Math.PI * 1000 * i / SR)
+    }
+
+    const out = render(input, input, semitones).l
+    const span = FFT_SIZE * 4
+    const delay = energyCentroid(out, center + LATENCY_FRAMES - span, center + LATENCY_FRAMES + span)
+      - energyCentroid(input, center - span, center + span)
+
+    expect(Math.abs(delay - LATENCY_FRAMES)).toBeLessThan(ANALYSIS_HOP)
+  })
+
+  it.each(SEMITONES)('is at full level by SETTLE_FRAMES at %i semitones', (semitones) => {
+    // Where the Player crossfades onto the shifter; any earlier and the dry leg
+    // fades out over output that hasn't come up yet.
+    const from = LATENCY_FRAMES + SETTLE_FRAMES
+
+    for (const freq of [220, 1000]) {
+      const out = render(sine(freq, SR * 2), sine(freq, SR * 2), semitones).l
+      const steady = rms(out, SR, SR * 2 - FFT_SIZE)
+
+      for (let at = from; at < from + FFT_SIZE; at += 512) {
+        expect(Math.abs(db(rms(out, at, at + 512) / steady))).toBeLessThan(1)
+      }
+    }
+  })
+
+  it('runs identically at any sample rate', () => {
+    // Everything is sized in frames, so LATENCY_FRAMES and SETTLE_FRAMES hold
+    // at any rate as long as nothing starts reading sampleRate.
+    const input = noise(SR)
+
+    for (const semitones of [-6, -1, 1, 6]) {
+      const reference = render(input, input, semitones).l
+
+      for (const sampleRate of [22050, 48000, 96000, 192000]) {
+        expect(render(input, input, semitones, sampleRate).l).toEqual(reference)
+      }
+    }
   })
 
   it.each(SEMITONES)('shifts pitch by %i semitones, keeping duration', (semitones) => {

@@ -29,6 +29,7 @@ export const phaseVocoderEngine: PitchShifterEngine = {
     return {
       node,
       latency: node.latency,
+      fullLevelAt: node.fullLevelAt,
       setPitchSemitones: (semitones: number) => node.setPitchSemitones(semitones),
       dispose: () => node.disconnect(),
     }

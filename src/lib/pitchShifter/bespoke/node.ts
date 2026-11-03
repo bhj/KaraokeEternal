@@ -4,7 +4,7 @@
  * prefills the output buffer — see ./pitch and ./pipe.
  */
 
-import { LATENCY_FRAMES, PROCESSOR_FILENAME, PROCESSOR_NAME } from './constants'
+import { LATENCY_FRAMES, PROCESSOR_FILENAME, PROCESSOR_NAME, SETTLE_FRAMES } from './constants'
 import { quantizePitch } from './pitch'
 
 export class PitchShifterNode extends AudioWorkletNode {
@@ -25,6 +25,12 @@ export class PitchShifterNode extends AudioWorkletNode {
    */
   readonly latency: number
 
+  /**
+   * Context time from which the output is at full level, once the processor
+   * reports when input first reached it (see ./processor).
+   */
+  readonly fullLevelAt: Promise<number>
+
   constructor (ctx: BaseAudioContext) {
     super(ctx, PROCESSOR_NAME, {
       numberOfInputs: 1,
@@ -33,6 +39,12 @@ export class PitchShifterNode extends AudioWorkletNode {
     })
 
     this.latency = LATENCY_FRAMES / ctx.sampleRate
+
+    this.fullLevelAt = new Promise((resolve) => {
+      this.port.onmessage = ({ data: startTime }: MessageEvent<number>) => {
+        resolve(startTime + (LATENCY_FRAMES + SETTLE_FRAMES) / ctx.sampleRate)
+      }
+    })
   }
 
   /**

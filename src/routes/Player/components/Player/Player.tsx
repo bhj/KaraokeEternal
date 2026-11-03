@@ -12,7 +12,24 @@ const PlayerVisualizer = React.lazy(() => import('./PlayerVisualizer/PlayerVisua
 // kept below full scale to absorb resampler overshoot
 const HEADROOM_DB = 0.5
 
+// time constant (s) of the fades that cover pitch shifter (dis)engagement;
+// ~99% settled after 5τ
+const PITCH_FADE_TAU = 0.003
+
+// a faded-out shifter is torn down after this (ms), well past settled
+const PITCH_FADE_RELEASE_MS = 50
+
 const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max)
+
+/**
+ * Exponential approach rather than a linear ramp: it starts from wherever the
+ * gain currently is, so a fade interrupted by another (quick 0 → n → 0) never
+ * jumps.
+ */
+function fadeTo (param: AudioParam, value: number, startTime: number) {
+  param.cancelScheduledValues(startTime)
+  param.setTargetAtTime(value, startTime, PITCH_FADE_TAU)
+}
 
 /**
  * The dB adjustment to apply for a track, or null when the values are unusable.
@@ -65,8 +82,10 @@ class Player extends React.Component<PlayerProps> {
   audioCtx: AudioContext | null = null
   audioGainNode: GainNode | null = null
   audioPitchBusNode: GainNode | null = null
+  audioDryNode: GainNode | null = null
   audioSourceNode: MediaElementAudioSourceNode | null = null
   pitchShifter: PitchShifter | null = null
+  pitchShifterGain: GainNode | null = null
   isFetching = false // internal
   appliedRG: { gain?: number | null, peak?: number | null } = {} // RG values latched at play
 
@@ -94,6 +113,11 @@ class Player extends React.Component<PlayerProps> {
       // (dis)engaged on the source → bus leg only
       this.audioPitchBusNode = this.audioCtx.createGain()
       this.audioPitchBusNode.connect(this.audioGainNode)
+
+      // bypass leg, always connected; faded rather than (dis)connected so
+      // switching never cuts the waveform mid-cycle
+      this.audioDryNode = this.audioCtx.createGain()
+      this.audioDryNode.connect(this.audioPitchBusNode)
 
       if (this.state.pitchShifterState === 'loading') {
         pitchShifterEngine.prepare(this.audioCtx)
@@ -137,10 +161,7 @@ class Player extends React.Component<PlayerProps> {
   }
 
   componentWillUnmount () {
-    if (this.pitchShifter) {
-      this.pitchShifter.dispose()
-      this.pitchShifter = null
-    }
+    this.releasePitchShifter(false)
   }
 
   handleAudioElement = (el: HTMLVideoElement | HTMLAudioElement) => {
@@ -151,13 +172,10 @@ class Player extends React.Component<PlayerProps> {
     // new media element; discard routing tied to the old source
     // (safe to fully disconnect since the visualizer taps the pitch bus)
     this.audioSourceNode?.disconnect()
-
-    if (this.pitchShifter) {
-      this.pitchShifter.dispose()
-      this.pitchShifter = null
-    }
+    this.releasePitchShifter(false)
 
     this.audioSourceNode = this.audioCtx.createMediaElementSource(el)
+    this.audioSourceNode.connect(this.audioDryNode)
     this.audioGainNode.connect(this.audioCtx.destination)
     this.updatePitch() // wires source → [pitchShifter →] pitch bus
 
@@ -199,22 +217,11 @@ class Player extends React.Component<PlayerProps> {
   updatePitch = () => {
     const source = this.audioSourceNode
 
-    if (!this.audioCtx || !this.audioPitchBusNode || !source) return
+    if (!this.audioCtx || !this.audioPitchBusNode || !this.audioDryNode || !source) return
 
     if (this.props.pitch === 0 || this.state.pitchShifterState !== 'ready') {
-      // bypass: source feeds the bus directly (no added latency)
-      if (this.pitchShifter) {
-        try {
-          source.disconnect(this.pitchShifter.node)
-        } catch {
-          // wasn't connected
-        }
-
-        this.pitchShifter.dispose()
-        this.pitchShifter = null
-      }
-
-      source.connect(this.audioPitchBusNode) // no-op if already connected
+      // bypass: dry leg only (no added latency)
+      this.releasePitchShifter(true)
 
       if (this.state.audioLatency !== 0) {
         this.setState({ audioLatency: 0 })
@@ -224,21 +231,69 @@ class Player extends React.Component<PlayerProps> {
     }
 
     if (!this.pitchShifter) {
-      // fresh instance per engagement; disposed on return to 0
-      this.pitchShifter = pitchShifterEngine.create(this.audioCtx)
-      this.pitchShifter.node.connect(this.audioPitchBusNode)
-      source.connect(this.pitchShifter.node)
+      // fresh instance per engagement; released on return to 0
+      const shifter = pitchShifterEngine.create(this.audioCtx)
+      const shifterGain = this.audioCtx.createGain()
+      const dryGain = this.audioDryNode.gain
 
+      shifterGain.gain.value = 0
+      shifterGain.connect(this.audioPitchBusNode)
+      shifter.node.connect(shifterGain)
+      source.connect(shifter.node)
+
+      this.pitchShifter = shifter
+      this.pitchShifterGain = shifterGain
+
+      // keep the dry leg until the shifter is up to level, then crossfade
+      // (repeats that much audio rather than leaving a gap)
+      shifter.fullLevelAt.then((time) => {
+        if (this.pitchShifter !== shifter) return // released meanwhile
+
+        fadeTo(dryGain, 0, time)
+        fadeTo(shifterGain.gain, 1, time)
+        return
+      }).catch(() => {})
+
+      this.setState({ audioLatency: shifter.latency })
+    }
+
+    this.pitchShifter.setPitchSemitones(this.props.pitch)
+  }
+
+  // detaches the current shifter and restores the dry leg, optionally
+  // crossfading rather than switching
+  releasePitchShifter (isFading: boolean) {
+    const { audioSourceNode: source, pitchShifter, pitchShifterGain } = this
+    const dryGain = this.audioDryNode.gain
+    const now = this.audioCtx.currentTime
+
+    if (!pitchShifter) return
+
+    this.pitchShifter = null
+    this.pitchShifterGain = null
+
+    const dispose = () => {
       try {
-        source.disconnect(this.audioPitchBusNode)
+        // an input keeps the worklet processing even with its output detached
+        source?.disconnect(pitchShifter.node)
       } catch {
         // wasn't connected
       }
 
-      this.setState({ audioLatency: this.pitchShifter.latency })
+      pitchShifter.dispose()
+      pitchShifterGain.disconnect()
     }
 
-    this.pitchShifter.setPitchSemitones(this.props.pitch)
+    if (!isFading) {
+      dryGain.cancelScheduledValues(0)
+      dryGain.setValueAtTime(1, now)
+      dispose()
+      return
+    }
+
+    fadeTo(dryGain, 1, now)
+    fadeTo(pitchShifterGain.gain, 0, now)
+    setTimeout(dispose, PITCH_FADE_RELEASE_MS)
   }
 
   updateVolume = () => {

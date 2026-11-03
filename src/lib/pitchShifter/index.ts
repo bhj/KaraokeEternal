@@ -3,6 +3,9 @@ export interface PitchShifter {
   readonly node: AudioNode
   // seconds of added latency at current settings (for graphics compensation)
   readonly latency: number
+  // context time (s) from which output is at full level; resolves once input
+  // has reached the shifter. Crossfade onto it no earlier.
+  readonly fullLevelAt: Promise<number>
   setPitchSemitones(semitones: number): void
   // disconnects outputs and releases resources; instance is unusable afterward
   dispose(): void

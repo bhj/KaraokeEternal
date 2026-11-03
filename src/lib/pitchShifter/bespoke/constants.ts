@@ -48,5 +48,16 @@ export const PREFILL_FRAMES = ANALYSIS_HOP + RENDER_QUANTUM * 3
  * worth reconstructing in a comment. pipeline.test.ts drives the pipeline the
  * way the worklet does and asserts the real delay against this, so it fails
  * loudly if a version bump or a setting moves it.
+ *
+ * Exact at no shift. Shifted, the real delay is shorter by up to ~300 frames
+ * (±6 semitones), well under a video frame; the tests bound it.
  */
 export const LATENCY_FRAMES = 2433
+
+/**
+ * Frames past LATENCY_FRAMES until the output reaches full level. The first
+ * hops of a fresh pipeline come out a few dB low, and crossfading onto them
+ * deepens the crossover dip by about 2 dB; from here on it is at the floor of
+ * a plain crossfade. Measured, and asserted in pipeline.test.ts.
+ */
+export const SETTLE_FRAMES = FFT_SIZE / 2
