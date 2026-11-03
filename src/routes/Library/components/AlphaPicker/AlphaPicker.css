@@ -11,3 +11,32 @@
   cursor: pointer;
   touch-action: none;
 }
+
+.overlay {
+  position: fixed;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  transform: translate(-50%, -50%);
+  font-size: 3.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  border: 1.5px solid var(--modal-border-color);
+  border-radius: var(--modal-border-radius);
+  background-color: var(--chrome-bg-color);
+  /* fallback for .bg-blur */
+  pointer-events: none;
+
+  &.fading {
+    animation: alphaPickerOverlayFade 0.25s forwards;
+  }
+}
+
+@keyframes alphaPickerOverlayFade {
+  to {
+    opacity: 0;
+  }
+}

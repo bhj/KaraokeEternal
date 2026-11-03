@@ -101,7 +101,9 @@ const PaddedList = ({
       overscanCount={10}
       listRef={handleListRef}
       className={styles.container}
-      style={{ width, height }}
+      // scrollToRow() aligns within scroll-padding, so rows land below the
+      // header/footer that overlay the spacers regardless of their heights
+      style={{ width, height, scrollPaddingTop: paddingTop, scrollPaddingBottom: paddingBottom }}
     />
   )
 }

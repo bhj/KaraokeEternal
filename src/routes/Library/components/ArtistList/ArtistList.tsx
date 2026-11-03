@@ -92,7 +92,8 @@ const ArtistList = ({
     const row = alphaPickerMap[char]
 
     if (typeof row !== 'undefined' && listRef.current) {
-      listRef.current.scrollToRow({ index: row > 0 ? row - 1 : row, align: 'start' })
+      // +1 for PaddedList's top spacer row
+      listRef.current.scrollToRow({ index: row + 1, align: 'start' })
     }
   }
 
