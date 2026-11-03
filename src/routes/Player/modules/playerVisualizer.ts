@@ -19,7 +19,7 @@ const getPreset = (i: number) => ({
   presetName: `[${i + 1}/${_presetKeys.length}] ` + _presetKeys[i],
 })
 
-const getRandomPreset = () => getPreset(Math.floor(Math.random() * (_presetKeys.length - 1)))
+const getRandomPreset = () => getPreset(Math.floor(Math.random() * _presetKeys.length))
 
 // ------------------------------------
 // Actions

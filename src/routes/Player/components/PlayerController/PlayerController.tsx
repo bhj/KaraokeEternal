@@ -124,6 +124,12 @@ const PlayerController = (props: PlayerControllerProps) => {
     queueItem?.isVideoKeyingEnabled,
   ])
 
+  // emit discrete visualizer changes immediately; keyed on primitives so that
+  // dragging the sensitivity slider stays throttled
+  useEffect(() => {
+    dispatch(playerStatus({}, true))
+  }, [dispatch, playerVisualizer.presetKey, playerVisualizer.isEnabled])
+
   // on unmount
   useEffect(() => () => dispatch(playerLeave()), [dispatch])
 

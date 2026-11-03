@@ -35,13 +35,21 @@ export const requestVolume = createAction(PLAYER_REQ_VOLUME, (vol: number) => ({
   },
 }))
 
+// only slider values are throttled: all options share one throttle, which sends
+// just the first and last request in each window, so discrete requests (preset
+// changes, visualizer toggle) would be dropped by any request made right after
+const isDiscreteOptions = (opts: PlaybackOptions) => !!opts.visualizer
+  && Object.keys(opts.visualizer).some(key => key !== 'sensitivity')
+
 export const requestOptions = createAction(PLAYER_REQ_OPTIONS, (opts: PlaybackOptions) => ({
   payload: opts,
   meta: {
-    throttle: {
-      wait: 200,
-      leading: true,
-    },
+    throttle: isDiscreteOptions(opts)
+      ? false
+      : {
+          wait: 200,
+          leading: true,
+        },
   },
 }))
 

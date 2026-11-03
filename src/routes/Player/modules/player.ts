@@ -45,7 +45,13 @@ const playerCmdOptions = createAction<{
 // ------------------------------------
 // Actions for emitting to room
 // ------------------------------------
-export function playerStatus (status: Partial<PlayerState> = {}, deferEmit = false): AppThunk {
+/**
+ * isImmediate skips the throttle's wait, which during playback is nearly always
+ * running because position updates arrive several times a second. Cancelling the
+ * pending emit first is what makes this safe: it can only hold an older snapshot
+ * than the one sent now, and a second unthrottled path would let it go out after.
+ */
+export function playerStatus (status: Partial<PlayerState> = {}, isImmediate = false): AppThunk {
   return (dispatch, getState) => {
     const { player, playerVisualizer } = getState()
 
@@ -60,6 +66,8 @@ export function playerStatus (status: Partial<PlayerState> = {}, deferEmit = fal
       }).filter(([key]) => !key.startsWith('_')),
     )
 
+    if (isImmediate) dispatch(playerStatusCancel())
+
     dispatch({
       type: PLAYER_EMIT_STATUS,
       payload: {
@@ -67,9 +75,11 @@ export function playerStatus (status: Partial<PlayerState> = {}, deferEmit = fal
         visualizer: playerVisualizer,
       },
       meta: {
+        // redux-throttle keeps the options from the first action of this type,
+        // so these can't vary per call
         throttle: {
           wait: 1000,
-          leading: !deferEmit,
+          leading: true,
         },
       },
     })
