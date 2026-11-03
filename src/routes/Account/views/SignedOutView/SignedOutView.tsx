@@ -30,15 +30,22 @@ const SignedOutView = () => {
   const [prevRooms, setPrevRooms] = useState<typeof rooms | null>(null)
   const [focusRequest, setFocusRequest] = useState(0)
   const [isRoomsLoading, setIsRoomsLoading] = useState(true)
+  const [isWaitExpired, setIsWaitExpired] = useState(false)
 
   // once per mount
   useEffect(() => {
+    // don't wait on a hung request forever (admins must always be able to sign in)
+    const timer = setTimeout(() => setIsWaitExpired(true), 2000)
+
     const load = async () => {
+      // the thunk's promise resolves even when the request fails
       await dispatch(fetchRooms())
       setIsRoomsLoading(false)
     }
 
     load()
+
+    return () => clearTimeout(timer)
   }, [dispatch])
 
   // room selection visibility/defaults
@@ -129,7 +136,7 @@ const SignedOutView = () => {
   const allowNew = allowNewStandard || allowNewGuest
 
   // allowNew depends on both rooms and roles, so wait for them to avoid swapping headings
-  const isReady = !isRoomsLoading && prefs.roles.result.length > 0
+  const isReady = isWaitExpired || (!isRoomsLoading && prefs.roles.result.length > 0)
 
   useEffect(() => {
     const scroll = scrollOnFocusRef.current
@@ -171,7 +178,7 @@ const SignedOutView = () => {
 
       {showRoomSection && (
         <>
-          <h1>Join room...</h1>
+          <h1>Choose a room</h1>
           <SelectRoom
             rooms={rooms}
             roomId={roomId}
@@ -187,7 +194,7 @@ const SignedOutView = () => {
         {allowNew
           ? (
               <>
-                <h1>Join as...</h1>
+                <h1>Join as</h1>
                 <div className={styles.radioContainer}>
                   <InputRadio name='type' value='returning' checked={mode === 'returning'} onChange={setMode} label='Returning user' />
                   {allowNewStandard && <InputRadio name='type' value='standard' checked={mode === 'standard'} onChange={setMode} label='New user' />}
