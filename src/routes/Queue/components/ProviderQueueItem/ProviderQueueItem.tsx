@@ -77,15 +77,31 @@ const ProviderQueueItem = ({
     error,
   })
 
+  const isExpandable = isAdmin || isCancelable || isRetryable
+
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => setExpanded(isAdmin || isCancelable || isRetryable),
+    onSwipedLeft: () => setExpanded(isExpandable),
     onSwipedRight: () => setExpanded(false),
     preventScrollOnSwipe: true,
     trackMouse: true,
   })
 
+  // keyboard equivalent of swiping; ignore keys bubbling up from the buttons
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return
+    if (e.key === 'ArrowLeft') setExpanded(isExpandable)
+    else if (e.key === 'ArrowRight') setExpanded(false)
+    else return
+    e.preventDefault()
+  }
+
   return (
-    <div {...swipeHandlers} className={clsx(styles.container, status === 'error' && styles.errored)}>
+    <div
+      {...swipeHandlers}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      className={clsx(styles.container, status === 'error' && styles.errored)}
+    >
       <div className={styles.content}>
         <div className={styles.imageContainer}>
           <UserImage userId={userId} dateUpdated={userDateUpdated} />

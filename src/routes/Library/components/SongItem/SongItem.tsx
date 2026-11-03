@@ -52,6 +52,14 @@ const SongItem = ({
     if (ignoreMouseup) ignoreMouseup = false
     else if (!isUpcoming) onSongQueue(songId)
   }
+  // arrow keys are the keyboard equivalent of swiping
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowLeft') setExpanded(isAdmin)
+    else if (e.key === 'ArrowRight') setExpanded(false)
+    else if ((e.key === 'Enter' || e.key === ' ') && !isUpcoming) onSongQueue(songId)
+    else return
+    e.preventDefault()
+  }
   const handleInfoClick = () => onSongInfo(songId)
   const handleStarClick = () => onSongStarClick(songId)
 
@@ -78,10 +86,18 @@ const SongItem = ({
         artist && styles.withArtist,
       )}
     >
-      <div className={clsx(styles.duration, glow.className)} onAnimationEnd={glow.onAnimationEnd}>
-        {formatDuration(duration)}
-      </div>
-      <div onClick={handleClick} className={clsx(styles.primary, glow.className)} onAnimationEnd={glow.onAnimationEnd}>
+      <div
+        className={clsx(styles.primary, glow.className)}
+        role='button'
+        tabIndex={0}
+        aria-disabled={isUpcoming}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        onAnimationEnd={glow.onAnimationEnd}
+      >
+        <div className={styles.duration}>
+          {formatDuration(duration)}
+        </div>
         <div className={styles.title}>
           <Highlight text={title} pattern={highlight ?? null} />
           {isAdmin && numMedia > 1 && (

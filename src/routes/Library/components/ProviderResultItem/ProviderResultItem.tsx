@@ -74,12 +74,14 @@ const ProviderResultItem = ({
     onFetch({ providerId, itemId, title, artist, source, iconUrl, duration })
   }
 
+  // arrow keys are the keyboard equivalent of swiping, and stay live while
+  // disabled so an in-flight fetch can still be canceled
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (disabled) return
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      onFetch({ providerId, itemId, title, artist, source, iconUrl, duration })
-    }
+    if (e.key === 'ArrowLeft') setExpanded(isAdmin || isCancelable)
+    else if (e.key === 'ArrowRight') setExpanded(false)
+    else if ((e.key === 'Enter' || e.key === ' ') && !disabled) onFetch({ providerId, itemId, title, artist, source, iconUrl, duration })
+    else return
+    e.preventDefault()
   }
 
   const handleInfoClick = () => {

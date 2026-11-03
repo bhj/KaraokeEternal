@@ -48,11 +48,19 @@
 
 .primary {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
   align-self: stretch;
-  align-content: center;
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
+
+  /* inset: the list clips anything outside the row */
+  &:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: -4px;
+  }
 }
 
 .title {

@@ -35,9 +35,10 @@
   white-space: nowrap;
   cursor: pointer;
 
+  /* inset: the list clips anything outside the row */
   &:focus-visible {
-    outline: 2px solid var(--color-gray-7);
-    outline-offset: -2px;
+    outline: var(--focus-outline);
+    outline-offset: -4px;
   }
 
   .containerDisabled & {

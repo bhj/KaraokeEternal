@@ -97,14 +97,23 @@ const QueueItem = ({
   const handleRemoveClick = () => dispatch(removeItem({ queueId }))
   const handleStarClick = () => dispatch(toggleSongStarred(songId))
 
+  const isExpandable = isErrored || isInfoable || isRemovable || isSkippable
+
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => {
-      setExpanded(isErrored || isInfoable || isRemovable || isSkippable)
-    },
+    onSwipedLeft: () => setExpanded(isExpandable),
     onSwipedRight: () => setExpanded(false),
     preventScrollOnSwipe: true,
     trackMouse: true,
   })
+
+  // keyboard equivalent of swiping; ignore keys bubbling up from the buttons
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return
+    if (e.key === 'ArrowLeft') setExpanded(isExpandable)
+    else if (e.key === 'ArrowRight') setExpanded(false)
+    else return
+    e.preventDefault()
+  }
 
   const bindRemovePressHandlers = useLongPress(() => {
     const confirmText = isOwner ? 'Remove all your upcoming songs?' : `Remove all upcoming songs for "${userDisplayName}"?`
@@ -128,6 +137,8 @@ const QueueItem = ({
   return (
     <div
       {...swipeHandlers}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
       className={clsx(
         styles.container,
         isCurrent && styles.current,
