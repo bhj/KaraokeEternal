@@ -98,6 +98,7 @@ const InputImage = ({ user, onSelect }: UserImageProps) => {
           icon='CLEAR'
           onClick={handleImgClear}
           size={32}
+          aria-label='Remove Image'
         />
       )}
 

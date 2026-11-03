@@ -123,6 +123,7 @@ const ProviderQueueItem = ({
               className={styles.danger}
               icon='ALERT_OUTLINE'
               onClick={isAdmin ? handleInfoClick : handleErrorInfoClick}
+              aria-label='Error Info'
             />
           )}
           {status !== 'error' && isAdmin && (
@@ -131,6 +132,7 @@ const ProviderQueueItem = ({
               data-hide
               icon='INFO_OUTLINE'
               onClick={handleInfoClick}
+              aria-label='Info'
             />
           )}
           {isRetryable && (
@@ -139,6 +141,7 @@ const ProviderQueueItem = ({
               data-hide
               icon='REPLAY'
               onClick={handleRetryClick}
+              aria-label='Retry'
             />
           )}
           {isCancelable && (
@@ -147,6 +150,7 @@ const ProviderQueueItem = ({
               data-hide
               icon='CLEAR'
               onClick={handleCancelClick}
+              aria-label='Cancel'
             />
           )}
         </Buttons>

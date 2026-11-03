@@ -33,6 +33,7 @@ const LibraryHeader = () => {
         className={clsx(styles.btnMagnifier, filterStr && styles.active)}
         icon='MAGNIFIER'
         onClick={handleMagnifierClick}
+        aria-label={value.trim() ? 'Clear Search' : 'Search'}
       />
       <input
         type='search'
@@ -47,12 +48,15 @@ const LibraryHeader = () => {
           icon='CLEAR'
           onClick={clearSearch}
           className={clsx(styles.btnClear, styles.active)}
+          aria-label='Clear Search'
         />
       )}
       <Button
         className={clsx(styles.btnStar, filterStarred && styles.active)}
         icon='STAR_FULL'
         onClick={() => dispatch(toggleFilterStarred())}
+        aria-label='Starred Only'
+        aria-pressed={filterStarred}
       />
     </div>
   )

@@ -107,7 +107,7 @@ const SongItem = ({
           isStarred={isStarred}
           count={numStars}
         />
-        <Button onClick={handleInfoClick} className={clsx(styles.btn, styles.info)} data-hide>
+        <Button onClick={handleInfoClick} className={clsx(styles.btn, styles.info)} data-hide aria-label='Info'>
           <Icon icon='INFO_OUTLINE' />
         </Button>
       </Buttons>

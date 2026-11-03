@@ -163,6 +163,7 @@ const QueueItem = ({
               className={styles.danger}
               icon='ALERT_OUTLINE'
               onClick={handleErrorInfoClick}
+              aria-label='Error Info'
             />
           )}
           <ButtonStar
@@ -177,6 +178,7 @@ const QueueItem = ({
               data-hide
               icon='INFO_OUTLINE'
               onClick={handleInfoClick}
+              aria-label='Info'
             />
           )}
           {isMovable && (
@@ -185,6 +187,7 @@ const QueueItem = ({
               data-hide
               icon='MOVE_TOP'
               onClick={handleMoveClick}
+              aria-label='Move to Top'
             />
           )}
           {isPlayed && (
@@ -193,6 +196,7 @@ const QueueItem = ({
               data-hide
               icon='PLUS'
               onClick={handleRequeueClick}
+              aria-label='Queue Again'
             />
           )}
           {isReplayable && (
@@ -201,6 +205,7 @@ const QueueItem = ({
               data-hide
               icon='REPLAY'
               onClick={handleReplayClick}
+              aria-label='Replay'
             />
           )}
           {isRemovable && (
@@ -208,6 +213,7 @@ const QueueItem = ({
               className={styles.danger}
               data-hide
               icon='DELETE'
+              aria-label='Remove'
               onTouchEnd={(e: React.TouchEvent<HTMLButtonElement>) => {
                 if (longPressActiveRef.current) {
                   e.preventDefault()
@@ -231,6 +237,7 @@ const QueueItem = ({
               className={clsx(styles.btnPlayNext, styles.danger)}
               data-hide
               icon='PLAY_NEXT'
+              aria-label='Play Next'
               onTouchEnd={(e: React.TouchEvent<HTMLButtonElement>) => {
                 if (longPressActiveRef.current) {
                   e.preventDefault()

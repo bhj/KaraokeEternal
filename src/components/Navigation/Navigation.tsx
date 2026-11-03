@@ -6,7 +6,7 @@ import styles from './Navigation.css'
 
 const Navigation = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => (
   <div className={clsx(styles.container, 'bg-blur')} ref={ref}>
-    <NavLink to='/library' replace className={({ isActive }) => clsx(isActive && styles.active)}>
+    <NavLink to='/library' replace className={({ isActive }) => clsx(isActive && styles.active)} aria-label='Library'>
       {({ isActive }) => (
         <Button
           icon='NAV_LIBRARY'
@@ -16,7 +16,7 @@ const Navigation = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => (
         />
       )}
     </NavLink>
-    <NavLink to='/queue' replace className={({ isActive }) => clsx(isActive && styles.active)}>
+    <NavLink to='/queue' replace className={({ isActive }) => clsx(isActive && styles.active)} aria-label='Queue'>
       {({ isActive }) => (
         <Button
           icon='NAV_SUBSCRIPTIONS'
@@ -26,7 +26,7 @@ const Navigation = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => (
         />
       )}
     </NavLink>
-    <NavLink to='/account' replace className={({ isActive }) => clsx(isActive && styles.active)}>
+    <NavLink to='/account' replace className={({ isActive }) => clsx(isActive && styles.active)} aria-label='Account'>
       {({ isActive }) => (
         <Button
           icon={isActive ? 'NAV_ACCOUNT_ACTIVE' : 'NAV_ACCOUNT'}

@@ -31,7 +31,7 @@ const ProviderItem = ({ index, onInfo, provider }: ProviderItemProps) => {
           style={provided.draggableProps.style}
           {...provided.draggableProps}
         >
-          <div {...provided.dragHandleProps} tabIndex={-1}>
+          <div {...provided.dragHandleProps} tabIndex={-1} aria-label='Drag to Reorder'>
             <Icon icon='DRAG_INDICATOR' className={styles.btnDrag} />
           </div>
           <div className={clsx(styles.providerName, !provider.prefs.enabled && styles.disabled)}>

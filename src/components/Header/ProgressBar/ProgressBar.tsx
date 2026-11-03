@@ -47,6 +47,7 @@ const ProgressBar = ({ isActive, onCancel, pct, text }: ProgressBarProps) => {
         icon='CLEAR'
         onClick={handleCancelClick}
         size={40}
+        aria-label={isActive ? 'Cancel' : 'Close'}
       />
     </div>
   )

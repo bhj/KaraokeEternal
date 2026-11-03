@@ -24,6 +24,8 @@ const ButtonStar = ({
     <Button
       onClick={onClick}
       className={clsx(styles.container, isStarred && styles.starred, className)}
+      aria-label='Star'
+      aria-pressed={isStarred}
     >
       <Icon icon='STAR_FULL' className={starAnimation.className} onAnimationEnd={starAnimation.onAnimationEnd} />
       <div className={styles.starCount}>
