@@ -161,7 +161,7 @@ const QueueItem = ({
           {isErrored && (
             <Button
               className={styles.danger}
-              icon='INFO_OUTLINE'
+              icon='ALERT_OUTLINE'
               onClick={handleErrorInfoClick}
             />
           )}

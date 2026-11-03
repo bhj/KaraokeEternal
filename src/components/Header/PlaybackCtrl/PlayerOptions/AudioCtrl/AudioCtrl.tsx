@@ -108,7 +108,7 @@ const AudioCtrl = ({
 
             {onSetGlobalPitch && (
               <dl className={styles.saved}>
-                <dt>Global Pitch:</dt>
+                <dt>Default:</dt>
                 {/* 0 is stored as "unset", so there's no absent state to show */}
                 <dd className={styles.value}>
                   {formatSavedPitch(globalPitch)}
@@ -118,18 +118,18 @@ const AudioCtrl = ({
                     className={styles.link}
                     onClick={() => onSetGlobalPitch(displayPitch)}
                     disabled={displayPitch === globalPitch}
-                    aria-label='Set global pitch'
+                    aria-label='Set Global Pitch'
                   >
-                    Set
+                    Set Default
                   </Button>
                   {/* the server stores 0 as "unset", so clearing is setting 0 */}
                   <Button
                     className={styles.link}
                     onClick={handleClearGlobalPitch}
                     disabled={globalPitch === 0}
-                    aria-label='Clear global pitch'
+                    aria-label='Clear Global Pitch'
                   >
-                    Clear
+                    Reset
                   </Button>
                 </dd>
               </dl>
@@ -147,7 +147,7 @@ const AudioCtrl = ({
             <br />
             {/* @ts-expect-error: global via Webpack */}
             <a href={__KE_URL_PITCH_HELP__} target='_blank' rel='noreferrer'>
-              How to enable
+              Learn more
             </a>
           </p>
         )}

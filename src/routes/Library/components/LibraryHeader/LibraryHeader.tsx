@@ -37,7 +37,7 @@ const LibraryHeader = () => {
       <input
         type='search'
         className={styles.searchInput}
-        placeholder='search'
+        placeholder='Search'
         value={value}
         onChange={handleChange}
         ref={searchInputRef}

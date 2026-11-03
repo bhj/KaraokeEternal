@@ -40,6 +40,8 @@
   color: var(--btn-active-bg-color);
   position: absolute;
   touch-action: pan-x;
+  -webkit-user-select: none;
+  user-select: none;
   outline: none;
 
   &:focus-visible {
@@ -50,4 +52,10 @@
     display: block;
     height: var(--handle-height);
   }
+}
+
+/* on the content, not the handle, so the bloom doesn't halo the focus outline;
+   zero specificity so a custom handleComponent's own filter wins */
+:where(.handle > *) {
+  filter: var(--transport-volume-track-active-filter);
 }

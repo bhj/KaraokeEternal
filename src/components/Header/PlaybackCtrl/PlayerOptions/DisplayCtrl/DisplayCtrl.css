@@ -31,6 +31,17 @@
   }
 }
 
+.presetAnimate {
+  animation: preset-glow 1s var(--activate-1);
+}
+
+/* no `to`: fades back to the button's unfiltered resting state */
+@keyframes preset-glow {
+  from {
+    filter: var(--btn-activate-filter);
+  }
+}
+
 .presetName {
   margin: 0;
   height: 2lh;

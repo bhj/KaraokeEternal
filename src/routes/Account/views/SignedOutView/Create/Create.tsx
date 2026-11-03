@@ -44,7 +44,7 @@ const Create = ({
             autoComplete='off'
             value={username}
             onChange={e => onUsernameChange(e.target.value)}
-            placeholder='username or email'
+            placeholder='Username or email'
             ref={onFirstFieldRef}
           />
           <input
@@ -52,12 +52,12 @@ const Create = ({
             autoComplete='new-password'
             value={password}
             onChange={e => onPasswordChange(e.target.value)}
-            placeholder='password'
+            placeholder='Password'
           />
           <input
             type='password'
             autoComplete='new-password'
-            placeholder='confirm password'
+            placeholder='Confirm password'
             value={passwordConfirm}
             onChange={e => setPasswordConfirm(e.target.value)}
           />
@@ -68,7 +68,7 @@ const Create = ({
         <InputImage onSelect={setImage} />
         <input
           type='text'
-          placeholder='display name'
+          placeholder='Display name'
           value={name}
           onChange={e => setName(e.target.value)}
           ref={guest ? onFirstFieldRef : undefined}

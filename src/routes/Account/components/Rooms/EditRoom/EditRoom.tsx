@@ -82,7 +82,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
             autoComplete='off'
             defaultValue={room ? room.name : ''}
             name='name'
-            placeholder='room name'
+            placeholder='Room name'
             // https://github.com/facebook/react/issues/23301
             ref={r => typeof room === 'undefined' ? r?.setAttribute('autofocus', 'true') : undefined}
           />
@@ -94,7 +94,7 @@ const EditRoom = ({ onClose, room }: EditRoomProps) => {
             name='password'
             onChange={handlePasswordChange}
             onFocus={e => e.target.select()}
-            placeholder='room password (optional)'
+            placeholder='Room password (optional)'
           />
 
           <select

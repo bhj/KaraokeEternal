@@ -70,8 +70,8 @@ const SelectRoom = ({
                 autoComplete='off'
                 className={clsx((roomId === null || id !== roomId) && styles.hidden)}
                 onChange={(e) => { onRoomPasswordChange(e.target.value) }}
-                placeholder='room password (required)'
-                aria-label='room password (required)'
+                placeholder='Room password (required)'
+                aria-label='Room password (required)'
                 ref={setPasswordRef(id)}
                 value={roomPassword}
               />

@@ -80,21 +80,24 @@ const DisplayCtrl = ({
                 <div className={styles.presetButtons}>
                   <Button
                     onClick={handlePresetPrev}
-                    aria-label='Previous preset'
+                    animateClassName={styles.presetAnimate}
+                    aria-label='Previous Preset'
                     aria-controls='visualizer-preset-name'
                   >
                     <Icon icon='CHEVRON_LEFT' />
                   </Button>
                   <Button
                     onClick={handlePresetRandom}
-                    aria-label='Random preset'
+                    animateClassName={styles.presetAnimate}
+                    aria-label='Random Preset'
                     aria-controls='visualizer-preset-name'
                   >
                     <Icon icon='DICE' />
                   </Button>
                   <Button
                     onClick={handlePresetNext}
-                    aria-label='Next preset'
+                    animateClassName={styles.presetAnimate}
+                    aria-label='Next Preset'
                     aria-controls='visualizer-preset-name'
                   >
                     <Icon icon='CHEVRON_RIGHT' />

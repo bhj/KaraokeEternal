@@ -140,7 +140,7 @@ const RowComponent = ({
     return (
       <div style={style} className={styles.providerSearchButton}>
         <Button variant='primary' onClick={onProviderSearch}>
-          {isProviderSearchDone ? 'Search again' : 'Search for more songs'}
+          {isProviderSearchDone ? 'Search Again' : 'Search for More Songs'}
         </Button>
       </div>
     )

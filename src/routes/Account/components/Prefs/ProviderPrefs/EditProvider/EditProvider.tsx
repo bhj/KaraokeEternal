@@ -151,7 +151,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
       inputMode='url'
       value={url}
       onChange={e => setUrl(e.target.value)}
-      placeholder='provider URL'
+      placeholder='Provider URL'
     />
   )
 
@@ -229,7 +229,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
                 autoComplete='off'
                 value={name}
                 onChange={e => setName(e.target.value)}
-                placeholder='provider name'
+                placeholder='Provider name'
               />
               <div>
                 <p className={styles.meta}>
@@ -299,7 +299,7 @@ const EditProvider = ({ provider, onClose }: EditProviderProps) => {
                         min={0}
                         step={1}
                         inputMode='numeric'
-                        aria-label='maximum library results'
+                        aria-label='Maximum library results'
                         value={maxLibraryResults}
                         onChange={e => setMaxLibraryResults(e.target.value)}
                         onFocus={() => setAlwaysShown(false)}

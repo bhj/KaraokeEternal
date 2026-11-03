@@ -155,7 +155,7 @@ const ProviderResultItem = ({
             className={styles.danger}
             icon='ALERT_OUTLINE'
             onClick={isAdmin ? handleInfoClick : handleErrorInfoClick}
-            aria-label='Error info'
+            aria-label='Error Info'
           />
         )}
         {!isErrored && isAdmin && (

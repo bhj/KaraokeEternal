@@ -182,7 +182,7 @@ export class ProviderStatusImpl {
       log.info('%s (%d) ready: %j', provider.name, providerId, status.types)
       entry.retryMs = RETRY_MIN_MS
     } else {
-      log.warn('%s (%d) %s: %s (retrying in %dms)', provider.name, providerId, status.state, status.message, entry.retryMs)
+      log.warn('%s (%d) %s: %s (retrying in %ds)', provider.name, providerId, status.state, status.message, entry.retryMs / 1000)
       entry.retryTimer = setTimeout(() => {
         entry.retryTimer = undefined
         void this.recheck(providerId)

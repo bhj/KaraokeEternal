@@ -63,7 +63,7 @@ const SongInfo = () => {
           <span className={styles.label}>Song ID: </span>
           {songId}
           <br />
-          <span className={styles.label}>Media Files: </span>
+          <span className={styles.label}>Media files: </span>
           {isLoading ? '?' : media.result.length}
         </p>
 

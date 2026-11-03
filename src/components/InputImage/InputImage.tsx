@@ -88,7 +88,7 @@ const InputImage = ({ user, onSelect }: UserImageProps) => {
           height={72}
           onLoad={handleImgLoad}
           onError={handleImgError}
-          alt='User Profile'
+          alt='User profile'
         />
       )}
 

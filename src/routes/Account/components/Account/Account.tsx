@@ -72,7 +72,7 @@ const Account = () => {
             <input
               type='password'
               autoComplete='current-password'
-              placeholder='current password'
+              placeholder='Current password'
               ref={curPasswordRef}
             />
 

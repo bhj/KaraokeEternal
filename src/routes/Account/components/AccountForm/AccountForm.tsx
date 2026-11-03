@@ -112,7 +112,7 @@ const AccountForm = ({
           autoComplete='off'
           autoFocus={autoFocus}
           onChange={updateDirty}
-          placeholder={user && user.userId !== null ? 'change username (optional)' : 'username or email'}
+          placeholder={user && user.userId !== null ? 'Change username (optional)' : 'Username or email'}
           // https://github.com/facebook/react/issues/23301
           ref={(r) => {
             if (r) usernameRef.current = r
@@ -126,7 +126,7 @@ const AccountForm = ({
           type='password'
           autoComplete='new-password'
           onChange={updateDirty}
-          placeholder={user && user.userId !== null ? 'change password (optional)' : 'password'}
+          placeholder={user && user.userId !== null ? 'Change password (optional)' : 'Password'}
           ref={newPasswordRef}
         />
       )}
@@ -135,7 +135,7 @@ const AccountForm = ({
         <input
           type='password'
           autoComplete='new-password'
-          placeholder={user && user.userId !== null ? 'new password confirm' : 'confirm password'}
+          placeholder={user && user.userId !== null ? 'Confirm new password' : 'Confirm password'}
           ref={newPasswordConfirmRef}
         />
       )}
@@ -149,7 +149,7 @@ const AccountForm = ({
           type='text'
           defaultValue={user?.name ?? ''}
           onChange={updateDirty}
-          placeholder='display name'
+          placeholder='Display name'
           ref={nameRef}
         />
       </div>

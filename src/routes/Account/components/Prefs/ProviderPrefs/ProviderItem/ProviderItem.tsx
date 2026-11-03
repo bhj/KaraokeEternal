@@ -43,7 +43,7 @@ const ProviderItem = ({ index, onInfo, provider }: ProviderItemProps) => {
             icon={alert ? 'ALERT_OUTLINE' : 'INFO_OUTLINE'}
             onClick={handleInfo}
             title={alert ?? undefined}
-            aria-label={alert ?? 'Provider info'}
+            aria-label={alert ?? 'Provider Info'}
           />
         </div>
       )}

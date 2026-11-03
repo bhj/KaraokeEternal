@@ -23,6 +23,7 @@ interface HandleProps {
   'aria-label'?: string
   'aria-labelledby'?: string
   'className'?: string
+  'onDragStart'?: React.DragEventHandler<HTMLDivElement>
   'onTouchEnd'?: React.TouchEventHandler<HTMLDivElement>
 }
 
@@ -77,6 +78,8 @@ const Slider = ({
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledby,
       'className': styles.handle,
+      // prevent drag of a handleComponent's text instead of moving the handle
+      'onDragStart': (e: React.DragEvent<HTMLDivElement>) => e.preventDefault(),
       'onTouchEnd': (e: React.TouchEvent<HTMLDivElement>) => {
         // Prevent focus outline on touch in mobile Safari
         (e.currentTarget as HTMLDivElement).blur()

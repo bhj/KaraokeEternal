@@ -54,6 +54,13 @@ const Button = <E extends ButtonElementType = 'button'>({
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     if (animateClassName) {
+      // the class is already applied mid-animation, so replay it or rapid taps go unacknowledged
+      if (animating) {
+        elementRef.current?.getAnimations().forEach((a) => {
+          a.currentTime = 0
+        })
+      }
+
       setAnimating(true)
     }
 

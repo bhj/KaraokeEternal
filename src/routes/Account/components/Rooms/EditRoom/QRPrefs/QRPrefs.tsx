@@ -78,7 +78,7 @@ const QRPrefs = ({ onChange, prefs = {}, roomPassword, roomPasswordDirty }: QRPr
                   value={prefs?.qr?.password ?? ''}
                   onChange={e => handleSetPref({ qr: { ...prefs.qr, password: e.target.value } })}
                   onFocus={e => e.target.select()}
-                  placeholder='re-enter room password'
+                  placeholder='Re-enter room password'
                 />
               </div>
             )}
