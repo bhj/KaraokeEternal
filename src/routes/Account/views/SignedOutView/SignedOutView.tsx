@@ -29,10 +29,16 @@ const SignedOutView = () => {
   const [showAllRooms, setShowAllRooms] = useState(true)
   const [prevRooms, setPrevRooms] = useState<typeof rooms | null>(null)
   const [focusRequest, setFocusRequest] = useState(0)
+  const [isRoomsLoading, setIsRoomsLoading] = useState(true)
 
   // once per mount
   useEffect(() => {
-    dispatch(fetchRooms())
+    const load = async () => {
+      await dispatch(fetchRooms())
+      setIsRoomsLoading(false)
+    }
+
+    load()
   }, [dispatch])
 
   // room selection visibility/defaults
@@ -122,6 +128,9 @@ const SignedOutView = () => {
   const allowNewStandard = getAllowed('standard')
   const allowNew = allowNewStandard || allowNewGuest
 
+  // allowNew depends on both rooms and roles, so wait for them to avoid swapping headings
+  const isReady = !isRoomsLoading && prefs.roles.result.length > 0
+
   useEffect(() => {
     const scroll = scrollOnFocusRef.current
     scrollOnFocusRef.current = false
@@ -154,7 +163,7 @@ const SignedOutView = () => {
       cancelAnimationFrame(raf)
       window.visualViewport?.removeEventListener('resize', handleViewportResize)
     }
-  }, [focusRequest, mode])
+  }, [focusRequest, mode, isReady])
 
   return (
     <div className={styles.container} style={{ maxWidth: Math.max(340, ui.contentWidth * 0.66) }}>
@@ -174,7 +183,7 @@ const SignedOutView = () => {
         </>
       )}
 
-      <div ref={userSectionRef} className={clsx(rooms.result.length > 1 && roomId === null && styles.hidden)}>
+      <div ref={userSectionRef} className={clsx((!isReady || (rooms.result.length > 1 && roomId === null)) && styles.hidden)}>
         {allowNew
           ? (
               <>
