@@ -57,6 +57,37 @@ describe('MetaParser', () => {
     expect(results).toMatchSnapshot()
   })
 
+  describe('normalization', () => {
+    const norms = (filename: string, p = parser) => {
+      const { artistNorm, titleNorm } = p({ name: filename })
+      return { artistNorm, titleNorm }
+    }
+
+    it('normalizes every ampersand, spaced or not', () => {
+      expect(norms('Crosby, Stills & Nash & Young - Ohio').artistNorm).toBe('Crosby Stills and Nash and Young')
+      expect(norms('Simon&Garfunkel - The Boxer')).toEqual(norms('Simon and Garfunkel - The Boxer'))
+    })
+
+    it('folds full-width compatibility forms', () => {
+      expect(norms('Ｂｅｃｋ - Loser')).toEqual(norms('Beck - Loser'))
+    })
+
+    it('removes surrounding curly quotes, but not a surrounding pipe', () => {
+      expect(parser({ name: '“Weird Al” Yankovic - ‘Eat It’' })).toMatchObject({ artist: '“Weird Al” Yankovic', title: 'Eat It' })
+      expect(parser({ name: 'Artist - |Title|' }).title).toBe('|Title|')
+    })
+
+    it('normalizes artist and title set by a user template', () => {
+      const templated = MetaParser({ artist: 'The Beatles', title: 'A Day In The Life' })
+      expect(norms('Unrelated - Name', templated)).toEqual(norms('The Beatles - A Day In The Life'))
+    })
+
+    it('passes through a non-string user template value', () => {
+      const templated = MetaParser({ title: { $eval: '1999' } })
+      expect(norms('Prince - Unrelated', templated).titleNorm).toBe(1999)
+    })
+  })
+
   // Individual test for debugging purposes
   testCases.forEach((filename) => {
     it(`should parse: ${filename}`, () => {

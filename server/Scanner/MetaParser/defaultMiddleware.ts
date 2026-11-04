@@ -85,8 +85,8 @@ m.set('set artist', (ctx, next) => {
 
 // remove any surrounding quotes
 m.set('remove quotes', (ctx, next) => {
-  ctx.artist = ctx.artist.replace(/^['|"](.*)['|"]$/, '$1')
-  ctx.title = ctx.title.replace(/^['|"](.*)['|"]$/, '$1')
+  ctx.artist = ctx.artist.replace(/^['"‘’“”](.*)['"‘’“”]$/, '$1')
+  ctx.title = ctx.title.replace(/^['"‘’“”](.*)['"‘’“”]$/, '$1')
   next()
 })
 
@@ -149,11 +149,11 @@ function cleanParts (patterns) {
   }
 }
 
-function normalizeStr (str, articles) {
+export function normalizeStr (str, articles) {
   str = removeArticles(str, articles)
-    .normalize('NFD')
+    .normalize('NFKD') // also folds compatibility forms (full-width, ligatures)
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(' & ', ' and ') // normalize ampersand
+    .replace(/(?<=\S)\s*&\s*(?=\S)/g, ' and ') // normalize ampersand
     .replace(/[^\p{L}\p{N}\s\p{M}]/gu, '') // remove punctuation
 
   return str

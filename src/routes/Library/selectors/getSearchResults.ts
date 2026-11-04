@@ -5,6 +5,18 @@ import { RootState } from 'store/store'
 
 const THRESHOLD = 0.7
 
+// strip accents and all punctuation/symbols from keys and query alike; fast-fuzzy's
+// ignoreSymbols only knows ASCII ones, so curly quotes (iOS smart punctuation) and
+// accented letters would otherwise cost a full edit each. A spaced "&" reads as "and"
+// so either spelling finds the other; unspaced ones (R&B, M&M) just drop out, since
+// single-letter tokens would match nearly everything
+const fold = (str: string) => str
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/\s+&\s+/g, ' and ')
+  .replace(/[\p{P}\p{S}]/gu, '')
+  .normalize('NFC')
+
 const getArtists = (state: RootState) => state.artists
 const getSongs = (state: RootState) => state.songs
 const getFilterStr = (state: RootState) => state.library.filterStr.trim().toLowerCase()
@@ -17,7 +29,7 @@ const getSongSearcher = createSelector(
     keySelector: ((songId: number) => {
       const song = songs.entities[songId]
       const artist = artists.entities[song.artistId]
-      return `${artist?.name ?? ''} ${song.title}`
+      return fold(`${artist?.name ?? ''} ${song.title}`)
     }) as unknown as (s: object) => string,
     threshold: THRESHOLD,
   }),
@@ -28,7 +40,8 @@ const getRankedSongs = createSelector(
   (songs, filterStr, searcher) => {
     if (!filterStr) return songs.result
 
-    const tokens = filterStr.split(/\s+/).filter(Boolean)
+    // symbol-only tokens like "&" fold to nothing; an empty term matches no songs
+    const tokens = fold(filterStr).split(/\s+/).filter(Boolean)
     if (tokens.length === 0) return songs.result
 
     // run each token through the trie-backed searcher; intersect across tokens

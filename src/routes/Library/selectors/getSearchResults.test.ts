@@ -100,6 +100,57 @@ describe('getSearchResults', () => {
     expect(result).toEqual([])
   })
 
+  describe('special characters', () => {
+    const fixture: Omit<Fixture, 'filterStr'> = {
+      artists: [
+        { artistId: 4, name: 'Big & Rich', songIds: [40] },
+        { artistId: 5, name: 'Sigur Rós', songIds: [50] },
+        { artistId: 6, name: 'Jason Mraz', songIds: [60] },
+        { artistId: 7, name: 'AC/DC', songIds: [70] },
+      ],
+      songs: [
+        { songId: 40, artistId: 4, title: 'Save a Horse' },
+        { songId: 50, artistId: 5, title: 'Hoppípolla' },
+        { songId: 60, artistId: 6, title: 'I\'m Yours' },
+        { songId: 70, artistId: 7, title: 'Back in Black' },
+      ],
+    }
+
+    it('ignores symbol-only tokens', () => {
+      expect(getResults(buildState({ ...fixture, filterStr: 'big & rich' }))).toEqual([40])
+      expect(getResults(buildState({ ...fixture, filterStr: '&' }))).toEqual([40, 50, 60, 70])
+      expect(getResults(buildState({ ...fixture, filterStr: 'big &' }))).toEqual([40])
+    })
+
+    it('treats a spaced "&" as "and"', () => {
+      expect(getResults(buildState({ ...fixture, filterStr: 'big and rich' }))).toEqual([40])
+    })
+
+    it('keeps an unspaced "&" from splitting into single-letter tokens', () => {
+      const withRnB: Omit<Fixture, 'filterStr'> = {
+        artists: [...fixture.artists, { artistId: 8, name: 'Usher', songIds: [80] }],
+        songs: [...fixture.songs, { songId: 80, artistId: 8, title: 'R&B Junkie' }],
+      }
+      expect(getResults(buildState({ ...withRnB, filterStr: 'r&b' }))).toEqual([80])
+      expect(getResults(buildState({ ...withRnB, filterStr: 'rb' }))).toEqual([80])
+    })
+
+    it('matches across straight and curly apostrophes', () => {
+      expect(getResults(buildState({ ...fixture, filterStr: 'i’m' }))).toEqual([60])
+    })
+
+    it('matches unaccented queries against accented names, and vice versa', () => {
+      expect(getResults(buildState({ ...fixture, filterStr: 'ros' }))).toEqual([50])
+      expect(getResults(buildState({ ...fixture, filterStr: 'hoppipolla' }))).toEqual([50])
+      expect(getResults(buildState({ ...fixture, filterStr: 'mráz' }))).toEqual([60])
+    })
+
+    it('matches with or without punctuation inside words', () => {
+      expect(getResults(buildState({ ...fixture, filterStr: 'acdc' }))).toEqual([70])
+      expect(getResults(buildState({ ...fixture, filterStr: 'ac/dc' }))).toEqual([70])
+    })
+  })
+
   it('applies the starred filter after ranking', () => {
     const result = getResults(buildState({
       ...libraryFixture,

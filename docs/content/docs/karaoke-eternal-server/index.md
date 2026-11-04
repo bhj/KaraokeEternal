@@ -494,9 +494,9 @@ For example, if you had a folder with filenames in the format "Title - Artist" i
 If changing the parser's default configuration doesn't yield the desired results, you can also define your own "template" to override the result for one or more of these fields:
 
 - `artist` (string) artist's name as it will be shown in the library
-- `artistNorm` (string) normalized version of the artist's name; used for matching and sorting (`artist` if not set)
+- `artistNorm` (string) normalized version of the artist's name; used for matching and sorting (normalized from your `artist` if not set)
 - `title` (string) song's title as it will be shown in the library
-- `titleNorm` (string) normalized version of the song's title; used for matching and sorting (`title` if not set)
+- `titleNorm` (string) normalized version of the song's title; used for matching and sorting (normalized from your `title` if not set)
 
 For each media file encountered, Karaoke Eternal makes a "context" available to your field template(s). This context includes the fields above (that is, the results from the built-in parser) in addition to:
 

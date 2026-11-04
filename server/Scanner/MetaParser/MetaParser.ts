@@ -1,7 +1,7 @@
 import getLogger from '../../lib/Log.js'
 import { composeSync } from 'ctx-compose'
 import jsone from 'json-e'
-import defaultMiddleware from './defaultMiddleware.js'
+import defaultMiddleware, { normalizeStr } from './defaultMiddleware.js'
 const log = getLogger('MetaParser')
 const defaultParser = compose(...defaultMiddleware.values())
 const parserCfgProps = ['articles', 'artistOnLeft', 'delimiter']
@@ -35,7 +35,7 @@ function getDefaultParser (cfg: { articles?: string[] } = {}) {
 }
 
 const MetaParser = (userCfg = {}) => {
-  const parserCfg = {}
+  const parserCfg: { articles?: string[] } = {}
   const template = {}
 
   // we accept parser config and JSON-e template items (both
@@ -63,8 +63,11 @@ const MetaParser = (userCfg = {}) => {
         if (typeof res[key] === 'string') res[key] = res[key].trim()
       })
 
-      if (res.artist) res.artistNorm = res.artistNorm ?? res.artist
-      if (res.title) res.titleNorm = res.titleNorm ?? res.title
+      // normalized like the default parser's so the same artist matches across folders
+      // (a template can evaluate to a non-string, which is stored as-is)
+      const norm = val => typeof val === 'string' ? normalizeStr(val, parserCfg.articles) : val
+      if (res.artist) res.artistNorm = res.artistNorm ?? norm(res.artist)
+      if (res.title) res.titleNorm = res.titleNorm ?? norm(res.title)
 
       log.debug('User template:')
       log.debug(template)
