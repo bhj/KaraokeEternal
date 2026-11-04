@@ -14,6 +14,7 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
   - MP3+G (MP3 with CDG lyrics; including zipped)
   - MP4 videos
   - Music-synced visualizations (with automatic lyrics background removal)
+- Pitch shifting and automatic loudness normalization
 - Fast, modern mobile browser app designed for "karaoke conditions"
 - Easy joining with QR codes and guest accounts
 - Multiple simultaneous rooms/queues (optionally password-protected)
@@ -27,8 +28,8 @@ Microphones are *not* required since the player itself only outputs music - this
 
  Karaoke Eternal basically has 3 parts. See [Getting Started](https://www.karaoke-eternal.com/docs/getting-started/) to get up and running step-by-step, or jump to the documentation for each part below:
  
-- **[Server:](https://www.karaoke-eternal.com/docs/karaoke-eternal-server/)** Runs on pretty much anything to serve the web app and your media files, including a Windows PC, Mac, or a dedicated server like a Raspberry Pi or Synology NAS.
-- **[App:](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/)** Fast, modern mobile web app designed for "karaoke conditions".
+- **[Server:](https://www.karaoke-eternal.com/docs/karaoke-eternal-server/)** Runs on pretty much anything to serve the web app and your media files, including a Windows PC, Mac, or a dedicated server like a Raspberry Pi or Synology NAS
+- **[App:](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/)** Fast, modern mobile web app designed for "karaoke conditions"
 - **[Player:](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/#player)** Just another part of the app, but meant to run fullscreen on the system handling audio/video for a [room](https://www.karaoke-eternal.com/docs/karaoke-eternal-app/#rooms-admin-only)
 
 ## Installation
@@ -39,12 +40,10 @@ There are several [installation methods](https://www.karaoke-eternal.com/docs/ka
 
 Join the [Karaoke Eternal Discord Server](https://discord.gg/PgqVtFq) for general support and development chat, or just to say hi!
 
-## Contributing & Development
+## Provider Development
 
-Contributions are welcome! Please join the `#dev` channel of the [Discord Server](https://discord.gg/PgqVtFq) before embarking on major features; the project's scope is limited to ensure success.
+Providers are an official way to extend Karaoke Eternal. Check the [currently available providers](https://github.com/bhj/KaraokeEternal-Providers), including reference implementations, and join the `#dev` channel of the [Discord Server](https://discord.gg/PgqVtFq).
 
-Make sure you have [Node.js](https://nodejs.org/en/) v24 or later, then:
+## Contributing
 
-1. Fork and clone the repo
-2. `npm i`
-3. `npm run dev` and look for "Web server running at" for the **server URL**
+Contributions are welcome! The project's scope is limited to ensure success, so please join the `#dev` channel of the [Discord Server](https://discord.gg/PgqVtFq) before embarking on major features.

@@ -3,7 +3,11 @@
   <header>
     <div class="logo">
       <a href='/'>
-        Karaoke<span class="logo-eternal">Eterna<span class="logo-lastChar">l</span></span>
+        {{- range split "Karaoke" "" }}<span class="logo-tube logo-letter">{{ . }}</span>{{ end -}}
+        <span class="logo-tube logo-eternal">
+          {{- range split "Eterna" "" }}<span class="logo-tube logo-letter">{{ . }}</span>{{ end -}}
+          <span class="logo-tube logo-letter logo-lastChar">l</span>
+        </span>
       </a>
       <div class="tagline">Open karaoke party system</div>
     </div>

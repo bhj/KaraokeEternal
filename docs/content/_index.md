@@ -18,6 +18,7 @@ Host awesome karaoke parties where everyone can easily find and queue songs from
   - MP3+G (MP3 with CDG lyrics; including zipped)
   - MP4 videos
   - Music-synced visualizations (with automatic lyrics background removal)
+- Pitch shifting and automatic loudness normalization
 - Fast, modern mobile browser app designed for "karaoke conditions"
 - Easy joining with QR codes and guest accounts
 - Multiple simultaneous rooms/queues (optionally password-protected)

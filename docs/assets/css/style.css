@@ -9,6 +9,7 @@ html {
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
+  font-size: max(16px, 1rem - 2px); /* headings and layout are sized off the root */
 }
 
 h1 {
@@ -120,7 +121,7 @@ hr {
   .content {
     padding-top: 6rem;
     max-width: 1440px;
-    margin-left: 22rem;
+    margin-left: 20rem;
     margin-right: 0;
   }
 }
@@ -134,13 +135,13 @@ hr {
     top: 0;
     left: 0;
     bottom: 0;
-    padding-top: 3rem;
-    width: 22rem;
+    padding-top: 1.5rem;
+    width: 20rem;
     overflow-y: scroll;
 
     nav {
       display: block;
-      margin: 2rem;
+      margin: 1.5rem 2rem 2rem;
       padding: 0;
     }
   }

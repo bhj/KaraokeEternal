@@ -14,6 +14,12 @@
       url('{{ (resources.Get "fonts/beon.woff2").Permalink }}') format('woff2');
     }
   </style>
+  <script>
+    // skip the logo power-on when navigating within the site (runs before the logo renders to avoid a dark flash)
+    if (document.referrer && new URL(document.referrer).host === location.host) {
+      document.documentElement.classList.add('logo-lit')
+    }
+  </script>
   {{ $css := slice (resources.Get "css/variables.css") (resources.Get "css/poole.css") (resources.Get "css/logo.css") (resources.Get "css/style.css") }}
   {{ $style := $css | resources.Concat "css/style.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $style.Permalink }}">

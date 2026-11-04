@@ -1,11 +1,42 @@
-## TBD
+## v2.1.0 (2026-11-04)
 
-- **(App)** Pitch shifting
-- **(App)** Pitch offsets can be saved as a media file's default
-- **(App)** Singers can save their own default pitch for a song, which takes precedence over the file's default
-- **(App)** ReplayGain for all
-- **(App)** Combined search view now works for keywords spanning both an artist name and song title (e.g. "beatles all together now")
-- **(Server)** Only scan changed files by default
+This release includes important security fixes and big new features:
+
+### Provider API support
+
+An official way to extend Karaoke Eternal, **song providers** allow you to expand your song library using additional sources. Singers can search and queue provider songs like any other, and those songs are added to the library automatically.
+
+Interested in developing a provider? Check the [currently available providers](https://github.com/bhj/KaraokeEternal-Providers), including reference implementations, and join the `#dev` Discord channel.
+
+### Pitch shifting
+
+The player now supports pitch shifting, with admins able to set default song pitches, and each singer able to further adjust to fit their range.
+
+Because the player uses a low-latency (phase vocoder) AudioWorklet, **pitch shifting requires either an HTTPS connection or a `localhost` URL**. See the [Karaoke Eternal Server docs](https://www.karaoke-eternal.com/docs/karaoke-eternal-server/#reverse-proxy-https) for more on setting up a reverse proxy to enable HTTPS.
+
+### ReplayGain for all
+
+Previously, enabling the ReplayGain player preference only had an effect if your media actually had ReplayGain tags. Now, files without tags will be analyzed the first time they're played, so you can get more consistent volume across songs automatically.
+
+It's planned to enable this preference by default in future releases, so please try it out now!
+
+### Faster media scanning
+
+When scanning a media folder, Karaoke Eternal Server now defaults to skipping files that haven't changed since the last scan.
+
+### Other notable changes
+
+- **(App)** New combined search view now works for searches spanning both an artist name and song title (e.g. "beatles all together now")
+- **(Server)** Fixed a potential privilege escalation in preference validation
+- **(Server)** Fixed potential queue corruption if files were removed from a watched folder during an active scan
+- **(Server)** Fixed an issue when migrating from a v1.0 database
+- **(Server)** Added explicit reverse proxy support (see the docs!)
+
+### Sponsors
+
+This release was sponsored by: [jonnparkertx](https://github.com/jonnparkertx), [fgallarday](https://github.com/fgallarday).
+
+Thank you! If you have fun with it, please consider [sponsoring](https://www.karaoke-eternal.com/sponsor).
 
 ## v2.0.2 (2026-02-14)
 

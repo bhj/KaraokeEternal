@@ -63,7 +63,7 @@ You can do a lot more in the Library view, but for now let's play some music!
 
 Karaoke Eternal's player is just another part of the browser app, but it's meant to run fullscreen on the system connected to your display and speakers. If you aren't using the system you intend to use as the player, go to it now, browse to the **server URL**, and sign in with your admin account.
 
-By now you've probably noticed a **"No player in room"** message at the top of the app. Click the **Start Player** link to do just that!
+By now you've probably noticed a **"No player in room"** message at the top of the app. Click the **Launch Player** link to do just that!
 
 <aside class="info">
   {{% icon-info %}}
