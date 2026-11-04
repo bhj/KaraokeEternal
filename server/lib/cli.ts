@@ -107,7 +107,8 @@ const argv = yargs(hideBin(process.argv))
   .parseSync()
 
 if (argv.version) {
-  console.log(process.env.npm_package_version)
+  // npm_package_version is only set when launched via npm scripts
+  console.log(JSON.parse(fs.readFileSync(path.join(baseDir, 'package.json'), 'utf8')).version)
   process.exit(0) // eslint-disable-line n/no-process-exit
 }
 
