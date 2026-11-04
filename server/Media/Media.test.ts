@@ -121,5 +121,16 @@ describe('userPitches', () => {
 
       expect(storedPitch(other, preferredMediaId)).toBeUndefined()
     })
+
+    it('Media.cleanup removes artists left without songs, and their stars', () => {
+      const orphanId = insert('INSERT INTO artists (name, nameNorm) VALUES (\'Orphan\', \'orphan\')')
+      insert('INSERT INTO songs (artistId, title, titleNorm) VALUES (?, \'Gone\', \'gone\')', [orphanId])
+      insert('INSERT INTO artistStars (userId, artistId) VALUES (?, ?)', [singer, orphanId])
+      Media.cleanup()
+
+      expect(db.get('SELECT * FROM artists WHERE artistId = ?', [orphanId])).toBeUndefined()
+      expect(db.get('SELECT * FROM artistStars WHERE artistId = ?', [orphanId])).toBeUndefined()
+      expect(db.get('SELECT * FROM songs WHERE songId = ?', [songId])).toBeDefined()
+    })
   })
 })

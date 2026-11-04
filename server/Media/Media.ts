@@ -276,6 +276,22 @@ class Media {
     `)
     log.info(`cleanup: ${res.changes} songs with no associated media`)
 
+    // remove artists without associated songs
+    res = db.run(`
+      DELETE FROM artists WHERE artistId IN (
+        SELECT artists.artistId FROM artists LEFT JOIN songs USING(artistId) WHERE songs.songId IS NULL
+      )
+    `)
+    log.info(`cleanup: ${res.changes} artists with no associated songs`)
+
+    // remove stars for nonexistent artists
+    res = db.run(`
+      DELETE FROM artistStars WHERE artistId IN (
+        SELECT artistStars.artistId FROM artistStars LEFT JOIN artists USING(artistId) WHERE artists.artistId IS NULL
+      )
+    `)
+    log.info(`cleanup: ${res.changes} stars for nonexistent artists`)
+
     // remove stars for nonexistent songs
     res = db.run(`
       DELETE FROM songStars WHERE songId IN (
