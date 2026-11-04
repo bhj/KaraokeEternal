@@ -1,4 +1,5 @@
 build/
+dist/
 dockerfiles/
 docs/public/
 docs/resources/

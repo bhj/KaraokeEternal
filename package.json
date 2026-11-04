@@ -30,6 +30,7 @@
     "build": "npm run build:server ; npm run build:client",
     "build:client": "webpack --config config/webpack.config.js",
     "build:server": "rm -rf build/server ; tsc -p config/tsconfig.server.json --noEmitOnError false ; mkdir -p build/server/lib ; cp -R server/lib/schemas build/server/lib/",
+    "prepack": "npm run build",
     "serve": "node build/server/main.js",
     "server": "npm run serve"
   },
