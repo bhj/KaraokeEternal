@@ -44,6 +44,7 @@
   font-size: 14px;
   text-align: right;
   width: 40px;
+  flex-shrink: 0;
 }
 
 .primary {

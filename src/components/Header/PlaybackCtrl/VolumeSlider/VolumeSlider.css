@@ -1,13 +1,12 @@
 .container {
   display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 0 34px 0 30px;
+  flex: 0 1 360px;
+  min-width: 0;
+  margin: 0 38px 0 30px;
 }
 
 .slider {
   width: 100%;
-  max-width: 360px;
 }
 
 .handleIcon {

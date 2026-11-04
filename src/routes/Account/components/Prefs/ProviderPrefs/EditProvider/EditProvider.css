@@ -49,25 +49,35 @@
 fieldset.content {
   gap: var(--space-s);
   margin: 0;
+  /* WebKit ignores float on a legend, so the legend carries the top padding */
+  padding-top: 0;
   border: none;
   min-width: 0;
 }
 
 .legend {
-  float: left;
-  padding: 0;
-  margin-bottom: var(--space-s);
+  padding: var(--space-s) 0 calc(var(--space-s) + var(--space-xs));
 }
 
+/* hanging indent: wrapped text lines up with the radio's label, past the
+   1.5em radio and its gap (see InputRadio.css) */
 .sentence {
+  --radio-indent: calc(1.5em + var(--space-s));
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-s);
+  gap: 0 var(--space-s);
+  padding-inline-start: var(--radio-indent);
+
+  > label {
+    margin-inline-start: calc(-1 * var(--radio-indent));
+  }
 }
 
 .sentence input[type="number"] {
   width: 2.5em;
+  padding-block: var(--space-xs);
 }
 
 .metaLabel {

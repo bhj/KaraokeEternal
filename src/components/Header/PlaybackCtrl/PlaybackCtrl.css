@@ -2,6 +2,11 @@
   display: flex;
   align-items: center;
   padding: 0 var(--container-padding);
+
+  &::before {
+    content: '';
+    margin-right: auto;
+  }
 }
 
 .btn {
@@ -19,6 +24,9 @@
 
 .play,
 .pause {
+  /* optically centers the glyph over the Library's search icon when there's no free space */
+  margin-left: -10px;
+
   svg {
     height: 2.66rem;
   }
@@ -29,6 +37,7 @@
 }
 
 .playerOptions {
+  margin-left: auto;
   color: var(--btn-active-bg-color);
   filter: var(--btn-active-filter);
 }
